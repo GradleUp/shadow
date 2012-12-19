@@ -26,6 +26,7 @@ package org.gradle.api.plugins.shadow.pom;
 //---------------------------------/
 
 import org.apache.maven.model.*;
+import org.apache.maven.model.Parent;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jdom.*;
 import org.jdom.output.Format;

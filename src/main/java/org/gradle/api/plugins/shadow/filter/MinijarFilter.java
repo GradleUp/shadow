@@ -19,8 +19,8 @@ package org.gradle.api.plugins.shadow.filter;
  * under the License.
  */
 
+import org.apache.commons.logging.Log;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
 import org.vafer.jdependency.Clazz;

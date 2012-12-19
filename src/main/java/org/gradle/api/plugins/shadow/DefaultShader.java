@@ -19,11 +19,11 @@ package org.gradle.api.plugins.shadow;
  * under the License.
  */
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.shade.filter.Filter;
-import org.apache.maven.plugins.shade.relocation.Relocator;
-import org.apache.maven.plugins.shade.resource.ManifestResourceTransformer;
-import org.apache.maven.plugins.shade.resource.ResourceTransformer;
+import org.gradle.api.GradleException;
+import org.gradle.api.plugins.shadow.filter.Filter;
+import org.gradle.api.plugins.shadow.relocation.Relocator;
+import org.gradle.api.plugins.shadow.resource.ManifestResourceTransformer;
+import org.gradle.api.plugins.shadow.resource.ResourceTransformer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
@@ -52,7 +52,7 @@ public class DefaultShader
 {
 
     public void shade( ShadeRequest shadeRequest )
-        throws IOException, MojoExecutionException
+        throws IOException, GradleException
     {
         Set<String> resources = new HashSet<String>();
 
@@ -239,7 +239,7 @@ public class DefaultShader
 
     private void addRemappedClass( RelocatorRemapper remapper, JarOutputStream jos, File jar, String name,
                                    InputStream is )
-        throws IOException, MojoExecutionException
+        throws IOException, GradleException
     {
         if ( !remapper.hasRelocators() )
         {
@@ -273,7 +273,7 @@ public class DefaultShader
         }
         catch ( Throwable ise )
         {
-            throw new MojoExecutionException( "Error in ASM processing class " + name, ise );
+            throw new GradleException( "Error in ASM processing class " + name, ise );
         }
 
         byte[] renamedClass = cw.toByteArray();

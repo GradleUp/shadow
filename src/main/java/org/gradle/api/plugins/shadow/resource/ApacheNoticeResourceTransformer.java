@@ -19,7 +19,7 @@ package org.gradle.api.plugins.shadow.resource;
  * under the License.
  */
 
-import org.apache.maven.plugins.shade.relocation.Relocator;
+import org.gradle.api.plugins.shadow.relocation.Relocator;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.*;

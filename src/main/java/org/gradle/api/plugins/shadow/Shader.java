@@ -19,7 +19,7 @@ package org.gradle.api.plugins.shadow;
  * under the License.
  */
 
-import org.apache.maven.plugin.MojoExecutionException;
+import org.gradle.api.GradleException;
 
 import java.io.IOException;
 
@@ -35,8 +35,8 @@ public interface Shader
      *
      * @param shadeRequest            holds the many parameters to this method
      * @throws java.io.IOException            for IO errors reading the thing
-     * @throws MojoExecutionException for anything else that goes wrong.
+     * @throws GradleException for anything else that goes wrong.
      */
     void shade(ShadeRequest shadeRequest)
-        throws IOException, MojoExecutionException;
+        throws IOException, GradleException;
 }
