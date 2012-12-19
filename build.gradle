@@ -15,9 +15,7 @@ dependencies {
     compile 'org.vafer:jdependency:0.7'
     compile 'org.codehaus.plexus:plexus-component-annotations:1.5.5'
 
-    groovy localGroovy()
-//    groovy 'org.codehaus.groovy:groovy-all:2.0.5'
-//    groovy 'org.apache.ivy:ivy:2.2.0'
+    groovy 'org.codehaus.groovy:groovy-all:2.0.5'
 
     testCompile 'junit:junit:4.10'
     testCompile 'xmlunit:xmlunit:1.3'
