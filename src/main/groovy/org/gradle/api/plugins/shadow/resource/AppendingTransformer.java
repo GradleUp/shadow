@@ -1,4 +1,4 @@
-package shadow.resource;
+package org.gradle.api.plugins.shadow.resource;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,24 +20,29 @@ package shadow.resource;
  */
 
 import org.apache.maven.plugins.shade.relocation.Relocator;
+import org.codehaus.plexus.util.IOUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 /**
- * A resource processor that prevents the inclusion of an arbitrary
- * resource into the shaded JAR.
+ * A resource processor that appends content for a resource, separated by a newline.
  */
-public class DontIncludeResourceTransformer
+public class AppendingTransformer
     implements ResourceTransformer
 {
     String resource;
 
+    ByteArrayOutputStream data = new ByteArrayOutputStream();
+
     public boolean canTransformResource( String r )
     {
-        if ( r.endsWith( resource ) )
+        if ( resource != null && resource.equalsIgnoreCase( r ) )
         {
             return true;
         }
@@ -48,17 +53,23 @@ public class DontIncludeResourceTransformer
     public void processResource( String resource, InputStream is, List<Relocator> relocators )
         throws IOException
     {
-        // no op
+        IOUtil.copy( is, data );
+        data.write( '\n' );
+
+        is.close();
     }
 
     public boolean hasTransformedResource()
     {
-        return false;
+        return data.size() > 0;
     }
 
-    public void modifyOutputStream( JarOutputStream os )
+    public void modifyOutputStream( JarOutputStream jos )
         throws IOException
     {
-        // no op
+        jos.putNextEntry( new JarEntry( resource ) );
+
+        IOUtil.copy( new ByteArrayInputStream( data.toByteArray() ), jos );
+        data.reset();
     }
 }

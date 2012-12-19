@@ -1,4 +1,4 @@
-package shadow.resource;
+package org.gradle.api.plugins.shadow.resource;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -27,26 +27,28 @@ import java.util.List;
 import java.util.jar.JarOutputStream;
 
 /**
- * Prevents duplicate copies of the license
+ * A resource processor that prevents the inclusion of an arbitrary
+ * resource into the shaded JAR.
  */
-public class ApacheLicenseResourceTransformer
+public class DontIncludeResourceTransformer
     implements ResourceTransformer
 {
+    String resource;
 
-    private static final String LICENSE_PATH = "META-INF/LICENSE";
-
-    private static final String LICENSE_TXT_PATH = "META-INF/LICENSE.txt";
-
-    public boolean canTransformResource( String resource )
+    public boolean canTransformResource( String r )
     {
-        return LICENSE_PATH.equalsIgnoreCase( resource )
-            || LICENSE_TXT_PATH.regionMatches( true, 0, resource, 0, LICENSE_TXT_PATH.length() );
+        if ( r.endsWith( resource ) )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public void processResource( String resource, InputStream is, List<Relocator> relocators )
         throws IOException
     {
-
+        // no op
     }
 
     public boolean hasTransformedResource()
@@ -57,5 +59,6 @@ public class ApacheLicenseResourceTransformer
     public void modifyOutputStream( JarOutputStream os )
         throws IOException
     {
+        // no op
     }
 }

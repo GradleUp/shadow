@@ -1,6 +1,4 @@
-package shadow.resource;
-
-/*
+package org.gradle.api.plugins.shadow;/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -19,23 +17,11 @@ package shadow.resource;
  * under the License.
  */
 
-import shadow.relocation.Relocator;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.jar.JarOutputStream;
-
-/** @author Jason van Zyl */
-public interface ResourceTransformer
+/**
+ * @author Jason van Zyl
+ */
+public interface ShadeConfiguration
 {
-    boolean canTransformResource(String resource);
-
-    void processResource(String resource, InputStream is, List<Relocator> relocators)
-        throws IOException;
-
-    boolean hasTransformedResource();
-
-    void modifyOutputStream(JarOutputStream os)
-        throws IOException;
+    // no op
+    // olamy: what this class ??
 }

@@ -1,4 +1,4 @@
-package shadow.resource;
+package org.gradle.api.plugins.shadow.resource;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,50 +20,42 @@ package shadow.resource;
  */
 
 import org.apache.maven.plugins.shade.relocation.Relocator;
-import org.codehaus.plexus.util.IOUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 /**
- * A resource processor that allows the addition of an arbitrary file
- * content into the shaded JAR.
+ * Prevents duplicate copies of the license
  */
-public class IncludeResourceTransformer
+public class ApacheLicenseResourceTransformer
     implements ResourceTransformer
 {
-    File file;
 
-    String resource;
+    private static final String LICENSE_PATH = "META-INF/LICENSE";
 
-    public boolean canTransformResource( String r )
+    private static final String LICENSE_TXT_PATH = "META-INF/LICENSE.txt";
+
+    public boolean canTransformResource( String resource )
     {
-        return false;
+        return LICENSE_PATH.equalsIgnoreCase( resource )
+            || LICENSE_TXT_PATH.regionMatches( true, 0, resource, 0, LICENSE_TXT_PATH.length() );
     }
 
     public void processResource( String resource, InputStream is, List<Relocator> relocators )
         throws IOException
     {
-        // no op
+
     }
 
     public boolean hasTransformedResource()
     {
-        return file != null ? file.exists() : false;
+        return false;
     }
 
-    public void modifyOutputStream( JarOutputStream jos )
+    public void modifyOutputStream( JarOutputStream os )
         throws IOException
     {
-        jos.putNextEntry( new JarEntry( resource ) );
-
-        InputStream in = new FileInputStream( file );
-        IOUtil.copy( in, jos );
-        in.close();
     }
 }

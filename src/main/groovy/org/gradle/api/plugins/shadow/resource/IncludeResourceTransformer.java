@@ -1,4 +1,4 @@
-package shadow.resource;
+package org.gradle.api.plugins.shadow.resource;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,8 +22,8 @@ package shadow.resource;
 import org.apache.maven.plugins.shade.relocation.Relocator;
 import org.codehaus.plexus.util.IOUtil;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -31,37 +31,30 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 /**
- * A resource processor that appends content for a resource, separated by a newline.
+ * A resource processor that allows the addition of an arbitrary file
+ * content into the shaded JAR.
  */
-public class AppendingTransformer
+public class IncludeResourceTransformer
     implements ResourceTransformer
 {
-    String resource;
+    File file;
 
-    ByteArrayOutputStream data = new ByteArrayOutputStream();
+    String resource;
 
     public boolean canTransformResource( String r )
     {
-        if ( resource != null && resource.equalsIgnoreCase( r ) )
-        {
-            return true;
-        }
-
         return false;
     }
 
     public void processResource( String resource, InputStream is, List<Relocator> relocators )
         throws IOException
     {
-        IOUtil.copy( is, data );
-        data.write( '\n' );
-
-        is.close();
+        // no op
     }
 
     public boolean hasTransformedResource()
     {
-        return data.size() > 0;
+        return file != null ? file.exists() : false;
     }
 
     public void modifyOutputStream( JarOutputStream jos )
@@ -69,7 +62,8 @@ public class AppendingTransformer
     {
         jos.putNextEntry( new JarEntry( resource ) );
 
-        IOUtil.copy( new ByteArrayInputStream( data.toByteArray() ), jos );
-        data.reset();
+        InputStream in = new FileInputStream( file );
+        IOUtil.copy( in, jos );
+        in.close();
     }
 }

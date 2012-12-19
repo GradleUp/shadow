@@ -1,4 +1,4 @@
-package shadow;/*
+package org.gradle.api.plugins.shadow;/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -26,10 +26,10 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingClassAdapter;
-import shadow.filter.Filter;
-import shadow.relocation.Relocator;
-import shadow.resource.ManifestResourceTransformer;
-import shadow.resource.ResourceTransformer;
+import org.gradle.api.plugins.shadow.filter.Filter;
+import org.gradle.api.plugins.shadow.relocation.Relocator;
+import org.gradle.api.plugins.shadow.resource.ManifestResourceTransformer;
+import org.gradle.api.plugins.shadow.resource.ResourceTransformer;
 
 import java.io.*;
 import java.util.*;

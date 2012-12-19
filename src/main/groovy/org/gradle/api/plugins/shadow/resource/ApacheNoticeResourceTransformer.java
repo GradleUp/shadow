@@ -1,4 +1,4 @@
-package shadow.resource;
+package org.gradle.api.plugins.shadow.resource;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

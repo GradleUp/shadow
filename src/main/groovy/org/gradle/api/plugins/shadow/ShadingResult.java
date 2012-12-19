@@ -1,6 +1,4 @@
-package shadow.filter;
-
-/*
+package org.gradle.api.plugins.shadow;/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -19,16 +17,11 @@ package shadow.filter;
  * under the License.
  */
 
-import java.io.File;
-
 /**
- * @author David Blevins
+ * @author Jason van Zyl
  */
-public interface Filter
+public class ShadingResult
 {
-    boolean canFilter(File jar);
-
-    boolean isFiltered(String classFile);
-
-    void finished();
+    // no op
+    // olamy: what this class ??
 }

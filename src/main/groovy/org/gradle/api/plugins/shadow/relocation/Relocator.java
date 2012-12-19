@@ -1,4 +1,6 @@
-package shadow;/*
+package org.gradle.api.plugins.shadow.relocation;
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,11 +19,18 @@ package shadow;/*
  * under the License.
  */
 
-/**
- * @author Jason van Zyl
- */
-public class ShadingResult
+/** @author Jason van Zyl */
+public interface Relocator
 {
-    // no op
-    // olamy: what this class ??
+    String ROLE = Relocator.class.getName();
+
+    boolean canRelocatePath(String clazz);
+
+    String relocatePath(String clazz);
+
+    boolean canRelocateClass(String clazz);
+
+    String relocateClass(String clazz);
+    
+    String applyToSourceContent(String sourceContent);
 }

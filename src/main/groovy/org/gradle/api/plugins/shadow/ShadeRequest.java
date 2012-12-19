@@ -1,4 +1,4 @@
-package shadow;/*
+package org.gradle.api.plugins.shadow;/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,9 +17,9 @@ package shadow;/*
  * under the License.
  */
 
-import shadow.relocation.Relocator;
-import shadow.filter.Filter;
-import shadow.resource.ResourceTransformer;
+import org.gradle.api.plugins.shadow.relocation.Relocator;
+import org.gradle.api.plugins.shadow.filter.Filter;
+import org.gradle.api.plugins.shadow.resource.ResourceTransformer;
 
 import java.io.File;
 import java.util.List;

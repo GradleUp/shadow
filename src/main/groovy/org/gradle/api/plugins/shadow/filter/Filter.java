@@ -1,4 +1,6 @@
-package shadow;/*
+package org.gradle.api.plugins.shadow.filter;
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,24 +19,16 @@ package shadow;/*
  * under the License.
  */
 
-import org.gradle.api.GradleScriptException;
-
-import java.io.IOException;
+import java.io.File;
 
 /**
- * Interface that defines the process of shading.
+ * @author David Blevins
  */
-public interface Shader
+public interface Filter
 {
-    String ROLE = Shader.class.getName();
+    boolean canFilter(File jar);
 
-    /**
-     * Perform a shading operation.
-     *
-     * @param shadeRequest            holds the many parameters to this method
-     * @throws java.io.IOException            for IO errors reading the thing
-     * @throws GradleScriptException for anything else that goes wrong.
-     */
-    void shade(ShadeRequest shadeRequest)
-        throws IOException, GradleScriptException;
+    boolean isFiltered(String classFile);
+
+    void finished();
 }

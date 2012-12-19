@@ -1,4 +1,4 @@
-package shadow.filter;
+package org.gradle.api.plugins.shadow.filter;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

@@ -1,6 +1,4 @@
-package shadow.relocation;
-
-/*
+package org.gradle.api.plugins.shadow;/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -19,18 +17,24 @@ package shadow.relocation;
  * under the License.
  */
 
-/** @author Jason van Zyl */
-public interface Relocator
+import org.gradle.api.GradleScriptException;
+
+import java.io.IOException;
+
+/**
+ * Interface that defines the process of shading.
+ */
+public interface Shader
 {
-    String ROLE = Relocator.class.getName();
+    String ROLE = Shader.class.getName();
 
-    boolean canRelocatePath(String clazz);
-
-    String relocatePath(String clazz);
-
-    boolean canRelocateClass(String clazz);
-
-    String relocateClass(String clazz);
-    
-    String applyToSourceContent(String sourceContent);
+    /**
+     * Perform a shading operation.
+     *
+     * @param shadeRequest            holds the many parameters to this method
+     * @throws java.io.IOException            for IO errors reading the thing
+     * @throws GradleScriptException for anything else that goes wrong.
+     */
+    void shade(ShadeRequest shadeRequest)
+        throws IOException, GradleScriptException;
 }
