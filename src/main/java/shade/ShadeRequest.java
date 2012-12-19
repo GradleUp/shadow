@@ -19,9 +19,9 @@ package shade;
  * under the License.
  */
 
-import shadow.relocation.Relocator;
-import shadow.filter.Filter;
-import shadow.resource.ResourceTransformer;
+import shade.relocation.Relocator;
+import shade.filter.Filter;
+import shade.resource.ResourceTransformer;
 
 import java.io.File;
 import java.util.List;
