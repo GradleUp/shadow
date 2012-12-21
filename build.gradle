@@ -1,22 +1,26 @@
 buildscript {
     repositories {
-        mavenCentral()
+        maven {
+            url 'http://repo.jfrog.org/artifactory/gradle-plugins'
+        }
     }
     
     dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.1'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.9'
     }
 }
-
-apply plugin: 'groovy'
-apply plugin: 'nexus'
-
-group = 'org.gradle.plugins'
-version = '0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'artifactory'
+apply plugin: 'idea'
+
+group = 'org.gradle.plugins'
+version = "${currentVersion}"
 
 dependencies {
     groovy 'org.codehaus.groovy:groovy-all:1.8.6'
@@ -25,32 +29,30 @@ dependencies {
     testCompile "org.spockframework:spock-core:0.6-groovy-1.8"
 }
 
-modifyPom {
-    project {
-        name 'Gradle Shadow Plugin'
-        packaging 'jar'
-        description 'Gradle plugin to build shadow (shaded) JARs with dependencies.'
-        url 'https://github.com/johnrengelman/shadow'
+artifactoryPublish {
+    dependsOn jar
+}
 
-        scm {
-            url 'scm:git://github.com/johnrengelman/shadow.git'
-            connection 'scm:git://github.com/johnrengelman/shadow.git'
-            developerConnection 'scm:git://github.com/johnrengelman/shadow.git'
-        }
+artifactory {
+    contextUrl = "${project.artifactory_contextUrl}"
 
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
-        }
-
-        developers {
-            developer {
-                id 'johnrengelman'
-                name 'John Engelman'
-            }
+    def currentRepoKey = isSnapshot() ? 'libs-snapshot-local' : 'libs-release-local'
+    publish {
+        repository {
+            username = "${artifactory_username}"
+            password = "${artifactory_password}"
+            repoKey = "${currentRepoKey}"
+            maven = true
         }
     }
+    resolve {
+        repository {
+            repoKey = "${currentRepoKey}"
+            maven = true
+        }
+    }
+}
+
+boolean isSnapshot() {
+    currentVersion.endsWith('SNAPSHOT')
 }
