@@ -1,46 +1,56 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.1'
+    }
+}
+
 apply plugin: 'groovy'
-apply plugin: 'idea'
+apply plugin: 'nexus'
+
+group = 'org.gradle.plugins'
+version = '0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    groovy 'org.codehaus.groovy:groovy-all:1.8.6'
     compile gradleApi()
-    compile 'org.codehaus.plexus:plexus-container-default:1.0-alpha-9-stable-1'
-    compile 'org.codehaus.plexus:plexus-utils:3.0.1'
-    compile 'asm:asm:3.3.1'
-    compile 'asm:asm-commons:3.3.1'
-    compile 'org.jdom:jdom:1.1'
-    compile 'org.vafer:jdependency:0.7'
-    compile 'org.codehaus.plexus:plexus-component-annotations:1.5.5'
-
-    groovy 'org.codehaus.groovy:groovy-all:2.0.5'
-
-    testCompile 'junit:junit:4.10'
-    testCompile 'xmlunit:xmlunit:1.3'
+    
+    testCompile "org.spockframework:spock-core:0.6-groovy-1.8"
 }
 
-task createSourceDirs(description : 'Create empty source directories for all defined sourceSets') << {
-    project.sourceSets*.allSource.srcDirTrees.flatten().dir.each { dir ->
-        if (!dir.exists()) {
-            println "Making $dir"
-            dir.mkdirs()
-        }
-    }
-}
-
-idea {
+modifyPom {
     project {
-        jdkName = '1.6'
-        ipr {
-            withXml { provider ->
-                provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
+        name 'Gradle Shadow Plugin'
+        packaging 'jar'
+        description 'Gradle plugin to build shadow (shaded) JARs with dependencies.'
+        url 'https://github.com/johnrengelman/shadow'
+
+        scm {
+            url 'scm:git://github.com/johnrengelman/shadow.git'
+            connection 'scm:git://github.com/johnrengelman/shadow.git'
+            developerConnection 'scm:git://github.com/johnrengelman/shadow.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
             }
         }
-    }
-    module {
-        downloadSources = true
-        downloadJavadoc = true
+
+        developers {
+            developer {
+                id 'johnrengelman'
+                name 'John Engelman'
+            }
+        }
     }
 }
