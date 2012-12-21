@@ -33,19 +33,26 @@ class ShadowTask extends DefaultTask {
 
     @TaskAction
     void shadow() {
+        logger.info "${NAME.capitalize()} - start"
+        logger.info "${NAME.capitalize()} - total jars [${jars.size()}]"
+        def startTime = System.currentTimeMillis()
 
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
 
         List<RelativePath> existingPaths = []
         jars.each { File jar ->
+            logger.debug "${NAME.capitalize()} - shadowing [${jar.name}]"
+            def fileTime = System.currentTimeMillis()
             project.zipTree(jar).matching(filter).visit { FileTreeElement jarEntry ->
                 if (!jarEntry.isDirectory() && !existingPaths.contains(jarEntry.relativePath)) {
                     existingPaths << jarEntry.relativePath
                     writeJarEntry jos, jarEntry
                 }
             }
+            logger.trace "${NAME.capitalize()} - shadowed in ${System.currentTimeMillis() - fileTime} ms"
         }
         jos.close()
+        logger.info "${NAME.capitalize()} - finish [${(System.currentTimeMillis() - startTime)/1000} s]"
     }
 
     PatternFilterable getFilter() {
