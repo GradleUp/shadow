@@ -3,6 +3,7 @@ package org.gradle.api.plugins.shadow.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
+import org.gradle.api.plugins.shadow.ShadowStats
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -32,13 +33,18 @@ class ShadowTask extends DefaultTask {
     @InputFiles
     List<File> artifacts = project.configurations.getByName("runtime").allArtifacts.files as List
 
+    boolean statsEnabled
+
     List<RelativePath> existingPaths = []
+
+    private List<File> jarCache
+
+    ShadowStats stats
 
     @TaskAction
     void shadow() {
         logger.info "${NAME.capitalize()} - start"
-        logger.info "${NAME.capitalize()} - total jars [${jars.size()}]"
-        def startTime = System.currentTimeMillis()
+        initStats()
 
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
 
@@ -46,18 +52,46 @@ class ShadowTask extends DefaultTask {
             processJar(jar, jos)
         }
         IOUtil.close(jos)
-        logger.info "${NAME.capitalize()} - finish [${(System.currentTimeMillis() - startTime)/1000} s]"
+        logger.info "${NAME.capitalize()} - finish"
+        printStats()
+    }
+
+    private void initStats() {
+        statsEnabled = project.shadow.stats
+        if (statsEnabled) {
+            stats = new ShadowStats()
+            stats.jarCount = jars.size()
+            logger.info "${NAME.capitalize()} - total jars [${stats.jarCount}]"
+        }
+    }
+
+    private void printStats() {
+        if (statsEnabled) {
+            stats.printStats()
+        }
     }
 
     void processJar(File file, JarOutputStream jos) {
         logger.debug "${NAME.capitalize()} - shadowing [${file.name}]"
-        def fileTime = System.currentTimeMillis()
-        def filteredTree = project.zipTree(file).matching(filter)
-        def jarFile = new JarFile(file)
-        filteredTree.visit { FileTreeElement jarEntry ->
-            processJarEntry(jarEntry, jarFile, jos)
+        withStats {
+            def filteredTree = project.zipTree(file).matching(filter)
+            def jarFile = new JarFile(file)
+            filteredTree.visit { FileTreeElement jarEntry ->
+                processJarEntry(jarEntry, jarFile, jos)
+            }
         }
-        logger.trace "${NAME.capitalize()} - shadowed in ${System.currentTimeMillis() - fileTime} ms"
+
+    }
+
+    void withStats(Closure c) {
+        if (statsEnabled) {
+            stats.startJar()
+        }
+        c()
+        if (statsEnabled) {
+            stats.finishJar()
+            logger.trace "${NAME.capitalize()} - shadowed in ${stats.jarTiming} ms"
+        }
     }
 
     void processJarEntry(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
@@ -75,7 +109,10 @@ class ShadowTask extends DefaultTask {
     }
 
     List<File> getJars() {
-        artifacts + dependencies
+        if (!jarCache) {
+            jarCache = artifacts + dependencies
+        }
+        jarCache
     }
 
     List<File> getDependencies() {

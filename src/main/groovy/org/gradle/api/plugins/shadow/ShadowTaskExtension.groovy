@@ -11,6 +11,7 @@ class ShadowTaskExtension {
     String destinationDir = "${project.buildDir}/libs"
     String baseName = "${project.archivesBaseName}-shadow-${project.version}"
     String extension = "jar"
+    boolean stats = false
 
     private final Project project
 
