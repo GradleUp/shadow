@@ -1,48 +1,58 @@
-apply plugin: 'groovy'
-apply plugin: 'idea'
+buildscript {
+    repositories {
+        maven {
+            url 'http://repo.jfrog.org/artifactory/gradle-plugins'
+        }
+    }
+    
+    dependencies {
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.17'
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'artifactory'
+apply plugin: 'idea'
+
+group = 'org.gradle.plugins'
+version = "${currentVersion}"
+
 dependencies {
+    groovy 'org.codehaus.groovy:groovy-all:1.8.6'
     compile gradleApi()
-    compile 'org.codehaus.plexus:plexus-container-default:1.0-alpha-9-stable-1'
-    compile 'org.codehaus.plexus:plexus-utils:3.0.1'
-    compile 'asm:asm:3.3.1'
-    compile 'asm:asm-commons:3.3.1'
-    compile 'org.jdom:jdom:1.1'
-    compile 'org.vafer:jdependency:0.7'
-    compile 'org.codehaus.plexus:plexus-component-annotations:1.5.5'
-
-    groovy localGroovy()
-//    groovy 'org.codehaus.groovy:groovy-all:2.0.5'
-//    groovy 'org.apache.ivy:ivy:2.2.0'
-
-    testCompile 'junit:junit:4.10'
-    testCompile 'xmlunit:xmlunit:1.3'
+    
+    testCompile "org.spockframework:spock-core:0.6-groovy-1.8"
 }
 
-task createSourceDirs(description : 'Create empty source directories for all defined sourceSets') << {
-    project.sourceSets*.allSource.srcDirTrees.flatten().dir.each { dir ->
-        if (!dir.exists()) {
-            println "Making $dir"
-            dir.mkdirs()
+artifactoryPublish {
+    dependsOn jar
+}
+
+artifactory {
+    contextUrl = "${project.artifactory_contextUrl}"
+
+    def currentRepoKey = isSnapshot() ? 'libs-snapshot-local' : 'libs-release-local'
+    publish {
+        repository {
+            username = "${artifactory_username}"
+            password = "${artifactory_password}"
+            repoKey = "${currentRepoKey}"
+            maven = true
+        }
+    }
+    resolve {
+        repository {
+            repoKey = "${currentRepoKey}"
+            maven = true
         }
     }
 }
 
-idea {
-    project {
-        jdkName = '1.6'
-        ipr {
-            withXml { provider ->
-                provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
-            }
-        }
-    }
-    module {
-        downloadSources = true
-        downloadJavadoc = true
-    }
+boolean isSnapshot() {
+    currentVersion.endsWith('SNAPSHOT')
 }
