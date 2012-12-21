@@ -1,4 +1,4 @@
-package org.gradle.plugins.shadow
+package org.gradle.api.plugins.shadow
 
 import org.gradle.api.Project
 
