@@ -1,4 +1,4 @@
-package org.gradle.plugins.shadow.tasks
+package org.gradle.api.plugins.shadow.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTreeElement

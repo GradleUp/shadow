@@ -1,6 +1,6 @@
-package org.gradle.plugins.shadow
+package org.gradle.api.plugins.shadow
 
-import org.gradle.plugins.shadow.tasks.ShadowTask
+import org.gradle.api.plugins.shadow.tasks.ShadowTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
