@@ -9,8 +9,10 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
+import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 import java.util.jar.JarEntry
+import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
 class ShadowTask extends DefaultTask {
@@ -30,6 +32,8 @@ class ShadowTask extends DefaultTask {
     @InputFiles
     List<File> artifacts = project.configurations.getByName("runtime").allArtifacts.files as List
 
+    List<RelativePath> existingPaths = []
+
     @TaskAction
     void shadow() {
         logger.info "${NAME.capitalize()} - start"
@@ -38,20 +42,29 @@ class ShadowTask extends DefaultTask {
 
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
 
-        List<RelativePath> existingPaths = []
         jars.each { File jar ->
-            logger.debug "${NAME.capitalize()} - shadowing [${jar.name}]"
-            def fileTime = System.currentTimeMillis()
-            project.zipTree(jar).matching(filter).visit { FileTreeElement jarEntry ->
-                if (!jarEntry.isDirectory() && !existingPaths.contains(jarEntry.relativePath)) {
-                    existingPaths << jarEntry.relativePath
-                    writeJarEntry jos, jarEntry
-                }
-            }
-            logger.trace "${NAME.capitalize()} - shadowed in ${System.currentTimeMillis() - fileTime} ms"
+            processJar(jar, jos)
         }
-        jos.close()
+        IOUtil.close(jos)
         logger.info "${NAME.capitalize()} - finish [${(System.currentTimeMillis() - startTime)/1000} s]"
+    }
+
+    void processJar(File file, JarOutputStream jos) {
+        logger.debug "${NAME.capitalize()} - shadowing [${file.name}]"
+        def fileTime = System.currentTimeMillis()
+        def filteredTree = project.zipTree(file).matching(filter)
+        def jarFile = new JarFile(file)
+        filteredTree.visit { FileTreeElement jarEntry ->
+            processJarEntry(jarEntry, jarFile, jos)
+        }
+        logger.trace "${NAME.capitalize()} - shadowed in ${System.currentTimeMillis() - fileTime} ms"
+    }
+
+    void processJarEntry(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
+        if (!entry.isDirectory() && !existingPaths.contains(entry.relativePath)) {
+            existingPaths << entry.relativePath
+            writeJarEntry jos, entry, jar
+        }
     }
 
     PatternFilterable getFilter() {
@@ -69,17 +82,16 @@ class ShadowTask extends DefaultTask {
         project.configurations.getByName("runtime").resolve() as List
     }
 
-    static void writeJarEntry(JarOutputStream jos, String path, byte[] bytes) {
-        jos.putNextEntry(new JarEntry(path))
-        jos.write(bytes)
+    static void writeJarEntry(JarOutputStream jos, FileTreeElement entry, JarFile jar) {
+        JarEntry jarEntry = jar.getJarEntry(entry.relativePath.toString())
+        writeJarEntry jos, entry.relativePath, jarEntry, jar
+    }
+
+    static void writeJarEntry(JarOutputStream jos, RelativePath path, JarEntry entry, JarFile jar) {
+        def is = jar.getInputStream(entry)
+        jos.putNextEntry(new JarEntry(path.toString()))
+        IOUtil.copy(is, jos)
         jos.closeEntry()
-    }
-
-    static void writeJarEntry(JarOutputStream jos, RelativePath rPath, byte[] bytes) {
-        writeJarEntry(jos, rPath.toString(), bytes)
-    }
-
-    static void writeJarEntry(JarOutputStream jos, FileTreeElement entry) {
-        writeJarEntry jos, entry.relativePath, entry.file.bytes
+        IOUtil.close(is)
     }
 }
