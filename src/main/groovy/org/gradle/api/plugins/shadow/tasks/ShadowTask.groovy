@@ -31,13 +31,14 @@ class ShadowTask extends DefaultTask {
     List<String> excludes = project.shadow.excludes
 
     @InputFiles
-    List<File> artifacts = project.configurations.getByName("runtime").allArtifacts.files as List
+    List<File> artifacts = project.configurations.runtime.allArtifacts.files as List
 
     boolean statsEnabled
 
     List<RelativePath> existingPaths = []
 
     private List<File> jarCache
+    private List<File> signedJarCache
 
     ShadowStats stats
 
@@ -48,7 +49,9 @@ class ShadowTask extends DefaultTask {
 
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
 
-        jars.each { File jar ->
+        jars.findAll { File jar ->
+            !signedJars.contains(jar)
+        }.each { File jar ->
             processJar(jar, jos)
         }
         IOUtil.close(jos)
@@ -109,14 +112,29 @@ class ShadowTask extends DefaultTask {
     }
 
     List<File> getJars() {
-        if (!jarCache) {
+        if (jarCache == null) {
             jarCache = artifacts + dependencies
         }
         jarCache
     }
 
+    List<File> getSignedJars() {
+        if (signedJarCache == null) {
+            signedJarCache = signedCompileJars + signedRuntimeJars
+        }
+        signedJarCache
+    }
+
+    List<File> getSignedCompileJars() {
+        project.configurations.signedCompile.resolve() as List
+    }
+
+    List<File> getSignedRuntimeJars() {
+        project.configurations.signedRuntime.resolve() as List
+    }
+
     List<File> getDependencies() {
-        project.configurations.getByName("runtime").resolve() as List
+        project.configurations.runtime.resolve() as List
     }
 
     static void writeJarEntry(JarOutputStream jos, FileTreeElement entry, JarFile jar) {
