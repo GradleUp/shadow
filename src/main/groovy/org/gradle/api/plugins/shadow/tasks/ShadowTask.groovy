@@ -19,7 +19,7 @@ import java.util.jar.JarOutputStream
 class ShadowTask extends DefaultTask {
 
     static final String NAME = "shadow"
-    static final String DESC = "Combines all classpath resources into a single jar"
+    static final String DESC = "Combines all classpath resources into a single jar."
 
     @OutputFile
     File outputJar = project.shadow.shadowJar

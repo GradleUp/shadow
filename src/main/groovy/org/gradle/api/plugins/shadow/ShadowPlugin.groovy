@@ -2,6 +2,7 @@ package org.gradle.api.plugins.shadow
 
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.shadow.tasks.KnowsTask
+import org.gradle.api.plugins.shadow.tasks.OutputSignedLibsTask
 import org.gradle.api.plugins.shadow.tasks.ShadowTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -27,6 +28,13 @@ class ShadowPlugin implements Plugin<Project>{
         KnowsTask knows = project.tasks.add(KnowsTask.NAME, KnowsTask)
         knows.description = KnowsTask.DESC
         knows.group = GROUP
+
+        OutputSignedLibsTask signedCopyTask = project.tasks.add(OutputSignedLibsTask.NAME, OutputSignedLibsTask)
+        signedCopyTask.description = OutputSignedLibsTask.DESC
+        signedCopyTask.group = GROUP
+        signedCopyTask.outputs.upToDateWhen {
+            false
+        }
 
         ["compile", "runtime"].each { config ->
             Configuration signed = project.configurations.add "signed${config.capitalize()}"
