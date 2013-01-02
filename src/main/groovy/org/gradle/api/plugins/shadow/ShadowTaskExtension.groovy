@@ -8,7 +8,7 @@ class ShadowTaskExtension {
 
     List<String> includes = []
     List<String> excludes = []
-    String destinationDir = "${project.buildDir}/libs"
+    String destinationDir = "${project.buildDir}/libs/"
     String baseName = "${project.archivesBaseName}-shadow-${project.version}"
     String extension = "jar"
     boolean stats = false
@@ -21,6 +21,10 @@ class ShadowTaskExtension {
 
     File getShadowJar() {
         return new File(destinationDir, "$baseName.$extension")
+    }
+
+    File getSignedLibsDir() {
+        return new File(destinationDir, "signedLibs/")
     }
 
     ShadowTaskExtension exclude(String s) {
