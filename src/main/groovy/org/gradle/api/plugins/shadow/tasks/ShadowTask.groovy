@@ -4,6 +4,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.plugins.shadow.ShadowStats
+import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
+import org.gradle.api.plugins.shadow.transformers.Transformer
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -33,6 +35,8 @@ class ShadowTask extends DefaultTask {
     @InputFiles
     List<File> artifacts = project.configurations.runtime.allArtifacts.files as List
 
+    List<Transformer> transformers = [new ServiceFileTransformer()]
+
     boolean statsEnabled
 
     List<RelativePath> existingPaths = []
@@ -53,6 +57,9 @@ class ShadowTask extends DefaultTask {
             !signedJars.contains(jar)
         }.each { File jar ->
             processJar(jar, jos)
+        }
+        transformers.each { Transformer transformer ->
+            transformer.modifyOutputStream(jos)
         }
         IOUtil.close(jos)
         logger.info "${NAME.capitalize()} - finish"
@@ -97,8 +104,18 @@ class ShadowTask extends DefaultTask {
         }
     }
 
+    boolean resourceTransformed(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
+        for(Transformer transformer in transformers) {
+            if (transformer.canTransformResource(entry)) {
+                transformer.transform(entry, jar, jos)
+                return true
+            }
+        }
+        return false
+    }
+
     void processJarEntry(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
-        if (!entry.isDirectory() && !existingPaths.contains(entry.relativePath)) {
+        if (!entry.isDirectory() && ! resourceTransformed(entry, jar, jos) && !existingPaths.contains(entry.relativePath)) {
             addDirectories(entry.relativePath.parent, jos)
             existingPaths << entry.relativePath
             writeJarEntry jos, entry, jar
