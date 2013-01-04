@@ -34,13 +34,13 @@ artifactoryPublish {
 }
 
 artifactory {
-    contextUrl = "${project.artifactory_contextUrl}"
+    contextUrl = "${bloom_artifactory_contextUrl}"
 
     def currentRepoKey = isSnapshot() ? 'libs-snapshot-local' : 'libs-release-local'
     publish {
         repository {
-            username = "${artifactory_username}"
-            password = "${artifactory_password}"
+            username = "${bloom_artifactory_publish_username}"
+            password = "${bloom_artifactory_publish_password}"
             repoKey = "${currentRepoKey}"
             maven = true
         }
