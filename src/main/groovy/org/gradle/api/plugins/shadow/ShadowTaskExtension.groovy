@@ -7,7 +7,7 @@ class ShadowTaskExtension {
     public static final NAME = "shadow"
 
     List<String> includes = []
-    List<String> excludes = []
+    List<String> excludes = ['META-INF/INDEX.LIST']
     String destinationDir = "${project.buildDir}/libs/"
     String baseName = "${project.archivesBaseName}-shadow-${project.version}"
     String extension = "jar"
