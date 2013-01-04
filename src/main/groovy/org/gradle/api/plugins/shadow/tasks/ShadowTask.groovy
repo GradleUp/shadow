@@ -99,8 +99,17 @@ class ShadowTask extends DefaultTask {
 
     void processJarEntry(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
         if (!entry.isDirectory() && !existingPaths.contains(entry.relativePath)) {
+            addDirectories(entry.relativePath.parent, jos)
             existingPaths << entry.relativePath
             writeJarEntry jos, entry, jar
+        }
+    }
+
+    void addDirectories(RelativePath path, JarOutputStream jos) {
+        if (path.parent && !existingPaths.contains(path)) {
+            addDirectories(path.parent, jos)
+            writeDirectoryJarEntry(jos, path)
+            existingPaths << path
         }
     }
 
@@ -135,6 +144,11 @@ class ShadowTask extends DefaultTask {
 
     List<File> getDependencies() {
         project.configurations.runtime.resolve() as List
+    }
+
+    static void writeDirectoryJarEntry(JarOutputStream jos, RelativePath path) {
+        JarEntry entry = new JarEntry(path.toString() + "/")
+        jos.putNextEntry(entry)
     }
 
     static void writeJarEntry(JarOutputStream jos, FileTreeElement entry, JarFile jar) {
