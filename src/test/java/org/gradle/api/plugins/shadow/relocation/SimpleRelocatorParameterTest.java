@@ -23,6 +23,9 @@ import junit.framework.TestCase;
 
 import java.util.Collections;
 
+/**
+ * Modified from org.apache.maven.plugins.shade.relocation.SimpleRelocatorParameterTest.java
+ */
 public class SimpleRelocatorParameterTest
     extends TestCase
 {

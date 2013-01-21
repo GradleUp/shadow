@@ -9,6 +9,8 @@ import java.util.Arrays;
  *
  * @author Benjamin Bentmann
  * @version $Id: SimpleRelocatorTest.java 1342979 2012-05-26 22:05:45Z bimargulies $
+ *
+ * Modified from org.apache.maven.plugins.shade.relocation.SimpleRelocatorTest.java
  */
 public class SimpleRelocatorTest
     extends TestCase
