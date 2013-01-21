@@ -19,7 +19,7 @@
 package org.gradle.api.plugins.shadow.transformers
 
 import org.gradle.api.file.FileTreeElement
-import org.gradle.api.plugins.shadow.relocator.Relocator
+import org.gradle.api.plugins.shadow.relocation.Relocator
 
 import java.util.jar.JarOutputStream
 

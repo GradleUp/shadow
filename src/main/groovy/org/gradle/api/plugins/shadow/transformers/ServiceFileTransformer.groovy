@@ -20,7 +20,7 @@ package org.gradle.api.plugins.shadow.transformers
 
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
-import org.gradle.api.plugins.shadow.relocator.Relocator
+import org.gradle.api.plugins.shadow.relocation.Relocator
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 import java.util.jar.JarEntry

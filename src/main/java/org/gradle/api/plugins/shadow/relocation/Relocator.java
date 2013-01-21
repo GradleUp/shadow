@@ -1,4 +1,4 @@
-package org.gradle.api.plugins.shadow.relocator;
+package org.gradle.api.plugins.shadow.relocation;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

@@ -19,7 +19,7 @@ package org.gradle.api.plugins.shadow.transformers
  * under the License.
  */
 
-import org.gradle.api.plugins.shadow.relocator.Relocator
+import org.gradle.api.plugins.shadow.relocation.Relocator
 import org.gradle.api.file.FileTreeElement
 
 import java.util.jar.JarOutputStream
