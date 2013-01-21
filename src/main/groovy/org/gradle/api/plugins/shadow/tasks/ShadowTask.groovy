@@ -107,7 +107,8 @@ class ShadowTask extends DefaultTask {
     boolean resourceTransformed(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
         for(Transformer transformer in transformers) {
             if (transformer.canTransformResource(entry)) {
-                transformer.transform(entry, jar, jos)
+                def jarEntry = jar.getEntry(new JarEntry(entry.relativePath.pathString))
+                transformer.transform(entry, jar.getInputStream(jarEntry), jos)
                 return true
             }
         }
