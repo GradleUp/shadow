@@ -38,21 +38,21 @@ import java.util.jar.JarOutputStream
  * Modifications
  * @author John Engelman
  */
-public class ComponentsXmlResourceTransformer implements Transformer {
+class ComponentsXmlResourceTransformer implements Transformer {
     private Map<String, Xpp3Dom> components = new LinkedHashMap<String, Xpp3Dom>()
 
-    public static final String COMPONENTS_XML_PATH = "META-INF/plexus/components.xml"
+    static final String COMPONENTS_XML_PATH = "META-INF/plexus/components.xml"
 
-    public boolean canTransformResource(FileTreeElement entry) {
-        return COMPONENTS_XML_PATH.equals(entry.relativePath.pathString)
+    boolean canTransformResource(String path) {
+        return COMPONENTS_XML_PATH.equals(path)
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    void transform(String path, InputStream is, List<Relocator> relocators) {
         Xpp3Dom newDom
 
         try {
             BufferedInputStream bis = new BufferedInputStream(is) {
-                public void close()
+                void close()
                 throws IOException {
                     // leave ZIP open
                 }
@@ -112,7 +112,7 @@ public class ComponentsXmlResourceTransformer implements Transformer {
         }
     }
 
-    public void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(JarOutputStream jos) {
         byte[] data = getTransformedResource()
 
         jos.putNextEntry(new JarEntry(COMPONENTS_XML_PATH))
@@ -122,7 +122,7 @@ public class ComponentsXmlResourceTransformer implements Transformer {
         components.clear()
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return !components.isEmpty()
     }
 

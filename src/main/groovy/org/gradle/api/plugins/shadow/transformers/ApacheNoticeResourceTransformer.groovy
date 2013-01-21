@@ -34,7 +34,7 @@ import java.util.jar.JarOutputStream
  * Modifications
  * @author John Engelman
  */
-public class ApacheNoticeResourceTransformer implements Transformer {
+class ApacheNoticeResourceTransformer implements Transformer {
     Set<String> entries = new LinkedHashSet<String>()
 
     Map<String, Set<String>> organizationEntries = new LinkedHashMap<String, Set<String>>()
@@ -69,15 +69,15 @@ public class ApacheNoticeResourceTransformer implements Transformer {
 
     private static final String NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
 
-    public boolean canTransformResource(FileTreeElement entry) {
-        if (NOTICE_PATH.equalsIgnoreCase(resource) || NOTICE_TXT_PATH.equalsIgnoreCase(resource)) {
+    boolean canTransformResource(String path) {
+        if (NOTICE_PATH.equalsIgnoreCase(path) || NOTICE_TXT_PATH.equalsIgnoreCase(path)) {
             return true
         }
 
         return false
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    void transform(String path, InputStream is, List<Relocator> relocators) {
         if (entries.isEmpty()) {
             String year = new SimpleDateFormat("yyyy").format(new Date())
             if (!inceptionYear.equals(year)) {
@@ -156,11 +156,11 @@ public class ApacheNoticeResourceTransformer implements Transformer {
         }
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return true
     }
 
-    public void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(JarOutputStream jos) {
         jos.putNextEntry(new JarEntry(NOTICE_PATH))
 
         Writer pow

@@ -4,6 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.plugins.shadow.ShadowStats
+import org.gradle.api.plugins.shadow.relocation.Relocator
 import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
 import org.gradle.api.plugins.shadow.transformers.Transformer
 import org.gradle.api.tasks.Input
@@ -36,6 +37,7 @@ class ShadowTask extends DefaultTask {
     List<File> artifacts = project.configurations.runtime.allArtifacts.files as List
 
     List<Transformer> transformers = [new ServiceFileTransformer()]
+    List<Relocator> relocators = []
 
     boolean statsEnabled
 
@@ -59,7 +61,9 @@ class ShadowTask extends DefaultTask {
             processJar(jar, jos)
         }
         transformers.each { Transformer transformer ->
-            transformer.modifyOutputStream(jos)
+            if (transformer.hasTransformedResource()) {
+                transformer.modifyOutputStream(jos)
+            }
         }
         IOUtil.close(jos)
         logger.info "${NAME.capitalize()} - finish"
@@ -104,11 +108,12 @@ class ShadowTask extends DefaultTask {
         }
     }
 
-    boolean resourceTransformed(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
+    boolean resourceTransformed(FileTreeElement entry, JarFile jar) {
+        String path = entry.relativePath.pathString
         for(Transformer transformer in transformers) {
-            if (transformer.canTransformResource(entry)) {
-                def jarEntry = jar.getEntry(new JarEntry(entry.relativePath.pathString))
-                transformer.transform(entry, jar.getInputStream(jarEntry), jos)
+            if (transformer.canTransformResource(path)) {
+                def jarEntry = jar.getEntry(path)
+                transformer.transform(path, jar.getInputStream(jarEntry), relocators)
                 return true
             }
         }
@@ -116,7 +121,7 @@ class ShadowTask extends DefaultTask {
     }
 
     void processJarEntry(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
-        if (!entry.isDirectory() && ! resourceTransformed(entry, jar, jos) && !existingPaths.contains(entry.relativePath)) {
+        if (!entry.isDirectory() && ! resourceTransformed(entry, jar) && !existingPaths.contains(entry.relativePath)) {
             addDirectories(entry.relativePath.parent, jos)
             existingPaths << entry.relativePath
             writeJarEntry jos, entry, jar

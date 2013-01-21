@@ -33,31 +33,31 @@ import java.util.jar.JarOutputStream
  * Modifications
  * @author John Engelman
  */
-public class AppendingTransformer implements Transformer {
+class AppendingTransformer implements Transformer {
     String resource
 
     ByteArrayOutputStream data = new ByteArrayOutputStream()
 
-    public boolean canTransformResource(FileTreeElement entry) {
-        if (resource != null && resource.equalsIgnoreCase(entry.relativePath.pathString)) {
+    boolean canTransformResource(String path) {
+        if (resource != null && resource.equalsIgnoreCase(path)) {
             return true
         }
 
         return false
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    void transform(String path, InputStream is, List<Relocator> relocators) {
         IOUtil.copy(is, data)
         data.write('\n')
 
         is.close()
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return data.size() > 0
     }
 
-    public void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(JarOutputStream jos) {
         jos.putNextEntry(new JarEntry(resource))
 
         IOUtil.copy(new ByteArrayInputStream(data.toByteArray()), jos)

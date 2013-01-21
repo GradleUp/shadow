@@ -39,8 +39,8 @@ import java.util.jar.JarOutputStream
  * Modifications
  * @author John Engelman
  */
-public class XmlAppendingTransformer implements Transformer {
-    public static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
+class XmlAppendingTransformer implements Transformer {
+    static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 
     boolean ignoreDtd = true
 
@@ -48,22 +48,22 @@ public class XmlAppendingTransformer implements Transformer {
 
     Document doc
 
-    public boolean canTransformResource(FileTreeElement entry) {
-        if (resource != null && resource.equalsIgnoreCase(entry.relativePath.pathString)) {
+    boolean canTransformResource(String path) {
+        if (resource != null && resource.equalsIgnoreCase(path)) {
             return true
         }
 
         return false
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    void transform(String path, InputStream is, List<Relocator> relocators) {
         Document r
         try {
             SAXBuilder builder = new SAXBuilder(false)
             builder.setExpandEntities(false)
             if (ignoreDtd) {
                 builder.setEntityResolver(new EntityResolver() {
-                    public InputSource resolveEntity(String publicId, String systemId)
+                    InputSource resolveEntity(String publicId, String systemId)
                     throws SAXException, IOException {
                         return new InputSource(new StringReader(""))
                     }
@@ -96,11 +96,11 @@ public class XmlAppendingTransformer implements Transformer {
         }
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return doc != null
     }
 
-    public void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(JarOutputStream jos) {
         jos.putNextEntry(new JarEntry(resource))
 
         new XMLOutputter(Format.getPrettyFormat()).output(doc, jos)

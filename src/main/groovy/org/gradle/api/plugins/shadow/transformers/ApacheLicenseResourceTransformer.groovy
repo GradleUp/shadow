@@ -31,25 +31,25 @@ import java.util.jar.JarOutputStream
  * Modifications
  * @author John Engelman
  */
-public class ApacheLicenseResourceTransformer implements Transformer {
+class ApacheLicenseResourceTransformer implements Transformer {
 
     private static final String LICENSE_PATH = "META-INF/LICENSE"
 
     private static final String LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
 
-    public boolean canTransformResource(FileTreeElement entry) {
-        return LICENSE_PATH.equalsIgnoreCase(entry.relativePath.pathString) ||
-                LICENSE_TXT_PATH.regionMatches(true, 0, entry.relativePath.pathString, 0, LICENSE_TXT_PATH.length())
+    boolean canTransformResource(String path) {
+        return LICENSE_PATH.equalsIgnoreCase(path) ||
+                LICENSE_TXT_PATH.regionMatches(true, 0, path, 0, LICENSE_TXT_PATH.length())
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    void transform(String path, InputStream is, List<Relocator> relocators) {
 
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return false
     }
 
-    public void modifyOutputStream(JarOutputStream os) {
+    void modifyOutputStream(JarOutputStream os) {
     }
 }

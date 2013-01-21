@@ -38,7 +38,7 @@ import java.util.jar.Attributes.Name
  * Modifications
  * @author John Engelman
  */
-public class ManifestResourceTransformer implements Transformer {
+class ManifestResourceTransformer implements Transformer {
 
     // Configuration
     private String mainClass
@@ -50,15 +50,15 @@ public class ManifestResourceTransformer implements Transformer {
 
     private Manifest manifest
 
-    public boolean canTransformResource(FileTreeElement entry) {
-        if (JarFile.MANIFEST_NAME.equalsIgnoreCase(entry.relativePath.pathString)) {
+    boolean canTransformResource(String path) {
+        if (JarFile.MANIFEST_NAME.equalsIgnoreCase(path)) {
             return true
         }
 
         return false
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    void transform(String path, InputStream is, List<Relocator> relocators) {
         // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
         // now which is situational at best. Right now there is no context passed in with the processing so we cannot
         // tell what artifact is being processed.
@@ -69,11 +69,11 @@ public class ManifestResourceTransformer implements Transformer {
         }
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return true
     }
 
-    public void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(JarOutputStream jos) {
         // If we didn't find a manifest, then let's create one.
         if (manifest == null) {
             manifest = new Manifest()

@@ -33,26 +33,26 @@ import java.util.jar.JarOutputStream
  * Modifications
  * @author John Engelman
  */
-public class DontIncludeResourceTransformer implements Transformer {
+class DontIncludeResourceTransformer implements Transformer {
     String resource
 
-    public boolean canTransformResource(FileTreeElement entry) {
-        if (entry.relativePath.pathString.endsWith(resource)) {
+    boolean canTransformResource(String path) {
+        if (path.endsWith(resource)) {
             return true
         }
 
         return false
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    void transform(String path, InputStream is, List<Relocator> relocators) {
         // no op
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return false
     }
 
-    public void modifyOutputStream(JarOutputStream os) {
+    void modifyOutputStream(JarOutputStream os) {
         // no op
     }
 }

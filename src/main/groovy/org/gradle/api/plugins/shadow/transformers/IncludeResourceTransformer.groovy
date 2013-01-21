@@ -39,11 +39,11 @@ public class IncludeResourceTransformer implements Transformer {
 
     String resource
 
-    public boolean canTransformResource(FileTreeElement entry) {
+    public boolean canTransformResource(String path) {
         return false
     }
 
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+    public void transform(String path, InputStream is, List<Relocator> relocators) {
         // no op
     }
 

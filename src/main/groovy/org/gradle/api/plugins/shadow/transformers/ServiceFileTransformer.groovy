@@ -45,19 +45,19 @@ import java.util.jar.JarOutputStream
 class ServiceFileTransformer implements Transformer {
 
     private static final String SERVICES_PATH = "META-INF/services";
-    Map<RelativePath, ServiceStream> serviceEntries = [:]
+    Map<String, ServiceStream> serviceEntries = [:]
 
     @Override
-    boolean canTransformResource(FileTreeElement entry) {
-        return entry.relativePath.pathString.contains(SERVICES_PATH)
+    boolean canTransformResource(String path) {
+        return path.contains(SERVICES_PATH)
     }
 
     @Override
-    void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
-        ServiceStream out = serviceEntries[entry.relativePath]
+    void transform(String path, InputStream is, List<Relocator> relocators) {
+        ServiceStream out = serviceEntries[path]
         if ( out == null ) {
             out = new ServiceStream()
-            serviceEntries[entry.relativePath] = out
+            serviceEntries[path] = out
         }
         out.append(is)
     }

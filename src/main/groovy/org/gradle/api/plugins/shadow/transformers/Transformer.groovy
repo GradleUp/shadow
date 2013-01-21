@@ -33,11 +33,11 @@ import java.util.jar.JarOutputStream
  * @author Charlie Knudsen
  * @author John Engelman
  */
-public interface Transformer {
+interface Transformer {
 
-    boolean canTransformResource(FileTreeElement entry)
+    boolean canTransformResource(String path)
 
-    void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators)
+    void transform(String path, InputStream is, List<Relocator> relocators)
 
     boolean hasTransformedResource()
 
