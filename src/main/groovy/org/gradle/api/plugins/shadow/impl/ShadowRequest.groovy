@@ -31,99 +31,20 @@ import org.gradle.api.plugins.shadow.transformers.Transformer
  *
  * Modified from org.apache.maven.plugins.shade.ShadeRequest.java
  */
-public class ShadowRequest {
+class ShadowRequest {
 
-    private Set<File> jars
+    List<File> jars
 
-    private File uberJar
+    File uberJar
 
-    private List<Filter> filters
+    List<Filter> filters
 
-    private List<Relocator> relocators
+    List<Relocator> relocators
 
-    private List<Transformer> resourceTransformers
+    List<Transformer> resourceTransformers
 
-    private boolean shadeSourcesContent
+    boolean shadeSourcesContent
 
     ShadowStats stats
 
-    public Set<File> getJars() {
-        return jars
-    }
-
-    /**
-     * Which jars to shade.
-     *
-     * @param jars
-     */
-    public void setJars(Set<File> jars) {
-        this.jars = jars
-    }
-
-    public File getUberJar() {
-        return uberJar
-    }
-
-    /**
-     * Output jar.
-     *
-     * @param uberJar
-     */
-    public void setUberJar(File uberJar) {
-        this.uberJar = uberJar
-    }
-
-    public List<Filter> getFilters() {
-        return filters
-    }
-
-    /**
-     * The filters.
-     *
-     * @param filters
-     */
-    public void setFilters(List<Filter> filters) {
-        this.filters = filters
-    }
-
-    public List<Relocator> getRelocators() {
-        return relocators
-    }
-
-    /**
-     * The relocators.
-     *
-     * @param relocators
-     */
-    public void setRelocators(List<Relocator> relocators) {
-        this.relocators = relocators
-    }
-
-    public List<Transformer> getResourceTransformers() {
-        return resourceTransformers
-    }
-
-    /**
-     * The transformers.
-     *
-     * @param resourceTransformers
-     */
-    public void setResourceTransformers(List<Transformer> resourceTransformers) {
-        this.resourceTransformers = resourceTransformers
-    }
-
-    public boolean isShadeSourcesContent() {
-        return shadeSourcesContent
-    }
-
-    /**
-     * When true, it will attempt to shade the contents of the java source files when creating the sources jar.
-     * When false, it will just relocate the java source files to the shaded paths, but will not modify the
-     * actual contents of the java source files.
-     *
-     * @param shadeSourcesContent
-     */
-    public void setShadeSourcesContent(boolean shadeSourcesContent) {
-        this.shadeSourcesContent = shadeSourcesContent
-    }
 }

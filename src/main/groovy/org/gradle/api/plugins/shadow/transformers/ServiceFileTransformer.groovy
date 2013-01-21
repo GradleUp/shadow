@@ -69,8 +69,8 @@ class ServiceFileTransformer implements Transformer {
 
     @Override
     void modifyOutputStream(JarOutputStream jos) {
-        serviceEntries.each { RelativePath path, ServiceStream stream ->
-            jos.putNextEntry(new JarEntry(path.pathString))
+        serviceEntries.each { String path, ServiceStream stream ->
+            jos.putNextEntry(new JarEntry(path))
             IOUtil.copy(stream.toInputStream(), jos)
             jos.closeEntry()
         }

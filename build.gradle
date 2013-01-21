@@ -13,6 +13,8 @@ dependencies {
     groovy 'org.codehaus.groovy:groovy-all:1.8.8'
     compile gradleApi()
     compile 'jdom:jdom:1.1'
+    compile 'asm:asm:3.3.1'
+    compile 'asm:asm-commons:3.3.1'
     
     testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
     testCompile 'xmlunit:xmlunit:1.3'

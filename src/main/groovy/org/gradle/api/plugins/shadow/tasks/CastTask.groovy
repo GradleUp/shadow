@@ -8,6 +8,7 @@ import org.gradle.api.plugins.shadow.impl.Caster
 import org.gradle.api.plugins.shadow.impl.DefaultCaster
 import org.gradle.api.plugins.shadow.impl.ShadowRequest
 import org.gradle.api.plugins.shadow.relocation.Relocator
+import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
 import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
 import org.gradle.api.plugins.shadow.transformers.Transformer
 import org.gradle.api.tasks.Input
@@ -39,7 +40,7 @@ class CastTask extends DefaultTask {
     @InputFiles
     List<File> artifacts = project.configurations.runtime.allArtifacts.files as List
 
-    List<Transformer> transformers = [new ServiceFileTransformer()]
+    List<Transformer> transformers = [new ServiceFileTransformer(), new ManifestResourceTransformer()]
     List<Relocator> relocators = []
 
     boolean statsEnabled
@@ -67,7 +68,7 @@ class CastTask extends DefaultTask {
         shadow.filters = []
         shadow.resourceTransformers = transformers
         shadow.shadeSourcesContent = false
-        shadow.jars = jars.findAll { !signedJars.contains(it) }
+        shadow.jars = jars
 
         caster.cast(shadow)
 //        JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
@@ -183,7 +184,7 @@ class CastTask extends DefaultTask {
     }
 
     List<File> getDependencies() {
-        project.configurations.runtime.resolve() as List
+        (project.configurations.runtime.resolve() as List).findAll { !signedJars.contains(it) }
     }
 
     static void writeDirectoryJarEntry(JarOutputStream jos, RelativePath path) {
