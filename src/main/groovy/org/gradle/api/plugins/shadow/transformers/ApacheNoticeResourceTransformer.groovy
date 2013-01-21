@@ -1,7 +1,3 @@
-package org.gradle.api.plugins.shadow.transformers
-
-import org.gradle.api.file.FileTreeElement
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,7 +16,9 @@ import org.gradle.api.file.FileTreeElement
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.gradle.api.plugins.shadow.transformers
 
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.plugins.shadow.relocator.Relocator
 import org.gradle.mvn3.org.codehaus.plexus.util.StringUtils
 
