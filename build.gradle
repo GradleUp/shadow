@@ -12,6 +12,7 @@ version = "${currentVersion}"
 dependencies {
     groovy 'org.codehaus.groovy:groovy-all:1.8.8'
     compile gradleApi()
+    compile 'jdom:jdom:1.1'
     
     testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
 }
