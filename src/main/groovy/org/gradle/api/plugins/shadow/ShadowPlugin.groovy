@@ -3,7 +3,7 @@ package org.gradle.api.plugins.shadow
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.shadow.tasks.KnowsTask
 import org.gradle.api.plugins.shadow.tasks.OutputSignedLibsTask
-import org.gradle.api.plugins.shadow.tasks.ShadowTask
+import org.gradle.api.plugins.shadow.tasks.CastTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -20,10 +20,10 @@ class ShadowPlugin implements Plugin<Project>{
 
     void addShadow(Project project) {
         project.extensions.create(ShadowTaskExtension.NAME, ShadowTaskExtension, project)
-        ShadowTask shadow = project.tasks.add(ShadowTask.NAME, ShadowTask)
-        shadow.description = ShadowTask.DESC
-        shadow.group = GROUP
-        shadow.dependsOn project.tasks.jar
+        CastTask cast = project.tasks.add(CastTask.NAME, CastTask)
+        cast.description = CastTask.DESC
+        cast.group = GROUP
+        cast.dependsOn project.tasks.jar
 
         KnowsTask knows = project.tasks.add(KnowsTask.NAME, KnowsTask)
         knows.description = KnowsTask.DESC

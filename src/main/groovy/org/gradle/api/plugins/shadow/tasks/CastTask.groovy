@@ -4,6 +4,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.plugins.shadow.ShadowStats
+import org.gradle.api.plugins.shadow.impl.Caster
+import org.gradle.api.plugins.shadow.impl.DefaultCaster
+import org.gradle.api.plugins.shadow.impl.ShadowRequest
 import org.gradle.api.plugins.shadow.relocation.Relocator
 import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
 import org.gradle.api.plugins.shadow.transformers.Transformer
@@ -19,9 +22,9 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
-class ShadowTask extends DefaultTask {
+class CastTask extends DefaultTask {
 
-    static final String NAME = "shadow"
+    static final String NAME = "cast"
     static final String DESC = "Combines all classpath resources into a single jar."
 
     @OutputFile
@@ -47,25 +50,39 @@ class ShadowTask extends DefaultTask {
     private List<File> signedJarCache
 
     ShadowStats stats
+    Caster caster
 
     @TaskAction
-    void shadow() {
+    void cast() {
+
         logger.info "${NAME.capitalize()} - start"
         initStats()
 
-        JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
+        caster = new DefaultCaster()
 
-        jars.findAll { File jar ->
-            !signedJars.contains(jar)
-        }.each { File jar ->
-            processJar(jar, jos)
-        }
-        transformers.each { Transformer transformer ->
-            if (transformer.hasTransformedResource()) {
-                transformer.modifyOutputStream(jos)
-            }
-        }
-        IOUtil.close(jos)
+        ShadowRequest shadow = new ShadowRequest()
+        shadow.stats = stats
+        shadow.uberJar = outputJar
+        shadow.relocators = []
+        shadow.filters = []
+        shadow.resourceTransformers = transformers
+        shadow.shadeSourcesContent = false
+        shadow.jars = jars.findAll { !signedJars.contains(it) }
+
+        caster.cast(shadow)
+//        JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
+//
+//        jars.findAll { File jar ->
+//            !signedJars.contains(jar)
+//        }.each { File jar ->
+//            processJar(jar, jos)
+//        }
+//        transformers.each { Transformer transformer ->
+//            if (transformer.hasTransformedResource()) {
+//                transformer.modifyOutputStream(jos)
+//            }
+//        }
+//        IOUtil.close(jos)
         logger.info "${NAME.capitalize()} - finish"
         printStats()
     }

@@ -1,5 +1,7 @@
 package org.gradle.api.plugins.shadow.impl
 
+import org.gradle.api.plugins.shadow.ShadowStats
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -42,6 +44,8 @@ public class ShadowRequest {
     private List<Transformer> resourceTransformers
 
     private boolean shadeSourcesContent
+
+    ShadowStats stats
 
     public Set<File> getJars() {
         return jars

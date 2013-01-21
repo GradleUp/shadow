@@ -1,5 +1,7 @@
 package org.gradle.api.plugins.shadow.impl
 
+import groovy.util.logging.Slf4j
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,10 +21,10 @@ package org.gradle.api.plugins.shadow.impl
  * under the License.
  */
 
-import org.codehaus.plexus.logging.AbstractLogEnabled
-
+import org.gradle.api.plugins.shadow.ShadowStats
 import org.gradle.api.plugins.shadow.filter.Filter
 import org.gradle.api.plugins.shadow.relocation.Relocator
+import org.gradle.api.plugins.shadow.tasks.CastTask
 import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
 import org.gradle.api.plugins.shadow.transformers.Transformer
 import org.gradle.api.tasks.TaskExecutionException
@@ -42,7 +44,8 @@ import java.util.zip.ZipException
  *
  * Modified from org.apache.maven.plugins.shade.DefaultShader.java
  */
-public class DefaultCaster extends AbstractLogEnabled implements Caster {
+@Slf4j
+public class DefaultCaster implements Caster {
 
     public void cast(ShadowRequest shadowRequest) {
         Set<String> resources = new HashSet<String>()
@@ -59,7 +62,6 @@ public class DefaultCaster extends AbstractLogEnabled implements Caster {
 
         RelocatorRemapper remapper = new RelocatorRemapper(shadowRequest.getRelocators())
 
-        shadowRequest.getUberJar().getParentFile().mkdirs()
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(shadowRequest.getUberJar()))
 
         if (manifestTransformer != null) {
@@ -81,64 +83,62 @@ public class DefaultCaster extends AbstractLogEnabled implements Caster {
         }
 
         for (File jar : shadowRequest.getJars()) {
+            withStats(shadowRequest.stats) {
 
-            getLogger().debug("Processing JAR " + jar)
+                log.debug("Processing JAR " + jar)
 
-            List<Filter> jarFilters = getFilters(jar, shadowRequest.getFilters())
+                List<Filter> jarFilters = getFilters(jar, shadowRequest.getFilters())
+                JarFile jarFile = newJarFile(jar)
 
-            JarFile jarFile = newJarFile(jar)
+                for (Enumeration<JarEntry> j = jarFile.entries(); j.hasMoreElements();) {
+                    JarEntry entry = j.nextElement()
+                    String name = entry.getName()
 
-            for (Enumeration<JarEntry> j = jarFile.entries(); j.hasMoreElements();) {
-                JarEntry entry = j.nextElement()
-
-                String name = entry.getName()
-
-                if ("META-INF/INDEX.LIST".equals(name)) {
-                    // we cannot allow the jar indexes to be copied over or the
-                    // jar is useless. Ideally, we could create a new one
-                    // later
-                    continue;
-                }
-
-                if (!entry.isDirectory() && !isFiltered(jarFilters, name)) {
-                    InputStream is = jarFile.getInputStream(entry)
-
-                    String mappedName = remapper.map(name)
-
-                    int idx = mappedName.lastIndexOf('/')
-                    if (idx != -1) {
-                        // make sure dirs are created
-                        String dir = mappedName.substring(0, idx)
-                        if (!resources.contains(dir)) {
-                            addDirectory(resources, jos, dir)
-                        }
+                    if ("META-INF/INDEX.LIST".equals(name)) {
+                        // we cannot allow the jar indexes to be copied over or the
+                        // jar is useless. Ideally, we could create a new one
+                        // later
+                        continue;
                     }
 
-                    if (name.endsWith(".class")) {
-                        addRemappedClass(remapper, jos, jar, name, is)
-                    } else if (shadowRequest.isShadeSourcesContent() && name.endsWith(".java")) {
-                        // Avoid duplicates
-                        if (resources.contains(mappedName)) {
-                            continue;
+                    if (!entry.isDirectory() && !isFiltered(jarFilters, name)) {
+                        InputStream is = jarFile.getInputStream(entry)
+                        String mappedName = remapper.map(name)
+                        int idx = mappedName.lastIndexOf('/')
+                        if (idx != -1) {
+                            // make sure dirs are created
+                            String dir = mappedName.substring(0, idx)
+                            if (!resources.contains(dir)) {
+                                addDirectory(resources, jos, dir)
+                            }
                         }
 
-                        addJavaSource(resources, jos, mappedName, is, shadowRequest.getRelocators())
-                    } else {
-                        if (!resourceTransformed(transformers, mappedName, is, shadowRequest.getRelocators())) {
-                            // Avoid duplicates that aren't accounted for by the resource transformers
+                        if (name.endsWith(".class")) {
+                            addRemappedClass(remapper, jos, jar, name, is)
+                        } else if (shadowRequest.isShadeSourcesContent() && name.endsWith(".java")) {
+                            // Avoid duplicates
                             if (resources.contains(mappedName)) {
                                 continue;
                             }
 
-                            addResource(resources, jos, mappedName, is)
+                            addJavaSource(resources, jos, mappedName, is, shadowRequest.getRelocators())
+                        } else {
+                            if (!resourceTransformed(transformers, mappedName, is, shadowRequest.getRelocators())) {
+                                // Avoid duplicates that aren't accounted for by the resource transformers
+                                if (resources.contains(mappedName)) {
+                                    continue;
+                                }
+
+                                addResource(resources, jos, mappedName, is)
+                            }
                         }
+
+                        IOUtil.close(is)
                     }
-
-                    IOUtil.close(is)
                 }
-            }
 
-            jarFile.close()
+                jarFile.close()
+            }
         }
 
         for (Transformer transformer : transformers) {
@@ -201,7 +201,7 @@ public class DefaultCaster extends AbstractLogEnabled implements Caster {
                 IOUtil.copy(is, jos)
             }
             catch (ZipException e) {
-                getLogger().warn("We have a duplicate " + name + " in " + jar)
+                log.warn("We have a duplicate " + name + " in " + jar)
             }
 
             return
@@ -237,7 +237,7 @@ public class DefaultCaster extends AbstractLogEnabled implements Caster {
             IOUtil.copy(renamedClass, jos)
         }
         catch (ZipException e) {
-            getLogger().warn("We have a duplicate " + mappedName + " in " + jar)
+            log.warn("We have a duplicate " + mappedName + " in " + jar)
         }
     }
 
@@ -257,7 +257,7 @@ public class DefaultCaster extends AbstractLogEnabled implements Caster {
 
         for (Transformer transformer : resourceTransformers) {
             if (transformer.canTransformResource(name)) {
-                getLogger().debug("Transforming " + name + " using " + transformer.getClass().getName())
+                log.debug("Transforming " + name + " using " + transformer.getClass().getName())
 
                 transformer.transform(name, is, relocators)
 
@@ -293,6 +293,17 @@ public class DefaultCaster extends AbstractLogEnabled implements Caster {
         IOUtil.copy(is, jos)
 
         resources.add(name)
+    }
+
+    void withStats(ShadowStats stats, Closure c) {
+        if (stats) {
+            stats.startJar()
+        }
+        c()
+        if (stats) {
+            stats.finishJar()
+            log.trace "${CastTask.NAME.capitalize()} - shadowed in ${stats.jarTiming} ms"
+        }
     }
 
 }
