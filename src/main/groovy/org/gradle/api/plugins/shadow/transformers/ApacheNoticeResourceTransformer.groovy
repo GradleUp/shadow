@@ -33,9 +33,6 @@ import java.util.jar.JarOutputStream
  *
  * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.javA
  *
- * Original
- * unknown
- *
  * Modifications
  * @author John Engelman
  */

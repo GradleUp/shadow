@@ -30,9 +30,6 @@ import java.util.jar.JarOutputStream
  *
  * Modified from org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer.java
  *
- * Original
- * @author unknown
- *
  * Modifications
  * @author John Engelman
  */

@@ -21,35 +21,41 @@ package org.gradle.api.plugins.shadow.transformers
 
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.plugins.shadow.relocator.Relocator
+import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
+import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 
 /**
- * Prevents duplicate copies of the license
+ * A resource processor that allows the addition of an arbitrary file
+ * content into the shaded JAR.
  *
- * Modified from org.apache.maven.plugins.shade.resouce.ApacheLicenseResourceTransformer.java
+ * Modified from org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java
  *
  * Modifications
  * @author John Engelman
  */
-public class ApacheLicenseResourceTransformer implements Transformer {
+public class IncludeResourceTransformer implements Transformer {
+    File file
 
-    private static final String LICENSE_PATH = "META-INF/LICENSE"
-
-    private static final String LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
+    String resource
 
     public boolean canTransformResource(FileTreeElement entry) {
-        return LICENSE_PATH.equalsIgnoreCase(entry.relativePath.pathString) ||
-                LICENSE_TXT_PATH.regionMatches(true, 0, entry.relativePath.pathString, 0, LICENSE_TXT_PATH.length())
-    }
-
-    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
-
-    }
-
-    public boolean hasTransformedResource() {
         return false
     }
 
-    public void modifyOutputStream(JarOutputStream os) {
+    public void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators) {
+        // no op
+    }
+
+    public boolean hasTransformedResource() {
+        return file != null ? file.exists() : false
+    }
+
+    public void modifyOutputStream(JarOutputStream jos) {
+        jos.putNextEntry(new JarEntry(resource))
+
+        InputStream is = new FileInputStream(file)
+        IOUtil.copy(is, jos)
+        is.close()
     }
 }
