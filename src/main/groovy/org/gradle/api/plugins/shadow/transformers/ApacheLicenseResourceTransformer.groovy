@@ -1,10 +1,5 @@
 package org.gradle.api.plugins.shadow.transformers
 
-import org.gradle.api.file.FileTreeElement
-import org.gradle.api.plugins.shadow.relocator.Relocator
-
-import java.util.jar.JarOutputStream
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,6 +18,11 @@ import java.util.jar.JarOutputStream
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.plugins.shadow.relocator.Relocator
+import java.util.jar.JarOutputStream
+
 /**
  * Prevents duplicate copies of the license
  *
