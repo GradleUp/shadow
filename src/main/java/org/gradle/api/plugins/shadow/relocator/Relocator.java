@@ -1,4 +1,4 @@
-package org.gradle.api.plugins.shadow.transformers
+package org.gradle.api.plugins.shadow.relocator;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,28 +19,18 @@ package org.gradle.api.plugins.shadow.transformers
  * under the License.
  */
 
-import org.gradle.api.file.FileTreeElement
-import org.gradle.api.plugins.shadow.relocator.Relocator
+/** @author Jason van Zyl */
+public interface Relocator
+{
+    String ROLE = Relocator.class.getName();
 
-import java.util.jar.JarFile
-import java.util.jar.JarOutputStream
+    boolean canRelocatePath(String clazz);
 
-/**
- * Modified from org.apache.maven.plugins.shade.resource.ResourceTransformer.java
- * Original
- * @author Jason van Zyl
- *
- * Modifications
- * @author Charlie Knudsen
- * @author John Engelman
- */
-public interface Transformer {
+    String relocatePath(String clazz);
 
-    boolean canTransformResource(FileTreeElement entry)
+    boolean canRelocateClass(String clazz);
 
-    void transform(FileTreeElement entry, InputStream is, List<Relocator> relocators)
-
-    boolean hasTransformedResource()
-
-    void modifyOutputStream(JarOutputStream jos)
+    String relocateClass(String clazz);
+    
+    String applyToSourceContent(String sourceContent);
 }
