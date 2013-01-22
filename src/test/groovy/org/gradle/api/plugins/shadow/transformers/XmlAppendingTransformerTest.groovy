@@ -1,5 +1,3 @@
-package org.gradle.api.plugins.shadow.transformers
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.gradle.api.plugins.shadow.transformers
  * "License") you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,8 @@ package org.gradle.api.plugins.shadow.transformers
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package org.gradle.api.plugins.shadow.transformers
 
 import junit.framework.TestCase
 
@@ -29,7 +29,7 @@ import junit.framework.TestCase
  *
  * Modified from org.apache.maven.plugins.shade.resource.XmlAppendingTransformerTest.java
  */
-public class XmlAppendingTransformerTest extends TestCase {
+class XmlAppendingTransformerTest extends TestCase {
 
     XmlAppendingTransformer transformer
 
@@ -41,11 +41,11 @@ public class XmlAppendingTransformerTest extends TestCase {
         Locale.setDefault(new Locale("tr"))
     }
 
-    public void setUp() {
+    void setUp() {
         transformer = new XmlAppendingTransformer()
     }
 
-    public void testCanTransformResource() {
+    void testCanTransformResource() {
         transformer.resource = "abcdefghijklmnopqrstuvwxyz"
 
         assertTrue(this.transformer.canTransformResource("abcdefghijklmnopqrstuvwxyz"))

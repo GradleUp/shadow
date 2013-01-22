@@ -1,12 +1,3 @@
-package org.gradle.api.plugins.shadow.impl
-
-import junit.framework.TestCase
-import org.gradle.api.plugins.shadow.filter.Filter
-import org.gradle.api.plugins.shadow.relocation.Relocator
-import org.gradle.api.plugins.shadow.relocation.SimpleRelocator
-import org.gradle.api.plugins.shadow.transformers.ComponentsXmlResourceTransformer
-import org.gradle.api.plugins.shadow.transformers.Transformer
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,6 +16,16 @@ import org.gradle.api.plugins.shadow.transformers.Transformer
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package org.gradle.api.plugins.shadow.impl
+
+import junit.framework.TestCase
+import org.gradle.api.plugins.shadow.filter.Filter
+import org.gradle.api.plugins.shadow.relocation.Relocator
+import org.gradle.api.plugins.shadow.relocation.SimpleRelocator
+import org.gradle.api.plugins.shadow.transformers.ComponentsXmlResourceTransformer
+import org.gradle.api.plugins.shadow.transformers.Transformer
+
 /**
  * @author Jason van Zyl
  * @author Mauro Talevi
@@ -34,16 +35,16 @@ import org.gradle.api.plugins.shadow.transformers.Transformer
  * Modifications
  * @author John Engelman
  */
-public class DefaultShaderTest extends TestCase {
+class DefaultShaderTest extends TestCase {
     private static final String[] EXCLUDES = [
             "org/codehaus/plexus/util/xml/Xpp3Dom",
             "org/codehaus/plexus/util/xml/pull.*"] as String[]
 
-    public void testShaderWithDefaultShadedPattern() {
+    void testShaderWithDefaultShadedPattern() {
         shaderWithPattern(null, File.createTempFile("food-default", "jar"), EXCLUDES)
     }
 
-    public void testShaderWithStaticInitializedClass() {
+    void testShaderWithStaticInitializedClass() {
         Caster s = newCaster()
 
         List<File> jars = []
@@ -75,16 +76,16 @@ public class DefaultShaderTest extends TestCase {
         assertEquals("foo.bar/baz", c.getDeclaredField("CONSTANT").get(o))
     }
 
-    public void testShaderWithCustomShadedPattern() {
+    void testShaderWithCustomShadedPattern() {
         shaderWithPattern("org/shaded/plexus/util", File.createTempFile("foo-custom", "jar"), EXCLUDES)
     }
 
-    public void testShaderWithoutExcludesShouldRemoveReferencesOfOriginalPattern() {
+    void testShaderWithoutExcludesShouldRemoveReferencesOfOriginalPattern() {
         //FIXME:  shaded jar should not include references to org/codehaus/* (empty dirs) or org.codehaus.* META-INF files.
         shaderWithPattern("org/shaded/plexus/util", File.createTempFile("foo-custom-without-excludes", "jar"), [] as String[])
     }
 
-    public void shaderWithPattern(String shadedPattern, File jar, String[] excludes) {
+    void shaderWithPattern(String shadedPattern, File jar, String[] excludes) {
         DefaultCaster s = newCaster()
 
         List<File> jars = []

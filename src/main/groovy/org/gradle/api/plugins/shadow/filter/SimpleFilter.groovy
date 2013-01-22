@@ -1,5 +1,3 @@
-package org.gradle.api.plugins.shadow.filter
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,6 +17,8 @@ package org.gradle.api.plugins.shadow.filter
  * under the License.
  */
 
+package org.gradle.api.plugins.shadow.filter
+
 import org.gradle.mvn3.org.codehaus.plexus.util.SelectorUtils
 
 /**
@@ -26,7 +26,7 @@ import org.gradle.mvn3.org.codehaus.plexus.util.SelectorUtils
  *
  * Modified from org.apache.maven.plugins.shade.filter.SimpleFilter.java
  */
-public class SimpleFilter implements Filter {
+class SimpleFilter implements Filter {
 
     private List<File> jars
 
@@ -34,23 +34,23 @@ public class SimpleFilter implements Filter {
 
     private List<String> excludes
 
-    public SimpleFilter(List<File> jars, List<String> includes, List<String> excludes) {
+    SimpleFilter(List<File> jars, List<String> includes, List<String> excludes) {
         this.jars = (jars != null) ? new ArrayList<File>(jars) : []
         this.includes = normalizePatterns(includes)
         this.excludes = normalizePatterns(excludes)
     }
 
-    public boolean canFilter(File jar) {
+    boolean canFilter(File jar) {
         return jars.contains(jar)
     }
 
-    public boolean isFiltered(String classFile) {
+    boolean isFiltered(String classFile) {
         String path = normalizePath(classFile)
 
         return !(isIncluded(path) && !isExcluded(path))
     }
 
-    public boolean isSpecificallyIncluded(String classFile) {
+    boolean isSpecificallyIncluded(String classFile) {
         if (includes == null || includes.isEmpty()) {
             return false
         }
@@ -109,6 +109,6 @@ public class SimpleFilter implements Filter {
         return result
     }
 
-    public void finished() {
+    void finished() {
     }
 }

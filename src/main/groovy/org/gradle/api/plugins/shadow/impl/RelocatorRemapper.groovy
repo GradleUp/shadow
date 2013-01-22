@@ -1,5 +1,3 @@
-package org.gradle.api.plugins.shadow.impl
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,6 +17,8 @@ package org.gradle.api.plugins.shadow.impl
  * under the License.
  */
 
+package org.gradle.api.plugins.shadow.impl
+
 import org.gradle.api.plugins.shadow.relocation.Relocator
 import org.objectweb.asm.commons.Remapper
 
@@ -34,15 +34,15 @@ class RelocatorRemapper extends Remapper {
 
     List<Relocator> relocators
 
-    public RelocatorRemapper(List<Relocator> relocators) {
+    RelocatorRemapper(List<Relocator> relocators) {
         this.relocators = relocators
     }
 
-    public boolean hasRelocators() {
+    boolean hasRelocators() {
         return !relocators.isEmpty()
     }
 
-    public Object mapValue(Object object) {
+    Object mapValue(Object object) {
         if (object instanceof String) {
             String name = (String) object
             String value = name
@@ -73,7 +73,7 @@ class RelocatorRemapper extends Remapper {
         return super.mapValue(object)
     }
 
-    public String map(String name) {
+    String map(String name) {
         String value = name
 
         String prefix = ""

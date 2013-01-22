@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License") you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.gradle.api.plugins.shadow.relocation
 
 import junit.framework.TestCase
@@ -13,9 +32,9 @@ import junit.framework.TestCase
  * Modifications
  * @author John Engelman
  */
-public class SimpleRelocatorTest extends TestCase {
+class SimpleRelocatorTest extends TestCase {
 
-    public void testCanRelocatePath() {
+    void testCanRelocatePath() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
@@ -47,7 +66,7 @@ public class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocatePath("org/foo/PublicUtilStuff.class"))
     }
 
-    public void testCanRelocateClass() {
+    void testCanRelocateClass() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
@@ -69,7 +88,7 @@ public class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocateClass("org.foo.PublicUtilStuff"))
     }
 
-    public void testCanRelocateRawString() {
+    void testCanRelocateRawString() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org/foo", null, null, null, true)
@@ -80,13 +99,13 @@ public class SimpleRelocatorTest extends TestCase {
     }
 
     //MSHADE-119, make sure that the easy part of this works.
-    public void testCanRelocateAbsClassPath() {
+    void testCanRelocateAbsClassPath() {
         SimpleRelocator relocator = new SimpleRelocator("org.apache.velocity", "org.apache.momentum", null, null)
         assertEquals("/org/apache/momentum/mass.properties", relocator.relocatePath("/org/apache/velocity/mass.properties"))
 
     }
 
-    public void testRelocatePath() {
+    void testRelocatePath() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
@@ -96,7 +115,7 @@ public class SimpleRelocatorTest extends TestCase {
         assertEquals("private/stuff/bar/Class.class", relocator.relocatePath("org/foo/bar/Class.class"))
     }
 
-    public void testRelocateClass() {
+    void testRelocateClass() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
@@ -106,7 +125,7 @@ public class SimpleRelocatorTest extends TestCase {
         assertEquals("private.stuff.bar.Class", relocator.relocateClass("org.foo.bar.Class"))
     }
 
-    public void testRelocateRawString() {
+    void testRelocateRawString() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("Lorg/foo", "Lhidden/org/foo", null, null, true)

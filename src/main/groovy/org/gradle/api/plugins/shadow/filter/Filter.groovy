@@ -1,5 +1,3 @@
-package org.gradle.api.plugins.shadow.filter
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,12 +17,14 @@ package org.gradle.api.plugins.shadow.filter
  * under the License.
  */
 
+package org.gradle.api.plugins.shadow.filter
+
 /**
  * @author David Blevins
  *
  * Modified from org.apache.maven.plugins.shade.filter.Filter.java
  */
-public interface Filter {
+interface Filter {
     boolean canFilter(File jar)
 
     boolean isFiltered(String classFile)

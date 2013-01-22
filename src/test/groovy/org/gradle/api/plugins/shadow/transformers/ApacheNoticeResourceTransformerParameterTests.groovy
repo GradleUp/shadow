@@ -1,9 +1,3 @@
-package org.gradle.api.plugins.shadow.transformers
-
-import junit.framework.TestCase
-import org.gradle.api.plugins.shadow.relocation.Relocator
-
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -13,7 +7,7 @@ import org.gradle.api.plugins.shadow.relocation.Relocator
  * "License") you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -23,12 +17,17 @@ import org.gradle.api.plugins.shadow.relocation.Relocator
  * under the License.
  */
 
+package org.gradle.api.plugins.shadow.transformers
+
+import junit.framework.TestCase
+import org.gradle.api.plugins.shadow.relocation.Relocator
+
 /**
  * Tests {@link ApacheLicenseResourceTransformer} parameters.
  *
  * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerParameterTests.java
  */
-public class ApacheNoticeResourceTransformerParameterTests extends TestCase {
+class ApacheNoticeResourceTransformerParameterTests extends TestCase {
 
     private static final String NOTICE_RESOURCE = "META-INF/NOTICE"
     private ApacheNoticeResourceTransformer subject
@@ -38,31 +37,31 @@ public class ApacheNoticeResourceTransformerParameterTests extends TestCase {
         subject = new ApacheNoticeResourceTransformer()
     }
 
-    public void testNoParametersShouldNotThrowNullPointerWhenNoInput() {
+    void testNoParametersShouldNotThrowNullPointerWhenNoInput() {
         processAndFailOnNullPointer("")
     }
 
-    public void testNoParametersShouldNotThrowNullPointerWhenNoLinesOfInput() {
+    void testNoParametersShouldNotThrowNullPointerWhenNoLinesOfInput() {
         processAndFailOnNullPointer("Some notice text")
     }
 
-    public void testNoParametersShouldNotThrowNullPointerWhenOneLineOfInput() {
+    void testNoParametersShouldNotThrowNullPointerWhenOneLineOfInput() {
         processAndFailOnNullPointer("Some notice text\n")
     }
 
-    public void testNoParametersShouldNotThrowNullPointerWhenTwoLinesOfInput() {
+    void testNoParametersShouldNotThrowNullPointerWhenTwoLinesOfInput() {
         processAndFailOnNullPointer("Some notice text\nSome notice text\n")
     }
 
-    public void testNoParametersShouldNotThrowNullPointerWhenLineStartsWithSlashSlash() {
+    void testNoParametersShouldNotThrowNullPointerWhenLineStartsWithSlashSlash() {
         processAndFailOnNullPointer("Some notice text\n//Some notice text\n")
     }
 
-    public void testNoParametersShouldNotThrowNullPointerWhenLineIsSlashSlash() {
+    void testNoParametersShouldNotThrowNullPointerWhenLineIsSlashSlash() {
         processAndFailOnNullPointer("//\n")
     }
 
-    public void testNoParametersShouldNotThrowNullPointerWhenLineIsEmpty() {
+    void testNoParametersShouldNotThrowNullPointerWhenLineIsEmpty() {
         processAndFailOnNullPointer("\n")
     }
 

@@ -1,7 +1,3 @@
-package org.gradle.api.plugins.shadow.impl
-
-import groovy.util.logging.Slf4j
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +16,10 @@ import groovy.util.logging.Slf4j
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package org.gradle.api.plugins.shadow.impl
+
+import groovy.util.logging.Slf4j
 
 import org.gradle.api.plugins.shadow.ShadowStats
 import org.gradle.api.plugins.shadow.filter.Filter
@@ -45,9 +45,9 @@ import java.util.zip.ZipException
  * Modified from org.apache.maven.plugins.shade.DefaultShader.java
  */
 @Slf4j
-public class DefaultCaster implements Caster {
+class DefaultCaster implements Caster {
 
-    public void cast(ShadowRequest shadowRequest) {
+    void cast(ShadowRequest shadowRequest) {
         Set<String> resources = new HashSet<String>()
 
         Transformer manifestTransformer = null

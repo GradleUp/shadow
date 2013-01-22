@@ -1,5 +1,3 @@
-package org.gradle.api.plugins.shadow.filter
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,6 +17,7 @@ package org.gradle.api.plugins.shadow.filter
  * under the License.
  */
 
+package org.gradle.api.plugins.shadow.filter
 
 import junit.framework.TestCase
 
@@ -27,9 +26,9 @@ import junit.framework.TestCase
  *
  * Modified from org.apache.maven.plugins.shade.filter.SimpleFilterTest.java
  */
-public class SimpleFilterTest extends TestCase {
+class SimpleFilterTest extends TestCase {
 
-    public void testIsFiltered() {
+    void testIsFiltered() {
         SimpleFilter filter
 
         filter = new SimpleFilter(null, null, null)

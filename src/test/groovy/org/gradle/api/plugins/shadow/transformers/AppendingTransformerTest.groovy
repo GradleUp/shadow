@@ -1,15 +1,13 @@
-package org.gradle.api.plugins.shadow.transformers;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
  * regarding copyright ownership.  The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
+ * "License") you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,21 +17,19 @@ package org.gradle.api.plugins.shadow.transformers;
  * under the License.
  */
 
-import java.util.Locale;
+package org.gradle.api.plugins.shadow.transformers
 
-import junit.framework.TestCase;
+import junit.framework.TestCase
 
 /**
  * Test for {@link AppendingTransformer}.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id: AppendingTransformerTest.java 673906 2008-07-04 05:03:20Z brett $
  */
-public class AppendingTransformerTest
-    extends TestCase
-{
+class AppendingTransformerTest extends TestCase {
 
-    private AppendingTransformer transformer;
+    private AppendingTransformer transformer
 
     static
     {
@@ -41,21 +37,19 @@ public class AppendingTransformerTest
          * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
          * choice to test for improper case-less string comparisions.
          */
-        Locale.setDefault( new Locale( "tr" ) );
+        Locale.setDefault(new Locale("tr"))
     }
 
-    public void setUp()
-    {
-        this.transformer = new AppendingTransformer();
+    void setUp() {
+        this.transformer = new AppendingTransformer()
     }
 
-    public void testCanTransformResource()
-    {
-        this.transformer.resource = "abcdefghijklmnopqrstuvwxyz";
+    void testCanTransformResource() {
+        this.transformer.resource = "abcdefghijklmnopqrstuvwxyz"
 
-        assertTrue( this.transformer.canTransformResource( "abcdefghijklmnopqrstuvwxyz" ) );
-        assertTrue( this.transformer.canTransformResource( "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ) );
-        assertFalse( this.transformer.canTransformResource( "META-INF/MANIFEST.MF" ) );
+        assertTrue(this.transformer.canTransformResource("abcdefghijklmnopqrstuvwxyz"))
+        assertTrue(this.transformer.canTransformResource("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+        assertFalse(this.transformer.canTransformResource("META-INF/MANIFEST.MF"))
     }
 
 }
