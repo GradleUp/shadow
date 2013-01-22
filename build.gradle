@@ -65,6 +65,11 @@ task configureUploadArchives(dependsOn: [configureUploadArchivesBinTray, configu
 
 uploadArchives.dependsOn test, configureUploadArchives
 
+jar {
+    from 'LICENSE'
+    from 'NOTICE'
+}
+
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')
 }
