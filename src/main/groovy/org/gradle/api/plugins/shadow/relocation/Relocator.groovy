@@ -4,7 +4,7 @@
  * distributed with this work for additional information
  * regarding copyright ownership.  The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
+ * "License") you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.gradle.api.plugins.shadow.relocation;
+package org.gradle.api.plugins.shadow.relocation
 
 /**
  * @author Jason van Zyl
@@ -27,16 +27,16 @@ package org.gradle.api.plugins.shadow.relocation;
  * Modifications
  * @author John Engelman
  */
-public interface Relocator {
-    String ROLE = Relocator.class.getName();
+interface Relocator {
+    String ROLE = Relocator.class.getName()
 
-    boolean canRelocatePath(String clazz);
+    boolean canRelocatePath(String clazz)
 
-    String relocatePath(String clazz);
+    String relocatePath(String clazz)
 
-    boolean canRelocateClass(String clazz);
+    boolean canRelocateClass(String clazz)
 
-    String relocateClass(String clazz);
+    String relocateClass(String clazz)
 
-    String applyToSourceContent(String sourceContent);
+    String applyToSourceContent(String sourceContent)
 }
