@@ -1,22 +1,9 @@
-buildscript {
-    repositories {
-        maven {
-            url 'http://repo.jfrog.org/artifactory/gradle-plugins'
-        }
-    }
-    
-    dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.17'
-    }
-}
-
 repositories {
     mavenCentral()
 }
 
-apply plugin: 'groovy'
 apply plugin: 'maven'
-apply plugin: 'artifactory'
+apply plugin: 'groovy'
 apply plugin: 'idea'
 
 group = 'org.gradle.plugins'
@@ -29,26 +16,27 @@ dependencies {
     testCompile "org.spockframework:spock-core:0.6-groovy-1.8"
 }
 
-artifactoryPublish {
-    dependsOn jar
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
-artifactory {
-    contextUrl = "${bloom_artifactory_contextUrl}"
+artifacts {
+    archives sourcesJar
+}
 
-    def currentRepoKey = isSnapshot() ? 'libs-snapshot-local' : 'libs-release-local'
-    publish {
-        repository {
-            username = "${bloom_artifactory_publish_username}"
-            password = "${bloom_artifactory_publish_password}"
-            repoKey = "${currentRepoKey}"
-            maven = true
-        }
-    }
-    resolve {
-        repository {
-            repoKey = "${currentRepoKey}"
-            maven = true
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository (
+                url: bintray_api_base_url + '/maven/' + bintray_username + '/' + bintray_repo + '/' + bintray_package
+            ) {
+                authentication(
+                    userName: bintray_username,
+                    password: bintray_api_key
+                )
+            }
         }
     }
 }
