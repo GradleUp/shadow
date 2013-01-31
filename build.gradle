@@ -1,57 +1,44 @@
-buildscript {
-    repositories {
-        maven {
-            url 'http://repo.jfrog.org/artifactory/gradle-plugins'
-        }
-    }
-    
-    dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.17'
-    }
-}
-
 repositories {
     mavenCentral()
 }
 
-apply plugin: 'groovy'
 apply plugin: 'maven'
-apply plugin: 'artifactory'
+apply plugin: 'groovy'
 apply plugin: 'idea'
 
 group = 'org.gradle.plugins'
 version = "${currentVersion}"
 
 dependencies {
-    groovy 'org.codehaus.groovy:groovy-all:1.8.6'
+    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
     compile gradleApi()
     
-    testCompile "org.spockframework:spock-core:0.6-groovy-1.8"
+    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
 }
 
-artifactoryPublish {
-    dependsOn jar
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
-artifactory {
-    contextUrl = "${bloom_artifactory_contextUrl}"
+artifacts {
+    archives sourcesJar
+}
 
-    def currentRepoKey = isSnapshot() ? 'libs-snapshot-local' : 'libs-release-local'
-    publish {
-        repository {
-            username = "${bloom_artifactory_publish_username}"
-            password = "${bloom_artifactory_publish_password}"
-            repoKey = "${currentRepoKey}"
-            maven = true
+
+uploadArchives {
+    repositories {
+        ivy {
+            url = bintray_api_base_url + '/content/' + bintray_username + '/' + bintray_repo + '/' + bintray_package + '/' + version
+            credentials {
+                username bintray_username
+                password bintray_api_key
+            }
         }
     }
-    resolve {
-        repository {
-            repoKey = "${currentRepoKey}"
-            maven = true
-        }
-    }
 }
+
+//uploadArchives.dependsOn createBintrayPackage
 
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')
