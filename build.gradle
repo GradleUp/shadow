@@ -25,11 +25,10 @@ artifacts {
     archives sourcesJar
 }
 
-
 uploadArchives {
     repositories {
         ivy {
-            url = bintray_api_base_url + '/content/' + bintray_username + '/' + bintray_repo + '/' + bintray_package + '/' + version
+            url = bintray_api_base_url + '/content/' + bintray_username + '/' + (isSnapshot() ? bintray_snap_repo : bintray_repo) + '/' + bintray_package + '/' + version
             credentials {
                 username bintray_username
                 password bintray_api_key
@@ -38,7 +37,7 @@ uploadArchives {
     }
 }
 
-//uploadArchives.dependsOn createBintrayPackage
+uploadArchives.dependsOn test
 
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')
