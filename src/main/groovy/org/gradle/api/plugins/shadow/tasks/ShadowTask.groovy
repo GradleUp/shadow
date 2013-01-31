@@ -23,9 +23,9 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
-class CastTask extends DefaultTask {
+class ShadowTask extends DefaultTask {
 
-    static final String NAME = "cast"
+    static final String NAME = "shadow"
     static final String DESC = "Combines all classpath resources into a single jar."
 
     @OutputFile
@@ -54,7 +54,7 @@ class CastTask extends DefaultTask {
     Caster caster
 
     @TaskAction
-    void cast() {
+    void shadow() {
 
         logger.info "${NAME.capitalize()} - start"
         initStats()
@@ -71,19 +71,7 @@ class CastTask extends DefaultTask {
         shadow.jars = jars
 
         caster.cast(shadow)
-//        JarOutputStream jos = new JarOutputStream(new FileOutputStream(outputJar))
-//
-//        jars.findAll { File jar ->
-//            !signedJars.contains(jar)
-//        }.each { File jar ->
-//            processJar(jar, jos)
-//        }
-//        transformers.each { Transformer transformer ->
-//            if (transformer.hasTransformedResource()) {
-//                transformer.modifyOutputStream(jos)
-//            }
-//        }
-//        IOUtil.close(jos)
+
         logger.info "${NAME.capitalize()} - finish"
         printStats()
     }

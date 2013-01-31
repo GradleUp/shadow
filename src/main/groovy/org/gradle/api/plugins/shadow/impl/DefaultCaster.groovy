@@ -24,7 +24,7 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.plugins.shadow.ShadowStats
 import org.gradle.api.plugins.shadow.filter.Filter
 import org.gradle.api.plugins.shadow.relocation.Relocator
-import org.gradle.api.plugins.shadow.tasks.CastTask
+import org.gradle.api.plugins.shadow.tasks.ShadowTask
 import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
 import org.gradle.api.plugins.shadow.transformers.Transformer
 import org.gradle.api.tasks.TaskExecutionException
@@ -302,7 +302,7 @@ class DefaultCaster implements Caster {
         c()
         if (stats) {
             stats.finishJar()
-            log.trace "${CastTask.NAME.capitalize()} - shadowed in ${stats.jarTiming} ms"
+            log.trace "${ShadowTask.NAME.capitalize()} - shadowed in ${stats.jarTiming} ms"
         }
     }
 

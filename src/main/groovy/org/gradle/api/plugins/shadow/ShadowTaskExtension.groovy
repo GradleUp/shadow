@@ -23,8 +23,8 @@ class ShadowTaskExtension {
         return new File(destinationDir, "$baseName.$extension")
     }
 
-    File getSignedLibsDir() {
-        return new File(destinationDir, "signedLibs/")
+    String getSignedLibsDir() {
+        return destinationDir + 'signedLibs/'
     }
 
     ShadowTaskExtension exclude(String s) {
