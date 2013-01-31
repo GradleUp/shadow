@@ -10,10 +10,10 @@ group = 'org.gradle.plugins'
 version = "${currentVersion}"
 
 dependencies {
-    groovy 'org.codehaus.groovy:groovy-all:1.8.6'
+    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
     compile gradleApi()
     
-    testCompile "org.spockframework:spock-core:0.6-groovy-1.8"
+    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -28,18 +28,17 @@ artifacts {
 
 uploadArchives {
     repositories {
-        mavenDeployer {
-            repository (
-                url: bintray_api_base_url + '/maven/' + bintray_username + '/' + bintray_repo + '/' + bintray_package
-            ) {
-                authentication(
-                    userName: bintray_username,
-                    password: bintray_api_key
-                )
+        ivy {
+            url = bintray_api_base_url + '/content/' + bintray_username + '/' + bintray_repo + '/' + bintray_package + '/' + version
+            credentials {
+                username bintray_username
+                password bintray_api_key
             }
         }
     }
 }
+
+//uploadArchives.dependsOn createBintrayPackage
 
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')
