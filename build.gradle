@@ -25,19 +25,41 @@ artifacts {
     archives sourcesJar
 }
 
-uploadArchives {
-    repositories {
-        ivy {
-            url = bintray_api_base_url + '/content/' + bintray_username + '/' + (isSnapshot() ? bintray_snap_repo : bintray_repo) + '/' + bintray_package + '/' + version
-            credentials {
-                username bintray_username
-                password bintray_api_key
+task configureUploadArchivesBinTray << {
+    uploadArchives {
+        repositories {
+            ivy {
+                url = bintray_api_base_url + '/content/' + bintray_username + '/' + bintray_repo + '/' + bintray_package + '/' + version
+                credentials {
+                    username bintray_username
+                    password bintray_api_key
+                }
+            }
+        }
+    }
+}
+configureUploadArchivesBinTray.onlyIf {
+    !isSnapshot()
+}
+
+task configureUploadArchivesArtifactory << {
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${bloom_artifactory_contextUrl}/libs-${isSnapshot() ? 'snapshot' : 'release'}-local") {
+                    authentication(
+                            userName: bloom_artifactory_username,
+                            password: bloom_artifactory_password
+                    )
+                }
             }
         }
     }
 }
 
-uploadArchives.dependsOn test
+task configureUploadArchives(dependsOn: [configureUploadArchivesBinTray, configureUploadArchivesArtifactory])
+
+uploadArchives.dependsOn test, configureUploadArchives
 
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')
