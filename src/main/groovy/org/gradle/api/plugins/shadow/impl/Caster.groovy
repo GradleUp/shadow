@@ -23,6 +23,9 @@ package org.gradle.api.plugins.shadow.impl
  * Interface that defines the process of shadowing.
  *
  * Modified from org.apache.maven.plugins.shade.Shader.java
+ *
+ * Modifications
+ * @author John Engelman
  */
 interface Caster {
     String ROLE = Caster.class.getName()

@@ -49,6 +49,9 @@ import org.gradle.api.plugins.shadow.transformers.Transformer
  * @since 2.0
  *
  * Modified from org.apache.maven.plugins.shade.ShadeRequest.java
+ *
+ * Modifications
+ * @author John Engelman
  */
 class ShadowRequest {
 

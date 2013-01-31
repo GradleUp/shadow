@@ -23,6 +23,9 @@ package org.gradle.api.plugins.shadow.filter
  * @author David Blevins
  *
  * Modified from org.apache.maven.plugins.shade.filter.Filter.java
+ *
+ * Modifications
+ * @author John Engelman
  */
 interface Filter {
     boolean canFilter(File jar)

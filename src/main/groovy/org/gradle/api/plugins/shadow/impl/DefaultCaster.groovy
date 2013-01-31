@@ -19,8 +19,8 @@
 
 package org.gradle.api.plugins.shadow.impl
 
-import groovy.util.logging.Slf4j
-
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.shadow.ShadowStats
 import org.gradle.api.plugins.shadow.filter.Filter
 import org.gradle.api.plugins.shadow.relocation.Relocator
@@ -43,9 +43,13 @@ import java.util.zip.ZipException
  * @author Jason van Zyl
  *
  * Modified from org.apache.maven.plugins.shade.DefaultShader.java
+ *
+ * Modifications
+ * @author John Engelman
  */
-@Slf4j
 class DefaultCaster implements Caster {
+
+    Logger logger = Logging.getLogger(DefaultCaster)
 
     void cast(ShadowRequest shadowRequest) {
         Set<String> resources = new HashSet<String>()
@@ -85,7 +89,7 @@ class DefaultCaster implements Caster {
         for (File jar : shadowRequest.getJars()) {
             withStats(shadowRequest.stats) {
 
-                log.debug("Processing JAR " + jar)
+                logger.debug("Processing JAR " + jar)
 
                 List<Filter> jarFilters = getFilters(jar, shadowRequest.getFilters())
                 JarFile jarFile = newJarFile(jar)
@@ -201,7 +205,7 @@ class DefaultCaster implements Caster {
                 IOUtil.copy(is, jos)
             }
             catch (ZipException e) {
-                log.warn("We have a duplicate " + name + " in " + jar)
+                logger.debug("We have a duplicate " + name + " in " + jar)
             }
 
             return
@@ -237,7 +241,7 @@ class DefaultCaster implements Caster {
             IOUtil.copy(renamedClass, jos)
         }
         catch (ZipException e) {
-            log.warn("We have a duplicate " + mappedName + " in " + jar)
+            logger.warn("We have a duplicate " + mappedName + " in " + jar)
         }
     }
 
@@ -257,7 +261,7 @@ class DefaultCaster implements Caster {
 
         for (Transformer transformer : resourceTransformers) {
             if (transformer.canTransformResource(name)) {
-                log.debug("Transforming " + name + " using " + transformer.getClass().getName())
+                logger.debug("Transforming " + name + " using " + transformer.getClass().getName())
 
                 transformer.transform(name, is, relocators)
 
@@ -302,7 +306,7 @@ class DefaultCaster implements Caster {
         c()
         if (stats) {
             stats.finishJar()
-            log.trace "${ShadowTask.NAME.capitalize()} - shadowed in ${stats.jarTiming} ms"
+            logger.trace "${ShadowTask.NAME.capitalize()} - shadowed in ${stats.jarTiming} ms"
         }
     }
 

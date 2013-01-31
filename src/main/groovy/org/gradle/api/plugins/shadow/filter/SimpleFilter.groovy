@@ -25,6 +25,9 @@ import org.gradle.mvn3.org.codehaus.plexus.util.SelectorUtils
  * @author David Blevins
  *
  * Modified from org.apache.maven.plugins.shade.filter.SimpleFilter.java
+ *
+ * Modifications
+ * @author John Engelman
  */
 class SimpleFilter implements Filter {
 
