@@ -12,6 +12,7 @@ class ShadowTaskExtension {
     String baseName = "${project.archivesBaseName}-shadow-${project.version}"
     String extension = "jar"
     boolean stats = false
+    boolean artifactAttached = true
 
     private final Project project
 

@@ -41,7 +41,7 @@ class DefaultShaderTest extends TestCase {
             "org/codehaus/plexus/util/xml/pull.*"] as String[]
 
     void testShaderWithDefaultShadedPattern() {
-        shaderWithPattern(null, File.createTempFile("food-default", "jar"), EXCLUDES)
+        shaderWithPattern(null, File.createTempFile("foo-default", "jar"), EXCLUDES)
     }
 
     void testShaderWithStaticInitializedClass() {
