@@ -1,27 +1,20 @@
 package org.gradle.api.plugins.shadow.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileTreeElement
+import org.gradle.api.artifacts.PublishArtifactSet
+import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.file.RelativePath
 import org.gradle.api.plugins.shadow.ShadowStats
+import org.gradle.api.plugins.shadow.impl.ArtifactSelector
+import org.gradle.api.plugins.shadow.impl.ArtifactSet
 import org.gradle.api.plugins.shadow.impl.Caster
 import org.gradle.api.plugins.shadow.impl.DefaultCaster
 import org.gradle.api.plugins.shadow.impl.ShadowRequest
 import org.gradle.api.plugins.shadow.relocation.Relocator
-import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
-import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
 import org.gradle.api.plugins.shadow.transformers.Transformer
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.util.PatternFilterable
-import org.gradle.api.tasks.util.PatternSet
-import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
-
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
-import java.util.jar.JarOutputStream
 
 class ShadowTask extends DefaultTask {
 
@@ -31,24 +24,12 @@ class ShadowTask extends DefaultTask {
     @OutputFile
     File outputJar = project.shadow.shadowJar
 
-    @Input
-    List<String> includes = project.shadow.includes
-
-    @Input
-    List<String> excludes = project.shadow.excludes
-
-    @InputFiles
-    List<File> artifacts = project.configurations.runtime.allArtifacts.files as List
-
-    List<Transformer> transformers = [new ServiceFileTransformer(), new ManifestResourceTransformer()]
+    List<Transformer> transformers = project.shadow.transformers
     List<Relocator> relocators = []
 
     boolean statsEnabled
 
     List<RelativePath> existingPaths = []
-
-    private List<File> jarCache
-    private List<File> signedJarCache
 
     ShadowStats stats
     Caster caster
@@ -66,7 +47,7 @@ class ShadowTask extends DefaultTask {
         shadow.uberJar = outputJar
         shadow.relocators = []
         shadow.filters = []
-        shadow.resourceTransformers = transformers
+        shadow.resourceTransformers = project.shadow.transformers
         shadow.shadeSourcesContent = false
         shadow.jars = jars
 
@@ -91,76 +72,21 @@ class ShadowTask extends DefaultTask {
         }
     }
 
-    void processJar(File file, JarOutputStream jos) {
-        logger.debug "${NAME.capitalize()} - shadowing [${file.name}]"
-        withStats {
-            def filteredTree = project.zipTree(file).matching(filter)
-            def jarFile = new JarFile(file)
-            filteredTree.visit { FileTreeElement jarEntry ->
-                processJarEntry(jarEntry, jarFile, jos)
-            }
-        }
-
-    }
-
-    void withStats(Closure c) {
-        if (statsEnabled) {
-            stats.startJar()
-        }
-        c()
-        if (statsEnabled) {
-            stats.finishJar()
-            logger.trace "${NAME.capitalize()} - shadowed in ${stats.jarTiming} ms"
-        }
-    }
-
-    boolean resourceTransformed(FileTreeElement entry, JarFile jar) {
-        String path = entry.relativePath.pathString
-        for(Transformer transformer in transformers) {
-            if (transformer.canTransformResource(path)) {
-                def jarEntry = jar.getEntry(path)
-                transformer.transform(path, jar.getInputStream(jarEntry), relocators)
-                return true
-            }
-        }
-        return false
-    }
-
-    void processJarEntry(FileTreeElement entry, JarFile jar, JarOutputStream jos) {
-        if (!entry.isDirectory() && ! resourceTransformed(entry, jar) && !existingPaths.contains(entry.relativePath)) {
-            addDirectories(entry.relativePath.parent, jos)
-            existingPaths << entry.relativePath
-            writeJarEntry jos, entry, jar
-        }
-    }
-
-    void addDirectories(RelativePath path, JarOutputStream jos) {
-        if (path.parent && !existingPaths.contains(path)) {
-            addDirectories(path.parent, jos)
-            writeDirectoryJarEntry(jos, path)
-            existingPaths << path
-        }
-    }
-
-    PatternFilterable getFilter() {
-        PatternFilterable filter = new PatternSet()
-        filter.includes = includes
-        filter.excludes = excludes
-        filter
-    }
-
     List<File> getJars() {
-        if (jarCache == null) {
-            jarCache = artifacts + dependencies
-        }
-        jarCache
+        println "Getting Jars"
+        ArtifactSelector selector = initSelector()
+        println "Selector: $selector"
+        getArtifacts(selector) + getDependencies(selector)
+    }
+
+    @InputFiles
+    List<File> getArtifacts(ArtifactSelector selector) {
+        println "Getting artifacts"
+        project.configurations.runtime.artifacts.files as List
     }
 
     List<File> getSignedJars() {
-        if (signedJarCache == null) {
-            signedJarCache = signedCompileJars + signedRuntimeJars
-        }
-        signedJarCache
+        signedCompileJars + signedRuntimeJars
     }
 
     List<File> getSignedCompileJars() {
@@ -171,25 +97,37 @@ class ShadowTask extends DefaultTask {
         project.configurations.signedRuntime.resolve() as List
     }
 
-    List<File> getDependencies() {
-        (project.configurations.runtime.resolve() as List).findAll { !signedJars.contains(it) }
+    List<ResolvedArtifact> getResolvedSignedArtifacts() {
+        ['signedCompile', 'signedRuntime'].collect {
+            getResolvedArtifactsFor(it)
+        }.flatten().unique()
     }
 
-    static void writeDirectoryJarEntry(JarOutputStream jos, RelativePath path) {
-        JarEntry entry = new JarEntry(path.toString() + "/")
-        jos.putNextEntry(entry)
+    List<ResolvedArtifact> getAllResolvedArtifacts() {
+        getResolvedArtifactsFor('runtime')
     }
 
-    static void writeJarEntry(JarOutputStream jos, FileTreeElement entry, JarFile jar) {
-        JarEntry jarEntry = jar.getJarEntry(entry.relativePath.toString())
-        writeJarEntry jos, entry.relativePath, jarEntry, jar
+    List<ResolvedArtifact> getResolvedArtifactsFor(String configuration) {
+        project.configurations."$configuration".resolvedConfiguration.resolvedArtifacts as List
     }
 
-    static void writeJarEntry(JarOutputStream jos, RelativePath path, JarEntry entry, JarFile jar) {
-        def is = jar.getInputStream(entry)
-        jos.putNextEntry(new JarEntry(path.toString()))
-        IOUtil.copy(is, jos)
-        jos.closeEntry()
-        IOUtil.close(is)
+    @InputFiles
+    List<File> getDependencies(ArtifactSelector selector) {
+
+        List<ResolvedArtifact> resolvedConfiguration = allResolvedArtifacts - resolvedSignedArtifacts
+        println "Resolved Configuration: $resolvedConfiguration"
+        List<File> resolvedFiles = resolvedConfiguration.findAll { resolvedArtifact ->
+            selector.isSelected(resolvedArtifact)
+        }.collect { resolvedArtifact ->
+            resolvedArtifact.file
+        }
+        println "Resolved Files: $resolvedFiles"
+        resolvedFiles
+    }
+
+    ArtifactSelector initSelector() {
+        new ArtifactSelector(((PublishArtifactSet) project.configurations.runtime.artifacts),
+                ((ArtifactSet) project.shadow.artifactSet),
+                project.group as String)
     }
 }

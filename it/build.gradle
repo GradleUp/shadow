@@ -10,6 +10,7 @@ buildscript {
 }
 
 subprojects { subproj ->
+    version = "${currentVersion}"
 
     repositories {
         maven {
@@ -18,9 +19,8 @@ subprojects { subproj ->
         }
     }
 
+    apply plugin: 'java'
     apply plugin: 'shadow'
-
-    version = "${currentVersion}"
 
     subproj.ext.testTasks = 'shadow'
 

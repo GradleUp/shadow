@@ -5,6 +5,8 @@ dependencies {
 
 shadow {
     artifactAttached = false
-    include 'org.apache.maven.its.shade.aie'
-    exclude '*:b:jar:'
+    artifactSet {
+        include 'org.apache.maven.its.shade.aie'
+        exclude '*:b:jar:'
+    }
 }

@@ -1,9 +1,12 @@
-
 { project ->
     def wanted = ['a.properties']
     def unwanted = ['b.properties', 'junit/framework/TestCase.class']
 
-    def jarFile = zipTree("${buildDir}/libs/${project.name}-shadow-${currentVersion}.jar")
+    def jar = file("${buildDir}/libs/${project.name}-shadow-${currentVersion}.jar")
+
+    assert jar.exists()
+
+    def jarFile = zipTree(jar)
 
     wanted.each { item ->
         assert !jarFile.matching {
