@@ -1,15 +1,11 @@
-import org.gradle.api.plugins.shadow.ShadowPlugin
-
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 
     dependencies {
-        classpath project(':plugin')
-        classpath 'jdom:jdom:1.1'
-        classpath 'asm:asm:3.3.1'
-        classpath 'asm:asm-commons:3.3.1'
+        classpath "org.gradle.plugins:shadow:${currentVersion}"
     }
 }
 
@@ -22,11 +18,9 @@ subprojects { subproj ->
         }
     }
 
-    dependencies {
-        compile project(':plugin')
-    }
+    apply plugin: 'shadow'
 
-    apply plugin: ShadowPlugin
+    version = "${currentVersion}"
 
     subproj.ext.testTasks = 'shadow'
 

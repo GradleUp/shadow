@@ -1,4 +1,3 @@
-import org.gradle.api.file.FileTree
 
 { project ->
     def wanted = ['a.properties']

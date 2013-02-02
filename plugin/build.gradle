@@ -55,6 +55,15 @@ task configureUploadArchives(dependsOn: [configureUploadArchivesBinTray, configu
 uploadArchives.dependsOn test, configureUploadArchives
 
 jar {
+    baseName = 'shadow'
     from 'LICENSE'
     from 'NOTICE'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.artifactId = 'shadow'
+        }
+    }
 }
