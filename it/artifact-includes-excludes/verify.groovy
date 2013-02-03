@@ -2,7 +2,7 @@
     def wanted = ['a.properties']
     def unwanted = ['b.properties', 'junit/framework/TestCase.class']
 
-    def jar = file("${buildDir}/libs/${project.name}-shadow-${currentVersion}.jar")
+    def jar = file("${buildDir}/libs/${project.name}-${currentVersion}.jar")
 
     assert jar.exists()
 

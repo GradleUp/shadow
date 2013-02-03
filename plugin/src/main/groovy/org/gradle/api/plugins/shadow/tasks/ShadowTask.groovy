@@ -21,9 +21,6 @@ class ShadowTask extends DefaultTask {
     static final String NAME = "shadow"
     static final String DESC = "Combines all classpath resources into a single jar."
 
-    @OutputFile
-    File outputJar = project.shadow.shadowJar
-
     List<Transformer> transformers = project.shadow.transformers
     List<Relocator> relocators = []
 
@@ -72,17 +69,29 @@ class ShadowTask extends DefaultTask {
         }
     }
 
+    @OutputFile
+    File getOutputJar() {
+        project.shadow.shadowJar
+    }
+
     List<File> getJars() {
-        println "Getting Jars"
         ArtifactSelector selector = initSelector()
-        println "Selector: $selector"
         getArtifacts(selector) + getDependencies(selector)
     }
 
     @InputFiles
     List<File> getArtifacts(ArtifactSelector selector) {
-        println "Getting artifacts"
-        project.configurations.runtime.artifacts.files as List
+        List<File> artifacts = project.configurations.runtime.artifacts.files as List
+        artifacts = renameOriginalArtifacts(artifacts)
+        artifacts
+    }
+
+    List<File> renameOriginalArtifacts(List<File> artifacts) {
+        artifacts.collect { artifact ->
+            def newFile = new File(artifact.parent, "${artifact.name}.orig")
+            artifact.renameTo(newFile)
+            newFile
+        }
     }
 
     List<File> getSignedJars() {
@@ -115,13 +124,11 @@ class ShadowTask extends DefaultTask {
     List<File> getDependencies(ArtifactSelector selector) {
 
         List<ResolvedArtifact> resolvedConfiguration = allResolvedArtifacts - resolvedSignedArtifacts
-        println "Resolved Configuration: $resolvedConfiguration"
         List<File> resolvedFiles = resolvedConfiguration.findAll { resolvedArtifact ->
             selector.isSelected(resolvedArtifact)
         }.collect { resolvedArtifact ->
             resolvedArtifact.file
         }
-        println "Resolved Files: $resolvedFiles"
         resolvedFiles
     }
 
