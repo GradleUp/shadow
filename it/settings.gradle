@@ -1,1 +1,1 @@
-include 'artifact-includes-excludes'
+include 'artifact-includes-excludes', 'filter-artifact-contents'

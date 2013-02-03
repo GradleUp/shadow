@@ -114,4 +114,8 @@ class SimpleFilter implements Filter {
 
     void finished() {
     }
+
+    String toString() {
+        "$jars : $includes : $excludes"
+    }
 }

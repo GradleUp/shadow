@@ -36,8 +36,8 @@ class ArtifactSelector {
     private Collection<ArtifactId> excludes
 
     public ArtifactSelector(PublishArtifactSet artifacts, ArtifactSet artifactSet, String groupPrefix) {
-        this((artifactSet != null) ? artifactSet.getIncludes() : null,
-                (artifactSet != null) ? artifactSet.getExcludes() : null, groupPrefix)
+        this((artifactSet != null) ? artifactSet.includes : null,
+                (artifactSet != null) ? artifactSet.excludes : null, groupPrefix)
 
         if (artifacts != null && !this.includes.isEmpty()) {
             artifacts.each {

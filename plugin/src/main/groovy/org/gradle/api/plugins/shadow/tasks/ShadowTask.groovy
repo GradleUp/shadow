@@ -5,6 +5,10 @@ import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.file.RelativePath
 import org.gradle.api.plugins.shadow.ShadowStats
+import org.gradle.api.plugins.shadow.filter.Filter
+import org.gradle.api.plugins.shadow.filter.SimpleFilter
+import org.gradle.api.plugins.shadow.impl.ArchiveFilter
+import org.gradle.api.plugins.shadow.impl.ArtifactId
 import org.gradle.api.plugins.shadow.impl.ArtifactSelector
 import org.gradle.api.plugins.shadow.impl.ArtifactSet
 import org.gradle.api.plugins.shadow.impl.Caster
@@ -26,8 +30,6 @@ class ShadowTask extends DefaultTask {
 
     boolean statsEnabled
 
-    List<RelativePath> existingPaths = []
-
     ShadowStats stats
     Caster caster
 
@@ -43,7 +45,7 @@ class ShadowTask extends DefaultTask {
         shadow.stats = stats
         shadow.uberJar = outputJar
         shadow.relocators = []
-        shadow.filters = []
+        shadow.filters = filters
         shadow.resourceTransformers = project.shadow.transformers
         shadow.shadeSourcesContent = false
         shadow.jars = jars
@@ -87,11 +89,14 @@ class ShadowTask extends DefaultTask {
     }
 
     List<File> renameOriginalArtifacts(List<File> artifacts) {
-        artifacts.collect { artifact ->
-            def newFile = new File(artifact.parent, "${artifact.name}.orig")
-            artifact.renameTo(newFile)
-            newFile
+        if (!project.shadow.artifactAttached) {
+            return artifacts.collect { artifact ->
+                def newFile = new File(artifact.parent, "${artifact.name}.orig.jar")
+                artifact.renameTo(newFile)
+                newFile
+            }
         }
+        artifacts
     }
 
     List<File> getSignedJars() {
@@ -116,6 +121,10 @@ class ShadowTask extends DefaultTask {
         getResolvedArtifactsFor('runtime')
     }
 
+    List<ResolvedArtifact> getResolvedArtifactsToShadow() {
+        allResolvedArtifacts - resolvedSignedArtifacts
+    }
+
     List<ResolvedArtifact> getResolvedArtifactsFor(String configuration) {
         project.configurations."$configuration".resolvedConfiguration.resolvedArtifacts as List
     }
@@ -123,9 +132,9 @@ class ShadowTask extends DefaultTask {
     @InputFiles
     List<File> getDependencies(ArtifactSelector selector) {
 
-        List<ResolvedArtifact> resolvedConfiguration = allResolvedArtifacts - resolvedSignedArtifacts
+        List<ResolvedArtifact> resolvedConfiguration = resolvedArtifactsToShadow
         List<File> resolvedFiles = resolvedConfiguration.findAll { resolvedArtifact ->
-            selector.isSelected(resolvedArtifact)
+            selector.isSelected(resolvedArtifact) && resolvedArtifact.type != 'pom'
         }.collect { resolvedArtifact ->
             resolvedArtifact.file
         }
@@ -135,6 +144,29 @@ class ShadowTask extends DefaultTask {
     ArtifactSelector initSelector() {
         new ArtifactSelector(((PublishArtifactSet) project.configurations.runtime.artifacts),
                 ((ArtifactSet) project.shadow.artifactSet),
-                project.group as String)
+                project.shadow.groupFilter as String)
+    }
+
+    List<Filter> getFilters() {
+        //TODO this doesn't include the project artifact
+        Map<ResolvedArtifact, ArtifactId> artifacts = resolvedArtifactsToShadow.inject([:]) { map, artifact ->
+            map[artifact] = new ArtifactId(artifact)
+            map
+        }
+        List<ArchiveFilter> archiveFilters = project.shadow.filters
+        List<Filter> configuredFilters = archiveFilters.collect { archiveFilter ->
+            ArtifactId pattern = new ArtifactId(archiveFilter.artifact)
+            List<File> jars = artifacts.findAll { ResolvedArtifact resolvedArtifact, ArtifactId artifactId ->
+                artifactId.matches(pattern)
+            }.collect { entry ->
+                entry.key.file
+                //TODO implementation for createSourcesJar
+            }
+            if (jars) {
+                new SimpleFilter( jars, archiveFilter.includes, archiveFilter.excludes)
+            }
+        }.findAll { it }
+        //TODO minijar filter
+        configuredFilters
     }
 }

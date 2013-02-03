@@ -1,6 +1,8 @@
 package org.gradle.api.plugins.shadow
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.plugins.shadow.impl.ArchiveFilter
 import org.gradle.api.plugins.shadow.impl.ArtifactSet
 import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
 import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
@@ -11,11 +13,13 @@ class ShadowTaskExtension {
     public static final NAME = "shadow"
 
     List<Transformer> transformers = [new ServiceFileTransformer(), new ManifestResourceTransformer()]
-    ArtifactSet artifactSet = new ArtifactSet()
+    List<ArchiveFilter> filters = []
+    ArtifactSet artifactSet
 
     String destinationDir = "${project.buildDir}/libs/"
     String baseName = null
     String extension = "jar"
+    String groupFilter
     boolean stats = false
     boolean artifactAttached = true
 
@@ -44,8 +48,18 @@ class ShadowTaskExtension {
     }
 
     ShadowTaskExtension artifactSet(Closure c) {
+        artifactSet = new ArtifactSet()
         c.delegate = artifactSet
         c()
+        this
+    }
+
+    ShadowTaskExtension filter(String artifact, Closure c) {
+        if (!artifact) throw new GradleException('Must specify artifact for filter!')
+        ArchiveFilter filter = new ArchiveFilter(artifact: artifact)
+        c.delegate = filter
+        c()
+        filters << filter
         this
     }
 
