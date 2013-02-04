@@ -1,9 +1,5 @@
 import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
 
-repositories {
-    mavenLocal()
-}
-
 dependencies {
     compile("org.gradle.plugins:shadow:${currentVersion}") {
         transitive = false

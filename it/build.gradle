@@ -13,6 +13,7 @@ subprojects { subproj ->
     version = "${currentVersion}"
 
     repositories {
+        mavenLocal()
         maven {
             name "Test Local"
             url "file://${subproj.file('repo').path}"
