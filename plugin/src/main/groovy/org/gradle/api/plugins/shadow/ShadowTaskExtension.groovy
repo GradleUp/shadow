@@ -4,15 +4,13 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.shadow.impl.ArchiveFilter
 import org.gradle.api.plugins.shadow.impl.ArtifactSet
-import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
-import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
 import org.gradle.api.plugins.shadow.transformers.Transformer
 
 class ShadowTaskExtension {
 
     public static final NAME = "shadow"
 
-    List<Transformer> transformers = [new ServiceFileTransformer(), new ManifestResourceTransformer()]
+    List<Transformer> transformers = []
     List<ArchiveFilter> filters = []
     ArtifactSet artifactSet
 
@@ -60,6 +58,17 @@ class ShadowTaskExtension {
         c.delegate = filter
         c()
         filters << filter
+        this
+    }
+
+    ShadowTaskExtension transformer(Class transformerClass, Closure c = null) {
+        if (!transformerClass) throw new GradleException('Must specify transformer impl class!')
+        Transformer transformer = transformerClass.newInstance()
+        if (c) {
+            c.delegate = transformer
+            c()
+        }
+        transformers << transformer
         this
     }
 
