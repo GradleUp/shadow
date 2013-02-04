@@ -48,6 +48,7 @@ class ShadowTaskExtension {
     ShadowTaskExtension artifactSet(Closure c) {
         artifactSet = new ArtifactSet()
         c.delegate = artifactSet
+        c.resolveStrategy = Closure.DELEGATE_ONLY
         c()
         this
     }
@@ -56,6 +57,7 @@ class ShadowTaskExtension {
         if (!artifact) throw new GradleException('Must specify artifact for filter!')
         ArchiveFilter filter = new ArchiveFilter(artifact: artifact)
         c.delegate = filter
+        c.resolveStrategy = Closure.DELEGATE_ONLY
         c()
         filters << filter
         this
@@ -66,6 +68,7 @@ class ShadowTaskExtension {
         Transformer transformer = transformerClass.newInstance()
         if (c) {
             c.delegate = transformer
+            c.resolveStrategy = Closure.DELEGATE_ONLY
             c()
         }
         transformers << transformer
