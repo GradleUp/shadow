@@ -91,7 +91,7 @@ class ShadowTask extends DefaultTask {
     List<File> renameOriginalArtifacts(List<File> artifacts) {
         if (!project.shadow.artifactAttached) {
             return artifacts.collect { artifact ->
-                def newFile = new File(artifact.parent, "${artifact.name}.orig.jar")
+                def newFile = new File(artifact.parent, "original-${artifact.name}")
                 artifact.renameTo(newFile)
                 newFile
             }
