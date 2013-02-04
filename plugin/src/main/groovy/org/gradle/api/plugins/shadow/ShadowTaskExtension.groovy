@@ -75,4 +75,16 @@ class ShadowTaskExtension {
         this
     }
 
+    ShadowTaskExtension include(String s) {
+        artifactSet {
+            include s
+        }
+    }
+
+    ShadowTaskExtension exclude(String s) {
+        artifactSet {
+            exclude s
+        }
+    }
+
 }
