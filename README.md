@@ -13,31 +13,31 @@ How to use
 
 + Apply the plugin to your Gradle build file
 
-    buildscript {
-        repositories {
-            ivy {
-                name 'Gradle Shadow'
-                url 'http://dl.bintray.com/content/johnrengelman/gradle-plugins'
+        buildscript {
+            repositories {
+                ivy {
+                    name 'Gradle Shadow'
+                    url 'http://dl.bintray.com/content/johnrengelman/gradle-plugins'
+                }
+            }
+            dependencies {
+                classpath 'org.gradle.plugins:shadow:0.7.PORT-SNAPSHOT'
             }
         }
-        dependencies {
-            classpath 'org.gradle.plugins:shadow:0.7.PORT-SNAPSHOT'
-        }
-    }
 
-    apply plugin: 'shadow'
+        apply plugin: 'shadow'
 
 + Configure Shadow using the 'shadow' keyword in your Gradle build file. For example, you probably want to exclude
 jar signature files
 
-    shadow {
-        exclude 'META-INF'/*.DSA'
-        exclude 'META-INF/*.RSA'
-    }
+        shadow {
+            exclude 'META-INF'/*.DSA'
+            exclude 'META-INF/*.RSA'
+        }
 
 + Call the Shadow task
 
-    $ gradle shadow
+        $ gradle shadow
 
 + The shadow artifact will be created in your configured build directory (by default: build/libs/<project>-shadow-<version>.jar
 
