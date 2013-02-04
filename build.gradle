@@ -1,65 +1,16 @@
-repositories {
-    mavenCentral()
-}
+subprojects {
 
-apply plugin: 'maven'
-apply plugin: 'groovy'
-apply plugin: 'idea'
-
-group = 'org.gradle.plugins'
-version = "${currentVersion}"
-
-dependencies {
-    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
-    compile gradleApi()
-    
-    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
-}
-
-task configureUploadArchivesBinTray << {
-    uploadArchives {
-        repositories {
-            ivy {
-                url = bintray_api_base_url + '/content/' + bintray_username + '/' + bintray_repo + '/' + bintray_package + '/' + version
-                credentials {
-                    username bintray_username
-                    password bintray_api_key
-                }
-            }
-        }
+    repositories {
+        mavenCentral()
     }
-}
-configureUploadArchivesBinTray.onlyIf {
-    !isSnapshot()
-}
 
-task configureUploadArchivesArtifactory << {
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${bloom_artifactory_contextUrl}/libs-${isSnapshot() ? 'snapshot' : 'release'}-local") {
-                    authentication(
-                            userName: bloom_artifactory_username,
-                            password: bloom_artifactory_password
-                    )
-                }
-            }
-        }
-    }
+    apply plugin: 'maven'
+    apply plugin: 'groovy'
+    apply plugin: 'idea'
+
+    group = 'org.gradle.plugins'
+    version = "${currentVersion}"
 }
-
-task configureUploadArchives(dependsOn: [configureUploadArchivesBinTray, configureUploadArchivesArtifactory])
-
-uploadArchives.dependsOn test, configureUploadArchives
 
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')

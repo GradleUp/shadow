@@ -1,0 +1,22 @@
+import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
+
+dependencies {
+    compile("org.gradle.plugins:shadow:${currentVersion}") {
+        transitive = false
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Test-Entry': 'FAILED'
+        attributes 'Original-Entry': 'PASSED'
+    }
+}
+
+shadow {
+    artifactAttached = false
+    transformer(ManifestResourceTransformer) {
+        attributes 'Main-Class': 'org.apache.maven.Shade'
+        attributes 'Test-Entry': 'PASSED'
+    }
+}

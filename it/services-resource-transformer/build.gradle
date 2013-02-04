@@ -1,0 +1,11 @@
+import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
+
+dependencies {
+    compile 'org.apache.maven.its.shade.srt:one:0.1'
+    compile 'org.apache.maven.its.shade.srt:two:0.1'
+}
+
+shadow {
+    artifactAttached = false
+    transformer(ServiceFileTransformer)
+}

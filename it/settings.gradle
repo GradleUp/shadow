@@ -1,0 +1,5 @@
+include 'artifact-includes-excludes'
+include 'filter-artifact-contents'
+include 'manifest-transformed'
+include 'services-resource-transformer'
+include 'xml-transformer-ignores-dtd'
