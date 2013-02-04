@@ -1,1 +1,4 @@
-include 'artifact-includes-excludes', 'filter-artifact-contents', 'services-resource-transformer'
+include 'artifact-includes-excludes'
+include 'filter-artifact-contents'
+include 'manifest-transformed'
+include 'services-resource-transformer'

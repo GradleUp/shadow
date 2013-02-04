@@ -94,4 +94,12 @@ class ManifestResourceTransformer implements Transformer {
         jos.putNextEntry(new JarEntry(JarFile.MANIFEST_NAME))
         manifest.write(jos)
     }
+
+    ManifestResourceTransformer attributes(Map<String, ?> attributes) {
+        if (manifestEntries == null) {
+            manifestEntries = [:]
+        }
+        manifestEntries.putAll(attributes)
+        this
+    }
 }
