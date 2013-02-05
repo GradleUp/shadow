@@ -16,8 +16,9 @@ class ShadowTaskExtension {
 
     String destinationDir = "${project.buildDir}/libs/"
     String baseName = null
-    String extension = "jar"
+    String extension = 'jar'
     String groupFilter
+    String classifier = 'shadow'
     boolean stats = false
     boolean artifactAttached = true
 
@@ -30,15 +31,13 @@ class ShadowTaskExtension {
     String getOutputJarBaseName() {
         if(baseName) {
             baseName
-        } else if (artifactAttached) {
-            "${project.archivesBaseName}-shadow"
         } else {
             project.archivesBaseName
         }
     }
 
     File getShadowJar() {
-        return new File(destinationDir, "${outputJarBaseName}-${project.version}.$extension")
+        return new File(destinationDir, "${outputJarBaseName}-${project.version}${artifactAttached ? "-$classifier" : ''}.$extension")
     }
 
     String getSignedLibsDir() {
