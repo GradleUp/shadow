@@ -1,0 +1,17 @@
+dependencies {
+    compile("org.gradle.plugins:shadow:${currentVersion}") {
+        transitive = false
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.apache.maven.Main'
+        attributes 'Test-Entry': 'PASSED'
+    }
+}
+
+shadow {
+    artifactAttached = true
+//    shadedClassifierName = 'shadow' //TODO this is specified in shade but defaulted in shadow
+}
