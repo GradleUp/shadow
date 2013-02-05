@@ -20,7 +20,8 @@ class ShadowTaskExtension {
     String groupFilter
     String classifier = 'shadow'
     boolean stats = false
-    boolean artifactAttached = true
+    boolean artifactAttached = false
+    boolean reducePom = false
 
     File outputFile
 
@@ -39,7 +40,15 @@ class ShadowTaskExtension {
     }
 
     File getShadowJar() {
-        return outputFile ?: new File(destinationDir, "${outputJarBaseName}-${project.version}${artifactAttached ? "-$classifier" : ''}.$extension")
+        return outputFile ?: new File(destinationDir, "${outputJarBaseName}${jarVersion}${jarClassifier}.$extension")
+    }
+
+    String getJarVersion() {
+        project.version ? "-${project.version}" : ''
+    }
+
+    String getJarClassifier() {
+        artifactAttached ? "-${classifier}" : ''
     }
 
     String getSignedLibsDir() {

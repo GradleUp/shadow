@@ -1,6 +1,7 @@
 include 'artifact-includes-excludes'
 include 'artifact-includes-excludes-shortcut'
 include 'filter-artifact-contents'
+include 'finalNameBuild'
 include 'implicit-inclusion-of-project-artifact'
 include 'manifest-retained'
 include 'manifest-transformed'

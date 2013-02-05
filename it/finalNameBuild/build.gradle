@@ -1,0 +1,21 @@
+apply plugin: 'maven'
+
+group 'org.apache.maven.its.shade.fnb'
+version = ''
+
+install {
+    repositories.mavenInstaller {
+        pom.version = '1.0'
+        pom.artifactId = 'finalNameBuild'
+    }
+}
+
+archivesBaseName = 'MyFinalName'
+
+integTestVerify.dependsOn 'install'
+install.dependsOn 'shadow'
+
+shadow {
+    classifier = 'shadow'
+    reducePom = false
+}
