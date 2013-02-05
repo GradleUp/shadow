@@ -22,6 +22,8 @@ class ShadowTaskExtension {
     boolean stats = false
     boolean artifactAttached = true
 
+    File outputFile
+
     private final Project project
 
     ShadowTaskExtension(Project project) {
@@ -37,7 +39,7 @@ class ShadowTaskExtension {
     }
 
     File getShadowJar() {
-        return new File(destinationDir, "${outputJarBaseName}-${project.version}${artifactAttached ? "-$classifier" : ''}.$extension")
+        return outputFile ?: new File(destinationDir, "${outputJarBaseName}-${project.version}${artifactAttached ? "-$classifier" : ''}.$extension")
     }
 
     String getSignedLibsDir() {
