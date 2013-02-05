@@ -1,0 +1,28 @@
+apply plugin: 'maven'
+
+group 'org.apache.maven.its.shade.fnba'
+version = ''
+
+install {
+    repositories.mavenInstaller {
+        pom.version = '1.0'
+        pom.artifactId = 'finalNameBuildAttached'
+    }
+}
+
+archivesBaseName = 'MyFinalName'
+
+artifacts {
+    archives(shadow.shadowJar) { //TODO this should be automatically configured by the plugin
+        classifier 'shadow'
+    }
+}
+
+integTestVerify.dependsOn 'install'
+install.dependsOn 'shadow'
+
+shadow {
+    artifactAttached = true
+    classifier = 'shadow'
+    reducePom = false
+}

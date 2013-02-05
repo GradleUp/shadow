@@ -14,6 +14,7 @@ subprojects { subproj ->
 
     repositories {
         mavenLocal()
+        mavenCentral()
         maven {
             name "Test Local"
             url "file://${subproj.file('repo').path}"
