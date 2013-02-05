@@ -20,7 +20,6 @@ subprojects { subproj ->
         }
     }
 
-    apply plugin: 'java'
     apply plugin: 'shadow'
 
     subproj.ext.testTasks = 'shadow'
