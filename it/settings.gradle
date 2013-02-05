@@ -1,6 +1,7 @@
 include 'artifact-includes-excludes'
 include 'artifact-includes-excludes-shortcut'
 include 'filter-artifact-contents'
+include 'implicit-inclusion-of-project-artifact'
 include 'manifest-transformed'
 include 'services-resource-transformer'
 include 'xml-transformer-ignores-dtd'
