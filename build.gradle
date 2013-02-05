@@ -1,3 +1,10 @@
+task integTest(type: GradleBuild) {
+    buildFile = file('it/build.gradle')
+    dir = file('it')
+    tasks = ['clean', 'integTest']
+}
+integTest.dependsOn ':plugin:install'
+
 subprojects {
 
     repositories {
@@ -10,6 +17,9 @@ subprojects {
 
     group = 'org.gradle.plugins'
     version = "${currentVersion}"
+
+    jar.dependsOn test
+    uploadArchives.dependsOn integTest
 }
 
 boolean isSnapshot() {
