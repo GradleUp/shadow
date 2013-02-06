@@ -25,3 +25,7 @@ subprojects {
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.4'
+}
