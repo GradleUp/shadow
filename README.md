@@ -39,7 +39,7 @@ jar signature files
 
         $ gradle shadow
 
-+ The shadow artifact will be created in your configured build directory (by default: build/libs/<project>-shadow-<version>.jar
++ The shadow artifact will be created in your configured build directory (by default: build/libs/<project>-<version>-shadow.jar
 
 Configuration Options
 =====================
@@ -49,9 +49,9 @@ Configuration Options
 + classifier - the classifier the append to the artifact. Default: shadow
 + extension - configures the extension of the output file. Default: jar
 + stats - enables/disables output of statistics for Shadow. Useful for analyzing performance. Default: false
-+ artifactAttached - if true, keep original jar; else overwrite the default artifact. Default: false
++ artifactAttached - if true, keep original jar; else overwrite the default artifact. Default: true
 + groupFilter - configured the inclusion of only specific artifacts to the shadow. Default: * (all artifacts)
-+ outputFile - configures a specific file as output for shadow. If set, overrides all naming configurations
++ outputFile - configures a specific file as output for shadow. If set, overrides all naming configurations. Default: not configured
 
 Extensions
 ==========
@@ -133,7 +133,8 @@ more of Shade's features with minor changes.
    + Includes support for Transformers: ApacheLicenseResourceTransformer, ApacheNoticeResourceTransformer,
    AppendingTransformer, ComponentsXmlResourceTransformer, DontIncludeResourceTransformer, IncludeResourceTransformer,
    ManifestResourceTransformer, ServiceFileTransformer, XmlAppendingTransfomer
-+ v0.6 - first release, mostly written from scratch using Shade code.
++ v0.6 - first release, mostly written from scratch using Shade code as reference.
++ v0.5 and earlier - incremental internal releases.
 
 Feature Backlog
 ===============

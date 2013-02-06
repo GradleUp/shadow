@@ -16,6 +16,7 @@ integTestVerify.dependsOn 'install'
 install.dependsOn 'shadow'
 
 shadow {
+    artifactAttached = false
     classifier = 'shadow'
     reducePom = false
 }

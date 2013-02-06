@@ -20,7 +20,7 @@ class ShadowTaskExtension {
     String groupFilter
     String classifier = 'shadow'
     boolean stats = false
-    boolean artifactAttached = false
+    boolean artifactAttached = true
     boolean reducePom = false
 
     File outputFile

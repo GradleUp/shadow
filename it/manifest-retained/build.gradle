@@ -12,6 +12,5 @@ jar {
 }
 
 shadow {
-    artifactAttached = true
     classifier = 'shadow'
 }
