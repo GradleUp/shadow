@@ -6,11 +6,11 @@ version = ''
 install {
     repositories.mavenInstaller {
         pom.version = '1.0'
-        pom.artifactId = 'finalNameBuildAttached'
+        pom.artifactId = 'archivesBaseNameAttached'
     }
 }
 
-archivesBaseName = 'MyFinalName'
+archivesBaseName = 'MyArchivesBaseName'
 
 artifacts {
     archives(shadow.shadowJar) { //TODO this should be automatically configured by the plugin

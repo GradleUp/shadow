@@ -89,7 +89,9 @@ class ShadowTask extends DefaultTask {
     }
 
     List<File> renameOriginalArtifacts(List<File> artifacts) {
-        if (!project.shadow.artifactAttached) {
+        if (!project.shadow.artifactAttached &&
+                (!project.shadow.baseName ||
+                        project.shadow.baseName == project.archivesBaseName)) {
             return artifacts.collect { artifact ->
                 def newFile = new File(artifact.parent, "original-${artifact.name}")
                 artifact.renameTo(newFile)
