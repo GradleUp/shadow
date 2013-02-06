@@ -21,7 +21,7 @@ How to use
                 }
             }
             dependencies {
-                classpath 'org.gradle.plugins:shadow:0.7.PORT-SNAPSHOT'
+                classpath 'org.gradle.plugins:shadow:0.7'
             }
         }
 
@@ -45,9 +45,55 @@ Configuration Options
 =====================
 
 + destinationDir - configures the output directory for shadow. Default: $buildDir/libs/
-+ baseName - configures the base name of the output file. Default: ${archivesBaseName}-shadow-${version}
++ baseName - configures the base name of the output file. Default: ${archivesBaseName}-${version}-${classifier}
++ classifier - the classifier the append to the artifact. Default: shadow
 + extension - configures the extension of the output file. Default: jar
 + stats - enables/disables output of statistics for Shadow. Useful for analyzing performance. Default: false
++ artifactAttached - if true, keep original jar; else overwrite the default artifact. Default: false
++ groupFilter - configured the inclusion of only specific artifacts to the shadow. Default: * (all artifacts)
++ outputFile - configures a specific file as output for shadow. If set, overrides all naming configurations
+
+Extensions
+==========
++ Transformers - apply a transformer class to the processing
+
+        shadow {
+            transformer(TransformerClass) {
+                <configuration>
+            }
+        }
+
++ Artifact Set - specify the included/excluded files
+
+        shadow {
+            artifactSet {
+                include 'org.apache.maven.its.shade.aie'
+                exclude '*:b:jar:'
+            }
+        }
+
+        OR SHORTHAND
+
+        shadow {
+            include 'org.apache.maven.its.shade.aie'
+            exclude '*:b:jar:'
+        }
+
++ Filters - filter contents of shadow jar by dependency
+
+        shadow {
+            filter('org.apache.maven.its.shade.fac:a') {
+                include '**/a.properties'
+            }
+            filter('org.apache.maven.its.shade.fac:b:client') {
+                exclude 'org/apache/*'
+                exclude 'org/apache/maven/b/'
+            }
+            filter('*:*') {
+                exclude 'org/*'
+            }
+        }
+
 
 Configuring Output of Signed Libraries
 ======================================
@@ -83,10 +129,16 @@ Version History
 + v0.7 (in progress) - all the v0.6 features, but using a port of the Shade code. Primarily this involves using a port
 of the DefaultShader class instead of the from scratch implementation used in v0.6. This will allow for integration of
 more of Shade's features with minor changes.
+   + Includes support for SimpleFilter
+   + Includes support for Transformers: ApacheLicenseResourceTransformer, ApacheNoticeResourceTransformer,
+   AppendingTransformer, ComponentsXmlResourceTransformer, DontIncludeResourceTransformer, IncludeResourceTransformer,
+   ManifestResourceTransformer, ServiceFileTransformer, XmlAppendingTransfomer
 + v0.6 - first release, mostly written from scratch using Shade code.
 
 Feature Backlog
 ===============
-+ Allow for configuration of transformers, relocators, and filters (expected for v0.7)
-+ Allow for configuration of a custom Caster (Shader) implementation
-+ Port shade integration tests (expect most for v0.7)
++ Port support for relocators
++ Port support for configuration of a custom Caster (Shader) implementation
++ Automatically configure Shadow output as publish artifact
++ Port support for generation of shadow sources jar
++ Port support for minijar filter
