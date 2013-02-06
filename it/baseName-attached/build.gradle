@@ -10,12 +10,6 @@ install {
     }
 }
 
-artifacts {
-    archives(shadow.shadowJar) { //TODO this should be automatically configured by the plugin
-        classifier 'shadow'
-    }
-}
-
 integTestVerify.dependsOn 'install'
 install.dependsOn 'shadow'
 
@@ -25,3 +19,9 @@ shadow {
     classifier = 'shadow'
     reducePom = false
 }
+
+artifacts {
+    archives(shadow.shadowJar) { //TODO this should be automatically configured by the plugin
+        classifier 'shadow'
+    }
+} //TODO this has to be after the shadow config block to work correctly, is that correct behavior?
