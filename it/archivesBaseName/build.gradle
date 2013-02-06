@@ -1,28 +1,21 @@
 apply plugin: 'maven'
 
-group 'org.apache.maven.its.shade.fnba'
+group 'org.gradle.plugins.shadow.its.abn'
 version = ''
 
 install {
     repositories.mavenInstaller {
         pom.version = '1.0'
-        pom.artifactId = 'finalNameBuildAttached'
+        pom.artifactId = 'finalNameBuild'
     }
 }
 
 archivesBaseName = 'MyFinalName'
 
-artifacts {
-    archives(shadow.shadowJar) { //TODO this should be automatically configured by the plugin
-        classifier 'shadow'
-    }
-}
-
 integTestVerify.dependsOn 'install'
 install.dependsOn 'shadow'
 
 shadow {
-    artifactAttached = true
     classifier = 'shadow'
     reducePom = false
 }
