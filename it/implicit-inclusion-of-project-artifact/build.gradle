@@ -1,0 +1,10 @@
+dependencies {
+    compile 'junit:junit:3.8.2'
+}
+
+shadow {
+    artifactAttached = false
+    artifactSet {
+        include 'junit:junit'
+    }
+}

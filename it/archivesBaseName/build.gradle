@@ -1,0 +1,22 @@
+apply plugin: 'maven'
+
+group 'org.gradle.plugins.shadow.its.abn'
+version = ''
+
+install {
+    repositories.mavenInstaller {
+        pom.version = '1.0'
+        pom.artifactId = 'archivesBaseName'
+    }
+}
+
+archivesBaseName = 'MyArchivesBaseName'
+
+integTestVerify.dependsOn 'install'
+install.dependsOn 'shadow'
+
+shadow {
+    artifactAttached = false
+    classifier = 'shadow'
+    reducePom = false
+}

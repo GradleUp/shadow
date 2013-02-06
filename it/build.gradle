@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.gradle.plugins:shadow:${currentVersion}"
+    }
+}
+
+subprojects { subproj ->
+    version = "${currentVersion}"
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            name "Test Local"
+            url "file://${subproj.file('repo').path}"
+        }
+    }
+
+    apply plugin: 'shadow'
+
+    subproj.ext.testTasks = 'shadow'
+
+    task integTestSetup << {
+        executeScript(subproj.file('setup.groovy'), subproj)
+    }
+
+    task integTestTask(dependsOn: ['integTestSetup'] + testTasks.split(',')*.trim())
+
+    testTasks.split(',')*.trim().each { testTask ->
+        subproj.tasks."$testTask".with {
+            addSetupDependency(dependsOn, integTestSetup)
+            dependsOn integTestSetup
+        }
+    }
+
+    task integTestVerify(dependsOn: ['integTestSetup', 'integTestTask']) <<  {
+        executeScript(subproj.file('verify.groovy'), subproj)
+    }
+
+    task integTest(dependsOn: ['integTestSetup', 'integTestTask', 'integTestVerify'])
+}
+
+void addSetupDependency(Set dependencies, Task setup) {
+    dependencies.each { dep ->
+        if (dep instanceof Collection) {
+            addSetupDependency(dep, setup)
+        }
+        if(dep instanceof Task && dep != setup) {
+            addSetupDependency(dep.dependsOn, setup)
+            dep.dependsOn setup
+        }
+    }
+}
+
+void executeScript(File f, def project) {
+    if(f.exists()) {
+        def binding = new Binding()
+        GroovyShell shell = new GroovyShell(binding)
+
+        Closure c = shell.evaluate(f)
+        c.delegate = project
+        c.setResolveStrategy(Closure.OWNER_FIRST)
+        c(project)
+    }
+}

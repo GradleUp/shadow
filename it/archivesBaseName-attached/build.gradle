@@ -1,0 +1,27 @@
+apply plugin: 'maven'
+
+group 'org.gradle.plugins.shadow.its.abna'
+version = ''
+
+install {
+    repositories.mavenInstaller {
+        pom.version = '1.0'
+        pom.artifactId = 'archivesBaseNameAttached'
+    }
+}
+
+archivesBaseName = 'MyArchivesBaseName'
+
+integTestVerify.dependsOn 'install'
+install.dependsOn 'shadow'
+
+shadow {
+    classifier = 'shadow'
+    reducePom = false
+}
+
+artifacts {
+    archives(shadow.shadowJar) { //TODO this should be automatically configured by the plugin
+        classifier 'shadow'
+    }
+} //TODO this has to be after the shadow config block to work correctly, is that correct behavior?

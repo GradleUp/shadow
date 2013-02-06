@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.its.shade.nrse</groupId>
+  <artifactId>compile</artifactId>
+  <version>1.0</version>
+  <versioning>
+    <versions>
+      <version>1.0</version>
+    </versions>
+    <lastUpdated>20100110230146</lastUpdated>
+  </versioning>
+</metadata>

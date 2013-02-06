@@ -1,43 +1,26 @@
-repositories {
-    mavenCentral()
+task integTest(type: GradleBuild) {
+    buildFile = file('it/build.gradle')
+    dir = file('it')
+    tasks = ['clean', 'integTest']
 }
+integTest.dependsOn ':plugin:install'
 
-apply plugin: 'maven'
-apply plugin: 'groovy'
-apply plugin: 'idea'
+subprojects {
 
-group = 'org.gradle.plugins'
-version = "${currentVersion}"
-
-dependencies {
-    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
-    compile gradleApi()
-    
-    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
-}
-
-uploadArchives {
     repositories {
-        ivy {
-            url = bintray_api_base_url + '/content/' + bintray_username + '/' + (isSnapshot() ? bintray_snap_repo : bintray_repo) + '/' + bintray_package + '/' + version
-            credentials {
-                username bintray_username
-                password bintray_api_key
-            }
-        }
+        mavenCentral()
     }
-}
 
-uploadArchives.dependsOn test
+    apply plugin: 'maven'
+    apply plugin: 'groovy'
+    apply plugin: 'idea'
+
+    group = 'org.gradle.plugins'
+    version = "${currentVersion}"
+
+    jar.dependsOn test
+    uploadArchives.dependsOn integTest
+}
 
 boolean isSnapshot() {
     currentVersion.endsWith('SNAPSHOT')
