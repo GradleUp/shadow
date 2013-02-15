@@ -3,7 +3,7 @@ task integTest(type: GradleBuild) {
     dir = file('it')
     tasks = ['clean', 'integTest']
 }
-integTest.dependsOn ':plugin:install'
+integTest.dependsOn ':shadow:install'
 
 subprojects {
 
