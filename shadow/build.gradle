@@ -21,16 +21,20 @@ artifacts {
 task configureUploadArchivesBinTray << {
     uploadArchives {
         repositories {
-            ivy {
-                url = bintray_api_base_url + '/content/' + bintray_username + '/' + bintray_repo + '/' + bintray_package + '/' + version
-                credentials {
-                    username bintray_username
-                    password bintray_api_key
+            mavenDeployer {
+                repository(
+                        url: bintray_api_base_url + '/maven/' + bintray_username + '/' + bintray_repo + '/' + bintray_package
+                ) {
+                    authentication(
+                            userName: bintray_username,
+                            password: bintray_api_key
+                    )
                 }
             }
         }
     }
 }
+
 configureUploadArchivesBinTray.onlyIf {
     !isSnapshot()
 }
