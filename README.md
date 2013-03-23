@@ -15,13 +15,13 @@ How to use
 
         buildscript {
             repositories {
-                ivy {
+                maven {
                     name 'Gradle Shadow'
                     url 'http://dl.bintray.com/content/johnrengelman/gradle-plugins'
                 }
             }
             dependencies {
-                classpath 'org.gradle.plugins:shadow:0.7'
+                classpath 'org.gradle.plugins:shadow:0.7.1'
             }
         }
 
@@ -126,7 +126,9 @@ The default implementation excludes all META-INF/INDEX.LIST files.
 Version History
 ===============
 
-+ v0.7 (in progress) - all the v0.6 features, but using a port of the Shade code. Primarily this involves using a port
++ v0.7.1 - fix the up-to-date bug where the shadow task wasn't executing after making a source change. Changed the
+BinTray repo to Maven compatabile instead of Ivy.
++ v0.7 - all the v0.6 features, but using a port of the Shade code. Primarily this involves using a port
 of the DefaultShader class instead of the from scratch implementation used in v0.6. This will allow for integration of
 more of Shade's features with minor changes.
    + Includes support for SimpleFilter
