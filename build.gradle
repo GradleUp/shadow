@@ -2,6 +2,7 @@ task integTest(type: GradleBuild) {
     buildFile = file('it/build.gradle')
     dir = file('it')
     tasks = ['clean', 'integTest']
+    startParameter.projectProperties.currentVersion = currentVersion
 }
 integTest.dependsOn ':shadow:install'
 

@@ -76,12 +76,12 @@ class ShadowTask extends DefaultTask {
         project.shadow.shadowJar
     }
 
+    @InputFiles
     List<File> getJars() {
         ArtifactSelector selector = initSelector()
         getArtifacts(selector) + getDependencies(selector)
     }
 
-    @InputFiles
     List<File> getArtifacts(ArtifactSelector selector) {
         List<File> artifacts = project.configurations.runtime.artifacts.files as List
         artifacts = renameOriginalArtifacts(artifacts)
@@ -131,7 +131,6 @@ class ShadowTask extends DefaultTask {
         project.configurations."$configuration".resolvedConfiguration.resolvedArtifacts as List
     }
 
-    @InputFiles
     List<File> getDependencies(ArtifactSelector selector) {
 
         List<ResolvedArtifact> resolvedConfiguration = resolvedArtifactsToShadow
