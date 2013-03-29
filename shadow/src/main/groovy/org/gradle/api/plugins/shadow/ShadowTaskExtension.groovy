@@ -56,7 +56,7 @@ class ShadowTaskExtension {
     }
 
     ShadowTaskExtension artifactSet(Closure c) {
-        artifactSet = new ArtifactSet()
+        artifactSet = artifactSet ?: new ArtifactSet()
         c.delegate = artifactSet
         c.resolveStrategy = Closure.DELEGATE_ONLY
         c()
@@ -86,13 +86,13 @@ class ShadowTaskExtension {
     }
 
     ShadowTaskExtension include(String s) {
-        artifactSet {
+        filter('*:*') {
             include s
         }
     }
 
     ShadowTaskExtension exclude(String s) {
-        artifactSet {
+        filter('*:*') {
             exclude s
         }
     }

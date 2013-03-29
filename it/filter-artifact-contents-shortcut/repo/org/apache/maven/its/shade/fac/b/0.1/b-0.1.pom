@@ -22,8 +22,8 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.shade.aie</groupId>
-  <artifactId>a</artifactId>
+  <groupId>org.apache.maven.its.shade.fac</groupId>
+  <artifactId>b</artifactId>
   <version>0.1</version>
   <packaging>jar</packaging>
 
