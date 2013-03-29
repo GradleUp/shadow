@@ -21,7 +21,7 @@ How to use
                 }
             }
             dependencies {
-                classpath 'org.gradle.plugins:shadow:0.7.1'
+                classpath 'org.gradle.plugins:shadow:0.7.2'
             }
         }
 
@@ -126,6 +126,8 @@ The default implementation excludes all META-INF/INDEX.LIST files.
 Version History
 ===============
 
++ v0.7.2 - fix a bug that was preventing multiple includes/excludes in the artifactSet. Fix bug in filtering
+shorthand style that caused filters to not be applied.
 + v0.7.1 - fix the up-to-date bug where the shadow task wasn't executing after making a source change. Changed the
 BinTray repo to Maven compatabile instead of Ivy.
 + v0.7 - all the v0.6 features, but using a port of the Shade code. Primarily this involves using a port
