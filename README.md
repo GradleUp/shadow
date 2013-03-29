@@ -63,20 +63,13 @@ Extensions
             }
         }
 
-+ Artifact Set - specify the included/excluded files
++ Artifact Set - specify the included/excluded artifacts (this includes or excludes specific jars)
 
         shadow {
             artifactSet {
                 include 'org.apache.maven.its.shade.aie'
                 exclude '*:b:jar:'
             }
-        }
-
-        OR SHORTHAND
-
-        shadow {
-            include 'org.apache.maven.its.shade.aie'
-            exclude '*:b:jar:'
         }
 
 + Filters - filter contents of shadow jar by dependency
@@ -92,6 +85,13 @@ Extensions
             filter('*:*') {
                 exclude 'org/*'
             }
+        }
+
+        OR SHORTHAND
+
+        shadow {
+            include 'META-INF/MANIFEST.MF'
+            exclude 'META-INF/*.RSA'
         }
 
 

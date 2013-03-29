@@ -3,7 +3,6 @@ package org.gradle.api.plugins.shadow.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.api.artifacts.ResolvedArtifact
-import org.gradle.api.file.RelativePath
 import org.gradle.api.plugins.shadow.ShadowStats
 import org.gradle.api.plugins.shadow.filter.Filter
 import org.gradle.api.plugins.shadow.filter.SimpleFilter
@@ -156,7 +155,7 @@ class ShadowTask extends DefaultTask {
         }
         List<ArchiveFilter> archiveFilters = project.shadow.filters
         List<Filter> configuredFilters = archiveFilters.collect { archiveFilter ->
-            ArtifactId pattern = new ArtifactId(archiveFilter.artifact)
+            ArtifactId pattern = new ArtifactId((String) archiveFilter.artifact)
             List<File> jars = artifacts.findAll { ResolvedArtifact resolvedArtifact, ArtifactId artifactId ->
                 artifactId.matches(pattern)
             }.collect { entry ->
