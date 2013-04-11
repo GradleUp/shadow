@@ -21,7 +21,7 @@ How to use
                 }
             }
             dependencies {
-                classpath 'org.gradle.plugins:shadow:0.7.2'
+                classpath 'org.gradle.plugins:shadow:0.7.3'
             }
         }
 

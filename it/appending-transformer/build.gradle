@@ -1,0 +1,13 @@
+import org.gradle.api.plugins.shadow.transformers.AppendingTransformer
+
+dependencies {
+    compile 'org.apache.maven.its.shade.at:one:0.1'
+    compile 'org.apache.maven.its.shade.at:two:0.1'
+}
+
+shadow {
+    artifactAttached = false
+    transformer(AppendingTransformer) {
+        resource = 'META-INF/services/org.apache.maven.Shade'
+    }
+}

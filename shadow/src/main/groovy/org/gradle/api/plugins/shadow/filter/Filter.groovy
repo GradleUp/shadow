@@ -32,5 +32,7 @@ interface Filter {
 
     boolean isFiltered(String classFile)
 
+    boolean isSpecificallyIncluded(String classFile)
+
     void finished()
 }

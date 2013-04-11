@@ -246,13 +246,10 @@ class DefaultCaster implements Caster {
     }
 
     private boolean isFiltered(List<Filter> filters, String name) {
-        for (Filter filter : filters) {
-            if (filter.isFiltered(name)) {
-                return true
-            }
-        }
-
-        return false
+//        if (filters.any { it.isSpecificallyIncluded(name)}) {
+//            return false
+//        }
+        return filters.any { it.isFiltered(name) }
     }
 
     private boolean resourceTransformed(List<Transformer> resourceTransformers, String name, InputStream is,
