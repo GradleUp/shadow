@@ -65,11 +65,13 @@ class ShadowTaskExtension {
 
     ShadowTaskExtension filter(String artifact, Closure c) {
         if (!artifact) throw new GradleException('Must specify artifact for filter!')
-        ArchiveFilter filter = new ArchiveFilter(artifact: artifact)
+        ArchiveFilter filter = filters.find { it.artifact == artifact } ?: new ArchiveFilter(artifact: artifact)
         c.delegate = filter
         c.resolveStrategy = Closure.DELEGATE_ONLY
         c()
-        filters << filter
+        if (!filters.contains(filter)) {
+            filters << filter
+        }
         this
     }
 

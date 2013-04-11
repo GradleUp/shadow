@@ -12,7 +12,7 @@ shadow {
         exclude 'org/apache/*'
         exclude 'org/apache/maven/b/'
     }
-    include 'META-INF/MANIFEST.MF'
+//    include 'META-INF/MANIFEST.MF'
     exclude 'org/*'
     exclude 'META-INF/**/'
 }

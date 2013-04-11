@@ -1,14 +1,14 @@
-include 'archivesBaseName'
-include 'archivesBaseName-attached'
-include 'artifact-includes-excludes'
-include 'artifact-includes-excludes-shortcut'
-include 'baseName'
-include 'baseName-attached'
-include 'filter-artifact-contents'
-include 'implicit-inclusion-of-project-artifact'
-include 'manifest-retained'
-include 'manifest-transformed'
-include 'non-runtime-scope-excluded'
-include 'pom-packaging'
-include 'services-resource-transformer'
-include 'xml-transformer-ignores-dtd'
+import groovy.io.FileType
+
+def path = [] as LinkedList
+rootDir.traverse(
+        type: FileType.FILES,
+        nameFilter: ~/.+\.gradle/,
+        maxDepth: 3,
+        preDir: { path << it.name },
+        postDir: { path.removeLast() }
+) {
+    if (path) {
+        include path.join(':')
+    }
+}
