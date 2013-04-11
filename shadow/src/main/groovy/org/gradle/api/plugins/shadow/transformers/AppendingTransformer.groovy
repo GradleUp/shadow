@@ -48,7 +48,7 @@ class AppendingTransformer implements Transformer {
 
     void transform(String path, InputStream is, List<Relocator> relocators) {
         IOUtil.copy(is, data)
-        data.write('\n')
+        data.write('\n'.bytes)
 
         is.close()
     }
