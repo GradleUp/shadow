@@ -1,5 +1,5 @@
 dependencies {
-    groovy 'org.codehaus.groovy:groovy-all:1.8.8'
+    compile localGroovy()
     compile gradleApi()
     compile 'jdom:jdom:1.1'
     compile 'asm:asm:3.3.1'
