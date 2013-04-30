@@ -21,14 +21,14 @@ class ShadowPlugin implements Plugin<Project>{
     void addShadow(Project project) {
 
         ["compile", "runtime"].each { config ->
-            Configuration signed = project.configurations.add "signed${config.capitalize()}"
+            Configuration signed = project.configurations.create "signed${config.capitalize()}"
             Configuration original = project.configurations.getByName config
             original.extendsFrom = (original.extendsFrom + signed) as Set
         }
 
         project.extensions.create(ShadowTaskExtension.NAME, ShadowTaskExtension, project)
 
-        KnowsTask knows = project.tasks.add(KnowsTask.NAME, KnowsTask)
+        KnowsTask knows = project.tasks.create(KnowsTask.NAME, KnowsTask)
         knows.description = KnowsTask.DESC
         knows.group = GROUP
 
