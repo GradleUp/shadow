@@ -32,14 +32,14 @@ class ShadowPlugin implements Plugin<Project>{
         knows.description = KnowsTask.DESC
         knows.group = GROUP
 
-        OutputSignedLibsTask signedCopyTask = project.tasks.add(OutputSignedLibsTask.NAME, OutputSignedLibsTask)
+        OutputSignedLibsTask signedCopyTask = project.tasks.create(OutputSignedLibsTask.NAME, OutputSignedLibsTask)
         signedCopyTask.description = OutputSignedLibsTask.DESC
         signedCopyTask.group = GROUP
         signedCopyTask.from project.configurations.signedCompile
         signedCopyTask.from project.configurations.signedRuntime
         signedCopyTask.into project.shadow.signedLibsDir
 
-        ShadowTask shadow = project.tasks.add(ShadowTask.NAME, ShadowTask)
+        ShadowTask shadow = project.tasks.create(ShadowTask.NAME, ShadowTask)
         shadow.description = ShadowTask.DESC
         shadow.group = GROUP
         shadow.dependsOn project.tasks.jar, signedCopyTask

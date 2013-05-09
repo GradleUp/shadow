@@ -4,7 +4,7 @@ task integTest(type: GradleBuild) {
     tasks = ['clean', 'integTest']
     startParameter.projectProperties.currentVersion = currentVersion
 }
-integTest.dependsOn ':shadow:install'
+integTest.dependsOn ':shadow:publishToMavenLocal'
 
 subprojects {
 
@@ -12,7 +12,7 @@ subprojects {
         mavenCentral()
     }
 
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     apply plugin: 'groovy'
     apply plugin: 'idea'
 

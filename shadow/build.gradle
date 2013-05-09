@@ -14,60 +14,38 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-artifacts {
-    archives sourcesJar
-}
-
-task configureUploadArchivesBinTray << {
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(
-                        url: bintray_api_base_url + '/maven/' + bintray_username + '/' + bintray_repo + '/' + bintray_package
-                ) {
-                    authentication(
-                            userName: bintray_username,
-                            password: bintray_api_key
-                    )
+publishing {
+    publications {
+        shadow(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier 'sources'
+            }
+        }
+    }
+    repositories {
+        maven {
+            name 'Bloom'
+            url "${bloom_artifactory_contextUrl}/libs-${isSnapshot() ? 'snapshot' : 'release'}-local"
+            credentials {
+                username bloom_artifactory_username
+                password bloom_artifactory_password
+            }
+        }
+        if (!isSnapshot()) {
+            maven {
+                name 'BinTray'
+                url "${[bintray_api_base_url, 'maven', bintray_username, bintray_repo, bintray_package].join('/')}"
+                credentials {
+                    username bintray_username
+                    password bintray_api_key
                 }
             }
         }
     }
 }
-
-configureUploadArchivesBinTray.onlyIf {
-    !isSnapshot()
-}
-
-task configureUploadArchivesArtifactory << {
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${bloom_artifactory_contextUrl}/libs-${isSnapshot() ? 'snapshot' : 'release'}-local") {
-                    authentication(
-                            userName: bloom_artifactory_username,
-                            password: bloom_artifactory_password
-                    )
-                }
-            }
-        }
-    }
-}
-
-task configureUploadArchives(dependsOn: [configureUploadArchivesBinTray, configureUploadArchivesArtifactory])
-
-uploadArchives.dependsOn test, configureUploadArchives
 
 jar {
-    baseName = 'shadow'
     from 'LICENSE'
     from 'NOTICE'
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            pom.artifactId = 'shadow'
-        }
-    }
 }
