@@ -21,25 +21,25 @@ class ShadowPlugin implements Plugin<Project>{
     void addShadow(Project project) {
 
         ["compile", "runtime"].each { config ->
-            Configuration signed = project.configurations.add "signed${config.capitalize()}"
+            Configuration signed = project.configurations.create "signed${config.capitalize()}"
             Configuration original = project.configurations.getByName config
             original.extendsFrom = (original.extendsFrom + signed) as Set
         }
 
         project.extensions.create(ShadowTaskExtension.NAME, ShadowTaskExtension, project)
 
-        KnowsTask knows = project.tasks.add(KnowsTask.NAME, KnowsTask)
+        KnowsTask knows = project.tasks.create(KnowsTask.NAME, KnowsTask)
         knows.description = KnowsTask.DESC
         knows.group = GROUP
 
-        OutputSignedLibsTask signedCopyTask = project.tasks.add(OutputSignedLibsTask.NAME, OutputSignedLibsTask)
+        OutputSignedLibsTask signedCopyTask = project.tasks.create(OutputSignedLibsTask.NAME, OutputSignedLibsTask)
         signedCopyTask.description = OutputSignedLibsTask.DESC
         signedCopyTask.group = GROUP
         signedCopyTask.from project.configurations.signedCompile
         signedCopyTask.from project.configurations.signedRuntime
         signedCopyTask.into project.shadow.signedLibsDir
 
-        ShadowTask shadow = project.tasks.add(ShadowTask.NAME, ShadowTask)
+        ShadowTask shadow = project.tasks.create(ShadowTask.NAME, ShadowTask)
         shadow.description = ShadowTask.DESC
         shadow.group = GROUP
         shadow.dependsOn project.tasks.jar, signedCopyTask
