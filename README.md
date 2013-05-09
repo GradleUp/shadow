@@ -21,7 +21,7 @@ How to use
                 }
             }
             dependencies {
-                classpath 'org.gradle.plugins:shadow:0.7.3'
+                classpath 'org.gradle.plugins:shadow:0.7.4'
             }
         }
 
@@ -114,7 +114,7 @@ Results in the following output:
 
     build
         libs
-            foo-shadow-1.0.jar
+            foo-1.0-shadow.jar
             signedLibs
                 bcprov-jdk15on-1.47.jar
 
@@ -126,6 +126,8 @@ The default implementation excludes all META-INF/INDEX.LIST files.
 Version History
 ===============
 
++ v0.7.4 - upgrade to Gradle 1.6 internally and remove use of deprecated methods.
++ v0.7.3 - fix bad method call in the AppendingTransformer
 + v0.7.2 - fix a bug that was preventing multiple includes/excludes in the artifactSet. Fix bug in filtering
 shorthand style that caused filters to not be applied.
 + v0.7.1 - fix the up-to-date bug where the shadow task wasn't executing after making a source change. Changed the
