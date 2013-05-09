@@ -23,22 +23,24 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            name 'Bloom'
-            url "${bloom_artifactory_contextUrl}/libs-${isSnapshot() ? 'snapshot' : 'release'}-local"
-            credentials {
-                username bloom_artifactory_username
-                password bloom_artifactory_password
-            }
-        }
-        if (!isSnapshot()) {
+    if (!project.hasProperty('disablePublishing')) {
+        repositories {
             maven {
-                name 'BinTray'
-                url "${[bintray_api_base_url, 'maven', bintray_username, bintray_repo, bintray_package].join('/')}"
+                name 'Bloom'
+                url "${bloom_artifactory_contextUrl}/libs-${isSnapshot() ? 'snapshot' : 'release'}-local"
                 credentials {
-                    username bintray_username
-                    password bintray_api_key
+                    username bloom_artifactory_username
+                    password bloom_artifactory_password
+                }
+            }
+            if (!isSnapshot()) {
+                maven {
+                    name 'BinTray'
+                    url "${[bintray_api_base_url, 'maven', bintray_username, bintray_repo, bintray_package].join('/')}"
+                    credentials {
+                        username bintray_username
+                        password bintray_api_key
+                    }
                 }
             }
         }
