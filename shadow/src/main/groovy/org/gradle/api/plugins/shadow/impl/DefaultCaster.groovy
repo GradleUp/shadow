@@ -66,7 +66,8 @@ class DefaultCaster implements Caster {
 
         RelocatorRemapper remapper = new RelocatorRemapper(shadowRequest.getRelocators())
 
-        JarOutputStream jos = new JarOutputStream(new FileOutputStream(shadowRequest.getUberJar()))
+        File tempUberJar = File.createTempFile(shadowRequest.getUberJar().getName(), 'jar')
+        JarOutputStream jos = new JarOutputStream(new FileOutputStream(tempUberJar))
 
         if (manifestTransformer != null) {
             for (File jar : shadowRequest.getJars()) {
@@ -152,6 +153,10 @@ class DefaultCaster implements Caster {
         }
 
         IOUtil.close(jos)
+        boolean success = tempUberJar.renameTo(shadowRequest.getUberJar())
+        if (!success) {
+            throw new RuntimeException("Failed to rename temp jar, from=${tempUberJar.getAbsolutePath()}, to=${shadowRequest.getUberJar().getAbsolutePath()}")
+        }
 
         for (Filter filter : shadowRequest.getFilters()) {
             filter.finished()
