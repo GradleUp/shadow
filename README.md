@@ -31,7 +31,7 @@ How to use
 jar signature files
 
         shadow {
-            exclude 'META-INF'/*.DSA'
+            exclude 'META-INF/*.DSA'
             exclude 'META-INF/*.RSA'
         }
 
