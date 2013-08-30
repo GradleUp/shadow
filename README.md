@@ -16,8 +16,7 @@ How to use
         buildscript {
             repositories {
                 maven {
-                    name 'Gradle Shadow'
-                    url 'http://dl.bintray.com/content/johnrengelman/gradle-plugins'
+                    jcenter()
                 }
             }
             dependencies {
@@ -31,7 +30,7 @@ How to use
 jar signature files
 
         shadow {
-            exclude 'META-INF'/*.DSA'
+            exclude 'META-INF/*.DSA'
             exclude 'META-INF/*.RSA'
         }
 
@@ -57,9 +56,13 @@ Extensions
 ==========
 + Transformers - apply a transformer class to the processing
 
+        import org.gradle.api.plugins.shadow.transformers.AppendingTransformer
         shadow {
-            transformer(TransformerClass) {
-                <configuration>
+            transformer(AppendingTransformer) {
+                resource = 'META-INF/spring.handlers'
+            }
+            transformer(AppendingTransformer) {
+                resource = 'META-INF/spring.schemas'
             }
         }
 
@@ -128,6 +131,8 @@ Version History
 
 + v0.8
    + Changed Maven Group ID to com.github.jengelman.gradle.plugins
+   + Published artifact to JCenter
+   + Upgraded to Gradle 1.10
 + v0.7.4 - upgrade to Gradle 1.6 internally and remove use of deprecated methods.
 + v0.7.3 - fix bad method call in the AppendingTransformer
 + v0.7.2 - fix a bug that was preventing multiple includes/excludes in the artifactSet. Fix bug in filtering
