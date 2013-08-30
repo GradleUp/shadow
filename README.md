@@ -31,7 +31,7 @@ How to use
 jar signature files
 
         shadow {
-            exclude 'META-INF'/*.DSA'
+            exclude 'META-INF/*.DSA'
             exclude 'META-INF/*.RSA'
         }
 
@@ -57,9 +57,13 @@ Extensions
 ==========
 + Transformers - apply a transformer class to the processing
 
+        import org.gradle.api.plugins.shadow.transformers.AppendingTransformer
         shadow {
-            transformer(TransformerClass) {
-                <configuration>
+            transformer(AppendingTransformer) {
+                resource = 'META-INF/spring.handlers'
+            }
+            transformer(AppendingTransformer) {
+                resource = 'META-INF/spring.schemas'
             }
         }
 
