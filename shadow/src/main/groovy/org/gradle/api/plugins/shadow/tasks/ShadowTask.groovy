@@ -7,6 +7,7 @@ import org.gradle.api.plugins.shadow.ShadowStats
 import org.gradle.api.plugins.shadow.filter.Filter
 import org.gradle.api.plugins.shadow.filter.SimpleFilter
 import org.gradle.api.plugins.shadow.impl.ArchiveFilter
+import org.gradle.api.plugins.shadow.impl.ArchiveRelocation
 import org.gradle.api.plugins.shadow.impl.ArtifactId
 import org.gradle.api.plugins.shadow.impl.ArtifactSelector
 import org.gradle.api.plugins.shadow.impl.ArtifactSet
@@ -14,6 +15,7 @@ import org.gradle.api.plugins.shadow.impl.Caster
 import org.gradle.api.plugins.shadow.impl.DefaultCaster
 import org.gradle.api.plugins.shadow.impl.ShadowRequest
 import org.gradle.api.plugins.shadow.relocation.Relocator
+import org.gradle.api.plugins.shadow.relocation.SimpleRelocator
 import org.gradle.api.plugins.shadow.transformers.Transformer
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -25,7 +27,6 @@ class ShadowTask extends DefaultTask {
     static final String DESC = "Combines all classpath resources into a single jar."
 
     List<Transformer> transformers = project.shadow.transformers
-    List<Relocator> relocators = []
 
     boolean statsEnabled
 
@@ -43,7 +44,7 @@ class ShadowTask extends DefaultTask {
         ShadowRequest shadow = new ShadowRequest()
         shadow.stats = stats
         shadow.uberJar = outputJar
-        shadow.relocators = []
+        shadow.relocators = relocators
         shadow.filters = filters
         shadow.resourceTransformers = project.shadow.transformers
         shadow.shadeSourcesContent = false
@@ -168,5 +169,11 @@ class ShadowTask extends DefaultTask {
         }.findAll { it }
         //TODO minijar filter
         configuredFilters
+    }
+
+    List<Relocator> getRelocators() {
+        project.shadow.relocations.collect { ArchiveRelocation relocation ->
+            new SimpleRelocator(relocation.pattern, relocation.shadedPattern, relocation.includes, relocation.excludes)
+        }
     }
 }

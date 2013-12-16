@@ -3,6 +3,7 @@ package org.gradle.api.plugins.shadow
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.shadow.impl.ArchiveFilter
+import org.gradle.api.plugins.shadow.impl.ArchiveRelocation
 import org.gradle.api.plugins.shadow.impl.ArtifactSet
 import org.gradle.api.plugins.shadow.transformers.Transformer
 
@@ -12,6 +13,7 @@ class ShadowTaskExtension {
 
     List<Transformer> transformers = []
     List<ArchiveFilter> filters = []
+    List<ArchiveRelocation> relocations = []
     ArtifactSet artifactSet
 
     String destinationDir = "${project.buildDir}/libs/"
@@ -84,6 +86,17 @@ class ShadowTaskExtension {
             c()
         }
         transformers << transformer
+        this
+    }
+
+    ShadowTaskExtension relocation(Closure c) {
+        ArchiveRelocation relocation = new ArchiveRelocation()
+        if (c) {
+            c.delegate = relocation
+            c.resolveStrategy = Closure.DELEGATE_ONLY
+            c()
+        }
+        relocations << relocation
         this
     }
 
