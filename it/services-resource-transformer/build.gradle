@@ -1,4 +1,4 @@
-import org.gradle.api.plugins.shadow.transformers.ServiceFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 dependencies {
     compile 'org.apache.maven.its.shade.srt:one:0.1'

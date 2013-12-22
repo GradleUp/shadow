@@ -1,4 +1,4 @@
-import org.gradle.api.plugins.shadow.transformers.XmlAppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 
 shadow {
     artifactAttached = false

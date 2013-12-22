@@ -1,4 +1,4 @@
-import org.gradle.api.plugins.shadow.transformers.ManifestResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
 
 dependencies {
     compile("org.gradle.plugins:shadow:${currentVersion}") {

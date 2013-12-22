@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "org.gradle.plugins:shadow:${currentVersion}"
+        classpath "com.github.jengelman.gradle.plugins:shadow:${currentVersion}"
     }
 }
 

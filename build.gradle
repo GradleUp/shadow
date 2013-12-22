@@ -16,7 +16,7 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'idea'
 
-    group = 'org.gradle.plugins'
+    group = 'com.github.jengelman.gradle.plugins'
     version = "${currentVersion}"
 
     jar.dependsOn test

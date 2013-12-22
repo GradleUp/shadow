@@ -21,7 +21,7 @@ How to use
                 }
             }
             dependencies {
-                classpath 'org.gradle.plugins:shadow:0.7.4'
+                classpath 'com.github.jengelman.gradle.plugins:shadow:0.8'
             }
         }
 
@@ -126,6 +126,8 @@ The default implementation excludes all META-INF/INDEX.LIST files.
 Version History
 ===============
 
++ v0.8
+   + Changed Maven Group ID to com.github.jengelman.gradle.plugins
 + v0.7.4 - upgrade to Gradle 1.6 internally and remove use of deprecated methods.
 + v0.7.3 - fix bad method call in the AppendingTransformer
 + v0.7.2 - fix a bug that was preventing multiple includes/excludes in the artifactSet. Fix bug in filtering
