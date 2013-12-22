@@ -1,3 +1,12 @@
+apply plugin: 'bintray'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile localGroovy()
     compile gradleApi()
@@ -9,45 +18,77 @@ dependencies {
     testCompile 'xmlunit:xmlunit:1.3'
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
+def javaApiUrl = 'http://docs.oracle.com/javase/1.7.0/docs/api'
+def groovyApiUrl = 'http://groovy.codehaus.org/gapi/'
+
+tasks.withType(Javadoc) {
+    options.links(javaApiUrl, groovyApiUrl)
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
-publishing {
-    publications {
-        shadow(MavenPublication) {
-            from components.java
-            artifact sourcesJar {
-                classifier 'sources'
-            }
+def pomConfig = {
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
         }
     }
-    if (!project.hasProperty('disablePublishing')) {
-        repositories {
-            maven {
-                name 'Bloom'
-                url "${bloom_artifactory_contextUrl}/libs-${isSnapshot() ? 'snapshot' : 'release'}-local"
-                credentials {
-                    username bloom_artifactory_username
-                    password bloom_artifactory_password
-                }
-            }
-            if (!isSnapshot()) {
-                maven {
-                    name 'BinTray'
-                    url "${[bintray_api_base_url, 'maven', bintray_username, bintray_repo, bintray_package].join('/')}"
-                    credentials {
-                        username bintray_username
-                        password bintray_api_key
-                    }
-                }
+    developers {
+        developer {
+            id 'jengelman'
+            name 'John Engelman'
+            email 'john.r.engelman@gmail.com'
+        }
+    }
+}
+
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Gradle plugin to combine dependencies into a single Jar. Port of Maven Shade.')
+                root.children().last() + pomConfig
             }
         }
     }
 }
 
+task configureBintray << {
+    bintrayUpload.user = bintrayUser
+    bintrayUpload.apiKey = bintrayKey
+}
+
+bintrayUpload.dependsOn configureBintray
+
+bintray {
+    publications = ['plugin']
+    pkg {
+        repo = 'gradle-plugins'
+        name = 'gradle-shadow-plugin'
+        licenses = ['Apache-2.0']
+    }
+}
+
+task install(dependsOn: publishToMavenLocal)
+
+build.dependsOn javadocJar, sourcesJar
+
 jar {
-    from 'LICENSE'
-    from 'NOTICE'
+    from rootProject.file('LICENSE')
+    from rootProject.file('NOTICE')
 }
