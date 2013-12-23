@@ -91,4 +91,5 @@ build.dependsOn javadocJar, sourcesJar
 jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
+
 }

@@ -1,5 +1,5 @@
 dependencies {
-    compile("org.gradle.plugins:shadow:${currentVersion}") {
+    compile("com.github.jengelman.gradle.plugins:shadow:${currentVersion}") {
         transitive = false
     }
 }

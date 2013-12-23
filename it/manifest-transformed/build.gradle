@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
 
 dependencies {
-    compile("org.gradle.plugins:shadow:${currentVersion}") {
+    compile("com.github.jengelman.gradle.plugins:shadow:${currentVersion}") {
         transitive = false
     }
 }
