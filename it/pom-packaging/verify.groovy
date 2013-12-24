@@ -4,7 +4,7 @@
     ]
     def unwanted = []
 
-    def jar = file("${buildDir}/libs/shadow.jar")
+    def jar = file("${buildDir}/distributions/shadow.jar")
 
     assert jar.exists()
 

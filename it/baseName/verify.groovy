@@ -1,8 +1,8 @@
 { project ->
-    File artifact = file("${buildDir}/libs/${project.name}.jar") //shadowed artifact
+    File artifact = file("${buildDir}/libs/${project.name}.jar") //unshadowed
     assert artifact.exists()
 
-    File original = file("${buildDir}/libs/MyShadowBaseName.jar") //unshadowed
+    File original = file("${buildDir}/distributions/MyShadowBaseName.jar") //shadowed artifact
     assert original.exists()
 
     File repo = new File("${project.repositories.mavenLocal().url}/org/gradle/plugins/shadow/its/bn/baseName/1.0/baseName-1.0.jar" - 'file:')

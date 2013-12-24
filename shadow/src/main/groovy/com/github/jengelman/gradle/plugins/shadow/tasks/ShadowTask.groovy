@@ -83,20 +83,6 @@ class ShadowTask extends DefaultTask {
 
     List<File> getArtifacts(ArtifactSelector selector) {
         List<File> artifacts = project.configurations.runtime.artifacts.files as List
-        artifacts = renameOriginalArtifacts(artifacts)
-        artifacts
-    }
-
-    List<File> renameOriginalArtifacts(List<File> artifacts) {
-        if (!project.shadow.artifactAttached &&
-                (!project.shadow.baseName ||
-                        project.shadow.baseName == project.archivesBaseName)) {
-            return artifacts.collect { artifact ->
-                def newFile = new File(artifact.parent, "original-${artifact.name}")
-                artifact.renameTo(newFile)
-                newFile
-            }
-        }
         artifacts
     }
 

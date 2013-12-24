@@ -3,7 +3,7 @@ import java.util.jar.*
 { project ->
 
     // NOTE: We deliberately use JarInputStream and not JarFile here!
-    def jar = file("${buildDir}/libs/${project.name}-${currentVersion}.jar")
+    def jar = file("${buildDir}/distributions/${project.name}-${currentVersion}.jar")
     JarInputStream jarStream = new JarInputStream(jar.newInputStream())
     Manifest mf = jarStream.getManifest()
     jarStream.close()

@@ -35,7 +35,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
  * Modifications
  * @author John Engelman
  */
-class DefaultShaderTest extends TestCase {
+class DefaultCasterTest extends TestCase {
     private static final String[] EXCLUDES = [
             "org/codehaus/plexus/util/xml/Xpp3Dom",
             "org/codehaus/plexus/util/xml/pull.*"] as String[]

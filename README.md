@@ -141,6 +141,7 @@ Version History
    + Upgraded to Gradle 1.10
    + Main task renamed to be 'shadowJar' instead of 'shadow'. This was done so the task and extension namespace
      did not collide.
+   + Changed default output location to be ${buildDir}/distributions instead of ${buildDir}/libs
 + v0.7.4 - upgrade to Gradle 1.6 internally and remove use of deprecated methods.
 + v0.7.3 - fix bad method call in the AppendingTransformer
 + v0.7.2 - fix a bug that was preventing multiple includes/excludes in the artifactSet. Fix bug in filtering

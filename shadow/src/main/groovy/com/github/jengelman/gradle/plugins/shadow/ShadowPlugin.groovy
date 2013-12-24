@@ -26,7 +26,7 @@ class ShadowPlugin implements Plugin<Project>{
             original.extendsFrom = (original.extendsFrom + signed) as Set
         }
 
-        project.extensions.create(ShadowTaskExtension.NAME, ShadowTaskExtension, project)
+        project.extensions.create(ShadowExtension.NAME, ShadowExtension, project)
 
         KnowsTask knows = project.tasks.create(KnowsTask.NAME, KnowsTask)
         knows.description = KnowsTask.DESC

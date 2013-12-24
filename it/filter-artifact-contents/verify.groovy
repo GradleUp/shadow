@@ -14,7 +14,7 @@
             'org/apache/maven/b/b.properties'
     ]
 
-    def jar = file("${buildDir}/libs/${project.name}-${currentVersion}.jar")
+    def jar = file("${buildDir}/distributions/${project.name}-${currentVersion}.jar")
 
     assert jar.exists()
 

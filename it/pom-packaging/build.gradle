@@ -3,5 +3,5 @@ dependencies {
 }
 
 shadow {
-    outputFile = file("${buildDir}/libs/shadow.jar")
+    outputFile = file("${buildDir}/distributions/shadow.jar")
 }

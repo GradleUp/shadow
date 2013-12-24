@@ -6,7 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.impl.ArchiveFilter
 import com.github.jengelman.gradle.plugins.shadow.impl.ArtifactSet
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 
-class ShadowTaskExtension {
+class ShadowExtension {
 
     public static final NAME = "shadow"
 
@@ -14,7 +14,7 @@ class ShadowTaskExtension {
     List<ArchiveFilter> filters = []
     ArtifactSet artifactSet
 
-    String destinationDir = "${project.buildDir}/libs/"
+    String destinationDir = "${project.buildDir}/distributions/"
     String baseName = null
     String extension = 'jar'
     String groupFilter
@@ -27,7 +27,7 @@ class ShadowTaskExtension {
 
     private final Project project
 
-    ShadowTaskExtension(Project project) {
+    ShadowExtension(Project project) {
         this.project = project
     }
 
@@ -55,7 +55,7 @@ class ShadowTaskExtension {
         return destinationDir + 'signedLibs/'
     }
 
-    ShadowTaskExtension artifactSet(Closure c) {
+    ShadowExtension artifactSet(Closure c) {
         artifactSet = artifactSet ?: new ArtifactSet()
         c.delegate = artifactSet
         c.resolveStrategy = Closure.DELEGATE_ONLY
@@ -63,7 +63,7 @@ class ShadowTaskExtension {
         this
     }
 
-    ShadowTaskExtension filter(String artifact, Closure c) {
+    ShadowExtension filter(String artifact, Closure c) {
         if (!artifact) throw new GradleException('Must specify artifact for filter!')
         ArchiveFilter filter = filters.find { it.artifact == artifact } ?: new ArchiveFilter(artifact: artifact)
         c.delegate = filter
@@ -75,7 +75,7 @@ class ShadowTaskExtension {
         this
     }
 
-    ShadowTaskExtension transformer(Class transformerClass, Closure c = null) {
+    ShadowExtension transformer(Class transformerClass, Closure c = null) {
         if (!transformerClass) throw new GradleException('Must specify transformer impl class!')
         Transformer transformer = transformerClass.newInstance()
         if (c) {
@@ -87,13 +87,13 @@ class ShadowTaskExtension {
         this
     }
 
-    ShadowTaskExtension include(String s) {
+    ShadowExtension include(String s) {
         filter('*:*') {
             include s
         }
     }
 
-    ShadowTaskExtension exclude(String s) {
+    ShadowExtension exclude(String s) {
         filter('*:*') {
             exclude s
         }
