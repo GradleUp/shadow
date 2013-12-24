@@ -23,7 +23,7 @@ subprojects { subproj ->
 
     apply plugin: 'shadow'
 
-    subproj.ext.testTasks = 'shadow'
+    subproj.ext.testTasks = 'shadowJar'
 
     task integTestSetup << {
         executeScript(subproj.file('setup.groovy'), subproj)

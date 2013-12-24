@@ -11,7 +11,7 @@ install {
 }
 
 integTestVerify.dependsOn 'install'
-install.dependsOn 'shadow'
+install.dependsOn shadowJar
 
 shadow {
     baseName = 'MyShadowBaseNameAttached'

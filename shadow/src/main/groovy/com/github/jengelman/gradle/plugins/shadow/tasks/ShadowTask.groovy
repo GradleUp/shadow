@@ -21,7 +21,7 @@ import org.gradle.api.tasks.TaskAction
 
 class ShadowTask extends DefaultTask {
 
-    static final String NAME = "shadow"
+    static final String NAME = "shadowJar"
     static final String DESC = "Combines all classpath resources into a single jar."
 
     List<Transformer> transformers = project.shadow.transformers

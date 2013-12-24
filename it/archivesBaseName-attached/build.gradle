@@ -13,7 +13,7 @@ install {
 archivesBaseName = 'MyArchivesBaseName'
 
 integTestVerify.dependsOn 'install'
-install.dependsOn 'shadow'
+install.dependsOn shadowJar
 
 shadow {
     classifier = 'shadow'
