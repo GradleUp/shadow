@@ -1,7 +1,8 @@
 { project ->
     def wanted = [
             'system.properties',
-            'compile.properties'
+            'compile.properties',
+            'runtime.properties'
     ]
 
     def jar = file("${buildDir}/distributions/${project.name}-${currentVersion}.jar")
