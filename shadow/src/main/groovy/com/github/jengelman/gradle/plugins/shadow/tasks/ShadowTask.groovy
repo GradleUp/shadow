@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.api.artifacts.ResolvedArtifact
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
@@ -15,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.impl.DefaultCaster
 import com.github.jengelman.gradle.plugins.shadow.impl.ShadowRequest
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -124,7 +126,16 @@ class ShadowTask extends DefaultTask {
         }.collect { resolvedArtifact ->
             resolvedArtifact.file
         }
-        resolvedFiles
+        List<File> selfResolvingDependencies = selfResolvingDependencies*.resolve().flatten().findAll { File file ->
+            selector.isSelected(file)
+        }
+        resolvedFiles + selfResolvingDependencies
+    }
+
+    List<SelfResolvingDependency> getSelfResolvingDependencies() {
+        (List<SelfResolvingDependency>) project.configurations.runtime.allDependencies.findAll {
+            it instanceof SelfResolvingDependency
+        }.asList()
     }
 
     ArtifactSelector initSelector() {

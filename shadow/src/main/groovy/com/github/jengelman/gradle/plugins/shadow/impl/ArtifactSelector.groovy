@@ -20,6 +20,7 @@ package com.github.jengelman.gradle.plugins.shadow.impl
 
 import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.artifacts.SelfResolvingDependency
 
 /**
  * @author Benjamin Bentmann
@@ -69,6 +70,10 @@ class ArtifactSelector {
 
     boolean isSelected(ResolvedArtifact artifact) {
         artifact ? isSelected(new ArtifactId(artifact)) : false
+    }
+
+    boolean isSelected(File file) {
+        file ? isSelected(new ArtifactId(file)) : false
     }
 
     boolean isSelected(ArtifactId id) {

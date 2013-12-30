@@ -15,6 +15,18 @@ task integTest(type: GradleBuild) {
 }
 integTest.dependsOn ':shadow:publishToMavenLocal'
 
+tasks.addRule('Pattern: integTest<Project>') { String taskName ->
+    if (taskName.startsWith('integTest')) {
+        def projectName = taskName - 'integTest'
+        task "$taskName"(type: GradleBuild, dependsOn: ':shadow:publishToMavenLocal') {
+            buildFile = file('it/build.gradle')
+            dir = file('it')
+            tasks = [":$projectName:clean", ":$projectName:integTest"]*.toString()
+            startParameter.projectProperties.currentVersion = currentVersion
+        }
+    }
+}
+
 allprojects {
     group = 'com.github.jengelman.gradle.plugins'
     version = "${currentVersion}"

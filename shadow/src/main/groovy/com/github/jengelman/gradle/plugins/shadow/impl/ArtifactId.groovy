@@ -20,6 +20,7 @@ package com.github.jengelman.gradle.plugins.shadow.impl
 
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.mvn3.org.codehaus.plexus.util.SelectorUtils
 
 /**
@@ -42,6 +43,10 @@ class ArtifactId {
 
     public ArtifactId(ResolvedArtifact artifact) {
         this(artifact.moduleVersion.id.group, artifact.name, artifact.type, artifact.classifier)
+    }
+
+    public ArtifactId(File file) {
+        this(null, getFileName(file), getFileExtension(file), null)
     }
 
     public ArtifactId(String group, PublishArtifact artifact) {
@@ -88,6 +93,14 @@ class ArtifactId {
 
     private boolean match(String str, String pattern) {
         return SelectorUtils.match(pattern, str)
+    }
+
+    private static String getFileName(File file) {
+        return file.name.substring(0, file.name.lastIndexOf('.'))
+    }
+
+    private static String getFileExtension(File file) {
+        return file.name.substring(file.name.lastIndexOf('.')+1, file.name.size())
     }
 
     String toString() {
