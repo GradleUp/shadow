@@ -1,0 +1,19 @@
+dependencies {
+    compile("com.github.jengelman.gradle.plugins:shadow:${currentVersion}") {
+        transitive = false
+    }
+    compile 'junit:junit:3.8.2'
+}
+
+shadow {
+    artifactAttached = false
+
+    relocation {
+        pattern = 'junit.textui'
+        shadedPattern = 'a'
+    }
+    relocation {
+        pattern = 'junit.framework'
+        shadedPattern = 'b'
+    }
+}
