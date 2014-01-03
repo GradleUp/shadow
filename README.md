@@ -11,9 +11,7 @@ Backlog below.
 Current Status
 =============
 
-Latest Release: 0.7.4
-
-In Progress: v0.8 (Targeted 1/1/2014)
+Latest Release: 0.8 (Released 1/3/2014)
 
 [![Build Status](https://drone.io/github.com/johnrengelman/shadow/status.png)](https://drone.io/github.com/johnrengelman/shadow/latest)
 
