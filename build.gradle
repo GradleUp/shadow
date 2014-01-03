@@ -27,6 +27,14 @@ tasks.addRule('Pattern: integTest<Project>') { String taskName ->
     }
 }
 
+task test(dependsOn: integTest)
+subprojects {
+    tasks.withType(Test) {
+        rootProject.tasks.test.dependsOn it
+        rootProject.tasks.integTest.mustRunAfter it
+    }
+}
+
 allprojects {
     group = 'com.github.jengelman.gradle.plugins'
     version = "${currentVersion}"
