@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.filter.Filter
 import com.github.jengelman.gradle.plugins.shadow.filter.SimpleFilter
 import com.github.jengelman.gradle.plugins.shadow.impl.ArchiveFilter
+import com.github.jengelman.gradle.plugins.shadow.impl.ArchiveRelocation
 import com.github.jengelman.gradle.plugins.shadow.impl.ArtifactId
 import com.github.jengelman.gradle.plugins.shadow.impl.ArtifactSelector
 import com.github.jengelman.gradle.plugins.shadow.impl.ArtifactSet
@@ -15,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.impl.Caster
 import com.github.jengelman.gradle.plugins.shadow.impl.DefaultCaster
 import com.github.jengelman.gradle.plugins.shadow.impl.ShadowRequest
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.tasks.InputFiles
@@ -27,7 +29,6 @@ class ShadowTask extends DefaultTask {
     static final String DESC = "Combines all classpath resources into a single jar."
 
     List<Transformer> transformers = project.shadow.transformers
-    List<Relocator> relocators = []
 
     boolean statsEnabled
 
@@ -45,7 +46,7 @@ class ShadowTask extends DefaultTask {
         ShadowRequest shadow = new ShadowRequest()
         shadow.stats = stats
         shadow.uberJar = outputJar
-        shadow.relocators = []
+        shadow.relocators = relocators
         shadow.filters = filters
         shadow.resourceTransformers = project.shadow.transformers
         shadow.shadeSourcesContent = false
@@ -165,5 +166,11 @@ class ShadowTask extends DefaultTask {
         }.findAll { it }
         //TODO minijar filter
         configuredFilters
+    }
+
+    List<Relocator> getRelocators() {
+        project.shadow.relocations.collect { ArchiveRelocation relocation ->
+            new SimpleRelocator(relocation.pattern, relocation.shadedPattern, relocation.includes, relocation.excludes)
+        }
     }
 }
