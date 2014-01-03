@@ -11,7 +11,10 @@ Backlog below.
 Current Status
 =============
 
-v0.8 in progress.
+Latest Release: 0.7.4
+
+In Progress: v0.8 (Targeted 1/1/2014)
+
 [![Build Status](https://drone.io/github.com/johnrengelman/shadow/status.png)](https://drone.io/github.com/johnrengelman/shadow/latest)
 
 How to use
@@ -42,7 +45,7 @@ jar signature files
 
 + Call the Shadow task
 
-        $ gradle shadow
+        $ gradle shadowJar
 
 + The shadow artifact will be created in your configured build directory (by default: build/libs/<project>-<version>-shadow.jar
 
@@ -103,6 +106,16 @@ Extensions
             exclude 'META-INF/*.RSA'
         }
 
++ Relocators - relocate class from one package to another
+
+        shadow {
+            relocation {
+                pattern = 'junit.textui'
+                shadedPattern = 'a'
+                excludes = ['junit.textui.TestRunner']
+            }
+        }
+
 
 Configuring Output of Signed Libraries
 ======================================
@@ -142,6 +155,7 @@ Version History
    + Main task renamed to be 'shadowJar' instead of 'shadow'. This was done so the task and extension namespace
      did not collide.
    + Changed default output location to be ${buildDir}/distributions instead of ${buildDir}/libs
+   + Added support for class Relocation, thanks to [Baron Roberts](https://github.com/baron1405)
 + v0.7.4 - upgrade to Gradle 1.6 internally and remove use of deprecated methods.
 + v0.7.3 - fix bad method call in the AppendingTransformer
 + v0.7.2 - fix a bug that was preventing multiple includes/excludes in the artifactSet. Fix bug in filtering
@@ -160,7 +174,6 @@ more of Shade's features with minor changes.
 
 Feature Backlog
 ===============
-+ Port support for relocators
 + Port support for configuration of a custom Caster (Shader) implementation
 + Automatically configure Shadow output as publish artifact
 + Port support for generation of shadow sources jar
