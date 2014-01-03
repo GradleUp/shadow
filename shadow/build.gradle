@@ -73,7 +73,7 @@ task configureBintray << {
     bintrayUpload.apiKey = bintrayKey
 }
 
-bintrayUpload.dependsOn configureBintray
+bintrayUpload.dependsOn configureBintray, project.publishing.publications.plugin.artifacts
 
 bintray {
     publications = ['plugin']
