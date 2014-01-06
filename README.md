@@ -63,7 +63,7 @@ Extensions
 ==========
 + Transformers - apply a transformer class to the processing
 
-        import org.gradle.api.plugins.shadow.transformers.AppendingTransformer
+        import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
         shadow {
             transformer(AppendingTransformer) {
                 resource = 'META-INF/spring.handlers'
