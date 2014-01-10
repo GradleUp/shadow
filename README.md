@@ -45,7 +45,7 @@ jar signature files
 
         $ gradle shadowJar
 
-+ The shadow artifact will be created in your configured build directory (by default: build/libs/<project>-<version>-shadow.jar
++ The shadow artifact will be created in your configured build directory (by default: build/distributions/<project>-<version>-shadow.jar
 
 Configuration Options
 =====================
