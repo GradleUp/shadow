@@ -152,6 +152,7 @@ class ShadowTask extends DefaultTask {
             map
         }
         List<ArchiveFilter> archiveFilters = project.shadow.filters
+        ArtifactSelector selector = initSelector()
         List<Filter> configuredFilters = archiveFilters.collect { archiveFilter ->
             ArtifactId pattern = new ArtifactId((String) archiveFilter.artifact)
             List<File> jars = artifacts.findAll { ResolvedArtifact resolvedArtifact, ArtifactId artifactId ->
@@ -159,6 +160,11 @@ class ShadowTask extends DefaultTask {
             }.collect { entry ->
                 entry.key.file
                 //TODO implementation for createSourcesJar
+            }
+            // add any matching SelfResolvingDependencies
+            jars = jars + selfResolvingDependencies*.resolve().flatten().findAll { File file ->
+                ArtifactId artifactId = new ArtifactId(file)
+                selector.isSelected(artifactId) && artifactId.matches(pattern)
             }
             if (jars) {
                 new SimpleFilter( jars, archiveFilter.includes, archiveFilter.excludes)
