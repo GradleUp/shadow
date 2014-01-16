@@ -22,9 +22,7 @@ How to use
 
         buildscript {
             repositories {
-                maven {
-                    jcenter()
-                }
+                jcenter()
             }
             dependencies {
                 classpath 'com.github.jengelman.gradle.plugins:shadow:0.8'
