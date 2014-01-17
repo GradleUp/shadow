@@ -5,7 +5,7 @@ import com.github.jengelman.gradle.plugins.integration.PluginIntegrationSpec
 class AppendingTransformerSpec extends PluginIntegrationSpec {
 
     def setup() {
-        applyPlugin(ShadowPlugin)
+        applyPlugin('shadow')
     }
 
     def "append resources"() {

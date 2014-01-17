@@ -1,10 +1,8 @@
 package com.github.jengelman.gradle.plugins.integration
 
 import org.gradle.tooling.BuildLauncher
-import org.gradle.tooling.GradleConnectionException
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
-import org.gradle.tooling.ResultHandler
 import org.junit.Rule
 import spock.lang.Specification
 
@@ -61,11 +59,11 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
     }
 
     protected void addPluginInit() {
-        pluginInitFile << 'dependencies {'
+        pluginInitFile << 'dependencies {\n'
         runtimePaths.each {
             pluginInitFile << "classpath files('$it')\n"
         }
-        pluginInitFile << '}'
+        pluginInitFile << '}\n'
     }
 
     protected List<String> getRuntimePaths() {
@@ -73,14 +71,11 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
     }
 
     protected void applyPlugin(Class plugin) {
-        buildFile << "apply plugin: ${plugin.name}"
+        buildFile << "apply plugin: ${plugin.name}\n"
     }
 
-    protected String getPluginJarPath() {
-        if (!System.getProperty('jar.path')) {
-            throw new IllegalArgumentException('jar.path MUST be specified!')
-        }
-        return System.getProperty('jar.path')
+    protected void applyPlugin(String plugin) {
+        buildFile << "apply plugin: '$plugin'\n"
     }
 
     protected void buildSuccessful() {
@@ -90,60 +85,6 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
                 throw new AssertionError('Gradle build was not executed.')
             }
             throw new AssertionError('Gradle build failed with error', results.exception)
-        }
-    }
-
-    class Results implements ResultHandler<Void> {
-
-        private final Object lock = new Object()
-
-        private boolean success = false
-        private GradleConnectionException exception
-
-        void waitForCompletion() {
-            synchronized(lock) {
-                while(!successful && !failed) {
-                    lock.wait()
-                }
-            }
-        }
-
-        boolean getSuccessful() {
-            return success && !exception
-        }
-
-        boolean getFailed() {
-            return exception as boolean
-        }
-
-        GradleConnectionException getException() {
-            return exception
-        }
-
-        void markComplete() {
-            synchronized(lock) {
-                success = true
-                exception = null
-                lock.notifyAll()
-            }
-        }
-
-        void markFailed(GradleConnectionException e) {
-            synchronized(lock) {
-                success = false
-                exception = e
-                lock.notifyAll()
-            }
-        }
-
-        @Override
-        void onComplete(Void aVoid) {
-            markComplete()
-        }
-
-        @Override
-        void onFailure(GradleConnectionException e) {
-            markFailed(e)
         }
     }
 }
