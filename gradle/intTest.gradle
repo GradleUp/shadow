@@ -1,0 +1,30 @@
+sourceSets {
+    intTest
+}
+
+task intTest(type: Test) {
+    testClassesDir  = sourceSets.intTest.output.classesDir
+    classpath = sourceSets.intTest.runtimeClasspath
+    doFirst {
+        systemProperty 'runtime.jars.path', sourceSets.main.runtimeClasspath*.path.join(',')
+    }
+}
+
+dependencies {
+    intTestCompile sourceSets.main.output
+    intTestCompile configurations.testCompile
+    intTestCompile sourceSets.test.output
+    intTestCompile dependencies.module('org.apache.ant:ant:1.9.2') {
+        dependency 'org.apache.ant:ant-launcher:1.9.2@jar'
+    }
+    intTestCompile 'org.hamcrest:hamcrest-core:1.3'
+    intTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    intTestRuntime configurations.testRuntime
+}
+
+idea {
+    module {
+        testSourceDirs += file('src/intTest/groovy')
+        testSourceDirs += file('src/intTest/resources')
+    }
+}

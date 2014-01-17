@@ -93,3 +93,5 @@ jar {
     from rootProject.file('NOTICE')
 
 }
+
+apply from: rootProject.file('gradle/intTest.gradle')
