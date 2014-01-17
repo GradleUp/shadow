@@ -14,6 +14,7 @@ dependencies {
     intTestCompile sourceSets.main.output
     intTestCompile configurations.testCompile
     intTestCompile sourceSets.test.output
+    intTestCompile 'commons-io:commons-io:2.4'
     intTestCompile dependencies.module('org.apache.ant:ant:1.9.2') {
         dependency 'org.apache.ant:ant-launcher:1.9.2@jar'
     }

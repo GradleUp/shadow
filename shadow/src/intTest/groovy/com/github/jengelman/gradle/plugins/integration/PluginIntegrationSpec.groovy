@@ -9,6 +9,7 @@ import spock.lang.Specification
 abstract class PluginIntegrationSpec extends Specification implements TestDirectoryProvider {
 
     @Rule final TestNameTestDirectoryProvider temporaryFolder = new TestNameTestDirectoryProvider()
+    protected MavenFileRepository mavenRepo
 
     ProjectConnection project
     Results results
@@ -20,6 +21,10 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
                 .connect()
         addPluginInit()
         results = new Results()
+    }
+
+    def cleanup() {
+        project.close()
     }
 
     protected BuildLauncher execute(String... tasks) {
@@ -43,15 +48,15 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
     }
 
     protected TestFile getRunFile() {
-        testDirectory.file('build.gradle')
+        file('build.gradle')
     }
 
     protected TestFile getBuildFile() {
-        testDirectory.file('testBuild.gradle')
+        file('testBuild.gradle')
     }
 
-    protected TestFile getSettingsFiles() {
-        testDirectory.file('settings.gradle')
+    protected TestFile getSettingsFile() {
+        file('settings.gradle')
     }
 
     public TestFile getTestDirectory() {
@@ -84,7 +89,18 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
             if (!results.failed) {
                 throw new AssertionError('Gradle build was not executed.')
             }
-            throw new AssertionError('Gradle build failed with error', results.exception)
+            throw new AssertionError('Gradle build failed with error')
         }
+    }
+
+    public MavenFileRepository getMavenRepo() {
+        if (mavenRepo == null) {
+            mavenRepo = new MavenFileRepository(file("maven-repo"))
+        }
+        return mavenRepo
+    }
+
+    protected TestFile file(Object... path) {
+        testDirectory.file(path)
     }
 }
