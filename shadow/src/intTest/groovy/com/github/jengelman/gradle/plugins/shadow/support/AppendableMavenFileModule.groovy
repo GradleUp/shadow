@@ -6,10 +6,15 @@ import groovy.transform.InheritConstructors
 @InheritConstructors
 class AppendableMavenFileModule extends MavenFileModule {
 
-    Map<String, String> contents = [:]
+    Map<String, Map<String, String>> contents = [:].withDefault { [:] }
 
     AppendableMavenFileModule insertFile(String path, String content) {
-        contents[path] = content
+        insertFile('', path, content)
+        return this
+    }
+
+    AppendableMavenFileModule insertFile(String classifier, String path, String content) {
+        contents[classifier][path] = content
         return this
     }
 
@@ -20,18 +25,26 @@ class AppendableMavenFileModule extends MavenFileModule {
             return artifactFile
         }
         publishWithStream(artifactFile) { OutputStream os ->
-            writeJar(os)
-
+            writeJar(os, contents[(String) artifact['classifier'] ?: ''])
         }
         return artifactFile
     }
 
-    void writeJar(OutputStream os) {
+    void writeJar(OutputStream os, Map<String, String> contents) {
         JarBuilder builder = new JarBuilder(os)
-        contents.each { path, contents ->
-            builder.withFile(path, contents)
+        contents.each { path, content ->
+            builder.withFile(path, content)
         }
         builder.build()
+    }
+
+    /**
+     * Adds an additional artifact to this module.
+     * @param options Can specify any of: type or classifier
+     */
+    AppendableMavenFileModule artifact(Map<String, ?> options) {
+        artifacts << options
+        return this
     }
 
 }
