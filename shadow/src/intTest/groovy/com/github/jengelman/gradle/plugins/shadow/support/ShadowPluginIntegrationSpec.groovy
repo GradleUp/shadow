@@ -39,18 +39,26 @@ abstract class ShadowPluginIntegrationSpec extends PluginIntegrationSpec {
         return sw.toString()
     }
 
-    void contains(List<String> paths) {
-        JarFile jar = new JarFile(shadowOutput)
+    void contains(File f, List<String> paths) {
+        JarFile jar = new JarFile(f)
         paths.each { path ->
             assert jar.getJarEntry(path)
         }
     }
 
-    void doesNotContain(List<String> paths) {
-        JarFile jar = new JarFile(shadowOutput)
+    void contains(List<String> paths) {
+        contains(shadowOutput, paths)
+    }
+
+    void doesNotContain(File f, List<String> paths) {
+        JarFile jar = new JarFile(f)
         paths.each { path ->
             assert !jar.getJarEntry(path)
         }
+    }
+
+    void doesNotContain(List<String> paths) {
+        doesNotContain(shadowOutput, paths)
     }
 
 }

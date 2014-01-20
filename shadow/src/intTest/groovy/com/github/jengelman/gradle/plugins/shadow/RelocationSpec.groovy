@@ -8,7 +8,7 @@ class RelocationSpec extends ShadowPluginIntegrationSpec {
         given:
         buildFile << '''
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -78,7 +78,7 @@ shadow {
         given:
         buildFile << '''
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {

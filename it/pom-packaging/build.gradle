@@ -1,7 +1,0 @@
-dependencies {
-    compile 'junit:junit:3.8.2'
-}
-
-shadow {
-    outputFile = file("${buildDir}/distributions/shadow.jar")
-}
