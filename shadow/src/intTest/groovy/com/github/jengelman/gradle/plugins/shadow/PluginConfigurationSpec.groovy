@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.integration.TestFile
 import com.github.jengelman.gradle.plugins.shadow.support.ShadowPluginIntegrationSpec
+import spock.lang.Unroll
 
 class PluginConfigurationSpec extends ShadowPluginIntegrationSpec {
 
@@ -66,5 +67,76 @@ shadow {
 
         and:
         contains(jar, ['junit/framework/TestCase.class'])
+    }
+
+    @Unroll
+    def "base name and classifier outputs to #expectedOutput"() {
+        given:
+        file('src/main/java/shadow/Main.java') << '''package shadow;
+public class Main {
+    public static void main(String[] args) {}
+}
+'''
+        buildFile << """
+version = ''
+
+shadow {
+    artifactAttached = ${attached}
+    baseName = '${baseName}'
+    classifier = '${classifier}'
+    reducePom = false
+}
+"""
+
+        when:
+        execute('shadowJar')
+
+        then:
+        buildSuccessful()
+
+        and:
+        file("build/distributions/${expectedOutput}").exists()
+
+        where:
+        baseName    | classifier    | attached  || expectedOutput
+        'config'    | 'shadow'      | true      || 'config-shadow.jar'
+        'config'    | 'shadow'      | false     || 'config.jar'
+        'config'    | 'shadowApi'   | true      || 'config-shadowApi.jar'
+    }
+
+    @Unroll
+    def "archives base name and attached outputs to #expectedOutput"() {
+        given:
+        file('src/main/java/shadow/Main.java') << '''package shadow;
+public class Main {
+    public static void main(String[] args) {}
+}
+'''
+        buildFile << """
+version = ''
+
+archivesBaseName = '${baseName}'
+
+shadow {
+    artifactAttached = ${attached}
+    classifier = '${classifier}'
+    reducePom = false
+}
+"""
+
+        when:
+        execute('shadowJar')
+
+        then:
+        buildSuccessful()
+
+        and:
+        file("build/distributions/${expectedOutput}").exists()
+
+        where:
+        baseName    | classifier    | attached  || expectedOutput
+        'config'    | 'shadow'      | true      || 'config-shadow.jar'
+        'config'    | 'shadow'      | false     || 'config.jar'
+        'config'    | 'shadowApi'   | true      || 'config-shadowApi.jar'
     }
 }
