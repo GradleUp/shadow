@@ -34,12 +34,15 @@ publishing {
     }
 }
 
-task configureBintray << {
-    bintrayUpload.user = bintrayUser
-    bintrayUpload.apiKey = bintrayKey
+bintrayUpload { task ->
+    dependsOn project.publishing.publications.plugin.artifacts
+    gradle.taskGraph.whenReady { taskGraph ->
+        if (taskGraph.hasTask(task)) {
+            task.user = bintrayUser
+            task.apiKey = bintrayKey
+        }
+    }
 }
-
-bintrayUpload.dependsOn configureBintray, project.publishing.publications.plugin.artifacts
 
 bintray {
     publications = ['plugin']
