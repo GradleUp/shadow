@@ -9,6 +9,7 @@ task drone() {
             events "standardOut", "standardError"
             stackTraceFilters "truncate", "groovy"
         }
+        ignoreFailures = true
     }
     check.finalizedBy testReports
 }
