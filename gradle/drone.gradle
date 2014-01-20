@@ -1,9 +1,11 @@
 task testReports(type: Zip) {
-    from "${buildDir}/reports/tests"
     archiveName = 'testReports.zip'
+    from "${buildDir}/reports"
+    include "tests/**"
+    include "intTests/**"
 }
 
-task drone() {
+task drone << {
     intTest {
         testLogging {
             events "standardOut", "standardError"

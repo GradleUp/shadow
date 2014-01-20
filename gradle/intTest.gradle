@@ -5,8 +5,17 @@ sourceSets {
 task intTest(type: Test) {
     testClassesDir  = sourceSets.intTest.output.classesDir
     classpath = sourceSets.intTest.runtimeClasspath
-    doFirst {
+
+    project.afterEvaluate {
         systemProperty 'runtime.jars.path', sourceSets.main.runtimeClasspath*.path.join(',')
+    }
+    reports {
+        html {
+            destination = "${buildDir}/reports/intTests"
+        }
+        junitXml {
+            destination = "${buildDir}/reports/intTests"
+        }
     }
 }
 
