@@ -1,0 +1,53 @@
+apply plugin: 'bintray'
+apply plugin: 'maven-publish'
+
+def pomConfig = {
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    developers {
+        developer {
+            id 'jengelman'
+            name 'John Engelman'
+            email 'john.r.engelman@gmail.com'
+        }
+    }
+}
+
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Gradle plugin to combine dependencies into a single Jar. Port of Maven Shade.')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+task configureBintray << {
+    bintrayUpload.user = bintrayUser
+    bintrayUpload.apiKey = bintrayKey
+}
+
+bintrayUpload.dependsOn configureBintray, project.publishing.publications.plugin.artifacts
+
+bintray {
+    publications = ['plugin']
+    pkg {
+        repo = 'gradle-plugins'
+        name = 'gradle-shadow-plugin'
+        licenses = ['Apache-2.0']
+    }
+}
+
+task install(dependsOn: publishToMavenLocal)
