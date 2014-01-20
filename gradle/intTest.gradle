@@ -29,3 +29,5 @@ idea {
         testSourceDirs += file('src/intTest/resources')
     }
 }
+
+check.dependsOn intTest

@@ -7,37 +7,105 @@ buildscript {
     }
 }
 
-task integTest(type: GradleBuild) {
-    buildFile = file('it/build.gradle')
-    dir = file('it')
-    tasks = ['clean', 'integTest']
-    startParameter.projectProperties.currentVersion = currentVersion
-}
-integTest.dependsOn ':shadow:publishToMavenLocal'
+apply plugin: 'bintray'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
 
-tasks.addRule('Pattern: integTest<Project>') { String taskName ->
-    if (taskName.startsWith('integTest')) {
-        def projectName = taskName - 'integTest'
-        task "$taskName"(type: GradleBuild, dependsOn: ':shadow:publishToMavenLocal') {
-            buildFile = file('it/build.gradle')
-            dir = file('it')
-            tasks = [":$projectName:clean", ":$projectName:integTest"]*.toString()
-            startParameter.projectProperties.currentVersion = currentVersion
+apply from: file('gradle/intTest.gradle')
+
+group = 'com.github.jengelman.gradle.plugins'
+version = '0.9-SNAPSHOT'
+
+ext.isSnapshot = version.endsWith("SNAPSHOT")
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile localGroovy()
+    compile gradleApi()
+    compile 'jdom:jdom:1.1'
+    compile 'asm:asm:3.3.1'
+    compile 'asm:asm-commons:3.3.1'
+
+    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
+    testCompile 'xmlunit:xmlunit:1.3'
+}
+
+def javaApiUrl = 'http://docs.oracle.com/javase/1.7.0/docs/api'
+def groovyApiUrl = 'http://groovy.codehaus.org/gapi/'
+
+tasks.withType(Javadoc) {
+    options.links(javaApiUrl, groovyApiUrl)
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    developers {
+        developer {
+            id 'jengelman'
+            name 'John Engelman'
+            email 'john.r.engelman@gmail.com'
         }
     }
 }
 
-task test(dependsOn: integTest)
-subprojects {
-    tasks.withType(Test) {
-        rootProject.tasks.test.dependsOn it
-        rootProject.tasks.integTest.mustRunAfter it
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Gradle plugin to combine dependencies into a single Jar. Port of Maven Shade.')
+                root.children().last() + pomConfig
+            }
+        }
     }
 }
 
-allprojects {
-    group = 'com.github.jengelman.gradle.plugins'
-    version = "${currentVersion}"
+task configureBintray << {
+    bintrayUpload.user = bintrayUser
+    bintrayUpload.apiKey = bintrayKey
 }
 
-ext.isSnapshot = version.endsWith("SNAPSHOT")
+bintrayUpload.dependsOn configureBintray, project.publishing.publications.plugin.artifacts
+
+bintray {
+    publications = ['plugin']
+    pkg {
+        repo = 'gradle-plugins'
+        name = 'gradle-shadow-plugin'
+        licenses = ['Apache-2.0']
+    }
+}
+
+task install(dependsOn: publishToMavenLocal)
+
+build.dependsOn javadocJar, sourcesJar
+
+jar {
+    from rootProject.file('LICENSE')
+    from rootProject.file('NOTICE')
+
+}
