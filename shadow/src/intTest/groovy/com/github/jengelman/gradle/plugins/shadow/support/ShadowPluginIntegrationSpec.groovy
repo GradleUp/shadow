@@ -65,4 +65,6 @@ abstract class ShadowPluginIntegrationSpec extends PluginIntegrationSpec {
         doesNotContain(shadowOutput, paths)
     }
 
+
+
 }
