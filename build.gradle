@@ -37,5 +37,10 @@ dependencies {
 jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
-
 }
+
+task testReports(type: Zip) {
+    from "${buildDir}/reports/tests"
+    archiveName = 'testReports.zip'
+}
+check.finalizedBy testReports
