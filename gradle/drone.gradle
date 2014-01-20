@@ -1,17 +1,22 @@
 task testReports(type: Zip) {
+    mustRunAfter check
     archiveName = 'testReports.zip'
     from "${buildDir}/reports"
     include "tests/**"
     include "intTests/**"
 }
 
-task drone << {
-    intTest {
-        testLogging {
-            events "standardOut", "standardError"
-            stackTraceFilters "truncate", "groovy"
+task drone() { task ->
+    gradle.taskGraph.whenReady { taskGraph ->
+        if (taskGraph.hasTask(task)) {
+            tasks.intTest {
+                testLogging {
+                    events "standardOut", "standardError"
+                    stackTraceFilters "truncate", "groovy"
+                }
+                ignoreFailures = true
+            }
         }
-        ignoreFailures = true
     }
-    check.finalizedBy testReports
+
 }
