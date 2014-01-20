@@ -1,8 +1,0 @@
-jar {
-    baseName 'artifact'
-}
-
-shadow {
-    baseName 'artifact'
-    artifactAttached false
-}

@@ -11,6 +11,7 @@ abstract class ShadowPluginIntegrationSpec extends PluginIntegrationSpec {
     def setup() {
         applyPlugin('shadow')
         settingsFile << 'rootProject.name=\'shadowTest\''
+        buildFile << 'version=0.1'
     }
 
     @Override
@@ -22,7 +23,7 @@ abstract class ShadowPluginIntegrationSpec extends PluginIntegrationSpec {
     }
 
     File getShadowOutput() {
-        file('build/distributions/shadowTest-unspecified.jar')
+        file('build/distributions/shadowTest-0.1.jar')
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
