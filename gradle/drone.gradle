@@ -6,7 +6,7 @@ task testReports(type: Zip) {
     include "intTests/**"
 }
 
-task drone() { task ->
+task drone(dependsOn: testReports) { task ->
     gradle.taskGraph.whenReady { taskGraph ->
         if (taskGraph.hasTask(task)) {
             tasks.intTest {
