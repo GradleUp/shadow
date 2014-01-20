@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.integration
 
-import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.junit.Rule
@@ -13,11 +12,13 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
 
     ProjectConnection project
     Results results
+    ByteArrayOutputStream outputStream
 
     def setup() {
+        outputStream = new ByteArrayOutputStream()
         project = GradleConnector.newConnector()
                 .forProjectDirectory(testDirectory)
-                .useGradleUserHomeDir(homeDirectory)
+//                .useGradleUserHomeDir(homeDirectory)
                 .connect()
         addPluginInit()
         results = new Results()
@@ -27,12 +28,12 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
         project.close()
     }
 
-    protected BuildLauncher execute(String... tasks) {
+    protected void execute(String... tasks) {
         runFile << 'buildscript {\n'
         runFile << pluginInitFile.text + '\n'
         runFile << '}\n'
         runFile << buildFile.text
-        return project.newBuild().forTasks(tasks).run(results)
+        project.newBuild().forTasks(tasks).setStandardError(outputStream).setStandardOutput(outputStream).run(results)
     }
 
     protected TestFile getPluginInitFile() {
@@ -44,7 +45,7 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
     }
 
     protected TestFile getHomeDirectory() {
-        testDirectory.createDir('gradle-home')
+        temporaryFolder.createDir('gradle-home')
     }
 
     protected TestFile getRunFile() {
@@ -73,10 +74,6 @@ abstract class PluginIntegrationSpec extends Specification implements TestDirect
 
     protected List<String> getRuntimePaths() {
         System.getProperty('runtime.jars.path', '').split(',')
-    }
-
-    protected void applyPlugin(Class plugin) {
-        buildFile << "apply plugin: ${plugin.name}\n"
     }
 
     protected void applyPlugin(String plugin) {
