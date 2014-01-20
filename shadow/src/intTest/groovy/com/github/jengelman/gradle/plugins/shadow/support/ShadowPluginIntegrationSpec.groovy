@@ -26,13 +26,30 @@ abstract class ShadowPluginIntegrationSpec extends PluginIntegrationSpec {
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
+        assert getJarFileContents(f, path) == contents
+    }
+
+    String getJarFileContents(File f, String path) {
         JarFile jf = new JarFile(f)
-        println jf.entries()*.name
         def is = jf.getInputStream(new JarEntry(path))
         StringWriter sw = new StringWriter()
         IOUtil.copy(is, sw)
         is.close()
-        assert sw.toString() == contents
+        return sw.toString()
+    }
+
+    void contains(List<String> paths) {
+        JarFile jar = new JarFile(shadowOutput)
+        paths.each { path ->
+            assert jar.getJarEntry(path)
+        }
+    }
+
+    void doesNotContain(List<String> paths) {
+        JarFile jar = new JarFile(shadowOutput)
+        paths.each { path ->
+            assert !jar.getJarEntry(path)
+        }
     }
 
 }

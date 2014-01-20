@@ -1,38 +1,39 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.support.ShadowPluginIntegrationSpec
-import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
-class AppendingTransformerSpec extends ShadowPluginIntegrationSpec {
+class ServiceResourceTransformerSpec extends ShadowPluginIntegrationSpec {
 
-    def "append resources"() {
+    def "combines service resources"() {
         given:
+
         mavenRepo.module('shadow', 'one', '0.1')
             .insertFile('META-INF/services/org.apache.maven.Shade',
                 'one # NOTE: No newline terminates this line/file')
             .publish()
+
         mavenRepo.module('shadow', 'two', '0.1')
             .insertFile('META-INF/services/org.apache.maven.Shade',
                 'two # NOTE: No newline terminates this line/file')
             .publish()
 
         buildFile << """
-import ${AppendingTransformer.name}
+import ${ServiceFileTransformer.name}
 
 repositories { maven { url "${mavenRepo.uri}" } }
 
 dependencies {
-    compile "shadow:one:0.1"
-    compile "shadow:two:0.1"
+    compile 'shadow:one:0.1'
+    compile 'shadow:two:0.1'
 }
 
 shadow {
     artifactAttached = false
-    transformer(AppendingTransformer) {
-        resource = 'META-INF/services/org.apache.maven.Shade'
-    }
+    transformer(ServiceFileTransformer)
 }
 """
+
         when:
         execute('shadowJar')
 
@@ -43,10 +44,7 @@ shadow {
         assert shadowOutput.exists()
 
         and:
-        assertJarFileContentsEqual(shadowOutput, 'META-INF/services/org.apache.maven.Shade',
-'''one # NOTE: No newline terminates this line/file
-two # NOTE: No newline terminates this line/file
-'''
-        )
+        String text = getJarFileContents(shadowOutput, 'META-INF/services/org.apache.maven.Shade')
+        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
     }
 }

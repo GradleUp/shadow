@@ -1,8 +1,0 @@
-import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-
-shadow {
-    artifactAttached = false
-    transformer(XmlAppendingTransformer) {
-        resource = 'test.xml'
-    }
-}
