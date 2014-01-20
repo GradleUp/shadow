@@ -13,6 +13,7 @@ apply plugin: 'idea'
 apply from: file('gradle/intTest.gradle')
 apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
+apply from: file('gradle/drone.gradle')
 
 group = 'com.github.jengelman.gradle.plugins'
 version = '0.9-SNAPSHOT'
@@ -38,9 +39,3 @@ jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
 }
-
-task testReports(type: Zip) {
-    from "${buildDir}/reports/tests"
-    archiveName = 'testReports.zip'
-}
-check.finalizedBy testReports

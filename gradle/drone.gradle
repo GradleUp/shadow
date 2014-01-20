@@ -1,0 +1,13 @@
+task testReports(type: Zip) {
+    from "${buildDir}/reports/tests"
+    archiveName = 'testReports.zip'
+}
+
+task drone() {
+    intTest {
+        testLogging {
+            events "standardOut", "standardError"
+        }
+    }
+    check.finalizedBy testReports
+}

@@ -8,9 +8,6 @@ task intTest(type: Test) {
     doFirst {
         systemProperty 'runtime.jars.path', sourceSets.main.runtimeClasspath*.path.join(',')
     }
-    testLogging {
-        events "standardOut", "standardError"
-    }
 }
 
 dependencies {
