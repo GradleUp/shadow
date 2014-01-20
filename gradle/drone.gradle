@@ -7,6 +7,7 @@ task drone() {
     intTest {
         testLogging {
             events "standardOut", "standardError"
+            stackTraceFilters "truncate", "groovy"
         }
     }
     check.finalizedBy testReports

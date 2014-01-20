@@ -24,7 +24,6 @@ class JarBuilder {
             }
 
             // directory entries must end in "/"
-            println 'adding ' + name + '/'
             JarEntry entry = new JarEntry(name + "/")
             jos.putNextEntry(entry)
 
@@ -38,7 +37,6 @@ class JarBuilder {
             addDirectory(path.substring(0, idx))
         }
         if (!entries.contains(path)) {
-            println 'adding file @ ' + path
             JarEntry entry = new JarEntry(path)
             jos.putNextEntry(entry)
             entries << path
