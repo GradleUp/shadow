@@ -105,4 +105,37 @@ shadow {
         and:
         contains(['compile.properties', 'runtime.properties', 'system.properties'])
     }
+
+    def "select included artifact set"() {
+        given:
+        mavenRepo.module('shadow', 'a', '0.1').insertFile('a.properties', 'a').publish()
+        mavenRepo.module('shadow', 'b', '0.1').insertFile('b.properties', 'b').publish()
+
+        buildFile << """
+repositories { maven { url "${mavenRepo.uri}" } }
+
+dependencies {
+    compile 'shadow:a:0.1'
+    compile 'shadow:b:0.1'
+}
+
+shadow {
+    artifactAttached = false
+    artifactSet {
+        include 'shadow'
+        exclude '*:b:jar:'
+    }
+}
+"""
+
+        when:
+        execute('shadowJar')
+
+        then:
+        buildSuccessful()
+
+        and:
+        contains(['a.properties'])
+        doesNotContain(['b.properties'])
+    }
 }
