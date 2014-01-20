@@ -14,7 +14,7 @@ class ManifestSpec extends ShadowPluginIntegrationSpec {
         TestFile main = file('src/main/java/shadow/Main.java')
         main << '''package shadow;
 
-class Main {
+public class Main {
 
     public static void main(String[] args) {
     }
