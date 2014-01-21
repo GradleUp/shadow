@@ -14,7 +14,6 @@ task drone(dependsOn: testReports) { task ->
                     events "standardOut", "standardError"
                     stackTraceFilters "truncate", "groovy"
                 }
-                ignoreFailures = true
             }
         }
     }
