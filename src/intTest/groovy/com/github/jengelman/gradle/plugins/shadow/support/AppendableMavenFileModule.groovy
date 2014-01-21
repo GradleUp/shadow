@@ -31,11 +31,13 @@ class AppendableMavenFileModule extends MavenFileModule {
     }
 
     void writeJar(OutputStream os, Map<String, String> contents) {
-        JarBuilder builder = new JarBuilder(os)
-        contents.each { path, content ->
-            builder.withFile(path, content)
+        if (contents) {
+            JarBuilder builder = new JarBuilder(os)
+            contents.each { path, content ->
+                builder.withFile(path, content)
+            }
+            builder.build()
         }
-        builder.build()
     }
 
     /**
