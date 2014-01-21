@@ -27,7 +27,7 @@ abstract class ShadowPluginIntegrationSpec extends PluginIntegrationSpec {
     }
 
     File shadowOutput(String classifier) {
-        file("build/distributions/shadowtest-0.1-${classifier}.jar")
+        file("build/distributions/shadowTest-0.1-${classifier}.jar")
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
