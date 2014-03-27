@@ -1,0 +1,7 @@
+image: bradrydzewski/java:openjdk7
+script:
+  - ./gradlew build
+notify:
+  email:
+    recipients:
+      - john.r.engelman@gmail.com
