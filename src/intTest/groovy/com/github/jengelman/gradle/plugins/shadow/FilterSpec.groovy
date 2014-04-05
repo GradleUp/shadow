@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.support.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.support.ShadowPluginIntegrationSpec
 
 class FilterSpec extends ShadowPluginIntegrationSpec {
@@ -130,5 +131,37 @@ shadow {
                 'org/apache/maven/b/b.properties',
                 'META-INF/maven/shadow/b/pom.properties',
         ])
+    }
+
+    def "filter local file dependencies"() {
+        given:
+        mavenRepo.module('shadow', 'compile', '1.0').insertFile('compile.properties', 'compile').publish()
+        mavenRepo.module('shadow', 'runtime', '1.0').insertFile('runtime.properties', 'runtime').publish()
+        new AppendableJar(file('system.jar')).insertFile('system.properties', 'system').write()
+
+        buildFile << """
+repositories { maven { url "${mavenRepo.uri}" } }
+
+dependencies {
+    compile 'shadow:compile:1.0'
+    compile files('system.jar')
+    runtime 'shadow:runtime:1.0'
+}
+
+shadow {
+    artifactAttached = false
+    exclude 'system.properties'
+}
+"""
+
+        when:
+        execute('shadowJar')
+
+        then:
+        buildSuccessful()
+
+        and:
+        contains(['compile.properties', 'runtime.properties'])
+        doesNotContain(['system.properties'])
     }
 }
