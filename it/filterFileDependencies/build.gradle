@@ -1,0 +1,10 @@
+dependencies {
+    compile files('system.jar')
+    runtime 'org.apache.maven.its.shade.ifd:runtime:1.0'
+}
+
+shadow {
+    artifactAttached = false
+
+    exclude 'system.properties'
+}
