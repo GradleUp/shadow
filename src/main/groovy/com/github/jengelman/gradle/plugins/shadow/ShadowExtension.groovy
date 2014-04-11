@@ -60,7 +60,7 @@ class ShadowExtension {
     ShadowExtension artifactSet(Closure c) {
         artifactSet = artifactSet ?: new ArtifactSet()
         c.delegate = artifactSet
-        c.resolveStrategy = Closure.DELEGATE_ONLY
+        c.resolveStrategy = Closure.DELEGATE_FIRST
         c()
         this
     }
@@ -69,7 +69,7 @@ class ShadowExtension {
         if (!artifact) throw new GradleException('Must specify artifact for filter!')
         ArchiveFilter filter = filters.find { it.artifact == artifact } ?: new ArchiveFilter(artifact: artifact)
         c.delegate = filter
-        c.resolveStrategy = Closure.DELEGATE_ONLY
+        c.resolveStrategy = Closure.DELEGATE_FIRST
         c()
         if (!filters.contains(filter)) {
             filters << filter
@@ -82,7 +82,7 @@ class ShadowExtension {
         Transformer transformer = transformerClass.newInstance()
         if (c) {
             c.delegate = transformer
-            c.resolveStrategy = Closure.DELEGATE_ONLY
+            c.resolveStrategy = Closure.DELEGATE_FIRST
             c()
         }
         transformers << transformer
@@ -93,7 +93,7 @@ class ShadowExtension {
         ArchiveRelocation relocation = new ArchiveRelocation()
         if (c) {
             c.delegate = relocation
-            c.resolveStrategy = Closure.DELEGATE_ONLY
+            c.resolveStrategy = Closure.DELEGATE_FIRST
             c()
         }
         relocations << relocation
