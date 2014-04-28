@@ -36,6 +36,7 @@ idea {
     module {
         testSourceDirs += file('src/intTest/groovy')
         testSourceDirs += file('src/intTest/resources')
+        scopes.TEST.plus += configurations.intTestRuntime
     }
 }
 

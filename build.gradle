@@ -22,6 +22,9 @@ ext.isSnapshot = version.endsWith("SNAPSHOT")
 
 repositories {
     jcenter()
+    maven {
+        url 'http://dl.bintray.com/johnrengelman/gradle-plugins'
+    }
 }
 
 dependencies {
@@ -31,6 +34,7 @@ dependencies {
     compile 'asm:asm:3.3.1'
     compile 'asm:asm-commons:3.3.1'
 
+    testCompile 'com.github.jengelman.gradle.plugins:gradle-test-kit:0.2'
     testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
     testCompile 'xmlunit:xmlunit:1.3'
 }
