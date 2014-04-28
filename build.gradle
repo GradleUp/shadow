@@ -10,10 +10,11 @@ buildscript {
 apply plugin: 'groovy'
 apply plugin: 'idea'
 
+
 //apply from: file('gradle/intTest.gradle')
 apply from: file('gradle/docs.gradle')
-apply from: file('gradle/publish.gradle')
 //apply from: file('gradle/drone.gradle')
+apply from: file('gradle/publish.gradle')
 
 group = 'com.github.jengelman.gradle.plugins'
 version = '0.9-SNAPSHOT'
@@ -33,9 +34,12 @@ dependencies {
     compile 'jdom:jdom:1.1'
     compile 'asm:asm:3.3.1'
     compile 'asm:asm-commons:3.3.1'
+//    compile 'org.apache.ant:ant:1.9.3'
 
     testCompile 'com.github.jengelman.gradle.plugins:gradle-test-kit:0.2'
-    testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
+    testCompile("org.spockframework:spock-core:0.7-groovy-1.8") {
+        exclude module: 'groovy-all'
+    }
     testCompile 'xmlunit:xmlunit:1.3'
 }
 
@@ -43,3 +47,4 @@ jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
 }
+
