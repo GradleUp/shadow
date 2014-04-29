@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.apache.commons.io.IOUtils
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
@@ -28,16 +29,18 @@ public class ShadowCopyAction implements CopyAction {
     private final File zipFile
     private final ZipCompressor compressor
     private final DocumentationRegistry documentationRegistry
+    private final List<Transformer> transformers
 
-    public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry) {
+    public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry, List<Transformer> transformers) {
         this.zipFile = zipFile
         this.compressor = compressor
         this.documentationRegistry = documentationRegistry
+        this.transformers = transformers
     }
 
     @Override
     WorkResult execute(CopyActionProcessingStream stream) {
-        final def zipOutStr
+        final ZipOutputStream zipOutStr
 
         try {
             zipOutStr = compressor.createArchiveOutputStream(zipFile)
@@ -48,7 +51,7 @@ public class ShadowCopyAction implements CopyAction {
         try {
             IoActions.withResource(zipOutStr, new Action<ZipOutputStream>() {
                 public void execute(ZipOutputStream outputStream) {
-                    stream.process(new StreamAction(outputStream))
+                    stream.process(new StreamAction(outputStream, transformers))
                 }
             })
         } catch (UncheckedIOException e) {
@@ -65,9 +68,13 @@ public class ShadowCopyAction implements CopyAction {
     class StreamAction implements CopyActionProcessingStreamAction {
 
         private final ZipOutputStream zipOutStr
+        private final List<Transformer> transformers
 
-        public StreamAction(ZipOutputStream zipOutStr) {
+        private List<String> entries = []
+
+        public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers) {
             this.zipOutStr = zipOutStr
+            this.transformers = transformers
         }
 
         public void processFile(FileCopyDetailsInternal details) {
@@ -76,17 +83,30 @@ public class ShadowCopyAction implements CopyAction {
             } else {
                 visitFile(details)
             }
+            processTransformers()
+        }
+
+        private void processTransformers() {
+            transformers.each { Transformer transformer ->
+                if (transformer.hasTransformedResource()) {
+                    transformer.modifyOutputStream(zipOutStr)
+                }
+            }
         }
 
         private void visitFile(FileCopyDetails fileDetails) {
             if (!fileDetails.relativePath.pathString.endsWith('.jar')) {
                 try {
-                    ZipEntry archiveEntry = new ZipEntry(fileDetails.relativePath.pathString)
-                    archiveEntry.setTime(fileDetails.lastModified)
-                    archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
-                    zipOutStr.putNextEntry(archiveEntry)
-                    fileDetails.copyTo(zipOutStr)
-                    zipOutStr.closeEntry()
+                    String path = fileDetails.relativePath.pathString
+                    if (!entries.contains(path)) {
+                        ZipEntry archiveEntry = new ZipEntry(path)
+                        archiveEntry.setTime(fileDetails.lastModified)
+                        archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
+                        zipOutStr.putNextEntry(archiveEntry)
+                        fileDetails.copyTo(zipOutStr)
+                        zipOutStr.closeEntry()
+                        entries << path
+                    }
                 } catch (Exception e) {
                     throw new GradleException(String.format("Could not add %s to ZIP '%s'.", fileDetails, zipFile), e)
                 }
@@ -108,27 +128,48 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void visitJarDirectory(RelativeJarPath jarDir) {
-            zipOutStr.putNextEntry(jarDir.entry)
-            zipOutStr.closeEntry()
+            if (!entries.contains(jarDir.entry.name)) {
+                zipOutStr.putNextEntry(jarDir.entry)
+                zipOutStr.closeEntry()
+                entries << jarDir.entry.name
+            }
         }
 
         private void visitJarFile(RelativeJarPath jarFile, JarFile jar) {
-            zipOutStr.putNextEntry(jarFile.entry)
-            IOUtils.copyLarge(jar.getInputStream(jarFile.entry), zipOutStr)
-            zipOutStr.closeEntry()
+            if (jarFile.classFile || !isTransformable(jarFile)) {
+                //TODO class relocation
+                copyJarEntry(jarFile, jar)
+            }
+        }
+
+        private void copyJarEntry(RelativeJarPath jarFile, JarFile jar) {
+            if (!entries.contains(jarFile.entry.name)) {
+                zipOutStr.putNextEntry(jarFile.entry)
+                IOUtils.copyLarge(jar.getInputStream(jarFile.entry), zipOutStr)
+                zipOutStr.closeEntry()
+                entries << jarFile.entry.name
+            }
         }
 
         private void visitDir(FileCopyDetails dirDetails) {
             try {
                 // Trailing slash in name indicates that entry is a directory
-                ZipEntry archiveEntry = new ZipEntry(dirDetails.relativePath.pathString + '/')
-                archiveEntry.setTime(dirDetails.lastModified)
-                archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
-                zipOutStr.putNextEntry(archiveEntry)
-                zipOutStr.closeEntry()
+                String path = dirDetails.relativePath.pathString + '/'
+                if (!entries.contains(path)) {
+                    ZipEntry archiveEntry = new ZipEntry(path)
+                    archiveEntry.setTime(dirDetails.lastModified)
+                    archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
+                    zipOutStr.putNextEntry(archiveEntry)
+                    zipOutStr.closeEntry()
+                    entries << path
+                }
             } catch (Exception e) {
                 throw new GradleException(String.format("Could not add %s to ZIP '%s'.", dirDetails, zipFile), e)
             }
+        }
+
+        private boolean isTransformable(RelativeJarPath file) {
+            return transformers.find { it.canTransformResource(file.path) } as boolean
         }
     }
 
@@ -160,6 +201,14 @@ public class ShadowCopyAction implements CopyAction {
             if (index != -1) {
                 return new RelativeJarPath(new JarEntry(path[0..index]))
             }
+        }
+
+        String getPath() {
+            return entry.name
+        }
+
+        boolean isClassFile() {
+            return path.endsWith('.class')
         }
 
         ZipEntry getEntry() {
