@@ -20,8 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-
-import java.util.jar.JarOutputStream
+import org.apache.tools.zip.ZipOutputStream
 
 /**
  * Prevents duplicate copies of the license
@@ -50,6 +49,6 @@ class ApacheLicenseResourceTransformer implements Transformer {
         return false
     }
 
-    void modifyOutputStream(JarOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os) {
     }
 }

@@ -20,11 +20,11 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.mvn3.org.codehaus.plexus.util.StringUtils
 
 import java.text.SimpleDateFormat
-import java.util.jar.JarEntry
-import java.util.jar.JarOutputStream
 
 /**
  * Merges <code>META-INF/NOTICE.TXT</code> files.
@@ -160,14 +160,14 @@ class ApacheNoticeResourceTransformer implements Transformer {
         return true
     }
 
-    void modifyOutputStream(JarOutputStream jos) {
-        jos.putNextEntry(new JarEntry(NOTICE_PATH))
+    void modifyOutputStream(ZipOutputStream os) {
+        os.putNextEntry(new ZipEntry(NOTICE_PATH))
 
         Writer pow
         if (StringUtils.isNotEmpty(encoding)) {
-            pow = new OutputStreamWriter(jos, encoding)
+            pow = new OutputStreamWriter(os, encoding)
         } else {
-            pow = new OutputStreamWriter(jos)
+            pow = new OutputStreamWriter(os)
         }
         PrintWriter writer = new PrintWriter(pow)
 

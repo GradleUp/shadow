@@ -20,10 +20,6 @@ class Shadow2PluginSpec extends PluginSpecification {
 
         then:
         project.plugins.hasPlugin(Shadow2Plugin)
-
-        and:
-        FilteringClassLoader filter = ((ClassLoaderRegistry) project.getServices().get(ClassLoaderRegistry)).gradleApiClassLoader.parent
-        filter.loadClass('org.apache.tools.zip.ZipOutputStream')
     }
 
     def 'shadow copy'() {
@@ -44,7 +40,7 @@ class Shadow2PluginSpec extends PluginSpecification {
 
         when:
         runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.run()
 
         then:
         File output = file('build/shadow.jar')
