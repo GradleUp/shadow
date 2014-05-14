@@ -70,6 +70,8 @@ public class ShadowCopyAction implements CopyAction {
                         processTransformers(outputStream)
                     } catch (Exception e) {
                         log.error('ex', e)
+                        //TODO this should not be rethrown
+                        throw e
                     }
                 }
             })

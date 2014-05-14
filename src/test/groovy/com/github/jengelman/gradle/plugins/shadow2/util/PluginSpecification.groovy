@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow2.util
 
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
+import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
 import org.gradle.testkit.functional.GradleRunnerFactory
 import org.junit.Rule
@@ -66,5 +67,13 @@ class PluginSpecification extends Specification {
 
     AppendableJar buildJar(String path) {
         return new AppendableJar(file(path))
+    }
+
+    void success(ExecutionResult result) {
+        assert result.standardOutput.contains('BUILD SUCCESSFUL'), 'Gradle build failed with error'
+    }
+
+    void fail(ExecutionResult result) {
+        assert result.standardError, 'Gradle build succeeded'
     }
 }

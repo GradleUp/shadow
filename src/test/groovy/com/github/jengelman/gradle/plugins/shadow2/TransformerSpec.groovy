@@ -1,9 +1,15 @@
 package com.github.jengelman.gradle.plugins.shadow2
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopy
+import com.github.jengelman.gradle.plugins.shadow.Shadow2Plugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow2.util.PluginSpecification
+import org.gradle.testkit.functional.ExecutionResult
+
+import java.util.jar.JarInputStream
+import java.util.jar.Manifest
 
 class TransformerSpec extends PluginSpecification {
 
@@ -16,9 +22,7 @@ class TransformerSpec extends PluginSpecification {
                 'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            import ${ShadowCopy.name}
-
-            task shadow(type: ShadowCopy) {
+            task shadow(type: ${ShadowJar.name}) {
                 destinationDir = buildDir
                 baseName = 'shadow'
                 from('${one.path}')
@@ -29,9 +33,10 @@ class TransformerSpec extends PluginSpecification {
 
         when:
         runner.arguments << 'shadow'
-        runner.run()
+        ExecutionResult result = runner.run()
 
         then:
+        success(result)
         File output = file('build/shadow.jar')
         assert output.exists()
 
@@ -51,9 +56,7 @@ two # NOTE: No newline terminates this line/file'''
                 'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            import ${ShadowCopy.name}
-
-            task shadow(type: ShadowCopy) {
+            task shadow(type: ${ShadowJar.name}) {
                 destinationDir = buildDir
                 baseName = 'shadow'
                 from('${one.path}')
@@ -66,9 +69,10 @@ two # NOTE: No newline terminates this line/file'''
 
         when:
         runner.arguments << 'shadow'
-        runner.run()
+        ExecutionResult result = runner.run()
 
         then:
+        success(result)
         File output = file('build/shadow.jar')
         assert output.exists()
 
@@ -77,6 +81,151 @@ two # NOTE: No newline terminates this line/file'''
         assert text.split('(\r\n)|(\r)|(\n)').size() == 2
         assert text == '''one # NOTE: No newline terminates this line/file
 two # NOTE: No newline terminates this line/file
+'''
+    }
+
+    def 'manifest retained'() {
+        given:
+        File main = file('src/main/java/shadow/Main.java')
+        main << '''package shadow;
+
+public class Main {
+
+    public static void main(String[] args) { }
+}'''
+
+        buildFile << """
+apply plugin: ${Shadow2Plugin.name}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'shadow.Main'
+        attributes 'Test-Entry': 'PASSED'
+    }
+}
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+}
+"""
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        File output = file('build/libs/shadow.jar')
+        assert output.exists()
+
+        and:
+        JarInputStream jis = new JarInputStream(output.newInputStream())
+        Manifest mf = jis.manifest
+        jis.close()
+
+        assert mf
+        assert mf.mainAttributes.getValue('Test-Entry') == 'PASSED'
+        assert mf.mainAttributes.getValue('Main-Class') == 'shadow.Main'
+    }
+
+    def 'manifest transformed'() {
+        given:
+        File main = file('src/main/java/shadow/Main.java')
+        main << '''package shadow;
+
+public class Main {
+
+    public static void main(String[] args) { }
+}'''
+
+        buildFile << """
+apply plugin: ${Shadow2Plugin.name}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'shadow.Main'
+        attributes 'Test-Entry': 'FAILED'
+    }
+}
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+    appendManifest {
+        attributes 'Test-Entry': 'PASSED'
+        attributes 'New-Entry': 'NEW'
+    }
+}
+"""
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        File output = file('build/libs/shadow.jar')
+        assert output.exists()
+
+        and:
+        JarInputStream jis = new JarInputStream(output.newInputStream())
+        Manifest mf = jis.manifest
+        jis.close()
+
+        assert mf
+        assert mf.mainAttributes.getValue('Test-Entry') == 'PASSED'
+        assert mf.mainAttributes.getValue('Main-Class') == 'shadow.Main'
+        assert mf.mainAttributes.getValue('New-Entry') == 'NEW'
+    }
+
+    def 'append xml files'() {
+        given:
+        File xml1 = buildJar('xml1.jar').insertFile('properties.xml', '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties version="1.0">
+  <entry key="key1">val1</entry>
+</properties>
+''').write()
+
+        File xml2 = buildJar('xml2.jar').insertFile('properties.xml', '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties version="1.0">
+  <entry key="key2">val2</entry>
+</properties>
+''').write()
+
+        buildFile << """
+task shadow(type: ${ShadowJar.name}) {
+    destinationDir = buildDir
+    baseName = 'shadow'
+    from('${xml1.path}')
+    from('${xml2.path}')
+    transformer(${XmlAppendingTransformer.name}) {
+        resource = 'properties.xml'
+    }
+}
+"""
+
+        when:
+        runner.arguments << 'shadow'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        File output = file('build/shadow.jar')
+        assert output.exists()
+
+        and:
+        String text = getJarFileContents(output, 'properties.xml')
+        assert text.replaceAll('\r\n', '\n') == '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties version="1.0">
+  <entry key="key1">val1</entry>
+  <entry key="key2">val2</entry>
+</properties>
+
 '''
     }
 }

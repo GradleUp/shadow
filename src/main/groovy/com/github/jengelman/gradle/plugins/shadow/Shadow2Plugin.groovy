@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopy
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
@@ -23,10 +23,13 @@ class Shadow2Plugin implements Plugin<Project> {
 
     private void configureShadowTask(Project project) {
         JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
-        ShadowCopy shadow = project.tasks.create('shadowJar', ShadowCopy)
+        ShadowJar shadow = project.tasks.create('shadowJar', ShadowJar)
         shadow.conventionMapping.with {
             map('classifier') {
                 'shadow'
+            }
+            map('manifest') {
+                project.tasks.jar.manifest
             }
         }
         shadow.from(convention.sourceSets.main.output)

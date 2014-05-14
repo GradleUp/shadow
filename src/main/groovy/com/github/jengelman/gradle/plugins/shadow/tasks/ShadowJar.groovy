@@ -10,8 +10,9 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.util.ConfigureUtil
 
-class ShadowCopy extends Jar {
+class ShadowJar extends Jar {
 
     List<Transformer> transformers = []
     List<Relocator> relocators = []
@@ -33,7 +34,7 @@ class ShadowCopy extends Jar {
         }
     }
 
-    ShadowCopy transformer(Class<? extends Transformer> clazz, Closure c = null) {
+    ShadowJar transformer(Class<? extends Transformer> clazz, Closure c = null) {
         Transformer transformer = clazz.newInstance()
         if (c) {
             c.delegate = transformer
@@ -41,6 +42,11 @@ class ShadowCopy extends Jar {
             c(transformer)
         }
         transformers << transformer
+        return this
+    }
+
+    public ShadowJar appendManifest(Closure configureClosure) {
+        ConfigureUtil.configure(configureClosure, getManifest())
         return this
     }
 }

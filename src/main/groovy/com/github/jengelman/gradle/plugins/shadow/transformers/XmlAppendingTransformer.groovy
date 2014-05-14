@@ -89,8 +89,7 @@ class XmlAppendingTransformer implements Transformer {
             }
 
             root.children.each { Content n ->
-
-                doc.getRootElement().addContent(n)
+                doc.getRootElement().addContent(n.clone())
             }
         }
     }
@@ -101,7 +100,6 @@ class XmlAppendingTransformer implements Transformer {
 
     void modifyOutputStream(ZipOutputStream os) {
         os.putNextEntry(new ZipEntry(resource))
-
         new XMLOutputter(Format.getPrettyFormat()).output(doc, os)
 
         doc = null

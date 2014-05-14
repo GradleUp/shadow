@@ -36,7 +36,7 @@ class XmlAppendingTransformerTest extends TestCase {
     static {
         /*
          * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
-         * choice to test for improper case-less string comparisions.
+         * choice to test for improper case-less string comparisons.
          */
         Locale.setDefault(new Locale("tr"))
     }
