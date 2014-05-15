@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.tasks.bundling.Jar
@@ -49,4 +50,16 @@ class ShadowJar extends Jar {
         ConfigureUtil.configure(configureClosure, getManifest())
         return this
     }
+
+    public ShadowJar exclude(Dependency dependency) {
+        project.configurations.runtime.files(dependency).each {
+            this.exclude(it.path.substring(it.path.lastIndexOf('/')+1))
+        }
+        return this
+    }
+
+    public Dependency dependency(Object notation, Closure configuration = null) {
+        project.dependencies.create(notation, configuration)
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow2.util
 
+import com.github.jengelman.gradle.testkit.file.TestFile
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
@@ -36,6 +37,10 @@ class PluginSpecification extends Specification {
             return dir.newFile(path)
         }
         return f
+    }
+
+    AppendableMavenFileRepository repo(String path = 'maven-repo') {
+        new AppendableMavenFileRepository(new TestFile(dir.root, path))
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
