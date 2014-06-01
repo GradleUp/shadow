@@ -5,11 +5,14 @@ import static org.gradle.api.tasks.bundling.ZipEntryCompression.*
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
+import org.gradle.api.specs.Spec
+import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.util.ConfigureUtil
 
@@ -58,8 +61,42 @@ class ShadowJar extends Jar {
         return this
     }
 
+    public ShadowJar exclude(Spec<? super Dependency> spec) {
+        project.configurations.runtime.files(spec).each {
+            this.exclude(it.path.substring(it.path.lastIndexOf('/')+1))
+        }
+        return this
+    }
+
+    public ShadowJar include(Dependency dependency) {
+        project.configurations.runtime.files(dependency).each {
+            this.include(it.path.substring(it.path.lastIndexOf('/')+1))
+        }
+        return this
+    }
+
+    public ShadowJar include(Spec<? super Dependency> spec) {
+        project.configurations.runtime.files(spec).each {
+            this.include(it.path.substring(it.path.lastIndexOf('/')+1))
+        }
+        return this
+    }
+
     public Dependency dependency(Object notation, Closure configuration = null) {
         project.dependencies.create(notation, configuration)
+    }
+
+    public Spec<? super Dependency> dependencySpec(Closure spec) {
+        return Specs.<Dependency>convertClosureToSpec(spec)
+    }
+
+    public ShadowJar relocate(String pattern, String destination, Closure configure = null) {
+        SimpleRelocator relocator = new SimpleRelocator(pattern, destination, [], [])
+        if (configure) {
+            ConfigureUtil.configure(configure, relocator)
+        }
+        relocators << relocator
+        return this
     }
 
 }

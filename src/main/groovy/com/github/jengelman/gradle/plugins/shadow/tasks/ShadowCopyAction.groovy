@@ -185,36 +185,38 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
-            InputStream is = archive.getInputStream(file.entry)
-            ClassReader cr = new ClassReader(is)
+            if (file.classFile) {
+                InputStream is = archive.getInputStream(file.entry)
+                ClassReader cr = new ClassReader(is)
 
-            // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
-            // Copying the original constant pool should be avoided because it would keep references
-            // to the original class names. This is not a problem at runtime (because these entries in the
-            // constant pool are never used), but confuses some tools such as Felix' maven-bundle-plugin
-            // that use the constant pool to determine the dependencies of a class.
-            ClassWriter cw = new ClassWriter(0)
+                // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
+                // Copying the original constant pool should be avoided because it would keep references
+                // to the original class names. This is not a problem at runtime (because these entries in the
+                // constant pool are never used), but confuses some tools such as Felix' maven-bundle-plugin
+                // that use the constant pool to determine the dependencies of a class.
+                ClassWriter cw = new ClassWriter(0)
 
-            ClassVisitor cv = new RemappingClassAdapter(cw, remapper)
+                ClassVisitor cv = new RemappingClassAdapter(cw, remapper)
 
-            try {
-                cr.accept(cv, ClassReader.EXPAND_FRAMES)
-            } catch (Throwable ise) {
-                throw new GradleException("Error in ASM processing class " + file.pathString, ise)
-            }
+                try {
+                    cr.accept(cv, ClassReader.EXPAND_FRAMES)
+                } catch (Throwable ise) {
+                    throw new GradleException("Error in ASM processing class " + file.pathString, ise)
+                }
 
-            byte[] renamedClass = cw.toByteArray()
+                byte[] renamedClass = cw.toByteArray()
 
-            // Need to take the .class off for remapping evaluation
-            String mappedName = remapper.map(file.pathString.substring(0, file.pathString.indexOf('.')))
+                // Need to take the .class off for remapping evaluation
+                String mappedName = remapper.map(file.pathString.substring(0, file.pathString.indexOf('.')))
 
-            try {
-                // Now we put it back on so the class file is written out with the right extension.
-                zipOutStr.putNextEntry(new ZipEntry(mappedName + ".class"))
-                IOUtils.copyLarge(new ByteArrayInputStream(renamedClass), zipOutStr)
-                zipOutStr.closeEntry()
-            } catch (ZipException e) {
-                log.warn("We have a duplicate " + mappedName + " in " + archive)
+                try {
+                    // Now we put it back on so the class file is written out with the right extension.
+                    zipOutStr.putNextEntry(new ZipEntry(mappedName + ".class"))
+                    IOUtils.copyLarge(new ByteArrayInputStream(renamedClass), zipOutStr)
+                    zipOutStr.closeEntry()
+                } catch (ZipException e) {
+                    log.warn("We have a duplicate " + mappedName + " in " + archive)
+                }
             }
         }
 

@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.testkit.repo.maven
 
 import com.github.jengelman.gradle.testkit.file.TestFile
 
-
 class MavenFileModule extends AbstractMavenModule {
     private boolean uniqueSnapshots = true;
 

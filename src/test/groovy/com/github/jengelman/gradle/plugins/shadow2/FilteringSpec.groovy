@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.Shadow2Plugin
 import com.github.jengelman.gradle.plugins.shadow2.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow2.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
+import spock.lang.Ignore
 
 class FilteringSpec extends PluginSpecification {
 
@@ -48,13 +49,23 @@ shadowJar {
         contains(output, ['a.properties', 'a2.properties', 'b.properties'])
     }
 
-    def 'exclude a dependency by maven coordinates'() {
+    def "exclude dependency and its transitives"() {
         given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .dependsOn('b')
+                .publish()
+
         buildFile << '''
+dependencies {
+    compile 'shadow:c:1.0'
+}
+
 shadowJar {
-    exclude(dependency('shadow:b:1.0'))
+    exclude(dependency('shadow:c:1.0'))
 }
 '''
+
         when:
         runner.arguments << 'shadowJar'
         ExecutionResult result = runner.run()
@@ -66,7 +77,41 @@ shadowJar {
         contains(output, ['a.properties', 'a2.properties'])
 
         and:
-        doesNotContain(output, ['b.properties'])
+        doesNotContain(output, ['b.properties', 'c.properties'])
+    }
+
+    @Ignore('not supported yet')
+    def "exclude dependency retain transitives"() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .dependsOn('b')
+                .publish()
+
+        buildFile << '''
+dependencies {
+    compile 'shadow:c:1.0'
+}
+
+shadowJar {
+    exclude(dependency('shadow:c:1.0') {
+        transitive = false
+    })
+}
+'''
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties'])
+
+        and:
+        doesNotContain(output, ['c.properties'])
     }
 
     private getOutput() {
