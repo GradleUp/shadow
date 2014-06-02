@@ -8,7 +8,9 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.specs.Spec
@@ -54,40 +56,86 @@ class ShadowJar extends Jar {
         return this
     }
 
-    public ShadowJar exclude(Dependency dependency) {
-        project.configurations.runtime.files(dependency).each {
-            this.exclude(it.path.substring(it.path.lastIndexOf('/')+1))
+    /**
+     * Exclude dependencies that match the provided spec.
+     *
+     * @param spec
+     * @param includeTransitive exclude the transitive dependencies of any dependency that matches the spec.
+     * @return
+     */
+    public ShadowJar exclude(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
+        Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
+                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
+        dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
+            this.exclude(file.path.substring(file.path.lastIndexOf('/')+1)) //Get just the file name
         }
         return this
     }
 
-    public ShadowJar exclude(Spec<? super Dependency> spec) {
-        project.configurations.runtime.files(spec).each {
-            this.exclude(it.path.substring(it.path.lastIndexOf('/')+1))
+    /**
+     * Include dependencies that match the provided spec.
+     *
+     * @param spec
+     * @param includeTransitive include the transitive dependencies of any dependency that matches the spec.
+     * @return
+     */
+    public ShadowJar include(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
+        Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
+                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
+        dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
+            this.include(file.path.substring(file.path.lastIndexOf('/')+1))
         }
         return this
     }
 
-    public ShadowJar include(Dependency dependency) {
-        project.configurations.runtime.files(dependency).each {
-            this.include(it.path.substring(it.path.lastIndexOf('/')+1))
-        }
-        return this
+    /**
+     * Create a spec that matches the provided project notation on group, name, and version
+     * @param notation
+     * @return
+     */
+    public Spec<? super ResolvedDependency> project(Map<String, ?> notation) {
+        dependency(project.dependencies.project(notation))
     }
 
-    public ShadowJar include(Spec<? super Dependency> spec) {
-        project.configurations.runtime.files(spec).each {
-            this.include(it.path.substring(it.path.lastIndexOf('/')+1))
-        }
-        return this
+    /**
+     * Create a spec that matches the default configuration for the provided project path on group, name, and version
+     *
+     * @param notation
+     * @return
+     */
+    public Spec<? super ResolvedDependency> project(String notation) {
+        dependency(project.dependencies.project(path: notation, configuration: 'default'))
     }
 
-    public Dependency dependency(Object notation, Closure configuration = null) {
-        project.dependencies.create(notation, configuration)
+    /**
+     * Create a spec that matches dependencies using the provided notation on group, name, and version
+     * @param notation
+     * @return
+     */
+    public Spec<? super ResolvedDependency> dependency(Object notation) {
+        dependency(project.dependencies.create(notation))
     }
 
-    public Spec<? super Dependency> dependencySpec(Closure spec) {
-        return Specs.<Dependency>convertClosureToSpec(spec)
+    /**
+     * Create a spec that matches the provided dependency on group, name, and version
+     * @param dependency
+     * @return
+     */
+    public Spec<? super ResolvedDependency> dependency(Dependency dependency) {
+        this.dependency({ ResolvedDependency it ->
+            (!dependency.group || dependency.group == it.moduleGroup) &&
+                    (!dependency.name || dependency.name == it.moduleName) &&
+                    (!dependency.version || dependency.version == it.moduleVersion)
+        })
+    }
+
+    /**
+     * Create a spec that matches the provided closure
+     * @param spec
+     * @return
+     */
+    public Spec<? super ResolvedDependency> dependency(Closure spec) {
+        return Specs.<ResolvedDependency>convertClosureToSpec(spec)
     }
 
     public ShadowJar relocate(String pattern, String destination, Closure configure = null) {
@@ -97,6 +145,30 @@ class ShadowJar extends Jar {
         }
         relocators << relocator
         return this
+    }
+
+    protected Set<ResolvedDependency> findMatchingDependencies(Closure spec,
+                                                             Set<ResolvedDependency> dependencies,
+                                                             boolean includeTransitive) {
+        findMatchingDependencies(
+                Specs.<? super ResolvedDependency>convertClosureToSpec(spec), dependencies, includeTransitive)
+    }
+
+    protected Set<ResolvedDependency> findMatchingDependencies(Spec<? super ResolvedDependency> spec,
+                                                             Set<ResolvedDependency> dependencies,
+                                                             boolean includeTransitive) {
+
+        Set<ResolvedDependency> matched = []
+        dependencies.each {
+            if (spec.isSatisfiedBy(it)) {
+                matched.add(it)
+                if (includeTransitive) {
+                    matched.addAll(findMatchingDependencies({true}, it.children, true))
+                }
+            }
+            matched.addAll(findMatchingDependencies(spec, it.children, includeTransitive))
+        }
+        return matched
     }
 
 }

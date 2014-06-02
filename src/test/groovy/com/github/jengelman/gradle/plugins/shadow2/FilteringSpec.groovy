@@ -80,8 +80,7 @@ shadowJar {
         doesNotContain(output, ['b.properties', 'c.properties'])
     }
 
-    @Ignore('not supported yet')
-    def "exclude dependency retain transitives"() {
+    def "exclude dependency but retain transitives"() {
         given:
         repo.module('shadow', 'c', '1.0')
                 .insertFile('c.properties', 'c')
@@ -94,9 +93,7 @@ dependencies {
 }
 
 shadowJar {
-    exclude(dependency('shadow:c:1.0') {
-        transitive = false
-    })
+    exclude(dependency('shadow:c:1.0'), false)
 }
 '''
 
@@ -112,6 +109,110 @@ shadowJar {
 
         and:
         doesNotContain(output, ['c.properties'])
+    }
+
+    def 'filter project dependencies'() {
+        given:
+        file('settings.gradle') << """
+include 'client', 'server'
+"""
+        file('client/src/main/java/client/Client.java') << """package client;
+public class Client {}
+"""
+        file('client/build.gradle') << """
+apply plugin: 'java'
+repositories { jcenter() }
+dependencies { compile 'junit:junit:3.8.2' }
+"""
+
+        file('server/src/main/java/server/Server.java') << """package server;
+import client.Client;
+public class Server {}
+"""
+        file('server/build.gradle') << """
+apply plugin: 'java'
+apply plugin: ${Shadow2Plugin.name}
+
+repositories { jcenter() }
+dependencies { compile project(':client') }
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+    exclude(project(':client'))
+}
+"""
+        File serverOutput = file('server/build/libs/shadow.jar')
+
+        when:
+        runner.arguments << ':server:shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        doesNotContain(serverOutput, [
+                'client/Client.class',
+                'junit/framework/Test.class'
+        ])
+
+        and:
+        contains(serverOutput, ['server/Server.class'])
+    }
+
+//    @Ignore('transitive dependencies do not appear in the dependency graph')
+    def 'exclude a transitive project dependency'() {
+        given:
+        file('settings.gradle') << """
+include 'client', 'server'
+"""
+        file('client/src/main/java/client/Client.java') << """package client;
+public class Client {}
+"""
+        file('client/build.gradle') << """
+apply plugin: 'java'
+repositories { jcenter() }
+dependencies { compile 'junit:junit:3.8.2' }
+"""
+
+        file('server/src/main/java/server/Server.java') << """package server;
+import client.Client;
+public class Server {}
+"""
+        file('server/build.gradle') << """
+apply plugin: 'java'
+apply plugin: ${Shadow2Plugin.name}
+
+repositories { jcenter() }
+dependencies { compile project(':client') }
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+    exclude(dependencySpec {
+        it.moduleGroup == 'junit'
+    })
+}
+"""
+        File serverOutput = file('server/build/libs/shadow.jar')
+
+        when:
+        runner.arguments << ':server:shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        doesNotContain(serverOutput, [
+                'junit/framework/Test.class'
+        ])
+
+        and:
+        contains(serverOutput, [
+                'client/Client.class',
+                'server/Server.class'])
     }
 
     private getOutput() {

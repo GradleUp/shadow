@@ -25,6 +25,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import org.junit.Ignore
 
 /**
  * @author Jason van Zyl
@@ -35,6 +36,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
  * Modifications
  * @author John Engelman
  */
+@Ignore
 class DefaultCasterTest extends TestCase {
     private static final String[] EXCLUDES = [
             "org/codehaus/plexus/util/xml/Xpp3Dom",
