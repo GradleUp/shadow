@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.support
+package com.github.jengelman.gradle.plugins.shadow.util
 
 class AppendableJar {
 
@@ -14,11 +14,12 @@ class AppendableJar {
         return this
     }
 
-    void write() {
-        JarBuilder builder = new JarBuilder(file.newObjectOutputStream())
+    File write() {
+        JarBuilder builder = new JarBuilder(file.newOutputStream())
         contents.each { path, contents ->
             builder.withFile(path, contents)
         }
         builder.build()
+        return file
     }
 }

@@ -11,9 +11,7 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'project-report'
 
-//apply from: file('gradle/intTest.gradle')
 apply from: file('gradle/docs.gradle')
-//apply from: file('gradle/drone.gradle')
 apply from: file('gradle/publish.gradle')
 
 group = 'com.github.jengelman.gradle.plugins'

@@ -1,41 +1,37 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.support.ShadowPluginIntegrationSpec
+import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import org.gradle.testkit.functional.ExecutionResult
 
-class RelocationSpec extends ShadowPluginIntegrationSpec {
+class RelocationSpec extends PluginSpecification {
 
-    def "relocate files"() {
+    def "relocate dependency files"() {
         given:
-        buildFile << '''
-repositories {
-    jcenter()
-}
+        buildFile << """
+apply plugin: ${ShadowPlugin.name}
+
+repositories { jcenter() }
 
 dependencies {
     compile 'junit:junit:3.8.2'
 }
 
-shadow {
-    artifactAttached = false
-    relocation {
-        pattern = 'junit.textui'
-        shadedPattern = 'a'
-    }
-    relocation {
-        pattern = 'junit.framework'
-        shadedPattern = 'b'
-    }
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+    relocate 'junit.textui', 'a'
+    relocate 'junit.framework', 'b'
 }
-'''
-
+"""
         when:
-        execute('shadowJar')
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
 
         then:
-        buildSuccessful()
+        success(result)
 
         and:
-        contains([
+        contains(output, [
                 'a/ResultPrinter.class',
                 'a/TestRunner.class',
                 'b/Assert.class',
@@ -54,7 +50,7 @@ shadow {
         ])
 
         and:
-        doesNotContain([
+        doesNotContain(output, [
                 'junit/textui/ResultPrinter.class',
                 'junit/textui/TestRunner.class',
                 'junit/framework/Assert.class',
@@ -71,43 +67,39 @@ shadow {
                 'junit/framework/TestSuite$1.class',
                 'junit/framework/TestSuite.class'
         ])
-
     }
 
-    def "relocate files with includes and excludes"() {
+    def "relocate dependency files with filtering"() {
         given:
-        buildFile << '''
-repositories {
-    jcenter()
-}
+        buildFile << """
+apply plugin: ${ShadowPlugin.name}
+
+repositories { jcenter() }
 
 dependencies {
     compile 'junit:junit:3.8.2'
 }
 
-shadow {
-    artifactAttached = false
-    relocation {
-        pattern = 'junit.textui'
-        shadedPattern = 'a'
-        excludes = ['junit.textui.TestRunner']
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+    relocate('junit.textui', 'a') {
+        exclude 'junit.textui.TestRunner'
     }
-    relocation {
-        pattern = 'junit.framework'
-        shadedPattern = 'b'
-        includes = ['junit.framework.Test*']
+    relocate('junit.framework', 'b') {
+        include 'junit.framework.Test*'
     }
 }
-'''
-
+"""
         when:
-        execute('shadowJar')
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
 
         then:
-        buildSuccessful()
+        success(result)
 
         and:
-        contains([
+        contains(output, [
                 'a/ResultPrinter.class',
                 'b/Test.class',
                 'b/TestCase.class',
@@ -120,7 +112,7 @@ shadow {
         ])
 
         and:
-        doesNotContain([
+        doesNotContain(output, [
                 'a/TestRunner.class',
                 'b/Assert.class',
                 'b/AssertionFailedError.class',
@@ -128,5 +120,19 @@ shadow {
                 'b/ComparisonFailure.class',
                 'b/Protectable.class'
         ])
+
+        and:
+        contains(output, [
+                'junit/textui/TestRunner.class',
+                'junit/framework/Assert.class',
+                'junit/framework/AssertionFailedError.class',
+                'junit/framework/ComparisonCompactor.class',
+                'junit/framework/ComparisonFailure.class',
+                'junit/framework/Protectable.class'
+        ])
+    }
+
+    private getOutput() {
+        file('build/libs/shadow.jar')
     }
 }

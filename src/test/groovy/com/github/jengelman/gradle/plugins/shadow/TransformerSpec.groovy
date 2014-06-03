@@ -1,11 +1,10 @@
-package com.github.jengelman.gradle.plugins.shadow2
+package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.Shadow2Plugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-import com.github.jengelman.gradle.plugins.shadow2.util.PluginSpecification
+import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
 
 import java.util.jar.JarInputStream
@@ -95,7 +94,7 @@ public class Main {
 }'''
 
         buildFile << """
-apply plugin: ${Shadow2Plugin.name}
+apply plugin: ${ShadowPlugin.name}
 
 jar {
     manifest {
@@ -140,7 +139,7 @@ public class Main {
 }'''
 
         buildFile << """
-apply plugin: ${Shadow2Plugin.name}
+apply plugin: ${ShadowPlugin.name}
 
 jar {
     manifest {

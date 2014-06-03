@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow2.util
+package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.testkit.file.TestFile
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil

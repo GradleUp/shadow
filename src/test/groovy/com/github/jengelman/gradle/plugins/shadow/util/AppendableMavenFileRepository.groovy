@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow2.util
+package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.testkit.repo.maven.MavenFileRepository
 import groovy.transform.InheritConstructors

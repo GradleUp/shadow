@@ -1,10 +1,8 @@
-package com.github.jengelman.gradle.plugins.shadow2
+package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.Shadow2Plugin
-import com.github.jengelman.gradle.plugins.shadow2.util.AppendableMavenFileRepository
-import com.github.jengelman.gradle.plugins.shadow2.util.PluginSpecification
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
-import spock.lang.Ignore
 
 class FilteringSpec extends PluginSpecification {
 
@@ -22,7 +20,7 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-apply plugin: ${Shadow2Plugin.name}
+apply plugin: ${ShadowPlugin.name}
 
 repositories { maven { url "${repo.uri}" } }
 dependencies {
@@ -131,7 +129,7 @@ public class Server {}
 """
         file('server/build.gradle') << """
 apply plugin: 'java'
-apply plugin: ${Shadow2Plugin.name}
+apply plugin: ${ShadowPlugin.name}
 
 repositories { jcenter() }
 dependencies { compile project(':client') }
@@ -161,7 +159,6 @@ shadowJar {
         contains(serverOutput, ['server/Server.class'])
     }
 
-//    @Ignore('transitive dependencies do not appear in the dependency graph')
     def 'exclude a transitive project dependency'() {
         given:
         file('settings.gradle') << """
@@ -182,7 +179,7 @@ public class Server {}
 """
         file('server/build.gradle') << """
 apply plugin: 'java'
-apply plugin: ${Shadow2Plugin.name}
+apply plugin: ${ShadowPlugin.name}
 
 repositories { jcenter() }
 dependencies { compile project(':client') }
@@ -190,7 +187,7 @@ dependencies { compile project(':client') }
 shadowJar {
     baseName = 'shadow'
     classifier = null
-    exclude(dependencySpec {
+    exclude(dependency {
         it.moduleGroup == 'junit'
     })
 }

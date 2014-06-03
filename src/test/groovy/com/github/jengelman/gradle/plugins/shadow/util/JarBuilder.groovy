@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.support
+package com.github.jengelman.gradle.plugins.shadow.util
 
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
