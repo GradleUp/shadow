@@ -14,6 +14,7 @@ class ShadowExtension {
     List<Transformer> transformers = []
     List<ArchiveFilter> filters = []
     List<ArchiveRelocation> relocations = []
+    List<String> includeDependenciesFor = ["runtime"]
     ArtifactSet artifactSet
 
     String destinationDir = "${project.buildDir}/distributions/"

@@ -108,7 +108,13 @@ class ShadowTask extends DefaultTask {
     }
 
     List<ResolvedArtifact> getAllResolvedArtifacts() {
-        getResolvedArtifactsFor('runtime')
+        List<ResolvedArtifact> result = []
+
+        for(configuration in project.shadow.includeDependenciesFor) {
+            result += getResolvedArtifactsFor(configuration)
+        }
+
+        result
     }
 
     List<ResolvedArtifact> getResolvedArtifactsToShadow() {

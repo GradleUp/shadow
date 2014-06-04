@@ -56,6 +56,7 @@ Configuration Options
 + artifactAttached - if true, keep original jar; else overwrite the default artifact. Default: true
 + groupFilter - configured the inclusion of only specific artifacts to the shadow. Default: * (all artifacts)
 + outputFile - configures a specific file as output for shadow. If set, overrides all naming configurations. Default: not configured
++ includeDependenciesFor - specifies the configuration names the dependencies of which should be included in the resulting jar. Default: \["runtime"\]
 
 Extensions
 ==========
