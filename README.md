@@ -48,7 +48,7 @@ jar signature files
 Configuration Options
 =====================
 
-+ destinationDir - configures the output directory for shadow. Default: $buildDir/libs/
++ destinationDir - configures the output directory for shadow. Default: $buildDir/distributions/
 + baseName - configures the base name of the output file. Default: ${archivesBaseName}-${version}-${classifier}
 + classifier - the classifier the append to the artifact. Default: shadow
 + extension - configures the extension of the output file. Default: jar
