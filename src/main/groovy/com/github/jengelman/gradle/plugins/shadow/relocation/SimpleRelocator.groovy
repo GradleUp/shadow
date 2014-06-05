@@ -48,6 +48,10 @@ class SimpleRelocator implements Relocator {
 
     private final boolean rawString
 
+    SimpleRelocator() {
+
+    }
+
     SimpleRelocator(String patt, String shadedPattern, List<String> includes, List<String> excludes) {
         this(patt, shadedPattern, includes, excludes, false)
     }

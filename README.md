@@ -43,8 +43,6 @@ be used to add dependencies that are excluded from the shadowing.
 
 ### Filtering shadow jar contents by file pattern
 
-
-TODO - need test case for filtering file patterns
 ```
 shadowJar {
   exclude 'LICENSE'
@@ -90,6 +88,21 @@ TODO - need to implement this
 ### Publishing the shadow jar
 
 ### Configuring additional POM dependencies for Shadow Jar
+
+```
+dependencies {
+  compile 'asm:asm:3.3.1'
+  compile 'org.bouncycastle:bcprov-jdk15on:1.47'
+  shadow 'org.bouncycastle:bcprov-jdk15on:1.47'
+}
+
+shadowJar {
+  exclude(dependency('org.bouncycastle:bcprov-jdk15on:1.47'))
+}
+```
+
+This examples allows the project to compile against the BouncyCastle encryption library, but then excludes it from
+the shadowed jar, but including it as a dependency on the 'shadow' configuration.
 
 ## ChangeLog
 

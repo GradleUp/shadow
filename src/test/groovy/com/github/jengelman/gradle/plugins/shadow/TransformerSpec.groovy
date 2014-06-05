@@ -26,7 +26,41 @@ class TransformerSpec extends PluginSpecification {
                 baseName = 'shadow'
                 from('${one.path}')
                 from('${two.path}')
-                transformer(${ServiceFileTransformer.name})
+                transform(${ServiceFileTransformer.name})
+            }
+        """
+
+        when:
+        runner.arguments << 'shadow'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        File output = file('build/shadow.jar')
+        assert output.exists()
+
+        and:
+        String text = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
+        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text == '''one # NOTE: No newline terminates this line/file
+two # NOTE: No newline terminates this line/file'''
+    }
+
+    def 'service resource transformer short syntax'() {
+        given:
+        File one = buildJar('one.jar').insertFile('META-INF/services/org.apache.maven.Shade',
+                'one # NOTE: No newline terminates this line/file').write()
+
+        File two = buildJar('two.jar').insertFile('META-INF/services/org.apache.maven.Shade',
+                'two # NOTE: No newline terminates this line/file').write()
+
+        buildFile << """
+            task shadow(type: ${ShadowJar.name}) {
+                destinationDir = buildDir
+                baseName = 'shadow'
+                from('${one.path}')
+                from('${two.path}')
+                mergeServiceFiles()
             }
         """
 
@@ -60,9 +94,44 @@ two # NOTE: No newline terminates this line/file'''
                 baseName = 'shadow'
                 from('${one.path}')
                 from('${two.path}')
-                transformer(${AppendingTransformer.name}) {
+                transform(${AppendingTransformer.name}) {
                     resource = 'test.properties'
                 }
+            }
+        """
+
+        when:
+        runner.arguments << 'shadow'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        File output = file('build/shadow.jar')
+        assert output.exists()
+
+        and:
+        String text = getJarFileContents(output, 'test.properties')
+        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text == '''one # NOTE: No newline terminates this line/file
+two # NOTE: No newline terminates this line/file
+'''
+    }
+
+    def 'appending transformer short syntax'() {
+        given:
+        File one = buildJar('one.jar').insertFile('test.properties',
+                'one # NOTE: No newline terminates this line/file').write()
+
+        File two = buildJar('two.jar').insertFile('test.properties',
+                'two # NOTE: No newline terminates this line/file').write()
+
+        buildFile << """
+            task shadow(type: ${ShadowJar.name}) {
+                destinationDir = buildDir
+                baseName = 'shadow'
+                from('${one.path}')
+                from('${two.path}')
+                append('test.properties')
             }
         """
 
@@ -200,7 +269,7 @@ task shadow(type: ${ShadowJar.name}) {
     baseName = 'shadow'
     from('${xml1.path}')
     from('${xml2.path}')
-    transformer(${XmlAppendingTransformer.name}) {
+    transform(${XmlAppendingTransformer.name}) {
         resource = 'properties.xml'
     }
 }
