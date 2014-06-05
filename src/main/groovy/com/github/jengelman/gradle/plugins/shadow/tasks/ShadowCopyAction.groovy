@@ -17,15 +17,20 @@ import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.DuplicateFileCopyingException
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
+import org.gradle.api.internal.file.copy.CopySpecInternal
+import org.gradle.api.internal.file.copy.DefaultCopySpec
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.internal.tasks.SimpleWorkResult
+import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.internal.IoActions
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
@@ -42,14 +47,16 @@ public class ShadowCopyAction implements CopyAction {
     private final DocumentationRegistry documentationRegistry
     private final List<Transformer> transformers
     private final List<Relocator> relocators
+    private final PatternSet patternSet
 
     public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
-                            List<Transformer> transformers, List<Relocator> relocators) {
+                            List<Transformer> transformers, List<Relocator> relocators, PatternSet patternSet) {
         this.zipFile = zipFile
         this.compressor = compressor
         this.documentationRegistry = documentationRegistry
         this.transformers = transformers
         this.relocators = relocators
+        this.patternSet = patternSet
     }
 
     @Override
@@ -66,7 +73,7 @@ public class ShadowCopyAction implements CopyAction {
             IoActions.withResource(zipOutStr, new Action<ZipOutputStream>() {
                 public void execute(ZipOutputStream outputStream) {
                     try {
-                        stream.process(new StreamAction(outputStream, transformers, relocators))
+                        stream.process(new StreamAction(outputStream, transformers, relocators, patternSet))
                         processTransformers(outputStream)
                     } catch (Exception e) {
                         log.error('ex', e)
@@ -100,14 +107,17 @@ public class ShadowCopyAction implements CopyAction {
         private final List<Transformer> transformers
         private final List<Relocator> relocators
         private final RelocatorRemapper remapper
+        private final PatternSet patternSet
 
         private Set<RelativePath> visitedFiles = new HashSet<RelativePath>()
 
-        public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers, List<Relocator> relocators) {
+        public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers, List<Relocator> relocators,
+                            PatternSet patternSet) {
             this.zipOutStr = zipOutStr
             this.transformers = transformers
             this.relocators = relocators
             this.remapper = new RelocatorRemapper(relocators)
+            this.patternSet = patternSet
         }
 
         public void processFile(FileCopyDetailsInternal details) {
@@ -144,8 +154,13 @@ public class ShadowCopyAction implements CopyAction {
 
         private void processArchive(FileCopyDetails fileDetails) {
             ZipFile archive = new ZipFile(fileDetails.file)
-            archive.entries.each { ZipEntry entry ->
-                RelativeArchivePath relativePath = new RelativeArchivePath(entry, fileDetails)
+            List<RelativeArchivePath> archivePaths = archive.entries.collect { new RelativeArchivePath(it, fileDetails) }
+            Spec<FileTreeElement> patternSpec = patternSet.getAsSpec()
+            List<RelativeArchivePath> filteredArchivePaths = archivePaths.findAll { RelativeArchivePath archivePath ->
+                FileTreeElement element = new ArchiveFileTreeElement(archivePath)
+                patternSpec.isSatisfiedBy(element)
+            }
+            filteredArchivePaths.each { RelativeArchivePath relativePath ->
                 if (!relativePath.file) {
                     visitArchiveDirectory(relativePath)
                 } else {
@@ -265,6 +280,70 @@ public class ShadowCopyAction implements CopyAction {
 
         boolean isClassFile() {
             return lastName.endsWith('.class')
+        }
+    }
+
+    class ArchiveFileTreeElement implements FileTreeElement {
+
+        private final RelativeArchivePath archivePath
+
+        ArchiveFileTreeElement(RelativeArchivePath archivePath) {
+            this.archivePath = archivePath
+        }
+
+        @Override
+        File getFile() {
+            return null
+        }
+
+        @Override
+        boolean isDirectory() {
+            return archivePath.entry.directory
+        }
+
+        @Override
+        long getLastModified() {
+            return archivePath.entry.lastModifiedDate.time
+        }
+
+        @Override
+        long getSize() {
+            return archivePath.entry.size
+        }
+
+        @Override
+        InputStream open() {
+            return null
+        }
+
+        @Override
+        void copyTo(OutputStream outputStream) {
+
+        }
+
+        @Override
+        boolean copyTo(File file) {
+            return false
+        }
+
+        @Override
+        String getName() {
+            return archivePath.pathString
+        }
+
+        @Override
+        String getPath() {
+            return archivePath.lastName
+        }
+
+        @Override
+        RelativePath getRelativePath() {
+            return archivePath
+        }
+
+        @Override
+        int getMode() {
+            return archivePath.entry.unixMode
         }
     }
 }

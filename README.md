@@ -35,7 +35,9 @@ apply plugin: 'shadow'
 $ gradle shadowJar //shadow the runtime configuration with project code into ./build/libs/
 ```
 
-`shadowJar` by uses the same default configurations as `jar` and additionally configures the `classifier` to be `"shadow"`.
+`shadowJar` by uses the same default configurations as `jar` and additionally configures the `classifier` to be `"all"`.
+Additionally, it creates a 'shadow' configuration and assigns the jar as an artifact of it. This configuration can
+be used to add dependencies that are excluded from the shadowing.
 
 ## Advanced Configuration
 
@@ -45,7 +47,7 @@ $ gradle shadowJar //shadow the runtime configuration with project code into ./b
 TODO - need test case for filtering file patterns
 ```
 shadowJar {
-
+  exclude 'LICENSE'
 }
 ```
 

@@ -8,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.DocumentationRegistry
@@ -16,6 +15,7 @@ import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.util.ConfigureUtil
 
 class ShadowJar extends Jar {
@@ -26,7 +26,8 @@ class ShadowJar extends Jar {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
-        return new ShadowCopyAction(getArchivePath(), getCustomCompressor(), documentationRegistry, transformers, relocators)
+        return new ShadowCopyAction(getArchivePath(), getCustomCompressor(), documentationRegistry,
+                transformers, relocators, (PatternSet) mainSpec.getPatternSet())
     }
 
     protected ZipCompressor getCustomCompressor() {
@@ -43,9 +44,7 @@ class ShadowJar extends Jar {
     ShadowJar transformer(Class<? extends Transformer> clazz, Closure c = null) {
         Transformer transformer = clazz.newInstance()
         if (c) {
-            c.delegate = transformer
-            c.resolveStrategy = Closure.DELEGATE_FIRST
-            c(transformer)
+            ConfigureUtil.configure(c, transformer)
         }
         transformers << transformer
         return this

@@ -212,6 +212,30 @@ shadowJar {
                 'server/Server.class'])
     }
 
+    //http://mail-archives.apache.org/mod_mbox/ant-user/200506.mbox/%3C001d01c57756$6dc35da0$dc00a8c0@CTEGDOMAIN.COM%3E
+    def 'verify exclude precendence over include'() {
+        given:
+        buildFile << """
+shadowJar {
+    include '*.jar'
+    include '*.properties'
+    exclude 'a2.properties'
+}
+"""
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'b.properties'])
+
+        and:
+        doesNotContain(output, ['a2.properties'])
+    }
+
     private getOutput() {
         file('build/libs/shadow.jar')
     }

@@ -1,8 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.functional.ExecutionResult
 
@@ -28,8 +31,14 @@ class ShadowPluginSpec extends PluginSpecification {
         assert shadow.baseName == projectName
         assert shadow.destinationDir == new File(project.buildDir, 'libs')
         assert shadow.version == version
-        assert shadow.classifier == 'shadow'
+        assert shadow.classifier == 'all'
         assert shadow.extension == 'jar'
+
+        and:
+        Configuration shadowConfig = project.configurations.findByName('shadow')
+        assert shadowConfig
+        shadowConfig.artifacts.file.contains(shadow.archivePath)
+
     }
 
     def 'shadow copy'() {
@@ -127,6 +136,86 @@ shadowJar {
                 'server/Server.class',
                 'junit/framework/Test.class'
         ])
+    }
+
+    def "exclude INDEX.LIST, *.SF, *.DSA, and *.RSA by default"() {
+        given:
+        AppendableMavenFileRepository repo = repo()
+
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('META-INF/INDEX.LIST', 'JarIndex-Version: 1.0')
+                .insertFile('META-INF/a.SF', 'Signature File')
+                .insertFile('META-INF/a.DSA', 'DSA Signature Block')
+                .insertFile('META-INF/a.RSA', 'RSA Signature Block')
+                .insertFile('META-INF/a.properties', 'key=value')
+                .publish()
+
+        file('src/main/java/shadow/Passed.java') << '''package shadow;
+public class Passed {}'''
+
+        buildFile << """
+apply plugin: ${ShadowPlugin.name}
+repositories { maven { url "${repo.uri}" } }
+dependencies { compile 'shadow:a:1.0' }
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+}
+"""
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'META-INF/a.properties'])
+
+        and:
+        doesNotContain(output, ['META-INF/INDEX.LIST', 'META-INF/a.SF', 'META-INF/a.DSA', 'META-INF/a.RSA'])
+    }
+
+    def "include runtime configuration by default"() {
+        given:
+        AppendableMavenFileRepository repo = repo()
+
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .publish()
+
+        repo.module('shadow', 'b', '1.0')
+                .insertFile('b.properties', 'b')
+                .publish()
+
+        buildFile << """
+apply plugin: ${ShadowPlugin.name}
+
+repositories { maven { url "${repo.uri}" } }
+dependencies {
+    runtime 'shadow:a:1.0'
+    shadow 'shadow:b:1.0'
+}
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+}
+"""
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties'])
+
+        and:
+        doesNotContain(output, ['b.properties'])
     }
 
     private getOutput() {

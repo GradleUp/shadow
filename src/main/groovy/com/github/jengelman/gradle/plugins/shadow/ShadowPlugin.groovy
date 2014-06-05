@@ -26,7 +26,7 @@ class ShadowPlugin implements Plugin<Project> {
         ShadowJar shadow = project.tasks.create('shadowJar', ShadowJar)
         shadow.conventionMapping.with {
             map('classifier') {
-                'shadow'
+                'all'
             }
             map('manifest') {
                 project.tasks.jar.manifest
@@ -34,6 +34,7 @@ class ShadowPlugin implements Plugin<Project> {
         }
         shadow.from(convention.sourceSets.main.output)
         shadow.from(project.configurations.runtime)
+        shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
 
         ArchivePublishArtifact shadowArtifact = new ArchivePublishArtifact(shadow)
         project.configurations.shadow.artifacts.add(shadowArtifact)
