@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import static org.gradle.api.tasks.bundling.ZipEntryCompression.*
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -16,6 +17,7 @@ import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.util.ConfigureUtil
@@ -24,12 +26,23 @@ class ShadowJar extends Jar {
 
     List<Transformer> transformers = []
     List<Relocator> relocators = []
+    boolean stats = false
+
+    private final ShadowStats shadowStats = new ShadowStats()
 
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
         return new ShadowCopyAction(getArchivePath(), getCustomCompressor(), documentationRegistry,
-                transformers, relocators, (PatternSet) mainSpec.getPatternSet())
+                transformers, relocators, (PatternSet) mainSpec.getPatternSet(), shadowStats)
+    }
+
+    @TaskAction
+    protected void copy() {
+        super.copy()
+        if (stats) {
+            logger.info(shadowStats.toString())
+        }
     }
 
     protected ZipCompressor getCustomCompressor() {

@@ -9,7 +9,7 @@ class ShadowStats {
     long totalTime
     long jarStartTime
     long jarEndTime
-    int jarCount
+    int jarCount = 1
     boolean processingJar
 
     void startJar() {
@@ -21,21 +21,14 @@ class ShadowStats {
     void finishJar() {
         if (processingJar) {
             jarEndTime = System.currentTimeMillis()
+            jarCount++
             totalTime += jarTiming
             processingJar = false
         }
     }
 
     void printStats() {
-        println ""
-        println "*******************"
-        println "GRADLE SHADOW STATS"
-        println ""
-        println "Total Jars: $jarCount"
-        println "Total Time: ${totalTimeSecs}s [${totalTime}ms]"
-        println "Average Time/Jar: ${averageTimeSecsPerJar}s [${averageTimePerJar}ms]"
-        println "*******************"
-        println ""
+        println this
     }
 
     long getJarTiming() {
@@ -52,5 +45,16 @@ class ShadowStats {
 
     double getAverageTimeSecsPerJar() {
         averageTimePerJar / 1000
+    }
+    
+    String toString() {
+        StringBuilder sb = new StringBuilder()
+        sb.append "*******************\n"
+        sb.append "GRADLE SHADOW STATS\n"
+        sb.append "\n"
+        sb.append "Total Jars: $jarCount (includes project)\n"
+        sb.append "Total Time: ${totalTimeSecs}s [${totalTime}ms]\n"
+        sb.append "Average Time/Jar: ${averageTimeSecsPerJar}s [${averageTimePerJar}ms]\n"
+        sb.append "*******************"
     }
 }

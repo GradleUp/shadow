@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -48,15 +49,18 @@ public class ShadowCopyAction implements CopyAction {
     private final List<Transformer> transformers
     private final List<Relocator> relocators
     private final PatternSet patternSet
+    private final ShadowStats stats
 
     public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
-                            List<Transformer> transformers, List<Relocator> relocators, PatternSet patternSet) {
+                            List<Transformer> transformers, List<Relocator> relocators, PatternSet patternSet,
+                            ShadowStats stats) {
         this.zipFile = zipFile
         this.compressor = compressor
         this.documentationRegistry = documentationRegistry
         this.transformers = transformers
         this.relocators = relocators
         this.patternSet = patternSet
+        this.stats = stats
     }
 
     @Override
@@ -73,7 +77,7 @@ public class ShadowCopyAction implements CopyAction {
             IoActions.withResource(zipOutStr, new Action<ZipOutputStream>() {
                 public void execute(ZipOutputStream outputStream) {
                     try {
-                        stream.process(new StreamAction(outputStream, transformers, relocators, patternSet))
+                        stream.process(new StreamAction(outputStream, transformers, relocators, patternSet, stats))
                         processTransformers(outputStream)
                     } catch (Exception e) {
                         log.error('ex', e)
@@ -108,16 +112,18 @@ public class ShadowCopyAction implements CopyAction {
         private final List<Relocator> relocators
         private final RelocatorRemapper remapper
         private final PatternSet patternSet
+        private final ShadowStats stats
 
         private Set<RelativePath> visitedFiles = new HashSet<RelativePath>()
 
         public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet) {
+                            PatternSet patternSet, ShadowStats stats) {
             this.zipOutStr = zipOutStr
             this.transformers = transformers
             this.relocators = relocators
             this.remapper = new RelocatorRemapper(relocators)
             this.patternSet = patternSet
+            this.stats = stats
         }
 
         public void processFile(FileCopyDetailsInternal details) {
@@ -153,6 +159,7 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void processArchive(FileCopyDetails fileDetails) {
+            stats.startJar()
             ZipFile archive = new ZipFile(fileDetails.file)
             List<RelativeArchivePath> archivePaths = archive.entries.collect { new RelativeArchivePath(it, fileDetails) }
             Spec<FileTreeElement> patternSpec = patternSet.getAsSpec()
@@ -168,6 +175,7 @@ public class ShadowCopyAction implements CopyAction {
                 }
             }
             archive.close()
+            stats.finishJar()
         }
 
         private void visitArchiveDirectory(RelativeArchivePath archiveDir) {

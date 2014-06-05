@@ -57,5 +57,3 @@ project.afterEvaluate {
         bintrayUpload.inputs.files { -> project.publishing.publications.getByName(pub).publishableFiles }
     }
 }
-
-task install(dependsOn: publishToMavenLocal)

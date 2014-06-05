@@ -8,7 +8,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 
 ## Current Status
 
-In Progress: 0.9-SNAPSHOT
+Latest Version: 0.9.0-M1
 
 [![Build Status](https://drone.io/github.com/johnrengelman/shadow/status.png)](https://drone.io/github.com/johnrengelman/shadow/latest)
 
