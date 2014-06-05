@@ -131,8 +131,4 @@ shadowJar {
                 'junit/framework/Protectable.class'
         ])
     }
-
-    private getOutput() {
-        file('build/libs/shadow.jar')
-    }
 }

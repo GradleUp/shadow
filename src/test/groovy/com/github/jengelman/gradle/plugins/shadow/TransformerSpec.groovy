@@ -22,7 +22,7 @@ class TransformerSpec extends PluginSpecification {
 
         buildFile << """
             task shadow(type: ${ShadowJar.name}) {
-                destinationDir = buildDir
+                destinationDir = new File(buildDir, 'libs')
                 baseName = 'shadow'
                 from('${one.path}')
                 from('${two.path}')
@@ -36,7 +36,6 @@ class TransformerSpec extends PluginSpecification {
 
         then:
         success(result)
-        File output = file('build/shadow.jar')
         assert output.exists()
 
         and:
@@ -56,7 +55,7 @@ two # NOTE: No newline terminates this line/file'''
 
         buildFile << """
             task shadow(type: ${ShadowJar.name}) {
-                destinationDir = buildDir
+                destinationDir = new File(buildDir, 'libs')
                 baseName = 'shadow'
                 from('${one.path}')
                 from('${two.path}')
@@ -70,7 +69,6 @@ two # NOTE: No newline terminates this line/file'''
 
         then:
         success(result)
-        File output = file('build/shadow.jar')
         assert output.exists()
 
         and:
@@ -90,7 +88,7 @@ two # NOTE: No newline terminates this line/file'''
 
         buildFile << """
             task shadow(type: ${ShadowJar.name}) {
-                destinationDir = buildDir
+                destinationDir = new File(buildDir, 'libs')
                 baseName = 'shadow'
                 from('${one.path}')
                 from('${two.path}')
@@ -106,7 +104,6 @@ two # NOTE: No newline terminates this line/file'''
 
         then:
         success(result)
-        File output = file('build/shadow.jar')
         assert output.exists()
 
         and:
@@ -127,7 +124,7 @@ two # NOTE: No newline terminates this line/file
 
         buildFile << """
             task shadow(type: ${ShadowJar.name}) {
-                destinationDir = buildDir
+                destinationDir = new File(buildDir, 'libs')
                 baseName = 'shadow'
                 from('${one.path}')
                 from('${two.path}')
@@ -141,7 +138,6 @@ two # NOTE: No newline terminates this line/file
 
         then:
         success(result)
-        File output = file('build/shadow.jar')
         assert output.exists()
 
         and:
@@ -184,7 +180,6 @@ shadowJar {
 
         then:
         success(result)
-        File output = file('build/libs/shadow.jar')
         assert output.exists()
 
         and:
@@ -233,7 +228,6 @@ shadowJar {
 
         then:
         success(result)
-        File output = file('build/libs/shadow.jar')
         assert output.exists()
 
         and:
@@ -265,7 +259,7 @@ shadowJar {
 
         buildFile << """
 task shadow(type: ${ShadowJar.name}) {
-    destinationDir = buildDir
+    destinationDir = new File(buildDir, 'libs')
     baseName = 'shadow'
     from('${xml1.path}')
     from('${xml2.path}')
@@ -281,7 +275,6 @@ task shadow(type: ${ShadowJar.name}) {
 
         then:
         success(result)
-        File output = file('build/shadow.jar')
         assert output.exists()
 
         and:

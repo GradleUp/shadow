@@ -235,8 +235,4 @@ shadowJar {
         and:
         doesNotContain(output, ['a2.properties'])
     }
-
-    private getOutput() {
-        file('build/libs/shadow.jar')
-    }
 }

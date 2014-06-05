@@ -217,8 +217,4 @@ shadowJar {
         and:
         doesNotContain(output, ['b.properties'])
     }
-
-    private getOutput() {
-        file('build/libs/shadow.jar')
-    }
 }

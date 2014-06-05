@@ -81,4 +81,8 @@ class PluginSpecification extends Specification {
     void fail(ExecutionResult result) {
         assert result.standardError, 'Gradle build succeeded'
     }
+
+    protected getOutput() {
+        file('build/libs/shadow.jar')
+    }
 }
