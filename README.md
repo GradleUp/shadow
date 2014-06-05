@@ -87,6 +87,25 @@ TODO - need to implement this
 
 ### Publishing the shadow jar
 
+```
+apply plugin: 'shadow'
+apply plugin: 'maven-publish'
+
+shadowJar {
+  baseName = 'myproject-all'
+  classifier = ''
+}
+
+publishing {
+  publications {
+    shadow(MavenPublication) {
+      from components.shadow
+      artifactId = 'myproject-all'
+    }
+  }
+}
+```
+
 ### Configuring additional POM dependencies for Shadow Jar
 
 ```

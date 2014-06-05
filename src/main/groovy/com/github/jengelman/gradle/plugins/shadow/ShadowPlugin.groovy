@@ -3,7 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
+import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.artifacts.PublishArtifact
+import org.gradle.api.internal.java.JavaLibrary
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 
@@ -36,7 +38,19 @@ class ShadowPlugin implements Plugin<Project> {
         shadow.from(project.configurations.runtime)
         shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
 
-        ArchivePublishArtifact shadowArtifact = new ArchivePublishArtifact(shadow)
-        project.configurations.shadow.artifacts.add(shadowArtifact)
+        PublishArtifact shadowArtifact = project.artifacts.add('shadow', shadow)
+        project.components.add(new ShadowJavaLibrary(shadowArtifact, project.configurations.shadow.allDependencies))
+    }
+
+    class ShadowJavaLibrary extends JavaLibrary {
+
+        ShadowJavaLibrary(PublishArtifact jarArtifact, DependencySet runtimeDependencies) {
+            super(jarArtifact, runtimeDependencies)
+        }
+
+        @Override
+        String getName() {
+            return 'shadow'
+        }
     }
 }
