@@ -20,10 +20,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
-
-import java.util.jar.JarEntry
-import java.util.jar.JarOutputStream
 
 /**
  * A resource processor that allows the addition of an arbitrary file
@@ -51,11 +50,11 @@ public class IncludeResourceTransformer implements Transformer {
         return file != null ? file.exists() : false
     }
 
-    public void modifyOutputStream(JarOutputStream jos) {
-        jos.putNextEntry(new JarEntry(resource))
+    public void modifyOutputStream(ZipOutputStream os) {
+        os.putNextEntry(new ZipEntry(resource))
 
         InputStream is = new FileInputStream(file)
-        IOUtil.copy(is, jos)
+        IOUtil.copy(is, os)
         is.close()
     }
 }

@@ -35,7 +35,6 @@ publishing {
 }
 
 bintrayUpload { task ->
-    dependsOn project.publishing.publications.plugin.artifacts
     gradle.taskGraph.whenReady { taskGraph ->
         if (taskGraph.hasTask(task)) {
             task.user = bintrayUser
@@ -53,4 +52,8 @@ bintray {
     }
 }
 
-task install(dependsOn: publishToMavenLocal)
+project.afterEvaluate {
+    bintray.publications.each { pub ->
+        bintrayUpload.inputs.files { -> project.publishing.publications.getByName(pub).publishableFiles }
+    }
+}

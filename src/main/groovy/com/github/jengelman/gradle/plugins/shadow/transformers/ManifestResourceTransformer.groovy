@@ -20,6 +20,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 import java.util.jar.*
@@ -73,7 +75,7 @@ class ManifestResourceTransformer implements Transformer {
         return true
     }
 
-    void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(ZipOutputStream os) {
         // If we didn't find a manifest, then let's create one.
         if (manifest == null) {
             manifest = new Manifest()
@@ -91,8 +93,8 @@ class ManifestResourceTransformer implements Transformer {
             }
         }
 
-        jos.putNextEntry(new JarEntry(JarFile.MANIFEST_NAME))
-        manifest.write(jos)
+        os.putNextEntry(new ZipEntry(JarFile.MANIFEST_NAME))
+        manifest.write(os)
     }
 
     ManifestResourceTransformer attributes(Map<String, ?> attributes) {

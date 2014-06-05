@@ -20,6 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipOutputStream
 
 import java.util.jar.JarOutputStream
 
@@ -40,5 +41,5 @@ interface Transformer {
 
     boolean hasTransformedResource()
 
-    void modifyOutputStream(JarOutputStream jos)
+    void modifyOutputStream(ZipOutputStream jos)
 }

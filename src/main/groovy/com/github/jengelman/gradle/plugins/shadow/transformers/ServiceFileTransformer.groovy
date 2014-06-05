@@ -20,10 +20,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
-
-import java.util.jar.JarEntry
-import java.util.jar.JarOutputStream
 
 /**
  * Modified from org.apache.maven.plugins.shade.resource.ServiceResourceTransformer.java
@@ -67,15 +66,15 @@ class ServiceFileTransformer implements Transformer {
     }
 
     @Override
-    void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(ZipOutputStream os) {
         serviceEntries.each { String path, ServiceStream stream ->
-            jos.putNextEntry(new JarEntry(path))
-            IOUtil.copy(stream.toInputStream(), jos)
-            jos.closeEntry()
+            os.putNextEntry(new ZipEntry(path))
+            IOUtil.copy(stream.toInputStream(), os)
+            os.closeEntry()
         }
     }
 
-    static class ServiceStream extends ByteArrayOutputStream{
+    static class ServiceStream extends ByteArrayOutputStream {
 
         public ServiceStream(){
             super( 1024 );

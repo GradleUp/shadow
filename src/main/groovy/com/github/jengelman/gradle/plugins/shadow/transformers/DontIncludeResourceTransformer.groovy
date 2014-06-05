@@ -20,8 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-
-import java.util.jar.JarOutputStream
+import org.apache.tools.zip.ZipOutputStream
 
 /**
  * A resource processor that prevents the inclusion of an arbitrary
@@ -51,7 +50,7 @@ class DontIncludeResourceTransformer implements Transformer {
         return false
     }
 
-    void modifyOutputStream(JarOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os) {
         // no op
     }
 }

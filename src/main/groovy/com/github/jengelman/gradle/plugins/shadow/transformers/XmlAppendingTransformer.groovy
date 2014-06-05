@@ -20,6 +20,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
 import org.jdom.*
 import org.jdom.input.SAXBuilder
 import org.jdom.output.Format
@@ -27,9 +29,6 @@ import org.jdom.output.XMLOutputter
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
-
-import java.util.jar.JarEntry
-import java.util.jar.JarOutputStream
 
 /**
  * Appends multiple occurrences of some XML file.
@@ -90,8 +89,7 @@ class XmlAppendingTransformer implements Transformer {
             }
 
             root.children.each { Content n ->
-
-                doc.getRootElement().addContent(n)
+                doc.getRootElement().addContent(n.clone())
             }
         }
     }
@@ -100,10 +98,9 @@ class XmlAppendingTransformer implements Transformer {
         return doc != null
     }
 
-    void modifyOutputStream(JarOutputStream jos) {
-        jos.putNextEntry(new JarEntry(resource))
-
-        new XMLOutputter(Format.getPrettyFormat()).output(doc, jos)
+    void modifyOutputStream(ZipOutputStream os) {
+        os.putNextEntry(new ZipEntry(resource))
+        new XMLOutputter(Format.getPrettyFormat()).output(doc, os)
 
         doc = null
     }

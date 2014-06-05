@@ -20,15 +20,14 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 import org.gradle.mvn3.org.codehaus.plexus.util.ReaderFactory
 import org.gradle.mvn3.org.codehaus.plexus.util.WriterFactory
 import org.gradle.mvn3.org.codehaus.plexus.util.xml.Xpp3Dom
 import org.gradle.mvn3.org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.gradle.mvn3.org.codehaus.plexus.util.xml.Xpp3DomWriter
-
-import java.util.jar.JarEntry
-import java.util.jar.JarOutputStream
 
 /**
  * A resource processor that aggregates plexus <code>components.xml</code> files.
@@ -112,12 +111,12 @@ class ComponentsXmlResourceTransformer implements Transformer {
         }
     }
 
-    void modifyOutputStream(JarOutputStream jos) {
+    void modifyOutputStream(ZipOutputStream os) {
         byte[] data = getTransformedResource()
 
-        jos.putNextEntry(new JarEntry(COMPONENTS_XML_PATH))
+        os.putNextEntry(new ZipEntry(COMPONENTS_XML_PATH))
 
-        IOUtil.copy(data, jos)
+        IOUtil.copy(data, os)
 
         components.clear()
     }

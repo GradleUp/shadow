@@ -1,47 +1,56 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import org.gradle.api.artifacts.Configuration
-import com.github.jengelman.gradle.plugins.shadow.tasks.KnowsTask
-import com.github.jengelman.gradle.plugins.shadow.tasks.OutputSignedLibsTask
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.DependencySet
+import org.gradle.api.artifacts.PublishArtifact
+import org.gradle.api.internal.java.JavaLibrary
 import org.gradle.api.plugins.JavaPlugin
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowTask
+import org.gradle.api.plugins.JavaPluginConvention
 
-class ShadowPlugin implements Plugin<Project>{
-
-    static final String GROUP = "Shadow"
+class ShadowPlugin implements Plugin<Project> {
 
     @Override
-    public void apply(Project project) {
-        project.plugins.apply JavaPlugin
-        addShadow(project)
+    void apply(Project project) {
+
+        project.plugins.apply(JavaPlugin)
+        createShadowConfiguration(project)
+        configureShadowTask(project)
     }
 
-    void addShadow(Project project) {
+    private void createShadowConfiguration(Project project) {
+        project.configurations.create('shadow')
+    }
 
-        ["compile", "runtime"].each { config ->
-            Configuration signed = project.configurations.create "signed${config.capitalize()}"
-            Configuration original = project.configurations.getByName config
-            original.extendsFrom = (original.extendsFrom + signed) as Set
+    private void configureShadowTask(Project project) {
+        JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
+        ShadowJar shadow = project.tasks.create('shadowJar', ShadowJar)
+        shadow.conventionMapping.with {
+            map('classifier') {
+                'all'
+            }
+            map('manifest') {
+                project.tasks.jar.manifest
+            }
+        }
+        shadow.from(convention.sourceSets.main.output)
+        shadow.from(project.configurations.runtime)
+        shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+
+        PublishArtifact shadowArtifact = project.artifacts.add('shadow', shadow)
+        project.components.add(new ShadowJavaLibrary(shadowArtifact, project.configurations.shadow.allDependencies))
+    }
+
+    class ShadowJavaLibrary extends JavaLibrary {
+
+        ShadowJavaLibrary(PublishArtifact jarArtifact, DependencySet runtimeDependencies) {
+            super(jarArtifact, runtimeDependencies)
         }
 
-        project.extensions.create(ShadowExtension.NAME, ShadowExtension, project)
-
-        KnowsTask knows = project.tasks.create(KnowsTask.NAME, KnowsTask)
-        knows.description = KnowsTask.DESC
-        knows.group = GROUP
-
-        OutputSignedLibsTask signedCopyTask = project.tasks.create(OutputSignedLibsTask.NAME, OutputSignedLibsTask)
-        signedCopyTask.description = OutputSignedLibsTask.DESC
-        signedCopyTask.group = GROUP
-        signedCopyTask.from project.configurations.signedCompile
-        signedCopyTask.from project.configurations.signedRuntime
-        signedCopyTask.into project.shadow.signedLibsDir
-
-        ShadowTask shadow = project.tasks.create(ShadowTask.NAME, ShadowTask)
-        shadow.description = ShadowTask.DESC
-        shadow.group = GROUP
-        shadow.dependsOn project.tasks.jar, signedCopyTask
+        @Override
+        String getName() {
+            return 'shadow'
+        }
     }
 }

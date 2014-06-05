@@ -20,10 +20,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
-
-import java.util.jar.JarEntry
-import java.util.jar.JarOutputStream
 
 /**
  * A resource processor that appends content for a resource, separated by a newline.
@@ -57,10 +56,10 @@ class AppendingTransformer implements Transformer {
         return data.size() > 0
     }
 
-    void modifyOutputStream(JarOutputStream jos) {
-        jos.putNextEntry(new JarEntry(resource))
+    void modifyOutputStream(ZipOutputStream os) {
+        os.putNextEntry(new ZipEntry(resource))
 
-        IOUtil.copy(new ByteArrayInputStream(data.toByteArray()), jos)
+        IOUtil.copy(new ByteArrayInputStream(data.toByteArray()), os)
         data.reset()
     }
 }

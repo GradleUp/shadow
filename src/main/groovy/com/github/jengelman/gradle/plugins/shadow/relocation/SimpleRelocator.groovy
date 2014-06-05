@@ -48,6 +48,10 @@ class SimpleRelocator implements Relocator {
 
     private final boolean rawString
 
+    SimpleRelocator() {
+
+    }
+
     SimpleRelocator(String patt, String shadedPattern, List<String> includes, List<String> excludes) {
         this(patt, shadedPattern, includes, excludes, false)
     }
@@ -84,6 +88,16 @@ class SimpleRelocator implements Relocator {
         this.excludes = normalizePatterns(excludes)
     }
 
+    SimpleRelocator include(String pattern) {
+        this.includes.addAll normalizePatterns([pattern])
+        return this
+    }
+
+    SimpleRelocator exclude(String pattern) {
+        this.excludes.addAll normalizePatterns([pattern])
+        return this
+    }
+
     private static Set<String> normalizePatterns(Collection<String> patterns) {
         Set<String> normalized = null
 
@@ -103,7 +117,7 @@ class SimpleRelocator implements Relocator {
             }
         }
 
-        return normalized
+        return normalized ?: []
     }
 
     private boolean isIncluded(String path) {
