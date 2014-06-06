@@ -13,25 +13,30 @@ import org.gradle.api.plugins.JavaPluginConvention
 
 class ShadowPlugin implements Plugin<Project> {
 
+    static final String EXTENSION_NAME = 'shadow'
+    static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
+    static final String CONFIGURATION_NAME = 'shadow'
+    static final String SHADOW_COMPONENT_NAME = 'shadow'
+
     @Override
     void apply(Project project) {
 
         project.plugins.apply(JavaPlugin)
-        project.extensions.create('shadow', ShadowExtension, project)
+        project.extensions.create(EXTENSION_NAME, ShadowExtension, project)
         createShadowConfiguration(project)
         configureShadowTask(project)
         project.plugins.withType(ApplicationPlugin) {
-            new ApplicationConfigurer(project.tasks.findByName('shadowJar')).execute(project)
+            new ApplicationConfigurer(project.tasks.findByName(SHADOW_JAR_TASK_NAME)).execute(project)
         }
     }
 
     private void createShadowConfiguration(Project project) {
-        project.configurations.create('shadow')
+        project.configurations.create(CONFIGURATION_NAME)
     }
 
     private void configureShadowTask(Project project) {
         JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
-        ShadowJar shadow = project.tasks.create('shadowJar', ShadowJar)
+        ShadowJar shadow = project.tasks.create(SHADOW_JAR_TASK_NAME, ShadowJar)
         shadow.conventionMapping.with {
             map('classifier') {
                 'all'
@@ -56,7 +61,7 @@ class ShadowPlugin implements Plugin<Project> {
 
         @Override
         String getName() {
-            return 'shadow'
+            return SHADOW_COMPONENT_NAME
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
@@ -15,6 +17,12 @@ import org.gradle.api.tasks.bundling.Zip
 
 class ApplicationConfigurer {
 
+    static final String SHADOW_RUN_TASK_NAME = 'runShadow'
+    static final String SHADOW_SCRIPTS_TASK_NAME = 'startShadowScripts'
+    static final String SHADOW_INSTAL_TASK_NAME = 'installShadowApp'
+    static final String SHADOW_ZIP_DIST_TASK_NAME = 'distShadowZip'
+    static final String SHADOW_TAR_DIST_TASK_NAME = 'distShadowTar'
+
     private final Jar jar
 
     ApplicationConfigurer(Jar jar) {
@@ -26,7 +34,8 @@ class ApplicationConfigurer {
         addRunTask(project)
         addCreateScriptsTask(project)
 
-        configureDistSpec(project, project.extensions.shadow.applicationDistribution)
+        ShadowExtension extension = project.extensions.findByName(ShadowPlugin.EXTENSION_NAME)
+        configureDistSpec(project, extension.applicationDistribution)
 
         addInstallTask(project)
         addDistZipTask(project)
@@ -34,9 +43,10 @@ class ApplicationConfigurer {
     }
 
     private void addRunTask(Project project) {
-        ApplicationPluginConvention pluginConvention = project.convention.plugins.application
+        ApplicationPluginConvention pluginConvention = (
+                ApplicationPluginConvention) project.convention.plugins.application
 
-        def run = project.tasks.create('runShadow', JavaExec)
+        def run = project.tasks.create(SHADOW_RUN_TASK_NAME, JavaExec)
         run.description  = 'Runs this project as a JVM application using the shadow jar'
         run.group = ApplicationPlugin.APPLICATION_GROUP
         run.classpath = jar.outputs.files + project.configurations.shadow
@@ -45,9 +55,10 @@ class ApplicationConfigurer {
     }
 
     private void addCreateScriptsTask(Project project) {
-        ApplicationPluginConvention pluginConvention = project.convention.plugins.application
+        ApplicationPluginConvention pluginConvention =
+                (ApplicationPluginConvention) project.convention.plugins.application
 
-        def startScripts = project.tasks.create('startShadowScripts', CreateStartScripts)
+        def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts)
         startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
         startScripts.group = ApplicationPlugin.APPLICATION_GROUP
         startScripts.classpath = project.tasks.shadowJar.outputs.files + project.configurations.shadow
@@ -58,12 +69,14 @@ class ApplicationConfigurer {
     }
 
     private void addInstallTask(Project project) {
-        ApplicationPluginConvention pluginConvention = project.convention.plugins.application
+        ApplicationPluginConvention pluginConvention =
+                (ApplicationPluginConvention) project.convention.plugins.application
+        ShadowExtension extension = project.extensions.findByName(ShadowPlugin.EXTENSION_NAME)
 
-        def installTask = project.tasks.create('installShadowApp', Sync)
+        def installTask = project.tasks.create(SHADOW_INSTAL_TASK_NAME, Sync)
         installTask.description = "Installs the project as a JVM application along with libs and OS specific scripts."
         installTask.group = ApplicationPlugin.APPLICATION_GROUP
-        installTask.with project.extensions.shadow.applicationDistribution
+        installTask.with extension.applicationDistribution
         installTask.into { project.file("${project.buildDir}/installShadow/${pluginConvention.applicationName}") }
         installTask.doFirst {
             if (destinationDir.directory) {
@@ -81,11 +94,11 @@ class ApplicationConfigurer {
     }
 
     private void addDistZipTask(Project project) {
-        addArchiveTask(project, 'distShadowZip', Zip)
+        addArchiveTask(project, SHADOW_ZIP_DIST_TASK_NAME, Zip)
     }
 
     private void addDistTarTask(Project project) {
-        addArchiveTask(project, 'distShadowTar', Tar)
+        addArchiveTask(project, SHADOW_TAR_DIST_TASK_NAME, Tar)
     }
 
     private <T extends AbstractArchiveTask> void addArchiveTask(Project project, String name, Class<T> type) {
