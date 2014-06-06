@@ -41,6 +41,78 @@ be used to add dependencies that are excluded from the shadowing.
 
 ## Advanced Configuration
 
+### Configure MANIFEST file
+
+By default, uses the same manifest as the `Jar` task.
+
+```
+jar {
+  manifest {
+    attributes("Implementation-Title": "Gradle", "Implementation-Version": version)
+  }
+}
+```
+
+### Modifying the MANIFEST file
+
+Append to the Jar MANIFEST
+
+```
+shadowJar {
+  appendManifest {
+    attributes 'Test-Entry': 'PASSED'
+  }
+}
+```
+
+Replace the Jar MANIFEST
+
+```
+shadowJar {
+  manifest {
+    attributes("Implementation-Title": "Gradle", "Implementation-Version": version)
+  }
+}
+```
+
+### Merging Service files
+
+```
+shadowJar {
+  mergeServiceFiles()
+}
+```
+
+**OR**
+
+```
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
+shadowJar {
+  transform(ServiceFileTransformer)
+}
+```
+
+### Appending Files
+
+```
+shadowJar {
+  append('NOTICE')
+}
+```
+
+**OR**
+
+```
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+
+shadowJar {
+  transform(AppendingTransformer) {
+    resource = 'NOTICE'
+  }
+}
+```
+
 ### Filtering shadow jar contents by file pattern
 
 ```
@@ -75,17 +147,61 @@ shadowJar {
 }
 ```
 
-TODO need example of excluding a dependency but including one of its transitives
+Exclude a dependency and its transitives, except specified subset
+
+**Not currently supported**
 
 ### Relocating dependencies
 
+```
+shadowJar {
+  relocate 'org.objectweb.asm', 'myjarjarasm.asm'
+}
+```
+
+### Filtering files in relocation
+
+```
+shadowJar {
+  relocate('org.objectweb.asm', 'myjarjarasm.asm') {
+    exclude 'org.objectweb.asm.ClassReader'
+  }
+}
+```
+
 ### Transforming resources
+
+Uses the [Transformer](src/main/grovy/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.groovy) interface.
+
+```
+shadowJar {
+  transform(<Transformer class>) {
+    //..configure the Transformer class instance
+  }
+}
+```
 
 ### Changing the Default configuration for shadow jar
 
 TODO - need to implement this
 
-### Publishing the shadow jar
+### Publishing the shadow jar as an additional resource to the main jar
+
+```
+apply plugin: 'shadow'
+apply plugin: 'maven-publish'
+
+publishing {
+  publications {
+    shadow(MavenPublication) {
+      from components.java
+      artifact shadowJar
+    }
+  }
+}
+```
+
+### Publishing the shadow jar as a standalone artifact
 
 ```
 apply plugin: 'shadow'
