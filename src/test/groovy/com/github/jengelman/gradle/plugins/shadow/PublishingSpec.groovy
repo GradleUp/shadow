@@ -173,6 +173,10 @@ dependencies {
         success(result)
 
         and:
-        assert file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
+        File installedJar = file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
+        assert installedJar.exists()
+
+        and:
+        contains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
     }
 }
