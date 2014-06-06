@@ -43,7 +43,6 @@ dependencies {
     testUtilsCompile gradleApi()
 
     testCompile configurations.testUtilsCompile
-    testCompile sourceSets.testUtils.output
     testCompile 'com.github.jengelman.gradle.plugins:gradle-test-kit:0.2'
     testCompile("org.spockframework:spock-core:0.7-groovy-1.8") {
         exclude module: 'groovy-all'
@@ -62,4 +61,7 @@ idea {
         scopes.TEST.plus += configurations.testUtilsRuntime
     }
 }
+
+sourceSets.test.compileClasspath += sourceSets.testUtils.output
+sourceSets.test.runtimeClasspath += sourceSets.testUtils.output
 
