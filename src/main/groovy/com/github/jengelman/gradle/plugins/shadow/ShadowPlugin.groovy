@@ -17,6 +17,7 @@ class ShadowPlugin implements Plugin<Project> {
     static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
     static final String CONFIGURATION_NAME = 'shadow'
     static final String SHADOW_COMPONENT_NAME = 'shadow'
+    static final String SHADOW_GROUP = 'Shadow'
 
     @Override
     void apply(Project project) {
@@ -37,6 +38,8 @@ class ShadowPlugin implements Plugin<Project> {
     private void configureShadowTask(Project project) {
         JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
         ShadowJar shadow = project.tasks.create(SHADOW_JAR_TASK_NAME, ShadowJar)
+        shadow.group = SHADOW_GROUP
+        shadow.description = 'Create a single executable JAR'
         shadow.conventionMapping.with {
             map('classifier') {
                 'all'
