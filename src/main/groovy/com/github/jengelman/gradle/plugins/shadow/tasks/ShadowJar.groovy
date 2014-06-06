@@ -26,7 +26,6 @@ class ShadowJar extends Jar {
 
     List<Transformer> transformers = []
     List<Relocator> relocators = []
-    boolean stats = false
 
     private final ShadowStats shadowStats = new ShadowStats()
 
@@ -40,9 +39,7 @@ class ShadowJar extends Jar {
     @TaskAction
     protected void copy() {
         super.copy()
-        if (stats) {
-            logger.info(shadowStats.toString())
-        }
+        logger.info(shadowStats.toString())
     }
 
     protected ZipCompressor getCustomCompressor() {
