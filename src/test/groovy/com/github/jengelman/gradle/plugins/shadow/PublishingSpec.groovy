@@ -132,4 +132,47 @@ publishing {
         assert dependency.artifactId.text() == 'b'
         assert dependency.version.text() == '1.0'
     }
+
+    def 'integrating with application plugin'() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('a2.properties', 'a2')
+                .publish()
+
+        file('src/main/java/myapp/Main.java') << """package myapp;
+public class Main {
+    static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}
+"""
+        buildFile << """
+apply plugin: 'shadow'
+apply plugin: 'application'
+
+mainClassName = 'myapp.Main'
+
+version = '1.0'
+
+repositories {
+    maven { url "${repo.uri}" }
+}
+
+dependencies {
+    compile 'shadow:a:1.0'
+}
+"""
+        settingsFile << "rootProject.name = 'myapp'"
+
+        when:
+        runner.arguments << 'installShadow'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        assert file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
+    }
 }

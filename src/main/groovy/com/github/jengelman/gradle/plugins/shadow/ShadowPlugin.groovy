@@ -1,11 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.internal.ApplicationConfigurer
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.internal.java.JavaLibrary
+import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 
@@ -15,8 +17,12 @@ class ShadowPlugin implements Plugin<Project> {
     void apply(Project project) {
 
         project.plugins.apply(JavaPlugin)
+        project.extensions.create('shadow', ShadowExtension, project)
         createShadowConfiguration(project)
         configureShadowTask(project)
+        project.plugins.withType(ApplicationPlugin) {
+            new ApplicationConfigurer(project.tasks.findByName('shadowJar')).execute(project)
+        }
     }
 
     private void createShadowConfiguration(Project project) {
