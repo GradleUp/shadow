@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
+import spock.lang.Ignore
 
 class FilteringSpec extends PluginSpecification {
 
@@ -51,47 +52,19 @@ shadowJar {
         given:
         repo.module('shadow', 'c', '1.0')
                 .insertFile('c.properties', 'c')
-                .dependsOn('b')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .dependsOn('c')
                 .publish()
 
         buildFile << '''
 dependencies {
-    compile 'shadow:c:1.0'
+    compile 'shadow:d:1.0'
 }
 
 shadowJar {
-    exclude(dependency('shadow:c:1.0'))
-}
-'''
-
-        when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
-
-        then:
-        success(result)
-
-        and:
-        contains(output, ['a.properties', 'a2.properties'])
-
-        and:
-        doesNotContain(output, ['b.properties', 'c.properties'])
-    }
-
-    def "exclude dependency but retain transitives"() {
-        given:
-        repo.module('shadow', 'c', '1.0')
-                .insertFile('c.properties', 'c')
-                .dependsOn('b')
-                .publish()
-
-        buildFile << '''
-dependencies {
-    compile 'shadow:c:1.0'
-}
-
-shadowJar {
-    exclude(dependency('shadow:c:1.0'), false)
+    exclude(dependency('shadow:d:1.0'))
 }
 '''
 
@@ -106,7 +79,41 @@ shadowJar {
         contains(output, ['a.properties', 'a2.properties', 'b.properties'])
 
         and:
-        doesNotContain(output, ['c.properties'])
+        doesNotContain(output, ['c.properties', 'd.properties'])
+    }
+
+    def "exclude dependency but retain transitives"() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .dependsOn('c')
+                .publish()
+
+        buildFile << '''
+dependencies {
+    compile 'shadow:d:1.0'
+}
+
+shadowJar {
+    exclude(dependency('shadow:d:1.0'), false)
+}
+'''
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+
+        and:
+        doesNotContain(output, ['d.properties'])
     }
 
     def 'filter project dependencies'() {
@@ -210,6 +217,46 @@ shadowJar {
         contains(serverOutput, [
                 'client/Client.class',
                 'server/Server.class'])
+    }
+
+    @Ignore('need to figure out best way to do nested filtering')
+    def 'exclude a dependency but include one of its dependencies'() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .publish()
+        repo.module('shadow', 'e', '1.0')
+                .insertFile('e.properties', 'e')
+                .dependsOn('c', 'd')
+                .publish()
+
+        buildFile << '''
+dependencies {
+    compile 'shadow:e:1.0'
+}
+
+shadowJar {
+    exclude(dependency('shadow:e:1.0')) {
+        include(dependency('shadow:a:1.0'))
+    }
+}
+'''
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+
+        and:
+        doesNotContain(output, ['d.properties', 'e.properties'])
     }
 
     //http://mail-archives.apache.org/mod_mbox/ant-user/200506.mbox/%3C001d01c57756$6dc35da0$dc00a8c0@CTEGDOMAIN.COM%3E
