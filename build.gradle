@@ -15,7 +15,7 @@ apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
 
 group = 'com.github.jengelman.gradle.plugins'
-version = '0.9.0-M1'
+version = '0.9.0-M2'
 
 ext.isSnapshot = version.endsWith("SNAPSHOT")
 
