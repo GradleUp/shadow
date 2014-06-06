@@ -15,8 +15,6 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.UncheckedIOException
-import org.gradle.api.file.DuplicateFileCopyingException
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
@@ -24,8 +22,6 @@ import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
-import org.gradle.api.internal.file.copy.CopySpecInternal
-import org.gradle.api.internal.file.copy.DefaultCopySpec
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.internal.tasks.SimpleWorkResult
 import org.gradle.api.specs.Spec
@@ -114,7 +110,7 @@ public class ShadowCopyAction implements CopyAction {
         private final PatternSet patternSet
         private final ShadowStats stats
 
-        private Set<RelativePath> visitedFiles = new HashSet<RelativePath>()
+        private Set<String> visitedFiles = new HashSet<String>()
 
         public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers, List<Relocator> relocators,
                             PatternSet patternSet, ShadowStats stats) {
@@ -139,6 +135,10 @@ public class ShadowCopyAction implements CopyAction {
                     fileDetails.relativePath.pathString.endsWith('.zip')
         }
 
+        private boolean recordVisit(RelativePath path) {
+            return visitedFiles.add(path.pathString)
+        }
+
         private void visitFile(FileCopyDetails fileDetails) {
             if (!isArchive(fileDetails)) {
                 try {
@@ -149,7 +149,7 @@ public class ShadowCopyAction implements CopyAction {
                     zipOutStr.putNextEntry(archiveEntry)
                     fileDetails.copyTo(zipOutStr)
                     zipOutStr.closeEntry()
-                    visitedFiles.add(fileDetails.relativePath)
+                    recordVisit(fileDetails.relativePath)
                 } catch (Exception e) {
                     throw new GradleException(String.format("Could not add %s to ZIP '%s'.", fileDetails, zipFile), e)
                 }
@@ -179,7 +179,7 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void visitArchiveDirectory(RelativeArchivePath archiveDir) {
-            if (visitedFiles.add(archiveDir)) {
+            if (recordVisit(archiveDir)) {
                 zipOutStr.putNextEntry(archiveDir.entry)
                 zipOutStr.closeEntry()
             }
@@ -187,20 +187,12 @@ public class ShadowCopyAction implements CopyAction {
 
         private void visitArchiveFile(RelativeArchivePath archiveFile, ZipFile archive) {
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                if (!visitedFiles.add(archiveFile)) {
-                    DuplicatesStrategy strategy = archiveFile.details.duplicatesStrategy
-                    if (strategy == DuplicatesStrategy.EXCLUDE) {
-                        return
-                    } else if (strategy == DuplicatesStrategy.FAIL) {
-                        throw new DuplicateFileCopyingException(String.format("Encountered duplicate path \"%s\" during copy operation configured with DuplicatesStrategy.FAIL", archiveFile))
-                    } else if (strategy == DuplicatesStrategy.WARN) {
-                        log.warn("Encountered duplicate path \"{}\" during copy operation configured with DuplicatesStrategy.WARN", archiveFile)
+                if (recordVisit(archiveFile)) {
+                    if (!remapper.hasRelocators()) {
+                        copyArchiveEntry(archiveFile, archive)
+                    } else {
+                        remapClass(archiveFile, archive)
                     }
-                }
-                if (!remapper.hasRelocators()) {
-                    copyArchiveEntry(archiveFile, archive)
-                } else {
-                    remapClass(archiveFile, archive)
                 }
             } else {
                 transform(archiveFile, archive)
@@ -258,7 +250,7 @@ public class ShadowCopyAction implements CopyAction {
                 archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
                 zipOutStr.putNextEntry(archiveEntry)
                 zipOutStr.closeEntry()
-                visitedFiles.add(dirDetails.relativePath)
+                recordVisit(dirDetails.relativePath)
             } catch (Exception e) {
                 throw new GradleException(String.format("Could not add %s to ZIP '%s'.", dirDetails, zipFile), e)
             }

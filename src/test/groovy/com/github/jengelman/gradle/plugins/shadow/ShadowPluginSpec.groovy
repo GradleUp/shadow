@@ -9,6 +9,8 @@ import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.functional.ExecutionResult
 
+import java.util.jar.JarFile
+
 class ShadowPluginSpec extends PluginSpecification {
 
     def 'apply plugin'() {
@@ -216,5 +218,43 @@ shadowJar {
 
         and:
         doesNotContain(output, ['b.properties'])
+    }
+
+    def "default copying strategy"() {
+        given:
+        AppendableMavenFileRepository repo = repo()
+
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('META-INF/MANIFEST.MF', 'MANIFEST A')
+                .publish()
+
+        repo.module('shadow', 'b', '1.0')
+                .insertFile('META-INF/MANIFEST.MF', 'MANIFEST B')
+                .publish()
+
+        buildFile << """
+apply plugin: ${ShadowPlugin.name}
+
+repositories { maven { url "${repo.uri}" } }
+dependencies {
+    runtime 'shadow:a:1.0'
+    runtime 'shadow:b:1.0'
+}
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+}
+"""
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        JarFile jar = new JarFile(output)
+        assert jar.entries().collect().size() == 2
     }
 }
