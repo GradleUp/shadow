@@ -43,6 +43,29 @@ class ShadowPluginSpec extends PluginSpecification {
 
     }
 
+    def 'apply plugin by id'() {
+        given:
+        buildFile << """
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories { jcenter() }
+dependencies { compile 'junit:junit:3.8.2' }
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+}
+"""
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        assert output.exists()
+    }
+
     def 'shadow copy'() {
         given:
         URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')

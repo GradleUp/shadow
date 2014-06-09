@@ -25,7 +25,7 @@ buildscript {
   }
 }
 
-apply plugin: 'shadow'
+apply plugin: 'com.github.johnrengelman.shadow'
 ```
 
 
@@ -188,7 +188,7 @@ TODO - need to implement this
 ### Publishing the shadow jar as an additional resource to the main jar
 
 ```
-apply plugin: 'shadow'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
 
 publishing {
@@ -204,7 +204,7 @@ publishing {
 ### Publishing the shadow jar as a standalone artifact
 
 ```
-apply plugin: 'shadow'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
 
 shadowJar {

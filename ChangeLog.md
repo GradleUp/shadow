@@ -3,6 +3,7 @@ v0.9.0-M2
 
 + Added integration with `application` plugin to replace old `OutputSignedJars` task
 + Fixed bug that resulted in duplicate file entries in the resulting Jar
++ Changed plugin id to 'com.github.johnrengelman.shadow' to support Gradle 2.x plugin infrastructure.
 
 v0.9.0-M1
 =========

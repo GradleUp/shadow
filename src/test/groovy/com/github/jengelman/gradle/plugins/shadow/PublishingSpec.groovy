@@ -148,7 +148,7 @@ public class Main {
 }
 """
         buildFile << """
-apply plugin: 'shadow'
+apply plugin: ${ShadowPlugin.name}
 apply plugin: 'application'
 
 mainClassName = 'myapp.Main'
