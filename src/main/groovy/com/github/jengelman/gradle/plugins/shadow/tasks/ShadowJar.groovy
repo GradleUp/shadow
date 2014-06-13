@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import org.apache.commons.io.FilenameUtils
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
@@ -107,7 +108,7 @@ class ShadowJar extends Jar {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
                 project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
-            this.exclude(file.path.substring(file.path.lastIndexOf('/')+1)) //Get just the file name
+            this.exclude(FilenameUtils.getName(file.path))
         }
         return this
     }
@@ -123,7 +124,7 @@ class ShadowJar extends Jar {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
                 project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
-            this.include(file.path.substring(file.path.lastIndexOf('/')+1))
+            this.include(FilenameUtils.getName(file.path))
         }
         return this
     }

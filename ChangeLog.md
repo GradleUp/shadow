@@ -1,3 +1,8 @@
+v0.9.0-M3
+=========
+
++ Use commons.io FilenameUtils to determine name of resolved jars for including/excluding
+
 v0.9.0-M2
 =========
 
