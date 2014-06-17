@@ -1,6 +1,11 @@
 apply plugin: 'bintray'
 apply plugin: 'maven-publish'
 
+group = 'com.github.jengelman.gradle.plugins'
+version = file('version.txt').text
+
+ext.isSnapshot = version.endsWith("SNAPSHOT")
+
 def pomConfig = {
     licenses {
         license {
@@ -35,6 +40,11 @@ publishing {
 }
 
 bintrayUpload { task ->
+    doFirst {
+        if (isSnapshot) {
+            throw new GradleException('Cannot publish SNAPSHOT versions to BinTray!')
+        }
+    }
     gradle.taskGraph.whenReady { taskGraph ->
         if (taskGraph.hasTask(task)) {
             task.user = bintrayUser
