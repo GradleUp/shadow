@@ -27,7 +27,7 @@ class ShadowPlugin implements Plugin<Project> {
         createShadowConfiguration(project)
         configureShadowTask(project)
         project.plugins.withType(ApplicationPlugin) {
-            new ApplicationConfigurer((ShadowJar) project.tasks.findByName(SHADOW_JAR_TASK_NAME)).execute(project)
+            project.plugins.apply(ShadowApplicationPlugin)
         }
     }
 

@@ -1,8 +1,8 @@
-package com.github.jengelman.gradle.plugins.shadow.internal
+package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
-import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
@@ -11,11 +11,10 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Tar
 import org.gradle.api.tasks.bundling.Zip
 
-class ApplicationConfigurer {
+class ShadowApplicationPlugin implements Plugin<Project> {
 
     static final String SHADOW_RUN_TASK_NAME = 'runShadow'
     static final String SHADOW_SCRIPTS_TASK_NAME = 'startShadowScripts'
@@ -23,14 +22,12 @@ class ApplicationConfigurer {
     static final String SHADOW_ZIP_DIST_TASK_NAME = 'distShadowZip'
     static final String SHADOW_TAR_DIST_TASK_NAME = 'distShadowTar'
 
-    private final Jar jar
+    private Project project
 
-    ApplicationConfigurer(Jar jar) {
-        assert jar
-        this.jar = jar
-    }
+    @Override
+    void apply(Project project) {
+        this.project = project
 
-    public void execute(Project project) {
         addRunTask(project)
         addCreateScriptsTask(project)
 
@@ -133,4 +130,7 @@ class ApplicationConfigurer {
         distSpec
     }
 
+    private ShadowJar getJar() {
+        project.tasks.findByName(ShadowPlugin.SHADOW_JAR_TASK_NAME)
+    }
 }
