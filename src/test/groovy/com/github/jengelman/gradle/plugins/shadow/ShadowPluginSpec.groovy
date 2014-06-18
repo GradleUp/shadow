@@ -9,6 +9,9 @@ import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.functional.ExecutionResult
+import org.gradle.testkit.functional.GradleRunner
+import org.gradle.testkit.functional.GradleRunnerFactory
+import spock.lang.Unroll
 
 import java.util.jar.JarFile
 
@@ -50,8 +53,14 @@ class ShadowPluginSpec extends PluginSpecification {
 
     }
 
-    def 'apply plugin by id'() {
+    @Unroll
+    def 'apply plugin and run in Gradle #version'() {
         given:
+        GradleRunner versionRunner = GradleRunnerFactory.create() {
+            useGradleVersion(version)
+        }
+        versionRunner.directory = dir.root
+
         buildFile << """
             |apply plugin: 'java'
             |apply plugin: 'com.github.johnrengelman.shadow'
@@ -66,12 +75,15 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        versionRunner.arguments << 'shadowJar'
+        ExecutionResult result = versionRunner.run()
 
         then:
         success(result)
         assert output.exists()
+
+        where:
+        version << ['1.11', '1.12']
     }
 
     def 'shadow copy'() {

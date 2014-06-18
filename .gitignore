@@ -7,3 +7,4 @@ build
 .gradle
 *.orig
 out
+.gradle-test-kit
