@@ -131,6 +131,6 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
 
     private ShadowJar getJar() {
-        project.tasks.findByName(ShadowPlugin.SHADOW_JAR_TASK_NAME)
+        project.tasks.findByName(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME)
     }
 }
