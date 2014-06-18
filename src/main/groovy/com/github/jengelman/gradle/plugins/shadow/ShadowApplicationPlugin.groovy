@@ -31,7 +31,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         addRunTask(project)
         addCreateScriptsTask(project)
 
-        ShadowExtension extension = project.extensions.findByName(ShadowPlugin.EXTENSION_NAME)
+        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
         configureDistSpec(project, extension.applicationDistribution)
 
         addInstallTask(project)
@@ -68,7 +68,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     private void addInstallTask(Project project) {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
-        ShadowExtension extension = project.extensions.findByName(ShadowPlugin.EXTENSION_NAME)
+        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
 
         def installTask = project.tasks.create(SHADOW_INSTAL_TASK_NAME, Sync)
         installTask.description = "Installs the project as a JVM application along with libs and OS specific scripts."

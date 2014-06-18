@@ -23,27 +23,29 @@ class PublishingSpec extends PluginSpecification {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-apply plugin: ${ShadowPlugin.name}
-apply plugin: 'maven'
+            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'maven'
+            |apply plugin: 'java'
+            |
+            |group = 'shadow'
+            |version = '1.0'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies { compile 'shadow:a:1.0' }
+            |
+            |uploadShadow {
+            |   configuration = configurations.shadow
+            |   repositories {
+            |       mavenDeployer {
+            |           repository(url: "${publishingRepo.uri}")
+            |           pom.version = project.version
+            |           pom.groupId = project.group
+            |
+            |       }
+            |   }
+            |}
+        """.stripMargin()
 
-group = 'shadow'
-version = '1.0'
-
-repositories { maven { url "${repo.uri}" } }
-dependencies { compile 'shadow:a:1.0' }
-
-uploadShadow {
-    configuration = configurations.shadow
-    repositories {
-        mavenDeployer {
-            repository(url: "${publishingRepo.uri}")
-            pom.version = project.version
-            pom.groupId = project.group
-
-        }
-    }
-}
-"""
         when:
         runner.arguments << 'upload'
         ExecutionResult result = runner.run()
@@ -73,38 +75,39 @@ uploadShadow {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-apply plugin: ${ShadowPlugin.name}
-apply plugin: 'maven-publish'
+            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'maven-publish'
+            |apply plugin: 'java'
+            |
+            |group = 'shadow'
+            |version = '1.0'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies {
+            |   compile 'shadow:a:1.0'
+            |   shadow 'shadow:b:1.0'
+            |}
+            |
+            |shadowJar {
+            |   classifier = ''
+            |   baseName = 'maven-all'
+            |}
+            |
+            |publishing {
+            |   publications {
+            |       shadow(MavenPublication) {
+            |           from components.shadow
+            |           artifactId = 'maven-all'
+            |       }
+            |   }
+            |   repositories {
+            |       maven {
+            |           url "${publishingRepo.uri}"
+            |       }
+            |   }
+            |}
+        """.stripMargin()
 
-group = 'shadow'
-version = '1.0'
-
-repositories { maven { url "${repo.uri}" } }
-dependencies {
-    compile 'shadow:a:1.0'
-    shadow 'shadow:b:1.0'
-}
-
-shadowJar {
-    classifier = ''
-    baseName = 'maven-all'
-}
-
-publishing {
-    publications {
-        shadow(MavenPublication) {
-            from components.shadow
-            artifactId = 'maven-all'
-        }
-    }
-    repositories {
-        maven {
-            url "${publishingRepo.uri}"
-        }
-    }
-}
-
-"""
         when:
         runner.arguments << 'publish'
         ExecutionResult result = runner.run()
@@ -140,29 +143,33 @@ publishing {
                 .insertFile('a2.properties', 'a2')
                 .publish()
 
-        file('src/main/java/myapp/Main.java') << """package myapp;
-public class Main {
-    static void main(String[] args) {
-        System.out.println("Hello World!");
-    }
-}
-"""
+        file('src/main/java/myapp/Main.java') << """
+            |package myapp;
+            |public class Main {
+            |   static void main(String[] args) {
+            |       System.out.println("Hello World!");
+            |   }
+            |}
+        """.stripMargin()
+
         buildFile << """
-apply plugin: ${ShadowPlugin.name}
-apply plugin: 'application'
+            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'application'
+            |apply plugin: 'java'
+            |
+            |mainClassName = 'myapp.Main'
+            |
+            |version = '1.0'
+            |
+            |repositories {
+            |   maven { url "${repo.uri}" }
+            |}
+            |
+            |dependencies {
+            |   compile 'shadow:a:1.0'
+            |}
+        """.stripMargin()
 
-mainClassName = 'myapp.Main'
-
-version = '1.0'
-
-repositories {
-    maven { url "${repo.uri}" }
-}
-
-dependencies {
-    compile 'shadow:a:1.0'
-}
-"""
         settingsFile << "rootProject.name = 'myapp'"
 
         when:

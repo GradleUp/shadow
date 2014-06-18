@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.internal.ApplicationConfigurer
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,33 +12,26 @@ import org.gradle.api.plugins.JavaPluginConvention
 
 class ShadowPlugin implements Plugin<Project> {
 
-    static final String EXTENSION_NAME = 'shadow'
     static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
-    static final String CONFIGURATION_NAME = 'shadow'
     static final String SHADOW_COMPONENT_NAME = 'shadow'
     static final String SHADOW_GROUP = 'Shadow'
 
     @Override
     void apply(Project project) {
-
-        project.plugins.apply(JavaPlugin)
-        project.extensions.create(EXTENSION_NAME, ShadowExtension, project)
-        createShadowConfiguration(project)
-        configureShadowTask(project)
+        project.plugins.apply(ShadowBasePlugin)
+        project.plugins.withType(JavaPlugin) {
+            configureShadowTask(project)
+        }
         project.plugins.withType(ApplicationPlugin) {
             project.plugins.apply(ShadowApplicationPlugin)
         }
-    }
-
-    private void createShadowConfiguration(Project project) {
-        project.configurations.create(CONFIGURATION_NAME)
     }
 
     private void configureShadowTask(Project project) {
         JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
         ShadowJar shadow = project.tasks.create(SHADOW_JAR_TASK_NAME, ShadowJar)
         shadow.group = SHADOW_GROUP
-        shadow.description = 'Create a single executable JAR'
+        shadow.description = 'Create a combined JAR of project and runtime dependencies'
         shadow.conventionMapping.with {
             map('classifier') {
                 'all'
@@ -52,7 +44,7 @@ class ShadowPlugin implements Plugin<Project> {
         shadow.from(project.configurations.runtime)
         shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
 
-        PublishArtifact shadowArtifact = project.artifacts.add('shadow', shadow)
+        PublishArtifact shadowArtifact = project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, shadow)
         project.components.add(new ShadowJavaLibrary(shadowArtifact, project.configurations.shadow.allDependencies))
     }
 

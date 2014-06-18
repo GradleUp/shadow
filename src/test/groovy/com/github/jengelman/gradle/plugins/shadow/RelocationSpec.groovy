@@ -8,21 +8,23 @@ class RelocationSpec extends PluginSpecification {
     def "relocate dependency files"() {
         given:
         buildFile << """
-apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { jcenter() }
+            |
+            |dependencies {
+            |   compile 'junit:junit:3.8.2'
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   relocate 'junit.textui', 'a'
+            |   relocate 'junit.framework', 'b'
+            |}
+        """.stripMargin()
 
-repositories { jcenter() }
-
-dependencies {
-    compile 'junit:junit:3.8.2'
-}
-
-shadowJar {
-    baseName = 'shadow'
-    classifier = null
-    relocate 'junit.textui', 'a'
-    relocate 'junit.framework', 'b'
-}
-"""
         when:
         runner.arguments << 'shadowJar'
         ExecutionResult result = runner.run()
@@ -72,25 +74,27 @@ shadowJar {
     def "relocate dependency files with filtering"() {
         given:
         buildFile << """
-apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { jcenter() }
+            |
+            |dependencies {
+            |   compile 'junit:junit:3.8.2'
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   relocate('junit.textui', 'a') {
+            |       exclude 'junit.textui.TestRunner'
+            |   }
+            |   relocate('junit.framework', 'b') {
+            |       include 'junit.framework.Test*'
+            |   }
+            |}
+        """.stripMargin()
 
-repositories { jcenter() }
-
-dependencies {
-    compile 'junit:junit:3.8.2'
-}
-
-shadowJar {
-    baseName = 'shadow'
-    classifier = null
-    relocate('junit.textui', 'a') {
-        exclude 'junit.textui.TestRunner'
-    }
-    relocate('junit.framework', 'b') {
-        include 'junit.framework.Test*'
-    }
-}
-"""
         when:
         runner.arguments << 'shadowJar'
         ExecutionResult result = runner.run()

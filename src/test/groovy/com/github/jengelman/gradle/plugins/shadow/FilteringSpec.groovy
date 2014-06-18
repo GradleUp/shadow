@@ -21,19 +21,21 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-apply plugin: ${ShadowPlugin.name}
+            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'java'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies {
+            |   compile 'shadow:a:1.0'
+            |   compile 'shadow:b:1.0'
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |}
+        """.stripMargin()
 
-repositories { maven { url "${repo.uri}" } }
-dependencies {
-    compile 'shadow:a:1.0'
-    compile 'shadow:b:1.0'
-}
-
-shadowJar {
-    baseName = 'shadow'
-    classifier = null
-}
-"""
     }
 
     def 'include all dependencies'() {
@@ -59,14 +61,14 @@ shadowJar {
                 .publish()
 
         buildFile << '''
-dependencies {
-    compile 'shadow:d:1.0'
-}
-
-shadowJar {
-    exclude(dependency('shadow:d:1.0'))
-}
-'''
+            |dependencies {
+            |   compile 'shadow:d:1.0'
+            |}
+            |
+            |shadowJar {
+            |   exclude(dependency('shadow:d:1.0'))
+            |}
+        '''.stripMargin()
 
         when:
         runner.arguments << 'shadowJar'
@@ -93,14 +95,14 @@ shadowJar {
                 .publish()
 
         buildFile << '''
-dependencies {
-    compile 'shadow:d:1.0'
-}
-
-shadowJar {
-    exclude(dependency('shadow:d:1.0'), false)
-}
-'''
+            |dependencies {
+            |   compile 'shadow:d:1.0'
+            |}
+            |
+            |shadowJar {
+            |   exclude(dependency('shadow:d:1.0'), false)
+            |}
+        '''.stripMargin()
 
         when:
         runner.arguments << 'shadowJar'
@@ -119,34 +121,40 @@ shadowJar {
     def 'filter project dependencies'() {
         given:
         file('settings.gradle') << """
-include 'client', 'server'
-"""
-        file('client/src/main/java/client/Client.java') << """package client;
-public class Client {}
-"""
+            |include 'client', 'server'
+        """.stripMargin()
+
+        file('client/src/main/java/client/Client.java') << """
+            |package client;
+            |public class Client {}
+        """.stripMargin()
+
         file('client/build.gradle') << """
-apply plugin: 'java'
-repositories { jcenter() }
-dependencies { compile 'junit:junit:3.8.2' }
-"""
+            |apply plugin: 'java'
+            |repositories { jcenter() }
+            |dependencies { compile 'junit:junit:3.8.2' }
+        """.stripMargin()
 
-        file('server/src/main/java/server/Server.java') << """package server;
-import client.Client;
-public class Server {}
-"""
+        file('server/src/main/java/server/Server.java') << """
+            |package server;
+            |import client.Client;
+            |public class Server {}
+        """.stripMargin()
+
         file('server/build.gradle') << """
-apply plugin: 'java'
-apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { jcenter() }
+            |dependencies { compile project(':client') }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   exclude(project(':client'))
+            |}
+        """.stripMargin()
 
-repositories { jcenter() }
-dependencies { compile project(':client') }
-
-shadowJar {
-    baseName = 'shadow'
-    classifier = null
-    exclude(project(':client'))
-}
-"""
         File serverOutput = file('server/build/libs/shadow.jar')
 
         when:
@@ -169,36 +177,42 @@ shadowJar {
     def 'exclude a transitive project dependency'() {
         given:
         file('settings.gradle') << """
-include 'client', 'server'
-"""
-        file('client/src/main/java/client/Client.java') << """package client;
-public class Client {}
-"""
+            |include 'client', 'server'
+        """.stripMargin()
+
+        file('client/src/main/java/client/Client.java') << """
+            |package client;
+            |public class Client {}
+        """.stripMargin()
+
         file('client/build.gradle') << """
-apply plugin: 'java'
-repositories { jcenter() }
-dependencies { compile 'junit:junit:3.8.2' }
-"""
+            |apply plugin: 'java'
+            |repositories { jcenter() }
+            |dependencies { compile 'junit:junit:3.8.2' }
+        """.stripMargin()
 
-        file('server/src/main/java/server/Server.java') << """package server;
-import client.Client;
-public class Server {}
-"""
+        file('server/src/main/java/server/Server.java') << """
+            |package server;
+            |import client.Client;
+            |public class Server {}
+        """.stripMargin()
+
         file('server/build.gradle') << """
-apply plugin: 'java'
-apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { jcenter() }
+            |dependencies { compile project(':client') }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   exclude(dependency {
+            |       it.moduleGroup == 'junit'
+            |   })
+            |}
+        """.stripMargin()
 
-repositories { jcenter() }
-dependencies { compile project(':client') }
-
-shadowJar {
-    baseName = 'shadow'
-    classifier = null
-    exclude(dependency {
-        it.moduleGroup == 'junit'
-    })
-}
-"""
         File serverOutput = file('server/build/libs/shadow.jar')
 
         when:
@@ -234,16 +248,16 @@ shadowJar {
                 .publish()
 
         buildFile << '''
-dependencies {
-    compile 'shadow:e:1.0'
-}
-
-shadowJar {
-    exclude(dependency('shadow:e:1.0')) {
-        include(dependency('shadow:a:1.0'))
-    }
-}
-'''
+            |dependencies {
+            |   compile 'shadow:e:1.0'
+            |}
+            |
+            |shadowJar {
+            |   exclude(dependency('shadow:e:1.0')) {
+            |       include(dependency('shadow:a:1.0'))
+            |   }
+            |}
+        '''.stripMargin()
 
         when:
         runner.arguments << 'shadowJar'
@@ -263,12 +277,13 @@ shadowJar {
     def 'verify exclude precendence over include'() {
         given:
         buildFile << """
-shadowJar {
-    include '*.jar'
-    include '*.properties'
-    exclude 'a2.properties'
-}
-"""
+            |shadowJar {
+            |   include '*.jar'
+            |   include '*.properties'
+            |   exclude 'a2.properties'
+            |}
+        """.stripMargin()
+
         when:
         runner.arguments << 'shadowJar'
         ExecutionResult result = runner.run()
