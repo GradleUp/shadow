@@ -26,13 +26,12 @@ sourceSets {
 }
 
 dependencies {
+
     compile localGroovy()
     compile gradleApi()
     compile 'jdom:jdom:1.1'
     compile 'asm:asm:3.3.1'
     compile 'asm:asm-commons:3.3.1'
-    compile 'org.apache.ant:ant:1.9.3'
-    compile 'org.apache.commons:commons-io:1.3.2'
 
     testUtilsCompile localGroovy()
     testUtilsCompile gradleApi()

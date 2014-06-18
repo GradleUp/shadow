@@ -22,8 +22,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipOutputStream
 
-import java.util.jar.JarOutputStream
-
 /**
  * Modified from org.apache.maven.plugins.shade.resource.ResourceTransformer.java
  * Original

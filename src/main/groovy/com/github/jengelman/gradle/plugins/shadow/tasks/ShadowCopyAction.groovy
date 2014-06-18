@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import groovy.util.logging.Slf4j
@@ -23,6 +22,7 @@ import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
+import org.gradle.api.internal.file.copy.ZipCompressor
 import org.gradle.api.internal.tasks.SimpleWorkResult
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.WorkResult

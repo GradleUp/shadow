@@ -1,17 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import static org.gradle.api.tasks.bundling.ZipEntryCompression.*
-
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.apache.commons.io.FilenameUtils
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.DocumentationRegistry
@@ -33,7 +28,7 @@ class ShadowJar extends Jar {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
-        return new ShadowCopyAction(getArchivePath(), getCustomCompressor(), documentationRegistry,
+        return new ShadowCopyAction(getArchivePath(), getCompressor(), documentationRegistry,
                 transformers, relocators, (PatternSet) mainSpec.getPatternSet(), shadowStats)
     }
 
@@ -43,17 +38,6 @@ class ShadowJar extends Jar {
         logger.info(shadowStats.toString())
     }
 
-    protected ZipCompressor getCustomCompressor() {
-        switch (entryCompression) {
-            case DEFLATED:
-                return new DefaultZipCompressor(zip64, ZipOutputStream.DEFLATED)
-            case STORED:
-                return new DefaultZipCompressor(zip64, ZipOutputStream.STORED)
-            default:
-                throw new IllegalArgumentException(String.format('Unknown Compression type %s', entryCompression))
-        }
-    }
-
     /**
      * Add a Transformer instance for modifying JAR resources and configure.
      * @param clazz
@@ -61,7 +45,7 @@ class ShadowJar extends Jar {
      * @return
      */
     ShadowJar transform(Class<? super Transformer> clazz, Closure c = null) {
-        Transformer transformer = clazz.newInstance()
+        Transformer transformer = (Transformer) clazz.newInstance()
         if (c) {
             ConfigureUtil.configure(c, transformer)
         }
@@ -212,7 +196,7 @@ class ShadowJar extends Jar {
      * @return
      */
     public ShadowJar relocate(Class<? super Relocator> relocatorClass, Closure configure = null) {
-        Relocator relocator = relocatorClass.newInstance()
+        Relocator relocator = (Relocator) relocatorClass.newInstance()
         if (configure) {
             ConfigureUtil.configure(configure, relocator)
         }

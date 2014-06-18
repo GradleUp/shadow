@@ -7,4 +7,5 @@ build
 .gradle
 *.orig
 out
+.gradletasknamecache
 .gradle-test-kit
