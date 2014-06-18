@@ -24,8 +24,8 @@ class TransformerSpec extends PluginSpecification {
             |task shadow(type: ${ShadowJar.name}) {
             |    destinationDir = new File(buildDir, 'libs')
             |    baseName = 'shadow'
-            |    from('${one.path}')
-            |    from('${two.path}')
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
             |    transform(${ServiceFileTransformer.name})
             |}
         """.stripMargin()
@@ -57,8 +57,8 @@ class TransformerSpec extends PluginSpecification {
             |task shadow(type: ${ShadowJar.name}) {
             |    destinationDir = new File(buildDir, 'libs')
             |    baseName = 'shadow'
-            |    from('${one.path}')
-            |    from('${two.path}')
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
             |    mergeServiceFiles()
             |}
         """.stripMargin()
@@ -90,8 +90,8 @@ class TransformerSpec extends PluginSpecification {
             |task shadow(type: ${ShadowJar.name}) {
             |    destinationDir = new File(buildDir, 'libs')
             |    baseName = 'shadow'
-            |    from('${one.path}')
-            |    from('${two.path}')
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
             |    transform(${AppendingTransformer.name}) {
             |        resource = 'test.properties'
             |    }
@@ -126,8 +126,8 @@ class TransformerSpec extends PluginSpecification {
             |task shadow(type: ${ShadowJar.name}) {
             |    destinationDir = new File(buildDir, 'libs')
             |    baseName = 'shadow'
-            |    from('${one.path}')
-            |    from('${two.path}')
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
             |    append('test.properties')
             |}
         """.stripMargin()
@@ -269,8 +269,8 @@ class TransformerSpec extends PluginSpecification {
             |task shadow(type: ${ShadowJar.name}) {
             |   destinationDir = new File(buildDir, 'libs')
             |   baseName = 'shadow'
-            |   from('${xml1.path}')
-            |   from('${xml2.path}')
+            |   from('${escapedPath(xml1)}')
+            |   from('${escapedPath(xml2)}')
             |   transform(${XmlAppendingTransformer.name}) {
             |       resource = 'properties.xml'
             |   }
@@ -296,5 +296,9 @@ class TransformerSpec extends PluginSpecification {
             |</properties>
             |
         |'''.stripMargin()
+    }
+
+    private String escapedPath(File file) {
+        file.path.replaceAll('\\\\', '\\\\\\\\')
     }
 }
