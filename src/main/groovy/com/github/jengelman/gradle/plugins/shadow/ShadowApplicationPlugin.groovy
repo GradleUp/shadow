@@ -34,9 +34,19 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
         configureDistSpec(project, extension.applicationDistribution)
 
+        configureJarMainClass(project)
         addInstallTask(project)
         addDistZipTask(project)
         addDistTarTask(project)
+    }
+
+    private void configureJarMainClass(Project project) {
+        ApplicationPluginConvention pluginConvention = (
+                ApplicationPluginConvention) project.convention.plugins.application
+
+        jar.doFirst {
+            manifest.attributes 'Main-Class': pluginConvention.mainClassName
+        }
     }
 
     private void addRunTask(Project project) {

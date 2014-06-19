@@ -4,6 +4,9 @@ import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileReposi
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
 
+import java.util.jar.Attributes
+import java.util.jar.JarFile
+
 class PublishingSpec extends PluginSpecification {
 
     AppendableMavenFileRepository repo
@@ -187,6 +190,11 @@ class PublishingSpec extends PluginSpecification {
         contains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
 
         and:
+        JarFile jar = new JarFile(installedJar)
+        Attributes attributes = jar.manifest.mainAttributes
+        assert attributes.getValue('Main-Class') == 'myapp.Main'
+
+        then:
         File startScript = file('build/installShadow/myapp/bin/myapp')
         assert startScript.exists()
 

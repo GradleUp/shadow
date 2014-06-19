@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileReposi
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.PublishArtifactSet
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.functional.ExecutionResult
@@ -15,7 +14,6 @@ import spock.lang.Unroll
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
-import java.util.jar.Manifest
 
 class ShadowPluginSpec extends PluginSpecification {
 
@@ -352,8 +350,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         and:
         JarFile jar = new JarFile(output)
-        Manifest manifest = jar.manifest
-        Attributes attributes = manifest.getMainAttributes()
+        Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
         assert classpath == 'lib/junit-3.8.2.jar'
 
