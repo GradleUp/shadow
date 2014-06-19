@@ -5,6 +5,15 @@ v0.9.0-M4
   `ShadowJavaPlugin` and `ShadowApplicationPlugin` are applied in reaction to applying the `java` and `application`
   plugins respectively.
 + Shadow does not applied `java` plugin automatically. `java` or `groovy` must be applied in conjunction with `shadow`.
++ Moved artifact filtering to `artifact {}` block underneath `shadowJar`. This allows better include/exclude control
+  for dependencies.
++ Dependencies added to the `shadow` configuration are automatically added to the `Class-Path` attribute in the manifest
+  for `shadowJar`
++ Applying `application` plugin and settings `mainClassName` automatically configures the `Main-Class` attribute in
+  the manifest for `shadowJar`
++ `runShadow` now utilizes the output of the `shadowJar` and executes using `java -jar <shadow jar file>`
++ Start Scripts for shadow distribution now utilize `java -jar` to execute instead of placing all files on classpath
+  and executing main class.
 
 v0.9.0-M3
 =========

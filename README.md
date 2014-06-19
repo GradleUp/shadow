@@ -21,13 +21,17 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 buildscript {
   repositories { jcenter() }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:0.9.0-M3'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:0.9.0-M4'
   }
 }
 
+apply plugin: 'java' // or 'groovy'. Must be explicitly applied
 apply plugin: 'com.github.johnrengelman.shadow'
 ```
 
+Note: Applying the `ShadowPlugin` to a project applies the majority of its settings via a callback on the application of
+other plugins. For example, the bulk of `shadow` is only added to the project if the `java` or `groovy` plugins are also
+added. Shadow will **not** add them automatically, but instead listens for their application and responds.
 
 ### Using the default plugin task
 
@@ -38,6 +42,19 @@ $ gradle shadowJar //shadow the runtime configuration with project code into ./b
 `shadowJar` by uses the same default configurations as `jar` and additionally configures the `classifier` to be `"all"`.
 Additionally, it creates a 'shadow' configuration and assigns the jar as an artifact of it. This configuration can
 be used to add dependencies that are excluded from the shadowing.
+
+### Integrating with Application Plugin
+
+```
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+```
+
+Applying both `shadow` and `application` to a project will create a number of additional tasks to be created. These
+tasks mimic the `application` plugin but execute using the output of the `shadowJar` task.
+
+Applying the `application` plugin will cause the `shadowJar` to include the `Main-Class` attribute in the manifest of
+the `shadowJar` output. This is configured via the `mainClassName` attribute from the `application` plugin
 
 ## Advanced Configuration
 
@@ -242,6 +259,9 @@ shadowJar {
 
 This examples allows the project to compile against the BouncyCastle encryption library, but then excludes it from
 the shadowed jar, but including it as a dependency on the 'shadow' configuration.
+
+Additionally, any dependencies added to the `shadow` configuration will be added to the `Class-Path` attribute in
+the JAR Manifest for the output of `shadowJar`.
 
 ## ChangeLog
 
