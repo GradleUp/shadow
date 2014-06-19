@@ -136,7 +136,7 @@ class PublishingSpec extends PluginSpecification {
         assert dependency.version.text() == '1.0'
     }
 
-    def 'integrating with application plugin'() {
+    def 'integration with application plugin'() {
         given:
         repo.module('shadow', 'a', '1.0')
                 .insertFile('a.properties', 'a')
@@ -185,5 +185,12 @@ class PublishingSpec extends PluginSpecification {
 
         and:
         contains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
+
+        and:
+        File startScript = file('build/installShadow/myapp/bin/myapp')
+        assert startScript.exists()
+
+        and:
+        println startScript.text
     }
 }

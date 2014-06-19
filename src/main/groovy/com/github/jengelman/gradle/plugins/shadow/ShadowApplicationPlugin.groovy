@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCreateStartScripts
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -55,11 +56,11 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
 
-        def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts)
+        def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, ShadowCreateStartScripts)
         startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
         startScripts.group = ApplicationPlugin.APPLICATION_GROUP
-        startScripts.classpath = project.tasks.shadowJar.outputs.files + project.configurations.shadow
-        startScripts.conventionMapping.mainClassName = { pluginConvention.mainClassName }
+        startScripts.classpath = project.configurations.shadow
+        startScripts.conventionMapping.mainApplicationJar = { project.tasks[ShadowJavaPlugin.SHADOW_JAR_TASK_NAME].archivePath }
         startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
         startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
         startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
