@@ -27,11 +27,6 @@ class StartScriptGenerator {
     Iterable<String> defaultJvmOpts = []
 
     /**
-     * The classpath, relative to the application home directory.
-     */
-    Iterable<String> classpath
-
-    /**
      * The path of the script, relative to the application home directory.
      */
     String scriptRelPath
@@ -50,7 +45,6 @@ class StartScriptGenerator {
     }
 
     String generateUnixScriptContent() {
-        def unixClassPath = classpath.collect { "\$APP_HOME/${it.replace('\\', '/')}" }.join(":")
         def quotedDefaultJvmOpts = defaultJvmOpts.collect{
             //quote ', ", \, $. Probably not perfect. TODO: identify non-working cases, fail-fast on them
             it = it.replace('\\', '\\\\')
@@ -69,8 +63,7 @@ class StartScriptGenerator {
                        mainApplicationJar: mainJarPath,
                        defaultJvmOpts: defaultJvmOptsString,
                        appNameSystemProperty: appNameSystemProperty,
-                       appHomeRelativePath: appHomeRelativePath,
-                       classpath: unixClassPath]
+                       appHomeRelativePath: appHomeRelativePath]
         return generateNativeOutput('unixStartScript.txt', binding, TextUtil.unixLineSeparator)
     }
 
@@ -80,7 +73,6 @@ class StartScriptGenerator {
     }
 
     String generateWindowsScriptContent() {
-        def windowsClassPath = classpath.collect { "%APP_HOME%\\${it.replace('/', '\\')}" }.join(";")
         def appHome = appHomeRelativePath.replace('/', '\\')
         //argument quoting:
         // - " must be encoded as \"
@@ -110,8 +102,7 @@ class StartScriptGenerator {
                        mainApplicationJar: mainJarPath,
                        defaultJvmOpts: defaultJvmOptsString,
                        appNameSystemProperty: appNameSystemProperty,
-                       appHomeRelativePath: appHome,
-                       classpath: windowsClassPath]
+                       appHomeRelativePath: appHome]
         return generateNativeOutput('windowsStartScript.txt', binding, TextUtil.windowsLineSeparator)
 
     }

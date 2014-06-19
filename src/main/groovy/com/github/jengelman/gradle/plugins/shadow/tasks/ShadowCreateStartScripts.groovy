@@ -41,12 +41,6 @@ class ShadowCreateStartScripts extends ConventionTask {
     File mainApplicationJar
 
     /**
-     * The class path for the application.
-     */
-    @InputFiles
-    FileCollection classpath
-
-    /**
      * Returns the name of the application's OPTS environment variable.
      */
     @Input
@@ -89,7 +83,6 @@ class ShadowCreateStartScripts extends ConventionTask {
         generator.defaultJvmOpts = getDefaultJvmOpts()
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
-        generator.classpath = getClasspath().collect { "lib/${it.name}" }
         generator.scriptRelPath = "bin/${getUnixScript().name}"
         generator.generateUnixScript(getUnixScript())
         generator.generateWindowsScript(getWindowsScript())

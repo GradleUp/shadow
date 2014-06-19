@@ -10,7 +10,6 @@ import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
-import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Tar
 import org.gradle.api.tasks.bundling.Zip
@@ -47,8 +46,8 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         def run = project.tasks.create(SHADOW_RUN_TASK_NAME, JavaExec)
         run.description  = 'Runs this project as a JVM application using the shadow jar'
         run.group = ApplicationPlugin.APPLICATION_GROUP
-        run.classpath = jar.outputs.files + project.configurations.shadow
-        run.conventionMapping.main = { pluginConvention.mainClassName }
+        run.main = '-jar'
+        run.args = [jar.archivePath]
         run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
     }
 
@@ -59,7 +58,6 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, ShadowCreateStartScripts)
         startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
         startScripts.group = ApplicationPlugin.APPLICATION_GROUP
-        startScripts.classpath = project.configurations.shadow
         startScripts.conventionMapping.mainApplicationJar = { project.tasks[ShadowJavaPlugin.SHADOW_JAR_TASK_NAME].archivePath }
         startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
         startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }

@@ -65,8 +65,6 @@ cd "`dirname \"\$PRG\"`/${appHomeRelativePath}" >&-
 APP_HOME="`pwd -P`"
 cd "\$SAVED" >&-
 
-CLASSPATH=$classpath
-
 # Determine the Java command to use to start the JVM.
 if [ -n "\$JAVA_HOME" ] ; then
     if [ -x "\$JAVA_HOME/jre/sh/java" ] ; then
@@ -113,7 +111,6 @@ fi
 # For Cygwin, switch paths to Windows format before running java
 if \$cygwin ; then
     APP_HOME=`cygpath --path --mixed "\$APP_HOME"`
-    CLASSPATH=`cygpath --path --mixed "\$CLASSPATH"`
 
     # We build the pattern for arguments to be converted via cygpath
     ROOTDIRSRAW=`find -L / -maxdepth 1 -mindepth 1 -type d 2>/dev/null`
@@ -161,4 +158,4 @@ function splitJvmOpts() {
 eval splitJvmOpts \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$${optsEnvironmentVar}
 <% if ( appNameSystemProperty ) { %>JVM_OPTS[\${#JVM_OPTS[*]}]="-D${appNameSystemProperty}=\$APP_BASE_NAME"<% } %>
 
-exec "\$JAVACMD" "\${JVM_OPTS[@]}" -classpath "\$CLASSPATH" -jar ${mainApplicationJar} "\$@"
+exec "\$JAVACMD" "\${JVM_OPTS[@]}" -jar ${mainApplicationJar} "\$@"

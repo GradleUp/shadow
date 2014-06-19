@@ -191,6 +191,6 @@ class PublishingSpec extends PluginSpecification {
         assert startScript.exists()
 
         and:
-        println startScript.text
+        assert startScript.text.contains("-jar \$APP_HOME/lib/myapp-1.0-all.jar")
     }
 }
