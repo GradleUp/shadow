@@ -50,6 +50,28 @@ class FilteringSpec extends PluginSpecification {
         contains(output, ['a.properties', 'a2.properties', 'b.properties'])
     }
 
+    def 'exclude files'() {
+        given:
+        buildFile << """
+            |shadowJar {
+            |   exclude 'a2.properties'
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'b.properties'])
+
+        and:
+        doesNotContain(output, ['a2.properties'])
+    }
+
     def "exclude dependency and its transitives"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -66,7 +88,7 @@ class FilteringSpec extends PluginSpecification {
             |}
             |
             |shadowJar {
-            |   artifacts {
+            |   dependencies {
             |      exclude(dependency('shadow:d:1.0'))
             |   }
             |}
@@ -102,7 +124,7 @@ class FilteringSpec extends PluginSpecification {
             |}
             |
             |shadowJar {
-            |   artifacts {
+            |   dependencies {
             |       exclude(dependency('shadow:d:1.0'), false)
             |   }
             |}
@@ -143,7 +165,7 @@ class FilteringSpec extends PluginSpecification {
             |}
             |
             |shadowJar {
-            |   artifacts {
+            |   dependencies {
             |       include(dependency('shadow:d:1.0'))
             |   }
             |}
@@ -196,7 +218,7 @@ class FilteringSpec extends PluginSpecification {
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
-            |   artifacts {
+            |   dependencies {
             |       exclude(project(':client'))
             |   }
             |}
@@ -254,7 +276,7 @@ class FilteringSpec extends PluginSpecification {
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
-            |   artifacts {
+            |   dependencies {
             |       exclude(dependency {
             |           it.moduleGroup == 'junit'
             |       })
@@ -302,7 +324,7 @@ class FilteringSpec extends PluginSpecification {
             |}
             |
             |shadowJar {
-            |   artifacts {
+            |   dependencies {
             |       exclude(dependency('shadow:e:1.0')) {
             |           include(dependency('shadow:a:1.0'))
             |       }
