@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.KnowsTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -35,6 +36,10 @@ class ShadowBasePlugin implements Plugin<Project> {
         filteringClassLoader.allowPackage('org.apache.tools.zip')
         project.extensions.create(EXTENSION_NAME, ShadowExtension, project)
         createShadowConfiguration(project)
+
+        KnowsTask knows = project.tasks.create(KnowsTask.NAME, KnowsTask)
+        knows.group = ShadowJavaPlugin.SHADOW_GROUP
+        knows.description = KnowsTask.DESC
     }
 
     private void createShadowConfiguration(Project project) {
