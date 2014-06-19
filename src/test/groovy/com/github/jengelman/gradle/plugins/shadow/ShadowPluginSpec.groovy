@@ -13,7 +13,9 @@ import org.gradle.testkit.functional.GradleRunner
 import org.gradle.testkit.functional.GradleRunnerFactory
 import spock.lang.Unroll
 
+import java.util.jar.Attributes
 import java.util.jar.JarFile
+import java.util.jar.Manifest
 
 class ShadowPluginSpec extends PluginSpecification {
 
@@ -322,5 +324,38 @@ class ShadowPluginSpec extends PluginSpecification {
         and:
         JarFile jar = new JarFile(output)
         assert jar.entries().collect().size() == 2
+    }
+
+    def "add shadow configuration to Class-Path in Manifest"() {
+        given:
+
+        buildFile << """
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |repositories { jcenter() }
+            |dependencies { shadow 'junit:junit:3.8.2' }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        assert output.exists()
+
+        and:
+        JarFile jar = new JarFile(output)
+        Manifest manifest = jar.manifest
+        Attributes attributes = manifest.getMainAttributes()
+        String classpath = attributes.getValue('Class-Path')
+        assert classpath == 'lib/junit-3.8.2.jar'
+
     }
 }

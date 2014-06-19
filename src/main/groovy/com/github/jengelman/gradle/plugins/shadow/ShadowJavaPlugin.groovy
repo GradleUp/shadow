@@ -32,6 +32,10 @@ class ShadowJavaPlugin implements Plugin<Project> {
                 project.tasks.jar.manifest
             }
         }
+        shadow.doFirst {
+            manifest.attributes 'Class-Path': project.configurations.
+                    findByName(ShadowBasePlugin.CONFIGURATION_NAME).files.collect { "lib/${it.name}" }.join(' ')
+        }
         shadow.from(convention.sourceSets.main.output)
         shadow.from(project.configurations.runtime)
         shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
