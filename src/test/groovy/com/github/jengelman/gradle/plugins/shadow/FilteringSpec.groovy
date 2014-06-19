@@ -122,6 +122,47 @@ class FilteringSpec extends PluginSpecification {
         doesNotContain(output, ['d.properties'])
     }
 
+    def "include dependency and transitives, excluding all others"() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .dependsOn('c')
+                .publish()
+
+        file('src/main/java/shadow/Passed.java') << '''
+            |package shadow;
+            |public class Passed {}
+        '''.stripMargin()
+
+        buildFile << '''
+            |dependencies {
+            |   compile 'shadow:d:1.0'
+            |}
+            |
+            |shadowJar {
+            |   artifacts {
+            |       include(dependency('shadow:d:1.0'))
+            |   }
+            |}
+        '''.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['c.properties', 'd.properties', 'shadow/Passed.class'])
+
+        and:
+        doesNotContain(output, ['a.properties', 'a2.properties', 'b.properties'])
+    }
+
     def 'filter project dependencies'() {
         given:
         file('settings.gradle') << """

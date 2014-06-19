@@ -150,6 +150,16 @@ shadowJar {
 }
 ```
 
+Include specific dependencies (includes transitives by default)
+
+```
+shadowJar {
+  artifacts {
+    include(dependency('asm:asm:3.3.1'))
+  }
+}
+```
+
 Remove an external dependency but keep its transitive dependencies
 
 ```
