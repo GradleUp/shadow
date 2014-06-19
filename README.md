@@ -144,7 +144,7 @@ Remove an external dependency and all of its transitive dependencies
 
 ```
 shadowJar {
-  artifacts {
+  dependencies {
     exclude(dependency('asm:asm:3.3.1'))
   }
 }
@@ -154,7 +154,7 @@ Include specific dependencies (includes transitives by default)
 
 ```
 shadowJar {
-  artifacts {
+  dependencies {
     include(dependency('asm:asm:3.3.1'))
   }
 }
@@ -164,7 +164,7 @@ Remove an external dependency but keep its transitive dependencies
 
 ```
 shadowJar {
-  artifacts {
+  dependencies {
     exclude(dependency('asm:asm:3.3.1'), false)
   }
 }
@@ -174,7 +174,7 @@ Exclude a project dependency in a multi-project build
 
 ```
 shadowJar {
-  artifacts {
+  dependencies {
     exclude(project(":myclient"))
   }
 }
@@ -261,7 +261,7 @@ dependencies {
 }
 
 shadowJar {
-  artifacts {
+  dependencies {
     exclude(dependency('org.bouncycastle:bcprov-jdk15on:1.47'))
   }
 }

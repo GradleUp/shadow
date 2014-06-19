@@ -1,19 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import com.github.jengelman.gradle.plugins.shadow.internal.ArtifactFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
-import org.apache.commons.io.FilenameUtils
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
-import org.gradle.api.specs.Spec
-import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.util.PatternSet
@@ -25,17 +20,18 @@ class ShadowJar extends Jar {
     List<Relocator> relocators = []
 
     private final ShadowStats shadowStats = new ShadowStats()
-    private final ArtifactFilter artifactFilter
+    private final DependencyFilter dependencyFilter
 
     ShadowJar() {
-        artifactFilter = new ArtifactFilter(project)
+        dependencyFilter = new DependencyFilter(project)
     }
 
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
         return new ShadowCopyAction(getArchivePath(), getCompressor(), documentationRegistry,
-                transformers, relocators, (PatternSet) mainSpec.getPatternSet(), artifactFilter.patternSet, shadowStats)
+                transformers, relocators, (PatternSet) mainSpec.getPatternSet(),
+                dependencyFilter.patternSet, shadowStats)
     }
 
     @TaskAction
@@ -45,12 +41,12 @@ class ShadowJar extends Jar {
     }
 
     /**
-     * Configure inclusion/exclusion of Jar artifacts into uber jar
+     * Configure inclusion/exclusion of module & project dependencies into uber jar
      * @param c
      * @return
      */
-    ShadowJar artifacts(Closure c) {
-        ConfigureUtil.configure(c, artifactFilter)
+    ShadowJar dependencies(Closure c) {
+        ConfigureUtil.configure(c, dependencyFilter)
         return this
     }
 

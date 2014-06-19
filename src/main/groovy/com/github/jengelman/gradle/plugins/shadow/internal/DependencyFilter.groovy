@@ -9,12 +9,12 @@ import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.util.PatternSet
 
-class ArtifactFilter {
+class DependencyFilter {
 
     private final Project project
     private final CopySpecInternal mainSpec
 
-    ArtifactFilter(Project project) {
+    DependencyFilter(Project project) {
         assert project
         this.project = project
         this.mainSpec = (CopySpecInternal) project.copySpec {}
@@ -31,7 +31,7 @@ class ArtifactFilter {
      * @param includeTransitive exclude the transitive dependencies of any dependency that matches the spec.
      * @return
      */
-    public ArtifactFilter exclude(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
+    public DependencyFilter exclude(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
                 project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
@@ -47,7 +47,7 @@ class ArtifactFilter {
      * @param includeTransitive include the transitive dependencies of any dependency that matches the spec.
      * @return
      */
-    public ArtifactFilter include(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
+    public DependencyFilter include(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
                 project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->

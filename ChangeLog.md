@@ -5,7 +5,7 @@ v0.9.0-M4
   `ShadowJavaPlugin` and `ShadowApplicationPlugin` are applied in reaction to applying the `java` and `application`
   plugins respectively.
 + Shadow does not applied `java` plugin automatically. `java` or `groovy` must be applied in conjunction with `shadow`.
-+ Moved artifact filtering to `artifact {}` block underneath `shadowJar`. This allows better include/exclude control
++ Moved artifact filtering to `dependencies {}` block underneath `shadowJar`. This allows better include/exclude control
   for dependencies.
 + Dependencies added to the `shadow` configuration are automatically added to the `Class-Path` attribute in the manifest
   for `shadowJar`
