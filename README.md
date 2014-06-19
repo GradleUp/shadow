@@ -127,7 +127,9 @@ Remove an external dependency and all of its transitive dependencies
 
 ```
 shadowJar {
-  exclude(dependency('asm:asm:3.3.1'))
+  artifacts {
+    exclude(dependency('asm:asm:3.3.1'))
+  }
 }
 ```
 
@@ -135,7 +137,9 @@ Remove an external dependency but keep its transitive dependencies
 
 ```
 shadowJar {
-  exclude(dependency('asm:asm:3.3.1'), false)
+  artifacts {
+    exclude(dependency('asm:asm:3.3.1'), false)
+  }
 }
 ```
 
@@ -143,7 +147,9 @@ Exclude a project dependency in a multi-project build
 
 ```
 shadowJar {
-  exclude(project(":myclient"))
+  artifacts {
+    exclude(project(":myclient"))
+  }
 }
 ```
 
@@ -180,10 +186,6 @@ shadowJar {
   }
 }
 ```
-
-### Changing the Default configuration for shadow jar
-
-TODO - need to implement this
 
 ### Publishing the shadow jar as an additional resource to the main jar
 
@@ -232,7 +234,9 @@ dependencies {
 }
 
 shadowJar {
-  exclude(dependency('org.bouncycastle:bcprov-jdk15on:1.47'))
+  artifacts {
+    exclude(dependency('org.bouncycastle:bcprov-jdk15on:1.47'))
+  }
 }
 ```
 

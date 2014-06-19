@@ -66,7 +66,9 @@ class FilteringSpec extends PluginSpecification {
             |}
             |
             |shadowJar {
-            |   exclude(dependency('shadow:d:1.0'))
+            |   artifacts {
+            |      exclude(dependency('shadow:d:1.0'))
+            |   }
             |}
         '''.stripMargin()
 
@@ -100,7 +102,9 @@ class FilteringSpec extends PluginSpecification {
             |}
             |
             |shadowJar {
-            |   exclude(dependency('shadow:d:1.0'), false)
+            |   artifacts {
+            |       exclude(dependency('shadow:d:1.0'), false)
+            |   }
             |}
         '''.stripMargin()
 
@@ -151,7 +155,9 @@ class FilteringSpec extends PluginSpecification {
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
-            |   exclude(project(':client'))
+            |   artifacts {
+            |       exclude(project(':client'))
+            |   }
             |}
         """.stripMargin()
 
@@ -207,9 +213,11 @@ class FilteringSpec extends PluginSpecification {
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
-            |   exclude(dependency {
-            |       it.moduleGroup == 'junit'
-            |   })
+            |   artifacts {
+            |       exclude(dependency {
+            |           it.moduleGroup == 'junit'
+            |       })
+            |   }
             |}
         """.stripMargin()
 
@@ -253,8 +261,10 @@ class FilteringSpec extends PluginSpecification {
             |}
             |
             |shadowJar {
-            |   exclude(dependency('shadow:e:1.0')) {
-            |       include(dependency('shadow:a:1.0'))
+            |   artifacts {
+            |       exclude(dependency('shadow:e:1.0')) {
+            |           include(dependency('shadow:a:1.0'))
+            |       }
             |   }
             |}
         '''.stripMargin()
@@ -274,7 +284,7 @@ class FilteringSpec extends PluginSpecification {
     }
 
     //http://mail-archives.apache.org/mod_mbox/ant-user/200506.mbox/%3C001d01c57756$6dc35da0$dc00a8c0@CTEGDOMAIN.COM%3E
-    def 'verify exclude precendence over include'() {
+    def 'verify exclude precedence over include'() {
         given:
         buildFile << """
             |shadowJar {
