@@ -1,3 +1,11 @@
+v0.9.0-M4
+=========
+
++ Break plugin into multiple sub-plugins. `ShadowBasePlugin` is always applied.
+  `ShadowJavaPlugin` and `ShadowApplicationPlugin` are applied in reaction to applying the `java` and `application`
+  plugins respectively.
++ Shadow does not applied `java` plugin automatically. `java` or `groovy` must be applied in conjunction with `shadow`.
+
 v0.9.0-M3
 =========
 
