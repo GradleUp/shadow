@@ -28,12 +28,11 @@ class DependencyFilter {
      * Exclude dependencies that match the provided spec.
      *
      * @param spec
-     * @param includeTransitive exclude the transitive dependencies of any dependency that matches the spec.
      * @return
      */
-    public DependencyFilter exclude(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
+    public DependencyFilter exclude(Spec<? super ResolvedDependency> spec) {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
-                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
+                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
             this.mainSpec.exclude(FilenameUtils.getName(file.path))
         }
@@ -44,12 +43,11 @@ class DependencyFilter {
      * Include dependencies that match the provided spec.
      *
      * @param spec
-     * @param includeTransitive include the transitive dependencies of any dependency that matches the spec.
      * @return
      */
     public DependencyFilter include(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
-                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies, includeTransitive)
+                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
             this.mainSpec.include(FilenameUtils.getName(file.path))
         }
@@ -110,36 +108,29 @@ class DependencyFilter {
      * Support method for querying the resolved dependency graph using maven/project coordinates
      * @param spec
      * @param dependencies
-     * @param includeTransitive
      * @return
      */
     protected Set<ResolvedDependency> findMatchingDependencies(Closure spec,
-                                                               Set<ResolvedDependency> dependencies,
-                                                               boolean includeTransitive) {
+                                                               Set<ResolvedDependency> dependencies) {
         findMatchingDependencies(
-                Specs.<? super ResolvedDependency>convertClosureToSpec(spec), dependencies, includeTransitive)
+                Specs.<? super ResolvedDependency>convertClosureToSpec(spec), dependencies)
     }
 
     /**
      * Support method for querying the resolved dependency graph using maven/project coordinates
      * @param spec
      * @param dependencies
-     * @param includeTransitive
      * @return
      */
     protected Set<ResolvedDependency> findMatchingDependencies(Spec<? super ResolvedDependency> spec,
-                                                               Set<ResolvedDependency> dependencies,
-                                                               boolean includeTransitive) {
+                                                               Set<ResolvedDependency> dependencies) {
 
         Set<ResolvedDependency> matched = []
         dependencies.each {
             if (spec.isSatisfiedBy(it)) {
                 matched.add(it)
-                if (includeTransitive) {
-                    matched.addAll(findMatchingDependencies({true}, it.children, true))
-                }
             }
-            matched.addAll(findMatchingDependencies(spec, it.children, includeTransitive))
+            matched.addAll(findMatchingDependencies(spec, it.children))
         }
         return matched
     }

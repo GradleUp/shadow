@@ -14,6 +14,8 @@ v0.9.0-M4
 + `runShadow` now utilizes the output of the `shadowJar` and executes using `java -jar <shadow jar file>`
 + Start Scripts for shadow distribution now utilize `java -jar` to execute instead of placing all files on classpath
   and executing main class.
++ Excluding/Including dependencies no longer includes transitive dependencies. All dependencies for inclusion/exclusion
+  must be explicitly configured via a spec.
 
 v0.9.0-M3
 =========

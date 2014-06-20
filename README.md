@@ -140,7 +140,7 @@ shadowJar {
 
 ### Filtering shadow jar contents by maven/project dependency
 
-Remove an external dependency and all of its transitive dependencies
+Exclude specific dependency (transitive dependencies are **not** excluded)
 
 ```
 shadowJar {
@@ -150,22 +150,12 @@ shadowJar {
 }
 ```
 
-Include specific dependencies (includes transitives by default)
+Include specific dependency (transitive dependencies are **not** included)
 
 ```
 shadowJar {
   dependencies {
     include(dependency('asm:asm:3.3.1'))
-  }
-}
-```
-
-Remove an external dependency but keep its transitive dependencies
-
-```
-shadowJar {
-  dependencies {
-    exclude(dependency('asm:asm:3.3.1'), false)
   }
 }
 ```
@@ -179,10 +169,6 @@ shadowJar {
   }
 }
 ```
-
-Exclude a dependency and its transitives, except specified subset
-
-**Not currently supported**
 
 ### Relocating dependencies
 
