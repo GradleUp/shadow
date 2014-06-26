@@ -1,6 +1,6 @@
 image: bradrydzewski/java:openjdk7
 script:
-  - ./gradlew build
+  - ./gradlew build --info
 notify:
   email:
     recipients:
