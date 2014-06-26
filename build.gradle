@@ -30,8 +30,8 @@ dependencies {
     compile localGroovy()
     compile gradleApi()
     compile 'jdom:jdom:1.1'
-    compile 'asm:asm:3.3.1'
-    compile 'asm:asm-commons:3.3.1'
+    compile 'org.ow2.asm:asm:4.1'
+    compile 'org.ow2.asm:asm-commons:4.1'
 
     testUtilsCompile localGroovy()
     testUtilsCompile gradleApi()
