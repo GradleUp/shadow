@@ -46,7 +46,9 @@ dependencies {
 }
 
 test {
-    testLogging.showStandardStreams = true
+    if (System.env.CI == 'true') {
+        testLogging.showStandardStreams = true
+    }
 }
 
 jar {

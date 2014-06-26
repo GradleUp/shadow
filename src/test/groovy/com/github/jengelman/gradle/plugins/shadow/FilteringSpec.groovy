@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileReposi
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
 import spock.lang.Ignore
+import spock.lang.Issue
 
 class FilteringSpec extends PluginSpecification {
 
@@ -106,6 +107,61 @@ class FilteringSpec extends PluginSpecification {
 
         and:
         doesNotContain(output, ['d.properties'])
+    }
+
+    @Issue("SHADOW-54")
+    def "dependency exclusions affect UP-TO-DATE check"() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .dependsOn('c')
+                .publish()
+
+        buildFile << '''
+            |dependencies {
+            |   compile 'shadow:d:1.0'
+            |}
+            |
+            |shadowJar {
+            |   dependencies {
+            |      exclude(dependency('shadow:d:1.0'))
+            |   }
+            |}
+        '''.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+
+        and:
+        doesNotContain(output, ['d.properties'])
+
+        when: 'Update build file shadowJar dependency exclusion'
+        buildFile.text = buildFile.text.replace('exclude(dependency(\'shadow:d:1.0\'))',
+                                                'exclude(dependency(\'shadow:c:1.0\'))')
+
+        result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        assert !taskUpToDate(result, 'shadowJar')
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'd.properties'])
+
+        and:
+        doesNotContain(output, ['c.properties'])
     }
 
     def "include dependency, excluding all others"() {

@@ -3,6 +3,8 @@ v1.0.0
 
 + Previously known as v0.9.0
 + All changes from 0.9.0-M1 to 0.9.0-M5
++ Properly configure the ShadowJar task inputs to observe the include/excludes from the `dependencies` block. This
+  allows UP-TO-DATE checking to work properly when changing the `dependencies` rules ([Issue #54](https://github.com/johnrengelman/shadow/issues/54))
 
 v0.9.0-M5
 =========

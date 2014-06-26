@@ -7,8 +7,17 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import org.apache.commons.io.FilenameUtils
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
+import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.util.PatternSet
@@ -38,6 +47,26 @@ class ShadowJar extends Jar {
     protected void copy() {
         super.copy()
         logger.info(shadowStats.toString())
+    }
+
+    @Override
+    @InputFiles @SkipWhenEmpty @Optional
+    // SHADOW-54 Need to remove filtered dependencies from inputs list
+    public FileCollection getSource() {
+        super.source - excludedDependencies
+    }
+
+    /**
+     * Gets a list of dependency files that are being excluded
+     * @return
+     */
+    protected FileCollection getExcludedDependencies() {
+        def allDependencies = super.source.filter {
+            def ext = FilenameUtils.getExtension(it.name)
+            return ext == 'zip' || ext == 'jar'
+        }.asFileTree
+        def includedDependencies = allDependencies.matching(dependencyFilter.patternSet)
+        return allDependencies - includedDependencies
     }
 
     /**

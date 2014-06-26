@@ -83,6 +83,10 @@ class PluginSpecification extends Specification {
         assert result.standardError, 'Gradle build succeeded'
     }
 
+    boolean taskUpToDate(ExecutionResult result, String taskName) {
+        result.standardOutput.find(/:${taskName}(.*)/).trim().contains('UP-TO-DATE')
+    }
+
     protected getOutput() {
         file('build/libs/shadow.jar')
     }
