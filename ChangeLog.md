@@ -1,3 +1,9 @@
+v1.0.0
+======
+
++ Previously known as v0.9.0
++ All changes from 0.9.0-M1 to 0.9.0-M5
+
 v0.9.0-M5
 =========
 
