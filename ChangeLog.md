@@ -2,6 +2,7 @@ v0.9.0-M5
 =========
 
 + Add commons-io to compile classpath
++ Update asm library to 4.1
 
 v0.9.0-M4
 =========
