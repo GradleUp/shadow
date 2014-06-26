@@ -1,3 +1,8 @@
+v0.9.0-M5
+=========
+
++ Add commons-io to compile classpath
+
 v0.9.0-M4
 =========
 
