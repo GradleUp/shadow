@@ -45,6 +45,10 @@ dependencies {
     testCompile 'xmlunit:xmlunit:1.3'
 }
 
+test {
+    testLogging.showStandardStreams = true
+}
+
 jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
