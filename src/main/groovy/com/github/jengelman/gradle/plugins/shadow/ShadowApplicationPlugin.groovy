@@ -57,8 +57,10 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         run.description  = 'Runs this project as a JVM application using the shadow jar'
         run.group = ApplicationPlugin.APPLICATION_GROUP
         run.main = '-jar'
-        run.args = [jar.archivePath]
         run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
+        run.doFirst {
+            args = [jar.archivePath.path] + args
+        }
     }
 
     private void addCreateScriptsTask(Project project) {

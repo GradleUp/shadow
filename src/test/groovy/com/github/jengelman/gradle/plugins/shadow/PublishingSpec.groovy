@@ -149,8 +149,8 @@ class PublishingSpec extends PluginSpecification {
         file('src/main/java/myapp/Main.java') << """
             |package myapp;
             |public class Main {
-            |   static void main(String[] args) {
-            |       System.out.println("Hello World!");
+            |   public static void main(String[] args) {
+            |       System.out.println("TestApp: Hello World! (" + args[0] + ")");
             |   }
             |}
         """.stripMargin()
@@ -171,12 +171,17 @@ class PublishingSpec extends PluginSpecification {
             |dependencies {
             |   compile 'shadow:a:1.0'
             |}
+            |
+            |runShadow {
+            |   args 'foo'
+            |}
         """.stripMargin()
 
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
         runner.arguments << 'installShadow'
+        runner.arguments << 'runShadow'
         ExecutionResult result = runner.run()
 
         then:
@@ -200,5 +205,8 @@ class PublishingSpec extends PluginSpecification {
 
         and:
         assert startScript.text.contains("-jar \$APP_HOME/lib/myapp-1.0-all.jar")
+
+        and:
+        assert result.standardOutput.contains('TestApp: Hello World! (foo)')
     }
 }
