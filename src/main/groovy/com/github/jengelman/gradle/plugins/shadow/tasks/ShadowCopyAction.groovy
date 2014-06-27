@@ -149,7 +149,8 @@ public class ShadowCopyAction implements CopyAction {
         private void visitFile(FileCopyDetails fileDetails) {
             if (!isArchive(fileDetails)) {
                 try {
-                    if (!remapper.hasRelocators()) {
+                    boolean isClass = (FilenameUtils.getExtension(fileDetails.path) == 'class')
+                    if (!remapper.hasRelocators() || !isClass) {
                         String path = fileDetails.relativePath.pathString
                         ZipEntry archiveEntry = new ZipEntry(path)
                         archiveEntry.setTime(fileDetails.lastModified)
@@ -182,9 +183,7 @@ public class ShadowCopyAction implements CopyAction {
                     patternSpec.isSatisfiedBy(element)
                 }
                 filteredArchivePaths.each { RelativeArchivePath relativePath ->
-                    if (!relativePath.file) {
-//                        visitArchiveDirectory(relativePath)
-                    } else {
+                    if (relativePath.file) {
                         visitArchiveFile(relativePath, archive)
                     }
                 }

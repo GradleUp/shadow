@@ -1,3 +1,8 @@
+v1.0.1
+======
+
++ Fix issue where non-class files are dropped when using relocation ([Issue #58](https://github.com/johnrengelman/shadow/issues/58))
+
 v1.0.0
 ======
 

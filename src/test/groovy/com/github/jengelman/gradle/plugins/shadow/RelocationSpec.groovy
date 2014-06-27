@@ -4,8 +4,12 @@ import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
 import spock.lang.Issue
 
+import java.util.jar.Attributes
+import java.util.jar.JarFile
+
 class RelocationSpec extends PluginSpecification {
 
+    @Issue('SHADOW-58')
     def "relocate dependency files"() {
         given:
         buildFile << """
@@ -23,6 +27,9 @@ class RelocationSpec extends PluginSpecification {
             |   classifier = null
             |   relocate 'junit.textui', 'a'
             |   relocate 'junit.framework', 'b'
+            |   appendManifest {
+            |       attributes 'TEST-VALUE': 'FOO'
+            |   }
             |}
         """.stripMargin()
 
@@ -35,6 +42,7 @@ class RelocationSpec extends PluginSpecification {
 
         and:
         contains(output, [
+                'META-INF/MANIFEST.MF',
                 'a/ResultPrinter.class',
                 'a/TestRunner.class',
                 'b/Assert.class',
@@ -70,6 +78,12 @@ class RelocationSpec extends PluginSpecification {
                 'junit/framework/TestSuite$1.class',
                 'junit/framework/TestSuite.class'
         ])
+
+        and: 'Test that manifest file exists with contents'
+        JarFile jar = new JarFile(output)
+        Attributes attributes = jar.manifest.getMainAttributes()
+        String val = attributes.getValue('TEST-VALUE')
+        assert val == 'FOO'
     }
 
     def "relocate dependency files with filtering"() {
