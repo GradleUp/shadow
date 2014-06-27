@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import groovy.util.logging.Slf4j
+import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
@@ -148,13 +149,17 @@ public class ShadowCopyAction implements CopyAction {
         private void visitFile(FileCopyDetails fileDetails) {
             if (!isArchive(fileDetails)) {
                 try {
-                    String path = fileDetails.relativePath.pathString
-                    ZipEntry archiveEntry = new ZipEntry(path)
-                    archiveEntry.setTime(fileDetails.lastModified)
-                    archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
-                    zipOutStr.putNextEntry(archiveEntry)
-                    fileDetails.copyTo(zipOutStr)
-                    zipOutStr.closeEntry()
+                    if (!remapper.hasRelocators()) {
+                        String path = fileDetails.relativePath.pathString
+                        ZipEntry archiveEntry = new ZipEntry(path)
+                        archiveEntry.setTime(fileDetails.lastModified)
+                        archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
+                        zipOutStr.putNextEntry(archiveEntry)
+                        fileDetails.copyTo(zipOutStr)
+                        zipOutStr.closeEntry()
+                    } else {
+                        remapClass(fileDetails)
+                    }
                     recordVisit(fileDetails.relativePath)
                 } catch (Exception e) {
                     throw new GradleException(String.format("Could not add %s to ZIP '%s'.", fileDetails, zipFile), e)
@@ -216,37 +221,47 @@ public class ShadowCopyAction implements CopyAction {
 
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
-                InputStream is = archive.getInputStream(file.entry)
-                ClassReader cr = new ClassReader(is)
+                remapClass(archive.getInputStream(file.entry), file.pathString)
+            }
+        }
 
-                // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
-                // Copying the original constant pool should be avoided because it would keep references
-                // to the original class names. This is not a problem at runtime (because these entries in the
-                // constant pool are never used), but confuses some tools such as Felix' maven-bundle-plugin
-                // that use the constant pool to determine the dependencies of a class.
-                ClassWriter cw = new ClassWriter(0)
+        private void remapClass(FileCopyDetails fileCopyDetails) {
+            if (FilenameUtils.getExtension(fileCopyDetails.name) == 'class') {
+                remapClass(fileCopyDetails.file.newInputStream(), fileCopyDetails.path)
+            }
+        }
 
-                ClassVisitor cv = new RemappingClassAdapter(cw, remapper)
+        private void remapClass(InputStream classInputStream, String path) {
+            InputStream is = classInputStream
+            ClassReader cr = new ClassReader(is)
 
-                try {
-                    cr.accept(cv, ClassReader.EXPAND_FRAMES)
-                } catch (Throwable ise) {
-                    throw new GradleException("Error in ASM processing class " + file.pathString, ise)
-                }
+            // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
+            // Copying the original constant pool should be avoided because it would keep references
+            // to the original class names. This is not a problem at runtime (because these entries in the
+            // constant pool are never used), but confuses some tools such as Felix' maven-bundle-plugin
+            // that use the constant pool to determine the dependencies of a class.
+            ClassWriter cw = new ClassWriter(0)
 
-                byte[] renamedClass = cw.toByteArray()
+            ClassVisitor cv = new RemappingClassAdapter(cw, remapper)
 
-                // Need to take the .class off for remapping evaluation
-                String mappedName = remapper.map(file.pathString.substring(0, file.pathString.indexOf('.')))
+            try {
+                cr.accept(cv, ClassReader.EXPAND_FRAMES)
+            } catch (Throwable ise) {
+                throw new GradleException("Error in ASM processing class " + path, ise)
+            }
 
-                try {
-                    // Now we put it back on so the class file is written out with the right extension.
-                    zipOutStr.putNextEntry(new ZipEntry(mappedName + ".class"))
-                    IOUtils.copyLarge(new ByteArrayInputStream(renamedClass), zipOutStr)
-                    zipOutStr.closeEntry()
-                } catch (ZipException e) {
-                    log.warn("We have a duplicate " + mappedName + " in " + archive)
-                }
+            byte[] renamedClass = cw.toByteArray()
+
+            // Need to take the .class off for remapping evaluation
+            String mappedName = remapper.map(path.substring(0, path.indexOf('.')))
+
+            try {
+                // Now we put it back on so the class file is written out with the right extension.
+                zipOutStr.putNextEntry(new ZipEntry(mappedName + ".class"))
+                IOUtils.copyLarge(new ByteArrayInputStream(renamedClass), zipOutStr)
+                zipOutStr.closeEntry()
+            } catch (ZipException e) {
+                log.warn("We have a duplicate " + mappedName + " in source project")
             }
         }
 
