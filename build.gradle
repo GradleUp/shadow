@@ -60,6 +60,8 @@ idea {
     module {
         testSourceDirs += sourceSets.testUtils.allSource.srcDirs
         scopes.TEST.plus += configurations.testUtilsRuntime
+        outputDir = sourceSets.main.output.classesDir
+        testOutputDir = sourceSets.test.output.classesDir
     }
 }
 
