@@ -138,6 +138,9 @@ class ShadowPluginSpec extends PluginSpecification {
 
         and:
         contains(output, ['shadow/Passed.class', 'junit/framework/Test.class'])
+
+        and:
+        doesNotContain(output, ['/'])
     }
 
     def 'include project dependencies'() {
