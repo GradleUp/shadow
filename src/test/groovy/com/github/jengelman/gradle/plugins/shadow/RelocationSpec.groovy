@@ -137,7 +137,7 @@ class RelocationSpec extends PluginSpecification {
         ])
     }
 
-    @Issue('SHADOW-55')
+    @Issue(['SHADOW-55', 'SHADOW-53'])
     def "remap class names for relocated files in project source"() {
         given:
         buildFile << """
@@ -179,10 +179,12 @@ class RelocationSpec extends PluginSpecification {
         contains(output, [
                 'shadow/ShadowTest.class',
                 'shadow/junit/Test.class',
+                'shadow/junit'
         ])
 
         and:
         doesNotContain(output, [
+                'junit/framework',
                 'junit/framework/Test.class'
         ])
 

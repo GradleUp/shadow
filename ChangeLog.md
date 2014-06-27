@@ -6,6 +6,7 @@ v1.0.0
 + Properly configure the ShadowJar task inputs to observe the include/excludes from the `dependencies` block. This
   allows UP-TO-DATE checking to work properly when changing the `dependencies` rules ([Issue #54](https://github.com/johnrengelman/shadow/issues/54))
 + Apply relocation remappings to classes and imports in source project ([Issue #55](https://github.com/johnrengelman/shadow/issues/55))
++ Do not create directories in jar for source of remapped class, created directories in jar for destination of remapped classes ([Issue #53](https://github.com/johnrengelman/shadow/issues/53))
 
 v0.9.0-M5
 =========

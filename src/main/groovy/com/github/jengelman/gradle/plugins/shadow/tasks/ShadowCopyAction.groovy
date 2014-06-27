@@ -183,7 +183,7 @@ public class ShadowCopyAction implements CopyAction {
                 }
                 filteredArchivePaths.each { RelativeArchivePath relativePath ->
                     if (!relativePath.file) {
-                        visitArchiveDirectory(relativePath)
+//                        visitArchiveDirectory(relativePath)
                     } else {
                         visitArchiveFile(relativePath, archive)
                     }
@@ -219,8 +219,18 @@ public class ShadowCopyAction implements CopyAction {
             }
         }
 
+        private void addParentDirectories(RelativeArchivePath file) {
+            if (file) {
+                addParentDirectories(file.parent)
+                if (!file.file) {
+                    visitArchiveDirectory(file)
+                }
+            }
+        }
+
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
+                addParentDirectories(new RelativeArchivePath(new ZipEntry(remapper.mapPath(file) + '.class'), null))
                 remapClass(archive.getInputStream(file.entry), file.pathString)
             }
         }
@@ -253,7 +263,7 @@ public class ShadowCopyAction implements CopyAction {
             byte[] renamedClass = cw.toByteArray()
 
             // Need to take the .class off for remapping evaluation
-            String mappedName = remapper.map(path.substring(0, path.indexOf('.')))
+            String mappedName = remapper.mapPath(path)
 
             try {
                 // Now we put it back on so the class file is written out with the right extension.
@@ -266,6 +276,7 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void copyArchiveEntry(RelativeArchivePath archiveFile, ZipFile archive) {
+            addParentDirectories(archiveFile)
             zipOutStr.putNextEntry(archiveFile.entry)
             IOUtils.copyLarge(archive.getInputStream(archiveFile.entry), zipOutStr)
             zipOutStr.closeEntry()
@@ -310,6 +321,18 @@ public class ShadowCopyAction implements CopyAction {
 
         boolean isClassFile() {
             return lastName.endsWith('.class')
+        }
+
+        RelativeArchivePath getParent() {
+            if (!segments) {
+                return null
+            } else if (segments.length == 1) {
+                return new RelativeArchivePath(new ZipEntry('/'), null)
+            } else {
+                //Parent is always a directory so add / to the end of the path
+                String path = segments[0..-2].join('/') + '/'
+                return new RelativeArchivePath(new ZipEntry(path), null)
+            }
         }
     }
 

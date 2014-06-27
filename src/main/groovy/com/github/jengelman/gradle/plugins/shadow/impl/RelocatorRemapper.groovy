@@ -20,6 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.impl
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.RelativeArchivePath
 import org.objectweb.asm.commons.Remapper
 
 import java.util.regex.Matcher
@@ -97,6 +98,14 @@ class RelocatorRemapper extends Remapper {
         }
 
         return value
+    }
+
+    String mapPath(String path) {
+        map(path.substring(0, path.indexOf('.')))
+    }
+
+    String mapPath(RelativeArchivePath path) {
+        mapPath(path.pathString)
     }
 
 }
