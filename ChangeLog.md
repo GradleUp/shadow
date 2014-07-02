@@ -2,6 +2,9 @@ v1.0.2
 ======
 
 + Do not add an empty Class-Path attribute to the manifest when the `shadow` configuration contains no dependencies.
++ `runShadow` now registers `shadowJar` as an input. Previously, `runShadow` did not execute `shadowJar` and an error occurred.
++ Support Gradle 2.0 ([Issue #66](https://github.com/johnrengelman/shadow/issues/66))
++ Do not override existing 'Class-Path' Manifest attribute settings from Jar configuration. Instead combine. ([Issue #65](https://github.com/johnrengelman/shadow/issues/65))
 
 v1.0.1
 ======

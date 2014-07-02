@@ -56,9 +56,15 @@ class ShadowJar extends Jar {
         super.source - excludedDependencies
     }
 
+    /**
+     * Utility method for assisting between changes in Gradle 1.12 and 2.x
+     * @return
+     */
     protected PatternSet getRootPatternSet() {
+        // Gradle 1.12 class exposes patternSet on the spec
         if (mainSpec.respondsTo('getPatternSet')) {
             return mainSpec.getPatternSet()
+        // Gradle 2.x moves it to the spec resolver.
         } else {
             return mainSpec.buildRootResolver().getPatternSet()
         }
