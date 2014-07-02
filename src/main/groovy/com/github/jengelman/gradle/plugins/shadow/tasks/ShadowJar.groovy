@@ -39,7 +39,7 @@ class ShadowJar extends Jar {
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
         return new ShadowCopyAction(getArchivePath(), getCompressor(), documentationRegistry,
-                transformers, relocators, (PatternSet) mainSpec.getPatternSet(),
+                transformers, relocators, rootPatternSet,
                 dependencyFilter.patternSet, shadowStats)
     }
 
@@ -54,6 +54,14 @@ class ShadowJar extends Jar {
     // SHADOW-54 Need to remove filtered dependencies from inputs list
     public FileCollection getSource() {
         super.source - excludedDependencies
+    }
+
+    protected PatternSet getRootPatternSet() {
+        if (mainSpec.respondsTo('getPatternSet')) {
+            return mainSpec.getPatternSet()
+        } else {
+            return mainSpec.buildRootResolver().getPatternSet()
+        }
     }
 
     /**
