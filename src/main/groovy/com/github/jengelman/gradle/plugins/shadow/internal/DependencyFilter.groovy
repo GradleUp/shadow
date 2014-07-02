@@ -4,7 +4,6 @@ import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
-import org.gradle.api.internal.file.copy.CopySpecInternal
 import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.util.PatternSet
@@ -12,16 +11,12 @@ import org.gradle.api.tasks.util.PatternSet
 class DependencyFilter {
 
     private final Project project
-    private final CopySpecInternal mainSpec
+    private final PatternSet patternSet
 
     DependencyFilter(Project project) {
         assert project
         this.project = project
-        this.mainSpec = (CopySpecInternal) project.copySpec {}
-    }
-
-    public PatternSet getPatternSet() {
-        mainSpec.getPatternSet()
+        this.patternSet = new PatternSet()
     }
 
     /**
@@ -34,7 +29,7 @@ class DependencyFilter {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
                 project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
-            this.mainSpec.exclude(FilenameUtils.getName(file.path))
+            this.patternSet.exclude(FilenameUtils.getName(file.path))
         }
         return this
     }
@@ -45,13 +40,17 @@ class DependencyFilter {
      * @param spec
      * @return
      */
-    public DependencyFilter include(Spec<? super ResolvedDependency> spec, boolean includeTransitive = true) {
+    public DependencyFilter include(Spec<? super ResolvedDependency> spec) {
         Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
                 project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies)
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
-            this.mainSpec.include(FilenameUtils.getName(file.path))
+            this.patternSet.include(FilenameUtils.getName(file.path))
         }
         return this
+    }
+
+    public PatternSet getPatternSet() {
+        return patternSet
     }
 
     /**
