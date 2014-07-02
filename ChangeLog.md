@@ -1,3 +1,8 @@
+v1.0.2
+======
+
++ Do not add an empty Class-Path attribute to the manifest when the `shadow` configuration contains no dependencies.
+
 v1.0.1
 ======
 

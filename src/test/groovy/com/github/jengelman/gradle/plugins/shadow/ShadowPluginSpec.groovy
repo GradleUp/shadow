@@ -327,6 +327,36 @@ class ShadowPluginSpec extends PluginSpecification {
         assert jar.entries().collect().size() == 2
     }
 
+    def "Class-Path in Manifest not added if empty"() {
+        given:
+
+        buildFile << """
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |repositories { jcenter() }
+            |dependencies { compile 'junit:junit:3.8.2' }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        assert output.exists()
+
+        and:
+        JarFile jar = new JarFile(output)
+        Attributes attributes = jar.manifest.getMainAttributes()
+        assert attributes.getValue('Class-Path') == null
+    }
+
     def "add shadow configuration to Class-Path in Manifest"() {
         given:
 
