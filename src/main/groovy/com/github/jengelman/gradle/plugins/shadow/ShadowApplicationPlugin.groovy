@@ -61,6 +61,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         run.doFirst {
             args = [jar.archivePath.path] + args
         }
+        run.inputs.file jar
     }
 
     private void addCreateScriptsTask(Project project) {

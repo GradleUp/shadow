@@ -180,8 +180,8 @@ class PublishingSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.arguments << 'installShadow'
         runner.arguments << 'runShadow'
+        runner.arguments << 'installShadow'
         ExecutionResult result = runner.run()
 
         then:
