@@ -35,7 +35,8 @@ class ShadowJavaPlugin implements Plugin<Project> {
         shadow.doFirst {
             def files = project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME).files
             if (files) {
-                manifest.attributes 'Class-Path': files.collect { "lib/${it.name}" }.join(' ')
+                def value = manifest.attributes.get('Class-Path')
+                manifest.attributes 'Class-Path': [value, files.collect { "lib/${it.name}" }.join(' ')].join(' ')
             }
         }
         shadow.from(convention.sourceSets.main.output)

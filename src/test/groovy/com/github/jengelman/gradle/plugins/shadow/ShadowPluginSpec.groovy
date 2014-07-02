@@ -10,6 +10,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
 import org.gradle.testkit.functional.GradleRunnerFactory
+import spock.lang.Issue
 import spock.lang.Unroll
 
 import java.util.jar.Attributes
@@ -357,6 +358,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert attributes.getValue('Class-Path') == null
     }
 
+    @Issue('SHADOW-65')
     def "add shadow configuration to Class-Path in Manifest"() {
         given:
 
@@ -366,6 +368,12 @@ class ShadowPluginSpec extends PluginSpecification {
             |
             |repositories { jcenter() }
             |dependencies { shadow 'junit:junit:3.8.2' }
+            |
+            |jar {
+            |   manifest {
+            |       attributes 'Class-Path': 'a.jar'
+            |   }
+            |}
             |
             |shadowJar {
             |   baseName = 'shadow'
@@ -381,11 +389,11 @@ class ShadowPluginSpec extends PluginSpecification {
         success(result)
         assert output.exists()
 
-        and:
+        and: 'SHADOW-65 - combine w/ existing Class-Path'
         JarFile jar = new JarFile(output)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
-        assert classpath == 'lib/junit-3.8.2.jar'
+        assert classpath == 'a.jar lib/junit-3.8.2.jar'
 
     }
 }
