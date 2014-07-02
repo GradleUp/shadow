@@ -164,6 +164,65 @@ class FilteringSpec extends PluginSpecification {
         doesNotContain(output, ['c.properties'])
     }
 
+    @Issue("SHADOW-62")
+    @Ignore
+    def "project exclusions affect UP-TO-DATE check"() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .dependsOn('c')
+                .publish()
+
+        buildFile << '''
+            |dependencies {
+            |   compile 'shadow:d:1.0'
+            |}
+            |
+            |shadowJar {
+            |   dependencies {
+            |      exclude(dependency('shadow:d:1.0'))
+            |   }
+            |}
+        '''.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+
+        and:
+        doesNotContain(output, ['d.properties'])
+
+        when: 'Update build file shadowJar dependency exclusion'
+        buildFile.text << '''
+            |shadowJar {
+            |   exclude 'a.properties'
+            |}
+        '''.stripMargin()
+
+        result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        assert !taskUpToDate(result, 'shadowJar')
+
+        and:
+        contains(output, ['a2.properties', 'b.properties', 'd.properties'])
+
+        and:
+        doesNotContain(output, ['a.properties', 'c.properties'])
+    }
+
     def "include dependency, excluding all others"() {
         given:
         repo.module('shadow', 'c', '1.0')
