@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.apache.commons.io.FilenameUtils
+import org.apache.log4j.Logger
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
@@ -9,6 +10,7 @@ import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.util.PatternSet
 
 class DependencyFilter {
+    static Logger log = Logger.getLogger(DependencyFilter.class)
 
     private final Project project
     private final PatternSet patternSet
@@ -31,6 +33,7 @@ class DependencyFilter {
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
             this.patternSet.exclude(FilenameUtils.getName(file.path))
         }
+        dependencies.each { log.info("Excluding: ${it}")}
         return this
     }
 
@@ -115,6 +118,7 @@ class DependencyFilter {
                 Specs.<? super ResolvedDependency>convertClosureToSpec(spec), dependencies)
     }
 
+
     /**
      * Support method for querying the resolved dependency graph using maven/project coordinates
      * @param spec
@@ -122,14 +126,30 @@ class DependencyFilter {
      * @return
      */
     protected Set<ResolvedDependency> findMatchingDependencies(Spec<? super ResolvedDependency> spec,
-                                                               Set<ResolvedDependency> dependencies) {
+                                                                   Set<ResolvedDependency> dependencies) {
+        Set<ResolvedDependency> visitedDependencies = new HashSet<ResolvedDependency>()
+        return findMatchingDependenciesImpl(visitedDependencies, spec, dependencies)
+    }
+
+    /**
+     * Impl method for querying the resolved dependency graph using maven/project coordinates
+     * @param spec
+     * @param dependencies
+     * @return
+     */
+    private Set<ResolvedDependency> findMatchingDependenciesImpl(Set<ResolvedDependency> visitedDependencies,
+                                                                 Spec<? super ResolvedDependency> spec,
+                                                                 Set<ResolvedDependency> dependencies) {
 
         Set<ResolvedDependency> matched = []
         dependencies.each {
-            if (spec.isSatisfiedBy(it)) {
-                matched.add(it)
+            if (!visitedDependencies.contains(it)) {
+                visitedDependencies.add(it)
+                if (spec.isSatisfiedBy(it)) {
+                    matched.add(it)
+                }
+                matched.addAll(findMatchingDependenciesImpl(visitedDependencies, spec, it.children))
             }
-            matched.addAll(findMatchingDependencies(spec, it.children))
         }
         return matched
     }
