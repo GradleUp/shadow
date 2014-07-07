@@ -21,7 +21,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 buildscript {
   repositories { jcenter() }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:1.0.1'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.0.2'
   }
 }
 
@@ -150,7 +150,10 @@ shadowJar {
 }
 ```
 
-Include specific dependency (transitive dependencies are **not** included)
+Include specific dependency (transitive dependencies are **not** included). Note that dependency inclusion is based
+on the same core classes as Gradle's `CopySpec` inclusion/exclusion. By default, there is a global include, however,
+declaring a specific `include` effectively creates a global `exclude`. That is once an `include` is made, only items
+that are specifically listed for inclusion will be include in the final output.
 
 ```
 shadowJar {
