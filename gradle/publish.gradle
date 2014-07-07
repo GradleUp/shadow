@@ -1,8 +1,9 @@
-apply plugin: 'bintray'
+apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
 
 group = 'com.github.jengelman.gradle.plugins'
-version = file('version.txt').text
+def versionString = file('version.txt').text
+version = versionString
 
 ext.isSnapshot = version.endsWith("SNAPSHOT")
 
@@ -59,6 +60,22 @@ bintray {
         repo = 'gradle-plugins'
         name = 'gradle-shadow-plugin'
         licenses = ['Apache-2.0']
+        desc = 'Create uber-jar containing application code and dependencies.'
+        labels = ['gradle', 'onejar', 'fatjar', 'uberjar', 'shade']
+        websiteUrl = 'https://github.com/johnrengelman/shadow'
+        issueTrackerUrl = 'https://github.com/johnrengelman/shadow/issues'
+        vcsUrl = 'https://github.com/johnrengelman/shadow.git'
+        version {
+            vcsTag = versionString
+            attributes = [
+                    'gradle-plugin': [
+                            'com.github.johnrengelman.shadow:com.github.jengelman.gradle.plugins:shadow',
+                            'com.github.johnrengelman.shadow-base:com.github.jengelman.gradle.plugins:shadow',
+                            'com.github.johnrengelman.shadow-java:com.github.jengelman.gradle.plugins:shadow',
+                            'com.github.johnrengelman.shadow-application:com.github.jengelman.gradle.plugins:shadow',
+                    ].join(',')
+            ]
+        }
     }
 }
 
