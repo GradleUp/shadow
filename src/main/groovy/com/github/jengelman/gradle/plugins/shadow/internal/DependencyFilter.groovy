@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
-import org.apache.log4j.Logger
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
@@ -9,8 +9,8 @@ import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.util.PatternSet
 
+@Slf4j
 class DependencyFilter {
-    static Logger log = Logger.getLogger(DependencyFilter.class)
 
     private final Project project
     private final PatternSet patternSet
@@ -33,7 +33,7 @@ class DependencyFilter {
         dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
             this.patternSet.exclude(FilenameUtils.getName(file.path))
         }
-        dependencies.each { log.info("Excluding: ${it}")}
+        dependencies.each { log.debug("Excluding: ${it}")}
         return this
     }
 
@@ -126,7 +126,7 @@ class DependencyFilter {
      * @return
      */
     protected Set<ResolvedDependency> findMatchingDependencies(Spec<? super ResolvedDependency> spec,
-                                                                   Set<ResolvedDependency> dependencies) {
+                                                                 Set<ResolvedDependency> dependencies) {
         Set<ResolvedDependency> visitedDependencies = new HashSet<ResolvedDependency>()
         return findMatchingDependenciesImpl(visitedDependencies, spec, dependencies)
     }
