@@ -407,6 +407,7 @@ class FilteringSpec extends PluginSpecification {
         doesNotContain(output, ['a2.properties'])
     }
 
+    @Issue("SHADOW-69")
     def "handle exclude with circular dependency"() {
         given:
         repo.module('shadow', 'c', '1.0')
