@@ -111,7 +111,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
     }
 
-    def 'include project resources'() {
+    def 'include project sources'() {
         given:
         file('src/main/java/shadow/Passed.java') << '''
             |package shadow;
