@@ -2,6 +2,7 @@ v1.0.3
 ======
 
 + Make service files root path configurable for `ServiceFileTransformer` ([Issue #72](https://github.com/johnrengelman/shadow/issues/72))
++ [Andres Almiray](https://github.com/aalmiray) Added PropertiesFileTransformer ([Issue #73](https://github.com/johnrengelman/shadow/issues/73))
 
 v1.0.2
 ======
