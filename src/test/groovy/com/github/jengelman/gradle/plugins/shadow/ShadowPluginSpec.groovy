@@ -199,6 +199,132 @@ class ShadowPluginSpec extends PluginSpecification {
         ])
     }
 
+    def 'depend on project shadow jar'() {
+        given:
+        file('settings.gradle') << """
+            |include 'client', 'server'
+        """.stripMargin()
+
+        file('client/src/main/java/client/Client.java') << """
+            |package client;
+            |public class Client {}
+            |""".stripMargin()
+
+        file('client/build.gradle') << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies { compile 'junit:junit:3.8.2' }
+            |
+            |shadowJar {
+            |   relocate 'junit.framework', 'client.junit.framework'
+            |}
+        """.stripMargin()
+
+        file('server/src/main/java/server/Server.java') << """
+            |package server;
+            |
+            |import client.Client;
+            |import client.junit.framework.Test;
+            |
+            |public class Server {}
+        """.stripMargin()
+
+        file('server/build.gradle') << """
+            |apply plugin: 'java'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies { compile project(path: ':client', configuration: 'shadow') }
+        """.stripMargin()
+
+        File serverOutput = file('server/build/libs/server.jar')
+
+        when:
+        runner.arguments << ':server:jar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(serverOutput, [
+                'server/Server.class'
+        ])
+
+        and:
+        doesNotContain(serverOutput, [
+                'client/Client.class',
+                'junit/framework/Test.class',
+                'client/junit/framework/Test.class'
+        ])
+    }
+
+    def 'shadow a project shadow jar'() {
+        given:
+        file('settings.gradle') << """
+            |include 'client', 'server'
+        """.stripMargin()
+
+        file('client/src/main/java/client/Client.java') << """
+            |package client;
+            |public class Client {}
+            |""".stripMargin()
+
+        file('client/build.gradle') << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies { compile 'junit:junit:3.8.2' }
+            |
+            |shadowJar {
+            |   relocate 'junit.framework', 'client.junit.framework'
+            |}
+        """.stripMargin()
+
+        file('server/src/main/java/server/Server.java') << """
+            |package server;
+            |
+            |import client.Client;
+            |import client.junit.framework.Test;
+            |
+            |public class Server {}
+        """.stripMargin()
+
+        file('server/build.gradle') << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies { compile project(path: ':client', configuration: 'shadow') }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |}
+        """.stripMargin()
+
+        File serverOutput = file('server/build/libs/shadow.jar')
+
+        when:
+        runner.arguments << ':server:shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(serverOutput, [
+                'client/Client.class',
+                'client/junit/framework/Test.class',
+                'server/Server.class',
+        ])
+
+        and:
+        doesNotContain(serverOutput, [
+                'junit/framework/Test.class'
+        ])
+    }
+
     def "exclude INDEX.LIST, *.SF, *.DSA, and *.RSA by default"() {
         given:
         AppendableMavenFileRepository repo = repo()
