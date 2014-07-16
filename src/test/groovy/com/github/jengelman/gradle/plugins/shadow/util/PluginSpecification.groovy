@@ -18,9 +18,13 @@ class PluginSpecification extends Specification {
     @Rule TemporaryFolder dir
     GradleRunner runner
 
+    AppendableMavenFileRepository repo
+
     def setup() {
         runner = GradleRunnerFactory.create()
         runner.directory = dir.root
+        repo = repo()
+        repo.module('junit', 'junit', '3.8.2').use(testJar).publish()
     }
 
     File getBuildFile() {
@@ -89,5 +93,9 @@ class PluginSpecification extends Specification {
 
     protected getOutput() {
         file('build/libs/shadow.jar')
+    }
+
+    protected File getTestJar(String name = 'junit-3.8.2.jar') {
+        return new File(this.class.classLoader.getResource(name).toURI())
     }
 }

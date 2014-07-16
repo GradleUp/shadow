@@ -2,11 +2,22 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.testkit.repo.maven.MavenFileModule
 import groovy.transform.InheritConstructors
+import org.apache.commons.io.IOUtils
 
 @InheritConstructors
 class AppendableMavenFileModule extends MavenFileModule {
 
     Map<String, Map<String, String>> contents = [:].withDefault { [:] }
+    Map<String, File> files = [:]
+
+    AppendableMavenFileModule use(File file) {
+        return use('', file)
+    }
+
+    AppendableMavenFileModule use(String classifier, File file) {
+        files[classifier] = file
+        return this
+    }
 
     AppendableMavenFileModule insertFile(String path, String content) {
         insertFile('', path, content)
@@ -24,8 +35,15 @@ class AppendableMavenFileModule extends MavenFileModule {
         if (type == 'pom') {
             return artifactFile
         }
-        publishWithStream(artifactFile) { OutputStream os ->
-            writeJar(os, contents[(String) artifact['classifier'] ?: ''])
+        String classifier = (String) artifact['classifier'] ?: ''
+        if (files.containsKey(classifier)) {
+            publishWithStream(artifactFile) { OutputStream os ->
+                IOUtils.copy(files[classifier].newInputStream(), os)
+            }
+        } else {
+            publishWithStream(artifactFile) { OutputStream os ->
+                writeJar(os, contents[classifier])
+            }
         }
         return artifactFile
     }

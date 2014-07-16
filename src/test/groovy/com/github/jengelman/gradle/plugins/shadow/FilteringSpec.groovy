@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
 import spock.lang.Ignore
@@ -8,11 +7,7 @@ import spock.lang.Issue
 
 class FilteringSpec extends PluginSpecification {
 
-    AppendableMavenFileRepository repo
-
     def setup() {
-        repo = repo()
-
         repo.module('shadow', 'a', '1.0')
                 .insertFile('a.properties', 'a')
                 .insertFile('a2.properties', 'a2')
@@ -266,6 +261,8 @@ class FilteringSpec extends PluginSpecification {
 
     def 'filter project dependencies'() {
         given:
+        buildFile.text = ''
+
         file('settings.gradle') << """
             |include 'client', 'server'
         """.stripMargin()
@@ -277,7 +274,7 @@ class FilteringSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             |apply plugin: 'java'
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
         """.stripMargin()
 
@@ -291,7 +288,7 @@ class FilteringSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: ${ShadowPlugin.name}
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile project(':client') }
             |
             |shadowJar {
@@ -323,6 +320,8 @@ class FilteringSpec extends PluginSpecification {
 
     def 'exclude a transitive project dependency'() {
         given:
+        buildFile.text = ''
+
         file('settings.gradle') << """
             |include 'client', 'server'
         """.stripMargin()
@@ -334,7 +333,7 @@ class FilteringSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             |apply plugin: 'java'
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
         """.stripMargin()
 
@@ -348,7 +347,7 @@ class FilteringSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: ${ShadowPlugin.name}
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile project(':client') }
             |
             |shadowJar {

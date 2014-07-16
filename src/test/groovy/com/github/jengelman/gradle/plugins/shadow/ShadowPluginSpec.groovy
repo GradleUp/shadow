@@ -66,7 +66,7 @@ class ShadowPluginSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: 'com.github.johnrengelman.shadow'
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
             |
             |shadowJar {
@@ -121,7 +121,7 @@ class ShadowPluginSpec extends PluginSpecification {
         buildFile << """
             |apply plugin: 'java'
             |apply plugin: ${ShadowPlugin.name}
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
             |
             |shadowJar {
@@ -157,7 +157,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             |apply plugin: 'java'
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
         """.stripMargin()
 
@@ -173,7 +173,7 @@ class ShadowPluginSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: ${ShadowPlugin.name}
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile project(':client') }
             |
             |shadowJar {
@@ -335,7 +335,7 @@ class ShadowPluginSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: 'com.github.johnrengelman.shadow'
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
             |
             |shadowJar {
@@ -366,7 +366,7 @@ class ShadowPluginSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: 'com.github.johnrengelman.shadow'
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |dependencies { shadow 'junit:junit:3.8.2' }
             |
             |jar {

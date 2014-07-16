@@ -16,7 +16,7 @@ class RelocationSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: ${ShadowPlugin.name}
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |
             |dependencies {
             |   compile 'junit:junit:3.8.2'
@@ -92,7 +92,7 @@ class RelocationSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: ${ShadowPlugin.name}
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |
             |dependencies {
             |   compile 'junit:junit:3.8.2'
@@ -158,7 +158,7 @@ class RelocationSpec extends PluginSpecification {
             |apply plugin: 'java'
             |apply plugin: ${ShadowPlugin.name}
             |
-            |repositories { jcenter() }
+            |repositories { maven { url "${repo.uri}" } }
             |
             |dependencies {
             |   compile 'junit:junit:3.8.2'

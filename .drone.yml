@@ -1,5 +1,6 @@
 image: bradrydzewski/java:openjdk7
 script:
+  - ./gradlew --stop
   - ./gradlew build --info
 notify:
   email:
