@@ -151,13 +151,17 @@ public class ShadowCopyAction implements CopyAction {
                 try {
                     boolean isClass = (FilenameUtils.getExtension(fileDetails.path) == 'class')
                     if (!remapper.hasRelocators() || !isClass) {
-                        String path = fileDetails.relativePath.pathString
-                        ZipEntry archiveEntry = new ZipEntry(path)
-                        archiveEntry.setTime(fileDetails.lastModified)
-                        archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
-                        zipOutStr.putNextEntry(archiveEntry)
-                        fileDetails.copyTo(zipOutStr)
-                        zipOutStr.closeEntry()
+                        if (!isTransformable(fileDetails)) {
+                            String path = fileDetails.relativePath.pathString
+                            ZipEntry archiveEntry = new ZipEntry(path)
+                            archiveEntry.setTime(fileDetails.lastModified)
+                            archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
+                            zipOutStr.putNextEntry(archiveEntry)
+                            fileDetails.copyTo(zipOutStr)
+                            zipOutStr.closeEntry()
+                        } else {
+                            transform(fileDetails)
+                        }
                     } else {
                         remapClass(fileDetails)
                     }
@@ -297,13 +301,28 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void transform(RelativeArchivePath file, ZipFile archive) {
-            String mappedPath = remapper.map(file.pathString)
-            InputStream is = archive.getInputStream(file.entry)
-            transformers.find { it.canTransformResource(file.pathString) }.transform(mappedPath, is, relocators)
+            transform(file.pathString, archive.getInputStream(file.entry))
+        }
+
+        private void transform(FileCopyDetails file) {
+            transform(file.path, file.file.newInputStream())
+        }
+
+        private void transform(String path, InputStream is) {
+            String mappedPath = remapper.map(path)
+            transformers.find { it.canTransformResource(path) }.transform(mappedPath, is, relocators)
         }
 
         private boolean isTransformable(RelativeArchivePath file) {
-            return transformers.find { it.canTransformResource(file.pathString) } as boolean
+            return isTransformable(file.pathString)
+        }
+
+        private boolean isTransformable(FileCopyDetails file) {
+            return isTransformable(file.path)
+        }
+
+        private boolean isTransformable(String path) {
+            return transformers.any { it.canTransformResource(path) }
         }
     }
 

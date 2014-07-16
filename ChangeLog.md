@@ -4,6 +4,7 @@ v1.0.3
 + Make service files root path configurable for `ServiceFileTransformer` ([Issue #72](https://github.com/johnrengelman/shadow/issues/72))
 + [Andres Almiray](https://github.com/aalmiray) Added PropertiesFileTransformer ([Issue #73](https://github.com/johnrengelman/shadow/issues/73))
 + [Brandon Kearby](https://github.com/brandonkearby) Fixed StackOverflow when a cycle occurs in the resolved dependency graph ([Issue #69](https://github.com/johnrengelman/shadow/pull/69))
++ Apply Transformers to project resources ([Issue #70](https://github.com/johnrengelman/shadow/issues/70), [Issue #71](https://github.com/johnrengelman/shadow/issues/71))
 
 v1.0.2
 ======

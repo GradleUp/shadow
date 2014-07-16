@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.functional.ExecutionResult
+import spock.lang.Issue
 
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -75,6 +76,51 @@ class TransformerSpec extends PluginSpecification {
         String text = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
         assert text.split('(\r\n)|(\r)|(\n)').size() == 2
         assert text == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
+    }
+
+    @Issue(['SHADOW-70', 'SHADOW-71'])
+    def 'apply transformers to project resources'() {
+        given:
+        File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
+                'one # NOTE: No newline terminates this line/file').write()
+
+        repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
+                'two # NOTE: No newline terminates this line/file').publish()
+
+        buildFile << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies {
+            |  compile 'shadow:two:1.0'
+            |  compile files('${escapedPath(one)}')
+            |}
+            |
+            |shadowJar {
+            |  baseName = 'shadow'
+            |  classifier = null
+            |  mergeServiceFiles()
+            |}
+        """.stripMargin()
+
+        file('src/main/resources/META-INF/services/shadow.Shadow') <<
+                'three # NOTE: No newline terminates this line/file'
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        assert output.exists()
+
+        and:
+        String text = getJarFileContents(output, 'META-INF/services/shadow.Shadow')
+        assert text.split('(\r\n)|(\r)|(\n)').size() == 3
+        assert text == '''|three # NOTE: No newline terminates this line/file
+                          |one # NOTE: No newline terminates this line/file
                           |two # NOTE: No newline terminates this line/file'''.stripMargin()
     }
 
