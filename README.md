@@ -110,6 +110,27 @@ shadowJar {
 }
 ```
 
+### Merging service files in a different directory
+
+```
+shaodwJar {
+  mergeServiceFiles('META-INF/griffon')
+}
+```
+
+**OR**
+
+```
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
+shadowJar {
+  transform(ServiceFileTransformer) {
+    path = 'META-INF/griffon'
+  }
+}
+```
+
+
 ### Appending Files
 
 ```

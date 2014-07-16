@@ -42,22 +42,19 @@ import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
  */
 class ServiceFileTransformer implements Transformer {
 
-    private static final String SERVICES_PATH = "META-INF/services";
-    Map<String, ServiceStream> serviceEntries = [:]
+    private static final String DEFAULT_SERVICES_PATH = "META-INF/services"
+    Map<String, ServiceStream> serviceEntries = [:].withDefault { new ServiceStream() }
+
+    String path = DEFAULT_SERVICES_PATH
 
     @Override
-    boolean canTransformResource(String path) {
-        return path.contains(SERVICES_PATH)
+    boolean canTransformResource(String resourcePath) {
+        return resourcePath.startsWith(path)
     }
 
     @Override
     void transform(String path, InputStream is, List<Relocator> relocators) {
-        ServiceStream out = serviceEntries[path]
-        if ( out == null ) {
-            out = new ServiceStream()
-            serviceEntries[path] = out
-        }
-        out.append(is)
+        serviceEntries[path].append(is)
     }
 
     @Override
@@ -77,19 +74,19 @@ class ServiceFileTransformer implements Transformer {
     static class ServiceStream extends ByteArrayOutputStream {
 
         public ServiceStream(){
-            super( 1024 );
+            super( 1024 )
         }
 
         public void append( InputStream is ) throws IOException {
             if ( count > 0 && buf[count - 1] != '\n' && buf[count - 1] != '\r' ) {
-                byte[] newline = '\n'.bytes;
-                write(newline, 0, newline.length);
+                byte[] newline = '\n'.bytes
+                write(newline, 0, newline.length)
             }
-            IOUtil.copy(is, this);
+            IOUtil.copy(is, this)
         }
 
         public InputStream toInputStream() {
-            return new ByteArrayInputStream( buf, 0, count );
+            return new ByteArrayInputStream( buf, 0, count )
         }
     }
 }

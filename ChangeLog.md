@@ -1,3 +1,8 @@
+v1.0.3
+======
+
++ Make service files root path configurable for `ServiceFileTransformer` ([Issue #72](https://github.com/johnrengelman/shadow/issues/72))
+
 v1.0.2
 ======
 

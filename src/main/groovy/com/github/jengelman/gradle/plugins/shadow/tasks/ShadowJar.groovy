@@ -9,12 +9,8 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
-import org.gradle.api.specs.Spec
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.SkipWhenEmpty
@@ -109,11 +105,21 @@ class ShadowJar extends Jar {
     }
 
     /**
-     * Syntax sugar for merging service files in JARs
+     * Syntatic sugar for merging service files in JARs
      * @return
      */
     ShadowJar mergeServiceFiles() {
         transform(ServiceFileTransformer)
+    }
+
+    /**
+     * Syntatic sugar for merging service files in JARs
+     * @return
+     */
+    ShadowJar mergeServiceFiles(String rootPath) {
+        transform(ServiceFileTransformer) {
+            path = rootPath
+        }
     }
 
     /**
