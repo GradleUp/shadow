@@ -19,7 +19,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.util.ConfigureUtil
 
-class ShadowJar extends Jar {
+class ShadowJar extends Jar implements ShadowSpec {
 
     List<Transformer> transformers = []
     List<Relocator> relocators = []
@@ -100,6 +100,11 @@ class ShadowJar extends Jar {
         if (c) {
             ConfigureUtil.configure(c, transformer)
         }
+        transformers << transformer
+        return this
+    }
+
+    ShadowJar transform(Transformer transformer) {
         transformers << transformer
         return this
     }
