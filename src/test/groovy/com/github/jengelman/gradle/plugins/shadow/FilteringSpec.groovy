@@ -406,4 +406,43 @@ class FilteringSpec extends PluginSpecification {
         and:
         doesNotContain(output, ['a2.properties'])
     }
+
+    @Issue("SHADOW-69")
+    def "handle exclude with circular dependency"() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .dependsOn('d')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .dependsOn('c')
+                .publish()
+
+        buildFile << '''
+            |dependencies {
+            |   compile 'shadow:d:1.0'
+            |}
+            |
+            |shadowJar {
+            |   dependencies {
+            |      exclude(dependency('shadow:d:1.0'))
+            |   }
+            |}
+        '''.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+
+        and:
+        doesNotContain(output, ['d.properties'])
+    }
+
 }
