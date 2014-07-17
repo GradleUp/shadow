@@ -208,4 +208,77 @@ class RelocationSpec extends PluginSpecification {
                 ClassLoader.systemClassLoader.parent)
         classLoader.loadClass('shadow.ShadowTest')
     }
+
+    @Issue('SHADOW-61')
+    def "relocate does not drop dependency resources"() {
+        given: 'Core project with dependency and resource'
+        file('core/build.gradle') << """
+        |apply plugin: 'java'
+        |
+        |repositories { maven { url "${repo.uri}" } }
+        |dependencies { compile 'junit:junit:3.8.2' }
+        """.stripMargin()
+
+        file('core/src/main/resources/TEST') << 'TEST RESOURCE'
+        file('core/src/main/resources/test.properties') << 'name=test'
+        file('core/src/main/java/core/Core.java') << '''
+        |package core;
+        |
+        |import junit.framework.Test;
+        |
+        |public class Core {}
+        '''.stripMargin()
+
+        and: 'App project with shadow, relocation, and project dependency'
+        file('app/build.gradle') << """
+        |apply plugin: 'java'
+        |apply plugin: ${ShadowPlugin.name}
+        |
+        |repositories { maven { url "${repo.uri}" } }
+        |dependencies { compile project(':core') }
+        |
+        |shadowJar {
+        |  baseName = 'shadow'
+        |  classifier = null
+        |  relocate 'core', 'app.core'
+        |  relocate 'junit.framework', 'app.junit.framework'
+        |}
+        """.stripMargin()
+
+        file('app/src/main/resources/APP-TEST') << 'APP TEST RESOURCE'
+        file('app/src/main/java/app/App.java') << '''
+        |package app;
+        |
+        |import core.Core;
+        |import junit.framework.Test;
+        |
+        |public class App {}
+        '''.stripMargin()
+
+        and: 'Configure multi-project build'
+        settingsFile << '''
+        |include 'core', 'app'
+        '''.stripMargin()
+
+        when:
+        runner.arguments << ':app:shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        File appOutput = file('app/build/libs/shadow.jar')
+        assert appOutput.exists()
+
+        and:
+        contains(appOutput, [
+                'TEST',
+                'APP-TEST',
+                'test.properties',
+                'app/core/Core.class',
+                'app/App.class',
+                'app/junit/framework/Test.class'
+        ])
+    }
 }

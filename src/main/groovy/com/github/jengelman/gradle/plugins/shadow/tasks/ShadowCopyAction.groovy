@@ -211,7 +211,7 @@ public class ShadowCopyAction implements CopyAction {
         private void visitArchiveFile(RelativeArchivePath archiveFile, ZipFile archive) {
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
                 if (recordVisit(archiveFile)) {
-                    if (!remapper.hasRelocators()) {
+                    if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFile, archive)
                     } else {
                         remapClass(archiveFile, archive)
