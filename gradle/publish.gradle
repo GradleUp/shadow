@@ -1,5 +1,6 @@
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.artifactory-publish'
 
 group = 'com.github.jengelman.gradle.plugins'
 def versionString = file('version.txt').text
@@ -35,6 +36,38 @@ publishing {
                 def root = asNode()
                 root.appendNode('description', 'Gradle plugin to combine dependencies into a single Jar. Port of Maven Shade.')
                 root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'https://oss.jfrog.org/artifactory'
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+        }
+        defaults {
+            publications 'plugin'
+        }
+    }
+}
+
+artifactoryPublish { task ->
+    doFirst {
+        if (!isSnapshot) {
+            throw new GradleException('Cannot publish non-SNAPSHOT versions to OJO!')
+        }
+    }
+    gradle.taskGraph.whenReady { taskGraph ->
+        if (taskGraph.hasTask(task)) {
+            project.artifactory {
+                publish {
+                    repository {
+                        username = bintrayUser
+                        password = bintrayKey
+                    }
+                }
             }
         }
     }
@@ -76,11 +109,5 @@ bintray {
                     ].join(',')
             ]
         }
-    }
-}
-
-project.afterEvaluate {
-    bintray.publications.each { pub ->
-        bintrayUpload.inputs.files { -> project.publishing.publications.getByName(pub).publishableFiles }
     }
 }
