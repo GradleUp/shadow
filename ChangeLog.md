@@ -6,6 +6,7 @@ v1.0.3
 + [Brandon Kearby](https://github.com/brandonkearby) - Fixed StackOverflow when a cycle occurs in the resolved dependency graph ([Issue #69](https://github.com/johnrengelman/shadow/pull/69))
 + Apply Transformers to project resources ([Issue #70](https://github.com/johnrengelman/shadow/issues/70), [Issue #71](https://github.com/johnrengelman/shadow/issues/71))
 + Do not drop non-class files from dependencies when relocation is enabled. Thanks to [Minecrell](https://github.com/Minecrell) for digging into this. ([Issue #61](https://github.com/johnrengelman/shadow/issues/61))
++ Remove support for applying individual sub-plugins by Id (easier maintenance and cleaner presentation in Gradle Portal)
 
 v1.0.2
 ======

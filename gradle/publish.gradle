@@ -100,13 +100,9 @@ bintray {
         vcsUrl = 'https://github.com/johnrengelman/shadow.git'
         version {
             vcsTag = versionString
+            ['shadow']
             attributes = [
-                    'gradle-plugin': [
-                            'com.github.johnrengelman.shadow:com.github.jengelman.gradle.plugins:shadow',
-                            'com.github.johnrengelman.shadow-base:com.github.jengelman.gradle.plugins:shadow',
-                            'com.github.johnrengelman.shadow-java:com.github.jengelman.gradle.plugins:shadow',
-                            'com.github.johnrengelman.shadow-application:com.github.jengelman.gradle.plugins:shadow',
-                    ].join(',')
+                    'gradle-plugin': 'com.github.johnrengelman.shadow:com.github.jengelman.gradle.plugins:shadow'
             ]
         }
     }
