@@ -21,7 +21,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 buildscript {
   repositories { jcenter() }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:1.0.3'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.1.0'
   }
 }
 
