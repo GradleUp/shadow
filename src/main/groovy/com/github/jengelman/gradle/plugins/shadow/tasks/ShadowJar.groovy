@@ -7,13 +7,12 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
-import org.apache.commons.io.FilenameUtils
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.util.PatternSet
@@ -23,6 +22,7 @@ class ShadowJar extends Jar implements ShadowSpec {
 
     List<Transformer> transformers = []
     List<Relocator> relocators = []
+    List<Configuration> configurations = []
 
     private final ShadowStats shadowStats = new ShadowStats()
     private final DependencyFilter dependencyFilter
@@ -31,25 +31,30 @@ class ShadowJar extends Jar implements ShadowSpec {
         dependencyFilter = new DependencyFilter(project)
     }
 
+    protected DependencyFilter getDependencyFilter() {
+        return dependencyFilter
+    }
+
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
         return new ShadowCopyAction(getArchivePath(), getCompressor(), documentationRegistry,
                 transformers, relocators, rootPatternSet,
-                dependencyFilter.patternSet, shadowStats)
+                shadowStats)
     }
 
     @TaskAction
     protected void copy() {
+        from(includedDependencies)
         super.copy()
         logger.info(shadowStats.toString())
     }
 
-    @Override
-    @InputFiles @SkipWhenEmpty @Optional
-    // SHADOW-54 Need to remove filtered dependencies from inputs list
-    public FileCollection getSource() {
-        super.source - excludedDependencies
+    @InputFiles @Optional
+    public FileCollection getIncludedDependencies() {
+        configurations.collect { Configuration config ->
+            dependencyFilter.resolve(config)
+        }.sum() as FileCollection ?: project.files()
     }
 
     /**
@@ -64,19 +69,6 @@ class ShadowJar extends Jar implements ShadowSpec {
         } else {
             return mainSpec.buildRootResolver().getPatternSet()
         }
-    }
-
-    /**
-     * Gets a list of dependency files that are being excluded
-     * @return
-     */
-    protected FileCollection getExcludedDependencies() {
-        def allDependencies = super.source.filter {
-            def ext = FilenameUtils.getExtension(it.name)
-            return ext == 'zip' || ext == 'jar'
-        }.asFileTree
-        def includedDependencies = allDependencies.matching(dependencyFilter.patternSet)
-        return allDependencies - includedDependencies
     }
 
     /**

@@ -58,13 +58,18 @@ jar {
 }
 
 idea {
+    project {
+        jdkName = '1.7'
+        languageLevel = '1.6'
+    }
     module {
         testSourceDirs += sourceSets.testUtils.allSource.srcDirs
         scopes.TEST.plus += configurations.testUtilsRuntime
-        outputDir = sourceSets.main.output.classesDir
-        testOutputDir = sourceSets.test.output.classesDir
     }
 }
+
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
 
 sourceSets.test.compileClasspath += sourceSets.testUtils.output
 sourceSets.test.runtimeClasspath += sourceSets.testUtils.output

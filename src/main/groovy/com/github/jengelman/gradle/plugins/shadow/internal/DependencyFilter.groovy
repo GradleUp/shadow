@@ -1,24 +1,57 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import groovy.util.logging.Slf4j
-import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.file.FileCollection
 import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
-import org.gradle.api.tasks.util.PatternSet
 
 @Slf4j
 class DependencyFilter {
 
     private final Project project
-    private final PatternSet patternSet
+
+    private final List<Spec<? super ResolvedDependency>> includeSpecs = []
+    private final List<Spec<? super ResolvedDependency>> excludeSpecs = []
 
     DependencyFilter(Project project) {
         assert project
         this.project = project
-        this.patternSet = new PatternSet()
+    }
+
+    FileCollection resolve(Configuration configuration) {
+        Set<ResolvedDependency> includedDeps = []
+        Set<ResolvedDependency> excludedDeps = []
+        resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, includedDeps, excludedDeps)
+        return project.files(configuration.files) - project.files(excludedDeps.collect {
+            it.moduleArtifacts*.file
+        }.flatten())
+    }
+
+    void resolve(Set<ResolvedDependency> dependencies,
+                 Set<ResolvedDependency> includedDependencies,
+                 Set<ResolvedDependency> excludedDependencies) {
+        dependencies.each {
+            println "Processing ${it.name}"
+            if (isIncluded(it)) {
+                if (includedDependencies.add(it)) {
+                    resolve(it.children, includedDependencies, excludedDependencies)
+                }
+            } else {
+                if (excludedDependencies.add(it)) {
+                    resolve(it.children, includedDependencies, excludedDependencies)
+                }
+            }
+        }
+    }
+
+    private boolean isIncluded(ResolvedDependency dependency) {
+        boolean include = includeSpecs.empty || includeSpecs.any { it.isSatisfiedBy(dependency) }
+        boolean exclude = !excludeSpecs.empty && excludeSpecs.any { it.isSatisfiedBy(dependency) }
+        return include && !exclude
     }
 
     /**
@@ -28,12 +61,7 @@ class DependencyFilter {
      * @return
      */
     public DependencyFilter exclude(Spec<? super ResolvedDependency> spec) {
-        Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
-                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies)
-        dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
-            this.patternSet.exclude(FilenameUtils.getName(file.path))
-        }
-        dependencies.each { log.debug("Excluding: ${it}")}
+        excludeSpecs << spec
         return this
     }
 
@@ -44,16 +72,8 @@ class DependencyFilter {
      * @return
      */
     public DependencyFilter include(Spec<? super ResolvedDependency> spec) {
-        Set<ResolvedDependency> dependencies = findMatchingDependencies(spec,
-                project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies)
-        dependencies.collect { it.moduleArtifacts.file }.flatten().each { File file ->
-            this.patternSet.include(FilenameUtils.getName(file.path))
-        }
+        includeSpecs << spec
         return this
-    }
-
-    public PatternSet getPatternSet() {
-        return patternSet
     }
 
     /**
