@@ -5,12 +5,14 @@ buildscript {
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.0.0"
+        classpath "org.asciidoctor:asciidoctor-gradle-plugin:0.7.3"
     }
 }
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'project-report'
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
 apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
@@ -73,4 +75,23 @@ targetCompatibility = '1.6'
 
 sourceSets.test.compileClasspath += sourceSets.testUtils.output
 sourceSets.test.runtimeClasspath += sourceSets.testUtils.output
+
+asciidoctor {
+    baseDir = project.file('src/asciidoc')
+    options = [
+        attributes: [
+            toc                     : 'left',
+            doctype                 : 'book',
+            icons                   : 'font',
+            encoding                : 'utf-8',
+            sectlink                : true,
+            sectanchors             : true,
+            numbered                : true,
+            linkattrs               : true,
+            imagesdir               : 'images',
+            linkcss                 : true,
+//            stylesheet              : 'css/style.css',
+        ]
+    ]
+}
 
