@@ -19,7 +19,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         configureShadowTask(project)
     }
 
-    private void configureShadowTask(Project project) {
+    protected void configureShadowTask(Project project) {
         JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
         ShadowJar shadow = project.tasks.create(SHADOW_JAR_TASK_NAME, ShadowJar)
         shadow.group = SHADOW_GROUP

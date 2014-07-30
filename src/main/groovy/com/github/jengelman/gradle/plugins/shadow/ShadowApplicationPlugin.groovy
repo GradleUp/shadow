@@ -40,7 +40,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         addDistTarTask(project)
     }
 
-    private void configureJarMainClass(Project project) {
+    protected void configureJarMainClass(Project project) {
         ApplicationPluginConvention pluginConvention = (
                 ApplicationPluginConvention) project.convention.plugins.application
 
@@ -49,7 +49,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         }
     }
 
-    private void addRunTask(Project project) {
+    protected void addRunTask(Project project) {
         ApplicationPluginConvention pluginConvention = (
                 ApplicationPluginConvention) project.convention.plugins.application
 
@@ -64,7 +64,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         run.inputs.file jar
     }
 
-    private void addCreateScriptsTask(Project project) {
+    protected void addCreateScriptsTask(Project project) {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
 
@@ -77,7 +77,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
     }
 
-    private void addInstallTask(Project project) {
+    protected void addInstallTask(Project project) {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
         ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
@@ -102,15 +102,15 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         }
     }
 
-    private void addDistZipTask(Project project) {
+    protected void addDistZipTask(Project project) {
         addArchiveTask(project, SHADOW_ZIP_DIST_TASK_NAME, Zip)
     }
 
-    private void addDistTarTask(Project project) {
+    protected void addDistTarTask(Project project) {
         addArchiveTask(project, SHADOW_TAR_DIST_TASK_NAME, Tar)
     }
 
-    private <T extends AbstractArchiveTask> void addArchiveTask(Project project, String name, Class<T> type) {
+    protected <T extends AbstractArchiveTask> void addArchiveTask(Project project, String name, Class<T> type) {
         ApplicationPluginConvention pluginConvention = project.convention.plugins.application
 
         def archiveTask = project.tasks.create(name, type)
@@ -123,7 +123,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         }
     }
 
-    private CopySpec configureDistSpec(Project project, CopySpec distSpec) {
+    protected CopySpec configureDistSpec(Project project, CopySpec distSpec) {
         def startScripts = project.tasks.startShadowScripts
 
         distSpec.with {

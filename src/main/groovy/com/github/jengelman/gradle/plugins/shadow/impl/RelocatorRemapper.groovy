@@ -43,7 +43,7 @@ class RelocatorRemapper extends Remapper {
     }
 
     boolean hasRelocators() {
-        return !relocators.isEmpty()
+        return !relocators.empty
     }
 
     Object mapValue(Object object) {

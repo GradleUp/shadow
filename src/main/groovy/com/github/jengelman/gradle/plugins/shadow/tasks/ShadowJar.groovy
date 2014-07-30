@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -23,24 +24,19 @@ class ShadowJar extends Jar implements ShadowSpec {
     List<Transformer> transformers = []
     List<Relocator> relocators = []
     List<Configuration> configurations = []
+    DependencyFilter dependencyFilter
 
     private final ShadowStats shadowStats = new ShadowStats()
-    private final DependencyFilter dependencyFilter
 
     ShadowJar() {
-        dependencyFilter = new DependencyFilter(project)
-    }
-
-    protected DependencyFilter getDependencyFilter() {
-        return dependencyFilter
+        dependencyFilter = new DefaultDependencyFilter(project)
     }
 
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
         return new ShadowCopyAction(getArchivePath(), getCompressor(), documentationRegistry,
-                transformers, relocators, rootPatternSet,
-                shadowStats)
+                transformers, relocators, rootPatternSet, shadowStats)
     }
 
     @TaskAction
@@ -52,9 +48,7 @@ class ShadowJar extends Jar implements ShadowSpec {
 
     @InputFiles @Optional
     public FileCollection getIncludedDependencies() {
-        configurations.collect { Configuration config ->
-            dependencyFilter.resolve(config)
-        }.sum() as FileCollection ?: project.files()
+        dependencyFilter.resolve(configurations)
     }
 
     /**
@@ -89,13 +83,16 @@ class ShadowJar extends Jar implements ShadowSpec {
      */
     ShadowJar transform(Class<? super Transformer> clazz, Closure c = null) {
         Transformer transformer = (Transformer) clazz.newInstance()
-        if (c) {
-            ConfigureUtil.configure(c, transformer)
-        }
+        ConfigureUtil.configure(c, transformer)
         transformers << transformer
         return this
     }
 
+    /**
+     * Add a preconfigured transformer instance
+     * @param transformer
+     * @return
+     */
     ShadowJar transform(Transformer transformer) {
         transformers << transformer
         return this
@@ -134,7 +131,7 @@ class ShadowJar extends Jar implements ShadowSpec {
      * @param configureClosure
      * @return
      */
-    public ShadowJar appendManifest(Closure configureClosure) {
+    ShadowJar appendManifest(Closure configureClosure) {
         ConfigureUtil.configure(configureClosure, getManifest())
         return this
     }
@@ -146,11 +143,9 @@ class ShadowJar extends Jar implements ShadowSpec {
      * @param configure
      * @return
      */
-    public ShadowJar relocate(String pattern, String destination, Closure configure = null) {
+    ShadowJar relocate(String pattern, String destination, Closure configure = null) {
         SimpleRelocator relocator = new SimpleRelocator(pattern, destination, [], [])
-        if (configure) {
-            ConfigureUtil.configure(configure, relocator)
-        }
+        ConfigureUtil.configure(configure, relocator)
         relocators << relocator
         return this
     }
@@ -160,7 +155,7 @@ class ShadowJar extends Jar implements ShadowSpec {
      * @param relocator
      * @return
      */
-    public ShadowJar relocate(Relocator relocator) {
+    ShadowJar relocate(Relocator relocator) {
         relocators << relocator
         return this
     }
@@ -171,11 +166,9 @@ class ShadowJar extends Jar implements ShadowSpec {
      * @param configure
      * @return
      */
-    public ShadowJar relocate(Class<? super Relocator> relocatorClass, Closure configure = null) {
+    ShadowJar relocate(Class<? super Relocator> relocatorClass, Closure configure = null) {
         Relocator relocator = (Relocator) relocatorClass.newInstance()
-        if (configure) {
-            ConfigureUtil.configure(configure, relocator)
-        }
+        ConfigureUtil.configure(configure, relocator)
         relocators << relocator
         return this
     }
