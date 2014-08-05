@@ -214,7 +214,7 @@ shadowJar {
 
 ### Transforming resources
 
-Uses the [Transformer](src/main/grovy/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.groovy) interface.
+Uses the [Transformer](src/main/groovy/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.groovy) interface.
 
 ```
 shadowJar {
