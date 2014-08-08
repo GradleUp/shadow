@@ -92,6 +92,39 @@ class TransformerSpec extends PluginSpecification {
                           |two # NOTE: No newline terminates this line/file'''.stripMargin()
     }
 
+    def 'service resource transformer alternate path'() {
+        given:
+            File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'one # NOTE: No newline terminates this line/file').write()
+
+            File two = buildJar('two.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'two # NOTE: No newline terminates this line/file').write()
+
+            buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    mergeServiceFiles('META-INF/foo')
+            |}
+        """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            ExecutionResult result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
+            assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
+    }
+
     @Issue(['SHADOW-70', 'SHADOW-71'])
     def 'apply transformers to project resources'() {
         given:

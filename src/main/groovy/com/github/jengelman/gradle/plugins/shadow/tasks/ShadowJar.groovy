@@ -99,7 +99,7 @@ class ShadowJar extends Jar implements ShadowSpec {
     }
 
     /**
-     * Syntatic sugar for merging service files in JARs
+     * Syntactic sugar for merging service files in JARs
      * @return
      */
     ShadowJar mergeServiceFiles() {
@@ -107,12 +107,12 @@ class ShadowJar extends Jar implements ShadowSpec {
     }
 
     /**
-     * Syntatic sugar for merging service files in JARs
+     * Syntactic sugar for merging service files in JARs
      * @return
      */
     ShadowJar mergeServiceFiles(String rootPath) {
         transform(ServiceFileTransformer) {
-            path = rootPath
+            setIncludes(["${rootPath}/**"])
         }
     }
 
