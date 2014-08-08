@@ -34,7 +34,7 @@ class TransformerSpec extends PluginSpecification {
             |    from('${escapedPath(one)}')
             |    from('${escapedPath(two)}')
             |    transform(${ServiceFileTransformer.name}) {
-            |        exclude('META-INF/services/com.acme.*')
+            |        exclude 'META-INF/services/com.acme.*'
             |    }
             |}
         """.stripMargin()
@@ -59,13 +59,54 @@ class TransformerSpec extends PluginSpecification {
         assert text2 == 'one'
     }
 
+    def 'service resource transformer alternate path'() {
+        given:
+            File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'one # NOTE: No newline terminates this line/file').write()
+
+            File two = buildJar('two.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'two # NOTE: No newline terminates this line/file').write()
+
+            buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    transform(${ServiceFileTransformer.name}) {
+            |        path = 'META-INF/foo'
+            |    }
+            |}
+        """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            ExecutionResult result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
+            assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
+    }
+
     def 'service resource transformer short syntax'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/org.apache.maven.Shade',
-                'one # NOTE: No newline terminates this line/file').write()
+            File one = buildJar('one.jar')
+                    .insertFile('META-INF/services/org.apache.maven.Shade',
+                    'one # NOTE: No newline terminates this line/file')
+                    .insertFile('META-INF/services/com.acme.Foo', 'one')
+                    .write()
 
-        File two = buildJar('two.jar').insertFile('META-INF/services/org.apache.maven.Shade',
-                'two # NOTE: No newline terminates this line/file').write()
+            File two = buildJar('two.jar')
+                    .insertFile('META-INF/services/org.apache.maven.Shade',
+                    'two # NOTE: No newline terminates this line/file')
+                    .insertFile('META-INF/services/com.acme.Foo', 'two')
+                    .write()
 
         buildFile << """
             |task shadow(type: ${ShadowJar.name}) {
@@ -73,7 +114,9 @@ class TransformerSpec extends PluginSpecification {
             |    baseName = 'shadow'
             |    from('${escapedPath(one)}')
             |    from('${escapedPath(two)}')
-            |    mergeServiceFiles()
+            |    mergeServiceFiles {
+            |        exclude 'META-INF/services/com.acme.*'
+            |    }
             |}
         """.stripMargin()
 
@@ -86,13 +129,18 @@ class TransformerSpec extends PluginSpecification {
         assert output.exists()
 
         and:
-        String text = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
-        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
-        assert text == '''|one # NOTE: No newline terminates this line/file
+            String text1 = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
+            assert text1.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text1 == '''|one # NOTE: No newline terminates this line/file
                           |two # NOTE: No newline terminates this line/file'''.stripMargin()
+
+        and:
+            String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
+            assert text2.split('(\r\n)|(\r)|(\n)').size() == 1
+            assert text2 == 'one'
     }
 
-    def 'service resource transformer alternate path'() {
+    def 'service resource transformer short syntax alternate path'() {
         given:
             File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
                     'one # NOTE: No newline terminates this line/file').write()

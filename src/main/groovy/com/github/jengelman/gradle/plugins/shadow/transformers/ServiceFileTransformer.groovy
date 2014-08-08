@@ -52,6 +52,10 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     private final PatternSet patternSet = new PatternSet().include(SERVICES_PATTERN)
 
+    void setPath(String path) {
+        patternSet.setIncludes(["${path}/**"])
+    }
+
     @Override
     boolean canTransformResource(FileTreeElement element) {
         return patternSet.asSpec.isSatisfiedBy(element)

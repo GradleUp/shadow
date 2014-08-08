@@ -112,8 +112,16 @@ class ShadowJar extends Jar implements ShadowSpec {
      */
     ShadowJar mergeServiceFiles(String rootPath) {
         transform(ServiceFileTransformer) {
-            setIncludes(["${rootPath}/**"])
+            path = rootPath
         }
+    }
+
+    /**
+     * Syntactic sugar for merging service files in JARs
+     * @return
+     */
+    ShadowJar mergeServiceFiles(Closure configureClosure) {
+        transform(ServiceFileTransformer, configureClosure)
     }
 
     /**
