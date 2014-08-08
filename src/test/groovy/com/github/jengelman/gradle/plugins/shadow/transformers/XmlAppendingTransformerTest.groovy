@@ -19,7 +19,10 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import junit.framework.TestCase
+import org.junit.Before
+import org.junit.Test
+
+import static org.junit.Assert.*
 
 /**
  * Test for {@link XmlAppendingTransformer}.
@@ -29,7 +32,7 @@ import junit.framework.TestCase
  *
  * Modified from org.apache.maven.plugins.shade.resource.XmlAppendingTransformerTest.java
  */
-class XmlAppendingTransformerTest extends TestCase {
+class XmlAppendingTransformerTest extends TransformerTestSupport {
 
     XmlAppendingTransformer transformer
 
@@ -41,16 +44,18 @@ class XmlAppendingTransformerTest extends TestCase {
         Locale.setDefault(new Locale("tr"))
     }
 
+    @Before
     void setUp() {
         transformer = new XmlAppendingTransformer()
     }
 
+    @Test
     void testCanTransformResource() {
         transformer.resource = "abcdefghijklmnopqrstuvwxyz"
 
-        assertTrue(this.transformer.canTransformResource("abcdefghijklmnopqrstuvwxyz"))
-        assertTrue(this.transformer.canTransformResource("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-        assertFalse(this.transformer.canTransformResource("META-INF/MANIFEST.MF"))
+        assertTrue(this.transformer.canTransformResource(getFileElement("abcdefghijklmnopqrstuvwxyz")))
+        assertTrue(this.transformer.canTransformResource(getFileElement("ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
+        assertFalse(this.transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
     }
 
 }

@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 import java.util.jar.*
@@ -52,7 +53,8 @@ class ManifestResourceTransformer implements Transformer {
 
     private Manifest manifest
 
-    boolean canTransformResource(String path) {
+    boolean canTransformResource(FileTreeElement element) {
+        def path = element.relativePath.pathString
         if (JarFile.MANIFEST_NAME.equalsIgnoreCase(path)) {
             return true
         }

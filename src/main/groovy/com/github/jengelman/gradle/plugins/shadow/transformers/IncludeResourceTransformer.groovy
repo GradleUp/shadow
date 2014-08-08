@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 /**
@@ -38,7 +39,7 @@ public class IncludeResourceTransformer implements Transformer {
 
     String resource
 
-    public boolean canTransformResource(String path) {
+    public boolean canTransformResource(FileTreeElement element) {
         return false
     }
 

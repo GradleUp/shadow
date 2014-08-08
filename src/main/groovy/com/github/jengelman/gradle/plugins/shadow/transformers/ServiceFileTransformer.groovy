@@ -22,6 +22,10 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 /**
@@ -40,16 +44,17 @@ import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
  * @author Charlie Knudsen
  * @author John Engelman
  */
-class ServiceFileTransformer implements Transformer {
+class ServiceFileTransformer implements Transformer, PatternFilterable {
 
-    private static final String DEFAULT_SERVICES_PATH = "META-INF/services"
+    private static final String SERVICES_PATTERN = "META-INF/services/**"
+
     Map<String, ServiceStream> serviceEntries = [:].withDefault { new ServiceStream() }
 
-    String path = DEFAULT_SERVICES_PATH
+    private final PatternSet patternSet = new PatternSet().include(SERVICES_PATTERN)
 
     @Override
-    boolean canTransformResource(String resourcePath) {
-        return resourcePath.startsWith(path)
+    boolean canTransformResource(FileTreeElement element) {
+        return patternSet.asSpec.isSatisfiedBy(element)
     }
 
     @Override
@@ -89,4 +94,111 @@ class ServiceFileTransformer implements Transformer {
             return new ByteArrayInputStream( buf, 0, count )
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer include(String... includes) {
+        patternSet.include(includes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer include(Iterable<String> includes) {
+        patternSet.include(includes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer include(Spec<FileTreeElement> includeSpec) {
+        patternSet.include(includeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer include(Closure includeSpec) {
+        patternSet.include(includeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer exclude(String... excludes) {
+        patternSet.exclude(excludes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer exclude(Iterable<String> excludes) {
+        patternSet.exclude(excludes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer exclude(Spec<FileTreeElement> excludeSpec) {
+        patternSet.exclude(excludeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer exclude(Closure excludeSpec) {
+        patternSet.exclude(excludeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    Set<String> getIncludes() {
+        return patternSet.includes
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer setIncludes(Iterable<String> includes) {
+        patternSet.includes = includes
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    Set<String> getExcludes() {
+        return patternSet.excludes
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    ServiceFileTransformer setExcludes(Iterable<String> excludes) {
+        patternSet.excludes = excludes
+        return this
+    }
+
 }

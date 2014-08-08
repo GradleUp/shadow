@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 /**
@@ -114,7 +115,8 @@ class PropertiesFileTransformer implements Transformer {
     String mergeSeparator = ','
 
     @Override
-    boolean canTransformResource(String path) {
+    boolean canTransformResource(FileTreeElement element) {
+        def path = element.relativePath.pathString
         if (mappings.containsKey(path)) return true
         for (key in mappings.keySet()) {
             if (path =~ /$key/) return true

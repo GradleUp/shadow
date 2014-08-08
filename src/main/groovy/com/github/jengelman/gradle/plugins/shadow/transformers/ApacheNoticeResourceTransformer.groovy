@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.mvn3.org.codehaus.plexus.util.StringUtils
 
 import java.text.SimpleDateFormat
@@ -69,7 +70,8 @@ class ApacheNoticeResourceTransformer implements Transformer {
 
     private static final String NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
 
-    boolean canTransformResource(String path) {
+    boolean canTransformResource(FileTreeElement element) {
+        def path = element.relativePath.pathString
         if (NOTICE_PATH.equalsIgnoreCase(path) || NOTICE_TXT_PATH.equalsIgnoreCase(path)) {
             return true
         }

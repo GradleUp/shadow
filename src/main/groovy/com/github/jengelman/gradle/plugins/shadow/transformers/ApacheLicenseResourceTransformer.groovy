@@ -21,6 +21,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 
 /**
  * Prevents duplicate copies of the license
@@ -36,7 +37,8 @@ class ApacheLicenseResourceTransformer implements Transformer {
 
     private static final String LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
 
-    boolean canTransformResource(String path) {
+    boolean canTransformResource(FileTreeElement element) {
+        def path = element.relativePath.pathString
         return LICENSE_PATH.equalsIgnoreCase(path) ||
                 LICENSE_TXT_PATH.regionMatches(true, 0, path, 0, LICENSE_TXT_PATH.length())
     }

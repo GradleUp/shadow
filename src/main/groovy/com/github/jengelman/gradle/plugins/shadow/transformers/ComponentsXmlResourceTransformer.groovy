@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 import org.gradle.mvn3.org.codehaus.plexus.util.ReaderFactory
 import org.gradle.mvn3.org.codehaus.plexus.util.WriterFactory
@@ -42,7 +43,8 @@ class ComponentsXmlResourceTransformer implements Transformer {
 
     static final String COMPONENTS_XML_PATH = "META-INF/plexus/components.xml"
 
-    boolean canTransformResource(String path) {
+    boolean canTransformResource(FileTreeElement element) {
+        def path = element.relativePath.pathString
         return COMPONENTS_XML_PATH.equals(path)
     }
 

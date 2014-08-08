@@ -19,17 +19,17 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
-class PropertiesFileTransformerSpec extends Specification {
+class PropertiesFileTransformerSpec extends TransformerSpecSupport {
+
     void "Path #path #transform transformed"() {
         given:
         Transformer transformer = new PropertiesFileTransformer()
 
         when:
-        boolean actual = transformer.canTransformResource(path)
+        boolean actual = transformer.canTransformResource(getFileElement(path))
 
         then:
         actual == expected
@@ -43,14 +43,15 @@ class PropertiesFileTransformerSpec extends Specification {
         transform = expected ? 'can be' : 'can not be'
     }
 
-    void excerciseAllTransformConfigurations() {
+    void exerciseAllTransformConfigurations() {
         given:
+        def element = getFileElement(path)
         Transformer transformer = new PropertiesFileTransformer()
         transformer.mergeStrategy = mergeStrategy
         transformer.mergeSeparator = mergeSeparator
 
         when:
-        if (transformer.canTransformResource(path)) {
+        if (transformer.canTransformResource(element)) {
             transformer.transform(path, toInputStream(toProperties(input1)), [])
             transformer.transform(path, toInputStream(toProperties(input2)), [])
         }
@@ -66,14 +67,15 @@ class PropertiesFileTransformerSpec extends Specification {
         'f.properties' | 'append'      | ';'            | ['foo': 'foo'] | ['foo': 'bar'] || ['foo': 'foo;bar']
     }
 
-    void excerciseAllTransformConfigurationsWithPaths() {
+    void exerciseAllTransformConfigurationsWithPaths() {
         given:
+        def element = getFileElement(path)
         Transformer transformer = new PropertiesFileTransformer()
         transformer.paths = paths
         transformer.mergeStrategy = 'first'
 
         when:
-        if (transformer.canTransformResource(path)) {
+        if (transformer.canTransformResource(element)) {
             transformer.transform(path, toInputStream(toProperties(input1)), [])
             transformer.transform(path, toInputStream(toProperties(input2)), [])
         }
@@ -89,14 +91,15 @@ class PropertiesFileTransformerSpec extends Specification {
         'foo.properties' | []                | ['foo': 'foo'] | ['foo': 'bar'] || ['foo': 'foo']
     }
 
-    void excerciseAllTransformConfigurationsWithMappings() {
+    void exerciseAllTransformConfigurationsWithMappings() {
         given:
+        def element = getFileElement(path)
         Transformer transformer = new PropertiesFileTransformer()
         transformer.mappings = mappings
         transformer.mergeStrategy = 'latest'
 
         when:
-        if (transformer.canTransformResource(path)) {
+        if (transformer.canTransformResource(element)) {
             transformer.transform(path, toInputStream(toProperties(input1)), [])
             transformer.transform(path, toInputStream(toProperties(input2)), [])
         }

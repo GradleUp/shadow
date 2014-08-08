@@ -173,17 +173,16 @@ public class ShadowCopyAction implements CopyAction {
         private void processArchive(FileCopyDetails fileDetails) {
             stats.startJar()
             ZipFile archive = new ZipFile(fileDetails.file)
-            List<RelativeArchivePath> archivePaths = archive.entries.collect {
-                new RelativeArchivePath(it, fileDetails)
+            List<ArchiveFileTreeElement> archiveElements = archive.entries.collect {
+                new ArchiveFileTreeElement(new RelativeArchivePath(it, fileDetails))
             }
             Spec<FileTreeElement> patternSpec = patternSet.getAsSpec()
-            List<RelativeArchivePath> filteredArchivePaths = archivePaths.findAll { RelativeArchivePath archivePath ->
-                FileTreeElement element = new ArchiveFileTreeElement(archivePath)
-                patternSpec.isSatisfiedBy(element)
+            List<ArchiveFileTreeElement> filteredArchiveElements = archiveElements.findAll { ArchiveFileTreeElement archiveElement ->
+                patternSpec.isSatisfiedBy(archiveElement)
             }
-            filteredArchivePaths.each { RelativeArchivePath relativePath ->
-                if (relativePath.file) {
-                    visitArchiveFile(relativePath, archive)
+            filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
+                if (archiveElement.relativePath.file) {
+                    visitArchiveFile(archiveElement, archive)
                 }
             }
             archive.close()
@@ -197,13 +196,14 @@ public class ShadowCopyAction implements CopyAction {
             }
         }
 
-        private void visitArchiveFile(RelativeArchivePath archiveFile, ZipFile archive) {
+        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive) {
+            def archiveFilePath = archiveFile.relativePath
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                if (recordVisit(archiveFile)) {
+                if (recordVisit(archiveFilePath)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
-                        copyArchiveEntry(archiveFile, archive)
+                        copyArchiveEntry(archiveFilePath, archive)
                     } else {
-                        remapClass(archiveFile, archive)
+                        remapClass(archiveFilePath, archive)
                     }
                 }
             } else {
@@ -289,30 +289,23 @@ public class ShadowCopyAction implements CopyAction {
             }
         }
 
-        private void transform(RelativeArchivePath file, ZipFile archive) {
-            transform(file.pathString, archive.getInputStream(file.entry))
+        private void transform(ArchiveFileTreeElement element, ZipFile archive) {
+            transform(element, archive.getInputStream(element.relativePath.entry))
         }
 
-        private void transform(FileCopyDetails file) {
-            transform(file.path, file.file.newInputStream())
+        private void transform(FileCopyDetails details) {
+            transform(details, details.file.newInputStream())
         }
 
-        private void transform(String path, InputStream is) {
-            String mappedPath = remapper.map(path)
-            transformers.find { it.canTransformResource(path) }.transform(mappedPath, is, relocators)
+        private void transform(FileTreeElement element, InputStream is) {
+            String mappedPath = remapper.map(element.relativePath.pathString)
+            transformers.find { it.canTransformResource(element) }.transform(mappedPath, is, relocators)
         }
 
-        private boolean isTransformable(RelativeArchivePath file) {
-            return isTransformable(file.pathString)
+        private boolean isTransformable(FileTreeElement element) {
+            return transformers.any { it.canTransformResource(element) }
         }
 
-        private boolean isTransformable(FileCopyDetails file) {
-            return isTransformable(file.path)
-        }
-
-        private boolean isTransformable(String path) {
-            return transformers.any { it.canTransformResource(path) }
-        }
     }
 
     class RelativeArchivePath extends RelativePath {
@@ -347,6 +340,10 @@ public class ShadowCopyAction implements CopyAction {
 
         ArchiveFileTreeElement(RelativeArchivePath archivePath) {
             this.archivePath = archivePath
+        }
+
+        boolean isClassFile() {
+            return archivePath.classFile
         }
 
         @Override
@@ -395,7 +392,7 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         @Override
-        RelativePath getRelativePath() {
+        RelativeArchivePath getRelativePath() {
             return archivePath
         }
 

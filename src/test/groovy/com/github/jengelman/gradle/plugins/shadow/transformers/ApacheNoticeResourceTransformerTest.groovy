@@ -19,7 +19,10 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import junit.framework.TestCase
+import org.junit.Before
+import org.junit.Test
+
+import static org.junit.Assert.*
 
 /**
  * Test for {@link ApacheNoticeResourceTransformer}.
@@ -29,7 +32,7 @@ import junit.framework.TestCase
  *
  * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerTest.java
  */
-class ApacheNoticeResourceTransformerTest extends TestCase {
+class ApacheNoticeResourceTransformerTest extends TransformerTestSupport {
 
     private ApacheNoticeResourceTransformer transformer
 
@@ -41,15 +44,17 @@ class ApacheNoticeResourceTransformerTest extends TestCase {
         Locale.setDefault(new Locale("tr"))
     }
 
+    @Before
     void setUp() {
         this.transformer = new ApacheNoticeResourceTransformer()
     }
 
+    @Test
     void testCanTransformResource() {
-        assertTrue(this.transformer.canTransformResource("META-INF/NOTICE"))
-        assertTrue(this.transformer.canTransformResource("META-INF/NOTICE.TXT"))
-        assertTrue(this.transformer.canTransformResource("META-INF/Notice.txt"))
-        assertFalse(this.transformer.canTransformResource("META-INF/MANIFEST.MF"))
+        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/NOTICE")))
+        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/NOTICE.TXT")))
+        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/Notice.txt")))
+        assertFalse(this.transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
     }
 
 }
