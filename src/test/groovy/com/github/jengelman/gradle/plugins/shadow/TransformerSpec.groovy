@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
@@ -436,6 +437,98 @@ class TransformerSpec extends PluginSpecification {
             |</properties>
             |
         |'''.stripMargin()
+    }
+
+    def 'Groovy extension module transformer'() {
+        given:
+            def one = buildJar('one.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=foo
+                       |moduleVersion=1.0.5
+                       |extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+                       |staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripMargin())
+                    .write()
+
+            def two = buildJar('two.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=bar
+                       |moduleVersion=2.3.5
+                       |extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+                       |staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripMargin())
+                    .write()
+
+            buildFile << """
+                |task shadow(type: ${ShadowJar.name}) {
+                |    destinationDir = new File(buildDir, 'libs')
+                |    baseName = 'shadow'
+                |    from('${escapedPath(one)}')
+                |    from('${escapedPath(two)}')
+                |    transform(${GroovyExtensionModuleTransformer.name})
+                |}
+            """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            def result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+            def props = new Properties()
+            props.load(new StringReader(text))
+            assert props.getProperty('moduleName') == 'MergedByShadowJar'
+            assert props.getProperty('moduleVersion') == '1.0.0'
+            assert props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
+            assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
+    }
+
+    def 'Groovy extension module transformer short syntax'() {
+        given:
+            def one = buildJar('one.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=foo
+                       |moduleVersion=1.0.5
+                       |extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+                       |staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripMargin())
+                    .write()
+
+            def two = buildJar('two.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=bar
+                       |moduleVersion=2.3.5
+                       |extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+                       |staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripMargin())
+                    .write()
+
+            buildFile << """
+                |task shadow(type: ${ShadowJar.name}) {
+                |    destinationDir = new File(buildDir, 'libs')
+                |    baseName = 'shadow'
+                |    from('${escapedPath(one)}')
+                |    from('${escapedPath(two)}')
+                |    mergeGroovyExtensionModules()
+                |}
+            """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            def result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+            def props = new Properties()
+            props.load(new StringReader(text))
+            assert props.getProperty('moduleName') == 'MergedByShadowJar'
+            assert props.getProperty('moduleVersion') == '1.0.0'
+            assert props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
+            assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
     }
 
     private String escapedPath(File file) {

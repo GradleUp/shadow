@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.gradle.api.artifacts.Configuration
@@ -122,6 +123,14 @@ class ShadowJar extends Jar implements ShadowSpec {
      */
     ShadowJar mergeServiceFiles(Closure configureClosure) {
         transform(ServiceFileTransformer, configureClosure)
+    }
+
+    /**
+     * Syntactic sugar for merging Groovy extension module descriptor files in JARs
+     * @return
+     */
+    ShadowJar mergeGroovyExtensionModules() {
+        transform(GroovyExtensionModuleTransformer)
     }
 
     /**

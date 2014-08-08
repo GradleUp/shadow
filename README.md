@@ -154,6 +154,25 @@ shadowJar {
 ```
 
 
+### Merging Groovy extension modules
+
+```
+shadowJar {
+  mergeGroovyExtensionModules()
+}
+```
+
+**OR**
+
+```
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+
+shadowJar {
+  transform(GroovyExtensionModuleTransformer)
+}
+```
+
+
 ### Appending Files
 
 ```
