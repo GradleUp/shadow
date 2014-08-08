@@ -48,9 +48,13 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     private static final String SERVICES_PATTERN = "META-INF/services/**"
 
+    private static final String GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
+            "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+
     Map<String, ServiceStream> serviceEntries = [:].withDefault { new ServiceStream() }
 
-    private final PatternSet patternSet = new PatternSet().include(SERVICES_PATTERN)
+    private final PatternSet patternSet =
+            new PatternSet().include(SERVICES_PATTERN).exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN)
 
     void setPath(String path) {
         patternSet.setIncludes(["${path}/**"])

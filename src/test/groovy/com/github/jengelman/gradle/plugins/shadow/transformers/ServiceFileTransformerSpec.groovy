@@ -52,6 +52,15 @@ class ServiceFileTransformerSpec extends TransformerSpecSupport {
             'META-INF/services/com.acme.Bar' | 'foo\nbar' | 'zoo'  || 'foo\nbar\nzoo'
     }
 
+    def "excludes Groovy extension module descriptor files by default"() {
+        given:
+            def transformer = new ServiceFileTransformer()
+            def element = getFileElement('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+
+        expect:
+            !transformer.canTransformResource(element)
+    }
+
     private static InputStream toInputStream(String str) {
         return new ByteArrayInputStream(str.bytes)
     }
