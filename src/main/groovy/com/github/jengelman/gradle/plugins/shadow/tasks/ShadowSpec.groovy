@@ -18,6 +18,10 @@ interface ShadowSpec extends CopySpec {
 
     ShadowSpec mergeServiceFiles(String rootPath)
 
+    ShadowSpec mergeServiceFiles(Closure configureClosure)
+
+    ShadowSpec mergeGroovyExtensionModules()
+
     ShadowSpec append(String resourcePath)
 
     ShadowSpec appendManifest(Closure configure)
