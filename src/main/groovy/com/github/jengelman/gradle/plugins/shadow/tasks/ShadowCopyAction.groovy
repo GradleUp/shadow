@@ -48,9 +48,11 @@ public class ShadowCopyAction implements CopyAction {
     private final PatternSet patternSet
     private final ShadowStats stats
 
+    private Set<CopyLater> copyLaterList = new HashSet<CopyLater>()
+
     public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             List<Transformer> transformers, List<Relocator> relocators, PatternSet patternSet,
-                            ShadowStats stats) {
+            ShadowStats stats) {
 
         this.zipFile = zipFile
         this.compressor = compressor
@@ -78,6 +80,7 @@ public class ShadowCopyAction implements CopyAction {
                         stream.process(new StreamAction(outputStream, transformers, relocators, patternSet,
                                 stats))
                         processTransformers(outputStream)
+                        copyResources(outputStream)
                     } catch (Exception e) {
                         log.error('ex', e)
                         //TODO this should not be rethrown
@@ -101,6 +104,21 @@ public class ShadowCopyAction implements CopyAction {
             if (transformer.hasTransformedResource()) {
                 transformer.modifyOutputStream(stream)
             }
+        }
+    }
+
+    private void copyResources(ZipOutputStream stream) {
+        def groupedBySourceArchive = copyLaterList.groupBy {it.sourceArchive}
+
+        groupedBySourceArchive.each { File source, List<CopyLater> filesToCopy ->
+            def sourceZip = new ZipFile(source)
+            filesToCopy.each { CopyLater pathToCopy ->
+                stream.putNextEntry(pathToCopy.fileToCopy.entry)
+                IOUtils.copyLarge(sourceZip.getInputStream(pathToCopy.fileToCopy.entry), stream)
+                stream.closeEntry()
+            }
+
+            sourceZip.close()
         }
     }
 
@@ -182,7 +200,7 @@ public class ShadowCopyAction implements CopyAction {
             }
             filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
                 if (archiveElement.relativePath.file) {
-                    visitArchiveFile(archiveElement, archive)
+                    visitArchiveFile(archiveElement, archive, fileDetails.file)
                 }
             }
             archive.close()
@@ -196,12 +214,12 @@ public class ShadowCopyAction implements CopyAction {
             }
         }
 
-        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive) {
+        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive, File archiveAsFile) {
             def archiveFilePath = archiveFile.relativePath
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
                 if (recordVisit(archiveFilePath)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
-                        copyArchiveEntry(archiveFilePath, archive)
+                        addEntryToCopyLater(archiveFilePath, archiveAsFile)
                     } else {
                         remapClass(archiveFilePath, archive)
                     }
@@ -209,6 +227,11 @@ public class ShadowCopyAction implements CopyAction {
             } else {
                 transform(archiveFile, archive)
             }
+        }
+
+        private void addEntryToCopyLater(RelativeArchivePath pathToCopy, File sourceArchive) {
+            addParentDirectories(pathToCopy)
+            copyLaterList.add(new CopyLater(pathToCopy, sourceArchive))
         }
 
         private void addParentDirectories(RelativeArchivePath file) {
@@ -399,6 +422,17 @@ public class ShadowCopyAction implements CopyAction {
         @Override
         int getMode() {
             return archivePath.entry.unixMode
+        }
+    }
+
+    private class CopyLater {
+
+        RelativeArchivePath fileToCopy
+        File sourceArchive
+
+        CopyLater(RelativeArchivePath fileToCopy, File sourceArchive) {
+            this.fileToCopy = fileToCopy
+            this.sourceArchive = sourceArchive
         }
     }
 }
