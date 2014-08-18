@@ -1,3 +1,19 @@
+v1.1.0
+======
+
++ `ShadowTask` now has a `configurations` property that is resolved to the files in the resolved configuration before
+  being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task
+  has the convention of adding the `'runtime'` scope to this list. Manually created instances of `ShadowTask` have no
+  configurations added by default and can be configured by setting `task.configurations`.
++ Properly configure integration with the `'maven'` plugin when added. When adding `'maven'` the `'uploadShadow'` task
+  will now properly configure the POM dependencies by removing the `'compile'` and `'runtime'` configurations from the
+  POM and adding the `'shadow'` configuration as a `RUNTIME` scope in the POM. This behavior matches the behavior when
+  using the `'maven-publish'` plugin.
++ [Matt Hurne](https://github.com/mhurne) - Allow `ServiceFileTransformer` to specify include/exclude patterns for
+  files within the configured path to merge.
++ [Matt Hurne](https://github.com/mhurne) - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
+  descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default.
+
 v1.0.3
 ======
 
