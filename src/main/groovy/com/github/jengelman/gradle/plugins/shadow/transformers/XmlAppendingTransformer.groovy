@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.jdom.*
 import org.jdom.input.SAXBuilder
 import org.jdom.output.Format
@@ -47,7 +48,8 @@ class XmlAppendingTransformer implements Transformer {
 
     Document doc
 
-    boolean canTransformResource(String path) {
+    boolean canTransformResource(FileTreeElement element) {
+        def path = element.relativePath.pathString
         if (resource != null && resource.equalsIgnoreCase(path)) {
             return true
         }

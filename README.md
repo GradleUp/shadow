@@ -131,6 +131,48 @@ shadowJar {
 ```
 
 
+### Merging service files specified by include and exclude patterns
+
+```
+shadowJar {
+  mergeServiceFiles {
+    exclude 'META-INF/services/com.acme.*'
+  }
+}
+```
+
+**OR**
+
+```
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
+shadowJar {
+  transform(ServiceFileTransformer) {
+    exclude 'META-INF/services/com.acme.*'
+  }
+}
+```
+
+
+### Merging Groovy extension modules
+
+```
+shadowJar {
+  mergeGroovyExtensionModules()
+}
+```
+
+**OR**
+
+```
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+
+shadowJar {
+  transform(GroovyExtensionModuleTransformer)
+}
+```
+
+
 ### Appending Files
 
 ```

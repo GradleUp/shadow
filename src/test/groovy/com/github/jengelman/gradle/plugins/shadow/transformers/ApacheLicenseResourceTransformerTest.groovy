@@ -19,7 +19,10 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import junit.framework.TestCase
+import org.junit.Before
+import org.junit.Test
+
+import static org.junit.Assert.*
 
 /**
  * Test for {@link ApacheLicenseResourceTransformer}.
@@ -29,7 +32,7 @@ import junit.framework.TestCase
  *
  * Modified from org.apache.maven.plugins.shade.resources.ApacheLicenseResourceTransformerTest.java
  */
-class ApacheLicenseResourceTransformerTest extends TestCase {
+class ApacheLicenseResourceTransformerTest extends TransformerTestSupport {
 
     private ApacheLicenseResourceTransformer transformer
 
@@ -41,15 +44,17 @@ class ApacheLicenseResourceTransformerTest extends TestCase {
         Locale.setDefault(new Locale("tr"))
     }
 
+    @Before
     void setUp() {
         this.transformer = new ApacheLicenseResourceTransformer()
     }
 
+    @Test
     void testCanTransformResource() {
-        assertTrue(this.transformer.canTransformResource("META-INF/LICENSE"))
-        assertTrue(this.transformer.canTransformResource("META-INF/LICENSE.TXT"))
-        assertTrue(this.transformer.canTransformResource("META-INF/License.txt"))
-        assertFalse(this.transformer.canTransformResource("META-INF/MANIFEST.MF"))
+        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/LICENSE")))
+        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/LICENSE.TXT")))
+        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/License.txt")))
+        assertFalse(this.transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
     }
 
 }

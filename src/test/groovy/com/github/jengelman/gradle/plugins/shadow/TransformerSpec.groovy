@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
@@ -15,11 +16,17 @@ class TransformerSpec extends PluginSpecification {
 
     def 'service resource transformer'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/org.apache.maven.Shade',
-                'one # NOTE: No newline terminates this line/file').write()
+        File one = buildJar('one.jar')
+                .insertFile('META-INF/services/org.apache.maven.Shade',
+                        'one # NOTE: No newline terminates this line/file')
+                .insertFile('META-INF/services/com.acme.Foo', 'one')
+                .write()
 
-        File two = buildJar('two.jar').insertFile('META-INF/services/org.apache.maven.Shade',
-                'two # NOTE: No newline terminates this line/file').write()
+        File two = buildJar('two.jar')
+                .insertFile('META-INF/services/org.apache.maven.Shade',
+                        'two # NOTE: No newline terminates this line/file')
+                .insertFile('META-INF/services/com.acme.Foo', 'two')
+                .write()
 
         buildFile << """
             |task shadow(type: ${ShadowJar.name}) {
@@ -27,7 +34,9 @@ class TransformerSpec extends PluginSpecification {
             |    baseName = 'shadow'
             |    from('${escapedPath(one)}')
             |    from('${escapedPath(two)}')
-            |    transform(${ServiceFileTransformer.name})
+            |    transform(${ServiceFileTransformer.name}) {
+            |        exclude 'META-INF/services/com.acme.*'
+            |    }
             |}
         """.stripMargin()
 
@@ -40,19 +49,65 @@ class TransformerSpec extends PluginSpecification {
         assert output.exists()
 
         and:
-        String text = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
-        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
-        assert text == '''|one # NOTE: No newline terminates this line/file
+        String text1 = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
+        assert text1.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text1 == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
+
+        and:
+        String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
+        assert text2.split('(\r\n)|(\r)|(\n)').size() == 1
+        assert text2 == 'one'
+    }
+
+    def 'service resource transformer alternate path'() {
+        given:
+            File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'one # NOTE: No newline terminates this line/file').write()
+
+            File two = buildJar('two.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'two # NOTE: No newline terminates this line/file').write()
+
+            buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    transform(${ServiceFileTransformer.name}) {
+            |        path = 'META-INF/foo'
+            |    }
+            |}
+        """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            ExecutionResult result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
+            assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text == '''|one # NOTE: No newline terminates this line/file
                           |two # NOTE: No newline terminates this line/file'''.stripMargin()
     }
 
     def 'service resource transformer short syntax'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/org.apache.maven.Shade',
-                'one # NOTE: No newline terminates this line/file').write()
+            File one = buildJar('one.jar')
+                    .insertFile('META-INF/services/org.apache.maven.Shade',
+                    'one # NOTE: No newline terminates this line/file')
+                    .insertFile('META-INF/services/com.acme.Foo', 'one')
+                    .write()
 
-        File two = buildJar('two.jar').insertFile('META-INF/services/org.apache.maven.Shade',
-                'two # NOTE: No newline terminates this line/file').write()
+            File two = buildJar('two.jar')
+                    .insertFile('META-INF/services/org.apache.maven.Shade',
+                    'two # NOTE: No newline terminates this line/file')
+                    .insertFile('META-INF/services/com.acme.Foo', 'two')
+                    .write()
 
         buildFile << """
             |task shadow(type: ${ShadowJar.name}) {
@@ -60,7 +115,9 @@ class TransformerSpec extends PluginSpecification {
             |    baseName = 'shadow'
             |    from('${escapedPath(one)}')
             |    from('${escapedPath(two)}')
-            |    mergeServiceFiles()
+            |    mergeServiceFiles {
+            |        exclude 'META-INF/services/com.acme.*'
+            |    }
             |}
         """.stripMargin()
 
@@ -73,9 +130,47 @@ class TransformerSpec extends PluginSpecification {
         assert output.exists()
 
         and:
-        String text = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
-        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
-        assert text == '''|one # NOTE: No newline terminates this line/file
+            String text1 = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
+            assert text1.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text1 == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
+
+        and:
+            String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
+            assert text2.split('(\r\n)|(\r)|(\n)').size() == 1
+            assert text2 == 'one'
+    }
+
+    def 'service resource transformer short syntax alternate path'() {
+        given:
+            File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'one # NOTE: No newline terminates this line/file').write()
+
+            File two = buildJar('two.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+                    'two # NOTE: No newline terminates this line/file').write()
+
+            buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    mergeServiceFiles('META-INF/foo')
+            |}
+        """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            ExecutionResult result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
+            assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text == '''|one # NOTE: No newline terminates this line/file
                           |two # NOTE: No newline terminates this line/file'''.stripMargin()
     }
 
@@ -342,6 +437,98 @@ class TransformerSpec extends PluginSpecification {
             |</properties>
             |
         |'''.stripMargin()
+    }
+
+    def 'Groovy extension module transformer'() {
+        given:
+            def one = buildJar('one.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=foo
+                       |moduleVersion=1.0.5
+                       |extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+                       |staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripMargin())
+                    .write()
+
+            def two = buildJar('two.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=bar
+                       |moduleVersion=2.3.5
+                       |extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+                       |staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripMargin())
+                    .write()
+
+            buildFile << """
+                |task shadow(type: ${ShadowJar.name}) {
+                |    destinationDir = new File(buildDir, 'libs')
+                |    baseName = 'shadow'
+                |    from('${escapedPath(one)}')
+                |    from('${escapedPath(two)}')
+                |    transform(${GroovyExtensionModuleTransformer.name})
+                |}
+            """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            def result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+            def props = new Properties()
+            props.load(new StringReader(text))
+            assert props.getProperty('moduleName') == 'MergedByShadowJar'
+            assert props.getProperty('moduleVersion') == '1.0.0'
+            assert props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
+            assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
+    }
+
+    def 'Groovy extension module transformer short syntax'() {
+        given:
+            def one = buildJar('one.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=foo
+                       |moduleVersion=1.0.5
+                       |extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+                       |staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripMargin())
+                    .write()
+
+            def two = buildJar('two.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+                    '''|moduleName=bar
+                       |moduleVersion=2.3.5
+                       |extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+                       |staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripMargin())
+                    .write()
+
+            buildFile << """
+                |task shadow(type: ${ShadowJar.name}) {
+                |    destinationDir = new File(buildDir, 'libs')
+                |    baseName = 'shadow'
+                |    from('${escapedPath(one)}')
+                |    from('${escapedPath(two)}')
+                |    mergeGroovyExtensionModules()
+                |}
+            """.stripMargin()
+
+        when:
+            runner.arguments << 'shadow'
+            def result = runner.run()
+
+        then:
+            success(result)
+            assert output.exists()
+
+        and:
+            def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+            def props = new Properties()
+            props.load(new StringReader(text))
+            assert props.getProperty('moduleName') == 'MergedByShadowJar'
+            assert props.getProperty('moduleVersion') == '1.0.0'
+            assert props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
+            assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
     }
 
     private String escapedPath(File file) {

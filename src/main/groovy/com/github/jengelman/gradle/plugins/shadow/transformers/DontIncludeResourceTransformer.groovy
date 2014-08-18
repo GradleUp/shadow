@@ -21,6 +21,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 
 /**
  * A resource processor that prevents the inclusion of an arbitrary
@@ -34,7 +35,8 @@ import org.apache.tools.zip.ZipOutputStream
 class DontIncludeResourceTransformer implements Transformer {
     String resource
 
-    boolean canTransformResource(String path) {
+    boolean canTransformResource(FileTreeElement element) {
+        def path = element.relativePath.pathString
         if (path.endsWith(resource)) {
             return true
         }
