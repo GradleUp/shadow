@@ -1,18 +1,34 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.PublishArtifact
+import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer
+import org.gradle.api.artifacts.maven.MavenPom
 import org.gradle.api.internal.java.JavaLibrary
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.MavenPlugin
+import org.gradle.api.tasks.Upload
+import org.gradle.configuration.project.ProjectConfigurationActionContainer
+
+import javax.inject.Inject
 
 class ShadowJavaPlugin implements Plugin<Project> {
 
     static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
+    static final String SHADOW_UPLOAD_TASK = 'uploadShadow'
     static final String SHADOW_COMPONENT_NAME = 'shadow'
     static final String SHADOW_GROUP = 'Shadow'
+
+    private final ProjectConfigurationActionContainer configurationActionContainer;
+
+    @Inject
+    ShadowJavaPlugin(ProjectConfigurationActionContainer configurationActionContainer) {
+        this.configurationActionContainer = configurationActionContainer
+    }
 
     @Override
     void apply(Project project) {
@@ -45,6 +61,23 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
         PublishArtifact shadowArtifact = project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, shadow)
         project.components.add(new ShadowJavaLibrary(shadowArtifact, project.configurations.shadow.allDependencies))
+        configureShadowUpload()
+    }
+
+    private void configureShadowUpload() {
+        configurationActionContainer.add(new Action<Project>() {
+            public void execute(Project project) {
+                Upload upload = project.tasks.withType(Upload).findByName(SHADOW_UPLOAD_TASK)
+                if (!upload) {
+                    return
+                }
+                upload.configuration = project.configurations.shadow
+                MavenPom pom = upload.repositories.mavenDeployer.pom
+                pom.scopeMappings.mappings.remove(project.configurations.compile)
+                pom.scopeMappings.mappings.remove(project.configurations.runtime)
+                pom.scopeMappings.addMapping(MavenPlugin.RUNTIME_PRIORITY, project.configurations.shadow, Conf2ScopeMappingContainer.RUNTIME)
+            }
+        })
     }
 
     class ShadowJavaLibrary extends JavaLibrary {

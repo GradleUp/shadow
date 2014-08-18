@@ -261,6 +261,30 @@ publishing {
 }
 ```
 
+OR
+
+```
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven'
+
+shadowJar {
+  baseName = 'myproject-all'
+  classifier = ''
+}
+
+uploadShadow {
+  repositories {
+    mavenDeployer {
+      //configure maven deployment
+    }
+  }
+}
+```
+
+*_NOTE_*: When using the `'maven'` plugin, the `'compile'` and `'runtime'` configurations are removed from the POM and
+the `'shadow'` configuration is mapped as `'runtime'` scope. This is identical to the behavior with the
+`'maven-publish'` plugin
+
 ### Configuring additional POM dependencies for Shadow Jar
 
 ```

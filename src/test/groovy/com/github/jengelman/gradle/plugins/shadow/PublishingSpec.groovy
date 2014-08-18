@@ -23,6 +23,9 @@ class PublishingSpec extends PluginSpecification {
                 .insertFile('a.properties', 'a')
                 .insertFile('a2.properties', 'a2')
                 .publish()
+        repo.module('shadow', 'b', '1.0')
+                .insertFile('b.properties', 'b')
+                .publish()
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
@@ -34,36 +37,51 @@ class PublishingSpec extends PluginSpecification {
             |version = '1.0'
             |
             |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'shadow:a:1.0' }
+            |dependencies {
+            |   compile 'shadow:a:1.0'
+            |   shadow 'shadow:b:1.0'
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'maven-all'
+            |   classifier = null
+            |}
             |
             |uploadShadow {
-            |   configuration = configurations.shadow
             |   repositories {
             |       mavenDeployer {
             |           repository(url: "${publishingRepo.uri}")
-            |           pom.version = project.version
-            |           pom.groupId = project.group
-            |
             |       }
             |   }
             |}
         """.stripMargin()
 
         when:
-        runner.arguments << 'upload'
+        runner.arguments << 'uploadShadow'
         ExecutionResult result = runner.run()
 
         then:
         success(result)
 
-        and:
-        File publishedFile = publishingRepo.rootDir.file('shadow/maven/1.0/maven-1.0-all.jar').canonicalFile
+        and: 'Check that shadow artifact exists'
+        File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
         assert publishedFile.exists()
 
-        and:
+        and: 'Check contents of shadow artifact'
         contains(publishedFile, ['a.properties', 'a2.properties'])
 
-        //TODO need to figure out POM publishing
+        and: 'Check that shadow artifact pom exists and contents'
+        File pom = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.pom').canonicalFile
+        assert pom.exists()
+
+        def contents = new XmlSlurper().parse(pom)
+        assert contents.dependencies.size() == 1
+        assert contents.dependencies[0].dependency.size() == 1
+
+        def dependency = contents.dependencies[0].dependency[0]
+        assert dependency.groupId.text() == 'shadow'
+        assert dependency.artifactId.text() == 'b'
+        assert dependency.version.text() == '1.0'
     }
 
     def "publish shadow jar with maven-publish plugin"() {
