@@ -11,6 +11,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 <a href='https://bintray.com/johnrengelman/gradle-plugins/gradle-shadow-plugin/view?source=watch' alt='Get automatic notifications about new "gradle-shadow-plugin" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
 [ ![Download](https://api.bintray.com/packages/johnrengelman/gradle-plugins/gradle-shadow-plugin/images/download.png) ](https://bintray.com/johnrengelman/gradle-plugins/gradle-shadow-plugin/_latestVersion)
 [![Build Status](https://drone.io/github.com/johnrengelman/shadow/status.png)](https://drone.io/github.com/johnrengelman/shadow/latest)
+[ ![Codeship Status for johnrengelman/shadow](https://codeship.io/projects/13678020-e2b0-0131-bc4c-4231d3e9af6a/status)](https://codeship.io/projects/25349)
 
 
 ## QuickStart
