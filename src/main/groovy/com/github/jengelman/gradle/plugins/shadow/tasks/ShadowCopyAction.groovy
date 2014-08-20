@@ -48,6 +48,7 @@ public class ShadowCopyAction implements CopyAction {
     private final PatternSet patternSet
     private final ShadowStats stats
 
+    private Set<String> visitedFiles = new HashSet<String>()
     private Set<CopyLater> copyLaterList = new HashSet<CopyLater>()
 
     public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
@@ -108,18 +109,49 @@ public class ShadowCopyAction implements CopyAction {
     }
 
     private void copyResources(ZipOutputStream stream) {
+        detectDuplicatesAndModifyNames()
+
         def groupedBySourceArchive = copyLaterList.groupBy {it.sourceArchive}
 
         groupedBySourceArchive.each { File source, List<CopyLater> filesToCopy ->
             def sourceZip = new ZipFile(source)
             filesToCopy.each { CopyLater pathToCopy ->
-                stream.putNextEntry(pathToCopy.fileToCopy.entry)
+                stream.putNextEntry(new ZipEntry(pathToCopy.pathInFatJar))
                 IOUtils.copyLarge(sourceZip.getInputStream(pathToCopy.fileToCopy.entry), stream)
                 stream.closeEntry()
             }
 
             sourceZip.close()
         }
+    }
+
+    private void detectDuplicatesAndModifyNames() {
+        def byPath = copyLaterList.groupBy {it.fileToCopy.pathString}
+        byPath.each {String path, List<CopyLater> entriesWithSamePath ->
+//            It is possible that file was added, but not from .jar.
+//            E.g. it could be manifest added by appendManifest.
+//            In such case we need not to overwrite it with the manifest from the .jar,
+//            even if there is single one, so we need to check visitedFiles too.
+            if (entriesWithSamePath.size() > 1 || visitedFiles.contains(path)) {
+                modifyNames(entriesWithSamePath)
+            }
+        }
+    }
+
+    private void modifyNames(List<CopyLater> entries) {
+        entries.each {CopyLater entry ->
+            entry.pathInFatJar = addArchiveNameToFilePath(entry.fileToCopy.pathString, entry.sourceArchive.name)
+        }
+    }
+
+    private String addArchiveNameToFilePath(String filePath, String archiveName) {
+        def extension = FilenameUtils.getExtension(filePath)
+        def filePathMinusExtension = filePath - ~/\.$extension$/
+
+        def archiveExtension = FilenameUtils.getExtension(archiveName)
+        def archiveNameMinusExtension = archiveName - ~/\.$archiveExtension$/
+
+        filePathMinusExtension + "_" + archiveNameMinusExtension + ((extension.empty) ? "" : "." + extension)
     }
 
     class StreamAction implements CopyActionProcessingStreamAction {
@@ -130,8 +162,6 @@ public class ShadowCopyAction implements CopyAction {
         private final RelocatorRemapper remapper
         private final PatternSet patternSet
         private final ShadowStats stats
-
-        private Set<String> visitedFiles = new HashSet<String>()
 
         public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers, List<Relocator> relocators,
                             PatternSet patternSet, ShadowStats stats) {
@@ -217,10 +247,10 @@ public class ShadowCopyAction implements CopyAction {
         private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive, File archiveAsFile) {
             def archiveFilePath = archiveFile.relativePath
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                if (recordVisit(archiveFilePath)) {
-                    if (!remapper.hasRelocators() || !archiveFile.classFile) {
-                        addEntryToCopyLater(archiveFilePath, archiveAsFile)
-                    } else {
+                if (!remapper.hasRelocators() || !archiveFile.classFile) {
+                    addEntryToCopyLater(archiveFilePath, archiveAsFile)
+                } else {
+                    if (recordVisit(archiveFilePath)) {
                         remapClass(archiveFilePath, archive)
                     }
                 }
@@ -429,10 +459,12 @@ public class ShadowCopyAction implements CopyAction {
 
         RelativeArchivePath fileToCopy
         File sourceArchive
+        String pathInFatJar
 
         CopyLater(RelativeArchivePath fileToCopy, File sourceArchive) {
             this.fileToCopy = fileToCopy
             this.sourceArchive = sourceArchive
+            this.pathInFatJar = fileToCopy.pathString
         }
     }
 }
