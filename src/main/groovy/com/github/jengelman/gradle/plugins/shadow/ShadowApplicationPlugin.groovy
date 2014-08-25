@@ -112,6 +112,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
     protected <T extends AbstractArchiveTask> void addArchiveTask(Project project, String name, Class<T> type) {
         ApplicationPluginConvention pluginConvention = project.convention.plugins.application
+        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
 
         def archiveTask = project.tasks.create(name, type)
         archiveTask.description = "Bundles the project as a JVM application with libs and OS specific scripts."
@@ -119,7 +120,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         archiveTask.conventionMapping.baseName = { pluginConvention.applicationName }
         def baseDir = { archiveTask.archiveName - ".${archiveTask.extension}" }
         archiveTask.into(baseDir) {
-            with(pluginConvention.applicationDistribution)
+            with(extension.applicationDistribution)
         }
     }
 
