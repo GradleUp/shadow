@@ -439,6 +439,144 @@ class TransformerSpec extends PluginSpecification {
         |'''.stripMargin()
     }
 
+    @Issue('SHADOW-82')
+    def 'shadow.manifest leaks to jar.manifest'() {
+        given:
+        File main = file('src/main/java/shadow/Main.java')
+        main << '''
+            |package shadow;
+            |
+            |public class Main {
+            |
+            |   public static void main(String[] args) { }
+            |}
+        '''.stripMargin()
+
+        buildFile << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |jar {
+            |   baseName = 'jar'
+            |   manifest {
+            |       attributes 'Main-Class': 'shadow.Main'
+            |       attributes 'Test-Entry': 'FAILED'
+            |   }
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   manifest {
+            |       attributes 'Test-Entry': 'PASSED'
+            |       attributes 'New-Entry': 'NEW'
+            |   }
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'jar'
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        File jar = file('build/libs/jar.jar')
+        assert jar.exists()
+        assert output.exists()
+
+        then: 'Check contents of Shadow jar manifest'
+        JarInputStream jis = new JarInputStream(output.newInputStream())
+        Manifest mf = jis.manifest
+
+        assert mf
+        assert mf.mainAttributes.getValue('Test-Entry') == 'PASSED'
+        assert mf.mainAttributes.getValue('Main-Class') == 'shadow.Main'
+        assert mf.mainAttributes.getValue('New-Entry') == 'NEW'
+
+        then: 'Check contents of jar manifest'
+        JarInputStream jis2 = new JarInputStream(jar.newInputStream())
+        Manifest mf2 = jis2.manifest
+
+        assert mf2
+        assert mf2.mainAttributes.getValue('Test-Entry') == 'FAILED'
+        assert mf2.mainAttributes.getValue('Main-Class') == 'shadow.Main'
+        assert !mf2.mainAttributes.getValue('New-Entry')
+
+        cleanup:
+        jis?.close()
+        jis2?.close()
+    }
+
+    @Issue('SHADOW-82')
+    def 'shadow.appendManifest leaks to jar.manifest'() {
+        given:
+        File main = file('src/main/java/shadow/Main.java')
+        main << '''
+            |package shadow;
+            |
+            |public class Main {
+            |
+            |   public static void main(String[] args) { }
+            |}
+        '''.stripMargin()
+
+        buildFile << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |jar {
+            |   baseName = 'jar'
+            |   manifest {
+            |       attributes 'Main-Class': 'shadow.Main'
+            |       attributes 'Test-Entry': 'FAILED'
+            |   }
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   appendManifest {
+            |       attributes 'Test-Entry': 'PASSED'
+            |       attributes 'New-Entry': 'NEW'
+            |   }
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'jar'
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        File jar = file('build/libs/jar.jar')
+        assert jar.exists()
+        assert output.exists()
+
+        then: 'Check contents of Shadow jar manifest'
+        JarInputStream jis = new JarInputStream(output.newInputStream())
+        Manifest mf = jis.manifest
+
+        assert mf
+        assert mf.mainAttributes.getValue('Test-Entry') == 'PASSED'
+        assert mf.mainAttributes.getValue('Main-Class') == 'shadow.Main'
+        assert mf.mainAttributes.getValue('New-Entry') == 'NEW'
+
+        then: 'Check contents of jar manifest'
+        JarInputStream jis2 = new JarInputStream(jar.newInputStream())
+        Manifest mf2 = jis2.manifest
+
+        assert mf2
+        assert mf2.mainAttributes.getValue('Test-Entry') == 'FAILED'
+        assert mf2.mainAttributes.getValue('Main-Class') == 'shadow.Main'
+        assert !mf2.mainAttributes.getValue('New-Entry')
+
+        cleanup:
+        jis?.close()
+        jis2?.close()
+    }
+    
     def 'Groovy extension module transformer'() {
         given:
             def one = buildJar('one.jar')
