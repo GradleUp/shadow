@@ -31,7 +31,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         addRunTask(project)
         addCreateScriptsTask(project)
 
-        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
+        ShadowExtension extension = project.extensions.findByType(ShadowExtension)
         configureDistSpec(project, extension.applicationDistribution)
 
         configureJarMainClass(project)
@@ -80,7 +80,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     protected void addInstallTask(Project project) {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
-        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
+        ShadowExtension extension = project.extensions.findByType(ShadowExtension)
 
         def installTask = project.tasks.create(SHADOW_INSTAL_TASK_NAME, Sync)
         installTask.description = "Installs the project as a JVM application along with libs and OS specific scripts."
@@ -112,7 +112,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
     protected <T extends AbstractArchiveTask> void addArchiveTask(Project project, String name, Class<T> type) {
         ApplicationPluginConvention pluginConvention = project.convention.plugins.application
-        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
+        ShadowExtension extension = project.extensions.findByType(ShadowExtension)
 
         def archiveTask = project.tasks.create(name, type)
         archiveTask.description = "Bundles the project as a JVM application with libs and OS specific scripts."

@@ -291,4 +291,57 @@ class PublishingSpec extends PluginSpecification {
         cleanup:
         zipFile?.close()
     }
+
+    @Issue('SHADOW-90')
+    def 'installShadow does not execute dependent shadow task'() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('a2.properties', 'a2')
+                .publish()
+
+        file('src/main/java/myapp/Main.java') << """
+            |package myapp;
+            |public class Main {
+            |   public static void main(String[] args) {
+            |       System.out.println("TestApp: Hello World! (" + args[0] + ")");
+            |   }
+            |}
+        """.stripMargin()
+
+        buildFile << """
+            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'application'
+            |apply plugin: 'java'
+            |
+            |mainClassName = 'myapp.Main'
+            |
+            |version = '1.0'
+            |
+            |repositories {
+            |   maven { url "${repo.uri}" }
+            |}
+            |
+            |dependencies {
+            |   compile 'shadow:a:1.0'
+            |}
+            |
+            |runShadow {
+            |   args 'foo'
+            |}
+        """.stripMargin()
+
+        settingsFile << "rootProject.name = 'myapp'"
+
+        when:
+        runner.arguments << 'installShadow'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and: 'Check that the proper jar file was installed'
+        File installedJar = file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
+        assert installedJar.exists()
+    }
 }
