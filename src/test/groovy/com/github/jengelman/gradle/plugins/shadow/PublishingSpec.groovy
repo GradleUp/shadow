@@ -205,26 +205,24 @@ class PublishingSpec extends PluginSpecification {
         then:
         success(result)
 
-        and:
+        and: 'tests that runShadow executed and exited'
+        assert result.standardOutput.contains('TestApp: Hello World! (foo)')
+
+        and: 'Check that the proper jar file was installed'
         File installedJar = file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
         assert installedJar.exists()
 
-        and:
+        and: 'And that jar file as the correct files in it'
         contains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
 
-        and:
+        and: 'Check the manifest attributes in the jar file are corret'
         JarFile jar = new JarFile(installedJar)
         Attributes attributes = jar.manifest.mainAttributes
         assert attributes.getValue('Main-Class') == 'myapp.Main'
 
-        then:
+        then: 'Check that the start scripts is written out and has the correct Java invocation'
         File startScript = file('build/installShadow/myapp/bin/myapp')
         assert startScript.exists()
-
-        and:
         assert startScript.text.contains("-jar \$APP_HOME/lib/myapp-1.0-all.jar")
-
-        and:
-        assert result.standardOutput.contains('TestApp: Hello World! (foo)')
     }
 }
