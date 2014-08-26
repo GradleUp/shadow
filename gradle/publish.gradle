@@ -100,7 +100,6 @@ bintray {
         vcsUrl = 'https://github.com/johnrengelman/shadow.git'
         version {
             vcsTag = versionString
-            ['shadow']
             attributes = [
                     'gradle-plugin': 'com.github.johnrengelman.shadow:com.github.jengelman.gradle.plugins:shadow'
             ]
