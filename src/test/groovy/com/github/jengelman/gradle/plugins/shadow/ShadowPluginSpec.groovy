@@ -497,7 +497,7 @@ class ShadowPluginSpec extends PluginSpecification {
             |
             |jar {
             |   manifest {
-            |       attributes 'Class-Path': 'a.jar'
+            |       attributes 'Class-Path': '/libs/a.jar'
             |   }
             |}
             |
@@ -519,7 +519,7 @@ class ShadowPluginSpec extends PluginSpecification {
         JarFile jar = new JarFile(output)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
-        assert classpath == 'a.jar lib/junit-3.8.2.jar'
+        assert classpath == '/libs/a.jar junit-3.8.2.jar'
 
     }
 
@@ -552,7 +552,7 @@ class ShadowPluginSpec extends PluginSpecification {
         JarFile jar = new JarFile(output)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
-        assert classpath == 'lib/junit-3.8.2.jar'
+        assert classpath == 'junit-3.8.2.jar'
 
     }
 }

@@ -50,7 +50,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
             def files = project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME).files
             if (files) {
                 def libs = [project.tasks.jar.manifest.attributes.get('Class-Path')]
-                libs.addAll files.collect { "lib/${it.name}" }
+                libs.addAll files.collect { "${it.name}" }
                 manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
             }
         }
