@@ -153,20 +153,6 @@ class ShadowJar extends Jar implements ShadowSpec {
     }
 
     /**
-     * Append content to the JAR Manifest created by the Jar task.
-     * @param configureClosure
-     * @return
-     *
-     * @deprecated Use manifest {} instead
-     */
-    @Deprecated
-    ShadowJar appendManifest(Closure configureClosure) {
-        logger.warn 'The appendManifest method is deprecated and will be removed in the next major version. Use manifest(Closure) instead.'
-        ConfigureUtil.configure(configureClosure, getManifest())
-        return this
-    }
-
-    /**
      * Add a class relocator that maps each class in the pattern to the provided destination
      * @param pattern
      * @param destination

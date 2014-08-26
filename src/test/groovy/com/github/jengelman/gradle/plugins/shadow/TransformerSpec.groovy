@@ -362,7 +362,7 @@ class TransformerSpec extends PluginSpecification {
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
-            |   appendManifest {
+            |   manifest {
             |       attributes 'Test-Entry': 'PASSED'
             |       attributes 'New-Entry': 'NEW'
             |   }
@@ -509,7 +509,7 @@ class TransformerSpec extends PluginSpecification {
     }
 
     @Issue('SHADOW-82')
-    def 'shadow.appendManifest leaks to jar.manifest'() {
+    def 'shadow manifest leaks to jar manifest'() {
         given:
         File main = file('src/main/java/shadow/Main.java')
         main << '''
@@ -536,7 +536,7 @@ class TransformerSpec extends PluginSpecification {
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
-            |   appendManifest {
+            |   manifest {
             |       attributes 'Test-Entry': 'PASSED'
             |       attributes 'New-Entry': 'NEW'
             |   }

@@ -27,7 +27,7 @@ class RelocationSpec extends PluginSpecification {
             |   classifier = null
             |   relocate 'junit.textui', 'a'
             |   relocate 'junit.framework', 'b'
-            |   appendManifest {
+            |   manifest {
             |       attributes 'TEST-VALUE': 'FOO'
             |   }
             |}

@@ -1,6 +1,8 @@
 v1.1.0
 ======
 
++ (Breaking Change!) Fix leaking of `shadowJar.manifest` into `jar.manifest`. ([Issue #82](https://github.com/johnrengelman/shadow/issues/82))
+  To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with `shadowJar.manifest`
 + `ShadowTask` now has a `configurations` property that is resolved to the files in the resolved configuration before
   being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task
   has the convention of adding the `'runtime'` scope to this list. Manually created instances of `ShadowTask` have no
@@ -14,7 +16,6 @@ v1.1.0
 + [Matt Hurne](https://github.com/mhurne) - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
   descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default.
 + `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the `'application'` plugin ([Issue #89](https://github.com/johnrengelman/shadow/issues/89))
-+ Fix leaking of `shadowJar.manifest` into `jar.manifest`. ([Issue #82](https://github.com/johnrengelman/shadow/issues/82))
 
 v1.0.3
 ======
