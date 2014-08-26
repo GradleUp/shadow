@@ -2,6 +2,7 @@ v1.1.1
 ======
 
 + Fix bug in `'createStartScripts'` task that was causing it to not execute `'shadowJar'` task ([Issue #90](https://github.com/johnrengelman/shadow/issues/90))
++ Do not include `null` in ShadowJar Manifest `'Class-Path'` value when `jar` task does not specify a value for it. ([Issue #92](https://github.com/johnrengelman/shadow/issues/92)
 
 v1.1.0
 ======
