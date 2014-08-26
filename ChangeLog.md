@@ -1,3 +1,8 @@
+v1.1.1
+======
+
++ Fix bug in `'createStartScripts'` task that was causing it to not execute `'shadowJar'` task ([Issue #90](https://github.com/johnrengelman/shadow/issues/90))
+
 v1.1.0
 ======
 

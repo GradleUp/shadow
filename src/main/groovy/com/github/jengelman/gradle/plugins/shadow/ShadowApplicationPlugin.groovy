@@ -71,10 +71,11 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, ShadowCreateStartScripts)
         startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
         startScripts.group = ApplicationPlugin.APPLICATION_GROUP
-        startScripts.conventionMapping.mainApplicationJar = { project.tasks[ShadowJavaPlugin.SHADOW_JAR_TASK_NAME].archivePath }
+        startScripts.conventionMapping.mainApplicationJar = { jar.archivePath }
         startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
         startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
         startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
+        startScripts.inputs.file jar
     }
 
     protected void addInstallTask(Project project) {
