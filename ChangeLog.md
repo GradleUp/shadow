@@ -13,6 +13,8 @@ v1.1.0
   files within the configured path to merge.
 + [Matt Hurne](https://github.com/mhurne) - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
   descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default.
++ `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the `'application'` plugin ([Issue #89](https://github.com/johnrengelman/shadow/issues/89))
++ Fix leaking of `shadowJar.manifest` into `jar.manifest`. ([Issue #82](https://github.com/johnrengelman/shadow/issues/82))
 
 v1.0.3
 ======

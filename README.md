@@ -61,7 +61,7 @@ the `shadowJar` output. This is configured via the `mainClassName` attribute fro
 
 ### Configure MANIFEST file
 
-By default, uses the same manifest as the `Jar` task.
+By default, shadowJar.manifest inherits from jar.manifest.
 
 ```
 jar {
@@ -73,22 +73,12 @@ jar {
 
 ### Modifying the MANIFEST file
 
-Append to the Jar MANIFEST
-
-```
-shadowJar {
-  appendManifest {
-    attributes 'Test-Entry': 'PASSED'
-  }
-}
-```
-
-Replace the Jar MANIFEST
+Append to the Jar MANIFEST. Values specified here, override the values in jar.manifest
 
 ```
 shadowJar {
   manifest {
-    attributes("Implementation-Title": "Gradle", "Implementation-Version": version)
+    attributes 'Test-Entry': 'PASSED'
   }
 }
 ```
