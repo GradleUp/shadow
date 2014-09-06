@@ -3,7 +3,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory-publish'
 
 group = 'com.github.jengelman.gradle.plugins'
-def versionString = file('version.txt').text
+def versionString = file('version.txt').text.trim()
 version = versionString
 
 ext.isSnapshot = version.endsWith("SNAPSHOT")
@@ -100,7 +100,6 @@ bintray {
         vcsUrl = 'https://github.com/johnrengelman/shadow.git'
         version {
             vcsTag = versionString
-            ['shadow']
             attributes = [
                     'gradle-plugin': 'com.github.johnrengelman.shadow:com.github.jengelman.gradle.plugins:shadow'
             ]

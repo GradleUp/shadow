@@ -31,7 +31,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         addRunTask(project)
         addCreateScriptsTask(project)
 
-        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
+        ShadowExtension extension = project.extensions.findByType(ShadowExtension)
         configureDistSpec(project, extension.applicationDistribution)
 
         configureJarMainClass(project)
@@ -71,16 +71,17 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, ShadowCreateStartScripts)
         startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
         startScripts.group = ApplicationPlugin.APPLICATION_GROUP
-        startScripts.conventionMapping.mainApplicationJar = { project.tasks[ShadowJavaPlugin.SHADOW_JAR_TASK_NAME].archivePath }
+        startScripts.conventionMapping.mainApplicationJar = { jar.archivePath }
         startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
         startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
         startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
+        startScripts.inputs.file jar
     }
 
     protected void addInstallTask(Project project) {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
-        ShadowExtension extension = project.extensions.findByName(ShadowBasePlugin.EXTENSION_NAME)
+        ShadowExtension extension = project.extensions.findByType(ShadowExtension)
 
         def installTask = project.tasks.create(SHADOW_INSTAL_TASK_NAME, Sync)
         installTask.description = "Installs the project as a JVM application along with libs and OS specific scripts."
@@ -112,6 +113,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
     protected <T extends AbstractArchiveTask> void addArchiveTask(Project project, String name, Class<T> type) {
         ApplicationPluginConvention pluginConvention = project.convention.plugins.application
+        ShadowExtension extension = project.extensions.findByType(ShadowExtension)
 
         def archiveTask = project.tasks.create(name, type)
         archiveTask.description = "Bundles the project as a JVM application with libs and OS specific scripts."
@@ -119,7 +121,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         archiveTask.conventionMapping.baseName = { pluginConvention.applicationName }
         def baseDir = { archiveTask.archiveName - ".${archiveTask.extension}" }
         archiveTask.into(baseDir) {
-            with(pluginConvention.applicationDistribution)
+            with(extension.applicationDistribution)
         }
     }
 

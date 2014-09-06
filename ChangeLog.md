@@ -1,6 +1,15 @@
+v1.1.1
+======
+
++ Fix bug in `'createStartScripts'` task that was causing it to not execute `'shadowJar'` task ([Issue #90](https://github.com/johnrengelman/shadow/issues/90))
++ Do not include `null` in ShadowJar Manifest `'Class-Path'` value when `jar` task does not specify a value for it. ([Issue #92](https://github.com/johnrengelman/shadow/issues/92))
++ ShadowJar Manifest `'Class-Path'` should reference jars from `'shadow'` config as relative to location of `shadowJar` output ([Issue #91](https://github.com/johnrengelman/shadow/issues/91))
+
 v1.1.0
 ======
 
++ (Breaking Change!) Fix leaking of `shadowJar.manifest` into `jar.manifest`. ([Issue #82](https://github.com/johnrengelman/shadow/issues/82))
+  To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with `shadowJar.manifest`
 + `ShadowTask` now has a `configurations` property that is resolved to the files in the resolved configuration before
   being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task
   has the convention of adding the `'runtime'` scope to this list. Manually created instances of `ShadowTask` have no
@@ -13,6 +22,7 @@ v1.1.0
   files within the configured path to merge.
 + [Matt Hurne](https://github.com/mhurne) - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
   descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default.
++ `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the `'application'` plugin ([Issue #89](https://github.com/johnrengelman/shadow/issues/89))
 
 v1.0.3
 ======

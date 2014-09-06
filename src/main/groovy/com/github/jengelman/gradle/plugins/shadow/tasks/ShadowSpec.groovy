@@ -24,8 +24,6 @@ interface ShadowSpec extends CopySpec {
 
     ShadowSpec append(String resourcePath)
 
-    ShadowSpec appendManifest(Closure configure)
-
     ShadowSpec relocate(String pattern, String destination)
 
     ShadowSpec relocate(String pattern, String destination, Closure configure)

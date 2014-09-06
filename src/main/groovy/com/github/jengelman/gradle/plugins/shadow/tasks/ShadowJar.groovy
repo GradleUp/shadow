@@ -12,6 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.DocumentationRegistry
+import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
@@ -31,6 +32,14 @@ class ShadowJar extends Jar implements ShadowSpec {
 
     ShadowJar() {
         dependencyFilter = new DefaultDependencyFilter(project)
+        manifest = new DefaultInheritManifest(getServices().get(FileResolver))
+    }
+
+    @Override
+    // This should really return InheritManifest but cannot due to https://jira.codehaus.org/browse/GROOVY-5418
+    // TODO - change return type after upgrade to Gradle 2
+    public DefaultInheritManifest getManifest() {
+        return super.getManifest()
     }
 
     @Override
@@ -144,16 +153,6 @@ class ShadowJar extends Jar implements ShadowSpec {
     }
 
     /**
-     * Append content to the JAR Manifest created by the Jar task.
-     * @param configureClosure
-     * @return
-     */
-    ShadowJar appendManifest(Closure configureClosure) {
-        ConfigureUtil.configure(configureClosure, getManifest())
-        return this
-    }
-
-    /**
      * Add a class relocator that maps each class in the pattern to the provided destination
      * @param pattern
      * @param destination
@@ -189,5 +188,4 @@ class ShadowJar extends Jar implements ShadowSpec {
         relocators << relocator
         return this
     }
-
 }

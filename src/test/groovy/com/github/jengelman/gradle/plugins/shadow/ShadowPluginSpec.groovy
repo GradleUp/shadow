@@ -542,7 +542,7 @@ class ShadowPluginSpec extends PluginSpecification {
             |
             |jar {
             |   manifest {
-            |       attributes 'Class-Path': 'a.jar'
+            |       attributes 'Class-Path': '/libs/a.jar'
             |   }
             |}
             |
@@ -564,7 +564,40 @@ class ShadowPluginSpec extends PluginSpecification {
         JarFile jar = new JarFile(output)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
-        assert classpath == 'a.jar lib/junit-3.8.2.jar'
+        assert classpath == '/libs/a.jar junit-3.8.2.jar'
+
+    }
+
+    @Issue('SHADOW-92')
+    def "do not include null value in Class-Path when jar file does not contain Class-Path"() {
+        given:
+
+        buildFile << """
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies { shadow 'junit:junit:3.8.2' }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        assert output.exists()
+
+        and:
+        JarFile jar = new JarFile(output)
+        Attributes attributes = jar.manifest.getMainAttributes()
+        String classpath = attributes.getValue('Class-Path')
+        assert classpath == 'junit-3.8.2.jar'
 
     }
 }

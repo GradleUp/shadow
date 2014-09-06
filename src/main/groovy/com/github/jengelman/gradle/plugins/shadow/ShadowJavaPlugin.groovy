@@ -44,15 +44,14 @@ class ShadowJavaPlugin implements Plugin<Project> {
             map('classifier') {
                 'all'
             }
-            map('manifest') {
-                project.tasks.jar.manifest
-            }
         }
+        shadow.manifest.inheritFrom project.tasks.jar.manifest
         shadow.doFirst {
             def files = project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME).files
             if (files) {
-                def value = manifest.attributes.get('Class-Path')
-                manifest.attributes 'Class-Path': [value, files.collect { "lib/${it.name}" }.join(' ')].join(' ')
+                def libs = [project.tasks.jar.manifest.attributes.get('Class-Path')]
+                libs.addAll files.collect { "${it.name}" }
+                manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
             }
         }
         shadow.from(convention.sourceSets.main.output)
