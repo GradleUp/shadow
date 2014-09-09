@@ -1,3 +1,8 @@
+v1.1.2
+======
+
++ fix bug in `runShadow` where dependencies from the `shadow` configuration are not available ([Issue #94](https://github.com/johnrengelman/shadow/issues/94))
+
 v1.1.1
 ======
 

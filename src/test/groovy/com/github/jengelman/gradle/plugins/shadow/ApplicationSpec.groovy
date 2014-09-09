@@ -61,7 +61,6 @@ class ApplicationSpec extends PluginSpecification {
 
         when:
         runner.arguments << 'runShadow'
-        runner.arguments << 'installShadow'
         ExecutionResult result = runner.run()
 
         then:
