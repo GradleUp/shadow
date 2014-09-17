@@ -55,9 +55,13 @@ class TransformerSpec extends PluginSpecification {
                           |two # NOTE: No newline terminates this line/file'''.stripMargin()
 
         and:
-        String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
+        String text2 = getJarFileContents(output, 'META-INF/services/com.acme_one.Foo')
         assert text2.split('(\r\n)|(\r)|(\n)').size() == 1
         assert text2 == 'one'
+
+        String text3 = getJarFileContents(output, 'META-INF/services/com.acme_two.Foo')
+        assert text3.split('(\r\n)|(\r)|(\n)').size() == 1
+        assert text3 == 'two'
     }
 
     def 'service resource transformer alternate path'() {
@@ -136,9 +140,13 @@ class TransformerSpec extends PluginSpecification {
                           |two # NOTE: No newline terminates this line/file'''.stripMargin()
 
         and:
-            String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
+            String text2 = getJarFileContents(output, 'META-INF/services/com.acme_one.Foo')
             assert text2.split('(\r\n)|(\r)|(\n)').size() == 1
             assert text2 == 'one'
+
+            String text3 = getJarFileContents(output, 'META-INF/services/com.acme_two.Foo')
+            assert text3.split('(\r\n)|(\r)|(\n)').size() == 1
+            assert text3 == 'two'
     }
 
     def 'service resource transformer short syntax alternate path'() {

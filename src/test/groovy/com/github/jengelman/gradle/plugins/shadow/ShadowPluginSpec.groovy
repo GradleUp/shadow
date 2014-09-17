@@ -18,6 +18,11 @@ import java.util.jar.JarFile
 
 class ShadowPluginSpec extends PluginSpecification {
 
+    def setup() {
+        repo.module('junit', 'junit', '4.11').use(getTestJar("junit-4.11.jar")).publish()
+        repo.module('org.hamcrest', 'hamcrest-core', '1.3').use(getTestJar("hamcrest-core-1.3.jar")).publish()
+    }
+
     def 'apply plugin'() {
         given:
         String projectName = 'myshadow'
@@ -197,6 +202,41 @@ class ShadowPluginSpec extends PluginSpecification {
                 'server/Server.class',
                 'junit/framework/Test.class'
         ])
+    }
+
+    def 'do not overwrite files with the same path'() {
+        given:
+        file('src/main/java/client/Client.java') << """
+            |package client;
+            |public class Client {}
+            |""".stripMargin()
+
+        file('build.gradle') << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies { compile 'junit:junit:4.11' }
+            |dependencies { compile 'org.hamcrest:hamcrest-core:1.3' }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |}
+        """.stripMargin()
+
+        File clientOutput = file('build/libs/shadow.jar')
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(clientOutput, ['LICENSE_junit-4.11.txt',
+                               'LICENSE_hamcrest-core-1.3.txt'])
     }
 
     def 'depend on project shadow jar'() {
@@ -451,7 +491,12 @@ class ShadowPluginSpec extends PluginSpecification {
 
         and:
         JarFile jar = new JarFile(output)
-        assert jar.entries().collect().size() == 2
+        assert jar.entries().collect().size() == 4
+
+        and: 'Test that main manifest file is the default one, not the one from any of jars'
+        Attributes attributes = jar.manifest.getMainAttributes()
+        String val = attributes.getValue('Manifest-Version')
+        assert val == '1.0'
     }
 
     def "Class-Path in Manifest not added if empty"() {
