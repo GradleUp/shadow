@@ -182,7 +182,7 @@ public class ShadowCopyAction implements CopyAction {
             }
             filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
                 if (archiveElement.relativePath.file) {
-                    visitArchiveFile(archiveElement, archive)
+                    visitArchiveFile(archiveElement, fileDetails.file)
                 }
             }
             archive.close()
@@ -196,7 +196,8 @@ public class ShadowCopyAction implements CopyAction {
             }
         }
 
-        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive) {
+        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, File archiveAsFile) {
+            ZipFile archive = new ZipFile(archiveAsFile)
             def archiveFilePath = archiveFile.relativePath
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
                 if (recordVisit(archiveFilePath)) {
