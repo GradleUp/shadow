@@ -25,15 +25,20 @@ import org.apache.commons.lang.StringUtils
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
-class SamePathFilesTransformer implements Transformer {
+class SamePathFilesTransformer implements Transformer, PatternFilterable {
 
-    def serviceEntires = new MultiValueMap()
+    private final PatternSet patternSet = new PatternSet()
+
+    private final def serviceEntires = new MultiValueMap()
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
-        return true;
+        return patternSet.asSpec.isSatisfiedBy(element)
     }
 
     @Override
@@ -78,6 +83,112 @@ class SamePathFilesTransformer implements Transformer {
         }
 
         return "${pathWithoutExtension}_$mergedJarName$extension"
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer include(String... includes) {
+        patternSet.include(includes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer include(Iterable<String> includes) {
+        patternSet.include(includes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer include(Spec<FileTreeElement> includeSpec) {
+        patternSet.include(includeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer include(Closure includeSpec) {
+        patternSet.include(includeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer exclude(String... excludes) {
+        patternSet.exclude(excludes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer exclude(Iterable<String> excludes) {
+        patternSet.exclude(excludes)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer exclude(Spec<FileTreeElement> excludeSpec) {
+        patternSet.exclude(excludeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer exclude(Closure excludeSpec) {
+        patternSet.exclude(excludeSpec)
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    Set<String> getIncludes() {
+        return patternSet.includes
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer setIncludes(Iterable<String> includes) {
+        patternSet.includes = includes
+        return this
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    Set<String> getExcludes() {
+        return patternSet.excludes
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    SamePathFilesTransformer setExcludes(Iterable<String> excludes) {
+        patternSet.excludes = excludes
+        return this
     }
 
     private class InputStreamWithJarName {
