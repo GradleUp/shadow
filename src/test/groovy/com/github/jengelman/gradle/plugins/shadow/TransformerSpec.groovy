@@ -620,16 +620,16 @@ class TransformerSpec extends PluginSpecification {
             assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
     }
 
-    def 'Groovy same file transformer'() {
+    def 'same file transformer'() {
         given:
         def one = buildJar('one.jar')
-                .insertFile('fileInJar.txt',
-                            'This is file one content'.stripMargin())
+                .insertFile('fileInJar.txt', 'This is file one content')
+                .insertFile('toExclude', 'First content to exclude')
                 .write()
 
         def two = buildJar('two.jar')
-                .insertFile('fileInJar.txt',
-                            'This is file two content'.stripMargin())
+                .insertFile('fileInJar.txt', 'This is file two content')
+                .insertFile('toExclude', 'Second content to exclude')
                 .write()
 
         buildFile << """
@@ -638,7 +638,9 @@ class TransformerSpec extends PluginSpecification {
                 |    baseName = 'shadow'
                 |    from('${escapedPath(one)}')
                 |    from('${escapedPath(two)}')
-                |    transform(${SamePathFilesTransformer.name})
+                |    transform(${SamePathFilesTransformer.name}) {
+                |        exclude 'toExclude'
+                |    }
                 |}
             """.stripMargin()
 
@@ -658,14 +660,16 @@ class TransformerSpec extends PluginSpecification {
 
         and:
         doesNotContain(output, ['fileInJar'])
+        doesNotContain(output, ['toExclude_one', 'toExclude_two'])
+        contains(output, ['toExclude'])
 
         and:
         def text = getJarFileContents(output, 'fileInJar_one.txt')
-        assert text == "This is file one content", paths
-
-        and:
         def text2 = getJarFileContents(output, 'fileInJar_two.txt')
+        def text3 = getJarFileContents(output, 'toExclude')
+        assert text == "This is file one content"
         assert text2 == "This is file two content"
+        assert text3 == "First content to exclude" || text3 == "Second content to exclude"
     }
 
     def 'Groovy same file transformer for file without extension'() {
