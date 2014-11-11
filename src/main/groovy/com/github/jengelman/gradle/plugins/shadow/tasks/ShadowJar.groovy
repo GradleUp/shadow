@@ -2,13 +2,17 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil
+import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.DocumentationRegistry
@@ -18,6 +22,7 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.util.ConfigureUtil
 
@@ -29,8 +34,10 @@ class ShadowJar extends Jar implements ShadowSpec {
     DependencyFilter dependencyFilter
 
     private final ShadowStats shadowStats = new ShadowStats()
+    private final GradleVersionUtil versionUtil
 
     ShadowJar() {
+        versionUtil = new GradleVersionUtil(project.gradle.gradleVersion)
         dependencyFilter = new DefaultDependencyFilter(project)
         manifest = new DefaultInheritManifest(getServices().get(FileResolver))
     }
@@ -45,8 +52,12 @@ class ShadowJar extends Jar implements ShadowSpec {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
-        return new ShadowCopyAction(getArchivePath(), getCompressor(), documentationRegistry,
+        return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
                 transformers, relocators, rootPatternSet, shadowStats)
+    }
+
+    protected ZipCompressor getInternalCompressor() {
+        versionUtil.getInternalCompressor(entryCompression, this)
     }
 
     @TaskAction
@@ -66,13 +77,7 @@ class ShadowJar extends Jar implements ShadowSpec {
      * @return
      */
     protected PatternSet getRootPatternSet() {
-        // Gradle 1.12 class exposes patternSet on the spec
-        if (mainSpec.respondsTo('getPatternSet')) {
-            return mainSpec.getPatternSet()
-        // Gradle 2.x moves it to the spec resolver.
-        } else {
-            return mainSpec.buildRootResolver().getPatternSet()
-        }
+        versionUtil.getRootPatternSet(mainSpec)
     }
 
     /**

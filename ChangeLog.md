@@ -1,3 +1,8 @@
+v1.2.0
+======
+
++ Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the `org.apache.tools.zip` package.
+
 v1.1.2
 ======
 

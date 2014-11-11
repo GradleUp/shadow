@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
+import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import groovy.util.logging.Slf4j
@@ -23,13 +24,12 @@ import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
-import org.gradle.api.internal.file.copy.ZipCompressor
 import org.gradle.api.internal.tasks.SimpleWorkResult
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.util.PatternSet
-import org.gradle.internal.IoActions
+import org.gradle.internal.UncheckedException
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
@@ -72,7 +72,7 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         try {
-            IoActions.withResource(zipOutStr, new Action<ZipOutputStream>() {
+            withResource(zipOutStr, new Action<ZipOutputStream>() {
                 public void execute(ZipOutputStream outputStream) {
                     try {
                         stream.process(new StreamAction(outputStream, transformers, relocators, patternSet,
@@ -101,6 +101,25 @@ public class ShadowCopyAction implements CopyAction {
             if (transformer.hasTransformedResource()) {
                 transformer.modifyOutputStream(stream)
             }
+        }
+    }
+
+    private static <T extends Closeable> void withResource(T resource, Action<? super T> action) {
+        try {
+            action.execute(resource);
+        } catch(Throwable t) {
+            try {
+                resource.close();
+            } catch (IOException e) {
+                // Ignored
+            }
+            throw UncheckedException.throwAsUncheckedException(t);
+        }
+
+        try {
+            resource.close();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

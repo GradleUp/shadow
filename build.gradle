@@ -36,6 +36,7 @@ dependencies {
     compile 'org.ow2.asm:asm:4.1'
     compile 'org.ow2.asm:asm-commons:4.1'
     compile 'commons-io:commons-io:2.4'
+    compile 'org.apache.ant:ant:1.9.4'
 
     testUtilsCompile localGroovy()
     testUtilsCompile gradleApi()
