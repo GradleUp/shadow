@@ -3,13 +3,13 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import com.github.jengelman.gradle.testkit.GradleRunnerFactory
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
-import org.gradle.testkit.functional.GradleRunnerFactory
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -84,7 +84,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['1.11', '1.12']
+        version << ['1.11', '1.12', '2.0', '2.1']
     }
 
     def 'shadow copy'() {

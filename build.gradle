@@ -40,9 +40,9 @@ dependencies {
 
     testUtilsCompile localGroovy()
     testUtilsCompile gradleApi()
+    testUtilsCompile 'com.github.jengelman.gradle.plugins:gradle-test-kit:0.2'
 
     testCompile configurations.testUtilsCompile
-    testCompile 'com.github.jengelman.gradle.plugins:gradle-test-kit:0.2'
     testCompile("org.spockframework:spock-core:0.7-groovy-1.8") {
         exclude module: 'groovy-all'
     }

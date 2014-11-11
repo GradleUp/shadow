@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
-import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
@@ -12,7 +11,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransfor
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.DocumentationRegistry
@@ -22,7 +20,6 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.util.ConfigureUtil
 
@@ -40,13 +37,6 @@ class ShadowJar extends Jar implements ShadowSpec {
         versionUtil = new GradleVersionUtil(project.gradle.gradleVersion)
         dependencyFilter = new DefaultDependencyFilter(project)
         manifest = new DefaultInheritManifest(getServices().get(FileResolver))
-    }
-
-    @Override
-    // This should really return InheritManifest but cannot due to https://jira.codehaus.org/browse/GROOVY-5418
-    // TODO - change return type after upgrade to Gradle 2
-    public DefaultInheritManifest getManifest() {
-        return super.getManifest()
     }
 
     @Override
