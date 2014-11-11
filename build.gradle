@@ -32,7 +32,7 @@ dependencies {
 
     compile localGroovy()
     compile gradleApi()
-    compile 'jdom:jdom:1.1'
+    compile 'org.jdom:jdom2:2.0.5'
     compile 'org.ow2.asm:asm:4.1'
     compile 'org.ow2.asm:asm-commons:4.1'
     compile 'commons-io:commons-io:2.4'

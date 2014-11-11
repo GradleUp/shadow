@@ -2,6 +2,7 @@ v1.2.0
 ======
 
 + Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the `org.apache.tools.zip` package.
++ Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from `jdom:jdom:1.1` to `org.jdom:jdom2:2.0.5`) ([Issue #98](https://github.com/johnrengelman/shadow/issues/98))
 
 v1.1.2
 ======

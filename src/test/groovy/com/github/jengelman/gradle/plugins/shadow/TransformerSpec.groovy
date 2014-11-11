@@ -430,13 +430,11 @@ class TransformerSpec extends PluginSpecification {
         String text = getJarFileContents(output, 'properties.xml')
         assert text.replaceAll('\r\n', '\n') == '''|<?xml version="1.0" encoding="UTF-8"?>
             |<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            |
             |<properties version="1.0">
             |  <entry key="key1">val1</entry>
             |  <entry key="key2">val2</entry>
             |</properties>
-            |
-        |'''.stripMargin()
+            |'''.stripMargin()
     }
 
     @Issue('SHADOW-82')
