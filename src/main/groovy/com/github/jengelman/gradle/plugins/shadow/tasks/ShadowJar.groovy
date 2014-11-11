@@ -36,13 +36,6 @@ class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @Override
-    // This should really return InheritManifest but cannot due to https://jira.codehaus.org/browse/GROOVY-5418
-    // TODO - change return type after upgrade to Gradle 2
-    public DefaultInheritManifest getManifest() {
-        return super.getManifest()
-    }
-
-    @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry)
         return new ShadowCopyAction(getArchivePath(), getCompressor(), documentationRegistry,
