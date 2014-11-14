@@ -4,6 +4,7 @@ v1.2.0
 + Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the `org.apache.tools.zip` package.
 + Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from `jdom:jdom:1.1` to `org.jdom:jdom2:2.0.5`) ([Issue #98](https://github.com/johnrengelman/shadow/issues/98))
 + Convert ShadowJar.groovy to ShadowJar.java to workaround binary incompatibility introduced by Gradle 2.2 ([Issue #106](https://github.com/johnrengelman/shadow/issues/106))
++ Updated ASM library to `5.0.3` to support JDK8 ([Issue #97](https://github.com/johnrengelman/shadow/issues/97))
 
 v1.1.2
 ======

@@ -33,8 +33,8 @@ dependencies {
     compile localGroovy()
     compile gradleApi()
     compile 'org.jdom:jdom2:2.0.5'
-    compile 'org.ow2.asm:asm:4.1'
-    compile 'org.ow2.asm:asm-commons:4.1'
+    compile 'org.ow2.asm:asm:5.0.3'
+    compile 'org.ow2.asm:asm-commons:5.0.3'
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.ant:ant:1.9.4'
 
