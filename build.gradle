@@ -1,6 +1,5 @@
 import org.gradle.wrapper.Download
 import org.gradle.wrapper.GradleUserHomeLookup
-import org.gradle.wrapper.GradleWrapperMain
 import org.gradle.wrapper.Install
 import org.gradle.wrapper.PathAssembler
 import org.gradle.wrapper.WrapperConfiguration
@@ -109,7 +108,7 @@ task installWrappers << {
     ['1.11', '1.12', '2.0', '2.1', '2.2'].each {
         WrapperConfiguration config = wrapperExecutor.config
         config.setDistribution(new URI("https://services.gradle.org/distributions/gradle-$it-bin.zip"))
-        Install install = new Install(new Download("gradlew", GradleWrapperMain.wrapperVersion()),
+        Install install = new Install(new Download("gradlew", it),
                 new PathAssembler(GradleUserHomeLookup.gradleUserHome()))
         install.createDist(config)
     }

@@ -6,7 +6,7 @@ dependencies:
   cache_directories:
     - "~/.gradle"
   override:
-    - ./gradlew installWrappers
+    - ./gradlew installWrappers -s
     - ./gradlew dependencies
 
 
