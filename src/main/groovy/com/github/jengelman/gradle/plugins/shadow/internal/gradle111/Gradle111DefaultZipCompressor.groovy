@@ -12,7 +12,6 @@ class Gradle111DefaultZipCompressor implements ZipCompressor {
     public Gradle111DefaultZipCompressor() {
     }
 
-    @Override
     public int getCompressedMethod() {
         return ZipOutputStream.DEFLATED
     }
