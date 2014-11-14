@@ -104,6 +104,43 @@ class FilteringSpec extends PluginSpecification {
         doesNotContain(output, ['d.properties'])
     }
 
+    @Issue('SHADOW-83')
+    def "exclude dependency using wildcard syntax"() {
+        given:
+        repo.module('shadow', 'c', '1.0')
+                .insertFile('c.properties', 'c')
+                .publish()
+        repo.module('shadow', 'd', '1.0')
+                .insertFile('d.properties', 'd')
+                .dependsOn('c')
+                .publish()
+
+        buildFile << '''
+            |dependencies {
+            |   compile 'shadow:d:1.0'
+            |}
+            |
+            |shadowJar {
+            |   dependencies {
+            |      exclude(dependency('shadow:d:.*'))
+            |   }
+            |}
+        '''.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+
+        and:
+        doesNotContain(output, ['d.properties'])
+    }
+
     @Issue("SHADOW-54")
     def "dependency exclusions affect UP-TO-DATE check"() {
         given:

@@ -225,6 +225,28 @@ shadowJar {
 }
 ```
 
+Include or exclude dependencies using regex pattern matching. The string is split on the `:` character in the form
+`<group>:<name>:<version>`. Each piece is compared as a regex to the values of the resolved dependencies.
+
+```
+shadowJar {
+  dependencies {
+    include(dependency('asm:asm:.*'))
+  }
+}
+```
+
+If a piece of the string is not specified, then that field is not used for the matching. Thus the following syntax
+results in the same filtering as the example above.
+
+```
+shadowJar {
+  dependencies {
+    include(dependency('asm:asm'))
+  }
+}
+```
+
 Exclude a project dependency in a multi-project build.
 
 ```

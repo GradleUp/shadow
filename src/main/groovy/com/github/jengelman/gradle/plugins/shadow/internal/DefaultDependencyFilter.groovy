@@ -94,9 +94,9 @@ class DefaultDependencyFilter implements DependencyFilter {
      */
     Spec<? super ResolvedDependency> dependency(Dependency dependency) {
         this.dependency({ ResolvedDependency it ->
-            (!dependency.group || dependency.group == it.moduleGroup) &&
-                    (!dependency.name || dependency.name == it.moduleName) &&
-                    (!dependency.version || dependency.version == it.moduleVersion)
+            (!dependency.group || it.moduleGroup.matches(dependency.group)) &&
+                    (!dependency.name || it.moduleName.matches(dependency.name)) &&
+                    (!dependency.version || it.moduleVersion.matches(dependency.version))
         })
     }
 
