@@ -1,11 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
+import com.github.jengelman.gradle.testkit.GradleRunnerFactory
 import com.github.jengelman.gradle.testkit.file.TestFile
-import com.google.common.io.Files
 import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
-import org.gradle.testkit.functional.GradleRunnerFactory
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -21,7 +20,9 @@ class PluginSpecification extends Specification {
     AppendableMavenFileRepository repo
 
     def setup() {
-        runner = GradleRunnerFactory.create()
+        runner = GradleRunnerFactory.create(null) {
+            setJvmArguments('-Xmx128m')
+        }
         runner.directory = dir.root
         repo = repo()
         repo.module('junit', 'junit', '3.8.2').use(testJar).publish()

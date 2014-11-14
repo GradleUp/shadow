@@ -57,9 +57,11 @@ class ShadowPluginSpec extends PluginSpecification {
     @Unroll
     def 'apply plugin and run in Gradle #version'() {
         given:
-        GradleRunner versionRunner = GradleRunnerFactory.create() {
+        GradleRunner versionRunner = GradleRunnerFactory.create({
             useGradleVersion(version)
-        }
+        }, {
+            setJvmArguments('-Xmx128m')
+        })
         versionRunner.directory = dir.root
 
         buildFile << """

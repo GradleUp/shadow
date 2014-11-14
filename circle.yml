@@ -1,6 +1,7 @@
 machine:
   environment:
     TERM: dumb
+    GRADLE_OPTS: -Xmx256m
 
 dependencies:
   cache_directories:
