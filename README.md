@@ -4,7 +4,7 @@ Shadow is an extension of the Gradle Jar task that optimizes FatJar/UberJar crea
 JarOutputStream to copy file contents. This avoids the unnecessary I/O overhead of expanding jar files to disk
 before recombining them. Shadow provides the similar filtering, relocation, and transformation capabilities as the
 Maven Shade plugin. Starting with version 0.9, Shadow is a complete re-write based on core Gradle classes and concepts
-instead of a port of the Maven Shade code. Documentation for version 0.8 and prior can be found [here](README_old.md)
+instead of a port of the Maven Shade code. Documentation for version 0.8 and prior can be found [here](README_old.md).
 
 ## Current Status
 
@@ -18,12 +18,25 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 
 ### Applying Shadow Plugin to Project
 
+#### Gradle 1.x and 2.0
+
 ```
 buildscript {
   repositories { jcenter() }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:1.1.1'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.1.2'
   }
+}
+
+apply plugin: 'java' // or 'groovy'. Must be explicitly applied
+apply plugin: 'com.github.johnrengelman.shadow'
+```
+
+#### Gradle 2.1 and higher
+
+```
+plugins {
+  id 'com.github.johnrengelman.shadow' version '1.1.2'
 }
 
 apply plugin: 'java' // or 'groovy'. Must be explicitly applied
@@ -40,8 +53,8 @@ added. Shadow will **not** add them automatically, but instead listens for their
 $ gradle shadowJar //shadow the runtime configuration with project code into ./build/libs/
 ```
 
-`shadowJar` by uses the same default configurations as `jar` and additionally configures the `classifier` to be `"all"`.
-Additionally, it creates a 'shadow' configuration and assigns the jar as an artifact of it. This configuration can
+`shadowJar` uses the same default configurations as `jar` and additionally configures the `classifier` to be `'all'`.
+Additionally, it creates a `'shadow'` configuration and assigns the jar as an artifact of it. This configuration can
 be used to add dependencies that are excluded from the shadowing.
 
 ### Integrating with Application Plugin
@@ -55,7 +68,7 @@ Applying both `shadow` and `application` to a project will create a number of ad
 tasks mimic the `application` plugin but execute using the output of the `shadowJar` task.
 
 Applying the `application` plugin will cause the `shadowJar` to include the `Main-Class` attribute in the manifest of
-the `shadowJar` output. This is configured via the `mainClassName` attribute from the `application` plugin
+the `shadowJar` output. This is configured via the `mainClassName` attribute from the `application` plugin.
 
 ## Advanced Configuration
 
@@ -73,7 +86,7 @@ jar {
 
 ### Modifying the MANIFEST file
 
-Append to the Jar MANIFEST. Values specified here, override the values in jar.manifest
+Append to the Jar MANIFEST. Values specified here, override the values in jar.manifest.
 
 ```
 shadowJar {
@@ -121,7 +134,6 @@ shadowJar {
 }
 ```
 
-
 ### Merging service files specified by include and exclude patterns
 
 ```
@@ -143,7 +155,6 @@ shadowJar {
   }
 }
 ```
-
 
 ### Merging Groovy extension modules
 
@@ -194,7 +205,7 @@ shadowJar {
 
 ### Filtering shadow jar contents by maven/project dependency
 
-Exclude specific dependency (transitive dependencies are **not** excluded)
+Exclude specific dependency (transitive dependencies are **not** excluded).
 
 ```
 shadowJar {
@@ -206,7 +217,7 @@ shadowJar {
 
 Include specific dependency (transitive dependencies are **not** included). Note that dependency inclusion is based
 on the same core classes as Gradle's `CopySpec` inclusion/exclusion. By default, there is a global include, however,
-declaring a specific `include` effectively creates a global `exclude`. That is once an `include` is made, only items
+declaring a specific `include` effectively creates a global `exclude`. That is, once an `include` is made, only items
 that are specifically listed for inclusion will be include in the final output.
 
 ```
@@ -217,7 +228,7 @@ shadowJar {
 }
 ```
 
-Exclude a project dependency in a multi-project build
+Exclude a project dependency in a multi-project build.
 
 ```
 shadowJar {
