@@ -1,8 +1,0 @@
-image: bradrydzewski/java:openjdk7
-script:
-  - ./gradlew --stop
-  - ./gradlew build --info
-notify:
-  email:
-    recipients:
-      - john.r.engelman@gmail.com

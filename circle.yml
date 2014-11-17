@@ -4,12 +4,8 @@ machine:
     GRADLE_OPTS: -Xmx256m
 
 dependencies:
-  cache_directories:
-    - "~/.gradle"
   override:
-    - ./gradlew installWrappers -s
-    - ./gradlew dependencies
-
+    - ./gradlew installWrappers dependencies
 
 test:
   override:
