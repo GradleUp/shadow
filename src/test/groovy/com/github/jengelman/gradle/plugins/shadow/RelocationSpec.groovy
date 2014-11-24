@@ -281,4 +281,47 @@ class RelocationSpec extends PluginSpecification {
                 'app/junit/framework/Test.class'
         ])
     }
+
+    @Issue('SHADOW-93')
+    def "relocate resource files"() {
+        given:
+        file('src/main/java/foo/Foo.java') << '''
+        |package foo;
+        |
+        |class Foo {}
+        |'''.stripMargin()
+        file('src/main/resources/foo/foo.properties') << 'name=foo'
+
+        buildFile << """
+            |apply plugin: 'java'
+            |apply plugin: ${ShadowPlugin.name}
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   relocate 'foo', 'bar'
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'shadowJar'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+
+        and:
+        contains(output, [
+                'bar/Foo.class',
+                'bar/foo.properties'
+        ])
+
+        and:
+        doesNotContain(output, [
+                'foo/Foo.class',
+                'foo/foo.properties'
+        ])
+    }
 }

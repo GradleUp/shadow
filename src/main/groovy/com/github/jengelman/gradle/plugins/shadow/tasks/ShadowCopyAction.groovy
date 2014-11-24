@@ -167,8 +167,8 @@ public class ShadowCopyAction implements CopyAction {
                     boolean isClass = (FilenameUtils.getExtension(fileDetails.path) == 'class')
                     if (!remapper.hasRelocators() || !isClass) {
                         if (!isTransformable(fileDetails)) {
-                            String path = fileDetails.relativePath.pathString
-                            ZipEntry archiveEntry = new ZipEntry(path)
+                            String mappedPath = remapper.map(fileDetails.relativePath.pathString)
+                            ZipEntry archiveEntry = new ZipEntry(mappedPath)
                             archiveEntry.setTime(fileDetails.lastModified)
                             archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
                             zipOutStr.putNextEntry(archiveEntry)
@@ -177,8 +177,10 @@ public class ShadowCopyAction implements CopyAction {
                         } else {
                             transform(fileDetails)
                         }
-                    } else {
+                    } else if (isClass) {
                         remapClass(fileDetails)
+                    } else {
+                        //relocate file
                     }
                     recordVisit(fileDetails.relativePath)
                 } catch (Exception e) {

@@ -6,6 +6,7 @@ v1.2.0
 + Convert ShadowJar.groovy to ShadowJar.java to workaround binary incompatibility introduced by Gradle 2.2 ([Issue #106](https://github.com/johnrengelman/shadow/issues/106))
 + Updated ASM library to `5.0.3` to support JDK8 ([Issue #97](https://github.com/johnrengelman/shadow/issues/97))
 + Allows for regex pattern matching in the `dependency` string when including/excluding ([Issue #83](https://github.com/johnrengelman/shadow/issues/83))
++ Apply package relocations to resource files ([Issue #93](https://github.com/johnrengelman/shadow/issues/93))
 
 v1.1.2
 ======
