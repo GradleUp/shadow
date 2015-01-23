@@ -1,3 +1,8 @@
+v1.2.1
+======
+
++ Apply package relocations to dependency resources ([Issue #114](https://github.com/johnrengelman/shadow/issues/114))
+
 v1.2.0
 ======
 

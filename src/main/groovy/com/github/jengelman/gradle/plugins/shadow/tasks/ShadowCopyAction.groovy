@@ -179,8 +179,6 @@ public class ShadowCopyAction implements CopyAction {
                         }
                     } else if (isClass) {
                         remapClass(fileDetails)
-                    } else {
-                        //relocate file
                     }
                     recordVisit(fileDetails.relativePath)
                 } catch (Exception e) {
@@ -289,8 +287,10 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void copyArchiveEntry(RelativeArchivePath archiveFile, ZipFile archive) {
-            addParentDirectories(archiveFile)
-            zipOutStr.putNextEntry(archiveFile.entry)
+            String mappedPath = remapper.map(archiveFile.entry.name)
+            RelativeArchivePath mappedFile = new RelativeArchivePath(new ZipEntry(mappedPath), archiveFile.details)
+            addParentDirectories(mappedFile)
+            zipOutStr.putNextEntry(mappedFile.entry)
             IOUtils.copyLarge(archive.getInputStream(archiveFile.entry), zipOutStr)
             zipOutStr.closeEntry()
         }

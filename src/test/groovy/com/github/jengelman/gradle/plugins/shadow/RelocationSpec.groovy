@@ -282,9 +282,12 @@ class RelocationSpec extends PluginSpecification {
         ])
     }
 
-    @Issue('SHADOW-93')
+    @Issue(['SHADOW-93', 'SHADOW-114'])
     def "relocate resource files"() {
         given:
+        repo.module('shadow', 'dep', '1.0')
+                .insertFile('foo/dep.properties', 'c')
+                .publish()
         file('src/main/java/foo/Foo.java') << '''
         |package foo;
         |
@@ -297,6 +300,10 @@ class RelocationSpec extends PluginSpecification {
             |apply plugin: ${ShadowPlugin.name}
             |
             |repositories { maven { url "${repo.uri}" } }
+            |
+            |dependencies {
+            |   compile 'shadow:dep:1.0'
+            |}
             |
             |shadowJar {
             |   baseName = 'shadow'
@@ -315,13 +322,15 @@ class RelocationSpec extends PluginSpecification {
         and:
         contains(output, [
                 'bar/Foo.class',
-                'bar/foo.properties'
+                'bar/foo.properties',
+                'bar/dep.properties'
         ])
 
         and:
         doesNotContain(output, [
                 'foo/Foo.class',
-                'foo/foo.properties'
+                'foo/foo.properties',
+                'foo/dep.properties'
         ])
     }
 }
