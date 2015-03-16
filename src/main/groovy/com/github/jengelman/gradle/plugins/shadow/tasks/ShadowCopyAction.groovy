@@ -132,7 +132,7 @@ public class ShadowCopyAction implements CopyAction {
         private final PatternSet patternSet
         private final ShadowStats stats
 
-        private Set<String> visitedFiles = new HashSet<String>()
+        private Map<String, Map> visitedFiles = new HashMap<String, Map>()
 
         public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers, List<Relocator> relocators,
                             PatternSet patternSet, ShadowStats stats) {
@@ -157,8 +157,25 @@ public class ShadowCopyAction implements CopyAction {
                     fileDetails.relativePath.pathString.endsWith('.zip')
         }
 
-        private boolean recordVisit(RelativePath path) {
-            return visitedFiles.add(path.pathString)
+        private boolean recordVisit(path, size, originJar) {
+            if (visitedFiles.containsKey(path.toString())) {
+                return false
+            }
+
+            if (originJar == null) {
+                originJar = ""
+            }
+
+            visitedFiles.put(path.toString(), [size: size, originJar: originJar])
+            return true
+        }
+
+        private boolean recordVisit(path) {
+            return recordVisit(path.toString(), 0, null)   
+        }
+
+        private boolean recordVisit(FileCopyDetails fileCopyDetails) {
+            return recordVisit(fileCopyDetails.relativePath, fileCopyDetails.size, null)
         }
 
         private void visitFile(FileCopyDetails fileDetails) {
@@ -180,7 +197,7 @@ public class ShadowCopyAction implements CopyAction {
                     } else if (isClass) {
                         remapClass(fileDetails)
                     }
-                    recordVisit(fileDetails.relativePath)
+                    recordVisit(fileDetails)
                 } catch (Exception e) {
                     throw new GradleException(String.format("Could not add %s to ZIP '%s'.", fileDetails, zipFile), e)
                 }
@@ -201,7 +218,7 @@ public class ShadowCopyAction implements CopyAction {
             }
             filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
                 if (archiveElement.relativePath.file) {
-                    visitArchiveFile(archiveElement, archive)
+                    visitArchiveFile(archiveElement, archive, fileDetails)
                 }
             }
             archive.close()
@@ -209,20 +226,28 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private void visitArchiveDirectory(RelativeArchivePath archiveDir) {
-            if (recordVisit(archiveDir)) {
+            if (recordVisit(archiveDir.toString())) {
                 zipOutStr.putNextEntry(archiveDir.entry)
                 zipOutStr.closeEntry()
             }
         }
 
-        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive) {
+        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive, FileCopyDetails fileDetails) {
             def archiveFilePath = archiveFile.relativePath
+            def archiveFileSize = archiveFile.size
+
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                if (recordVisit(archiveFilePath)) {
+                if (recordVisit(archiveFilePath.toString(), archiveFileSize, fileDetails.relativePath)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFilePath, archive)
                     } else {
                         remapClass(archiveFilePath, archive)
+                    }
+                } else {
+                    def archiveFileInVisitedFiles = visitedFiles.get(archiveFilePath.toString())
+                    if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size) && !archiveFilePath.toString().startsWith('META-INF/')) {
+                        log.warn("IGNORING ${archiveFilePath} from ${fileDetails.relativePath}, size is different (${fileDetails.size} vs ${archiveFileInVisitedFiles.size})")
+                        log.warn("  --> origin JAR was ${archiveFileInVisitedFiles.originJar}")
                     }
                 }
             } else {
