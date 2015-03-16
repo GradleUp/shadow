@@ -199,7 +199,7 @@ class ShadowCopyAction implements CopyAction {
         private final Set<String> unused
         private final ShadowStats stats
 
-        private Map<String, Map> visitedFiles = new HashMap<>()
+        private Map<String, Map> visitedFiles = new HashMap<String, Map>()
 
         StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
                      List<Relocator> relocators, PatternSet patternSet, Set<String> unused,
@@ -216,16 +216,8 @@ class ShadowCopyAction implements CopyAction {
             }
         }
 
-        /**
-         * Record visit and return true if visited for the first time.
-         *
-         * @param path Visited path.
-         * @param size Size.
-         * @param originJar JAR it originated from.
-         * @return True if wasn't visited already.
-         */
-        private boolean recordVisit(String path, long size, @Nullable RelativePath originJar) {
-            if (visitedFiles.containsKey(path)) {
+        private boolean recordVisit(path, size, originJar) {
+            if (visitedFiles.containsKey(path.toString())) {
                 return false
             }
 
@@ -304,29 +296,21 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive, FileCopyDetails fileDetails) {
-            RelativeArchivePath archiveFilePath = archiveFile.relativePath
-            long archiveFileSize = archiveFile.size
+            def archiveFilePath = archiveFile.relativePath
+            def archiveFileSize = archiveFile.size
 
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                def path = archiveFilePath.toString()
-                if (recordVisit(path, archiveFileSize, archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
+                if (recordVisit(archiveFilePath.toString(), archiveFileSize, fileDetails.relativePath) && !isUnused(archiveFilePath.entry.name)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFilePath, archive)
                     } else {
                         remapClass(archiveFilePath, archive)
                     }
                 } else {
-                    def archiveFileInVisitedFiles = visitedFiles.get(path)
-                    if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size)) {
+                    def archiveFileInVisitedFiles = visitedFiles.get(archiveFilePath.toString())
+                    if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size) && !archiveFilePath.toString().startsWith('META-INF/')) {
                         log.warn("IGNORING ${archiveFilePath} from ${fileDetails.relativePath}, size is different (${fileDetails.size} vs ${archiveFileInVisitedFiles.size})")
-                        if (archiveFileInVisitedFiles.originJar) {
-                            log.warn("\t--> origin JAR was ${archiveFileInVisitedFiles.originJar}")
-                        } else {
-                            log.warn("\t--> file originated from project sourcecode")
-                        }
-                        if (new StandardFilesMergeTransformer().canTransformResource(archiveFile)) {
-                            log.warn("\t--> Recommended transformer is " + StandardFilesMergeTransformer.class.name)
-                        }
+                        log.warn("  --> origin JAR was ${archiveFileInVisitedFiles.originJar}")
                     }
                 }
             } else {
