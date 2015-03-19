@@ -308,9 +308,13 @@ class ShadowCopyAction implements CopyAction {
                     }
                 } else {
                     def archiveFileInVisitedFiles = visitedFiles.get(archiveFilePath.toString())
-                    if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size) && !archiveFilePath.toString().startsWith('META-INF/')) {
+                    if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size)) {
                         log.warn("IGNORING ${archiveFilePath} from ${fileDetails.relativePath}, size is different (${fileDetails.size} vs ${archiveFileInVisitedFiles.size})")
-                        log.warn("  --> origin JAR was ${archiveFileInVisitedFiles.originJar}")
+                        if (archiveFileInVisitedFiles.originJar) {
+                            log.warn("  --> origin JAR was ${archiveFileInVisitedFiles.originJar}")
+                        } else {
+                            log.warn("  --> file originated from project sourcecode")
+                        }
                     }
                 }
             } else {
