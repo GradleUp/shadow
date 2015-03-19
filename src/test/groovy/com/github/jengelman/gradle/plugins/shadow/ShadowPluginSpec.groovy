@@ -113,6 +113,30 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
     }
 
+    def 'warns when a file is masked by a previously shadowed resource'() {
+        given:
+        URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
+        URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
+
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = buildDir
+            |    baseName = 'shadow'
+            |    from('${artifact.path}')
+            |    from('${project.path}')
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'shadow'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        assert result.standardOutput =~  /IGNORING META-INF\/MANIFEST\.MF from test-artifact-1\.0-SNAPSHOT\.jar, size is different \(3115 vs 25\)\s  --> file originated from project sourcecode/
+        assert result.standardOutput =~  /IGNORING META-INF\/MANIFEST\.MF from test-project-1\.0-SNAPSHOT\.jar, size is different \(3906 vs 25\)\s  --> file originated from project sourcecode/
+    }    
+
     def 'include project sources'() {
         given:
         file('src/main/java/shadow/Passed.java') << '''
