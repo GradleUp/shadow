@@ -23,7 +23,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 buildscript {
   repositories { jcenter() }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.0'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
   }
 }
 
@@ -36,7 +36,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 ```
 plugins {
   id 'java' // or 'groovy' Must be explicitly applied
-  id 'com.github.johnrengelman.shadow' version '1.2.0'
+  id 'com.github.johnrengelman.shadow' version '1.2.1'
 }
 ```
 
