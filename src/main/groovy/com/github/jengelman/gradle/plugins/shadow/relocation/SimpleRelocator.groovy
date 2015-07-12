@@ -19,7 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import org.gradle.mvn3.org.codehaus.plexus.util.SelectorUtils
+import org.codehaus.plexus.util.SelectorUtils
 
 import java.util.regex.Pattern
 

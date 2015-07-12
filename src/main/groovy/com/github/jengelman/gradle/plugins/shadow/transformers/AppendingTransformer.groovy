@@ -22,8 +22,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.codehaus.plexus.util.IOUtil
 import org.gradle.api.file.FileTreeElement
-import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
 
 /**
  * A resource processor that appends content for a resource, separated by a newline.

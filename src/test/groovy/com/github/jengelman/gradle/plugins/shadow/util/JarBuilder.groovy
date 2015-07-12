@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
+import org.codehaus.plexus.util.IOUtil
 
 import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
