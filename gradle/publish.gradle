@@ -120,6 +120,12 @@ pluginBundle {
             displayName = 'Shadow Plugin'
         }
     }
+
+    mavenCoordinates {
+        groupId = project.group
+        artifactId = project.name
+
+    }
 }
 
 publishPlugins { task ->
