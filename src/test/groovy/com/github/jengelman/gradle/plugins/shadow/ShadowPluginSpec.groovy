@@ -64,16 +64,26 @@ class ShadowPluginSpec extends PluginSpecification {
         })
         versionRunner.directory = dir.root
 
+        File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
+                'one # NOTE: No newline terminates this line/file').write()
+
+        repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
+                'two # NOTE: No newline terminates this line/file').publish()
+
         buildFile << """
             |apply plugin: 'java'
             |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
+            |dependencies {
+            |  compile 'junit:junit:3.8.2'
+            |  compile files('${escapedPath(one)}')
+            |}
             |
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
+            |   mergeServiceFiles()
             |}
         """.stripMargin()
 
@@ -556,5 +566,9 @@ class ShadowPluginSpec extends PluginSpecification {
         String classpath = attributes.getValue('Class-Path')
         assert classpath == 'junit-3.8.2.jar'
 
+    }
+
+    private String escapedPath(File file) {
+        file.path.replaceAll('\\\\', '\\\\\\\\')
     }
 }
