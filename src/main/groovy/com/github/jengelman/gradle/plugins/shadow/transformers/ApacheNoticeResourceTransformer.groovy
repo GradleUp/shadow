@@ -22,8 +22,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.codehaus.plexus.util.StringUtils
 import org.gradle.api.file.FileTreeElement
-import org.gradle.mvn3.org.codehaus.plexus.util.StringUtils
 
 import java.text.SimpleDateFormat
 

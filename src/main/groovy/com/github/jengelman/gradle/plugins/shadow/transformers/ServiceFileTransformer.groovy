@@ -26,7 +26,7 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
-import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
+import org.codehaus.plexus.util.IOUtil
 
 /**
  * Modified from org.apache.maven.plugins.shade.resource.ServiceResourceTransformer.java

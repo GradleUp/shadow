@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.testkit.GradleRunnerFactory
 import com.github.jengelman.gradle.testkit.file.TestFile
-import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
+import org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
 import org.junit.Rule
