@@ -125,7 +125,7 @@ liveReload {
 
 task installWrappers << {
     WrapperExecutor wrapperExecutor = WrapperExecutor.forWrapperPropertiesFile(file('gradle/wrapper/gradle-wrapper.properties'), System.out)
-    ['1.11', '1.12', '2.0', '2.1', '2.2'].each {
+    ['1.11', '1.12', '2.0', '2.1', '2.2', '2.3', '2.4', '2.5'].each {
         WrapperConfiguration config = wrapperExecutor.config
         config.setDistribution(new URI("https://services.gradle.org/distributions/gradle-$it-bin.zip"))
         Install install = new Install(new Download("gradlew", it),

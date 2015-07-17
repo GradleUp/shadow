@@ -86,7 +86,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['1.11', '1.12', '2.0', '2.1', '2.2']
+        version << ['1.11', '1.12', '2.0', '2.1', '2.2', '2.3', '2.4', '2.5']
     }
 
     def 'shadow copy'() {
