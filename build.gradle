@@ -52,6 +52,7 @@ dependencies {
     compile 'org.ow2.asm:asm-commons:5.0.3'
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.ant:ant:1.9.4'
+    compile 'org.codehaus.plexus:plexus-utils:2.0.6'
 
     testUtilsCompile localGroovy()
     testUtilsCompile gradleApi()

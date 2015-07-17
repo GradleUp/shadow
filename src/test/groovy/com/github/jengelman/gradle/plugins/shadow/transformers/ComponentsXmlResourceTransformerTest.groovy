@@ -25,7 +25,7 @@ import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLAssert
 import org.custommonkey.xmlunit.XMLUnit
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
+import org.codehaus.plexus.util.IOUtil
 
 /**
  * Test for {@link ComponentsXmlResourceTransformer}.

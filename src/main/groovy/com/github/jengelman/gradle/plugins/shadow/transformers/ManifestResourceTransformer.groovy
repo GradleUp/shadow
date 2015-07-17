@@ -23,7 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
-import org.gradle.mvn3.org.codehaus.plexus.util.IOUtil
+import org.codehaus.plexus.util.IOUtil
 
 import java.util.jar.*
 import java.util.jar.Attributes.Name
