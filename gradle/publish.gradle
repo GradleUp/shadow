@@ -1,6 +1,7 @@
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory-publish'
+apply plugin: "com.gradle.plugin-publish"
 
 group = 'com.github.jengelman.gradle.plugins'
 def versionString = file('version.txt').text.trim()
@@ -105,4 +106,30 @@ bintray {
             ]
         }
     }
+}
+
+pluginBundle {
+    website = 'https://github.com/johnrengelman/shadow'
+    vcsUrl = 'https://github.com/johnrengelman/shadow'
+    description = 'A Gradle plugin for collapsing all dependencies and project code into a single Jar file.'
+    tags = ['onejar', 'shade', 'fatjar', 'uberjar']
+
+    plugins {
+        shadowPlugin {
+            id = 'com.github.johnrengelman.shadow'
+            displayName = 'Shadow Plugin'
+        }
+    }
+}
+
+publishPlugins { task ->
+    doFirst {
+        if (isSnapshot) {
+            throw new GradleException('Cannot publish SNAPSHOT versions to Plugin Portal!')
+        }
+    }
+}
+
+task release() {
+    dependsOn 'build', 'bintrayUpload', 'publishPlugins'
 }
