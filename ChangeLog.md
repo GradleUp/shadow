@@ -1,3 +1,8 @@
+v1.2.2
+======
+
++ [Minecrell](https://github.com/Minecrell) Gradle 2.5 compatibility ([Issue #147](https://github.com/johnrengelman/shadow/issues/147))
+
 v1.2.1
 ======
 
