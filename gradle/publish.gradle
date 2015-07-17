@@ -137,5 +137,5 @@ publishPlugins { task ->
 }
 
 task release() {
-    dependsOn 'build', 'bintrayUpload', 'publishPlugins'
+    dependsOn 'assemble', 'bintrayUpload', 'publishPlugins'
 }
