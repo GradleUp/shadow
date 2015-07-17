@@ -8,26 +8,18 @@ import org.gradle.wrapper.WrapperExecutor
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.0.0"
-        classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.2"
-        classpath "com.bluepapa32:gradle-watch-plugin:0.1.5"
-        classpath "org.kordamp.gradle:livereload-gradle-plugin:0.2.1"
-//        classpath 'org.codehaus.groovy:groovy-backports-compat23:2.3.10'
+        classpath "org.asciidoctor:asciidoctor-gradle-plugin:0.7.3"
     }
 }
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'project-report'
-apply plugin: 'org.asciidoctor.convert'
-apply plugin: "com.bluepapa32.watch"
-apply plugin: "org.kordamp.gradle.livereload"
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
 apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
@@ -94,34 +86,22 @@ sourceSets.test.compileClasspath += sourceSets.testUtils.output
 sourceSets.test.runtimeClasspath += sourceSets.testUtils.output
 
 asciidoctor {
-    def source = project.sourceSets.main.java.srcDirs[0]
-
-    // add extra inputs since these include files that are included
-    inputs.dir source
-
-    attributes	'build-gradle': file('build.gradle'),
-            'sourcedir': source,
-            'endpoint-url': 'http://example.org',
-
-            'source-highlighter' : 'coderay',
-            'imagesdir':'images',
-            'toc':'left',
-            'icons': 'font',
-            'setanchors':'true',
-            'idprefix':'',
-            'idseparator':'-',
-            'docinfo1':'true'
-}
-
-watch {
-    asciidoc {
-        files fileTree('src')
-        tasks 'asciidoctor'
-    }
-}
-
-liveReload {
-    docRoot asciidoctor.outputDir.canonicalPath
+    baseDir = project.file('src/asciidoc')
+    options = [
+        attributes: [
+            toc                     : 'left',
+            doctype                 : 'book',
+            icons                   : 'font',
+            encoding                : 'utf-8',
+            sectlink                : true,
+            sectanchors             : true,
+            numbered                : true,
+            linkattrs               : true,
+            imagesdir               : 'images',
+            linkcss                 : true,
+//            stylesheet              : 'css/style.css',
+        ]
+    ]
 }
 
 task installWrappers << {
