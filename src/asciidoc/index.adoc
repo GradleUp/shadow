@@ -1,8 +1,0 @@
-= Shadow Plugin User Guide
-:author: John Engelman
-:revnumber: {project-version}
-:revremark: Fast fat-jar creation and class relocation for Gradle
-:toclevels: 10
-
-:leveloffset: 1
-include::introduction.adoc[]
