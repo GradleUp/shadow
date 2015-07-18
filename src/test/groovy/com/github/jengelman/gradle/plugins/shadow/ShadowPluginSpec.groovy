@@ -10,9 +10,11 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Unroll
 
+import java.util.concurrent.TimeUnit
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
@@ -59,6 +61,7 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
         GradleRunner versionRunner = GradleRunnerFactory.create({
             useGradleVersion(version)
+            daemonMaxIdleTime(10, TimeUnit.SECONDS)
         }, {
             setJvmArguments('-Xmx128m')
         })
@@ -94,6 +97,9 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         success(result)
         assert output.exists()
+
+        cleanup:
+        versionRunner.close()
 
         where:
         version << ['1.11', '1.12', '2.0', '2.1', '2.2', '2.3', '2.4', '2.5']

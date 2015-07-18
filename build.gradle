@@ -29,6 +29,7 @@ apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
 
 repositories {
+    mavenLocal()
     jcenter()
     maven {
         url 'http://dl.bintray.com/johnrengelman/gradle-plugins'
@@ -49,13 +50,14 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.ant:ant:1.9.4'
     compile 'org.codehaus.plexus:plexus-utils:2.0.6'
+    compile 'org.codehaus.groovy:groovy-backports-compat23:2.4.4'
 
     testUtilsCompile localGroovy()
     testUtilsCompile gradleApi()
-    testUtilsCompile 'com.github.jengelman.gradle.plugins:gradle-test-kit:0.2'
+    testUtilsCompile 'com.github.jengelman.gradle.plugins:gradle-test-kit:0.3'
 
     testCompile configurations.testUtilsCompile
-    testCompile("org.spockframework:spock-core:0.7-groovy-1.8") {
+    testCompile("org.spockframework:spock-core:0.7-groovy-2.0") {
         exclude module: 'groovy-all'
     }
     testCompile 'xmlunit:xmlunit:1.3'
@@ -79,7 +81,7 @@ idea {
     }
     module {
         testSourceDirs += sourceSets.testUtils.allSource.srcDirs
-        scopes.TEST.plus += configurations.testUtilsRuntime
+        scopes.TEST.plus += [configurations.testUtilsRuntime]
     }
 }
 
@@ -118,4 +120,3 @@ task installWrappers << {
         install.createDist(config)
     }
 }
-

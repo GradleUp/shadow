@@ -35,6 +35,10 @@ public class ClasspathInjectingFilteringGrandleHandleFactory implements GradleHa
         return delegateFactory.start(directory, ammendedArguments);
     }
 
+    void close() {
+        delegateFactory.close()
+    }
+
     private List<File> getClasspathAsFiles() {
         List<URL> classpathUrls = ClasspathUtil.getClasspath(classLoader);
         List<File> sourceClasspath =  CollectionUtils.collect(classpathUrls, new ArrayList<File>(classpathUrls.size()), new Transformer<File, URL>() {

@@ -5,10 +5,12 @@ import com.github.jengelman.gradle.testkit.file.TestFile
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.functional.ExecutionResult
 import org.gradle.testkit.functional.GradleRunner
+import org.gradle.tooling.GradleConnector
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
+import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
@@ -20,12 +22,18 @@ class PluginSpecification extends Specification {
     AppendableMavenFileRepository repo
 
     def setup() {
-        runner = GradleRunnerFactory.create(null) {
+        runner = GradleRunnerFactory.create({
+            daemonMaxIdleTime(10, TimeUnit.SECONDS)
+        }, {
             setJvmArguments('-Xmx128m')
-        }
+        })
         runner.directory = dir.root
         repo = repo()
         repo.module('junit', 'junit', '3.8.2').use(testJar).publish()
+    }
+
+    def cleanup() {
+        runner.close()
     }
 
     File getBuildFile() {
@@ -59,6 +67,7 @@ class PluginSpecification extends Specification {
         StringWriter sw = new StringWriter()
         IOUtil.copy(is, sw)
         is.close()
+        jf.close()
         return sw.toString()
     }
 
@@ -67,6 +76,7 @@ class PluginSpecification extends Specification {
         paths.each { path ->
             assert jar.getJarEntry(path), "${f.path} does not contain [$path]"
         }
+        jar.close()
     }
 
     void doesNotContain(File f, List<String> paths) {
@@ -74,6 +84,7 @@ class PluginSpecification extends Specification {
         paths.each { path ->
             assert !jar.getJarEntry(path), "${f.path} contains [$path]"
         }
+        jar.close()
     }
 
     AppendableJar buildJar(String path) {
