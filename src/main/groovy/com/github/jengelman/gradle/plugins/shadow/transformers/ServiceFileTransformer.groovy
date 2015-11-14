@@ -67,7 +67,16 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     @Override
     void transform(String path, InputStream is, List<Relocator> relocators) {
-        serviceEntries[path].append(is)
+        def lines = is.readLines()
+        relocators.each {rel ->
+            path = rel.relocateClass(path)
+            lines.eachWithIndex { String line, int i ->
+                if(rel.canRelocateClass(line)) {
+                    lines[i] = rel.relocateClass(line)
+                }
+            }
+        }
+        lines.each {line -> serviceEntries[path].append(new ByteArrayInputStream(line.getBytes()))}
     }
 
     @Override
