@@ -69,7 +69,9 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
     void transform(String path, InputStream is, List<Relocator> relocators) {
         def lines = is.readLines()
         relocators.each {rel ->
-            path = rel.relocateClass(path)
+            if(rel.canRelocateClass(new File(path).name)) {
+                path = rel.relocateClass(path)
+            }
             lines.eachWithIndex { String line, int i ->
                 if(rel.canRelocateClass(line)) {
                     lines[i] = rel.relocateClass(line)

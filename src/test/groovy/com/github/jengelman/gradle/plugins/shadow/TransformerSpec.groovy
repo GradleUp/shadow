@@ -149,6 +149,8 @@ class TransformerSpec extends PluginSpecification {
                    |org.apache.hive.jdbc.HiveDriver'''.stripMargin())
                 .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
                 'org.apache.axis.components.compiler.Javac')
+                .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
+                'org.apache.commons.logging.impl.LogFactoryImpl')
                 .write()
 
         File two = buildJar('two.jar')
@@ -157,6 +159,8 @@ class TransformerSpec extends PluginSpecification {
                    |com.mysql.jdbc.Driver'''.stripMargin())
                 .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
                 'org.apache.axis.components.compiler.Jikes')
+                .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
+                'org.mortbay.log.Factory')
                 .write()
 
         buildFile << """
@@ -168,6 +172,7 @@ class TransformerSpec extends PluginSpecification {
             |    mergeServiceFiles()
             |    relocate('org.apache', 'myapache') {
             |        exclude 'org.apache.axis.components.compiler.Jikes'
+            |        exclude 'org.apache.commons.logging.LogFactory'
             |    }
             |}
         """.stripMargin()
@@ -193,6 +198,12 @@ class TransformerSpec extends PluginSpecification {
         assert text2.split('(\r\n)|(\r)|(\n)').size() == 2
         assert text2 == '''|myapache.axis.components.compiler.Javac
                            |org.apache.axis.components.compiler.Jikes'''.stripMargin()
+
+        and:
+        String text3 = getJarFileContents(output, 'META-INF/services/org.apache.commons.logging.LogFactory')
+        assert text3.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text3 == '''|myapache.commons.logging.impl.LogFactoryImpl
+                           |org.mortbay.log.Factory'''.stripMargin()
     }
 
     def 'service resource transformer short syntax alternate path'() {
