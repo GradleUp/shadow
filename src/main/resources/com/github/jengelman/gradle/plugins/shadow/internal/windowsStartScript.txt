@@ -71,7 +71,7 @@ set CMD_LINE_ARGS=%\$
 @rem Setup the command line
 
 @rem Execute ${applicationName}
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %${optsEnvironmentVar}% <% if ( appNameSystemProperty ) { %>"-D${appNameSystemProperty}=%APP_BASE_NAME%"<% } %> -jar ${mainApplicationJar} %CMD_LINE_ARGS%
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %${optsEnvironmentVar}% <% if ( appNameSystemProperty ) { %>"-D${appNameSystemProperty}=%APP_BASE_NAME%"<% } %> -jar "${mainApplicationJar}" %CMD_LINE_ARGS%
 
 :end
 @rem End local scope for the variables with windows NT shell
