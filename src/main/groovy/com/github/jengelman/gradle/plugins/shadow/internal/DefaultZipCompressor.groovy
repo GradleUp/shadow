@@ -31,10 +31,11 @@ public class DefaultZipCompressor implements ZipCompressor {
 
     public ZipOutputStream createArchiveOutputStream(File destination) {
         try {
-            ZipOutputStream outStream = new ZipOutputStream(destination);
-            outStream.setUseZip64(zip64Mode);
-            outStream.setMethod(entryCompressionMethod);
-            return outStream;
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(destination))
+            ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+            zipOutputStream.setUseZip64(zip64Mode);
+            zipOutputStream.setMethod(entryCompressionMethod);
+            return zipOutputStream;
         } catch (Exception e) {
             String message = String.format("Unable to create ZIP output stream for file %s.", destination);
             throw new UncheckedIOException(message, e);
