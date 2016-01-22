@@ -1,7 +1,7 @@
-package com.github.jengelman.gradle.testkit.repo.maven
+package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import com.github.jengelman.gradle.testkit.file.TestFile
-import com.github.jengelman.gradle.testkit.repo.AbstractModule
+import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
+import com.github.jengelman.gradle.plugins.shadow.util.repo.AbstractModule
 import groovy.xml.MarkupBuilder
 import java.text.SimpleDateFormat
 

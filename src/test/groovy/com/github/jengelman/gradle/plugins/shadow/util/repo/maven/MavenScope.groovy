@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.testkit.repo.maven
+package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
 import org.apache.commons.lang.StringUtils
 

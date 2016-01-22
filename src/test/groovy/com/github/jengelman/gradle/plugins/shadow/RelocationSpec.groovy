@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import org.gradle.testkit.functional.ExecutionResult
 import spock.lang.Issue
 
 import java.util.jar.Attributes
@@ -14,7 +13,7 @@ class RelocationSpec extends PluginSpecification {
         given:
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |
@@ -34,13 +33,9 @@ class RelocationSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(output, [
                 'META-INF/MANIFEST.MF',
                 'a/ResultPrinter.class',
@@ -90,7 +85,7 @@ class RelocationSpec extends PluginSpecification {
         given:
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |
@@ -111,13 +106,9 @@ class RelocationSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(output, [
                 'a/ResultPrinter.class',
                 'b/Test.class',
@@ -156,7 +147,7 @@ class RelocationSpec extends PluginSpecification {
         given:
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |
@@ -183,13 +174,9 @@ class RelocationSpec extends PluginSpecification {
         '''.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(output, [
                 'shadow/ShadowTest.class',
                 'shadow/junit/Test.class',
@@ -232,7 +219,7 @@ class RelocationSpec extends PluginSpecification {
         and: 'App project with shadow, relocation, and project dependency'
         file('app/build.gradle') << """
         |apply plugin: 'java'
-        |apply plugin: ${ShadowPlugin.name}
+        |apply plugin: 'com.github.johnrengelman.shadow'
         |
         |repositories { maven { url "${repo.uri}" } }
         |dependencies { compile project(':core') }
@@ -261,13 +248,9 @@ class RelocationSpec extends PluginSpecification {
         '''.stripMargin()
 
         when:
-        runner.arguments << ':app:shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments(':app:shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         File appOutput = file('app/build/libs/shadow.jar')
         assert appOutput.exists()
 
@@ -297,7 +280,7 @@ class RelocationSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |
@@ -313,13 +296,9 @@ class RelocationSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(output, [
                 'bar/Foo.class',
                 'bar/foo.properties',

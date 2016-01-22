@@ -19,6 +19,7 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
+import org.gradle.api.java.archives.Manifest;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
@@ -45,6 +46,11 @@ public class ShadowJar extends Jar implements ShadowSpec {
         transformers = new ArrayList<Transformer>();
         relocators = new ArrayList<Relocator>();
         configurations = new ArrayList<Configuration>();
+    }
+
+    @Override
+    public InheritManifest getManifest() {
+        return (InheritManifest) super.getManifest();
     }
 
     @Override

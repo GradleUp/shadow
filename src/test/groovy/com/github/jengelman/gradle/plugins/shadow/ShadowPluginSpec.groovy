@@ -3,18 +3,14 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import com.github.jengelman.gradle.testkit.GradleRunnerFactory
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testkit.functional.ExecutionResult
-import org.gradle.testkit.functional.GradleRunner
-import spock.lang.Ignore
+import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Issue
 import spock.lang.Unroll
 
-import java.util.concurrent.TimeUnit
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
@@ -59,13 +55,14 @@ class ShadowPluginSpec extends PluginSpecification {
     @Unroll
     def 'apply plugin and run in Gradle #version'() {
         given:
-        GradleRunner versionRunner = GradleRunnerFactory.create({
-            useGradleVersion(version)
-            daemonMaxIdleTime(10, TimeUnit.SECONDS)
-        }, {
-            setJvmArguments('-Xmx128m')
-        })
-        versionRunner.directory = dir.root
+        GradleRunner versionRunner = GradleRunner.create()
+                .withGradleVersion(version)
+                .withArguments('--stacktrace')
+                .withProjectDir(dir.root)
+                .forwardOutput()
+                .withDebug(true)
+                .withTestKitDir(getTestKitDir())
+
 
         File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
                 'one # NOTE: No newline terminates this line/file').write()
@@ -91,18 +88,13 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        versionRunner.arguments << 'shadowJar'
-        ExecutionResult result = versionRunner.run()
+        versionRunner.withArguments('shadowJar', '--stacktrace').build()
 
         then:
-        success(result)
         assert output.exists()
 
-        cleanup:
-        versionRunner.close()
-
         where:
-        version << ['1.11', '1.12', '2.0', '2.1', '2.2', '2.3', '2.4', '2.5']
+        version << ['1.12', '2.0', '2.5', '2.11-rc-1']
     }
 
     def 'shadow copy'() {
@@ -120,11 +112,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadow').build()
 
         then:
-        success(result)
         File output = file('build/shadow.jar')
         assert output.exists()
     }
@@ -138,7 +128,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
             |
@@ -149,13 +139,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(output, ['shadow/Passed.class', 'junit/framework/Test.class'])
 
         and:
@@ -189,7 +175,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile project(':client') }
@@ -203,13 +189,9 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/shadow.jar')
 
         when:
-        runner.arguments << ':server:shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments(':server:shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(serverOutput, [
                 'client/Client.class',
                 'server/Server.class',
@@ -230,7 +212,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
             |
@@ -258,13 +240,9 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server.jar')
 
         when:
-        runner.arguments << ':server:jar'
-        ExecutionResult result = runner.run()
+        runner.withArguments(':server:jar').build()
 
         then:
-        success(result)
-
-        and:
         contains(serverOutput, [
                 'server/Server.class'
         ])
@@ -290,7 +268,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
             |
@@ -310,7 +288,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile project(path: ':client', configuration: 'shadow') }
@@ -324,13 +302,9 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/shadow.jar')
 
         when:
-        runner.arguments << ':server:shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments(':server:shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(serverOutput, [
                 'client/Client.class',
                 'client/junit/framework/Test.class',
@@ -363,7 +337,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'shadow:a:1.0' }
@@ -375,13 +349,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(output, ['a.properties', 'META-INF/a.properties'])
 
         and:
@@ -402,7 +372,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |
@@ -418,13 +388,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         contains(output, ['a.properties'])
 
         and:
@@ -445,7 +411,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |
@@ -461,13 +427,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
-
-        and:
         JarFile jar = new JarFile(output)
         assert jar.entries().collect().size() == 2
     }
@@ -489,11 +451,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -526,11 +486,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and: 'SHADOW-65 - combine w/ existing Class-Path'
@@ -559,11 +517,9 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:

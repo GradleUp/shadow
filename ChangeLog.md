@@ -1,3 +1,10 @@
+v1.2.3
+======
+
++ Support for Gradle 2.11-rc-1 ([Issue #177](https://github.com/johnrengelman/shadow/issues/177))
++ Convert internal framework to [Gradle TestKit](https://docs.gradle.org/current/userguide/test_kit.html)
++
+
 v1.2.2
 ======
 

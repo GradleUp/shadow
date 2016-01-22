@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.testkit.file;
+package com.github.jengelman.gradle.plugins.shadow.util.file;
 
 /**
  * Implementations provide a working space to be used in tests.

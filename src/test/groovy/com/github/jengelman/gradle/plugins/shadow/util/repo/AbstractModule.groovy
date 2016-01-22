@@ -1,6 +1,6 @@
-package com.github.jengelman.gradle.testkit.repo
+package com.github.jengelman.gradle.plugins.shadow.util.repo
 
-import com.github.jengelman.gradle.testkit.file.TestFile
+import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import org.gradle.internal.hash.HashUtil
 
 

@@ -6,7 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import org.gradle.testkit.functional.ExecutionResult
 import spock.lang.Issue
 
 import java.util.jar.JarInputStream
@@ -41,11 +40,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadow').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -81,11 +78,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-            runner.arguments << 'shadow'
-            ExecutionResult result = runner.run()
+            runner.withArguments('shadow').build()
 
         then:
-            success(result)
             assert output.exists()
 
         and:
@@ -122,11 +117,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadow').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -160,11 +153,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-            runner.arguments << 'shadow'
-            ExecutionResult result = runner.run()
+            runner.withArguments('shadow').build()
 
         then:
-            success(result)
             assert output.exists()
 
         and:
@@ -185,7 +176,7 @@ class TransformerSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
             |dependencies {
@@ -204,11 +195,9 @@ class TransformerSpec extends PluginSpecification {
                 'three # NOTE: No newline terminates this line/file'
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -240,11 +229,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadow').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -274,11 +261,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadow').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -303,7 +288,7 @@ class TransformerSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |jar {
             |   manifest {
@@ -319,11 +304,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -350,7 +333,7 @@ class TransformerSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |jar {
             |   manifest {
@@ -370,11 +353,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadowJar').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -419,11 +400,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadow').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
@@ -452,7 +431,7 @@ class TransformerSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |jar {
             |   baseName = 'jar'
@@ -473,12 +452,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'jar'
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('jar', 'shadowJar').build()
 
         then:
-        success(result)
         File jar = file('build/libs/jar.jar')
         assert jar.exists()
         assert output.exists()
@@ -521,7 +497,7 @@ class TransformerSpec extends PluginSpecification {
 
         buildFile << """
             |apply plugin: 'java'
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |jar {
             |   baseName = 'jar'
@@ -542,12 +518,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'jar'
-        runner.arguments << 'shadowJar'
-        ExecutionResult result = runner.run()
+        runner.withArguments('jar', 'shadowJar').build()
 
         then:
-        success(result)
         File jar = file('build/libs/jar.jar')
         assert jar.exists()
         assert output.exists()
@@ -604,11 +577,9 @@ class TransformerSpec extends PluginSpecification {
             """.stripMargin()
 
         when:
-            runner.arguments << 'shadow'
-            def result = runner.run()
+            runner.withArguments('shadow').build()
 
         then:
-            success(result)
             assert output.exists()
 
         and:
@@ -650,11 +621,9 @@ class TransformerSpec extends PluginSpecification {
             """.stripMargin()
 
         when:
-            runner.arguments << 'shadow'
-            def result = runner.run()
+            runner.withArguments('shadow').build()
 
         then:
-            success(result)
             assert output.exists()
 
         and:

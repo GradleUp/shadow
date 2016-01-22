@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.jengelman.gradle.testkit.file;
+package com.github.jengelman.gradle.plugins.shadow.util.file;
 
 import groovy.lang.Closure;
 import org.apache.commons.io.FileUtils;
@@ -23,7 +23,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.EnumeratedAttribute;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
+import org.codehaus.groovy.runtime.ResourceGroovyMethods;
 import org.hamcrest.Matcher;
 
 import java.io.*;
@@ -131,7 +131,7 @@ public class TestFile extends File {
     public TestFile leftShift(Object content) {
         getParentFile().mkdirs();
         try {
-            DefaultGroovyMethods.leftShift(this, content);
+            ResourceGroovyMethods.leftShift(this, content);
             return this;
         } catch (IOException e) {
             throw new RuntimeException(String.format("Could not append to test file '%s'", this), e);

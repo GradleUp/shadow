@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.testkit.file
+package com.github.jengelman.gradle.plugins.shadow.util.file
 
 class ExecOutput {
     ExecOutput(String rawOutput, String error) {

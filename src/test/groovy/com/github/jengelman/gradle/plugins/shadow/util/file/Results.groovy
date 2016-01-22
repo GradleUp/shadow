@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.testkit.file
+package com.github.jengelman.gradle.plugins.shadow.util.file
 
 import org.gradle.tooling.GradleConnectionException
 import org.gradle.tooling.ResultHandler

@@ -1,6 +1,6 @@
-package com.github.jengelman.gradle.testkit.repo.maven
+package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import com.github.jengelman.gradle.testkit.file.TestFile
+import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 
 interface MavenModule {
     /**

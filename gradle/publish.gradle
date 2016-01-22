@@ -4,7 +4,7 @@ apply plugin: 'com.jfrog.artifactory-publish'
 apply plugin: "com.gradle.plugin-publish"
 
 group = 'com.github.jengelman.gradle.plugins'
-def versionString = file('version.txt').text.trim()
+def versionString = file('src/main/resources/shadow-version.txt').text.trim()
 version = versionString
 
 ext.isSnapshot = version.endsWith("SNAPSHOT")

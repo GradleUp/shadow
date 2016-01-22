@@ -2,12 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import org.apache.tools.zip.ZipFile
-import org.gradle.testkit.functional.ExecutionResult
-import spock.lang.Issue
-
-import java.util.jar.Attributes
-import java.util.jar.JarFile
 
 class PublishingSpec extends PluginSpecification {
 
@@ -31,7 +25,7 @@ class PublishingSpec extends PluginSpecification {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |apply plugin: 'maven'
             |apply plugin: 'java'
             |
@@ -59,13 +53,9 @@ class PublishingSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'uploadShadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('uploadShadow').build()
 
-        then:
-        success(result)
-
-        and: 'Check that shadow artifact exists'
+        then: 'Check that shadow artifact exists'
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
         assert publishedFile.exists()
 
@@ -98,7 +88,7 @@ class PublishingSpec extends PluginSpecification {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |apply plugin: 'maven-publish'
             |apply plugin: 'java'
             |
@@ -132,13 +122,9 @@ class PublishingSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'publish'
-        ExecutionResult result = runner.run()
+        runner.withArguments('publish').build()
 
         then:
-        success(result)
-
-        and:
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
         assert publishedFile.exists()
 

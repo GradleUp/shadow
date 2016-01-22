@@ -1,39 +1,57 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-import com.github.jengelman.gradle.testkit.GradleRunnerFactory
-import com.github.jengelman.gradle.testkit.file.TestFile
+import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
+import com.google.common.base.StandardSystemProperty
 import org.codehaus.plexus.util.IOUtil
-import org.gradle.testkit.functional.ExecutionResult
-import org.gradle.testkit.functional.GradleRunner
-import org.gradle.tooling.GradleConnector
+import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 class PluginSpecification extends Specification {
 
     @Rule TemporaryFolder dir
-    GradleRunner runner
+
+    private static final String SHADOW_VERSION = PluginSpecification.classLoader.getResource("shadow-version.txt").text.trim()
 
     AppendableMavenFileRepository repo
 
     def setup() {
-        runner = GradleRunnerFactory.create({
-            daemonMaxIdleTime(10, TimeUnit.SECONDS)
-        }, {
-            setJvmArguments('-Xmx128m')
-        })
-        runner.directory = dir.root
         repo = repo()
         repo.module('junit', 'junit', '3.8.2').use(testJar).publish()
+
+        buildFile << defaultBuildScript
     }
 
-    def cleanup() {
-        runner.close()
+    String getDefaultBuildScript() {
+        return """
+        |buildscript {
+        |  repositories {
+        |    //maven { url "${localRepo.toURI()}" }
+        |    mavenLocal()
+        |    jcenter()
+        |  }
+        |  dependencies {
+        |    classpath 'com.github.jengelman.gradle.plugins:shadow:${SHADOW_VERSION}'
+        |  }
+        |}
+        """.stripMargin()
+    }
+
+    GradleRunner getRunner() {
+        GradleRunner.create()
+                .withProjectDir(dir.root)
+                .forwardOutput()
+                .withDebug(true)
+                .withTestKitDir(getTestKitDir())
+    }
+
+    File getLocalRepo() {
+        def rootRelative = new File("build/localrepo")
+        rootRelative.directory ? rootRelative : new File(new File(StandardSystemProperty.USER_DIR.value()).parentFile, "build/localrepo")
     }
 
     File getBuildFile() {
@@ -91,23 +109,19 @@ class PluginSpecification extends Specification {
         return new AppendableJar(file(path))
     }
 
-    void success(ExecutionResult result) {
-        assert result.standardOutput.contains('BUILD SUCCESSFUL'), 'Gradle build failed with error'
-    }
-
-    void fail(ExecutionResult result) {
-        assert result.standardError, 'Gradle build succeeded'
-    }
-
-    boolean taskUpToDate(ExecutionResult result, String taskName) {
-        result.standardOutput.find(/:${taskName}(.*)/).trim().contains('UP-TO-DATE')
-    }
-
     protected getOutput() {
         file('build/libs/shadow.jar')
     }
 
     protected File getTestJar(String name = 'junit-3.8.2.jar') {
         return new File(this.class.classLoader.getResource(name).toURI())
+    }
+
+    public static File getTestKitDir() {
+        def gradleUserHome = System.getenv("GRADLE_USER_HOME")
+        if (!gradleUserHome) {
+            gradleUserHome = new File(System.getProperty("user.home"), ".gradle").absolutePath
+        }
+        return new File(gradleUserHome, "testkit")
     }
 }

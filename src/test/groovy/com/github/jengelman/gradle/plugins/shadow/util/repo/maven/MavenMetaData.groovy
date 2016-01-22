@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.testkit.repo.maven
+package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
 public interface MavenMetaData {
     List<String> getVersions();

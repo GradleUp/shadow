@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.apache.tools.zip.ZipFile
-import org.gradle.testkit.functional.ExecutionResult
+import org.gradle.testkit.runner.BuildResult
 import spock.lang.Issue
 
 import java.util.jar.Attributes
@@ -36,7 +36,7 @@ class ApplicationSpec extends PluginSpecification {
         """.stripMargin()
 
         buildFile << """
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |apply plugin: 'application'
             |apply plugin: 'java'
             |
@@ -60,14 +60,10 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.arguments << 'runShadow'
-        ExecutionResult result = runner.run()
+        BuildResult result = runner.withArguments('runShadow').build()
 
-        then:
-        success(result)
-
-        and: 'tests that runShadow executed and exited'
-        assert result.standardOutput.contains('TestApp: Hello World! (foo)')
+        then: 'tests that runShadow executed and exited'
+        assert result.output.contains('TestApp: Hello World! (foo)')
 
         and: 'Check that the proper jar file was installed'
         File installedJar = file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
@@ -108,7 +104,7 @@ class ApplicationSpec extends PluginSpecification {
         """.stripMargin()
 
         buildFile << """
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |apply plugin: 'application'
             |apply plugin: 'java'
             |
@@ -132,11 +128,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.arguments << 'distShadowZip'
-        ExecutionResult result = runner.run()
-
-        then:
-        success(result)
+        runner.withArguments('distShadowZip').build()
 
         then: 'Check that the distribution zip was created'
         File zip = file('build/distributions/myapp-1.0.zip')
@@ -169,7 +161,7 @@ class ApplicationSpec extends PluginSpecification {
         """.stripMargin()
 
         buildFile << """
-            |apply plugin: ${ShadowPlugin.name}
+            |apply plugin: 'com.github.johnrengelman.shadow'
             |apply plugin: 'application'
             |apply plugin: 'java'
             |
@@ -193,13 +185,9 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.arguments << 'installShadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('installShadow').build()
 
-        then:
-        success(result)
-
-        and: 'Check that the proper jar file was installed'
+        then: 'Check that the proper jar file was installed'
         File installedJar = file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
         assert installedJar.exists()
     }
