@@ -171,11 +171,9 @@ class TransformerSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        runner.withArguments('shadow').build()
 
         then:
-        success(result)
         assert output.exists()
 
         and:
