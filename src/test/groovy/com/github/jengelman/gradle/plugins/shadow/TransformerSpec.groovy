@@ -134,6 +134,71 @@ class TransformerSpec extends PluginSpecification {
             assert text2 == 'one'
     }
 
+    def 'service resource transformer short syntax relocation'() {
+        given:
+        File one = buildJar('one.jar')
+                .insertFile('META-INF/services/java.sql.Driver',
+                '''|oracle.jdbc.OracleDriver
+                   |org.apache.hive.jdbc.HiveDriver'''.stripMargin())
+                .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
+                'org.apache.axis.components.compiler.Javac')
+                .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
+                'org.apache.commons.logging.impl.LogFactoryImpl')
+                .write()
+
+        File two = buildJar('two.jar')
+                .insertFile('META-INF/services/java.sql.Driver',
+                '''|org.apache.derby.jdbc.AutoloadedDriver
+                   |com.mysql.jdbc.Driver'''.stripMargin())
+                .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
+                'org.apache.axis.components.compiler.Jikes')
+                .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
+                'org.mortbay.log.Factory')
+                .write()
+
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    mergeServiceFiles()
+            |    relocate('org.apache', 'myapache') {
+            |        exclude 'org.apache.axis.components.compiler.Jikes'
+            |        exclude 'org.apache.commons.logging.LogFactory'
+            |    }
+            |}
+        """.stripMargin()
+
+        when:
+        runner.arguments << 'shadow'
+        ExecutionResult result = runner.run()
+
+        then:
+        success(result)
+        assert output.exists()
+
+        and:
+        String text1 = getJarFileContents(output, 'META-INF/services/java.sql.Driver')
+        assert text1.split('(\r\n)|(\r)|(\n)').size() == 4
+        assert text1 == '''|oracle.jdbc.OracleDriver
+                           |myapache.hive.jdbc.HiveDriver
+                           |myapache.derby.jdbc.AutoloadedDriver
+                           |com.mysql.jdbc.Driver'''.stripMargin()
+
+        and:
+        String text2 = getJarFileContents(output, 'META-INF/services/myapache.axis.components.compiler.Compiler')
+        assert text2.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text2 == '''|myapache.axis.components.compiler.Javac
+                           |org.apache.axis.components.compiler.Jikes'''.stripMargin()
+
+        and:
+        String text3 = getJarFileContents(output, 'META-INF/services/org.apache.commons.logging.LogFactory')
+        assert text3.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text3 == '''|myapache.commons.logging.impl.LogFactoryImpl
+                           |org.mortbay.log.Factory'''.stripMargin()
+    }
+
     def 'service resource transformer short syntax alternate path'() {
         given:
             File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
