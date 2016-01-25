@@ -3,7 +3,7 @@ v1.2.3
 
 + Support for Gradle 2.11-rc-1 ([Issue #177](https://github.com/johnrengelman/shadow/issues/177))
 + Convert internal framework to [Gradle TestKit](https://docs.gradle.org/current/userguide/test_kit.html)
-+
++ [Fedor Korotkov](https://github.com/fkorotkov) - Use BufferedOutputStream when writing the Zip file ([PR #171](https://github.com/johnrengelman/shadow/pull/171))
 
 v1.2.2
 ======
