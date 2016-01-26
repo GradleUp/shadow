@@ -7,7 +7,9 @@ apply plugin: "org.kordamp.gradle.livereload"
 
 tasks.withType(Javadoc) {
     options.links(javaApiUrl, groovyApiUrl)
-    options.addStringOption('Xdoclint:none', '-quiet')
+    if (JavaVersion.current().java8Compatible) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
