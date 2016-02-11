@@ -26,7 +26,7 @@ https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 buildscript {
   repositories { jcenter() }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
   }
 }
 
@@ -39,7 +39,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 ```
 plugins {
   id 'java' // or 'groovy' Must be explicitly applied
-  id 'com.github.johnrengelman.shadow' version '1.2.2'
+  id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 ```
 
