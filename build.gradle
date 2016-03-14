@@ -60,6 +60,7 @@ test {
     if (System.env.CI == 'true') {
         testLogging.showStandardStreams = true
     }
+    jvmArgs "-XX:MaxPermSize=256m"
 }
 
 jar {

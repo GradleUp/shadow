@@ -7,6 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Issue
 import spock.lang.Unroll
@@ -88,13 +89,13 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        versionRunner.withArguments('shadowJar', '--stacktrace').build()
+        BuildResult result = versionRunner.withArguments('shadowJar', '--stacktrace').build()
 
         then:
         assert output.exists()
 
         where:
-        version << ['1.12', '2.0', '2.5', '2.11-rc-1']
+        version << ['1.12', '2.0', '2.5', '2.11', '2.12']
     }
 
     def 'shadow copy'() {
