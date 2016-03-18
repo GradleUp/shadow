@@ -22,7 +22,7 @@ https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 
 #### Gradle 1.x and 2.0
 
-```
+```gradle
 buildscript {
   repositories { jcenter() }
   dependencies {
@@ -36,7 +36,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 #### Gradle 2.1 and higher
 
-```
+```gradle
 plugins {
   id 'java' // or 'groovy' Must be explicitly applied
   id 'com.github.johnrengelman.shadow' version '1.2.3'
@@ -59,7 +59,7 @@ be used to add dependencies that are excluded from the shadowing.
 
 ### Integrating with Application Plugin
 
-```
+```gradle
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 ```
@@ -76,7 +76,7 @@ the `shadowJar` output. This is configured via the `mainClassName` attribute fro
 
 By default, shadowJar.manifest inherits from jar.manifest.
 
-```
+```gradle
 jar {
   manifest {
     attributes("Implementation-Title": "Gradle", "Implementation-Version": version)
@@ -88,7 +88,7 @@ jar {
 
 Append to the Jar MANIFEST. Values specified here, override the values in jar.manifest.
 
-```
+```gradle
 shadowJar {
   manifest {
     attributes 'Test-Entry': 'PASSED'
@@ -98,7 +98,7 @@ shadowJar {
 
 ### Merging Service files
 
-```
+```gradle
 shadowJar {
   mergeServiceFiles()
 }
@@ -106,7 +106,7 @@ shadowJar {
 
 **OR**
 
-```
+```gradle
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 shadowJar {
@@ -116,7 +116,7 @@ shadowJar {
 
 ### Merging service files in a different directory
 
-```
+```gradle
 shadowJar {
   mergeServiceFiles('META-INF/griffon')
 }
@@ -124,7 +124,7 @@ shadowJar {
 
 **OR**
 
-```
+```gradle
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 shadowJar {
@@ -136,7 +136,7 @@ shadowJar {
 
 ### Merging service files specified by include and exclude patterns
 
-```
+```gradle
 shadowJar {
   mergeServiceFiles {
     exclude 'META-INF/services/com.acme.*'
@@ -146,7 +146,7 @@ shadowJar {
 
 **OR**
 
-```
+```gradle
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 shadowJar {
@@ -158,7 +158,7 @@ shadowJar {
 
 ### Merging Groovy extension modules
 
-```
+```gradle
 shadowJar {
   mergeGroovyExtensionModules()
 }
@@ -166,7 +166,7 @@ shadowJar {
 
 **OR**
 
-```
+```gradle
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 
 shadowJar {
@@ -177,7 +177,7 @@ shadowJar {
 
 ### Appending Files
 
-```
+```gradle
 shadowJar {
   append('NOTICE')
 }
@@ -185,7 +185,7 @@ shadowJar {
 
 **OR**
 
-```
+```gradle
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 
 shadowJar {
@@ -197,7 +197,7 @@ shadowJar {
 
 ### Filtering shadow jar contents by file pattern
 
-```
+```gradle
 shadowJar {
   exclude 'LICENSE'
 }
@@ -207,7 +207,7 @@ shadowJar {
 
 Exclude specific dependency (transitive dependencies are **not** excluded).
 
-```
+```gradle
 shadowJar {
   dependencies {
     exclude(dependency('asm:asm:3.3.1'))
@@ -220,7 +220,7 @@ on the same core classes as Gradle's `CopySpec` inclusion/exclusion. By default,
 declaring a specific `include` effectively creates a global `exclude`. That is, once an `include` is made, only items
 that are specifically listed for inclusion will be include in the final output.
 
-```
+```gradle
 shadowJar {
   dependencies {
     include(dependency('asm:asm:3.3.1'))
@@ -231,7 +231,7 @@ shadowJar {
 Include or exclude dependencies using regex pattern matching. The string is split on the `:` character in the form
 `<group>:<name>:<version>`. Each piece is compared as a regex to the values of the resolved dependencies.
 
-```
+```gradle
 shadowJar {
   dependencies {
     include(dependency('asm:asm:.*'))
@@ -242,7 +242,7 @@ shadowJar {
 If a piece of the string is not specified, then that field is not used for the matching. Thus the following syntax
 results in the same filtering as the example above.
 
-```
+```gradle
 shadowJar {
   dependencies {
     include(dependency('asm:asm'))
@@ -252,7 +252,7 @@ shadowJar {
 
 Exclude a project dependency in a multi-project build.
 
-```
+```gradle
 shadowJar {
   dependencies {
     exclude(project(":myclient"))
@@ -262,7 +262,7 @@ shadowJar {
 
 ### Relocating dependencies
 
-```
+```gradle
 shadowJar {
   relocate 'org.objectweb.asm', 'myjarjarasm.asm'
 }
@@ -270,7 +270,7 @@ shadowJar {
 
 ### Filtering files in relocation
 
-```
+```gradle
 shadowJar {
   relocate('org.objectweb.asm', 'myjarjarasm.asm') {
     exclude 'org.objectweb.asm.ClassReader'
@@ -282,7 +282,7 @@ shadowJar {
 
 Uses the [Transformer](src/main/groovy/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.groovy) interface.
 
-```
+```gradle
 shadowJar {
   transform(<Transformer class>) {
     //..configure the Transformer class instance
@@ -292,7 +292,7 @@ shadowJar {
 
 ### Publishing the shadow jar as an additional resource to the main jar
 
-```
+```gradle
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
 
@@ -308,7 +308,7 @@ publishing {
 
 ### Publishing the shadow jar as a standalone artifact
 
-```
+```gradle
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
 
@@ -329,7 +329,7 @@ publishing {
 
 OR
 
-```
+```gradle
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven'
 
@@ -353,7 +353,7 @@ the `'shadow'` configuration is mapped as `'runtime'` scope. This is identical t
 
 ### Configuring additional POM dependencies for Shadow Jar
 
-```
+```gradle
 dependencies {
   compile 'asm:asm:3.3.1'
   compile 'org.bouncycastle:bcprov-jdk15on:1.47'
