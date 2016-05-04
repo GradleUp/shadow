@@ -12,6 +12,11 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 [ ![Download](https://api.bintray.com/packages/johnrengelman/gradle-plugins/gradle-shadow-plugin/images/download.png) ](https://bintray.com/johnrengelman/gradle-plugins/gradle-shadow-plugin/_latestVersion)
 [![Circle CI](https://circleci.com/gh/johnrengelman/shadow.png?style=badge)](https://circleci.com/gh/johnrengelman/shadow)
 
+## Latest Test Compatibility
+
+|Gradle Version|Shadow Version|
+|2.13|1.2.3|
+
 ## Gradle Plugins
 
 https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
