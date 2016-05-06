@@ -378,6 +378,21 @@ the shadowed jar, but including it as a dependency on the 'shadow' configuration
 Additionally, any dependencies added to the `shadow` configuration will be added to the `Class-Path` attribute in
 the JAR Manifest for the output of `shadowJar`.
 
+### Using shadow plugin for multi project builds
+Using shadowJar plugin is just as easy in a multi project builds. What depends is which project you need the shadowJar for
+Lets assume you have a root project X with sub projects Y and Z. Y has a compile dependency on Z.
+
+- If you want a shadow Jar for Y(which should contain Z) just add the shadow plugin to Y and you should be good to go.
+- Another case is if you want one uber jar for X containing Y and Z as well. This is not apparent especially if X is just a container for Y and Z and holds no actual code on its own. In this case you need to declare an explicit dependency in X for Y and Z:
+
+```
+  dependencies {
+    compile subprojects
+    // ... more deps
+  }
+```
+and apply the shadow jar plugin in X.
+
 ## ChangeLog
 
 [ChangeLog](ChangeLog.md)
