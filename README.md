@@ -15,6 +15,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 ## Latest Test Compatibility
 
 |Gradle Version|Shadow Version|
+| --- | --- |
 |2.13|1.2.3|
 
 ## Gradle Plugins
