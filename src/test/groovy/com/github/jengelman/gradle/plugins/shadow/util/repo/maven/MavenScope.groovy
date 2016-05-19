@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 
 class MavenScope {
     Map<String, MavenDependency> dependencies = [:]
