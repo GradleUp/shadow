@@ -12,25 +12,25 @@ class RelocationSpec extends PluginSpecification {
     def "relocate dependency files"() {
         given:
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |
-            |dependencies {
-            |   compile 'junit:junit:3.8.2'
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |   relocate 'junit.textui', 'a'
-            |   relocate 'junit.framework', 'b'
-            |   manifest {
-            |       attributes 'TEST-VALUE': 'FOO'
-            |   }
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            
+            dependencies {
+               compile 'junit:junit:3.8.2'
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+               relocate 'junit.textui', 'a'
+               relocate 'junit.framework', 'b'
+               manifest {
+                   attributes 'TEST-VALUE': 'FOO'
+               }
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -84,26 +84,26 @@ class RelocationSpec extends PluginSpecification {
     def "relocate dependency files with filtering"() {
         given:
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |
-            |dependencies {
-            |   compile 'junit:junit:3.8.2'
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |   relocate('junit.textui', 'a') {
-            |       exclude 'junit.textui.TestRunner'
-            |   }
-            |   relocate('junit.framework', 'b') {
-            |       include 'junit.framework.Test*'
-            |   }
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            
+            dependencies {
+               compile 'junit:junit:3.8.2'
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+               relocate('junit.textui', 'a') {
+                   exclude 'junit.textui.TestRunner'
+               }
+               relocate('junit.framework', 'b') {
+                   include 'junit.framework.Test*'
+               }
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -146,32 +146,32 @@ class RelocationSpec extends PluginSpecification {
     def "remap class names for relocated files in project source"() {
         given:
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |
-            |dependencies {
-            |   compile 'junit:junit:3.8.2'
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |   relocate 'junit.framework', 'shadow.junit'
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            
+            dependencies {
+               compile 'junit:junit:3.8.2'
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+               relocate 'junit.framework', 'shadow.junit'
+            }
+        """.stripIndent()
 
         file('src/main/java/shadow/ShadowTest.java') << '''
-            |package shadow;
-            |
-            |import junit.framework.Test;
-            |import junit.framework.TestResult;
-            |public class ShadowTest implements Test {
-            |  public int countTestCases() { return 0; }
-            |  public void run(TestResult result) { }
-            |}
-        '''.stripMargin()
+            package shadow;
+            
+            import junit.framework.Test;
+            import junit.framework.TestResult;
+            public class ShadowTest implements Test {
+              public int countTestCases() { return 0; }
+              public void run(TestResult result) { }
+            }
+        '''.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -200,52 +200,52 @@ class RelocationSpec extends PluginSpecification {
     def "relocate does not drop dependency resources"() {
         given: 'Core project with dependency and resource'
         file('core/build.gradle') << """
-        |apply plugin: 'java'
-        |
-        |repositories { maven { url "${repo.uri}" } }
-        |dependencies { compile 'junit:junit:3.8.2' }
-        """.stripMargin()
+        apply plugin: 'java'
+        
+        repositories { maven { url "${repo.uri}" } }
+        dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
 
         file('core/src/main/resources/TEST') << 'TEST RESOURCE'
         file('core/src/main/resources/test.properties') << 'name=test'
         file('core/src/main/java/core/Core.java') << '''
-        |package core;
-        |
-        |import junit.framework.Test;
-        |
-        |public class Core {}
-        '''.stripMargin()
+        package core;
+        
+        import junit.framework.Test;
+        
+        public class Core {}
+        '''.stripIndent()
 
         and: 'App project with shadow, relocation, and project dependency'
         file('app/build.gradle') << """
-        |apply plugin: 'java'
-        |apply plugin: 'com.github.johnrengelman.shadow'
-        |
-        |repositories { maven { url "${repo.uri}" } }
-        |dependencies { compile project(':core') }
-        |
-        |shadowJar {
-        |  baseName = 'shadow'
-        |  classifier = null
-        |  relocate 'core', 'app.core'
-        |  relocate 'junit.framework', 'app.junit.framework'
-        |}
-        """.stripMargin()
+        apply plugin: 'java'
+        apply plugin: 'com.github.johnrengelman.shadow'
+        
+        repositories { maven { url "${repo.uri}" } }
+        dependencies { compile project(':core') }
+        
+        shadowJar {
+          baseName = 'shadow'
+          classifier = null
+          relocate 'core', 'app.core'
+          relocate 'junit.framework', 'app.junit.framework'
+        }
+        """.stripIndent()
 
         file('app/src/main/resources/APP-TEST') << 'APP TEST RESOURCE'
         file('app/src/main/java/app/App.java') << '''
-        |package app;
-        |
-        |import core.Core;
-        |import junit.framework.Test;
-        |
-        |public class App {}
-        '''.stripMargin()
+        package app;
+        
+        import core.Core;
+        import junit.framework.Test;
+        
+        public class App {}
+        '''.stripIndent()
 
         and: 'Configure multi-project build'
         settingsFile << '''
-        |include 'core', 'app'
-        '''.stripMargin()
+        include 'core', 'app'
+        '''.stripIndent()
 
         when:
         runner.withArguments(':app:shadowJar').build()
@@ -272,28 +272,28 @@ class RelocationSpec extends PluginSpecification {
                 .insertFile('foo/dep.properties', 'c')
                 .publish()
         file('src/main/java/foo/Foo.java') << '''
-        |package foo;
-        |
-        |class Foo {}
-        |'''.stripMargin()
+        package foo;
+        
+        class Foo {}
+        '''.stripIndent()
         file('src/main/resources/foo/foo.properties') << 'name=foo'
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |
-            |dependencies {
-            |   compile 'shadow:dep:1.0'
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |   relocate 'foo', 'bar'
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            
+            dependencies {
+               compile 'shadow:dep:1.0'
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+               relocate 'foo', 'bar'
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()

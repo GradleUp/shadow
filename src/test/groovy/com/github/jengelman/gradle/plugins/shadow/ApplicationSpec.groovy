@@ -27,35 +27,35 @@ class ApplicationSpec extends PluginSpecification {
                 .publish()
 
         file('src/main/java/myapp/Main.java') << """
-            |package myapp;
-            |public class Main {
-            |   public static void main(String[] args) {
-            |       System.out.println("TestApp: Hello World! (" + args[0] + ")");
-            |   }
-            |}
-        """.stripMargin()
+            package myapp;
+            public class Main {
+               public static void main(String[] args) {
+                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
+               }
+            }
+        """.stripIndent()
 
         buildFile << """
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |apply plugin: 'application'
-            |apply plugin: 'java'
-            |
-            |mainClassName = 'myapp.Main'
-            |
-            |version = '1.0'
-            |
-            |repositories {
-            |   maven { url "${repo.uri}" }
-            |}
-            |
-            |dependencies {
-            |   compile 'shadow:a:1.0'
-            |}
-            |
-            |runShadow {
-            |   args 'foo'
-            |}
-        """.stripMargin()
+            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'application'
+            apply plugin: 'java'
+            
+            mainClassName = 'myapp.Main'
+            
+            version = '1.0'
+            
+            repositories {
+               maven { url "${repo.uri}" }
+            }
+            
+            dependencies {
+               compile 'shadow:a:1.0'
+            }
+            
+            runShadow {
+               args 'foo'
+            }
+        """.stripIndent()
 
         settingsFile << "rootProject.name = 'myapp'"
 
@@ -95,35 +95,35 @@ class ApplicationSpec extends PluginSpecification {
                 .publish()
 
         file('src/main/java/myapp/Main.java') << """
-            |package myapp;
-            |public class Main {
-            |   public static void main(String[] args) {
-            |       System.out.println("TestApp: Hello World! (" + args[0] + ")");
-            |   }
-            |}
-        """.stripMargin()
+            package myapp;
+            public class Main {
+               public static void main(String[] args) {
+                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
+               }
+            }
+        """.stripIndent()
 
         buildFile << """
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |apply plugin: 'application'
-            |apply plugin: 'java'
-            |
-            |mainClassName = 'myapp.Main'
-            |
-            |version = '1.0'
-            |
-            |repositories {
-            |   maven { url "${repo.uri}" }
-            |}
-            |
-            |dependencies {
-            |   shadow 'shadow:a:1.0'
-            |}
-            |
-            |runShadow {
-            |   args 'foo'
-            |}
-        """.stripMargin()
+            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'application'
+            apply plugin: 'java'
+            
+            mainClassName = 'myapp.Main'
+            
+            version = '1.0'
+            
+            repositories {
+               maven { url "${repo.uri}" }
+            }
+            
+            dependencies {
+               shadow 'shadow:a:1.0'
+            }
+            
+            runShadow {
+               args 'foo'
+            }
+        """.stripIndent()
 
         settingsFile << "rootProject.name = 'myapp'"
 
@@ -152,35 +152,35 @@ class ApplicationSpec extends PluginSpecification {
                 .publish()
 
         file('src/main/java/myapp/Main.java') << """
-            |package myapp;
-            |public class Main {
-            |   public static void main(String[] args) {
-            |       System.out.println("TestApp: Hello World! (" + args[0] + ")");
-            |   }
-            |}
-        """.stripMargin()
+            package myapp;
+            public class Main {
+               public static void main(String[] args) {
+                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
+               }
+            }
+        """.stripIndent()
 
         buildFile << """
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |apply plugin: 'application'
-            |apply plugin: 'java'
-            |
-            |mainClassName = 'myapp.Main'
-            |
-            |version = '1.0'
-            |
-            |repositories {
-            |   maven { url "${repo.uri}" }
-            |}
-            |
-            |dependencies {
-            |   compile 'shadow:a:1.0'
-            |}
-            |
-            |runShadow {
-            |   args 'foo'
-            |}
-        """.stripMargin()
+            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'application'
+            apply plugin: 'java'
+            
+            mainClassName = 'myapp.Main'
+            
+            version = '1.0'
+            
+            repositories {
+               maven { url "${repo.uri}" }
+            }
+            
+            dependencies {
+               compile 'shadow:a:1.0'
+            }
+            
+            runShadow {
+               args 'foo'
+            }
+        """.stripIndent()
 
         settingsFile << "rootProject.name = 'myapp'"
 
