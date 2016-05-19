@@ -1,10 +1,6 @@
 def javaApiUrl = 'http://docs.oracle.com/javase/1.7.0/docs/api'
 def groovyApiUrl = 'http://groovy.codehaus.org/gapi/'
 
-apply plugin: 'org.asciidoctor.convert'
-apply plugin: "com.bluepapa32.watch"
-apply plugin: "org.kordamp.gradle.livereload"
-
 tasks.withType(Javadoc) {
     options.links(javaApiUrl, groovyApiUrl)
     if (JavaVersion.current().java8Compatible) {
@@ -23,34 +19,3 @@ task sourcesJar(type: Jar) {
 }
 
 build.dependsOn javadocJar, sourcesJar
-
-asciidoctor {
-    def source = project.sourceSets.main.java.srcDirs[0]
-
-    // add extra inputs since these include files that are included
-    inputs.dir source
-
-    attributes	'build-gradle': file('build.gradle'),
-            'sourcedir': source,
-            'endpoint-url': 'http://example.org',
-
-            'source-highlighter' : 'coderay',
-            'imagesdir':'images',
-            'toc':'left',
-            'icons': 'font',
-            'setanchors':'true',
-            'idprefix':'',
-            'idseparator':'-',
-            'docinfo1':'true'
-}
-
-watch {
-    asciidoc {
-        files fileTree('src')
-        tasks 'asciidoctor'
-    }
-}
-
-liveReload {
-    docRoot asciidoctor.outputDir.canonicalPath
-}

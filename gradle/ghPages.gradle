@@ -1,0 +1,11 @@
+githubPages {
+    repoUri = 'https://github.com/johnrengelman/shadow.git'
+    credentials {
+        username = project.hasProperty('githubToken') ? project.githubToken : ''
+        password = ''
+    }
+
+    pages {
+        from 'build/asciidoc/html5'
+    }
+}

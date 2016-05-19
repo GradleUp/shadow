@@ -1,0 +1,25 @@
+== Getting Started
+
+
+[source,groovy,subs="+attributes"]
+----
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:{project-version}'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+----
+
+Alternatively, the Gradle Plugin syntax can be used:
+
+[source,groovy,subs="+attributes"]
+----
+plugins {
+  id 'com.github.johnrengelman.shadow' version '{project-version}'
+}
+----

@@ -1,0 +1,28 @@
+//asciidoctorj {
+//    version = '1.5.2'
+//}
+//
+//asciidoctor {
+//    backends = ['html5','pdf']
+//    options doctype: 'book'
+//}
+
+apply plugin: 'org.asciidoctor.convert'
+
+asciidoctorj {
+    version = '1.5.4'
+}
+
+asciidoctor {
+    sourceDir = new File("$rootDir/src/docs/asciidoc")
+    sources {
+        include 'index.adoc'
+    }
+    backends = ['html5', 'pdf']
+
+    attributes  toc                 :'left',
+            'source-highlighter': 'coderay',
+            icons               : 'font',
+            numbered            : '',
+            idprefix            : ''
+}

@@ -1,0 +1,2 @@
+filtering dependencies
+shadowJar scope

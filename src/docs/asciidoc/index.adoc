@@ -1,81 +1,21 @@
+:src: ../
+:tests: {src}/test/groovy/com/github/jengelman/gradle/plugins/shadow
 = Shadow Plugin User Guide & Examples
 John Engelman - @johnrengelman
 :revnumber: {project-version}
-:example-caption!:
-ifndef::imagesdir[:imagesdir: images]
-ifndef::sourcedir[:sourcedir: ../groovy]
 
-This is a user manual for an example project.
+include::01-intro.adoc[]
 
-== Introduction
+include::02-getting-started.adoc[]
 
-This project does something.
-We just haven't decided what that is yet.
+include::03-configuring.adoc[]
 
-== Source Code
+include::04-custom-tasks.adoc[]
 
-[source,java]
-.Java code from project
-----
-include::{sourcedir}/example/StringUtils.java[tags=contains,indent=0]
-----
+include::05-controlling-dependencies.adoc[]
 
-This page was built by the following command:
+include::06-controlling-merging.adoc[]
 
- $ ./gradlew asciidoctor
+include::07-publishing.adoc[]
 
-== Live Reload Support
-
-The Gradle build also can support http://asciidoctor.org/docs/editing-asciidoc-with-live-preview/#livereload[Live Reload]
-
-Start by running the build with the watch task
-
- $ ./gradlew asciidoctor watch
-
-This ensures if you modify example-manual.adoc then everything is rebuilt.
-
-Open another terminal and run the liveReload task:
-
- $ ./gradlew liveReload
-
-Now you can use the https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=en[Chrome] or http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-[Firefox] plugins to automatically reload your browser when the build completes.
-
-IMPORTANT: After installing the Chrome LiveReload extension, you need to check the "Allow access to file URLs" checkbox in Tools > Extensions > LiveReload in order for it to work with local files.
-
-Now try editing example-manual.adoc and watching your browser.
-After a brief wait you will observe that the browser is automatically updated with your changes.
-
-== Images
-
-[.thumb]
-image::sunset.jpg[scaledwidth=75%]
-
-== Attributes
-
-.Built-in
-asciidoctor-version:: {asciidoctor-version}
-safe-mode-name:: {safe-mode-name}
-docdir:: {docdir}
-docfile:: {docfile}
-imagesdir:: {imagesdir}
-
-.Custom
-project-version:: {project-version}
-sourcedir:: {sourcedir}
-endpoint-url:: {endpoint-url}
-
-== Includes
-
-.include::subdir/_b.adoc[]
-====
-include::subdir/_b.adoc[]
-====
-
-WARNING: Includes can be tricky!
-
-== build.gradle
-
-[source,groovy]
-----
-include::{build-gradle}[]
-----
+include::08-application-plugin.adoc
