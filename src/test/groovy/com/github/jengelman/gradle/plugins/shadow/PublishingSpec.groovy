@@ -25,32 +25,32 @@ class PublishingSpec extends PluginSpecification {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
-            apply plugin: 'maven'
-            apply plugin: 'java'
-            
-            group = 'shadow'
-            version = '1.0'
-            
-            repositories { maven { url "${repo.uri}" } }
-            dependencies {
-               compile 'shadow:a:1.0'
-               shadow 'shadow:b:1.0'
-            }
-            
-            shadowJar {
-               baseName = 'maven-all'
-               classifier = null
-            }
-            
-            uploadShadow {
-               repositories {
-                   mavenDeployer {
-                       repository(url: "${publishingRepo.uri}")
-                   }
-               }
-            }
-        """.stripIndent()
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |apply plugin: 'maven'
+            |apply plugin: 'java'
+            |
+            |group = 'shadow'
+            |version = '1.0'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies {
+            |   compile 'shadow:a:1.0'
+            |   shadow 'shadow:b:1.0'
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'maven-all'
+            |   classifier = null
+            |}
+            |
+            |uploadShadow {
+            |   repositories {
+            |       mavenDeployer {
+            |           repository(url: "${publishingRepo.uri}")
+            |       }
+            |   }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('uploadShadow').build()
@@ -88,38 +88,38 @@ class PublishingSpec extends PluginSpecification {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
-            apply plugin: 'maven-publish'
-            apply plugin: 'java'
-            
-            group = 'shadow'
-            version = '1.0'
-            
-            repositories { maven { url "${repo.uri}" } }
-            dependencies {
-               compile 'shadow:a:1.0'
-               shadow 'shadow:b:1.0'
-            }
-            
-            shadowJar {
-               classifier = ''
-               baseName = 'maven-all'
-            }
-            
-            publishing {
-               publications {
-                   shadow(MavenPublication) {
-                       from components.shadow
-                       artifactId = 'maven-all'
-                   }
-               }
-               repositories {
-                   maven {
-                       url "${publishingRepo.uri}"
-                   }
-               }
-            }
-        """.stripIndent()
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |apply plugin: 'maven-publish'
+            |apply plugin: 'java'
+            |
+            |group = 'shadow'
+            |version = '1.0'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies {
+            |   compile 'shadow:a:1.0'
+            |   shadow 'shadow:b:1.0'
+            |}
+            |
+            |shadowJar {
+            |   classifier = ''
+            |   baseName = 'maven-all'
+            |}
+            |
+            |publishing {
+            |   publications {
+            |       shadow(MavenPublication) {
+            |           from components.shadow
+            |           artifactId = 'maven-all'
+            |       }
+            |   }
+            |   repositories {
+            |       maven {
+            |           url "${publishingRepo.uri}"
+            |       }
+            |   }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('publish').build()

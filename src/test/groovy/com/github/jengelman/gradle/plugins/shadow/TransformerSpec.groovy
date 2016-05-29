@@ -28,16 +28,16 @@ class TransformerSpec extends PluginSpecification {
                 .write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
-                from('${escapedPath(one)}')
-                from('${escapedPath(two)}')
-                transform(${ServiceFileTransformer.name}) {
-                    exclude 'META-INF/services/com.acme.*'
-                }
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    transform(${ServiceFileTransformer.name}) {
+            |        exclude 'META-INF/services/com.acme.*'
+            |    }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadow').build()
@@ -47,13 +47,13 @@ class TransformerSpec extends PluginSpecification {
 
         and:
         String text1 = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
-        assert text1.split('(\r\n)(\r)(\n)').size() == 2
-        assert text1 == '''one # NOTE: No newline terminates this line/file
-                          two # NOTE: No newline terminates this line/file'''.stripIndent()
+        assert text1.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text1 == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
 
         and:
         String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
-        assert text2.split('(\r\n)(\r)(\n)').size() == 1
+        assert text2.split('(\r\n)|(\r)|(\n)').size() == 1
         assert text2 == 'one'
     }
 
@@ -66,16 +66,16 @@ class TransformerSpec extends PluginSpecification {
                     'two # NOTE: No newline terminates this line/file').write()
 
             buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
-                from('${escapedPath(one)}')
-                from('${escapedPath(two)}')
-                transform(${ServiceFileTransformer.name}) {
-                    path = 'META-INF/foo'
-                }
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    transform(${ServiceFileTransformer.name}) {
+            |        path = 'META-INF/foo'
+            |    }
+            |}
+        """.stripMargin()
 
         when:
             runner.withArguments('shadow').build()
@@ -85,9 +85,9 @@ class TransformerSpec extends PluginSpecification {
 
         and:
             String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
-            assert text.split('(\r\n)(\r)(\n)').size() == 2
-            assert text == '''one # NOTE: No newline terminates this line/file
-                          two # NOTE: No newline terminates this line/file'''.stripIndent()
+            assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
     }
 
     def 'service resource transformer short syntax'() {
@@ -105,16 +105,16 @@ class TransformerSpec extends PluginSpecification {
                     .write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
-                from('${escapedPath(one)}')
-                from('${escapedPath(two)}')
-                mergeServiceFiles {
-                    exclude 'META-INF/services/com.acme.*'
-                }
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    mergeServiceFiles {
+            |        exclude 'META-INF/services/com.acme.*'
+            |    }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadow').build()
@@ -124,13 +124,13 @@ class TransformerSpec extends PluginSpecification {
 
         and:
             String text1 = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
-            assert text1.split('(\r\n)(\r)(\n)').size() == 2
-            assert text1 == '''one # NOTE: No newline terminates this line/file
-                          two # NOTE: No newline terminates this line/file'''.stripIndent()
+            assert text1.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text1 == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
 
         and:
             String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
-            assert text2.split('(\r\n)(\r)(\n)').size() == 1
+            assert text2.split('(\r\n)|(\r)|(\n)').size() == 1
             assert text2 == 'one'
     }
 
@@ -138,8 +138,8 @@ class TransformerSpec extends PluginSpecification {
         given:
         File one = buildJar('one.jar')
                 .insertFile('META-INF/services/java.sql.Driver',
-                '''oracle.jdbc.OracleDriver
-                   org.apache.hive.jdbc.HiveDriver'''.stripIndent())
+                '''|oracle.jdbc.OracleDriver
+                   |org.apache.hive.jdbc.HiveDriver'''.stripMargin())
                 .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
                 'org.apache.axis.components.compiler.Javac')
                 .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
@@ -148,8 +148,8 @@ class TransformerSpec extends PluginSpecification {
 
         File two = buildJar('two.jar')
                 .insertFile('META-INF/services/java.sql.Driver',
-                '''org.apache.derby.jdbc.AutoloadedDriver
-                   com.mysql.jdbc.Driver'''.stripIndent())
+                '''|org.apache.derby.jdbc.AutoloadedDriver
+                   |com.mysql.jdbc.Driver'''.stripMargin())
                 .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
                 'org.apache.axis.components.compiler.Jikes')
                 .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
@@ -157,18 +157,18 @@ class TransformerSpec extends PluginSpecification {
                 .write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
-                from('${escapedPath(one)}')
-                from('${escapedPath(two)}')
-                mergeServiceFiles()
-                relocate('org.apache', 'myapache') {
-                    exclude 'org.apache.axis.components.compiler.Jikes'
-                    exclude 'org.apache.commons.logging.LogFactory'
-                }
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    mergeServiceFiles()
+            |    relocate('org.apache', 'myapache') {
+            |        exclude 'org.apache.axis.components.compiler.Jikes'
+            |        exclude 'org.apache.commons.logging.LogFactory'
+            |    }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadow').build()
@@ -178,23 +178,23 @@ class TransformerSpec extends PluginSpecification {
 
         and:
         String text1 = getJarFileContents(output, 'META-INF/services/java.sql.Driver')
-        assert text1.split('(\r\n)(\r)(\n)').size() == 4
-        assert text1 == '''oracle.jdbc.OracleDriver
-                           myapache.hive.jdbc.HiveDriver
-                           myapache.derby.jdbc.AutoloadedDriver
-                           com.mysql.jdbc.Driver'''.stripIndent()
+        assert text1.split('(\r\n)|(\r)|(\n)').size() == 4
+        assert text1 == '''|oracle.jdbc.OracleDriver
+                           |myapache.hive.jdbc.HiveDriver
+                           |myapache.derby.jdbc.AutoloadedDriver
+                           |com.mysql.jdbc.Driver'''.stripMargin()
 
         and:
         String text2 = getJarFileContents(output, 'META-INF/services/myapache.axis.components.compiler.Compiler')
-        assert text2.split('(\r\n)(\r)(\n)').size() == 2
-        assert text2 == '''myapache.axis.components.compiler.Javac
-                           org.apache.axis.components.compiler.Jikes'''.stripIndent()
+        assert text2.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text2 == '''|myapache.axis.components.compiler.Javac
+                           |org.apache.axis.components.compiler.Jikes'''.stripMargin()
 
         and:
         String text3 = getJarFileContents(output, 'META-INF/services/org.apache.commons.logging.LogFactory')
-        assert text3.split('(\r\n)(\r)(\n)').size() == 2
-        assert text3 == '''myapache.commons.logging.impl.LogFactoryImpl
-                           org.mortbay.log.Factory'''.stripIndent()
+        assert text3.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text3 == '''|myapache.commons.logging.impl.LogFactoryImpl
+                           |org.mortbay.log.Factory'''.stripMargin()
     }
 
     def 'service resource transformer short syntax alternate path'() {
@@ -206,14 +206,14 @@ class TransformerSpec extends PluginSpecification {
                     'two # NOTE: No newline terminates this line/file').write()
 
             buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
-                from('${escapedPath(one)}')
-                from('${escapedPath(two)}')
-                mergeServiceFiles('META-INF/foo')
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    mergeServiceFiles('META-INF/foo')
+            |}
+        """.stripMargin()
 
         when:
             runner.withArguments('shadow').build()
@@ -223,9 +223,9 @@ class TransformerSpec extends PluginSpecification {
 
         and:
             String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
-            assert text.split('(\r\n)(\r)(\n)').size() == 2
-            assert text == '''one # NOTE: No newline terminates this line/file
-                          two # NOTE: No newline terminates this line/file'''.stripIndent()
+            assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+            assert text == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
     }
 
     @Issue(['SHADOW-70', 'SHADOW-71'])
@@ -238,21 +238,21 @@ class TransformerSpec extends PluginSpecification {
                 'two # NOTE: No newline terminates this line/file').publish()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-            dependencies {
-              compile 'shadow:two:1.0'
-              compile files('${escapedPath(one)}')
-            }
-            
-            shadowJar {
-              baseName = 'shadow'
-              classifier = null
-              mergeServiceFiles()
-            }
-        """.stripIndent()
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |repositories { maven { url "${repo.uri}" } }
+            |dependencies {
+            |  compile 'shadow:two:1.0'
+            |  compile files('${escapedPath(one)}')
+            |}
+            |
+            |shadowJar {
+            |  baseName = 'shadow'
+            |  classifier = null
+            |  mergeServiceFiles()
+            |}
+        """.stripMargin()
 
         file('src/main/resources/META-INF/services/shadow.Shadow') <<
                 'three # NOTE: No newline terminates this line/file'
@@ -265,10 +265,10 @@ class TransformerSpec extends PluginSpecification {
 
         and:
         String text = getJarFileContents(output, 'META-INF/services/shadow.Shadow')
-        assert text.split('(\r\n)(\r)(\n)').size() == 3
-        assert text == '''three # NOTE: No newline terminates this line/file
-                          one # NOTE: No newline terminates this line/file
-                          two # NOTE: No newline terminates this line/file'''.stripIndent()
+        assert text.split('(\r\n)|(\r)|(\n)').size() == 3
+        assert text == '''|three # NOTE: No newline terminates this line/file
+                          |one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file'''.stripMargin()
     }
 
     def 'appending transformer'() {
@@ -280,16 +280,16 @@ class TransformerSpec extends PluginSpecification {
                 'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
-                from('${escapedPath(one)}')
-                from('${escapedPath(two)}')
-                transform(${AppendingTransformer.name}) {
-                    resource = 'test.properties'
-                }
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    transform(${AppendingTransformer.name}) {
+            |        resource = 'test.properties'
+            |    }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadow').build()
@@ -299,10 +299,10 @@ class TransformerSpec extends PluginSpecification {
 
         and:
         String text = getJarFileContents(output, 'test.properties')
-        assert text.split('(\r\n)(\r)(\n)').size() == 2
-        assert text == '''one # NOTE: No newline terminates this line/file
-                          two # NOTE: No newline terminates this line/file
-                          '''.stripIndent()
+        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file
+                          |'''.stripMargin()
     }
 
     def 'appending transformer short syntax'() {
@@ -314,14 +314,14 @@ class TransformerSpec extends PluginSpecification {
                 'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
-                from('${escapedPath(one)}')
-                from('${escapedPath(two)}')
-                append('test.properties')
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDir = new File(buildDir, 'libs')
+            |    baseName = 'shadow'
+            |    from('${escapedPath(one)}')
+            |    from('${escapedPath(two)}')
+            |    append('test.properties')
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadow').build()
@@ -331,40 +331,40 @@ class TransformerSpec extends PluginSpecification {
 
         and:
         String text = getJarFileContents(output, 'test.properties')
-        assert text.split('(\r\n)(\r)(\n)').size() == 2
-        assert text == '''one # NOTE: No newline terminates this line/file
-                          two # NOTE: No newline terminates this line/file
-                          '''.stripIndent()
+        assert text.split('(\r\n)|(\r)|(\n)').size() == 2
+        assert text == '''|one # NOTE: No newline terminates this line/file
+                          |two # NOTE: No newline terminates this line/file
+                          |'''.stripMargin()
     }
 
     def 'manifest retained'() {
         given:
         File main = file('src/main/java/shadow/Main.java')
         main << '''
-            package shadow;
-            
-            public class Main {
-            
-               public static void main(String[] args) { }
-            }
-        '''.stripIndent()
+            |package shadow;
+            |
+            |public class Main {
+            |
+            |   public static void main(String[] args) { }
+            |}
+        '''.stripMargin()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            jar {
-               manifest {
-                   attributes 'Main-Class': 'shadow.Main'
-                   attributes 'Test-Entry': 'PASSED'
-               }
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-            }
-        """.stripIndent()
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |jar {
+            |   manifest {
+            |       attributes 'Main-Class': 'shadow.Main'
+            |       attributes 'Test-Entry': 'PASSED'
+            |   }
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -386,34 +386,34 @@ class TransformerSpec extends PluginSpecification {
         given:
         File main = file('src/main/java/shadow/Main.java')
         main << '''
-            package shadow;
-            
-            public class Main {
-            
-               public static void main(String[] args) { }
-            }
-        '''.stripIndent()
+            |package shadow;
+            |
+            |public class Main {
+            |
+            |   public static void main(String[] args) { }
+            |}
+        '''.stripMargin()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            jar {
-               manifest {
-                   attributes 'Main-Class': 'shadow.Main'
-                   attributes 'Test-Entry': 'FAILED'
-               }
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-               manifest {
-                   attributes 'Test-Entry': 'PASSED'
-                   attributes 'New-Entry': 'NEW'
-               }
-            }
-        """.stripIndent()
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |jar {
+            |   manifest {
+            |       attributes 'Main-Class': 'shadow.Main'
+            |       attributes 'Test-Entry': 'FAILED'
+            |   }
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   manifest {
+            |       attributes 'Test-Entry': 'PASSED'
+            |       attributes 'New-Entry': 'NEW'
+            |   }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -434,33 +434,33 @@ class TransformerSpec extends PluginSpecification {
 
     def 'append xml files'() {
         given:
-        File xml1 = buildJar('xml1.jar').insertFile('properties.xml', '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            
-            <properties version="1.0">
-               <entry key="key1">val1</entry>
-            </properties>
-            '''.stripIndent()
+        File xml1 = buildJar('xml1.jar').insertFile('properties.xml', '''|<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+            |
+            |<properties version="1.0">
+            |   <entry key="key1">val1</entry>
+            |</properties>
+            |'''.stripMargin()
         ).write()
 
-        File xml2 = buildJar('xml2.jar').insertFile('properties.xml', '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            
-            <properties version="1.0">
-               <entry key="key2">val2</entry>
-            </properties>
-            '''.stripIndent()
+        File xml2 = buildJar('xml2.jar').insertFile('properties.xml', '''|<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+            |
+            |<properties version="1.0">
+            |   <entry key="key2">val2</entry>
+            |</properties>
+            |'''.stripMargin()
         ).write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-               destinationDir = new File(buildDir, 'libs')
-               baseName = 'shadow'
-               from('${escapedPath(xml1)}')
-               from('${escapedPath(xml2)}')
-               transform(${XmlAppendingTransformer.name}) {
-                   resource = 'properties.xml'
-               }
-            }
-        """.stripIndent()
+            |task shadow(type: ${ShadowJar.name}) {
+            |   destinationDir = new File(buildDir, 'libs')
+            |   baseName = 'shadow'
+            |   from('${escapedPath(xml1)}')
+            |   from('${escapedPath(xml2)}')
+            |   transform(${XmlAppendingTransformer.name}) {
+            |       resource = 'properties.xml'
+            |   }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('shadow').build()
@@ -470,13 +470,13 @@ class TransformerSpec extends PluginSpecification {
 
         and:
         String text = getJarFileContents(output, 'properties.xml')
-        assert text.replaceAll('\r\n', '\n') == '''<?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            <properties version="1.0">
-              <entry key="key1">val1</entry>
-              <entry key="key2">val2</entry>
-            </properties>
-            '''.stripIndent()
+        assert text.replaceAll('\r\n', '\n') == '''|<?xml version="1.0" encoding="UTF-8"?>
+            |<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+            |<properties version="1.0">
+            |  <entry key="key1">val1</entry>
+            |  <entry key="key2">val2</entry>
+            |</properties>
+            |'''.stripMargin()
     }
 
     @Issue('SHADOW-82')
@@ -484,35 +484,35 @@ class TransformerSpec extends PluginSpecification {
         given:
         File main = file('src/main/java/shadow/Main.java')
         main << '''
-            package shadow;
-            
-            public class Main {
-            
-               public static void main(String[] args) { }
-            }
-        '''.stripIndent()
+            |package shadow;
+            |
+            |public class Main {
+            |
+            |   public static void main(String[] args) { }
+            |}
+        '''.stripMargin()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            jar {
-               baseName = 'jar'
-               manifest {
-                   attributes 'Main-Class': 'shadow.Main'
-                   attributes 'Test-Entry': 'FAILED'
-               }
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-               manifest {
-                   attributes 'Test-Entry': 'PASSED'
-                   attributes 'New-Entry': 'NEW'
-               }
-            }
-        """.stripIndent()
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |jar {
+            |   baseName = 'jar'
+            |   manifest {
+            |       attributes 'Main-Class': 'shadow.Main'
+            |       attributes 'Test-Entry': 'FAILED'
+            |   }
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   manifest {
+            |       attributes 'Test-Entry': 'PASSED'
+            |       attributes 'New-Entry': 'NEW'
+            |   }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('jar', 'shadowJar').build()
@@ -550,35 +550,35 @@ class TransformerSpec extends PluginSpecification {
         given:
         File main = file('src/main/java/shadow/Main.java')
         main << '''
-            package shadow;
-            
-            public class Main {
-            
-               public static void main(String[] args) { }
-            }
-        '''.stripIndent()
+            |package shadow;
+            |
+            |public class Main {
+            |
+            |   public static void main(String[] args) { }
+            |}
+        '''.stripMargin()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            jar {
-               baseName = 'jar'
-               manifest {
-                   attributes 'Main-Class': 'shadow.Main'
-                   attributes 'Test-Entry': 'FAILED'
-               }
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-               manifest {
-                   attributes 'Test-Entry': 'PASSED'
-                   attributes 'New-Entry': 'NEW'
-               }
-            }
-        """.stripIndent()
+            |apply plugin: 'java'
+            |apply plugin: 'com.github.johnrengelman.shadow'
+            |
+            |jar {
+            |   baseName = 'jar'
+            |   manifest {
+            |       attributes 'Main-Class': 'shadow.Main'
+            |       attributes 'Test-Entry': 'FAILED'
+            |   }
+            |}
+            |
+            |shadowJar {
+            |   baseName = 'shadow'
+            |   classifier = null
+            |   manifest {
+            |       attributes 'Test-Entry': 'PASSED'
+            |       attributes 'New-Entry': 'NEW'
+            |   }
+            |}
+        """.stripMargin()
 
         when:
         runner.withArguments('jar', 'shadowJar').build()
@@ -615,29 +615,29 @@ class TransformerSpec extends PluginSpecification {
         given:
             def one = buildJar('one.jar')
                     .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
-                    '''moduleName=foo
-                       moduleVersion=1.0.5
-                       extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
-                       staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripIndent())
+                    '''|moduleName=foo
+                       |moduleVersion=1.0.5
+                       |extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+                       |staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripMargin())
                     .write()
 
             def two = buildJar('two.jar')
                     .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
-                    '''moduleName=bar
-                       moduleVersion=2.3.5
-                       extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
-                       staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent())
+                    '''|moduleName=bar
+                       |moduleVersion=2.3.5
+                       |extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+                       |staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripMargin())
                     .write()
 
             buildFile << """
-                task shadow(type: ${ShadowJar.name}) {
-                    destinationDir = new File(buildDir, 'libs')
-                    baseName = 'shadow'
-                    from('${escapedPath(one)}')
-                    from('${escapedPath(two)}')
-                    transform(${GroovyExtensionModuleTransformer.name})
-                }
-            """.stripIndent()
+                |task shadow(type: ${ShadowJar.name}) {
+                |    destinationDir = new File(buildDir, 'libs')
+                |    baseName = 'shadow'
+                |    from('${escapedPath(one)}')
+                |    from('${escapedPath(two)}')
+                |    transform(${GroovyExtensionModuleTransformer.name})
+                |}
+            """.stripMargin()
 
         when:
             runner.withArguments('shadow').build()
@@ -659,29 +659,29 @@ class TransformerSpec extends PluginSpecification {
         given:
             def one = buildJar('one.jar')
                     .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
-                    '''moduleName=foo
-                       moduleVersion=1.0.5
-                       extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
-                       staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripIndent())
+                    '''|moduleName=foo
+                       |moduleVersion=1.0.5
+                       |extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+                       |staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripMargin())
                     .write()
 
             def two = buildJar('two.jar')
                     .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
-                    '''moduleName=bar
-                       moduleVersion=2.3.5
-                       extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
-                       staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent())
+                    '''|moduleName=bar
+                       |moduleVersion=2.3.5
+                       |extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+                       |staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripMargin())
                     .write()
 
             buildFile << """
-                task shadow(type: ${ShadowJar.name}) {
-                    destinationDir = new File(buildDir, 'libs')
-                    baseName = 'shadow'
-                    from('${escapedPath(one)}')
-                    from('${escapedPath(two)}')
-                    mergeGroovyExtensionModules()
-                }
-            """.stripIndent()
+                |task shadow(type: ${ShadowJar.name}) {
+                |    destinationDir = new File(buildDir, 'libs')
+                |    baseName = 'shadow'
+                |    from('${escapedPath(one)}')
+                |    from('${escapedPath(two)}')
+                |    mergeGroovyExtensionModules()
+                |}
+            """.stripMargin()
 
         when:
             runner.withArguments('shadow').build()
