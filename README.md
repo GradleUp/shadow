@@ -25,7 +25,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 
 ## QuickStart
-11
+
 ### Applying Shadow Plugin to Project
 
 #### Gradle 1.x and 2.0
