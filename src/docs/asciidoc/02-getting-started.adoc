@@ -1,6 +1,5 @@
 == Getting Started
 
-
 [source,groovy,subs="+attributes"]
 ----
 buildscript {
@@ -23,3 +22,33 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '{project-version}'
 }
 ----
+
+Shadow is a reactive plugin.
+This means that applying Shadow by itself will perform no configuration on your project.
+Instead, Shadow __reacts__ to the application of other plugins to decorate the project.
+
+This means, that for most users, the `java` or `groovy` plugins must be __explicitly__ applied
+to have the desired effect.
+
+=== Default Java/Groovy Tasks
+
+In the presence of the `java` or `groovy` plugins, Shadow will automatically configure the
+following behavior:
+
+. Adds a `shadowJar` task to the project.
+. Adds a `shadow` configuration to the project.
+. Configures the `shadowJar` task to include all sources from the project's `main` sourceSet.
+. Configures the `shadowJar` task to bundle all dependencies from the `runtime` configuration.
+. Configures the output of the `shadowJar` task to attach the `-all` classifier.
+. Configures the `shadowJar` task to generate a `Manifest` with:
+  * Inheriting all configuration from the standard `jar` task.
+  * Adds a `Class-Path` attribute to the `Manifest` that appends all dependencies from the `shadow` configuration
+. Configures the `shadowJar` task to __exclude__ any JAR index or cryptographics signature files matching the following patterns:
+ * `META-INF/INDEX.LIST`
+ * `META-INF/*.SF`
+ * `META-INF/*.DSA`
+ * `META-INF/*.RSA`
+. Creates and registers the `shadow` component in the project (used for integrating with `maven-publish`.
+. Configures the `uploadShadow` task (as part of the `maven` plugin) with the following behavior:
+ * Removes the `compile` and `runtime` configurations from the `pom.xml` file mapping.
+ * Adds the `shadow` configuration to the `pom.xml` file as `RUNTIME` scope.
