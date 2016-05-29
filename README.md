@@ -14,16 +14,18 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 
 ## Latest Test Compatibility
 
-|Gradle Version|Shadow Version|
-| --- | --- |
-|2.13|1.2.3|
+| Gradle Version | Shadow Version |
+|----------------|----------------|
+| 2.14-rc-2      | 1.2.3          |
+
+*NOTE*: Shadow is incompatible with Gradle `2.14-rc-1` due to binary incompatibilities in the release. These issues were fixed in `2.14-rc-2`.
 
 ## Gradle Plugins
 
 https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 
 ## QuickStart
-
+11
 ### Applying Shadow Plugin to Project
 
 #### Gradle 1.x and 2.0
