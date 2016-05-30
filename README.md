@@ -16,7 +16,7 @@ instead of a port of the Maven Shade code. Documentation for version 0.8 and pri
 
 | Gradle Version | Shadow Version |
 |----------------|----------------|
-| 2.14-rc-2      | 1.2.3          |
+| 2.14-rc-3      | 1.2.3          |
 
 *NOTE*: Shadow is incompatible with Gradle `2.14-rc-1` due to binary incompatibilities in the release. These issues were fixed in `2.14-rc-2`.
 
