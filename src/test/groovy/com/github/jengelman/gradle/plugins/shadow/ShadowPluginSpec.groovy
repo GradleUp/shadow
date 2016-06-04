@@ -133,10 +133,12 @@ class ShadowPluginSpec extends PluginSpecification {
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile 'junit:junit:3.8.2' }
             |
+            |// tag::rename[]
             |shadowJar {
             |   baseName = 'shadow'
             |   classifier = null
             |}
+            |// end::rename[]
         """.stripMargin()
 
         when:

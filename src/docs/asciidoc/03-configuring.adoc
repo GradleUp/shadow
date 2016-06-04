@@ -7,6 +7,22 @@ details.
 
 === Configuring Output Name
 
+Shadow configures the default `shadowJar` task to set the output JAR's `destinationDir`, `baseName`, `appendix`,
+`version`, and `extension` to the same values as Gradle defaults all `Jar` tasks.
+Additionally, it configures the `classifier` to be `all`.
+
+If working with a Gradle project with the name `myApp` and version `1.0`, the default `shadowJar` task will output a
+file at: `build/libs/myApp-1.0-all.jar`
+
+As with all `Jar` tasks in Gradle, these values can be overridden:
+
+[source,groovy,indent=0]
+----
+include::{tests}/ShadowPluginSpec.groovy[tags=rename]
+----
+
+Configuring the `shadowJar` task above results in the file being created at: `build/libs/shadow.jar`
+
 === Configuring the Manifest
 
 === Filtering Files in Output (not dependencies)
