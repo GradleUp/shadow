@@ -1,2 +1,20 @@
+== Configuring Shadow
+
+The `ShadowJar` task type extends from Gradle's `Jar` type.
+This means that all attributes and methods available on `Jar` are also available on `ShadowJar`.
+Refer the __Gradle User Guide__ for https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html[Jar] for
+details.
+
+=== Configuring Output Name
+
+=== Configuring the Manifest
+
+=== Filtering Files in Output (not dependencies)
+
+=== Advanced Configuration
+* dependency include/exclude
+* transformers
+* relocating
+
 extending from Jar
 configuring the resulting manifest

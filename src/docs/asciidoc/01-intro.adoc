@@ -1,6 +1,12 @@
 == Introduction
 
-What is Shadow for?
+Shadow is a Gradle plugin for combining dependency classes and resources with a project's into a single
+output Jar.
+The combined Jar is often referred to a __fat-jar__ or __uber-jar__.
+Shadow utilizes `JarInputStream` and `JarOutputStream` to efficiently process dependent libraries
+into the output jar without incurring the I/O overhead of expanding the jars to disk.
+
+Shadow
 
 === Benefits of Shadow
 
