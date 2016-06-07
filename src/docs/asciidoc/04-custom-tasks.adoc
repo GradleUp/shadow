@@ -1,1 +1,9 @@
 == Creating a Custom ShadowJar Task
+
+[source,groovy,indent=0]
+----
+task testJar(type: ShadowJar) {
+  classifier = 'tests'
+  from sourceSets.test.output
+}
+----

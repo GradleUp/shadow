@@ -8,7 +8,7 @@ details.
 === Configuring Output Name
 
 Shadow configures the default `shadowJar` task to set the output JAR's `destinationDir`, `baseName`, `appendix`,
-`version`, and `extension` to the same values as Gradle defaults all `Jar` tasks.
+`version`, and `extension` to the same default values as Gradle does for all `Jar` tasks.
 Additionally, it configures the `classifier` to be `all`.
 
 If working with a Gradle project with the name `myApp` and version `1.0`, the default `shadowJar` task will output a
@@ -16,21 +16,102 @@ file at: `build/libs/myApp-1.0-all.jar`
 
 As with all `Jar` tasks in Gradle, these values can be overridden:
 
+.Output to `build/libs/shadow.jar`
 [source,groovy,indent=0]
 ----
 include::{tests}/ShadowPluginSpec.groovy[tags=rename]
 ----
 
-Configuring the `shadowJar` task above results in the file being created at: `build/libs/shadow.jar`
+=== Configuring the Runtime Classpath
 
-=== Configuring the Manifest
+Each Java JAR file contains a manifest file that provides meta data about the contents of the JAR file itself.
+When using a shadowed JAR file as an executable JAR, it is assumed that all necessary runtime classes are contained
+within the JAR itself.
+There may be situations where the desire is to **not** bundle select dependencies into the shadowed JAR file but
+they are still required for runtime execution.
 
-=== Filtering Files in Output (not dependencies)
+In these scenarios, Shadow creates a `shadow` configuration to declare these dependencies.
+Dependencies added to the `shadow` configuration are **not** bundled into the output JAR.
 
-=== Advanced Configuration
-* dependency include/exclude
-* transformers
-* relocating
+Additionally, Shadow automatically configures the manifest of the `shadowJar` task to contain a `Class-Path` entry
+in the JAR manifest.
+The value of the `Class-Path` entry is the name of all dependencies resolved in the `shadow` configuration
+for the project.
 
-extending from Jar
-configuring the resulting manifest
+[source,groovy,indent=0]
+----
+include::{tests}/ShadowPluginSpec.groovy[tags=shadowConfig]
+----
+
+Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the following attribute:
+[source,property,indent=0]
+----
+Class-Path: junit-3.8.2.jar
+----
+
+When deploying a shadowed JAR as an execution JAR, it is important to note that any non-bundled runtime dependencies
+**must** be deployed in the location specified in the `Class-Path` entry in the manifest.
+
+=== Configuring the JAR Manifest
+
+Beyond the autmatic configuration of the `Class-Path` entry, the `shadowJar` manifest is configured in a number of ways.
+First, the manifest for the `shadowJar` task is configured to __inherit__ from the manifest of the standard `jar` task.
+This means that any configuration performed on the `jar` task will propagate to the `shadowJar` tasks.
+
+[source,groovy,indent=0]
+----
+include::{tests}/ShadowPluginSpec.groovy[tags=jarManifest]
+----
+
+Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will revel the following attribute:
+[source,property,indent=0]
+----
+Class-Path: /libs/a.jar
+----
+
+If it is desired to inherit a manifest from a JAR task other than the standard `jar` task, the `inheritFrom` methods
+on the `shadowJar.manifest` object can be used to configure the upstream.
+
+[source,groovy,indent=0]
+----
+
+task testJar(type: Jar) {
+  manifest {
+    attributes 'Description': 'This is an application JAR'
+  }
+}
+
+shadowJar {
+  manifest {
+    inheritFrom project.tasks.testJar
+  }
+}
+----
+
+=== Filtering Shadow Jar Contents
+
+The final contents of a shadow JAR can be filtered using the `exclude` and `include` methods inherited from Gradle's
+`Jar` task type.
+
+Refer to the https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html[Jar] documentation for details
+on the various versions of the methods and their behavior.
+
+When using `exclude`/`include` with a `ShadowJar` task, the resulting copy specs are applied to the __final__ JAR
+contents.
+This means that, the configuration is applied to the individual files from both the project source set or __any__
+of the dependencies to be merged.
+
+.Exclude a file from Shadow Jar
+[source,groovy,indent=0]
+----
+include::{tests}/FilteringSpec.groovy[tags=excludeFile]
+----
+
+Excludes and includes can be combined just like a noraml `Jar` task, with `excludes` taking precendence over `includes`.
+Additionally, ANT style patterns can be used to match multiple files.
+
+.Configuring output using ANT patterns
+[source,groovy,indent=0]
+----
+include::{tests}/FilteringSpec.groovy[tags=excludeOverInclude]
+----

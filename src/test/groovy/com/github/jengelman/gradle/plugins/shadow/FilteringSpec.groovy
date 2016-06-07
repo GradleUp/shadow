@@ -47,9 +47,11 @@ class FilteringSpec extends PluginSpecification {
     def 'exclude files'() {
         given:
         buildFile << """
+            |// tag::excludeFile[]
             |shadowJar {
             |   exclude 'a2.properties'
             |}
+            |// end::excludeFile[]
         """.stripMargin()
 
         when:
@@ -73,6 +75,7 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << '''
+            |// tag::excludeDep[]
             |dependencies {
             |   compile 'shadow:d:1.0'
             |}
@@ -82,6 +85,7 @@ class FilteringSpec extends PluginSpecification {
             |      exclude(dependency('shadow:d:1.0'))
             |   }
             |}
+            |// end::excludeDep[]
         '''.stripMargin()
 
         when:
@@ -106,6 +110,7 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << '''
+            |// tag::excludeDepWildcard[]
             |dependencies {
             |   compile 'shadow:d:1.0'
             |}
@@ -115,6 +120,7 @@ class FilteringSpec extends PluginSpecification {
             |      exclude(dependency('shadow:d:.*'))
             |   }
             |}
+            |// end::excludeDepWildcard[]
         '''.stripMargin()
 
         when:
@@ -297,15 +303,22 @@ class FilteringSpec extends PluginSpecification {
             |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile project(':client') }
+            |
+            |// tag::excludeProject1[]
+            |dependencies {
+            |  compile project(':client')
+            |}
             |
             |shadowJar {
+            |// end::excludeProject1[]
             |   baseName = 'shadow'
             |   classifier = null
+            |// tag::excludeProject2[]
             |   dependencies {
             |       exclude(project(':client'))
             |   }
             |}
+            |// end::excludeProject2[]
         """.stripMargin()
 
         File serverOutput = file('server/build/libs/shadow.jar')
@@ -387,11 +400,13 @@ class FilteringSpec extends PluginSpecification {
     def 'verify exclude precedence over include'() {
         given:
         buildFile << """
+            |// tag::excludeOverInclude[]
             |shadowJar {
             |   include '*.jar'
             |   include '*.properties'
             |   exclude 'a2.properties'
             |}
+            |// end::excludeOverInclude[]
         """.stripMargin()
 
         when:

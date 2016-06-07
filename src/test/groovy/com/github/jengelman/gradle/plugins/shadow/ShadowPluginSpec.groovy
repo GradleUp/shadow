@@ -474,13 +474,19 @@ class ShadowPluginSpec extends PluginSpecification {
             |apply plugin: 'com.github.johnrengelman.shadow'
             |
             |repositories { maven { url "${repo.uri}" } }
-            |dependencies { shadow 'junit:junit:3.8.2' }
+            |// tag::shadowConfig[]
+            |dependencies {
+            |  shadow 'junit:junit:3.8.2'
+            |}
+            |// end::shadowConfig[]
             |
+            |// tag::jarManifest[]
             |jar {
             |   manifest {
             |       attributes 'Class-Path': '/libs/a.jar'
             |   }
             |}
+            |// end::jarManifest[]
             |
             |shadowJar {
             |   baseName = 'shadow'
