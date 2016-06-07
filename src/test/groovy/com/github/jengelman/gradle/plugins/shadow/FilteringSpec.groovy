@@ -369,15 +369,19 @@ class FilteringSpec extends PluginSpecification {
             |repositories { maven { url "${repo.uri}" } }
             |dependencies { compile project(':client') }
             |
+            |// tag::excludeSpec[]
             |shadowJar {
+            |// end::excludeSpec[]
             |   baseName = 'shadow'
             |   classifier = null
+            |// tag::excludeSpec2[]
             |   dependencies {
             |       exclude(dependency {
             |           it.moduleGroup == 'junit'
             |       })
             |   }
             |}
+            |// end::excludeSpec2[]
         """.stripMargin()
 
         File serverOutput = file('server/build/libs/shadow.jar')

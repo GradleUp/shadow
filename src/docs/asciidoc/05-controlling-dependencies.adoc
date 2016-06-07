@@ -52,4 +52,58 @@ common dependency between two 1st level dependencies when one is excluded and th
 ==== Using Regex Patterns to Filter Dependencies
 
 Dependencies can be filtered using regex patterns.
+Coupled with the `<group>:<artifact>:<version>` notation for dependencies, this allows for excluding/including
+using any of these individual fields.
 
+.Exclude Any Version of a Dependency
+[source,groovy,indent=0]
+----
+include::{tests}/FilteringSpec.groovy[tags=excludeDepWildcard]
+----
+
+Any of the individual fields can be safely absent and will function as though a wildcard was specified.
+
+.Ignore Dependency Version
+[source,groovy,indent=0]
+----
+shadowJar {
+  dependencies {
+    exclude(dependency('shadow:d'))
+  }
+}
+----
+
+The above code snippet is functionally equivalent to the previous example.
+
+This same patten can be used for any of the dependency notation fields.
+
+.Ignore Dependency Group
+[source,groovy,indent=0]
+----
+shadowJar {
+  dependencies {
+    exclude(dependency(':d:1.0'))
+  }
+}
+----
+
+.Ignore Dependency Artifact
+[source,groovy,indent=0]
+----
+shadowJar {
+  dependencies {
+    exclude(dependency('shadow::1.0'))
+  }
+}
+----
+
+==== Programmatically Selecting Dependencies to Filter
+
+If more complex decisions are needed to select the dependencies to be included, the `dependencies` block provides a
+method that accepts a `Closure` for selecting dependencies.
+
+.Selecting Dependencies to Filter with Spec
+[source,groovy,indent=0]
+----
+include::{tests}/FilteringSpec.groovy[tags=excludeSpec;excludeSpec2]
+----

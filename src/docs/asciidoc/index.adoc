@@ -18,4 +18,4 @@ include::06-controlling-merging.adoc[]
 
 include::07-publishing.adoc[]
 
-include::08-application-plugin.adoc
+include::08-application-plugin.adoc[]
