@@ -1,3 +1,5 @@
+apply plugin: "org.ajoberstar.github-pages"
+
 githubPages {
     repoUri = 'https://github.com/johnrengelman/shadow.git'
     credentials {
@@ -9,3 +11,5 @@ githubPages {
         from 'build/asciidoc/html5'
     }
 }
+
+publishGhPages.dependsOn asciidoctor

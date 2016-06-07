@@ -22,6 +22,7 @@ buildscript {
         classpath 'org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview2'
         classpath "com.bluepapa32:gradle-watch-plugin:0.1.5"
         classpath "org.kordamp.gradle:livereload-gradle-plugin:0.2.1"
+        classpath 'org.ajoberstar:gradle-git:1.5.0'
     }
 }
 
@@ -32,6 +33,7 @@ apply plugin: 'project-report'
 apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
 apply from: file('gradle/asciidoc.gradle')
+apply from: file('gradle/ghPages.gradle')
 
 repositories {
     mavenLocal()
