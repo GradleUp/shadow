@@ -1,3 +1,5 @@
+=== Controlling JAR Content Merging
+
 Transformers
 service files
 relocating

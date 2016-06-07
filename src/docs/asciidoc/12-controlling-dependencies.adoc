@@ -1,4 +1,4 @@
-== Configuring Shadowed Dependencies
+=== Configuring Shadowed Dependencies
 
 Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtime` configuration
 into the final JAR.

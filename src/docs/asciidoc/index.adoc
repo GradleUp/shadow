@@ -4,18 +4,13 @@
 John Engelman - @johnrengelman
 :revnumber: {project-version}
 
-include::01-intro.adoc[]
+include::00-intro.adoc[]
 
-include::02-getting-started.adoc[]
+include::10-configuring.adoc[]
 
-include::03-configuring.adoc[]
+include::20-custom-tasks.adoc[]
 
-include::04-custom-tasks.adoc[]
+include::30-application-plugin.adoc[]
 
-include::05-controlling-dependencies.adoc[]
+include::40-publishing.adoc[]
 
-include::06-controlling-merging.adoc[]
-
-include::07-publishing.adoc[]
-
-include::08-application-plugin.adoc[]

@@ -22,7 +22,8 @@ environment.
 In the case of Shadow, this is a single __uber__ or __fat__ JAR.
 The JAR file contains all the application code and dependent libraries to execute (not including the standard JVM
 libraries).
-The shadow JAR does **not** include the JVM itself.
+The shadow JAR does **not** include the JRE itself.
+It must be available on the target system.
 
 Executable JARs contain a JAR MANIFEST that specifies the application Main Class.
 This allows the application to be started with a single command:
@@ -43,3 +44,5 @@ These issues often manifest themselves as binary incompatibilities in either the
 
 By utilizing Shadow's ability to __relocate__ the package names for dependencies, a library author can ensure that the
 library's dependencies will not conflict with the same dependency being declared by the downstream application.
+
+include::01-getting-started.adoc[]

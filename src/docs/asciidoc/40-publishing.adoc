@@ -1,2 +1,4 @@
+== Publishing Shadow JARs
+
 Publishing shadow jars
 relying on shadow jar dependency from another project

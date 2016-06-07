@@ -1,0 +1,27 @@
+=== Filtering Shadow Jar Contents
+
+The final contents of a shadow JAR can be filtered using the `exclude` and `include` methods inherited from Gradle's
+`Jar` task type.
+
+Refer to the https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html[Jar] documentation for details
+on the various versions of the methods and their behavior.
+
+When using `exclude`/`include` with a `ShadowJar` task, the resulting copy specs are applied to the __final__ JAR
+contents.
+This means that, the configuration is applied to the individual files from both the project source set or __any__
+of the dependencies to be merged.
+
+.Exclude a file from Shadow Jar
+[source,groovy,indent=0]
+----
+include::{tests}/FilteringSpec.groovy[tags=excludeFile]
+----
+
+Excludes and includes can be combined just like a noraml `Jar` task, with `excludes` taking precendence over `includes`.
+Additionally, ANT style patterns can be used to match multiple files.
+
+.Configuring output using ANT patterns
+[source,groovy,indent=0]
+----
+include::{tests}/FilteringSpec.groovy[tags=excludeOverInclude]
+----
