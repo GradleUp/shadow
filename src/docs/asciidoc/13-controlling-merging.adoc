@@ -1,5 +1,68 @@
 === Controlling JAR Content Merging
 
-Transformers
+Shadow allows for customizing the process by which the output JAR is generated through the `Transformer` interface.
+This is a concept that has been carried over from the original Maven Shade implementation.
+A `Transformer` is invoked for each entry in the JAR before being written to the final output JAR.
+This allows a `Transformer` to determine if it should process a particular entry and apply any modifications before
+writing the stream to the output.
+
+.Adding a Transformer
+[source,groovy,indent=0]
+----
+shadowJar {
+  transform(MyTransformer.class)
+}
+----
+
+Additionally, a `Transformer` can accept a `Closure` to configure the provided `Transformer`.
+
+.Configuring a Transformer
+[source,groovy,indent=0]
+----
+shadowJar {
+  transform(MyTransformer.class) {
+    enable = true
+  }
+}
+----
+
+An instantiated instance of a `Transformer` can also be provided.
+
+.Adding a Transformer Instance
+[source,groovy,indent=0]
+----
+shadowJar {
+  transform(new MyTransformer(enabled: true))
+}
+----
+
+==== Merging Service Descriptor Files
+
+Java libraries often contain service descriptors files in the `META-INF/services` directory of the JAR.
+A service descriptor typically contains a line delimited list of classes that are supported for a particular __service__.
+At runtime, this file is read and used to configure library or application behavior.
+
+Multiple dependencies may use the same service descriptor file name.
+In this case, it is generally desired to merge the content of each instance of the file into a single output file.
+The `ServiceFileTransformer` class is used to perform this merging.
+By default, it will merge each copy of a file under `META-INF/services` into a single file in the output JAR.
+
+.Merging Service Files
+[source,groovy,indent=0]
+----
+shadowJar {
+  mergeServiceFiles()
+}
+----
+
+The above code snippet is a convenience syntax for calling `transform(ServiceFileTransformer.class)`.
+
+****
+Groovy Extension Module descriptor files (located at `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`)
+are ignored by the `ServiceFileTransformer`.
+This is due to these files having a different syntax than standard service descriptor files.
+Use the `mergeGroovyExtensionModules()` method to merge these files if your dependencies contain them.
+****
+
 service files
 relocating
