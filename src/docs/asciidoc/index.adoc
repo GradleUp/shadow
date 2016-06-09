@@ -18,5 +18,7 @@ include::30-application-plugin.adoc[]
 
 include::40-publishing.adoc[]
 
+include::50-multi-project-builds.adoc[]
+
 include::90-changes.adoc[]
 

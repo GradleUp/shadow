@@ -2,6 +2,50 @@
 
 === Publishing with Maven-Publish Plugin
 
+The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle's
+`maven-publish` plugin.
+THe plugin will create and configure a software component named `"shadow"` for use with the
+`publishing` block.
+
+.Publishing a Shadow JAR with the Maven-Publish Plugin
+[source,groovy,indent=0]
+----
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+publishing {
+  publications {
+    shadow(MavenPublication) {
+      from components.shadow
+    }
+  }
+  repositories {
+    maven {
+      url "http://repo.myorg.com"
+    }
+  }
+}
+----
+
 === Publishing with Maven Plugin
 
-=== Depending on the Shadow Jar from Another Project
+The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle's
+`maven` plugin.
+To publish the JAR, simply configure the publish location for the `uploadShadow` task and execute it.
+
+.Publishing a Shadow JAR with the Maven Plugin
+[source,groovy,indent=0]
+----
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+uploadShadow {
+  repositories {
+    mavenDeployer {
+      repository(url: "http://repo.myorg.com")
+    }
+  }
+}
+----
