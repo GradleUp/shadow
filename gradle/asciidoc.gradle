@@ -25,4 +25,11 @@ asciidoctor {
             icons               : 'font',
             numbered            : '',
             idprefix            : ''
+    resources {
+        from project.tasks.groovydoc {
+            into 'api'
+        }
+    }
 }
+
+project.tasks.asciidoctor.dependsOn project.tasks.groovydoc

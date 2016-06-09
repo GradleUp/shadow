@@ -1,7 +1,9 @@
 == Configuring Shadow
 
-The `ShadowJar` task type extends from Gradle's `Jar` type.
-This means that all attributes and methods available on `Jar` are also available on `ShadowJar`.
+The link:{api}/tasks/ShadowJar.html[`ShadowJar`] task type extends from Gradle's
+https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html[`Jar`] type.
+This means that all attributes and methods available on `Jar` are also available on
+link:{api}/tasks/ShadowJar.html[`ShadowJar`].
 Refer the __Gradle User Guide__ for https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html[Jar] for
 details.
 

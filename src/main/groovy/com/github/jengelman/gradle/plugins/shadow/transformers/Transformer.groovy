@@ -25,10 +25,8 @@ import org.gradle.api.file.FileTreeElement
 
 /**
  * Modified from org.apache.maven.plugins.shade.resource.ResourceTransformer.java
- * Original
- * @author Jason van Zyl
  *
- * Modifications
+ * @author Jason van Zyl
  * @author Charlie Knudsen
  * @author John Engelman
  */

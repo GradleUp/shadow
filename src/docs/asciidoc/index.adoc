@@ -1,8 +1,12 @@
 :src: ../
 :tests: {src}/test/groovy/com/github/jengelman/gradle/plugins/shadow
+:api: api/com/github/jengelman/gradle/plugins/shadow
+
 = Shadow Plugin User Guide & Examples
 John Engelman - @johnrengelman
 :revnumber: {project-version}
+
+link:api/index.html[API Docs]
 
 include::00-intro.adoc[]
 

@@ -1,10 +1,12 @@
 === Controlling JAR Content Merging
 
-Shadow allows for customizing the process by which the output JAR is generated through the `Transformer` interface.
+Shadow allows for customizing the process by which the output JAR is generated through the
+link:{api}/transformers/Transformer.html[`Transformer`] interface.
 This is a concept that has been carried over from the original Maven Shade implementation.
-A `Transformer` is invoked for each entry in the JAR before being written to the final output JAR.
-This allows a `Transformer` to determine if it should process a particular entry and apply any modifications before
-writing the stream to the output.
+A link:{api}/transformers/Transformer.html[`Transformer`] is invoked for each entry in the JAR before being written to
+the final output JAR.
+This allows a link:{api}/transformers/Transformer.html[`Transformer`] to determine if it should process a particular
+entry and apply any modifications beforewriting the stream to the output.
 
 .Adding a Transformer
 [source,groovy,indent=0]
@@ -44,7 +46,7 @@ At runtime, this file is read and used to configure library or application behav
 
 Multiple dependencies may use the same service descriptor file name.
 In this case, it is generally desired to merge the content of each instance of the file into a single output file.
-The `ServiceFileTransformer` class is used to perform this merging.
+The link:{api}/transformers/ServiceFileTransformer.html[`ServiceFileTransformer`] class is used to perform this merging.
 By default, it will merge each copy of a file under `META-INF/services` into a single file in the output JAR.
 
 .Merging Service Files
@@ -55,18 +57,21 @@ shadowJar {
 }
 ----
 
-The above code snippet is a convenience syntax for calling `transform(ServiceFileTransformer.class)`.
+The above code snippet is a convenience syntax for calling
+link:{api}/tasks/ShadowJar.html#transform(Class<? extends Transformer>)[`transform(ServiceFileTransformer.class)`].
 
 ****
 Groovy Extension Module descriptor files (located at `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`)
-are ignored by the `ServiceFileTransformer`.
+are ignored by the link:{api}/transformers/ServiceFileTransformer.html[`ServiceFileTransformer`].
 This is due to these files having a different syntax than standard service descriptor files.
-Use the `mergeGroovyExtensionModules()` method to merge these files if your dependencies contain them.
+Use the link:{api}/tasks/ShadowJar.html#mergeGroovyExtensionModules()[`mergeGroovyExtensionModules()`] method to merge
+these files if your dependencies contain them.
 ****
 
 ===== Configuring the Location of Service Descriptor Files
 
-By default the `ServiceFileTransformer` is configured to merge files in `META-INF/services`.
+By default the link:{api}/transformers/ServiceFileTransformer.html[`ServiceFileTransformer`] is configured to merge
+files in `META-INF/services`.
 This directory can be overridden to merge descriptor files in a different location.
 
 .Merging Service Files in a Specific Directory
@@ -81,7 +86,8 @@ shadowJar {
 
 ===== Excluding/Including Specific Service Descriptor Files From Merging
 
-The `ServiceFileTransformer` class supports specifying specific files to include or exclude from merging.
+The link:{api}/transformers/ServiceFileTransformer.html[`ServiceFileTransformer`] class supports specifying specific
+files to include or exclude from merging.
 
 .Excluding a Service Descriptor From Merging
 [source,groovy,indent=0]
@@ -97,8 +103,9 @@ shadowJar {
 
 Shadow provides a specific transformer for dealing with Groovy extension module files.
 This is due to their special syntax and how they need to be merged together.
-The `GroovyExtensionModuleTransformer` will handle these files.
-The `ShadowJar` task also provides a short syntax method to add this transformer.
+The link:{api}/transformers/GroovyExtensionModuleTransformer.html[`GroovyExtensionModuleTransformer`] will handle these
+files.
+The link:{api}/tasks/ShadowJar.html[`ShadowJar`] task also provides a short syntax method to add this transformer.
 
 .Merging Groovy Extension Modules
 [source,groovy,indent=0]
@@ -110,9 +117,11 @@ shadowJar {
 
 ==== Appending Text Files
 
-Generic text files can be appended together using the `AppendingTransformer`.
+Generic text files can be appended together using the
+link:{api}/transformers/AppendingTransformer.html[`AppendingTransformer`].
 Each file is appended using new lines to separate content.
-The `ShadowJar` task provides a short syntax method of `append(String)` to configure this transformer.
+The link:{api}/tasks/ShadowJar.html[`ShadowJar`] task provides a short syntax method of
+link:{api}/tasks/ShadowJar.html#append(java.lang.String)[`append(String)`] to configure this transformer.
 
 .Appending a Property File
 [source,groovy,indent=0]
@@ -125,9 +134,10 @@ shadowJar {
 ==== Appending XML Files
 
 XML files require a special transformer for merging.
-The `XmlAppendingTransformer` reads each XML document and merges each root element into a single document.
-There is no short syntax method for the `XmlAppendingTransformer`.
-It must be added using the `transform` methods.
+The link:{api}/transformers/XmlAppendingTransformer.html[`XmlAppendingTransformer`] reads each XML document and merges
+each root element into a single document.
+There is no short syntax method for the link:{api}/transformers/XmlAppendingTransformer.html[`XmlAppendingTransformer`].
+It must be added using the link:{api}/tasks/ShadowJar.html#transform(Class<? extends Transformer>)[`transform`] methods.
 
 .Appending a XML File
 [source,groovy,indent=0]
