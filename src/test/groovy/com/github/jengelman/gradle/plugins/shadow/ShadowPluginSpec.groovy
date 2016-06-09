@@ -72,21 +72,21 @@ class ShadowPluginSpec extends PluginSpecification {
                 'two # NOTE: No newline terminates this line/file').publish()
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies {
-            |  compile 'junit:junit:3.8.2'
-            |  compile files('${escapedPath(one)}')
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |   mergeServiceFiles()
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies {
+              compile 'junit:junit:3.8.2'
+              compile files('${escapedPath(one)}')
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+               mergeServiceFiles()
+            }
+        """.stripIndent()
 
         when:
         BuildResult result = versionRunner.withArguments('shadowJar', '--stacktrace').build()
@@ -104,13 +104,13 @@ class ShadowPluginSpec extends PluginSpecification {
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
         buildFile << """
-            |task shadow(type: ${ShadowJar.name}) {
-            |    destinationDir = buildDir
-            |    baseName = 'shadow'
-            |    from('${artifact.path}')
-            |    from('${project.path}')
-            |}
-        """.stripMargin()
+            task shadow(type: ${ShadowJar.name}) {
+                destinationDir = buildDir
+                baseName = 'shadow'
+                from('${artifact.path}')
+                from('${project.path}')
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadow').build()
@@ -123,23 +123,23 @@ class ShadowPluginSpec extends PluginSpecification {
     def 'include project sources'() {
         given:
         file('src/main/java/shadow/Passed.java') << '''
-            |package shadow;
-            |public class Passed {}
-        '''.stripMargin()
+            package shadow;
+            public class Passed {}
+        '''.stripIndent()
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
-            |
-            |// tag::rename[]
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-            |// end::rename[]
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+            
+            // tag::rename[]
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+            // end::rename[]
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -154,40 +154,40 @@ class ShadowPluginSpec extends PluginSpecification {
     def 'include project dependencies'() {
         given:
         file('settings.gradle') << """
-            |include 'client', 'server'
-        """.stripMargin()
+            include 'client', 'server'
+        """.stripIndent()
 
         file('client/src/main/java/client/Client.java') << """
-            |package client;
-            |public class Client {}
-            |""".stripMargin()
+            package client;
+            public class Client {}
+            """.stripIndent()
 
         file('client/build.gradle') << """
-            |apply plugin: 'java'
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
-        """.stripMargin()
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
-            |package server;
-            |
-            |import client.Client;
-            |
-            |public class Server {}
-        """.stripMargin()
+            package server;
+            
+            import client.Client;
+            
+            public class Server {}
+        """.stripIndent()
 
         file('server/build.gradle') << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile project(':client') }
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(':client') }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         File serverOutput = file('server/build/libs/shadow.jar')
 
@@ -205,40 +205,40 @@ class ShadowPluginSpec extends PluginSpecification {
     def 'depend on project shadow jar'() {
         given:
         file('settings.gradle') << """
-            |include 'client', 'server'
-        """.stripMargin()
+            include 'client', 'server'
+        """.stripIndent()
 
         file('client/src/main/java/client/Client.java') << """
-            |package client;
-            |public class Client {}
-            |""".stripMargin()
+            package client;
+            public class Client {}
+            """.stripIndent()
 
         file('client/build.gradle') << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
-            |
-            |shadowJar {
-            |   relocate 'junit.framework', 'client.junit.framework'
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+            
+            shadowJar {
+               relocate 'junit.framework', 'client.junit.framework'
+            }
+        """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
-            |package server;
-            |
-            |import client.Client;
-            |import client.junit.framework.Test;
-            |
-            |public class Server {}
-        """.stripMargin()
+            package server;
+            
+            import client.Client;
+            import client.junit.framework.Test;
+            
+            public class Server {}
+        """.stripIndent()
 
         file('server/build.gradle') << """
-            |apply plugin: 'java'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile project(path: ':client', configuration: 'shadow') }
-        """.stripMargin()
+            apply plugin: 'java'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(path: ':client', configuration: 'shadow') }
+        """.stripIndent()
 
         File serverOutput = file('server/build/libs/server.jar')
 
@@ -261,46 +261,46 @@ class ShadowPluginSpec extends PluginSpecification {
     def 'shadow a project shadow jar'() {
         given:
         file('settings.gradle') << """
-            |include 'client', 'server'
-        """.stripMargin()
+            include 'client', 'server'
+        """.stripIndent()
 
         file('client/src/main/java/client/Client.java') << """
-            |package client;
-            |public class Client {}
-            |""".stripMargin()
+            package client;
+            public class Client {}
+            """.stripIndent()
 
         file('client/build.gradle') << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
-            |
-            |shadowJar {
-            |   relocate 'junit.framework', 'client.junit.framework'
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+            
+            shadowJar {
+               relocate 'junit.framework', 'client.junit.framework'
+            }
+        """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
-            |package server;
-            |
-            |import client.Client;
-            |import client.junit.framework.Test;
-            |
-            |public class Server {}
-        """.stripMargin()
+            package server;
+            
+            import client.Client;
+            import client.junit.framework.Test;
+            
+            public class Server {}
+        """.stripIndent()
 
         file('server/build.gradle') << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile project(path: ':client', configuration: 'shadow') }
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(path: ':client', configuration: 'shadow') }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         File serverOutput = file('server/build/libs/shadow.jar')
 
@@ -334,22 +334,22 @@ class ShadowPluginSpec extends PluginSpecification {
                 .publish()
 
         file('src/main/java/shadow/Passed.java') << '''
-            |package shadow;
-            |public class Passed {}
-        '''.stripMargin()
+            package shadow;
+            public class Passed {}
+        '''.stripIndent()
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'shadow:a:1.0' }
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'shadow:a:1.0' }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -374,21 +374,21 @@ class ShadowPluginSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |
-            |dependencies {
-            |   runtime 'shadow:a:1.0'
-            |   shadow 'shadow:b:1.0'
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            
+            dependencies {
+               runtime 'shadow:a:1.0'
+               shadow 'shadow:b:1.0'
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -413,21 +413,21 @@ class ShadowPluginSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |
-            |dependencies {
-            |   runtime 'shadow:a:1.0'
-            |   runtime 'shadow:b:1.0'
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            
+            dependencies {
+               runtime 'shadow:a:1.0'
+               runtime 'shadow:b:1.0'
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -441,17 +441,17 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -470,29 +470,29 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |// tag::shadowConfig[]
-            |dependencies {
-            |  shadow 'junit:junit:3.8.2'
-            |}
-            |// end::shadowConfig[]
-            |
-            |// tag::jarManifest[]
-            |jar {
-            |   manifest {
-            |       attributes 'Class-Path': '/libs/a.jar'
-            |   }
-            |}
-            |// end::jarManifest[]
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            // tag::shadowConfig[]
+            dependencies {
+              shadow 'junit:junit:3.8.2'
+            }
+            // end::shadowConfig[]
+            
+            // tag::jarManifest[]
+            jar {
+               manifest {
+                   attributes 'Class-Path': '/libs/a.jar'
+               }
+            }
+            // end::jarManifest[]
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -513,17 +513,17 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
 
         buildFile << """
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { shadow 'junit:junit:3.8.2' }
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { shadow 'junit:junit:3.8.2' }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()

@@ -19,20 +19,20 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |apply plugin: 'java'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies {
-            |   compile 'shadow:a:1.0'
-            |   compile 'shadow:b:1.0'
-            |}
-            |
-            |shadowJar {
-            |   baseName = 'shadow'
-            |   classifier = null
-            |}
-        """.stripMargin()
+            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'java'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies {
+               compile 'shadow:a:1.0'
+               compile 'shadow:b:1.0'
+            }
+            
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+            }
+        """.stripIndent()
 
     }
 
@@ -47,12 +47,12 @@ class FilteringSpec extends PluginSpecification {
     def 'exclude files'() {
         given:
         buildFile << """
-            |// tag::excludeFile[]
-            |shadowJar {
-            |   exclude 'a2.properties'
-            |}
-            |// end::excludeFile[]
-        """.stripMargin()
+            // tag::excludeFile[]
+            shadowJar {
+               exclude 'a2.properties'
+            }
+            // end::excludeFile[]
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -75,18 +75,18 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << '''
-            |// tag::excludeDep[]
-            |dependencies {
-            |   compile 'shadow:d:1.0'
-            |}
-            |
-            |shadowJar {
-            |   dependencies {
-            |      exclude(dependency('shadow:d:1.0'))
-            |   }
-            |}
-            |// end::excludeDep[]
-        '''.stripMargin()
+            // tag::excludeDep[]
+            dependencies {
+               compile 'shadow:d:1.0'
+            }
+            
+            shadowJar {
+               dependencies {
+                  exclude(dependency('shadow:d:1.0'))
+               }
+            }
+            // end::excludeDep[]
+        '''.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -110,18 +110,18 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << '''
-            |// tag::excludeDepWildcard[]
-            |dependencies {
-            |   compile 'shadow:d:1.0'
-            |}
-            |
-            |shadowJar {
-            |   dependencies {
-            |      exclude(dependency('shadow:d:.*'))
-            |   }
-            |}
-            |// end::excludeDepWildcard[]
-        '''.stripMargin()
+            // tag::excludeDepWildcard[]
+            dependencies {
+               compile 'shadow:d:1.0'
+            }
+            
+            shadowJar {
+               dependencies {
+                  exclude(dependency('shadow:d:.*'))
+               }
+            }
+            // end::excludeDepWildcard[]
+        '''.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -146,16 +146,16 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << '''
-            |dependencies {
-            |   compile 'shadow:d:1.0'
-            |}
-            |
-            |shadowJar {
-            |   dependencies {
-            |      exclude(dependency('shadow:d:1.0'))
-            |   }
-            |}
-        '''.stripMargin()
+            dependencies {
+               compile 'shadow:d:1.0'
+            }
+            
+            shadowJar {
+               dependencies {
+                  exclude(dependency('shadow:d:1.0'))
+               }
+            }
+        '''.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -195,16 +195,16 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << '''
-            |dependencies {
-            |   compile 'shadow:d:1.0'
-            |}
-            |
-            |shadowJar {
-            |   dependencies {
-            |      exclude(dependency('shadow:d:1.0'))
-            |   }
-            |}
-        '''.stripMargin()
+            dependencies {
+               compile 'shadow:d:1.0'
+            }
+            
+            shadowJar {
+               dependencies {
+                  exclude(dependency('shadow:d:1.0'))
+               }
+            }
+        '''.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -217,10 +217,10 @@ class FilteringSpec extends PluginSpecification {
 
         when: 'Update build file shadowJar dependency exclusion'
         buildFile.text << '''
-            |shadowJar {
-            |   exclude 'a.properties'
-            |}
-        '''.stripMargin()
+            shadowJar {
+               exclude 'a.properties'
+            }
+        '''.stripIndent()
 
         BuildResult result = runner.withArguments('shadowJar').build()
 
@@ -245,21 +245,21 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         file('src/main/java/shadow/Passed.java') << '''
-            |package shadow;
-            |public class Passed {}
-        '''.stripMargin()
+            package shadow;
+            public class Passed {}
+        '''.stripIndent()
 
         buildFile << '''
-            |dependencies {
-            |   compile 'shadow:d:1.0'
-            |}
-            |
-            |shadowJar {
-            |   dependencies {
-            |       include(dependency('shadow:d:1.0'))
-            |   }
-            |}
-        '''.stripMargin()
+            dependencies {
+               compile 'shadow:d:1.0'
+            }
+            
+            shadowJar {
+               dependencies {
+                   include(dependency('shadow:d:1.0'))
+               }
+            }
+        '''.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -276,50 +276,50 @@ class FilteringSpec extends PluginSpecification {
         buildFile.text = ''
 
         file('settings.gradle') << """
-            |include 'client', 'server'
-        """.stripMargin()
+            include 'client', 'server'
+        """.stripIndent()
 
         file('client/src/main/java/client/Client.java') << """
-            |package client;
-            |public class Client {}
-        """.stripMargin()
+            package client;
+            public class Client {}
+        """.stripIndent()
 
         file('client/build.gradle') << """
-            |${defaultBuildScript}
-            |apply plugin: 'java'
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
-        """.stripMargin()
+            ${defaultBuildScript}
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
-            |package server;
-            |import client.Client;
-            |public class Server {}
-        """.stripMargin()
+            package server;
+            import client.Client;
+            public class Server {}
+        """.stripIndent()
 
         file('server/build.gradle') << """
-            |${defaultBuildScript}
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |
-            |// tag::excludeProject1[]
-            |dependencies {
-            |  compile project(':client')
-            |}
-            |
-            |shadowJar {
-            |// end::excludeProject1[]
-            |   baseName = 'shadow'
-            |   classifier = null
-            |// tag::excludeProject2[]
-            |   dependencies {
-            |       exclude(project(':client'))
-            |   }
-            |}
-            |// end::excludeProject2[]
-        """.stripMargin()
+            ${defaultBuildScript}
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            
+            // tag::excludeProject1[]
+            dependencies {
+              compile project(':client')
+            }
+            
+            shadowJar {
+            // end::excludeProject1[]
+               baseName = 'shadow'
+               classifier = null
+            // tag::excludeProject2[]
+               dependencies {
+                   exclude(project(':client'))
+               }
+            }
+            // end::excludeProject2[]
+        """.stripIndent()
 
         File serverOutput = file('server/build/libs/shadow.jar')
 
@@ -340,49 +340,49 @@ class FilteringSpec extends PluginSpecification {
         buildFile.text = ''
 
         file('settings.gradle') << """
-            |include 'client', 'server'
-        """.stripMargin()
+            include 'client', 'server'
+        """.stripIndent()
 
         file('client/src/main/java/client/Client.java') << """
-            |package client;
-            |public class Client {}
-        """.stripMargin()
+            package client;
+            public class Client {}
+        """.stripIndent()
 
         file('client/build.gradle') << """
-            |${defaultBuildScript}
-            |apply plugin: 'java'
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile 'junit:junit:3.8.2' }
-        """.stripMargin()
+            ${defaultBuildScript}
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
-            |package server;
-            |import client.Client;
-            |public class Server {}
-        """.stripMargin()
+            package server;
+            import client.Client;
+            public class Server {}
+        """.stripIndent()
 
         file('server/build.gradle') << """
-            |${defaultBuildScript}
-            |apply plugin: 'java'
-            |apply plugin: 'com.github.johnrengelman.shadow'
-            |
-            |repositories { maven { url "${repo.uri}" } }
-            |dependencies { compile project(':client') }
-            |
-            |// tag::excludeSpec[]
-            |shadowJar {
-            |// end::excludeSpec[]
-            |   baseName = 'shadow'
-            |   classifier = null
-            |// tag::excludeSpec2[]
-            |   dependencies {
-            |       exclude(dependency {
-            |           it.moduleGroup == 'junit'
-            |       })
-            |   }
-            |}
-            |// end::excludeSpec2[]
-        """.stripMargin()
+            ${defaultBuildScript}
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(':client') }
+            
+            // tag::excludeSpec[]
+            shadowJar {
+            // end::excludeSpec[]
+               baseName = 'shadow'
+               classifier = null
+            // tag::excludeSpec2[]
+               dependencies {
+                   exclude(dependency {
+                       it.moduleGroup == 'junit'
+                   })
+               }
+            }
+            // end::excludeSpec2[]
+        """.stripIndent()
 
         File serverOutput = file('server/build/libs/shadow.jar')
 
@@ -404,14 +404,14 @@ class FilteringSpec extends PluginSpecification {
     def 'verify exclude precedence over include'() {
         given:
         buildFile << """
-            |// tag::excludeOverInclude[]
-            |shadowJar {
-            |   include '*.jar'
-            |   include '*.properties'
-            |   exclude 'a2.properties'
-            |}
-            |// end::excludeOverInclude[]
-        """.stripMargin()
+            // tag::excludeOverInclude[]
+            shadowJar {
+               include '*.jar'
+               include '*.properties'
+               exclude 'a2.properties'
+            }
+            // end::excludeOverInclude[]
+        """.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
@@ -436,16 +436,16 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << '''
-            |dependencies {
-            |   compile 'shadow:d:1.0'
-            |}
-            |
-            |shadowJar {
-            |   dependencies {
-            |      exclude(dependency('shadow:d:1.0'))
-            |   }
-            |}
-        '''.stripMargin()
+            dependencies {
+               compile 'shadow:d:1.0'
+            }
+            
+            shadowJar {
+               dependencies {
+                  exclude(dependency('shadow:d:1.0'))
+               }
+            }
+        '''.stripIndent()
 
         when:
         runner.withArguments('shadowJar').build()
