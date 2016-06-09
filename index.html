@@ -1257,9 +1257,9 @@ Any non-class files that are stored within a package structure are also relocate
 <div class="listingblock">
 <div class="title">Relocating a Package</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>            |shadowJar {
-            |   relocate 'junit.framework', 'shadow.junit'
-            |}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
+|   relocate <span class="string"><span class="delimiter">'</span><span class="content">junit.framework</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">shadow.junit</span><span class="delimiter">'</span></span>
+|}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1280,7 +1280,7 @@ provided.</p>
 <div class="sidebarblock">
 <div class="content">
 <div class="paragraph">
-<p><strong>NOTE2</strong>: Relocation will be applied globally to all instance of the matched prefix.
+<p><strong>NOTE-2</strong>: Relocation will be applied globally to all instance of the matched prefix.
 That is, it does <strong>not</strong> scope to <em>only</em> the dependencies being shadowed.
 Be specific as possible when configuring relocation as to avoid unintended relocations.</p>
 </div>
@@ -1294,14 +1294,14 @@ Be specific as possible when configuring relocation as to avoid unintended reloc
 <div class="listingblock">
 <div class="title">Configuring Filtering for Relocation</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>            |shadowJar {
-            |   relocate('junit.textui', 'a') {
-            |       exclude 'junit.textui.TestRunner'
-            |   }
-            |   relocate('junit.framework', 'b') {
-            |       include 'junit.framework.Test*'
-            |   }
-            |}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
+|   relocate(<span class="string"><span class="delimiter">'</span><span class="content">junit.textui</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">a</span><span class="delimiter">'</span></span>) {
+|       exclude <span class="string"><span class="delimiter">'</span><span class="content">junit.textui.TestRunner</span><span class="delimiter">'</span></span>
+|   }
+|   relocate(<span class="string"><span class="delimiter">'</span><span class="content">junit.framework</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>) {
+|       include <span class="string"><span class="delimiter">'</span><span class="content">junit.framework.Test*</span><span class="delimiter">'</span></span>
+|   }
+|}</code></pre>
 </div>
 </div>
 </div>
