@@ -58,7 +58,7 @@ shadowJar {
 ----
 
 The above code snippet is a convenience syntax for calling
-link:{api}/tasks/ShadowJar.html#transform(Class<? extends Transformer>)[`transform(ServiceFileTransformer.class)`].
+link:{api}/tasks/ShadowJar.html#transform(Class++<? extends Transformer>++)[`transform(ServiceFileTransformer.class)`].
 
 ****
 Groovy Extension Module descriptor files (located at `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`)
@@ -137,7 +137,7 @@ XML files require a special transformer for merging.
 The link:{api}/transformers/XmlAppendingTransformer.html[`XmlAppendingTransformer`] reads each XML document and merges
 each root element into a single document.
 There is no short syntax method for the link:{api}/transformers/XmlAppendingTransformer.html[`XmlAppendingTransformer`].
-It must be added using the link:{api}/tasks/ShadowJar.html#transform(Class<? extends Transformer>)[`transform`] methods.
+It must be added using the link:{api}/tasks/ShadowJar.html#transform(++Class<? extends Transformer>++)[`transform`] methods.
 
 .Appending a XML File
 [source,groovy,indent=0]
