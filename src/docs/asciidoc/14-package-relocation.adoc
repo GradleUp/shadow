@@ -13,7 +13,7 @@ statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.
 
 .Relocating a Package
-[source,groovy.indent=0]
+[source,groovy,indent=0]
 ----
 include::{tests}/RelocationSpec.groovy[tags=relocate;relocate2]
 ----
@@ -30,7 +30,7 @@ provided.
 ****
 
 ****
-**NOTE2**: Relocation will be applied globally to all instance of the matched prefix.
+**NOTE-2**: Relocation will be applied globally to all instance of the matched prefix.
 That is, it does **not** scope to __only__ the dependencies being shadowed.
 Be specific as possible when configuring relocation as to avoid unintended relocations.
 ****
@@ -40,7 +40,7 @@ Be specific as possible when configuring relocation as to avoid unintended reloc
 Specific classes or files can be `included`/`excluded` from the relocation operation if necessary.
 
 .Configuring Filtering for Relocation
-[source,groovy.indent=0]
+[source,groovy,indent=0]
 ----
 include::{tests}/RelocationSpec.groovy[tags=relocateFilter;relocateFilter2]
 ----
