@@ -536,11 +536,18 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#configuring_shadowed_dependencies">2.5. Configuring Shadowed Dependencies</a></li>
 <li><a href="#filtering_dependencies">2.6. Filtering Dependencies</a></li>
 <li><a href="#controlling_jar_content_merging">2.7. Controlling JAR Content Merging</a></li>
+<li><a href="#relocating_packages">2.8. Relocating Packages</a></li>
 </ul>
 </li>
 <li><a href="#creating_a_custom_shadowjar_task">3. Creating a Custom ShadowJar Task</a></li>
 <li><a href="#integrating_with_application_plugin">4. Integrating with Application Plugin</a></li>
-<li><a href="#publishing_shadow_jars">5. Publishing Shadow JARs</a></li>
+<li><a href="#publishing_shadow_jars">5. Publishing Shadow JARs</a>
+<ul class="sectlevel2">
+<li><a href="#publishing_with_maven_publish_plugin">5.1. Publishing with Maven-Publish Plugin</a></li>
+<li><a href="#publishing_with_maven_plugin">5.2. Publishing with Maven Plugin</a></li>
+<li><a href="#depending_on_the_shadow_jar_from_another_project">5.3. Depending on the Shadow Jar from Another Project</a></li>
+</ul>
+</li>
 <li><a href="#change_log">6. Change Log</a></li>
 </ul>
 </div>
@@ -1219,18 +1226,35 @@ It must be added using the <a href="api/com/github/jengelman/gradle/plugins/shad
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="relocating_packages">2.8. Relocating Packages</h3>
+
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="creating_a_custom_shadowjar_task">3. Creating a Custom ShadowJar Task</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>The built in <code>shadowJar</code> task only provides an output for the <code>main</code> source set of the project.
+It is possible to add arbitrary <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html"><code>ShadowJar</code></a> tasks to a project.
+When doing so, ensure that the <code>configurations</code> property is specified to inform Shadow which dependencies to merge
+into the output.</p>
+</div>
 <div class="listingblock">
+<div class="title">Shadowing Test Sources and Dependencies</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">task testJar(<span class="key">type</span>: ShadowJar) {
   classifier = <span class="string"><span class="delimiter">'</span><span class="content">tests</span><span class="delimiter">'</span></span>
   from sourceSets.test.output
+  configurations = [project.configurations.testRuntime]
 }</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The code snippet above will geneated a shadowed JAR contain both the <code>main</code> and <code>test</code> sources as well as all <code>runtime</code>
+and <code>testRuntime</code> dependencies.
+The file is output to <code>build/libs/&lt;project&gt;-&lt;version&gt;-tests.jar</code>.</p>
 </div>
 </div>
 </div>
@@ -1243,9 +1267,17 @@ It must be added using the <a href="api/com/github/jengelman/gradle/plugins/shad
 <div class="sect1">
 <h2 id="publishing_shadow_jars">5. Publishing Shadow JARs</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>Publishing shadow jars
-relying on shadow jar dependency from another project</p>
+<div class="sect2">
+<h3 id="publishing_with_maven_publish_plugin">5.1. Publishing with Maven-Publish Plugin</h3>
+
+</div>
+<div class="sect2">
+<h3 id="publishing_with_maven_plugin">5.2. Publishing with Maven Plugin</h3>
+
+</div>
+<div class="sect2">
+<h3 id="depending_on_the_shadow_jar_from_another_project">5.3. Depending on the Shadow Jar from Another Project</h3>
+
 </div>
 </div>
 </div>
