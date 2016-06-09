@@ -147,3 +147,4 @@ shadowJar {
     resource = 'properties.xml'
   }
 }
+----
