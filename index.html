@@ -558,6 +558,12 @@ table.CodeRay td.code>pre{padding:0}
 </ul>
 </li>
 <li><a href="#change_log">7. Change Log</a></li>
+<li><a href="#about_this_project">8. About This Project</a>
+<ul class="sectlevel2">
+<li><a href="#maintainers">8.1. Maintainers</a></li>
+<li><a href="#contributors">8.2. Contributors</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -1756,11 +1762,79 @@ must be explicitly configured via a spec.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="about_this_project">8. About This Project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I started this project in December of 2012. We were working on converting from a monolithic application into a the
+new hot jazz of "microservices" using Dropwizard.
+I had also just started learning about Gradle and I knew that the incremental build system it provided would benefit
+our development team greatly.
+Unfortunately, the closest thing that Gradle had to Maven&#8217;s Shade plugin was its ability to create application TARs and
+ZIPs.</p>
+</div>
+<div class="paragraph">
+<p>So, Charlie Knudsen and myself set out to port the existing Shade code into a Gradle plugin.
+This port is what existing up until the <code>0.9</code> milestone releases for Shadow.
+It functioned, but it wasn&#8217;t idiomatic Gradle by any means.</p>
+</div>
+<div class="paragraph">
+<p>Starting with 0.9, Shadow was rewritten from the ground up as standard Gradle plugin and leveraged as much of Gradle&#8217;s
+classes and concepts as possible.
+At the same time as the 0.9 release, Gradle was announcing the <a href="https://plugins.gradle.org">Gradle Plugin Portal</a> and
+so Shadow was published there.</p>
+</div>
+<div class="paragraph">
+<p>Shadow has had nearly ~900,000 downloads from Bintray and countless more from the Gradle Plugin Portal.</p>
+</div>
+<div class="sect2">
+<h3 id="maintainers">8.1. Maintainers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/johnrengelman">John Engelman</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="contributors">8.2. Contributors</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/charliek">Charlie Knudsen</a></p>
+</li>
+<li>
+<p><a href="https://github.com/fkorotkov">Fedor Korotkov</a></p>
+</li>
+<li>
+<p><a href="https://github.com/hbchai">Haw-Bin Chai</a></p>
+</li>
+<li>
+<p><a href="https://github.com/siordache">Serban Iordache</a></p>
+</li>
+<li>
+<p><a href="https://github.com/Minecrell">Minecrell</a></p>
+</li>
+<li>
+<p><a href="https://github.com/mhurne">Matt Hurne</a></p>
+</li>
+<li>
+<p><a href="https://github.com/aalmiray">Andres Almiray</a></p>
+</li>
+<li>
+<p><a href="https://github.com/brandonkearby">Brandon Kearby</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 1.2.3<br>
-Last updated 2016-06-09 15:32:38 +00:00
+Last updated 2016-06-09 20:09:06 +00:00
 </div>
 </div>
 </body>
