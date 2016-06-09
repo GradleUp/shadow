@@ -1,0 +1,34 @@
+== About This Project
+
+I started this project in December of 2012. We were working on converting from a monolithic application into a the
+new hot jazz of "microservices" using Dropwizard.
+I had also just started learning about Gradle and I knew that the incremental build system it provided would benefit
+our development team greatly.
+Unfortunately, the closest thing that Gradle had to Maven's Shade plugin was its ability to create application TARs and
+ZIPs.
+
+So, Charlie Knudsen and myself set out to port the existing Shade code into a Gradle plugin.
+This port is what existing up until the `0.9` milestone releases for Shadow.
+It functioned, but it wasn't idiomatic Gradle by any means.
+
+Starting with 0.9, Shadow was rewritten from the ground up as standard Gradle plugin and leveraged as much of Gradle's
+classes and concepts as possible.
+At the same time as the 0.9 release, Gradle was announcing the https://plugins.gradle.org[Gradle Plugin Portal] and
+so Shadow was published there.
+
+Shadow has had nearly ~900,000 downloads from Bintray and countless more from the Gradle Plugin Portal.
+
+=== Maintainers
+
+* https://github.com/johnrengelman[John Engelman]
+
+=== Contributors
+
+* https://github.com/charliek[Charlie Knudsen]
+* https://github.com/fkorotkov[Fedor Korotkov]
+* https://github.com/hbchai[Haw-Bin Chai]
+* https://github.com/siordache[Serban Iordache]
+* https://github.com/Minecrell[Minecrell]
+* https://github.com/mhurne[Matt Hurne]
+* https://github.com/aalmiray[Andres Almiray]
+* https://github.com/brandonkearby[Brandon Kearby]
