@@ -32,17 +32,24 @@ class PluginSpecification extends Specification {
 
     String getDefaultBuildScript() {
         return """
-        |buildscript {
-        |  repositories {
-        |    //maven { url "${localRepo.toURI()}" }
-        |    mavenLocal()
-        |    jcenter()
-        |  }
-        |  dependencies {
-        |    classpath 'com.github.jengelman.gradle.plugins:shadow:${SHADOW_VERSION}'
-        |  }
-        |}
-        """.stripMargin()
+        buildscript {
+          repositories {
+            //maven { url "${localRepo.toURI()}" }
+            mavenLocal()
+            jcenter()
+          }
+          dependencies {
+            classpath 'com.github.jengelman.gradle.plugins:shadow:${SHADOW_VERSION}'
+          }
+        }
+        version = "1.0"
+        group = 'shadow'
+
+        apply plugin: 'java'
+        apply plugin: 'com.github.johnrengelman.shadow'
+
+        repositories { maven { url "${repo.uri}" } }
+        """.stripIndent()
     }
 
     GradleRunner getRunner() {
@@ -114,7 +121,11 @@ class PluginSpecification extends Specification {
     }
 
     protected getOutput() {
-        file('build/libs/shadow.jar')
+        file('build/libs/shadow-1.0-all.jar')
+    }
+
+    protected output(String name) {
+        file("build/libs/${name}")
     }
 
     protected File getTestJar(String name = 'junit-3.8.2.jar') {

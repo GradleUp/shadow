@@ -12,18 +12,11 @@ class RelocationSpec extends PluginSpecification {
     def "relocate dependency files"() {
         given:
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-            
             dependencies {
                compile 'junit:junit:3.8.2'
             }
             
             shadowJar {
-               baseName = 'shadow'
-               classifier = null
                relocate 'junit.textui', 'a'
                relocate 'junit.framework', 'b'
                manifest {
@@ -84,21 +77,12 @@ class RelocationSpec extends PluginSpecification {
     def "relocate dependency files with filtering"() {
         given:
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-            
             dependencies {
                compile 'junit:junit:3.8.2'
             }
             
             // tag::relocateFilter[]
             shadowJar {
-            // end::relocateFilter[]
-               baseName = 'shadow'
-               classifier = null
-            // tag::relocateFilter2[]
                relocate('junit.textui', 'a') {
                    exclude 'junit.textui.TestRunner'
                }
@@ -106,7 +90,7 @@ class RelocationSpec extends PluginSpecification {
                    include 'junit.framework.Test*'
                }
             }
-            // end::relocateFilter2[]
+            // end::relocateFilter[]
         """.stripIndent()
 
         when:
@@ -150,24 +134,15 @@ class RelocationSpec extends PluginSpecification {
     def "remap class names for relocated files in project source"() {
         given:
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-            
             dependencies {
                compile 'junit:junit:3.8.2'
             }
             
             // tag::relocate[]
             shadowJar {
-            // end::relocate[]
-               baseName = 'shadow'
-               classifier = null
-            // tag::relocate2[]
                relocate 'junit.framework', 'shadow.junit'
             }
-            // end::relocate2[]
+            // end::relocate[]
         """.stripIndent()
 
         file('src/main/java/shadow/ShadowTest.java') << '''
@@ -233,8 +208,6 @@ class RelocationSpec extends PluginSpecification {
         dependencies { compile project(':core') }
         
         shadowJar {
-          baseName = 'shadow'
-          classifier = null
           relocate 'core', 'app.core'
           relocate 'junit.framework', 'app.junit.framework'
         }
@@ -259,7 +232,7 @@ class RelocationSpec extends PluginSpecification {
         runner.withArguments(':app:shadowJar').build()
 
         then:
-        File appOutput = file('app/build/libs/shadow.jar')
+        File appOutput = file('app/build/libs/app-all.jar')
         assert appOutput.exists()
 
         and:
@@ -287,18 +260,11 @@ class RelocationSpec extends PluginSpecification {
         file('src/main/resources/foo/foo.properties') << 'name=foo'
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-            
             dependencies {
                compile 'shadow:dep:1.0'
             }
             
             shadowJar {
-               baseName = 'shadow'
-               classifier = null
                relocate 'foo', 'bar'
             }
         """.stripIndent()

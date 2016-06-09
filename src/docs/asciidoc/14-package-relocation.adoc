@@ -15,7 +15,7 @@ Any non-class files that are stored within a package structure are also relocate
 .Relocating a Package
 [source,groovy,indent=0]
 ----
-include::{tests}/RelocationSpec.groovy[tags=relocate;relocate2]
+include::{tests}/RelocationSpec.groovy[tags=relocate]
 ----
 
 The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`.
@@ -42,5 +42,5 @@ Specific classes or files can be `included`/`excluded` from the relocation opera
 .Configuring Filtering for Relocation
 [source,groovy,indent=0]
 ----
-include::{tests}/RelocationSpec.groovy[tags=relocateFilter;relocateFilter2]
+include::{tests}/RelocationSpec.groovy[tags=relocateFilter]
 ----

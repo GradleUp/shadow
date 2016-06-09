@@ -36,17 +36,9 @@ class ApplicationSpec extends PluginSpecification {
         """.stripIndent()
 
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
             apply plugin: 'application'
-            apply plugin: 'java'
-            
+
             mainClassName = 'myapp.Main'
-            
-            version = '1.0'
-            
-            repositories {
-               maven { url "${repo.uri}" }
-            }
             
             dependencies {
                compile 'shadow:a:1.0'
@@ -104,17 +96,9 @@ class ApplicationSpec extends PluginSpecification {
         """.stripIndent()
 
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
             apply plugin: 'application'
-            apply plugin: 'java'
-            
+
             mainClassName = 'myapp.Main'
-            
-            version = '1.0'
-            
-            repositories {
-               maven { url "${repo.uri}" }
-            }
             
             dependencies {
                shadow 'shadow:a:1.0'
@@ -161,17 +145,9 @@ class ApplicationSpec extends PluginSpecification {
         """.stripIndent()
 
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
             apply plugin: 'application'
-            apply plugin: 'java'
-            
+
             mainClassName = 'myapp.Main'
-            
-            version = '1.0'
-            
-            repositories {
-               maven { url "${repo.uri}" }
-            }
             
             dependencies {
                compile 'shadow:a:1.0'

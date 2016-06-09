@@ -19,18 +19,9 @@ class FilteringSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
-            apply plugin: 'java'
-            
-            repositories { maven { url "${repo.uri}" } }
             dependencies {
                compile 'shadow:a:1.0'
                compile 'shadow:b:1.0'
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
             }
         """.stripIndent()
 
@@ -303,25 +294,23 @@ class FilteringSpec extends PluginSpecification {
             apply plugin: 'com.github.johnrengelman.shadow'
             
             repositories { maven { url "${repo.uri}" } }
-            
-            // tag::excludeProject1[]
+
+            version = "1.0"
+
+            // tag::excludeProject[]
             dependencies {
               compile project(':client')
             }
             
             shadowJar {
-            // end::excludeProject1[]
-               baseName = 'shadow'
-               classifier = null
-            // tag::excludeProject2[]
                dependencies {
                    exclude(project(':client'))
                }
             }
-            // end::excludeProject2[]
+            // end::excludeProject[]
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/shadow.jar')
+        File serverOutput = file('server/build/libs/server-1.0-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()
@@ -368,23 +357,21 @@ class FilteringSpec extends PluginSpecification {
             
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(':client') }
-            
+
+            version = "1.0"
+
             // tag::excludeSpec[]
             shadowJar {
-            // end::excludeSpec[]
-               baseName = 'shadow'
-               classifier = null
-            // tag::excludeSpec2[]
                dependencies {
                    exclude(dependency {
                        it.moduleGroup == 'junit'
                    })
                }
             }
-            // end::excludeSpec2[]
+            // end::excludeSpec[]
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/shadow.jar')
+        File serverOutput = file('server/build/libs/server-1.0-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()

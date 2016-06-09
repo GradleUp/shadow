@@ -72,24 +72,18 @@ class ShadowPluginSpec extends PluginSpecification {
                 'two # NOTE: No newline terminates this line/file').publish()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
             dependencies {
               compile 'junit:junit:3.8.2'
               compile files('${escapedPath(one)}')
             }
             
             shadowJar {
-               baseName = 'shadow'
-               classifier = null
                mergeServiceFiles()
             }
         """.stripIndent()
 
         when:
-        BuildResult result = versionRunner.withArguments('shadowJar', '--stacktrace').build()
+        versionRunner.withArguments('shadowJar', '--stacktrace').build()
 
         then:
         assert output.exists()
@@ -104,19 +98,16 @@ class ShadowPluginSpec extends PluginSpecification {
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = buildDir
-                baseName = 'shadow'
+            shadowJar {
                 from('${artifact.path}')
                 from('${project.path}')
             }
         """.stripIndent()
 
         when:
-        runner.withArguments('shadow').build()
+        runner.withArguments('shadowJar').build()
 
         then:
-        File output = file('build/shadow.jar')
         assert output.exists()
     }
 
@@ -128,15 +119,13 @@ class ShadowPluginSpec extends PluginSpecification {
         '''.stripIndent()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            repositories { maven { url "${repo.uri}" } }
             dependencies { compile 'junit:junit:3.8.2' }
             
             // tag::rename[]
             shadowJar {
                baseName = 'shadow'
                classifier = null
+               version = null
             }
             // end::rename[]
         """.stripIndent()
@@ -145,10 +134,10 @@ class ShadowPluginSpec extends PluginSpecification {
         runner.withArguments('shadowJar').build()
 
         then:
-        contains(output, ['shadow/Passed.class', 'junit/framework/Test.class'])
+        contains(output("shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
 
         and:
-        doesNotContain(output, ['/'])
+        doesNotContain(output("shadow.jar"), ['/'])
     }
 
     def 'include project dependencies'() {
@@ -182,14 +171,10 @@ class ShadowPluginSpec extends PluginSpecification {
             
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(':client') }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-            }
+
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/shadow.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()
@@ -267,7 +252,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/src/main/java/client/Client.java') << """
             package client;
             public class Client {}
-            """.stripIndent()
+        """.stripIndent()
 
         file('client/build.gradle') << """
             apply plugin: 'java'
@@ -295,14 +280,9 @@ class ShadowPluginSpec extends PluginSpecification {
             
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(path: ':client', configuration: 'shadow') }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-            }
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/shadow.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()
@@ -339,16 +319,7 @@ class ShadowPluginSpec extends PluginSpecification {
         '''.stripIndent()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
             dependencies { compile 'shadow:a:1.0' }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-            }
         """.stripIndent()
 
         when:
@@ -374,19 +345,9 @@ class ShadowPluginSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-            
             dependencies {
                runtime 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
             }
         """.stripIndent()
 
@@ -413,19 +374,9 @@ class ShadowPluginSpec extends PluginSpecification {
                 .publish()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-            
             dependencies {
                runtime 'shadow:a:1.0'
                runtime 'shadow:b:1.0'
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
             }
         """.stripIndent()
 
@@ -441,16 +392,7 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
             dependencies { compile 'junit:junit:3.8.2' }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-            }
         """.stripIndent()
 
         when:
@@ -470,10 +412,6 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
             // tag::shadowConfig[]
             dependencies {
               shadow 'junit:junit:3.8.2'
@@ -487,11 +425,6 @@ class ShadowPluginSpec extends PluginSpecification {
                }
             }
             // end::jarManifest[]
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-            }
         """.stripIndent()
 
         when:
@@ -513,16 +446,7 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
             dependencies { shadow 'junit:junit:3.8.2' }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
-            }
         """.stripIndent()
 
         when:

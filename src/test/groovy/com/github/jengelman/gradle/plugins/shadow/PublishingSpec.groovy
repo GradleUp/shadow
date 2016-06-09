@@ -25,14 +25,8 @@ class PublishingSpec extends PluginSpecification {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
             apply plugin: 'maven'
-            apply plugin: 'java'
-            
-            group = 'shadow'
-            version = '1.0'
-            
-            repositories { maven { url "${repo.uri}" } }
+
             dependencies {
                compile 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
@@ -88,14 +82,8 @@ class PublishingSpec extends PluginSpecification {
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
-            apply plugin: 'com.github.johnrengelman.shadow'
             apply plugin: 'maven-publish'
-            apply plugin: 'java'
-            
-            group = 'shadow'
-            version = '1.0'
-            
-            repositories { maven { url "${repo.uri}" } }
+
             dependencies {
                compile 'shadow:a:1.0'
                shadow 'shadow:b:1.0'

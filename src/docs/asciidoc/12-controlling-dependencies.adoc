@@ -42,7 +42,7 @@ include::{tests}/FilteringSpec.groovy[tags=excludeDep]
 .Exclude a Project Dependency
 [source,groovy,indent=0]
 ----
-include::{tests}/FilteringSpec.groovy[tags=excludeProject1;excludeProject2]
+include::{tests}/FilteringSpec.groovy[tags=excludeProject]
 ----
 
 ****
@@ -108,5 +108,5 @@ method that accepts a `Closure` for selecting dependencies.
 .Selecting Dependencies to Filter With a Spec
 [source,groovy,indent=0]
 ----
-include::{tests}/FilteringSpec.groovy[tags=excludeSpec;excludeSpec2]
+include::{tests}/FilteringSpec.groovy[tags=excludeSpec]
 ----

@@ -28,9 +28,7 @@ class TransformerSpec extends PluginSpecification {
                 .write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
+            shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
                 transform(${ServiceFileTransformer.name}) {
@@ -40,7 +38,7 @@ class TransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('shadow').build()
+        runner.withArguments('shadowJar').build()
 
         then:
         assert output.exists()
@@ -67,9 +65,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
                     'two # NOTE: No newline terminates this line/file').write()
 
             buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
+            shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
                 transform(${ServiceFileTransformer.name}) {
@@ -79,7 +75,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-            runner.withArguments('shadow').build()
+            runner.withArguments('shadowJar').build()
 
         then:
             assert output.exists()
@@ -107,9 +103,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
                     .write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
+            shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
                 mergeServiceFiles {
@@ -119,7 +113,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-        runner.withArguments('shadow').build()
+        runner.withArguments('shadowJar').build()
 
         then:
         assert output.exists()
@@ -160,9 +154,7 @@ com.mysql.jdbc.Driver'''.stripIndent())
                 .write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
+            shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
                 mergeServiceFiles()
@@ -174,7 +166,7 @@ com.mysql.jdbc.Driver'''.stripIndent())
         """.stripIndent()
 
         when:
-        runner.withArguments('shadow').build()
+        runner.withArguments('shadowJar').build()
 
         then:
         assert output.exists()
@@ -212,9 +204,7 @@ org.mortbay.log.Factory'''.stripIndent()
                     'two # NOTE: No newline terminates this line/file').write()
 
             buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
+            shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
                 mergeServiceFiles('META-INF/foo')
@@ -222,7 +212,7 @@ org.mortbay.log.Factory'''.stripIndent()
         """.stripIndent()
 
         when:
-            runner.withArguments('shadow').build()
+            runner.withArguments('shadowJar').build()
 
         then:
             assert output.exists()
@@ -245,18 +235,12 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
                 'two # NOTE: No newline terminates this line/file').publish()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
             dependencies {
               compile 'shadow:two:1.0'
               compile files('${escapedPath(one)}')
             }
             
             shadowJar {
-              baseName = 'shadow'
-              classifier = null
               mergeServiceFiles()
             }
         """.stripIndent()
@@ -288,9 +272,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
                 'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
+            shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
                 transform(${AppendingTransformer.name}) {
@@ -300,7 +282,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-        runner.withArguments('shadow').build()
+        runner.withArguments('shadowJar').build()
 
         then:
         assert output.exists()
@@ -323,9 +305,7 @@ two # NOTE: No newline terminates this line/file
                 'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-                destinationDir = new File(buildDir, 'libs')
-                baseName = 'shadow'
+            shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
                 append('test.properties')
@@ -333,7 +313,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('shadow').build()
+        runner.withArguments('shadowJar').build()
 
         then:
         assert output.exists()
@@ -360,19 +340,11 @@ two # NOTE: No newline terminates this line/file
         '''.stripIndent()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
             jar {
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
                    attributes 'Test-Entry': 'PASSED'
                }
-            }
-            
-            shadowJar {
-               baseName = 'shadow'
-               classifier = null
             }
         """.stripIndent()
 
@@ -405,9 +377,6 @@ two # NOTE: No newline terminates this line/file
         '''.stripIndent()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
             jar {
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
@@ -416,8 +385,6 @@ two # NOTE: No newline terminates this line/file
             }
             
             shadowJar {
-               baseName = 'shadow'
-               classifier = null
                manifest {
                    attributes 'Test-Entry': 'PASSED'
                    attributes 'New-Entry': 'NEW'
@@ -463,9 +430,7 @@ two # NOTE: No newline terminates this line/file
         ).write()
 
         buildFile << """
-            task shadow(type: ${ShadowJar.name}) {
-               destinationDir = new File(buildDir, 'libs')
-               baseName = 'shadow'
+            shadowJar {
                from('${escapedPath(xml1)}')
                from('${escapedPath(xml2)}')
                transform(${XmlAppendingTransformer.name}) {
@@ -475,7 +440,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('shadow').build()
+        runner.withArguments('shadowJar').build()
 
         then:
         assert output.exists()
@@ -506,11 +471,7 @@ two # NOTE: No newline terminates this line/file
         '''.stripIndent()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
             jar {
-               baseName = 'jar'
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
                    attributes 'Test-Entry': 'FAILED'
@@ -518,8 +479,6 @@ two # NOTE: No newline terminates this line/file
             }
             
             shadowJar {
-               baseName = 'shadow'
-               classifier = null
                manifest {
                    attributes 'Test-Entry': 'PASSED'
                    attributes 'New-Entry': 'NEW'
@@ -531,7 +490,7 @@ two # NOTE: No newline terminates this line/file
         runner.withArguments('jar', 'shadowJar').build()
 
         then:
-        File jar = file('build/libs/jar.jar')
+        File jar = file('build/libs/shadow-1.0.jar')
         assert jar.exists()
         assert output.exists()
 
@@ -572,11 +531,7 @@ two # NOTE: No newline terminates this line/file
         '''.stripIndent()
 
         buildFile << """
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
             jar {
-               baseName = 'jar'
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
                    attributes 'Test-Entry': 'FAILED'
@@ -584,8 +539,6 @@ two # NOTE: No newline terminates this line/file
             }
             
             shadowJar {
-               baseName = 'shadow'
-               classifier = null
                manifest {
                    attributes 'Test-Entry': 'PASSED'
                    attributes 'New-Entry': 'NEW'
@@ -597,7 +550,7 @@ two # NOTE: No newline terminates this line/file
         runner.withArguments('jar', 'shadowJar').build()
 
         then:
-        File jar = file('build/libs/jar.jar')
+        File jar = file('build/libs/shadow-1.0.jar')
         assert jar.exists()
         assert output.exists()
 
@@ -641,9 +594,7 @@ extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
 staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
 
             buildFile << """
-                task shadow(type: ${ShadowJar.name}) {
-                    destinationDir = new File(buildDir, 'libs')
-                    baseName = 'shadow'
+                shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
                     transform(${GroovyExtensionModuleTransformer.name})
@@ -651,7 +602,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             """.stripIndent()
 
         when:
-            runner.withArguments('shadow').build()
+            runner.withArguments('shadowJar').build()
 
         then:
             assert output.exists()
@@ -683,9 +634,7 @@ extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
 staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
 
             buildFile << """
-                task shadow(type: ${ShadowJar.name}) {
-                    destinationDir = new File(buildDir, 'libs')
-                    baseName = 'shadow'
+                shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
                     mergeGroovyExtensionModules()
@@ -693,7 +642,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             """.stripIndent()
 
         when:
-            runner.withArguments('shadow').build()
+            runner.withArguments('shadowJar').build()
 
         then:
             assert output.exists()
