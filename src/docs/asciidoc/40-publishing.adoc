@@ -1,4 +1,7 @@
 == Publishing Shadow JARs
 
-Publishing shadow jars
-relying on shadow jar dependency from another project
+=== Publishing with Maven-Publish Plugin
+
+=== Publishing with Maven Plugin
+
+=== Depending on the Shadow Jar from Another Project
