@@ -772,10 +772,10 @@ file at: <code>build/libs/myApp-1.0-all.jar</code></p>
 <div class="listingblock">
 <div class="title">Output to <code>build/libs/shadow.jar</code></div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
-|   baseName = <span class="string"><span class="delimiter">'</span><span class="content">shadow</span><span class="delimiter">'</span></span>
-|   classifier = <span class="predefined-constant">null</span>
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+   baseName = <span class="string"><span class="delimiter">'</span><span class="content">shadow</span><span class="delimiter">'</span></span>
+   classifier = <span class="predefined-constant">null</span>
+}</code></pre>
 </div>
 </div>
 </div>
@@ -800,9 +800,9 @@ for the project.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|dependencies {
-|  shadow <span class="string"><span class="delimiter">'</span><span class="content">junit:junit:3.8.2</span><span class="delimiter">'</span></span>
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+  shadow <span class="string"><span class="delimiter">'</span><span class="content">junit:junit:3.8.2</span><span class="delimiter">'</span></span>
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -827,11 +827,11 @@ This means that any configuration performed on the <code>jar</code> task will pr
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|jar {
-|   manifest {
-|       attributes <span class="string"><span class="delimiter">'</span><span class="content">Class-Path</span><span class="delimiter">'</span></span>: <span class="string"><span class="delimiter">'</span><span class="content">/libs/a.jar</span><span class="delimiter">'</span></span>
-|   }
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">jar {
+   manifest {
+       attributes <span class="string"><span class="delimiter">'</span><span class="content">Class-Path</span><span class="delimiter">'</span></span>: <span class="string"><span class="delimiter">'</span><span class="content">/libs/a.jar</span><span class="delimiter">'</span></span>
+   }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -881,9 +881,9 @@ of the dependencies to be merged.</p>
 <div class="listingblock">
 <div class="title">Exclude a file from Shadow Jar</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
-|   exclude <span class="string"><span class="delimiter">'</span><span class="content">a2.properties</span><span class="delimiter">'</span></span>
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+   exclude <span class="string"><span class="delimiter">'</span><span class="content">a2.properties</span><span class="delimiter">'</span></span>
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -893,11 +893,11 @@ Additionally, ANT style patterns can be used to match multiple files.</p>
 <div class="listingblock">
 <div class="title">Configuring output using ANT patterns</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
-|   include <span class="string"><span class="delimiter">'</span><span class="content">*.jar</span><span class="delimiter">'</span></span>
-|   include <span class="string"><span class="delimiter">'</span><span class="content">*.properties</span><span class="delimiter">'</span></span>
-|   exclude <span class="string"><span class="delimiter">'</span><span class="content">a2.properties</span><span class="delimiter">'</span></span>
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+   include <span class="string"><span class="delimiter">'</span><span class="content">*.jar</span><span class="delimiter">'</span></span>
+   include <span class="string"><span class="delimiter">'</span><span class="content">*.properties</span><span class="delimiter">'</span></span>
+   exclude <span class="string"><span class="delimiter">'</span><span class="content">a2.properties</span><span class="delimiter">'</span></span>
+}</code></pre>
 </div>
 </div>
 </div>
@@ -947,29 +947,29 @@ Gradle&#8217;s <code>configurations</code> block.</p>
 <div class="listingblock">
 <div class="title">Exclude an Module Dependency</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|dependencies {
-|   compile <span class="string"><span class="delimiter">'</span><span class="content">shadow:d:1.0</span><span class="delimiter">'</span></span>
-|}
-|
-|shadowJar {
-|   dependencies {
-|      exclude(dependency(<span class="string"><span class="delimiter">'</span><span class="content">shadow:d:1.0</span><span class="delimiter">'</span></span>))
-|   }
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+   compile <span class="string"><span class="delimiter">'</span><span class="content">shadow:d:1.0</span><span class="delimiter">'</span></span>
+}
+
+shadowJar {
+   dependencies {
+      exclude(dependency(<span class="string"><span class="delimiter">'</span><span class="content">shadow:d:1.0</span><span class="delimiter">'</span></span>))
+   }
+}</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Exclude a Project Dependency</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|dependencies {
-|  compile project(<span class="string"><span class="delimiter">'</span><span class="content">:client</span><span class="delimiter">'</span></span>)
-|}
-|
-|shadowJar {
-|   dependencies {
-|       exclude(project(<span class="string"><span class="delimiter">'</span><span class="content">:client</span><span class="delimiter">'</span></span>))
-|   }
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+  compile project(<span class="string"><span class="delimiter">'</span><span class="content">:client</span><span class="delimiter">'</span></span>)
+}
+
+shadowJar {
+   dependencies {
+       exclude(project(<span class="string"><span class="delimiter">'</span><span class="content">:client</span><span class="delimiter">'</span></span>))
+   }
+}</code></pre>
 </div>
 </div>
 <div class="sidebarblock">
@@ -991,15 +991,15 @@ using any of these individual fields.</p>
 <div class="listingblock">
 <div class="title">Exclude Any Version of a Dependency</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|dependencies {
-|   compile <span class="string"><span class="delimiter">'</span><span class="content">shadow:d:1.0</span><span class="delimiter">'</span></span>
-|}
-|
-|shadowJar {
-|   dependencies {
-|      exclude(dependency(<span class="string"><span class="delimiter">'</span><span class="content">shadow:d:.*</span><span class="delimiter">'</span></span>))
-|   }
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+   compile <span class="string"><span class="delimiter">'</span><span class="content">shadow:d:1.0</span><span class="delimiter">'</span></span>
+}
+
+shadowJar {
+   dependencies {
+      exclude(dependency(<span class="string"><span class="delimiter">'</span><span class="content">shadow:d:.*</span><span class="delimiter">'</span></span>))
+   }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1052,13 +1052,13 @@ method that accepts a <code>Closure</code> for selecting dependencies.</p>
 <div class="listingblock">
 <div class="title">Selecting Dependencies to Filter With a Spec</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
-|   dependencies {
-|       exclude(dependency {
-|           <span class="local-variable">it</span>.moduleGroup == <span class="string"><span class="delimiter">'</span><span class="content">junit</span><span class="delimiter">'</span></span>
-|       })
-|   }
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+   dependencies {
+       exclude(dependency {
+           <span class="local-variable">it</span>.moduleGroup == <span class="string"><span class="delimiter">'</span><span class="content">junit</span><span class="delimiter">'</span></span>
+       })
+   }
+}</code></pre>
 </div>
 </div>
 </div>
@@ -1257,9 +1257,9 @@ Any non-class files that are stored within a package structure are also relocate
 <div class="listingblock">
 <div class="title">Relocating a Package</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
-|   relocate <span class="string"><span class="delimiter">'</span><span class="content">junit.framework</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">shadow.junit</span><span class="delimiter">'</span></span>
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+   relocate <span class="string"><span class="delimiter">'</span><span class="content">junit.framework</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">shadow.junit</span><span class="delimiter">'</span></span>
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1294,14 +1294,14 @@ Be specific as possible when configuring relocation as to avoid unintended reloc
 <div class="listingblock">
 <div class="title">Configuring Filtering for Relocation</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">|shadowJar {
-|   relocate(<span class="string"><span class="delimiter">'</span><span class="content">junit.textui</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">a</span><span class="delimiter">'</span></span>) {
-|       exclude <span class="string"><span class="delimiter">'</span><span class="content">junit.textui.TestRunner</span><span class="delimiter">'</span></span>
-|   }
-|   relocate(<span class="string"><span class="delimiter">'</span><span class="content">junit.framework</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>) {
-|       include <span class="string"><span class="delimiter">'</span><span class="content">junit.framework.Test*</span><span class="delimiter">'</span></span>
-|   }
-|}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+   relocate(<span class="string"><span class="delimiter">'</span><span class="content">junit.textui</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">a</span><span class="delimiter">'</span></span>) {
+       exclude <span class="string"><span class="delimiter">'</span><span class="content">junit.textui.TestRunner</span><span class="delimiter">'</span></span>
+   }
+   relocate(<span class="string"><span class="delimiter">'</span><span class="content">junit.framework</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">b</span><span class="delimiter">'</span></span>) {
+       include <span class="string"><span class="delimiter">'</span><span class="content">junit.framework.Test*</span><span class="delimiter">'</span></span>
+   }
+}</code></pre>
 </div>
 </div>
 </div>
@@ -1760,7 +1760,7 @@ must be explicitly configured via a spec.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.2.3<br>
-Last updated 2016-06-09 14:26:15 +00:00
+Last updated 2016-06-09 15:32:38 +00:00
 </div>
 </div>
 </body>
