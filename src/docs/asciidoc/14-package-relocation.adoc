@@ -1,1 +1,46 @@
 === Relocating Packages
+
+Shade is capable of scanning a project's classes and relocating specific dependencies to a new location.
+This is often required when one of the dependencies is susceptible to breaking changes in versions or
+to classpath pollution in a downstream project.
+
+****
+Google's Guave and the ASM library are typical cases where package relocation can come in handy.
+****
+
+Shadow uses the ASM library to modify class byte code to replace the package name and any import
+statements for a class.
+Any non-class files that are stored within a package structure are also relocated to the new location.
+
+.Relocating a Package
+[source,groovy.indent=0]
+----
+include::{tests}/RelocationSpec.groovy[tags=relocate;relocate2]
+----
+
+The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`.
+For example, the class `junit.textui.TestRunner` becomes `shadow.junit.TestRunner`.
+In the resulting JAR, the class file is relocated from `junit/textui/TestRunner.class` to
+`shadow/junit/TestRunner.class`.
+
+****
+**NOTE**: Relocation operates at a package level.
+It is not necessary to specify any patterns for matching, it will operate simply on the prefix
+provided.
+****
+
+****
+**NOTE2**: Relocation will be applied globally to all instance of the matched prefix.
+That is, it does **not** scope to __only__ the dependencies being shadowed.
+Be specific as possible when configuring relocation as to avoid unintended relocations.
+****
+
+==== Filtering Relocation
+
+Specific classes or files can be `included`/`excluded` from the relocation operation if necessary.
+
+.Configuring Filtering for Relocation
+[source,groovy.indent=0]
+----
+include::{tests}/RelocationSpec.groovy[tags=relocateFilter;relocateFilter2]
+----

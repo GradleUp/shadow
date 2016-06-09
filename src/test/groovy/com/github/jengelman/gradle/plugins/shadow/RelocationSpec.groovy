@@ -93,9 +93,12 @@ class RelocationSpec extends PluginSpecification {
             |   compile 'junit:junit:3.8.2'
             |}
             |
+            |// tag::relocateFilter[]
             |shadowJar {
+            |// end::relocateFilter[]
             |   baseName = 'shadow'
             |   classifier = null
+            |// tag::relocateFilter2[]
             |   relocate('junit.textui', 'a') {
             |       exclude 'junit.textui.TestRunner'
             |   }
@@ -103,6 +106,7 @@ class RelocationSpec extends PluginSpecification {
             |       include 'junit.framework.Test*'
             |   }
             |}
+            |// end::relocateFilter2[]
         """.stripMargin()
 
         when:
@@ -155,11 +159,15 @@ class RelocationSpec extends PluginSpecification {
             |   compile 'junit:junit:3.8.2'
             |}
             |
+            |// tag::relocate[]
             |shadowJar {
+            |// end::relocate[]
             |   baseName = 'shadow'
             |   classifier = null
+            |// tag::relocate2[]
             |   relocate 'junit.framework', 'shadow.junit'
             |}
+            |// end::relocate2[]
         """.stripMargin()
 
         file('src/main/java/shadow/ShadowTest.java') << '''
