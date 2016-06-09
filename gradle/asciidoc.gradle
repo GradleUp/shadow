@@ -30,6 +30,7 @@ asciidoctor {
             into 'api'
         }
     }
+    inputs.files project.sourceSets.test.allSource
 }
 
 project.tasks.asciidoctor.dependsOn project.tasks.groovydoc
