@@ -538,6 +538,10 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#controlling_jar_content_merging">2.7. Controlling JAR Content Merging</a></li>
 </ul>
 </li>
+<li><a href="#creating_a_custom_shadowjar_task">3. Creating a Custom ShadowJar Task</a></li>
+<li><a href="#integrating_with_application_plugin">4. Integrating with Application Plugin</a></li>
+<li><a href="#publishing_shadow_jars">5. Publishing Shadow JARs</a></li>
+<li><a href="#change_log">6. Change Log</a></li>
 </ul>
 </div>
 </div>
@@ -1210,173 +1214,317 @@ It must be added using the link:api/com/github/jengelman/gradle/plugins/shadow/t
   tranform(XmlAppendingTransformer.class) {
     resource = <span class="string"><span class="delimiter">'</span><span class="content">properties.xml</span><span class="delimiter">'</span></span>
   }
-}
-
-
-== Creating a Custom ShadowJar Task
-
-[source,groovy,indent=<span class="integer">0</span>]</code></pre>
+}</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>task testJar(type: ShadowJar) {
-  classifier = 'tests'
-  from sourceSets.test.output
-}</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating_a_custom_shadowjar_task">3. Creating a Custom ShadowJar Task</h2>
+<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre>== Integrating with Application Plugin
-
-== Publishing Shadow JARs
-
-Publishing shadow jars
-relying on shadow jar dependency from another project
-
-== Change Log
-
-[discrete]
-=== v1.2.3
-
-* Support for Gradle 2.11-rc-1 (https://github.com/johnrengelman/shadow/issues/177[Issue #177])
-* Convert internal framework to https://docs.gradle.org/current/userguide/test_kit.html[Gradle TestKit]
-* https://github.com/fkorotkov[Fedor Korotkov] - Use BufferedOutputStream when writing the Zip file (https://github.com/johnrengelman/shadow/pull/171[PR #171])
-* https://github.com/hbchai[Haw-Bin Chai] - Quote Jar path in Windows start script as it may contain spaces (https://github.com/johnrengelman/shadow/pull/170[PR #170])
-* https://github.com/siordache[Serban Iordache] - Evaluate relocation specs when merging service descriptors (https://github.com/johnrengelman/shadow/pull/165[PR #165])
-
-[discrete]
-=== v1.2.2
-
-* https://github.com/Minecrell[Minecrell] - Gradle 2.5 compatibility (https://github.com/johnrengelman/shadow/issues/147[Issue #147])
-
-[discrete]
-=== v1.2.1
-
-* Apply package relocations to dependency resources (https://github.com/johnrengelman/shadow/issues/114[Issue #114])
-
-[discrete]
-=== v1.2.0
-
-* Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the `org.apache.tools.zip` package.
-* Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from `jdom:jdom:1.1` to `org.jdom:jdom2:2.0.5`) (https://github.com/johnrengelman/shadow/issues/98[Issue #98])
-* Convert ShadowJar.groovy to ShadowJar.java to workaround binary incompatibility introduced by Gradle 2.2 ((https://github.com/johnrengelman/shadow/issues/106[Issue #106])
-* Updated ASM library to `5.0.3` to support JDK8 (https://github.com/johnrengelman/shadow/issues/97[Issue #97])
-* Allows for regex pattern matching in the `dependency` string when including/excluding (https://github.com/johnrengelman/shadow/issues/83[Issue #83])
-* Apply package relocations to resource files (https://github.com/johnrengelman/shadow/issues/93[Issue #93])
-
-[discrete]
-=== v1.1.2
-
-* fix bug in `runShadow` where dependencies from the `shadow` configuration are not available (https://github.com/johnrengelman/shadow/issues/94[Issue #94])
-
-[discrete]
-=== v1.1.1
-
-* Fix bug in `'createStartScripts'` task that was causing it to not execute `'shadowJar'` task (https://github.com/johnrengelman/shadow/issues/90[Issue #90])
-* Do not include `null` in ShadowJar Manifest `'Class-Path'` value when `jar` task does not specify a value for it. (https://github.com/johnrengelman/shadow/issues/92[Issue #92])
-* ShadowJar Manifest `'Class-Path'` should reference jars from `'shadow'` config as relative to location of `shadowJar` output (https://github.com/johnrengelman/shadow/issues/91[Issue #91])
-
-[discrete]
-=== v1.1.0
-
-* __**Breaking Change!**__ Fix leaking of `shadowJar.manifest` into `jar.manifest`. (https://github.com/johnrengelman/shadow/issues/82[Issue #82])
-  To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with `shadowJar.manifest`
-* `ShadowTask` now has a `configurations` property that is resolved to the files in the resolved configuration before
-  being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task
-  has the convention of adding the `'runtime'` scope to this list. Manually created instances of `ShadowTask` have no
-  configurations added by default and can be configured by setting `task.configurations`.
-* Properly configure integration with the `'maven'` plugin when added. When adding `'maven'` the `'uploadShadow'` task
-  will now properly configure the POM dependencies by removing the `'compile'` and `'runtime'` configurations from the
-  POM and adding the `'shadow'` configuration as a `RUNTIME` scope in the POM. This behavior matches the behavior when
-  using the `'maven-publish'` plugin.
-* https://github.com/mhurne[Matt Hurne] - Allow `ServiceFileTransformer` to specify include/exclude patterns for
-  files within the configured path to merge.
-* https://github.com/mhurne[Matt Hurne] - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
-  descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default.
-* `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the `'application'` plugin (https://github.com/johnrengelman/shadow/issues/89[Issue #89])
-
-[discrete]
-=== v1.0.3
-
-* Make service files root path configurable for `ServiceFileTransformer` (https://github.com/johnrengelman/shadow/issues/72[Issue #72])
-* https://github.com/aalmiray[Andres Almiray] - Added PropertiesFileTransformer (https://github.com/johnrengelman/shadow/issues/73[Issue #73])
-* https://github.com/brandonkearby[Brandon Kearby] - Fixed StackOverflow when a cycle occurs in the resolved dependency graph (https://github.com/johnrengelman/shadow/pull/69[Issue #69])
-* Apply Transformers to project resources (https://github.com/johnrengelman/shadow/issues/70[Issue #70]), https://github.com/johnrengelman/shadow/issues/71[Issue #71])
-* Do not drop non-class files from dependencies when relocation is enabled. Thanks to https://github.com/Minecrell[Minecrell] for digging into this. (https://github.com/johnrengelman/shadow/issues/61[Issue #61])
-* Remove support for applying individual sub-plugins by Id (easier maintenance and cleaner presentation in Gradle Portal)
-
-[discrete]
-=== v1.0.2
-
-* Do not add an empty Class-Path attribute to the manifest when the `shadow` configuration contains no dependencies.
-* `runShadow` now registers `shadowJar` as an input. Previously, `runShadow` did not execute `shadowJar` and an error occurred.
-* Support Gradle 2.0 (https://github.com/johnrengelman/shadow/issues/66[Issue #66])
-* Do not override existing 'Class-Path' Manifest attribute settings from Jar configuration. Instead combine. (https://github.com/johnrengelman/shadow/issues/65[Issue #65])
-
-[discrete]
-=== v1.0.1
-
-* Fix issue where non-class files are dropped when using relocation (https://github.com/johnrengelman/shadow/issues/58[Issue #58])
-* Do not create a `/` directory inside the output jar.
-* Fix `runShadow` task to evaluate the `shadowJar.archiveFile` property at execution time. (https://github.com/johnrengelman/shadow/issues/60[Issue #60])
-
-[discrete]
-=== v1.0.0
-
-* Previously known as v0.9.0
-* All changes from 0.9.0-M1 to 0.9.0-M5
-* Properly configure the ShadowJar task inputs to observe the include/excludes from the `dependencies` block. This
-  allows UP-TO-DATE checking to work properly when changing the `dependencies` rules (https://github.com/johnrengelman/shadow/issues/54[Issue #54])
-* Apply relocation remappings to classes and imports in source project (https://github.com/johnrengelman/shadow/issues/55[Issue #55])
-* Do not create directories in jar for source of remapped class, created directories in jar for destination of remapped classes (https://github.com/johnrengelman/shadow/issues/53[Issue #53])
-
-[discrete]
-=== v0.9.0-M5
-
-* Add commons-io to compile classpath
-* Update asm library to 4.1
-
-[discrete]
-=== v0.9.0-M4
-
-* Break plugin into multiple sub-plugins. `ShadowBasePlugin` is always applied.
-  `ShadowJavaPlugin` and `ShadowApplicationPlugin` are applied in reaction to applying the `java` and `application`
-  plugins respectively.
-* Shadow does not applied `java` plugin automatically. `java` or `groovy` must be applied in conjunction with `shadow`.
-* Moved artifact filtering to `dependencies {}` block underneath `shadowJar`. This allows better include/exclude control
-  for dependencies.
-* Dependencies added to the `shadow` configuration are automatically added to the `Class-Path` attribute in the manifest
-  for `shadowJar`
-* Applying `application` plugin and settings `mainClassName` automatically configures the `Main-Class` attribute in
-  the manifest for `shadowJar`
-* `runShadow` now utilizes the output of the `shadowJar` and executes using `java -jar &lt;shadow jar file&gt;`
-* Start Scripts for shadow distribution now utilize `java -jar` to execute instead of placing all files on classpath
-  and executing main class.
-* Excluding/Including dependencies no longer includes transitive dependencies. All dependencies for inclusion/exclusion
-  must be explicitly configured via a spec.
-
-[discrete]
-=== v0.9.0-M3
-
-* Use commons.io FilenameUtils to determine name of resolved jars for including/excluding
-
-[discrete]
-=== v0.9.0-M2
-
-* Added integration with `application` plugin to replace old `OutputSignedJars` task
-* Fixed bug that resulted in duplicate file entries in the resulting Jar
-* Changed plugin id to 'com.github.johnrengelman.shadow' to support Gradle 2.x plugin infrastructure.
-
-[discrete]
-=== v0.9.0-M1
-
-* Rewrite based on Gradle Jar Task
-* `ShadowJar` now extends `Jar`
-* Removed `signedCompile` and `signedRuntime` configurations in favor of `shadow` configuration
-* Removed `OutputSignedJars` task</pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">task testJar(<span class="key">type</span>: ShadowJar) {
+  classifier = <span class="string"><span class="delimiter">'</span><span class="content">tests</span><span class="delimiter">'</span></span>
+  from sourceSets.test.output
+}</code></pre>
 </div>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="integrating_with_application_plugin">4. Integrating with Application Plugin</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="publishing_shadow_jars">5. Publishing Shadow JARs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Publishing shadow jars
+relying on shadow jar dependency from another project</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="change_log">6. Change Log</h2>
+<div class="sectionbody">
+<h3 id="v1_2_3" class="discrete">v1.2.3</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Support for Gradle 2.11-rc-1 (<a href="https://github.com/johnrengelman/shadow/issues/177">Issue #177</a>)</p>
+</li>
+<li>
+<p>Convert internal framework to <a href="https://docs.gradle.org/current/userguide/test_kit.html">Gradle TestKit</a></p>
+</li>
+<li>
+<p><a href="https://github.com/fkorotkov">Fedor Korotkov</a> - Use BufferedOutputStream when writing the Zip file (<a href="https://github.com/johnrengelman/shadow/pull/171">PR #171</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/hbchai">Haw-Bin Chai</a> - Quote Jar path in Windows start script as it may contain spaces (<a href="https://github.com/johnrengelman/shadow/pull/170">PR #170</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/siordache">Serban Iordache</a> - Evaluate relocation specs when merging service descriptors (<a href="https://github.com/johnrengelman/shadow/pull/165">PR #165</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_2_2" class="discrete">v1.2.2</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/Minecrell">Minecrell</a> - Gradle 2.5 compatibility (<a href="https://github.com/johnrengelman/shadow/issues/147">Issue #147</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_2_1" class="discrete">v1.2.1</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Apply package relocations to dependency resources (<a href="https://github.com/johnrengelman/shadow/issues/114">Issue #114</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_2_0" class="discrete">v1.2.0</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the <code>org.apache.tools.zip</code> package.</p>
+</li>
+<li>
+<p>Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from <code>jdom:jdom:1.1</code> to <code>org.jdom:jdom2:2.0.5</code>) (<a href="https://github.com/johnrengelman/shadow/issues/98">Issue #98</a>)</p>
+</li>
+<li>
+<p>Convert ShadowJar.groovy to ShadowJar.java to workaround binary incompatibility introduced by Gradle 2.2 ((<a href="https://github.com/johnrengelman/shadow/issues/106">Issue #106</a>)</p>
+</li>
+<li>
+<p>Updated ASM library to <code>5.0.3</code> to support JDK8 (<a href="https://github.com/johnrengelman/shadow/issues/97">Issue #97</a>)</p>
+</li>
+<li>
+<p>Allows for regex pattern matching in the <code>dependency</code> string when including/excluding (<a href="https://github.com/johnrengelman/shadow/issues/83">Issue #83</a>)</p>
+</li>
+<li>
+<p>Apply package relocations to resource files (<a href="https://github.com/johnrengelman/shadow/issues/93">Issue #93</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_1_2" class="discrete">v1.1.2</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>fix bug in <code>runShadow</code> where dependencies from the <code>shadow</code> configuration are not available (<a href="https://github.com/johnrengelman/shadow/issues/94">Issue #94</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_1_1" class="discrete">v1.1.1</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix bug in <code>'createStartScripts'</code> task that was causing it to not execute <code>'shadowJar'</code> task (<a href="https://github.com/johnrengelman/shadow/issues/90">Issue #90</a>)</p>
+</li>
+<li>
+<p>Do not include <code>null</code> in ShadowJar Manifest <code>'Class-Path'</code> value when <code>jar</code> task does not specify a value for it. (<a href="https://github.com/johnrengelman/shadow/issues/92">Issue #92</a>)</p>
+</li>
+<li>
+<p>ShadowJar Manifest <code>'Class-Path'</code> should reference jars from <code>'shadow'</code> config as relative to location of <code>shadowJar</code> output (<a href="https://github.com/johnrengelman/shadow/issues/91">Issue #91</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_1_0" class="discrete">v1.1.0</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><em><strong>Breaking Change!</strong></em> Fix leaking of <code>shadowJar.manifest</code> into <code>jar.manifest</code>. (<a href="https://github.com/johnrengelman/shadow/issues/82">Issue #82</a>)
+To simplify behavior, the <code>shadowJar.appendManifest</code> method has been removed. Replace uses with <code>shadowJar.manifest</code></p>
+</li>
+<li>
+<p><code>ShadowTask</code> now has a <code>configurations</code> property that is resolved to the files in the resolved configuration before
+being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task
+has the convention of adding the <code>'runtime'</code> scope to this list. Manually created instances of <code>ShadowTask</code> have no
+configurations added by default and can be configured by setting <code>task.configurations</code>.</p>
+</li>
+<li>
+<p>Properly configure integration with the <code>'maven'</code> plugin when added. When adding <code>'maven'</code> the <code>'uploadShadow'</code> task
+will now properly configure the POM dependencies by removing the <code>'compile'</code> and <code>'runtime'</code> configurations from the
+POM and adding the <code>'shadow'</code> configuration as a <code>RUNTIME</code> scope in the POM. This behavior matches the behavior when
+using the <code>'maven-publish'</code> plugin.</p>
+</li>
+<li>
+<p><a href="https://github.com/mhurne">Matt Hurne</a> - Allow <code>ServiceFileTransformer</code> to specify include/exclude patterns for
+files within the configured path to merge.</p>
+</li>
+<li>
+<p><a href="https://github.com/mhurne">Matt Hurne</a> - Added <code>GroovyExtensionModuleTransformer</code> for merging Groovy Extension module
+descriptor files. The existing <code>ServiceFileTransformer</code> now excludes Groovy Extension Module descriptors by default.</p>
+</li>
+<li>
+<p><code>distShadowZip</code> and <code>distShadowZip</code> now contain the shadow library and run scripts instead of the default from the <code>'application'</code> plugin (<a href="https://github.com/johnrengelman/shadow/issues/89">Issue #89</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_0_3" class="discrete">v1.0.3</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Make service files root path configurable for <code>ServiceFileTransformer</code> (<a href="https://github.com/johnrengelman/shadow/issues/72">Issue #72</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/aalmiray">Andres Almiray</a> - Added PropertiesFileTransformer (<a href="https://github.com/johnrengelman/shadow/issues/73">Issue #73</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/brandonkearby">Brandon Kearby</a> - Fixed StackOverflow when a cycle occurs in the resolved dependency graph (<a href="https://github.com/johnrengelman/shadow/pull/69">Issue #69</a>)</p>
+</li>
+<li>
+<p>Apply Transformers to project resources (<a href="https://github.com/johnrengelman/shadow/issues/70">Issue #70</a>), <a href="https://github.com/johnrengelman/shadow/issues/71">Issue #71</a>)</p>
+</li>
+<li>
+<p>Do not drop non-class files from dependencies when relocation is enabled. Thanks to <a href="https://github.com/Minecrell">Minecrell</a> for digging into this. (<a href="https://github.com/johnrengelman/shadow/issues/61">Issue #61</a>)</p>
+</li>
+<li>
+<p>Remove support for applying individual sub-plugins by Id (easier maintenance and cleaner presentation in Gradle Portal)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_0_2" class="discrete">v1.0.2</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Do not add an empty Class-Path attribute to the manifest when the <code>shadow</code> configuration contains no dependencies.</p>
+</li>
+<li>
+<p><code>runShadow</code> now registers <code>shadowJar</code> as an input. Previously, <code>runShadow</code> did not execute <code>shadowJar</code> and an error occurred.</p>
+</li>
+<li>
+<p>Support Gradle 2.0 (<a href="https://github.com/johnrengelman/shadow/issues/66">Issue #66</a>)</p>
+</li>
+<li>
+<p>Do not override existing 'Class-Path' Manifest attribute settings from Jar configuration. Instead combine. (<a href="https://github.com/johnrengelman/shadow/issues/65">Issue #65</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_0_1" class="discrete">v1.0.1</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix issue where non-class files are dropped when using relocation (<a href="https://github.com/johnrengelman/shadow/issues/58">Issue #58</a>)</p>
+</li>
+<li>
+<p>Do not create a <code>/</code> directory inside the output jar.</p>
+</li>
+<li>
+<p>Fix <code>runShadow</code> task to evaluate the <code>shadowJar.archiveFile</code> property at execution time. (<a href="https://github.com/johnrengelman/shadow/issues/60">Issue #60</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_0_0" class="discrete">v1.0.0</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Previously known as v0.9.0</p>
+</li>
+<li>
+<p>All changes from 0.9.0-M1 to 0.9.0-M5</p>
+</li>
+<li>
+<p>Properly configure the ShadowJar task inputs to observe the include/excludes from the <code>dependencies</code> block. This
+allows UP-TO-DATE checking to work properly when changing the <code>dependencies</code> rules (<a href="https://github.com/johnrengelman/shadow/issues/54">Issue #54</a>)</p>
+</li>
+<li>
+<p>Apply relocation remappings to classes and imports in source project (<a href="https://github.com/johnrengelman/shadow/issues/55">Issue #55</a>)</p>
+</li>
+<li>
+<p>Do not create directories in jar for source of remapped class, created directories in jar for destination of remapped classes (<a href="https://github.com/johnrengelman/shadow/issues/53">Issue #53</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v0_9_0_m5" class="discrete">v0.9.0-M5</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Add commons-io to compile classpath</p>
+</li>
+<li>
+<p>Update asm library to 4.1</p>
+</li>
+</ul>
+</div>
+<h3 id="v0_9_0_m4" class="discrete">v0.9.0-M4</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Break plugin into multiple sub-plugins. <code>ShadowBasePlugin</code> is always applied.
+<code>ShadowJavaPlugin</code> and <code>ShadowApplicationPlugin</code> are applied in reaction to applying the <code>java</code> and <code>application</code>
+plugins respectively.</p>
+</li>
+<li>
+<p>Shadow does not applied <code>java</code> plugin automatically. <code>java</code> or <code>groovy</code> must be applied in conjunction with <code>shadow</code>.</p>
+</li>
+<li>
+<p>Moved artifact filtering to <code>dependencies {}</code> block underneath <code>shadowJar</code>. This allows better include/exclude control
+for dependencies.</p>
+</li>
+<li>
+<p>Dependencies added to the <code>shadow</code> configuration are automatically added to the <code>Class-Path</code> attribute in the manifest
+for <code>shadowJar</code></p>
+</li>
+<li>
+<p>Applying <code>application</code> plugin and settings <code>mainClassName</code> automatically configures the <code>Main-Class</code> attribute in
+the manifest for <code>shadowJar</code></p>
+</li>
+<li>
+<p><code>runShadow</code> now utilizes the output of the <code>shadowJar</code> and executes using <code>java -jar &lt;shadow jar file&gt;</code></p>
+</li>
+<li>
+<p>Start Scripts for shadow distribution now utilize <code>java -jar</code> to execute instead of placing all files on classpath
+and executing main class.</p>
+</li>
+<li>
+<p>Excluding/Including dependencies no longer includes transitive dependencies. All dependencies for inclusion/exclusion
+must be explicitly configured via a spec.</p>
+</li>
+</ul>
+</div>
+<h3 id="v0_9_0_m3" class="discrete">v0.9.0-M3</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Use commons.io FilenameUtils to determine name of resolved jars for including/excluding</p>
+</li>
+</ul>
+</div>
+<h3 id="v0_9_0_m2" class="discrete">v0.9.0-M2</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Added integration with <code>application</code> plugin to replace old <code>OutputSignedJars</code> task</p>
+</li>
+<li>
+<p>Fixed bug that resulted in duplicate file entries in the resulting Jar</p>
+</li>
+<li>
+<p>Changed plugin id to 'com.github.johnrengelman.shadow' to support Gradle 2.x plugin infrastructure.</p>
+</li>
+</ul>
+</div>
+<h3 id="v0_9_0_m1" class="discrete">v0.9.0-M1</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Rewrite based on Gradle Jar Task</p>
+</li>
+<li>
+<p><code>ShadowJar</code> now extends <code>Jar</code></p>
+</li>
+<li>
+<p>Removed <code>signedCompile</code> and <code>signedRuntime</code> configurations in favor of <code>shadow</code> configuration</p>
+</li>
+<li>
+<p>Removed <code>OutputSignedJars</code> task</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
