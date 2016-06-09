@@ -540,15 +540,24 @@ table.CodeRay td.code>pre{padding:0}
 </ul>
 </li>
 <li><a href="#creating_a_custom_shadowjar_task">3. Creating a Custom ShadowJar Task</a></li>
-<li><a href="#integrating_with_application_plugin">4. Integrating with Application Plugin</a></li>
+<li><a href="#integrating_with_application_plugin">4. Integrating with Application Plugin</a>
+<ul class="sectlevel2">
+<li><a href="#running_the_shadow_jar">4.1. Running the Shadow JAR</a></li>
+<li><a href="#distributing_the_shadow_jar">4.2. Distributing the Shadow JAR</a></li>
+</ul>
+</li>
 <li><a href="#publishing_shadow_jars">5. Publishing Shadow JARs</a>
 <ul class="sectlevel2">
 <li><a href="#publishing_with_maven_publish_plugin">5.1. Publishing with Maven-Publish Plugin</a></li>
 <li><a href="#publishing_with_maven_plugin">5.2. Publishing with Maven Plugin</a></li>
-<li><a href="#depending_on_the_shadow_jar_from_another_project">5.3. Depending on the Shadow Jar from Another Project</a></li>
 </ul>
 </li>
-<li><a href="#change_log">6. Change Log</a></li>
+<li><a href="#using_shadow_in_multi_project_builds">6. Using Shadow in Multi-Project Builds</a>
+<ul class="sectlevel2">
+<li><a href="#depending_on_the_shadow_jar_from_another_project">6.1. Depending on the Shadow Jar from Another Project</a></li>
+</ul>
+</li>
+<li><a href="#change_log">7. Change Log</a></li>
 </ul>
 </div>
 </div>
@@ -1228,7 +1237,74 @@ It must be added using the <a href="api/com/github/jengelman/gradle/plugins/shad
 </div>
 <div class="sect2">
 <h3 id="relocating_packages">2.8. Relocating Packages</h3>
-
+<div class="paragraph">
+<p>Shade is capable of scanning a project&#8217;s classes and relocating specific dependencies to a new location.
+This is often required when one of the dependencies is susceptible to breaking changes in versions or
+to classpath pollution in a downstream project.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>Google&#8217;s Guave and the ASM library are typical cases where package relocation can come in handy.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Shadow uses the ASM library to modify class byte code to replace the package name and any import
+statements for a class.
+Any non-class files that are stored within a package structure are also relocated to the new location.</p>
+</div>
+<div class="listingblock">
+<div class="title">Relocating a Package</div>
+<div class="content">
+<pre class="CodeRay highlight"><code>            |shadowJar {
+            |   relocate 'junit.framework', 'shadow.junit'
+            |}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The code snippet will rewrite the location for any class in the <code>junit.framework</code> to be <code>shadow.junit</code>.
+For example, the class <code>junit.textui.TestRunner</code> becomes <code>shadow.junit.TestRunner</code>.
+In the resulting JAR, the class file is relocated from <code>junit/textui/TestRunner.class</code> to
+<code>shadow/junit/TestRunner.class</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>NOTE</strong>: Relocation operates at a package level.
+It is not necessary to specify any patterns for matching, it will operate simply on the prefix
+provided.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>NOTE2</strong>: Relocation will be applied globally to all instance of the matched prefix.
+That is, it does <strong>not</strong> scope to <em>only</em> the dependencies being shadowed.
+Be specific as possible when configuring relocation as to avoid unintended relocations.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="filtering_relocation">2.8.1. Filtering Relocation</h4>
+<div class="paragraph">
+<p>Specific classes or files can be <code>included</code>/<code>excluded</code> from the relocation operation if necessary.</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuring Filtering for Relocation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code>            |shadowJar {
+            |   relocate('junit.textui', 'a') {
+            |       exclude 'junit.textui.TestRunner'
+            |   }
+            |   relocate('junit.framework', 'b') {
+            |       include 'junit.framework.Test*'
+            |   }
+            |}</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1261,7 +1337,57 @@ The file is output to <code>build/libs/&lt;project&gt;-&lt;version&gt;-tests.jar
 <div class="sect1">
 <h2 id="integrating_with_application_plugin">4. Integrating with Application Plugin</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Shadow reacts to the presence of Gradle&#8217;s
+<a href="https://docs.gradle.org/current/userguide/application_plugin.html"><code>application</code></a> plugin and will automatically
+configure additional tasks for running the shadowed JAR and creating distributions containing the shadowed JAR.</p>
+</div>
+<div class="paragraph">
+<p>Just like the normal <code>jar</code> task, when the <code>application</code> plugin is applied, the <code>shadowJar</code> manifest will be
+configured to contain the <code>Main-Class</code> attribute with the value specified in the project&#8217;s <code>mainClassName</code> atrribute.</p>
+</div>
+<div class="listingblock">
+<div class="title">Using Shadow with Application Plugin</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">application</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span>
 
+mainClassName = <span class="string"><span class="delimiter">'</span><span class="content">myapp.Main</span><span class="delimiter">'</span></span></code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running_the_shadow_jar">4.1. Running the Shadow JAR</h3>
+<div class="paragraph">
+<p>When applied along with the <code>application</code> plugin, the <code>runShadow</code> task will be created for starting
+the application from the shadowed JAR.
+The <code>runShadow</code> task is a <a href="https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html"><code>JavaExec</code></a>
+task that is configured to execute <code>java -jar myproject-all.jar</code>.
+It can be configured the same as any other <code>JavaExec</code> task.</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuring the runShadow Task</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">runShadow {
+  args <span class="string"><span class="delimiter">'</span><span class="content">foo</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="distributing_the_shadow_jar">4.2. Distributing the Shadow JAR</h3>
+<div class="paragraph">
+<p>The Shadow plugin will also configure distribution tasks when in the presence of the <code>application</code> plugin.
+The plugin will create <code>distShadowZip</code> and <code>distShadowTar</code> which creates Zip and Tar distributions
+respectively.
+Each distribution will contain the shadowed JAR file along with the necessary start scripts to launch
+the application.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, the plugin will create the <code>installShadowApp</code> and <code>startShadowScripts</code> tasks which stages the necessary
+files for a distribution to <code>build/installShadow</code>.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1269,20 +1395,90 @@ The file is output to <code>build/libs/&lt;project&gt;-&lt;version&gt;-tests.jar
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="publishing_with_maven_publish_plugin">5.1. Publishing with Maven-Publish Plugin</h3>
+<div class="paragraph">
+<p>The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle&#8217;s
+<code>maven-publish</code> plugin.
+THe plugin will create and configure a software component named <code>"shadow"</code> for use with the
+<code>publishing</code> block.</p>
+</div>
+<div class="listingblock">
+<div class="title">Publishing a Shadow JAR with the Maven-Publish Plugin</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">maven-publish</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span>
 
+publishing {
+  publications {
+    shadow(MavenPublication) {
+      from components.shadow
+    }
+  }
+  repositories {
+    maven {
+      url <span class="string"><span class="delimiter">&quot;</span><span class="content">http://repo.myorg.com</span><span class="delimiter">&quot;</span></span>
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="publishing_with_maven_plugin">5.2. Publishing with Maven Plugin</h3>
-
+<div class="paragraph">
+<p>The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle&#8217;s
+<code>maven</code> plugin.
+To publish the JAR, simply configure the publish location for the <code>uploadShadow</code> task and execute it.</p>
 </div>
-<div class="sect2">
-<h3 id="depending_on_the_shadow_jar_from_another_project">5.3. Depending on the Shadow Jar from Another Project</h3>
+<div class="listingblock">
+<div class="title">Publishing a Shadow JAR with the Maven Plugin</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">maven</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span>
 
+uploadShadow {
+  repositories {
+    mavenDeployer {
+      repository(<span class="key">url</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">http://repo.myorg.com</span><span class="delimiter">&quot;</span></span>)
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="change_log">6. Change Log</h2>
+<h2 id="using_shadow_in_multi_project_builds">6. Using Shadow in Multi-Project Builds</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When using Shadow in a multi-project build, project dependencies will be treated the same as
+external dependencies.
+That is a project dependency will be merged into the <code>shadowJar</code> output of the project that
+is applying the Shadow plugin.</p>
+</div>
+<div class="sect2">
+<h3 id="depending_on_the_shadow_jar_from_another_project">6.1. Depending on the Shadow Jar from Another Project</h3>
+<div class="paragraph">
+<p>In a multi-project build there may be one project that applies Shadow and another that
+requires the shadowed JAR as a dependency.
+In this case, use Gradle&#8217;s normal dependency declaration mechanism to depend on the <code>shadow</code>
+configuration of the shadowed project.</p>
+</div>
+<div class="listingblock">
+<div class="title">Depending On Shadow Output of Project</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+  compile project(<span class="key">path</span>: <span class="string"><span class="delimiter">'</span><span class="content">api</span><span class="delimiter">'</span></span>, <span class="key">configuration</span>: <span class="string"><span class="delimiter">'</span><span class="content">shadow</span><span class="delimiter">'</span></span>)
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="change_log">7. Change Log</h2>
 <div class="sectionbody">
 <h3 id="v1_2_3" class="discrete">v1.2.3</h3>
 <div class="ulist">
@@ -1564,7 +1760,7 @@ must be explicitly configured via a spec.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.2.3<br>
-Last updated 2016-06-09 11:24:23 +00:00
+Last updated 2016-06-09 14:26:15 +00:00
 </div>
 </div>
 </body>
