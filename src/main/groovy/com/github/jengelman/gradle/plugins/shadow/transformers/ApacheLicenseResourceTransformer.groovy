@@ -25,10 +25,9 @@ import org.gradle.api.file.FileTreeElement
 
 /**
  * Prevents duplicate copies of the license
- *
+ * <p>
  * Modified from org.apache.maven.plugins.shade.resouce.ApacheLicenseResourceTransformer.java
  *
- * Modifications
  * @author John Engelman
  */
 class ApacheLicenseResourceTransformer implements Transformer {

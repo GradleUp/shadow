@@ -28,10 +28,9 @@ import org.codehaus.plexus.util.IOUtil
 /**
  * A resource processor that allows the addition of an arbitrary file
  * content into the shaded JAR.
- *
+ * <p>
  * Modified from org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java
  *
- * Modifications
  * @author John Engelman
  */
 public class IncludeResourceTransformer implements Transformer {

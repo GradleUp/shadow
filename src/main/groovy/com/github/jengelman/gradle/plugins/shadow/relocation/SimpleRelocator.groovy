@@ -24,12 +24,10 @@ import org.codehaus.plexus.util.SelectorUtils
 import java.util.regex.Pattern
 
 /**
- * @author Jason van Zyl
- * @author Mauro Talevi
- *
  * Modified from org.apache.maven.plugins.shade.relocation.SimpleRelocator.java
  *
- * Modifications
+ * @author Jason van Zyl
+ * @author Mauro Talevi
  * @author John Engelman
  */
 class SimpleRelocator implements Relocator {

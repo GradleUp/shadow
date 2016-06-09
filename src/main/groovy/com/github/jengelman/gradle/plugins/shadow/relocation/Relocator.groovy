@@ -20,11 +20,9 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 /**
- * @author Jason van Zyl
- *
  * Modified from org.apache.maven.plugins.shade.relocation.Relocator.java
  *
- * Modifications
+ * @author Jason van Zyl
  * @author John Engelman
  */
 interface Relocator {

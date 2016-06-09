@@ -27,7 +27,7 @@ import org.codehaus.plexus.util.IOUtil
 
 /**
  * Modified from eu.appsatori.gradle.fatjar.tasks.PrepareFiles.groovy
- *
+ * <p>
  * Resource transformer that merges Groovy extension module descriptor files into a single file. If there are several
  * META-INF/services/org.codehaus.groovy.runtime.ExtensionModule resources spread across many JARs the individual
  * entries will all be merged into a single META-INF/services/org.codehaus.groovy.runtime.ExtensionModule resource

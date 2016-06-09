@@ -37,10 +37,9 @@ import org.xml.sax.SAXException
 
 /**
  * Appends multiple occurrences of some XML file.
- *
+ * <p>
  * Modified from org.apache.maven.plugins.shade.resource.XmlAppendingTransformer.java
  *
- * Modifications
  * @author John Engelman
  */
 class XmlAppendingTransformer implements Transformer {

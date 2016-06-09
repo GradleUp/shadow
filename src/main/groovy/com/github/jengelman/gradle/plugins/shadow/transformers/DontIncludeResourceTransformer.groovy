@@ -26,10 +26,9 @@ import org.gradle.api.file.FileTreeElement
 /**
  * A resource processor that prevents the inclusion of an arbitrary
  * resource into the shaded JAR.
- *
+ * <p>
  * Modified from org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer.java
  *
- * Modifications
  * @author John Engelman
  */
 class DontIncludeResourceTransformer implements Transformer {

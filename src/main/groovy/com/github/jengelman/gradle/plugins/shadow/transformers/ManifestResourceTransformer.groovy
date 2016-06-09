@@ -32,13 +32,9 @@ import java.util.jar.Attributes.Name
  * A resource processor that allows the arbitrary addition of attributes to
  * the first MANIFEST.MF that is found in the set of JARs being processed, or
  * to a newly created manifest for the shaded JAR.
- *
- * @author Jason van Zyl
- * @since 1.2
- *
+ * <p>
  * Modified from org.apache.maven.plugins.shade.resource.ManifestResourceTransformer
- *
- * Modifications
+ * @author Jason van Zyl
  * @author John Engelman
  */
 class ManifestResourceTransformer implements Transformer {

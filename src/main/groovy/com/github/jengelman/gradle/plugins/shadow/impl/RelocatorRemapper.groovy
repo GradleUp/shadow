@@ -29,7 +29,6 @@ import java.util.regex.Pattern
 /**
  * Modified from org.apache.maven.plugins.shade.DefaultShader.java#RelocatorRemapper
  *
- * Modifications
  * @author John Engelman
  */
 class RelocatorRemapper extends Remapper {

@@ -32,10 +32,9 @@ import org.codehaus.plexus.util.xml.Xpp3DomWriter
 
 /**
  * A resource processor that aggregates plexus <code>components.xml</code> files.
- *
+ * <p>
  * Modified from org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer.java
  *
- * Modifications
  * @author John Engelman
  */
 class ComponentsXmlResourceTransformer implements Transformer {

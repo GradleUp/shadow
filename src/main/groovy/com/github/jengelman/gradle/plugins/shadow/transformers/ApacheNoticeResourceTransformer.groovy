@@ -29,10 +29,9 @@ import java.text.SimpleDateFormat
 
 /**
  * Merges <code>META-INF/NOTICE.TXT</code> files.
+ * <p>
+ * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.java
  *
- * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.javA
- *
- * Modifications
  * @author John Engelman
  */
 class ApacheNoticeResourceTransformer implements Transformer {
