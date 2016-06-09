@@ -1,0 +1,7 @@
+com.github.jengelman.gradle.plugins.shadow
+com.github.jengelman.gradle.plugins.shadow.impl
+com.github.jengelman.gradle.plugins.shadow.internal
+com.github.jengelman.gradle.plugins.shadow.internal.gradle111
+com.github.jengelman.gradle.plugins.shadow.relocation
+com.github.jengelman.gradle.plugins.shadow.tasks
+com.github.jengelman.gradle.plugins.shadow.transformers
