@@ -9,7 +9,11 @@ githubPages {
 
     pages {
         from 'build/asciidoc/html5'
+        into('api') {
+            from project.tasks.groovydoc
+        }
     }
 }
 
 publishGhPages.dependsOn asciidoctor
+publishGhPages.dependsOn groovydoc

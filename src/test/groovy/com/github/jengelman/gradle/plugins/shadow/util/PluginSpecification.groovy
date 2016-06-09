@@ -24,6 +24,10 @@ class PluginSpecification extends Specification {
         repo.module('junit', 'junit', '3.8.2').use(testJar).publish()
 
         buildFile << defaultBuildScript
+
+        settingsFile << '''
+            rootProject.name = 'shadow'
+        '''
     }
 
     String getDefaultBuildScript() {

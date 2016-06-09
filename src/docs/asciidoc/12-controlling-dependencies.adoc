@@ -77,7 +77,7 @@ The above code snippet is functionally equivalent to the previous example.
 
 This same patten can be used for any of the dependency notation fields.
 
-.Ignore Dependency Group
+.Ignoring An Artifact Regardless of Group
 [source,groovy,indent=0]
 ----
 shadowJar {
@@ -87,7 +87,7 @@ shadowJar {
 }
 ----
 
-.Ignore Dependency Artifact
+.Excluding All Artifacts From Group
 [source,groovy,indent=0]
 ----
 shadowJar {
@@ -102,7 +102,7 @@ shadowJar {
 If more complex decisions are needed to select the dependencies to be included, the `dependencies` block provides a
 method that accepts a `Closure` for selecting dependencies.
 
-.Selecting Dependencies to Filter with Spec
+.Selecting Dependencies to Filter With a Spec
 [source,groovy,indent=0]
 ----
 include::{tests}/FilteringSpec.groovy[tags=excludeSpec;excludeSpec2]

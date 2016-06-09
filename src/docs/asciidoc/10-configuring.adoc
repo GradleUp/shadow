@@ -93,3 +93,5 @@ include::11-filtering-contents.adoc[]
 include::12-controlling-dependencies.adoc[]
 
 include::13-controlling-merging.adoc[]
+
+include::14-package-relocation.adoc[]

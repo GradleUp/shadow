@@ -64,5 +64,76 @@ This is due to these files having a different syntax than standard service descr
 Use the `mergeGroovyExtensionModules()` method to merge these files if your dependencies contain them.
 ****
 
-service files
-relocating
+===== Configuring the Location of Service Descriptor Files
+
+By default the `ServiceFileTransformer` is configured to merge files in `META-INF/services`.
+This directory can be overridden to merge descriptor files in a different location.
+
+.Merging Service Files in a Specific Directory
+[source,groovy,indent=0]
+----
+shadowJar {
+  mergeServiceFiles {
+    path = 'META-INF/custom'
+  }
+}
+----
+
+===== Excluding/Including Specific Service Descriptor Files From Merging
+
+The `ServiceFileTransformer` class supports specifying specific files to include or exclude from merging.
+
+.Excluding a Service Descriptor From Merging
+[source,groovy,indent=0]
+----
+shadowJar {
+  mergeServiceFiles {
+    exclude 'META-INF/services/com.acme.*'
+  }
+}
+----
+
+==== Merging Groovy Extension Modules
+
+Shadow provides a specific transformer for dealing with Groovy extension module files.
+This is due to their special syntax and how they need to be merged together.
+The `GroovyExtensionModuleTransformer` will handle these files.
+The `ShadowJar` task also provides a short syntax method to add this transformer.
+
+.Merging Groovy Extension Modules
+[source,groovy,indent=0]
+----
+shadowJar {
+  mergeGroovyExtensionModules()
+}
+----
+
+==== Appending Text Files
+
+Generic text files can be appended together using the `AppendingTransformer`.
+Each file is appended using new lines to separate content.
+The `ShadowJar` task provides a short syntax method of `append(String)` to configure this transformer.
+
+.Appending a Property File
+[source,groovy,indent=0]
+----
+shadowJar {
+  append 'test.properties'
+}
+----
+
+==== Appending XML Files
+
+XML files require a special transformer for merging.
+The `XmlAppendingTransformer` reads each XML document and merges each root element into a single document.
+There is no short syntax method for the `XmlAppendingTransformer`.
+It must be added using the `transform` methods.
+
+.Appending a XML File
+[source,groovy,indent=0]
+----
+shadowJar {
+  tranform(XmlAppendingTransformer.class) {
+    resource = 'properties.xml'
+  }
+}
