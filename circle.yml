@@ -10,3 +10,8 @@ dependencies:
 test:
   override:
     - ./gradlew check
+
+general:
+  branches:
+    ignore:
+      - gh-pages
