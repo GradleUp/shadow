@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
@@ -28,10 +27,13 @@ class TransformerSpec extends PluginSpecification {
                 .write()
 
         buildFile << """
+            import ${ServiceFileTransformer.name}
             shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-                transform(${ServiceFileTransformer.name}) {
+            }
+            shadowJar {
+                transform(ServiceFileTransformer) {
                     exclude 'META-INF/services/com.acme.*'
                 }
             }
@@ -65,10 +67,13 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
                     'two # NOTE: No newline terminates this line/file').write()
 
             buildFile << """
+            import ${ServiceFileTransformer.name}
             shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-                transform(${ServiceFileTransformer.name}) {
+            }
+            shadowJar {
+                transform(ServiceFileTransformer) {
                     path = 'META-INF/foo'
                 }
             }
@@ -106,6 +111,8 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
             shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
+            }
+            shadowJar {
                 mergeServiceFiles {
                     exclude 'META-INF/services/com.acme.*'
                 }
@@ -157,6 +164,8 @@ com.mysql.jdbc.Driver'''.stripIndent())
             shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
+            }
+            shadowJar {
                 mergeServiceFiles()
                 relocate('org.apache', 'myapache') {
                     exclude 'org.apache.axis.components.compiler.Jikes'
@@ -207,6 +216,8 @@ org.mortbay.log.Factory'''.stripIndent()
             shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
+            }
+            shadowJar {
                 mergeServiceFiles('META-INF/foo')
             }
         """.stripIndent()
@@ -272,10 +283,13 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
                 'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
+            import ${AppendingTransformer.name}
             shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-                transform(${AppendingTransformer.name}) {
+            }
+            shadowJar {
+                transform(AppendingTransformer) {
                     resource = 'test.properties'
                 }
             }
@@ -308,6 +322,8 @@ two # NOTE: No newline terminates this line/file
             shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
+            }
+            shadowJar {
                 append('test.properties')
             }
         """.stripIndent()
@@ -430,10 +446,15 @@ two # NOTE: No newline terminates this line/file
         ).write()
 
         buildFile << """
+            import ${XmlAppendingTransformer.name}
+
             shadowJar {
                from('${escapedPath(xml1)}')
                from('${escapedPath(xml2)}')
-               transform(${XmlAppendingTransformer.name}) {
+            }
+
+            shadowJar {
+               transform(XmlAppendingTransformer) {
                    resource = 'properties.xml'
                }
             }
@@ -594,10 +615,14 @@ extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
 staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
 
             buildFile << """
+                import ${GroovyExtensionModuleTransformer.name}
                 shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
-                    transform(${GroovyExtensionModuleTransformer.name})
+                }
+
+                shadowJar {
+                    transform(GroovyExtensionModuleTransformer)
                 }
             """.stripIndent()
 
@@ -637,6 +662,8 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
                 shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
+                }
+                shadowJar {
                     mergeGroovyExtensionModules()
                 }
             """.stripIndent()

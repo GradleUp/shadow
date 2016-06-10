@@ -277,8 +277,6 @@ class FilteringSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             ${defaultBuildScript}
-            apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
             dependencies { compile 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -290,12 +288,6 @@ class FilteringSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             ${defaultBuildScript}
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
-
-            version = "1.0"
 
             // tag::excludeProject[]
             dependencies {
@@ -339,8 +331,6 @@ class FilteringSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             ${defaultBuildScript}
-            apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
             dependencies { compile 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -352,13 +342,7 @@ class FilteringSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             ${defaultBuildScript}
-            apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
-            
-            repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(':client') }
-
-            version = "1.0"
 
             // tag::excludeSpec[]
             shadowJar {
