@@ -1,4 +1,4 @@
-Please check the (User Guide)[http://imperceptiblethoughts.com/shadow] before submitting "how do I _x_?" questions!
+Please check the (User Guide)[http://imperceptiblethoughts.com/shadow] before submitting "how do I do 'x'?" questions!
 
 ### Shadow Version
 
