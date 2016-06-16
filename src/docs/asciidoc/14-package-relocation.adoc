@@ -4,9 +4,10 @@ Shade is capable of scanning a project's classes and relocating specific depende
 This is often required when one of the dependencies is susceptible to breaking changes in versions or
 to classpath pollution in a downstream project.
 
-****
+[NOTE]
+====
 Google's Guave and the ASM library are typical cases where package relocation can come in handy.
-****
+====
 
 Shadow uses the ASM library to modify class byte code to replace the package name and any import
 statements for a class.
@@ -23,17 +24,19 @@ For example, the class `junit.textui.TestRunner` becomes `shadow.junit.TestRunne
 In the resulting JAR, the class file is relocated from `junit/textui/TestRunner.class` to
 `shadow/junit/TestRunner.class`.
 
-****
-**NOTE**: Relocation operates at a package level.
+[NOTE]
+====
+Relocation operates at a package level.
 It is not necessary to specify any patterns for matching, it will operate simply on the prefix
 provided.
-****
+====
 
-****
-**NOTE-2**: Relocation will be applied globally to all instance of the matched prefix.
+[NOTE]
+====
+Relocation will be applied globally to all instance of the matched prefix.
 That is, it does **not** scope to __only__ the dependencies being shadowed.
 Be specific as possible when configuring relocation as to avoid unintended relocations.
-****
+====
 
 ==== Filtering Relocation
 

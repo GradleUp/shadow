@@ -2,6 +2,9 @@
 :tests: {src}/test/groovy/com/github/jengelman/gradle/plugins/shadow
 :api: api/com/github/jengelman/gradle/plugins/shadow
 :docinfo1:
+ifdef::env-github[]
+:note-caption: :information-source:
+endif::[]
 
 = Shadow Plugin User Guide & Examples
 John Engelman - @johnrengelman
