@@ -24,7 +24,8 @@ asciidoctor {
             'source-highlighter': 'coderay',
             icons               : 'font',
             numbered            : '',
-            idprefix            : ''
+            idprefix            : '',
+            'docinfo1'          : 'true'
     resources {
         from project.tasks.groovydoc {
             into 'api'

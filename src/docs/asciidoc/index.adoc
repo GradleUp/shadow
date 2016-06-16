@@ -1,6 +1,7 @@
 :src: ../
 :tests: {src}/test/groovy/com/github/jengelman/gradle/plugins/shadow
 :api: api/com/github/jengelman/gradle/plugins/shadow
+:docinfo1:
 
 = Shadow Plugin User Guide & Examples
 John Engelman - @johnrengelman
