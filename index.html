@@ -1138,8 +1138,13 @@ By default, it will merge each copy of a file under <code>META-INF/services</cod
 <p>The above code snippet is a convenience syntax for calling
 <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#transform(Class&lt;? extends Transformer&gt;)"><code>transform(ServiceFileTransformer.class)</code></a>.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
 <p>Groovy Extension Module descriptor files (located at <code>META-INF/services/org.codehaus.groovy.runtime.ExtensionModule</code>)
 are ignored by the <a href="api/com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer.html"><code>ServiceFileTransformer</code></a>.
@@ -1147,7 +1152,9 @@ This is due to these files having a different syntax than standard service descr
 Use the <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#mergeGroovyExtensionModules()"><code>mergeGroovyExtensionModules()</code></a> method to merge
 these files if your dependencies contain them.</p>
 </div>
-</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="sect4">
 <h5 id="configuring_the_location_of_service_descriptor_files">Configuring the Location of Service Descriptor Files</h5>
@@ -1249,12 +1256,19 @@ It must be added using the <a href="api/com/github/jengelman/gradle/plugins/shad
 This is often required when one of the dependencies is susceptible to breaking changes in versions or
 to classpath pollution in a downstream project.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
 <p>Google&#8217;s Guave and the ASM library are typical cases where package relocation can come in handy.</p>
 </div>
-</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Shadow uses the ASM library to modify class byte code to replace the package name and any import
@@ -1275,23 +1289,37 @@ For example, the class <code>junit.textui.TestRunner</code> becomes <code>shadow
 In the resulting JAR, the class file is relocated from <code>junit/textui/TestRunner.class</code> to
 <code>shadow/junit/TestRunner.class</code>.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p><strong>NOTE</strong>: Relocation operates at a package level.
+<p>Relocation operates at a package level.
 It is not necessary to specify any patterns for matching, it will operate simply on the prefix
 provided.</p>
 </div>
+</td>
+</tr>
+</table>
 </div>
-</div>
-<div class="sidebarblock">
-<div class="content">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p><strong>NOTE-2</strong>: Relocation will be applied globally to all instance of the matched prefix.
+<p>Relocation will be applied globally to all instance of the matched prefix.
 That is, it does <strong>not</strong> scope to <em>only</em> the dependencies being shadowed.
 Be specific as possible when configuring relocation as to avoid unintended relocations.</p>
 </div>
-</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="sect3">
 <h4 id="filtering_relocation">2.8.1. Filtering Relocation</h4>
@@ -1835,7 +1863,7 @@ so Shadow was published there.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.2.3<br>
-Last updated 2016-06-16 15:24:59 +00:00
+Last updated 2016-06-16 19:56:28 +00:00
 </div>
 </div>
 <script>
