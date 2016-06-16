@@ -15,13 +15,14 @@ shadowJar {
 The above code sample would configure the `shadowJar` task to merge depdencies from only the `compile` configuration.
 This means any dependency declared in the `runtime` configuration would be **not** be included in the final JAR.
 
-****
+[NOTE]
+====
 Note the literal use of `project.configurations` when setting the `configurations` attribute of a
 link:{api}/tasks/ShadowJar.html[`ShadowJar`] task.
 This is **required**. It maybe be tempting to specify `configurations = [configurations.compile]` but this will not
 have the intended effect, as `configurations.compile` will try to delegate to the `configurations` property of the
 the link:{api}/tasks/ShadowJar.html[`ShadowJar`] task instead of the `project`
-****
+====
 
 === Filtering Dependencies
 
@@ -45,11 +46,12 @@ include::{tests}/FilteringSpec.groovy[tags=excludeDep]
 include::{tests}/FilteringSpec.groovy[tags=excludeProject]
 ----
 
-****
+[NOTE]
+====
 While not being able to filter entire transitive dependency graphs might seem like an oversight, it is necessary
 because it would not be possible to intelligently determine the build author's intended results when there is a
 common dependency between two 1st level dependencies when one is excluded and the other is not.
-****
+====
 
 ==== Using Regex Patterns to Filter Dependencies
 
