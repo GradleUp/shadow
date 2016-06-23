@@ -4,6 +4,7 @@
 === v1.3.0 (Unreleased)
 
 * Don't resolve dependency configurations during config phase (https://github.com/johnrengelman/shadow/issues/129[Issue #128])
+* Build plugin with Gradle 2.14
 
 [discrete]
 === v1.2.3
