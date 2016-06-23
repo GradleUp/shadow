@@ -5,11 +5,11 @@ machine:
 
 dependencies:
   override:
-    - ./gradlew installWrappers dependencies
+    - ./gradlew installWrappers dependencies -Dscan
 
 test:
   override:
-    - ./gradlew check
+    - ./gradlew check -Dscan
 
 general:
   branches:
