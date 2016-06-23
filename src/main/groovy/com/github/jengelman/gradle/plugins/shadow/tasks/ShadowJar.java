@@ -1,10 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks;
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats;
-import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter;
-import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
-import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil;
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor;
+import com.github.jengelman.gradle.plugins.shadow.internal.*;
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator;
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator;
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer;
@@ -19,7 +16,6 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
-import org.gradle.api.java.archives.Manifest;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
@@ -73,7 +69,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     @InputFiles @Optional
     public FileCollection getIncludedDependencies() {
-        return dependencyFilter.resolve(configurations);
+        return new DependencyFileCollection(dependencyFilter, configurations);
     }
 
     /**
