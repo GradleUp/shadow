@@ -1,6 +1,11 @@
 == Change Log
 
 [discrete]
+=== v1.3.0 (Unreleased)
+
+* Don't resolve dependency configurations during config phase (https://github.com/johnrengelman/shadow/issues/129[Issue #128])
+
+[discrete]
 === v1.2.3
 
 * Support for Gradle 2.11-rc-1 (https://github.com/johnrengelman/shadow/issues/177[Issue #177])
