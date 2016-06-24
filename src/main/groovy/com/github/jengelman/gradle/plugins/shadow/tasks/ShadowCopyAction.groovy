@@ -153,8 +153,7 @@ public class ShadowCopyAction implements CopyAction {
         }
 
         private boolean isArchive(FileCopyDetails fileDetails) {
-            return fileDetails.relativePath.pathString.endsWith('.jar') ||
-                    fileDetails.relativePath.pathString.endsWith('.zip')
+            return fileDetails.relativePath.pathString.endsWith('.jar')
         }
 
         private boolean recordVisit(RelativePath path) {
