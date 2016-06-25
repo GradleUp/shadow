@@ -302,8 +302,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
     def "exclude INDEX.LIST, *.SF, *.DSA, and *.RSA by default"() {
         given:
-        AppendableMavenFileRepository repo = repo()
-
         repo.module('shadow', 'a', '1.0')
                 .insertFile('a.properties', 'a')
                 .insertFile('META-INF/INDEX.LIST', 'JarIndex-Version: 1.0')
@@ -334,8 +332,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
     def "include runtime configuration by default"() {
         given:
-        AppendableMavenFileRepository repo = repo()
-
         repo.module('shadow', 'a', '1.0')
                 .insertFile('a.properties', 'a')
                 .publish()
@@ -361,10 +357,35 @@ class ShadowPluginSpec extends PluginSpecification {
         doesNotContain(output, ['b.properties'])
     }
 
+    def "doesn't include compileOnly configuration by default"() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .publish()
+
+        repo.module('shadow', 'b', '1.0')
+                .insertFile('b.properties', 'b')
+                .publish()
+
+        buildFile << """
+            dependencies {
+               runtime 'shadow:a:1.0'
+               compileOnly 'shadow:b:1.0'
+            }
+        """.stripIndent()
+
+        when:
+        runner.withArguments('shadowJar').build()
+
+        then:
+        contains(output, ['a.properties'])
+
+        and:
+        doesNotContain(output, ['b.properties'])
+    }
+
     def "default copying strategy"() {
         given:
-        AppendableMavenFileRepository repo = repo()
-
         repo.module('shadow', 'a', '1.0')
                 .insertFile('META-INF/MANIFEST.MF', 'MANIFEST A')
                 .publish()
