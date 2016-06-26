@@ -29,7 +29,7 @@ def pomConfig = {
 publishing {
     publications {
         plugin(MavenPublication) {
-            from components.java
+            from components.shadow
             artifact sourcesJar
             artifact javadocJar
 

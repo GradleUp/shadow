@@ -28,16 +28,16 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '1.0'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'groovy'
+    id 'project-report'
+    id 'idea'
 }
 
 buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'
     licenseAgree = 'yes'
 }
-
-apply plugin: 'groovy'
-apply plugin: 'idea'
-apply plugin: 'project-report'
 
 apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
@@ -51,8 +51,8 @@ repositories {
 
 dependencies {
 
-    compile localGroovy()
-    compile gradleApi()
+    shadow localGroovy()
+    shadow gradleApi()
     compile 'org.jdom:jdom2:2.0.5'
     compile 'org.ow2.asm:asm:5.0.3'
     compile 'org.ow2.asm:asm-commons:5.0.3'
@@ -82,6 +82,21 @@ test {
 jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
+}
+
+shadowJar {
+    classifier = ''
+    [
+            'org.codehaus.plexus',
+            'org.jdom',
+            'org.objectweb.asm'
+    ].each {
+        relocate it, "shadow.$it"
+    }
+}
+
+tasks.withType(AbstractCompile) {
+    classpath += project.configurations.shadow
 }
 
 idea {

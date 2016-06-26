@@ -2,6 +2,7 @@ def javaApiUrl = 'http://docs.oracle.com/javase/1.7.0/docs/api'
 def groovyApiUrl = 'http://groovy.codehaus.org/gapi/'
 
 tasks.withType(Javadoc) {
+    classpath += project.configurations.shadow
     options.links(javaApiUrl, groovyApiUrl)
     if (JavaVersion.current().java8Compatible) {
         options.addStringOption('Xdoclint:none', '-quiet')
