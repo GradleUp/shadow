@@ -6,7 +6,7 @@ to classpath pollution in a downstream project.
 
 [NOTE]
 ====
-Google's Guave and the ASM library are typical cases where package relocation can come in handy.
+Google's Guava and the ASM library are typical cases where package relocation can come in handy.
 ====
 
 Shadow uses the ASM library to modify class byte code to replace the package name and any import
