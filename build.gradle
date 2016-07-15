@@ -73,10 +73,10 @@ dependencies {
 
 test {
     dependsOn publishToMavenLocal
-    if (System.env.CI == 'true') {
-        testLogging.showStandardStreams = true
-    }
-    jvmArgs "-XX:MaxPermSize=256m"
+//    if (System.env.CI == 'true') {
+//        testLogging.showStandardStreams = true
+//    }
+    jvmArgs "-XX:MaxPermSize=1024m"
 }
 
 jar {
