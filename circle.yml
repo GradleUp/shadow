@@ -11,7 +11,7 @@ dependencies:
 
 test:
   override:
-    - ./gradlew check -Dscan -Dorg.gradle.daemon=false
+    - ./gradlew check -Dscan -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false
 
 general:
   branches:
