@@ -76,7 +76,6 @@ test {
     if (System.env.CI == 'true') {
         testLogging.showStandardStreams = true
     }
-    jvmArgs "-XX:MaxPermSize=1024m"
 }
 
 jar {
@@ -101,7 +100,6 @@ tasks.withType(AbstractCompile) {
 
 idea {
     project {
-        jdkName = '1.7'
         languageLevel = '1.6'
     }
 }

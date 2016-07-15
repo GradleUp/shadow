@@ -1,12 +1,3 @@
-//asciidoctorj {
-//    version = '1.5.2'
-//}
-//
-//asciidoctor {
-//    backends = ['html5','pdf']
-//    options doctype: 'book'
-//}
-
 apply plugin: 'org.asciidoctor.convert'
 
 asciidoctorj {
