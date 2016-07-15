@@ -16,6 +16,7 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
@@ -293,6 +294,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.relocators = relocators;
     }
 
+    @InputFiles @Optional
     public List<Configuration> getConfigurations() {
         return this.configurations;
     }
