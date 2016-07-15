@@ -16,7 +16,7 @@ Read the new [User Guide](http://imperceptiblethoughts.com/shadow)!
 
 | Gradle Version | Shadow Version |
 |----------------|----------------|
-| 2.14-rc-6      | 1.2.3          |
+| 2.14           | 1.2.3          |
 | 3.0-milestone-2| 1.2.3          |
 
 *NOTE*: Shadow is incompatible with Gradle `2.14-rc-1` due to binary incompatibilities in the release.
