@@ -1,7 +1,7 @@
 machine:
   environment:
     TERM: dumb
-    GRADLE_OPTS: -Xmx256m
+    GRADLE_OPTS: -Xmx1024m
 
 dependencies:
   override:
