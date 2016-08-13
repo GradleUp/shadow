@@ -89,7 +89,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         installTask.into { project.file("${project.buildDir}/installShadow/${pluginConvention.applicationName}") }
         installTask.doFirst {
             if (destinationDir.directory) {
-                if (!new File(destinationDir, 'libs').directory || !new File(destinationDir, 'bins').directory) {
+                if (!new File(destinationDir, 'libs').directory || !new File(destinationDir, 'bin').directory) {
                     throw new GradleException("The specified installation directory '${destinationDir}' is neither empty nor does it contain an installation for '${pluginConvention.applicationName}'.\n" +
                             "If you really want to install to this directory, delete it and run the install task again.\n" +
                             "Alternatively, choose a different installation directory."
