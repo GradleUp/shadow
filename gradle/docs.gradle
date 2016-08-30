@@ -19,4 +19,8 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+project.tasks.groovydoc {
+    classpath += project.configurations.shadow
+}
+
 build.dependsOn javadocJar, sourcesJar
