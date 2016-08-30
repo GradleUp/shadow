@@ -75,6 +75,8 @@ test {
     dependsOn publishToMavenLocal
     if (System.env.CI == 'true') {
         testLogging.showStandardStreams = true
+        minHeapSize "1g"
+        maxHeapSize "1g"
     }
 }
 
