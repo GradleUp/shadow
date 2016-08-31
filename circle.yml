@@ -7,11 +7,11 @@ machine:
 
 dependencies:
   override:
-    - ./gradlew installWrappers dependencies -Dscan -Dorg.gradle.daemon=false
+    - ./gradlew installWrappers dependencies -Dscan
 
 test:
   override:
-    - ./gradlew check -Dscan -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false
+    - ./gradlew check -Dscan
 
 general:
   branches:
