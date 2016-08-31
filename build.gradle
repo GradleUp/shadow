@@ -96,7 +96,7 @@ targetCompatibility = '1.6'
 
 task installWrappers << {
     WrapperExecutor wrapperExecutor = WrapperExecutor.forWrapperPropertiesFile(file('gradle/wrapper/gradle-wrapper.properties'), System.out)
-    ['1.12', '2.0', '2.5', '2.11', '2.12', '2.13', '2.14', '3.0-milestone-2'].each {
+    ['1.12', '2.0', '2.5', '2.11', '2.12', '2.13', '2.14', '3.0'].each {
         WrapperConfiguration config = wrapperExecutor.config
         config.setDistribution(new URI("https://services.gradle.org/distributions/gradle-$it-bin.zip"))
         Install install = new Install(new Logger(true), new Download(new Logger(true), "gradlew", it),
