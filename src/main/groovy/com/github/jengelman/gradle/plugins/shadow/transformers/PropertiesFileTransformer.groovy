@@ -24,6 +24,8 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.codehaus.plexus.util.IOUtil
 
+import static groovy.lang.Closure.IDENTITY
+
 /**
  * Resources transformer that merges Properties files.
  *
@@ -77,7 +79,8 @@ import org.codehaus.plexus.util.IOUtil
  *   <li>key3 = value3</li>
  * </ul>
  *
- * <p>There are two additional properties that can be set: <tt>paths</tt> and <tt>mappings</tt>.
+ * <p>There are three additional properties that can be set: <tt>paths</tt>, <tt>mappings</tt>,
+ * and <tt>keyTransformer</tt>.
  * The first contains a list of strings or regexes that will be used to determine if
  * a path should be transformed or not. The merge strategy and merge separator are
  * taken from the global settings.</p>
@@ -87,6 +90,10 @@ import org.codehaus.plexus.util.IOUtil
  * entries will be merged. <tt>mappings</tt> has precedence over <tt>paths</tt> if both
  * are defined.</p>
  *
+ * <p>If you need to transform keys in properties files, e.g. because they contain class
+ * names about to be relocated, you can set the <tt>keyTransformer</tt> property to a
+ * closure that receives the original key and returns the key name to be used.</p>
+ *
  * <p>Example:</p>
  * <pre>
  * import org.codehaus.griffon.gradle.shadow.transformers.*
@@ -95,11 +102,15 @@ import org.codehaus.plexus.util.IOUtil
  *         paths = [
  *             'META-INF/editors/java.beans.PropertyEditor'
  *         ]
+ *         keyTransformer = { key ->
+ *             key.replaceAll('^(orig\.package\..*)$', 'new.prefix.$1')
+ *         }
  *     }
  * }
  * </pre>
  *
  * @author Andres Almiray
+ * @author Marc Philipp
  */
 class PropertiesFileTransformer implements Transformer {
     private static final String PROPERTIES_SUFFIX = '.properties'
@@ -112,6 +123,7 @@ class PropertiesFileTransformer implements Transformer {
     Map<String, Map<String, String>> mappings = [:]
     String mergeStrategy = 'first' // latest, append
     String mergeSeparator = ','
+    Closure<String> keyTransformer = IDENTITY
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
@@ -132,13 +144,10 @@ class PropertiesFileTransformer implements Transformer {
     @Override
     void transform(TransformerContext context) {
         Properties props = propertiesEntries[context.path]
+        Properties incoming = loadAndTransformKeys(context.is)
         if (props == null) {
-            props = new Properties()
-            props.load(context.is)
-            propertiesEntries[context.path] = props
+            propertiesEntries[context.path] = incoming
         } else {
-            Properties incoming = new Properties()
-            incoming.load(context.is)
             incoming.each { key, value ->
                 if (props.containsKey(key)) {
                     switch (mergeStrategyFor(context.path).toLowerCase()) {
@@ -158,6 +167,22 @@ class PropertiesFileTransformer implements Transformer {
                 }
             }
         }
+    }
+
+    private Properties loadAndTransformKeys(InputStream is) {
+        Properties props = new Properties()
+        props.load(is)
+        return transformKeys(props)
+    }
+
+    private Properties transformKeys(Properties properties) {
+        if (keyTransformer == IDENTITY)
+            return properties
+        def result = new Properties()
+        properties.each { key, value ->
+            result.put(keyTransformer.call(key), value)
+        }
+        return result
     }
 
     private String mergeStrategyFor(String path) {

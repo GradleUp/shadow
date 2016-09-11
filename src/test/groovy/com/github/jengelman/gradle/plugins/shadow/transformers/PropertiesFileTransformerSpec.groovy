@@ -21,6 +21,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import spock.lang.Unroll
 
+import static groovy.lang.Closure.IDENTITY
+
 @Unroll
 class PropertiesFileTransformerSpec extends TransformerSpecSupport {
 
@@ -115,5 +117,29 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         'f.properties'   | ['f.properties': [mergeStrategy: 'append', mergeSeparator: ';']] | ['foo': 'foo'] | ['foo': 'bar'] || ['foo': 'foo;bar']
         'foo.properties' | ['.*.properties': [mergeStrategy: 'first']]                      | ['foo': 'foo'] | ['foo': 'bar'] || ['foo': 'foo']
         'foo.properties' | ['.*bar': [mergeStrategy: 'first']]                              | ['foo': 'foo'] | ['foo': 'bar'] || [:]
+    }
+
+    void appliesKeyTransformer() {
+        given:
+        def element = getFileElement(path)
+        Transformer transformer = new PropertiesFileTransformer()
+        transformer.keyTransformer = keyTransformer
+        transformer.mergeStrategy = 'append'
+
+        when:
+        if (transformer.canTransformResource(element)) {
+            transformer.transform(context(path, input1))
+            transformer.transform(context(path, input2))
+        }
+
+        then:
+        output == toMap(transformer.propertiesEntries[path])
+
+        where:
+        path             | keyTransformer                                | input1         | input2         || output
+        'foo.properties' | IDENTITY                                      | ['foo': 'bar'] | ['FOO': 'baz'] || ['foo': 'bar', 'FOO': 'baz']
+        'foo.properties' | { key -> key.toUpperCase() }                  | ['foo': 'bar'] | ['FOO': 'baz'] || ['FOO': 'bar,baz']
+        'foo.properties' | { key -> 'bar.' + key.toLowerCase() }         | ['foo': 'bar'] | ['FOO': 'baz'] || ['bar.foo': 'bar,baz']
+        'foo.properties' | { key -> key.replaceAll('^(foo)', 'bar.$1') } | ['foo': 'bar'] | ['FOO': 'baz'] || ['bar.foo': 'bar', 'FOO': 'baz']
     }
 }

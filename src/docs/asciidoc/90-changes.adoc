@@ -15,6 +15,7 @@
 * Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.
 * Replace `startShadowScripts` tasks with Gradle's built-in `CreateStartScripts` type.
 * Build with Gradle 3.1
+* https://github.com/marcphilipp[Marc Philipp] - Add `keyTransformer` property to `PropertiesFileTransformer`
 
 [discrete]
 === v1.2.4
