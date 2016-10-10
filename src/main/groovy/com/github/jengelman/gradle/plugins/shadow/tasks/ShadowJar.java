@@ -16,7 +16,6 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
@@ -36,6 +35,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private final ShadowStats shadowStats = new ShadowStats();
     private final GradleVersionUtil versionUtil;
 
+    private boolean zeroEntryTimestamps = false;
+
     public ShadowJar() {
         versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
@@ -54,7 +55,27 @@ public class ShadowJar extends Jar implements ShadowSpec {
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
-                transformers, relocators, getRootPatternSet(), shadowStats);
+                transformers, relocators, getRootPatternSet(), shadowStats, zeroEntryTimestamps);
+    }
+
+    /**
+     * Configure the shadow jar such that all timestamps on entries
+     * inside are fixed to Jan 1st 1980.
+     *
+     * Why would you want to do this? The timestamps usually are just set to the
+     * time the jar was built. However, those timestamps are repeated across every
+     * file inside the jar, which scatters byte-level changes throughout the
+     * shadow jar, which breaks any efforts to calculate efficient deltas between
+     * shadow jar builds (e.g. rsync). With static timestamps though, rsync just works.
+     *
+     * This is generally safe to turn on because nothing cares about
+     * internal timestamps, but it's off by default.
+     *
+     * @return this
+     */
+    public ShadowJar zeroEntryTimestamps() {
+        this.zeroEntryTimestamps = true;
+        return this;
     }
 
     protected ZipCompressor getInternalCompressor() {
@@ -276,6 +297,14 @@ public class ShadowJar extends Jar implements ShadowSpec {
         }
         relocators.add(relocator);
         return this;
+    }
+
+    public boolean isZeroEntryTimestamps() {
+        return zeroEntryTimestamps;
+    }
+
+    public void setZeroEntryTimestamps(boolean zeroEntryTimestamps) {
+        this.zeroEntryTimestamps = zeroEntryTimestamps;
     }
 
     public List<Transformer> getTransformers() {

@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
@@ -61,7 +62,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 .withArguments('--stacktrace')
                 .withProjectDir(dir.root)
                 .forwardOutput()
-                .withDebug(true)
+//                .withDebug(true)
                 .withTestKitDir(getTestKitDir())
 
 
@@ -482,6 +483,36 @@ class ShadowPluginSpec extends PluginSpecification {
         String classpath = attributes.getValue('Class-Path')
         assert classpath == 'junit-3.8.2.jar'
 
+    }
+
+    def 'zeroes zip entry timestamps if requested'() {
+        given:
+        file('src/main/java/shadow/Passed.java') << '''
+            package shadow;
+            public class Passed {}
+        '''.stripIndent()
+
+        buildFile << """
+            dependencies { compile 'junit:junit:3.8.2' }
+
+            // tag::rename[]
+            shadowJar {
+               baseName = 'shadow'
+               classifier = null
+               version = null
+
+               zeroEntryTimestamps()
+            }
+            // end::rename[]
+        """.stripIndent()
+
+        when:
+        runner.withArguments('-S', 'shadowJar').build()
+
+        then:
+        getZipEntries(output("shadow.jar")).each {
+            assert it.getTime() == ShadowCopyAction.DOS_TIMESTAMP_ZERO
+        }
     }
 
     private String escapedPath(File file) {

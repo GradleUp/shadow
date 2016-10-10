@@ -39,6 +39,10 @@ import java.util.zip.ZipException
 
 @Slf4j
 public class ShadowCopyAction implements CopyAction {
+    /**
+     * Jan 1st, 1980. The day the zip timestamps stood still.
+     */
+    public static final int DOS_TIMESTAMP_ZERO = 315558000000L
 
     private final File zipFile
     private final ZipCompressor compressor
@@ -47,11 +51,11 @@ public class ShadowCopyAction implements CopyAction {
     private final List<Relocator> relocators
     private final PatternSet patternSet
     private final ShadowStats stats
+    private final boolean zeroEntryTimestamps
 
     public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             List<Transformer> transformers, List<Relocator> relocators, PatternSet patternSet,
-                            ShadowStats stats) {
-
+                            ShadowStats stats, boolean zeroEntryTimestamps) {
         this.zipFile = zipFile
         this.compressor = compressor
         this.documentationRegistry = documentationRegistry
@@ -59,6 +63,7 @@ public class ShadowCopyAction implements CopyAction {
         this.relocators = relocators
         this.patternSet = patternSet
         this.stats = stats
+        this.zeroEntryTimestamps = zeroEntryTimestamps
     }
 
     @Override
@@ -170,7 +175,7 @@ public class ShadowCopyAction implements CopyAction {
                             ZipEntry archiveEntry = new ZipEntry(mappedPath)
                             archiveEntry.setTime(fileDetails.lastModified)
                             archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
-                            zipOutStr.putNextEntry(archiveEntry)
+                            putNextEntry(archiveEntry)
                             fileDetails.copyTo(zipOutStr)
                             zipOutStr.closeEntry()
                         } else {
@@ -209,7 +214,7 @@ public class ShadowCopyAction implements CopyAction {
 
         private void visitArchiveDirectory(RelativeArchivePath archiveDir) {
             if (recordVisit(archiveDir)) {
-                zipOutStr.putNextEntry(archiveDir.entry)
+                putNextEntry(archiveDir.entry)
                 zipOutStr.closeEntry()
             }
         }
@@ -277,7 +282,7 @@ public class ShadowCopyAction implements CopyAction {
 
             try {
                 // Now we put it back on so the class file is written out with the right extension.
-                zipOutStr.putNextEntry(new ZipEntry(mappedName + ".class"))
+                putNextEntry(new ZipEntry(mappedName + ".class"))
                 IOUtils.copyLarge(new ByteArrayInputStream(renamedClass), zipOutStr)
                 zipOutStr.closeEntry()
             } catch (ZipException e) {
@@ -289,7 +294,7 @@ public class ShadowCopyAction implements CopyAction {
             String mappedPath = remapper.map(archiveFile.entry.name)
             RelativeArchivePath mappedFile = new RelativeArchivePath(new ZipEntry(mappedPath), archiveFile.details)
             addParentDirectories(mappedFile)
-            zipOutStr.putNextEntry(mappedFile.entry)
+            putNextEntry(mappedFile.entry)
             IOUtils.copyLarge(archive.getInputStream(archiveFile.entry), zipOutStr)
             zipOutStr.closeEntry()
         }
@@ -301,7 +306,7 @@ public class ShadowCopyAction implements CopyAction {
                 ZipEntry archiveEntry = new ZipEntry(path)
                 archiveEntry.setTime(dirDetails.lastModified)
                 archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
-                zipOutStr.putNextEntry(archiveEntry)
+                putNextEntry(archiveEntry)
                 zipOutStr.closeEntry()
                 recordVisit(dirDetails.relativePath)
             } catch (Exception e) {
@@ -324,6 +329,13 @@ public class ShadowCopyAction implements CopyAction {
 
         private boolean isTransformable(FileTreeElement element) {
             return transformers.any { it.canTransformResource(element) }
+        }
+
+        // manually intercept `putNextEntry` to zero out timestamps if requested.
+        private void putNextEntry(ZipEntry entry) {
+            if (zeroEntryTimestamps)
+                entry.setTime(DOS_TIMESTAMP_ZERO)
+            zipOutStr.putNextEntry(entry)
         }
 
     }

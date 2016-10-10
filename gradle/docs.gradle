@@ -1,5 +1,5 @@
 def javaApiUrl = 'http://docs.oracle.com/javase/1.7.0/docs/api'
-def groovyApiUrl = 'http://groovy.codehaus.org/gapi/'
+def groovyApiUrl = 'http://groovy-lang.org/api.html'
 
 tasks.withType(Javadoc) {
     classpath += project.configurations.shadow
