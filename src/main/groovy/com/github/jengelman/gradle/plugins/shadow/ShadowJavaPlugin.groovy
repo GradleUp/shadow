@@ -66,12 +66,15 @@ class ShadowJavaPlugin implements Plugin<Project> {
     private void configureShadowUpload() {
         configurationActionContainer.add(new Action<Project>() {
             public void execute(Project project) {
+                if (!project.plugins.hasPlugin(MavenPlugin)) {
+                    return
+                }
                 Upload upload = project.tasks.withType(Upload).findByName(SHADOW_UPLOAD_TASK)
                 if (!upload) {
                     return
                 }
                 upload.configuration = project.configurations.shadow
-                MavenPom pom = upload.repositories.mavenDeployer.pom
+                MavenPom pom = upload.repositories.mavenDeployer().pom
                 pom.scopeMappings.mappings.remove(project.configurations.compile)
                 pom.scopeMappings.mappings.remove(project.configurations.runtime)
                 pom.scopeMappings.addMapping(MavenPlugin.RUNTIME_PRIORITY, project.configurations.shadow, Conf2ScopeMappingContainer.RUNTIME)
