@@ -241,17 +241,17 @@ public class ShadowCopyAction implements CopyAction {
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
                 addParentDirectories(new RelativeArchivePath(new ZipEntry(remapper.mapPath(file) + '.class'), null))
-                remapClass(archive.getInputStream(file.entry), file.pathString)
+                remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
             }
         }
 
         private void remapClass(FileCopyDetails fileCopyDetails) {
             if (FilenameUtils.getExtension(fileCopyDetails.name) == 'class') {
-                remapClass(fileCopyDetails.file.newInputStream(), fileCopyDetails.path)
+                remapClass(fileCopyDetails.file.newInputStream(), fileCopyDetails.path, fileCopyDetails.lastModified)
             }
         }
 
-        private void remapClass(InputStream classInputStream, String path) {
+        private void remapClass(InputStream classInputStream, String path, long lastModified) {
             InputStream is = classInputStream
             ClassReader cr = new ClassReader(is)
 
@@ -277,7 +277,9 @@ public class ShadowCopyAction implements CopyAction {
 
             try {
                 // Now we put it back on so the class file is written out with the right extension.
-                zipOutStr.putNextEntry(new ZipEntry(mappedName + ".class"))
+                ZipEntry archiveEntry = new ZipEntry(mappedName + ".class")
+                archiveEntry.setTime(lastModified)
+                zipOutStr.putNextEntry(archiveEntry)
                 IOUtils.copyLarge(new ByteArrayInputStream(renamedClass), zipOutStr)
                 zipOutStr.closeEntry()
             } catch (ZipException e) {
@@ -287,7 +289,9 @@ public class ShadowCopyAction implements CopyAction {
 
         private void copyArchiveEntry(RelativeArchivePath archiveFile, ZipFile archive) {
             String mappedPath = remapper.map(archiveFile.entry.name)
-            RelativeArchivePath mappedFile = new RelativeArchivePath(new ZipEntry(mappedPath), archiveFile.details)
+            ZipEntry entry = new ZipEntry(mappedPath)
+            entry.setTime(archiveFile.entry.time)
+            RelativeArchivePath mappedFile = new RelativeArchivePath(entry, archiveFile.details)
             addParentDirectories(mappedFile)
             zipOutStr.putNextEntry(mappedFile.entry)
             IOUtils.copyLarge(archive.getInputStream(archiveFile.entry), zipOutStr)
