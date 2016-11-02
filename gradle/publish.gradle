@@ -35,7 +35,7 @@ publishing {
 
             pom.withXml {
                 def root = asNode()
-                root.appendNode('description', 'Gradle plugin to combine dependencies into a single Jar. Port of Maven Shade.')
+                root.appendNode('description', 'Gradle plugin to combine/relocate dependencies in a single Jar.')
                 root.children().last() + pomConfig
             }
         }

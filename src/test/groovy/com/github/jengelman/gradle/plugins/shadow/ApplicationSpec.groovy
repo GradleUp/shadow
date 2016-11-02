@@ -112,7 +112,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.withArguments('distShadowZip').build()
+        runner.withArguments('distShadowZip', '--stacktrace').build()
 
         then: 'Check that the distribution zip was created'
         File zip = file('build/distributions/myapp-1.0.zip')

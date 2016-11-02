@@ -6,6 +6,9 @@ import org.gradle.wrapper.WrapperConfiguration
 import org.gradle.wrapper.WrapperExecutor
 import org.gradle.wrapper.Logger
 
+import java.util.jar.JarFile
+import java.util.jar.JarInputStream
+
 buildscript {
     repositories {
         jcenter()
@@ -53,13 +56,14 @@ dependencies {
 
     shadow localGroovy()
     shadow gradleApi()
+    shadow 'org.codehaus.groovy:groovy-backports-compat23:2.4.4'
+
     compile 'org.jdom:jdom2:2.0.5'
     compile 'org.ow2.asm:asm:5.0.3'
     compile 'org.ow2.asm:asm-commons:5.0.3'
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.ant:ant:1.9.4'
     compile 'org.codehaus.plexus:plexus-utils:2.0.6'
-    compile 'org.codehaus.groovy:groovy-backports-compat23:2.4.4'
 
 
     testCompile gradleTestKit()
@@ -85,15 +89,37 @@ jar {
     from rootProject.file('NOTICE')
 }
 
-shadowJar {
-    classifier = ''
-    [
-            'org.codehaus.plexus',
-            'org.jdom',
-            'org.objectweb.asm'
-    ].each {
-        relocate it, "shadow.$it"
+task configureShadow() {
+    dependsOn project.configurations.runtime
+    doLast {
+        def packages = [] as Set
+        project.configurations.runtime.files.each { jar ->
+            JarFile jf = new JarFile(jar)
+            jf.entries().each { entry ->
+                if (entry.name.endsWith(".class")) {
+                    packages << entry.name[0..entry.name.lastIndexOf('/')-1].replaceAll('/', '.')
+                }
+            }
+            jf.close()
+        }
+        project.tasks.shadowJar { task ->
+            packages.each {
+               task.relocate it, "shadow.$it"
+            }
+        }
     }
+}
+
+shadowJar {
+    dependsOn project.tasks.configureShadow
+    classifier = ''
+//    [
+//            'org.codehaus.plexus',
+//            'org.jdom',
+//            'org.objectweb.asm'
+//    ].each {
+//        relocate it, "shadow.$it"
+//    }
 }
 
 tasks.withType(AbstractCompile) {
