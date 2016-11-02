@@ -59,7 +59,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         run.group = ApplicationPlugin.APPLICATION_GROUP
         run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
         run.conventionMapping.jarFile = {
-            project.file("${project.buildDir}/installShadow/${pluginConvention.applicationName}/lib/${jar.archivePath.name}")
+            project.file("${project.buildDir}/installShadow/${pluginConvention.applicationName}/libs/${jar.archivePath.name}")
         }
     }
 
@@ -89,7 +89,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         installTask.into { project.file("${project.buildDir}/installShadow/${pluginConvention.applicationName}") }
         installTask.doFirst {
             if (destinationDir.directory) {
-                if (!new File(destinationDir, 'lib').directory || !new File(destinationDir, 'bin').directory) {
+                if (!new File(destinationDir, 'libs').directory || !new File(destinationDir, 'bin').directory) {
                     throw new GradleException("The specified installation directory '${destinationDir}' is neither empty nor does it contain an installation for '${pluginConvention.applicationName}'.\n" +
                             "If you really want to install to this directory, delete it and run the install task again.\n" +
                             "Alternatively, choose a different installation directory."
@@ -130,7 +130,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         distSpec.with {
             from(project.file("src/dist"))
 
-            into("lib") {
+            into("libs") {
                 from(jar)
                 from(project.configurations.shadow)
             }

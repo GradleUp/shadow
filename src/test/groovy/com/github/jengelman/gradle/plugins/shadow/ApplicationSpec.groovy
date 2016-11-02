@@ -58,7 +58,7 @@ class ApplicationSpec extends PluginSpecification {
         assert result.output.contains('TestApp: Hello World! (foo)')
 
         and: 'Check that the proper jar file was installed'
-        File installedJar = file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
+        File installedJar = file('build/installShadow/myapp/libs/myapp-1.0-all.jar')
         assert installedJar.exists()
 
         and: 'And that jar file as the correct files in it'
@@ -72,7 +72,7 @@ class ApplicationSpec extends PluginSpecification {
         then: 'Check that the start scripts is written out and has the correct Java invocation'
         File startScript = file('build/installShadow/myapp/bin/myapp')
         assert startScript.exists()
-        assert startScript.text.contains("-jar \$APP_HOME/lib/myapp-1.0-all.jar")
+        assert startScript.text.contains("-jar \$APP_HOME/libs/myapp-1.0-all.jar")
 
         cleanup:
         jar?.close()
@@ -120,8 +120,8 @@ class ApplicationSpec extends PluginSpecification {
 
         and: 'Check that the zip contains the correct library files & scripts'
         ZipFile zipFile = new ZipFile(zip)
-        assert zipFile.entries.find { it.name == 'myapp-1.0/lib/myapp-1.0-all.jar' }
-        assert zipFile.entries.find { it.name == 'myapp-1.0/lib/a-1.0.jar'}
+        assert zipFile.entries.find { it.name == 'myapp-1.0/libs/myapp-1.0-all.jar' }
+        assert zipFile.entries.find { it.name == 'myapp-1.0/libs/a-1.0.jar'}
 
         cleanup:
         zipFile?.close()
@@ -164,7 +164,7 @@ class ApplicationSpec extends PluginSpecification {
         runner.withArguments('installShadow').build()
 
         then: 'Check that the proper jar file was installed'
-        File installedJar = file('build/installShadow/myapp/lib/myapp-1.0-all.jar')
+        File installedJar = file('build/installShadow/myapp/libs/myapp-1.0-all.jar')
         assert installedJar.exists()
     }
 }

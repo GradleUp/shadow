@@ -77,7 +77,7 @@ class ShadowCreateStartScripts extends ConventionTask {
     void generate() {
         def generator = new StartScriptGenerator()
         generator.applicationName = getApplicationName()
-        generator.mainApplicationJar = "lib/${getMainApplicationJar().name}"
+        generator.mainApplicationJar = "libs/${getMainApplicationJar().name}"
         generator.defaultJvmOpts = getDefaultJvmOpts()
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
