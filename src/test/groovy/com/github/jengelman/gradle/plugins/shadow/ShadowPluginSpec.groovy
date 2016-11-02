@@ -484,6 +484,26 @@ class ShadowPluginSpec extends PluginSpecification {
 
     }
 
+    @Issue('SHADOW-256')
+    def "allow configuration of non-maven projects with uploads"() {
+        given:
+        buildFile << """
+            configurations.each { configuration ->
+              def upload = project.getTasks().getByName(configuration.getUploadTaskName())
+              upload.repositories.ivy {
+                layout 'ivy'
+                url "\$buildDir/repo"
+              }
+            }
+        """
+
+        when:
+        runner.withArguments('shadowJar').build()
+
+        then:
+        assert output.exists()
+    }
+
     private String escapedPath(File file) {
         file.path.replaceAll('\\\\', '\\\\\\\\')
     }
