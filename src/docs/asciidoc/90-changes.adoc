@@ -3,8 +3,17 @@
 [discrete]
 === v1.3.0 (Unreleased)
 
+* Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.
+
+[discrete]
+=== v1.2.4
 * Don't resolve dependency configurations during config phase (https://github.com/johnrengelman/shadow/issues/129[Issue #128])
 * Build plugin with Gradle 2.14
+* Fix docs regarding inheriting Jar manifest (https://github.com/johnrengelman/shadow/issues/251[Issue #251])
+* https://github.com/ethankhall[Ethan Hall] - Support projects that configure uploading to Ivy repositories (https://github.com/johnrengelman/shadow/pull/256[Pull Request #256])
+* Force task to depend on dependency configuration (https://github.com/johnrengelman/shadow/issues/152[Issue #152])
+* Do not explode ZIP files into shadow jar (https://github.com/johnrengelman/shadow/issues/196[Issue #196])
+* https://github.com/jszakmeister[John Szakmeister] - Preserve timestamps on merged jar entries (https://github.com/johnrengelman/shadow/pull/260[Pull Request #260])
 
 [discrete]
 === v1.2.3
