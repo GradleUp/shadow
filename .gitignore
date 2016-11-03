@@ -9,3 +9,4 @@ build
 out
 .gradletasknamecache
 .gradle-test-kit
+classes/

@@ -89,7 +89,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['1.12', '2.0', '2.5', '2.11', '2.12', '2.13', '2.14', '3.0', '3.1']
+        version << ['1.12', '2.0', '2.5', '2.11', '2.12', '2.13', '2.14', '3.0', '3.1', '3.2-rc-2']
     }
 
     def 'shadow copy'() {
@@ -482,6 +482,26 @@ class ShadowPluginSpec extends PluginSpecification {
         String classpath = attributes.getValue('Class-Path')
         assert classpath == 'junit-3.8.2.jar'
 
+    }
+
+    @Issue('SHADOW-256')
+    def "allow configuration of non-maven projects with uploads"() {
+        given:
+        buildFile << """
+            configurations.each { configuration ->
+              def upload = project.getTasks().getByName(configuration.getUploadTaskName())
+              upload.repositories.ivy {
+                layout 'ivy'
+                url "\$buildDir/repo"
+              }
+            }
+        """
+
+        when:
+        runner.withArguments('shadowJar').build()
+
+        then:
+        assert output.exists()
     }
 
     private String escapedPath(File file) {
