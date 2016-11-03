@@ -85,7 +85,7 @@ task testJar(type: Jar) {
 
 shadowJar {
   manifest {
-    inheritFrom project.tasks.testJar
+    inheritFrom project.tasks.testJar.manifest
   }
 }
 ----
