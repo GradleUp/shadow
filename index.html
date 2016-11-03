@@ -515,7 +515,7 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Shadow Plugin User Guide &amp; Examples</h1>
 <div class="details">
 <span id="author" class="author">John Engelman - @johnrengelman</span><br>
-<span id="revnumber">version 1.2.3</span>
+<span id="revnumber">version 1.2.4</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -647,7 +647,7 @@ library&#8217;s dependencies will not conflict with the same dependency being de
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:1.2.3</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:1.2.4</span><span class="delimiter">'</span></span>
     }
 }
 
@@ -660,7 +660,7 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">1.2.3</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">1.2.4</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -863,7 +863,7 @@ on the <code>shadowJar.manifest</code> object can be used to configure the upstr
 
 shadowJar {
   manifest {
-    inheritFrom project.tasks.testJar
+    inheritFrom project.tasks.testJar.manifest
   }
 }</code></pre>
 </div>
@@ -1278,7 +1278,7 @@ to classpath pollution in a downstream project.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Google&#8217;s Guave and the ASM library are typical cases where package relocation can come in handy.</p>
+<p>Google&#8217;s Guava and the ASM library are typical cases where package relocation can come in handy.</p>
 </div>
 </td>
 </tr>
@@ -1529,6 +1529,40 @@ configuration of the shadowed project.</p>
 <div class="sect1">
 <h2 id="change_log">7. Change Log</h2>
 <div class="sectionbody">
+<h3 id="v1_3_0_unreleased" class="discrete">v1.3.0 (Unreleased)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.</p>
+</li>
+</ul>
+</div>
+<h3 id="v1_2_4" class="discrete">v1.2.4</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Don&#8217;t resolve dependency configurations during config phase (<a href="https://github.com/johnrengelman/shadow/issues/129">Issue #128</a>)</p>
+</li>
+<li>
+<p>Build plugin with Gradle 2.14</p>
+</li>
+<li>
+<p>Fix docs regarding inheriting Jar manifest (<a href="https://github.com/johnrengelman/shadow/issues/251">Issue #251</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/ethankhall">Ethan Hall</a> - Support projects that configure uploading to Ivy repositories (<a href="https://github.com/johnrengelman/shadow/pull/256">Pull Request #256</a>)</p>
+</li>
+<li>
+<p>Force task to depend on dependency configuration (<a href="https://github.com/johnrengelman/shadow/issues/152">Issue #152</a>)</p>
+</li>
+<li>
+<p>Do not explode ZIP files into shadow jar (<a href="https://github.com/johnrengelman/shadow/issues/196">Issue #196</a>)</p>
+</li>
+<li>
+<p><a href="https://github.com/jszakmeister">John Szakmeister</a> - Preserve timestamps on merged jar entries (<a href="https://github.com/johnrengelman/shadow/pull/260">Pull Request #260</a>)</p>
+</li>
+</ul>
+</div>
 <h3 id="v1_2_3" class="discrete">v1.2.3</h3>
 <div class="ulist">
 <ul>
@@ -1876,7 +1910,7 @@ so Shadow was published there.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.2.3<br>
+Version 1.2.4<br>
 Last updated 2016-06-16 19:56:28 +00:00
 </div>
 </div>
