@@ -16,7 +16,7 @@ Read the new [User Guide](http://imperceptiblethoughts.com/shadow)!
 
 | Gradle Version | Shadow Version |
 |----------------|----------------|
-| 3.0            | 1.2.3          |
+| 3.1, 3.2-rc-2  | 1.2.4          |
 
 
 ## Gradle Plugins
