@@ -1,0 +1,21 @@
+dependencies {
+
+    shadow localGroovy()
+    shadow gradleApi()
+    shadow 'org.codehaus.groovy:groovy-backports-compat23:2.4.4'
+
+    compile 'org.jdom:jdom2:2.0.5'
+    compile 'org.ow2.asm:asm:5.0.3'
+    compile 'org.ow2.asm:asm-commons:5.0.3'
+    compile 'commons-io:commons-io:2.4'
+    compile 'org.apache.ant:ant:1.9.4'
+    compile 'org.codehaus.plexus:plexus-utils:2.0.6'
+
+    testCompile gradleTestKit()
+    testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
+        exclude module: 'groovy-all'
+    }
+    testCompile 'xmlunit:xmlunit:1.3'
+    testCompile 'commons-lang:commons-lang:2.6'
+    testCompile 'com.google.guava:guava:17.0'
+}

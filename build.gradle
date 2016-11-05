@@ -30,12 +30,13 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.0'
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'com.gradle.build-scan' version '1.2'
     id 'groovy'
     id 'project-report'
     id 'idea'
 }
+
+apply plugin: 'com.github.johnrengelman.shadow-plugin'
 
 buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'
@@ -46,32 +47,11 @@ apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
 apply from: file('gradle/asciidoc.gradle')
 apply from: file('gradle/ghPages.gradle')
+apply from: file('gradle/dependencies.gradle')
 
 repositories {
     mavenLocal()
     jcenter()
-}
-
-dependencies {
-
-    shadow localGroovy()
-    shadow gradleApi()
-    shadow 'org.codehaus.groovy:groovy-backports-compat23:2.4.4'
-
-    compile 'org.jdom:jdom2:2.0.5'
-    compile 'org.ow2.asm:asm:5.0.3'
-    compile 'org.ow2.asm:asm-commons:5.0.3'
-    compile 'commons-io:commons-io:2.4'
-    compile 'org.apache.ant:ant:1.9.4'
-    compile 'org.codehaus.plexus:plexus-utils:2.0.6'
-
-    testCompile gradleTestKit()
-    testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
-        exclude module: 'groovy-all'
-    }
-    testCompile 'xmlunit:xmlunit:1.3'
-    testCompile 'commons-lang:commons-lang:2.6'
-    testCompile 'com.google.guava:guava:17.0'
 }
 
 test {
@@ -88,29 +68,7 @@ jar {
     from rootProject.file('NOTICE')
 }
 
-task configureShadow() {
-    dependsOn project.configurations.runtime
-    doLast {
-        def packages = [] as Set
-        project.configurations.runtime.files.each { jar ->
-            JarFile jf = new JarFile(jar)
-            jf.entries().each { entry ->
-                if (entry.name.endsWith(".class")) {
-                    packages << entry.name[0..entry.name.lastIndexOf('/')-1].replaceAll('/', '.')
-                }
-            }
-            jf.close()
-        }
-        project.tasks.shadowJar { task ->
-            packages.each {
-               task.relocate it, "shadow.$it"
-            }
-        }
-    }
-}
-
 shadowJar {
-    dependsOn project.tasks.configureShadow
     classifier = ''
 }
 

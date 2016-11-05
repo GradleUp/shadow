@@ -46,6 +46,11 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @Override
+    public ShadowStats getStats() {
+        return shadowStats;
+    }
+
+    @Override
     public InheritManifest getManifest() {
         return (InheritManifest) super.getManifest();
     }

@@ -1,0 +1,2 @@
+rootProject.projectDir = rootProject.projectDir.parentFile
+rootProject.buildFileName = 'buildSrc/build.gradle'

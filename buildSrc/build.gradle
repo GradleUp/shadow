@@ -1,0 +1,53 @@
+import org.codehaus.groovy.control.CompilerConfiguration
+
+apply plugin: 'groovy'
+
+repositories {
+    jcenter()
+}
+
+ScriptHolder holder = new ScriptHolder()
+CompilerConfiguration cc = new CompilerConfiguration()
+cc.setScriptBaseClass(DelegatingScript.class.name)
+GroovyShell sh = new GroovyShell(Project.class.classLoader, new Binding(), cc)
+
+//The build file for the main project
+File projectBuildFile = file('gradle/dependencies.gradle')
+
+//Use this parse command because Groovy wants to use the file name as the classname
+//which fails if your Gradle build file has been renamed to contain an invalid character (i.e. '-')
+DelegatingScript script = (DelegatingScript)sh.parse(projectBuildFile.text.replaceAll('shadow', 'compile'), 'GradlePlugins')
+script.setDelegate(holder)
+
+//Resolve the project main Gradle file against our ScriptHolder
+script.run()
+
+//Class for holding the evaluation of a Gradle script
+//You may need to add some extra methods here depending on what you have all placed in build.gradle
+class ScriptHolder {
+    Closure dependencies
+
+    void dependencies(Closure c) {
+        this.dependencies = c
+    }
+
+    void apply(Map map) {
+
+    }
+}
+
+//Grab the dependencies closure and resolve it against
+//the buildSrc project dependencies
+//This effectively applies the same dependenices from build.gradle into buildSrc/build.gradle
+//This is required so that when buildSrc is compiled it has the dependencies to compile the source code
+def closure = holder.dependencies.clone()
+closure.delegate = project.dependencies
+closure()
+
+sourceSets {
+    test {
+        java.srcDirs = ['buildSrc/src/test/java']
+        groovy.srcDirs = ['buildSrc/src/test/groovy']
+        resources.srcDirs = ['buildSrc/src/test/resources']
+    }
+}
