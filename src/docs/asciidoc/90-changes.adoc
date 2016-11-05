@@ -3,6 +3,7 @@
 [discrete]
 === v1.3.0 (Unreleased)
 
+* Introducing Shadow-Plugin to automatically configure package relocation for Gradle plugins.
 * Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.
 
 [discrete]
