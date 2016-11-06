@@ -7,7 +7,7 @@ machine:
 
 dependencies:
   override:
-    - ./gradlew installWrappers dependencies -Dscan
+    - ./gradlew dependencies -Dscan
 
 test:
   override:
