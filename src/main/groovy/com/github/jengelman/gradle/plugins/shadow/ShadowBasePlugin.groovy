@@ -1,8 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.KnowsTask
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.util.GradleVersion
 
 class ShadowBasePlugin implements Plugin<Project> {
 
@@ -11,6 +13,9 @@ class ShadowBasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        if (GradleVersion.current() < GradleVersion.version("3.0")) {
+            throw new GradleException("This verison of Shadow support Gradle 3.0+ only. Please upgrade.")
+        }
         project.extensions.create(EXTENSION_NAME, ShadowExtension, project)
         createShadowConfiguration(project)
 

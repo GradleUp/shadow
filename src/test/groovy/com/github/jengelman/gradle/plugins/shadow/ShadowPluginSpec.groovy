@@ -54,7 +54,7 @@ class ShadowPluginSpec extends PluginSpecification {
     }
 
     @Unroll
-    def 'apply plugin and run in Gradle #version'() {
+    def 'Compatible with Gradle #version'() {
         given:
         GradleRunner versionRunner = GradleRunner.create()
                 .withGradleVersion(version)
@@ -89,7 +89,31 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['1.12', '2.0', '2.5', '2.11', '2.12', '2.13', '2.14', '3.0', '3.1', '3.2-rc-2']
+        version << ['3.0', '3.1', '3.2-rc-2']
+    }
+
+    def 'Error in Gradle versions < 3.0'() {
+        given:
+        GradleRunner versionRunner = GradleRunner.create()
+                .withGradleVersion('2.14')
+                .withArguments('--stacktrace')
+                .withProjectDir(dir.root)
+                .forwardOutput()
+                .withDebug(true)
+                .withTestKitDir(getTestKitDir())
+
+        buildFile << """
+            dependencies {
+              compile 'junit:junit:3.8.2'
+            }
+
+            shadowJar {
+               mergeServiceFiles()
+            }
+        """.stripIndent()
+
+        then:
+        versionRunner.withArguments('shadowJar', '--stacktrace').buildAndFail()
     }
 
     def 'shadow copy'() {
