@@ -72,7 +72,8 @@ class ApplicationSpec extends PluginSpecification {
         then: 'Check that the start scripts is written out and has the correct Java invocation'
         File startScript = file('build/installShadow/myapp/bin/myapp')
         assert startScript.exists()
-        assert startScript.text.contains("-jar \$APP_HOME/lib/myapp-1.0-all.jar")
+        assert startScript.text.contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
+        assert startScript.text.contains("eval \\\"\$JAVACMD\\\" \$JVM_OPTS -jar \\\"\$CLASSPATH\\\" \$APP_ARGS")
 
         cleanup:
         jar?.close()
