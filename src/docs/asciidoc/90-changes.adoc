@@ -1,10 +1,14 @@
 == Change Log
 
 [discrete]
-=== v1.3.0 (Unreleased)
+=== v2.0.0 (Unreleased)
 
 * Introducing Shadow-Plugin to automatically configure package relocation for Gradle plugins.
 * Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.
+* Replace `startShadowScripts` tasks with Gradle's built-in `CreateStarScripts` type.
+* Build with Gradle 3.1
+* Build with Java 7
+* Restrict Plugin to Gradle 3.0+
 
 [discrete]
 === v1.2.4

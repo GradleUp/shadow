@@ -7,7 +7,7 @@ machine:
 
 dependencies:
   override:
-    - ./gradlew dependencies -Dscan
+    - ./gradlew downloadDependencies
 
 test:
   override:

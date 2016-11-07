@@ -84,3 +84,8 @@ idea {
 
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
+
+task downloadDependencies(type: Exec) {
+    configurations.testRuntime.files
+    commandLine 'echo', 'Downloaded all dependencies'
+}
