@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.JavaJarExec
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCreateStartScripts
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -10,6 +9,7 @@ import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
 import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Tar
 import org.gradle.api.tasks.bundling.Zip
@@ -67,14 +67,18 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
 
-        def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, ShadowCreateStartScripts)
+        def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts)
+        startScripts.unixStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/unixStartScript.txt").text)
+        startScripts.windowsStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/windowsStartScript.txt").text)
         startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
         startScripts.group = ApplicationPlugin.APPLICATION_GROUP
-        startScripts.conventionMapping.mainApplicationJar = { jar.archivePath }
+        startScripts.classpath = project.files(jar)
+        startScripts.conventionMapping.mainClassName = { pluginConvention.mainClassName }
         startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
         startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
         startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
         startScripts.inputs.file jar
+
     }
 
     protected void addInstallTask(Project project) {

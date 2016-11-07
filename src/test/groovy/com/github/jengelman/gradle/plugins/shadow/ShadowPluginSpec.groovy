@@ -1,13 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Issue
 import spock.lang.Unroll
@@ -112,7 +110,7 @@ class ShadowPluginSpec extends PluginSpecification {
             }
         """.stripIndent()
 
-        then:
+        expect:
         versionRunner.withArguments('shadowJar', '--stacktrace').buildAndFail()
     }
 

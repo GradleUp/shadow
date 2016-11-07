@@ -2,6 +2,8 @@ import org.codehaus.groovy.control.CompilerConfiguration
 
 apply plugin: 'groovy'
 
+buildDir = project.file("buildSrc/build")
+
 repositories {
     jcenter()
 }
