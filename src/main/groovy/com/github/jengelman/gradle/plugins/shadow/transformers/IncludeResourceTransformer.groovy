@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -42,7 +41,7 @@ public class IncludeResourceTransformer implements Transformer {
         return false
     }
 
-    public void transform(String path, InputStream is, List<Relocator> relocators) {
+    public void transform(TransformerContext context) {
         // no op
     }
 

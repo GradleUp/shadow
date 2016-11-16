@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -58,14 +57,14 @@ class ManifestResourceTransformer implements Transformer {
         return false
     }
 
-    void transform(String path, InputStream is, List<Relocator> relocators) {
+    void transform(TransformerContext context) {
         // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
         // now which is situational at best. Right now there is no context passed in with the processing so we cannot
         // tell what artifact is being processed.
         if (!manifestDiscovered) {
-            manifest = new Manifest(is)
+            manifest = new Manifest(context.is)
             manifestDiscovered = true
-            IOUtil.close(is)
+            IOUtil.close(context.is)
         }
     }
 

@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import junit.framework.TestCase
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 
@@ -31,10 +32,12 @@ class ApacheNoticeResourceTransformerParameterTests extends TestCase {
 
     private static final String NOTICE_RESOURCE = "META-INF/NOTICE"
     private ApacheNoticeResourceTransformer subject
+    private ShadowStats stats
 
     protected void setUp() {
         super.setUp()
         subject = new ApacheNoticeResourceTransformer()
+        stats = new ShadowStats()
     }
 
     void testNoParametersShouldNotThrowNullPointerWhenNoInput() {
@@ -69,7 +72,7 @@ class ApacheNoticeResourceTransformerParameterTests extends TestCase {
         try {
             final ByteArrayInputStream noticeInputStream = new ByteArrayInputStream(noticeText.getBytes())
             final List<Relocator> emptyList = Collections.emptyList()
-            subject.transform(NOTICE_RESOURCE, noticeInputStream, emptyList)
+            subject.transform(TransformerContext.builder().path(NOTICE_RESOURCE).is(noticeInputStream).relocators(emptyList).stats(stats).build())
         }
         catch (NullPointerException e) {
             fail("Null pointer should not be thrown when no parameters are set.")

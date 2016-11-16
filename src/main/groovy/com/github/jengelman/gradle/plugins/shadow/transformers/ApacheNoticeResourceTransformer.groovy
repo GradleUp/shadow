@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.StringUtils
@@ -78,7 +77,7 @@ class ApacheNoticeResourceTransformer implements Transformer {
         return false
     }
 
-    void transform(String path, InputStream is, List<Relocator> relocators) {
+    void transform(TransformerContext context) {
         if (entries.isEmpty()) {
             String year = new SimpleDateFormat("yyyy").format(new Date())
             if (!inceptionYear.equals(year)) {
@@ -98,9 +97,9 @@ class ApacheNoticeResourceTransformer implements Transformer {
 
         BufferedReader reader
         if (StringUtils.isNotEmpty(encoding)) {
-            reader = new BufferedReader(new InputStreamReader(is, encoding))
+            reader = new BufferedReader(new InputStreamReader(context.is, encoding))
         } else {
-            reader = new BufferedReader(new InputStreamReader(is))
+            reader = new BufferedReader(new InputStreamReader(context.is))
         }
 
         String line = reader.readLine()

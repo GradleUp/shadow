@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -60,7 +59,7 @@ class XmlAppendingTransformer implements Transformer {
         return false
     }
 
-    void transform(String path, InputStream is, List<Relocator> relocators) {
+    void transform(TransformerContext context) {
         Document r
         try {
             SAXBuilder builder = new SAXBuilder(false)
@@ -73,7 +72,7 @@ class XmlAppendingTransformer implements Transformer {
                     }
                 })
             }
-            r = builder.build(is)
+            r = builder.build(context.is)
         }
         catch (JDOMException e) {
             throw new RuntimeException("Error processing resource " + resource + ": " + e.getMessage(), e)

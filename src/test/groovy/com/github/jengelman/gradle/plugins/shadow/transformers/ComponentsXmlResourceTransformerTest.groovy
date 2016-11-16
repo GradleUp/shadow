@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import junit.framework.TestCase
 
 import org.custommonkey.xmlunit.Diff
@@ -37,19 +38,31 @@ import org.codehaus.plexus.util.IOUtil
  */
 class ComponentsXmlResourceTransformerTest extends TestCase {
     private ComponentsXmlResourceTransformer transformer
+    private ShadowStats stats
 
     void setUp() {
         this.transformer = new ComponentsXmlResourceTransformer()
+        stats = new ShadowStats()
     }
 
     void testConfigurationMerging() {
 
         XMLUnit.setNormalizeWhitespace(true)
 
-        transformer.transform("components-1.xml", getClass().getResourceAsStream("/components-1.xml"),
-                Collections.<Relocator> emptyList())
-        transformer.transform("components-1.xml", getClass().getResourceAsStream("/components-2.xml"),
-                Collections.<Relocator> emptyList())
+        transformer.transform(
+                TransformerContext.builder()
+                        .path("components-1.xml")
+                        .is(getClass().getResourceAsStream("/components-1.xml"))
+                        .relocators(Collections.<Relocator> emptyList())
+                        .stats(stats)
+                        .build())
+        transformer.transform(
+                TransformerContext.builder()
+                        .path("components-1.xml")
+                        .is(getClass().getResourceAsStream("/components-2.xml"))
+                        .relocators(Collections.<Relocator> emptyList())
+                        .stats(stats)
+                        .build())
         Diff diff = XMLUnit.compareXML(
                 IOUtil.toString(getClass().getResourceAsStream("/components-expected.xml"), "UTF-8"),
                 IOUtil.toString(transformer.getTransformedResource(), "UTF-8"))

@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -131,23 +130,23 @@ class PropertiesFileTransformer implements Transformer {
     }
 
     @Override
-    void transform(String path, InputStream is, List<Relocator> relocators) {
-        Properties props = propertiesEntries[path]
+    void transform(TransformerContext context) {
+        Properties props = propertiesEntries[context.path]
         if (props == null) {
             props = new Properties()
-            props.load(is)
-            propertiesEntries[path] = props
+            props.load(context.is)
+            propertiesEntries[context.path] = props
         } else {
             Properties incoming = new Properties()
-            incoming.load(is)
+            incoming.load(context.is)
             incoming.each { key, value ->
                 if (props.containsKey(key)) {
-                    switch (mergeStrategyFor(path).toLowerCase()) {
+                    switch (mergeStrategyFor(context.path).toLowerCase()) {
                         case 'latest':
                             props.put(key, value)
                             break
                         case 'append':
-                            props.put(key, props.getProperty(key) + mergeSeparatorFor(path) + value)
+                            props.put(key, props.getProperty(key) + mergeSeparatorFor(context.path) + value)
                             break
                         case 'first':
                         default:

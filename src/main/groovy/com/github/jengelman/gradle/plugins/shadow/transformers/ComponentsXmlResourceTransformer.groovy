@@ -47,11 +47,11 @@ class ComponentsXmlResourceTransformer implements Transformer {
         return COMPONENTS_XML_PATH.equals(path)
     }
 
-    void transform(String path, InputStream is, List<Relocator> relocators) {
+    void transform(TransformerContext context) {
         Xpp3Dom newDom
 
         try {
-            BufferedInputStream bis = new BufferedInputStream(is) {
+            BufferedInputStream bis = new BufferedInputStream(context.is) {
                 void close()
                 throws IOException {
                     // leave ZIP open
@@ -63,7 +63,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
             newDom = Xpp3DomBuilder.build(reader)
         }
         catch (Exception e) {
-            throw (IOException) new IOException("Error parsing components.xml in " + is).initCause(e)
+            throw (IOException) new IOException("Error parsing components.xml in " + context.is).initCause(e)
         }
 
         // Only try to merge in components if there are some elements in the component-set
@@ -77,13 +77,13 @@ class ComponentsXmlResourceTransformer implements Transformer {
             Xpp3Dom component = children[i]
 
             String role = getValue(component, "role")
-            role = getRelocatedClass(role, relocators)
+            role = getRelocatedClass(role, context.relocators)
             setValue(component, "role", role)
 
             String roleHint = getValue(component, "role-hint")
 
             String impl = getValue(component, "implementation")
-            impl = getRelocatedClass(impl, relocators)
+            impl = getRelocatedClass(impl, context.relocators)
             setValue(component, "implementation", impl)
 
             String key = role + ':' + roleHint
@@ -103,7 +103,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
                     Xpp3Dom requirement = requirements.getChild(r)
 
                     String requiredRole = getValue(requirement, "role")
-                    requiredRole = getRelocatedClass(requiredRole, relocators)
+                    requiredRole = getRelocatedClass(requiredRole, context.relocators)
                     setValue(requirement, "role", requiredRole)
                 }
             }

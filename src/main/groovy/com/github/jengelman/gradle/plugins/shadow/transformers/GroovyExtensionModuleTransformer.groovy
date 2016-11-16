@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -54,9 +53,9 @@ class GroovyExtensionModuleTransformer implements Transformer {
     }
 
     @Override
-    void transform(String path, InputStream is, List<Relocator> relocators) {
+    void transform(TransformerContext context) {
         def props = new Properties()
-        props.load(is)
+        props.load(context.is)
         props.each { String key, String value ->
             switch (key) {
                 case MODULE_NAME_KEY:

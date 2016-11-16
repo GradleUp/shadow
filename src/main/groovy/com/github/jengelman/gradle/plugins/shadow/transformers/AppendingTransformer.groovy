@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
@@ -47,11 +46,11 @@ class AppendingTransformer implements Transformer {
         return false
     }
 
-    void transform(String path, InputStream is, List<Relocator> relocators) {
-        IOUtil.copy(is, data)
+    void transform(TransformerContext context) {
+        IOUtil.copy(context.is, data)
         data.write('\n'.bytes)
 
-        is.close()
+        context.is.close()
     }
 
     boolean hasTransformedResource() {

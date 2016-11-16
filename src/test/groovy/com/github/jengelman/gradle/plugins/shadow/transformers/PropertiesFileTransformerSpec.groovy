@@ -52,8 +52,8 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
 
         when:
         if (transformer.canTransformResource(element)) {
-            transformer.transform(path, toInputStream(toProperties(input1)), [])
-            transformer.transform(path, toInputStream(toProperties(input2)), [])
+            transformer.transform(context(path, input1))
+            transformer.transform(context(path, input2))
         }
 
         then:
@@ -76,8 +76,8 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
 
         when:
         if (transformer.canTransformResource(element)) {
-            transformer.transform(path, toInputStream(toProperties(input1)), [])
-            transformer.transform(path, toInputStream(toProperties(input2)), [])
+            transformer.transform(context(path, input1))
+            transformer.transform(context(path, input2))
         }
 
         then:
@@ -100,8 +100,8 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
 
         when:
         if (transformer.canTransformResource(element)) {
-            transformer.transform(path, toInputStream(toProperties(input1)), [])
-            transformer.transform(path, toInputStream(toProperties(input2)), [])
+            transformer.transform(context(path, input1))
+            transformer.transform(context(path, input2))
         }
 
         then:
@@ -115,25 +115,5 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         'f.properties'   | ['f.properties': [mergeStrategy: 'append', mergeSeparator: ';']] | ['foo': 'foo'] | ['foo': 'bar'] || ['foo': 'foo;bar']
         'foo.properties' | ['.*.properties': [mergeStrategy: 'first']]                      | ['foo': 'foo'] | ['foo': 'bar'] || ['foo': 'foo']
         'foo.properties' | ['.*bar': [mergeStrategy: 'first']]                              | ['foo': 'foo'] | ['foo': 'bar'] || [:]
-    }
-
-    private static InputStream toInputStream(Properties props) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        props.store(baos, '')
-        new ByteArrayInputStream(baos.toByteArray())
-    }
-
-    private static Properties toProperties(Map map) {
-        map.inject(new Properties()) { Properties props, entry ->
-            props.put(entry.key, entry.value)
-            props
-        }
-    }
-
-    private static Map toMap(Properties props) {
-        props.inject([:]) { Map map, entry ->
-            map.put(entry.key, entry.value)
-            map
-        }
     }
 }

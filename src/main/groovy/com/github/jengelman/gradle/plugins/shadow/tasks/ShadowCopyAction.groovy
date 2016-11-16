@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
@@ -323,7 +324,14 @@ public class ShadowCopyAction implements CopyAction {
 
         private void transform(FileTreeElement element, InputStream is) {
             String mappedPath = remapper.map(element.relativePath.pathString)
-            transformers.find { it.canTransformResource(element) }.transform(mappedPath, is, relocators)
+            transformers.find { it.canTransformResource(element) }.transform(
+                    TransformerContext.builder()
+                            .path(mappedPath)
+                            .is(is)
+                            .relocators(relocators)
+                            .stats(stats)
+                            .build()
+            )
         }
 
         private boolean isTransformable(FileTreeElement element) {

@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
@@ -34,7 +33,7 @@ interface Transformer {
 
     boolean canTransformResource(FileTreeElement element)
 
-    void transform(String path, InputStream is, List<Relocator> relocators)
+    void transform(TransformerContext context)
 
     boolean hasTransformedResource()
 

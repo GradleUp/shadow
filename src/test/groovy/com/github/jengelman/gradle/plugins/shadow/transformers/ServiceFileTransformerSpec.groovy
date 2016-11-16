@@ -38,8 +38,8 @@ class ServiceFileTransformerSpec extends TransformerSpecSupport {
 
         when:
             if (transformer.canTransformResource(element)) {
-                transformer.transform(path, toInputStream(input1), [])
-                transformer.transform(path, toInputStream(input2), [])
+                transformer.transform(context(path, input1))
+                transformer.transform(context(path, input2))
             }
 
         then:
@@ -60,9 +60,4 @@ class ServiceFileTransformerSpec extends TransformerSpecSupport {
         expect:
             !transformer.canTransformResource(element)
     }
-
-    private static InputStream toInputStream(String str) {
-        return new ByteArrayInputStream(str.bytes)
-    }
-
 }
