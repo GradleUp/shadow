@@ -87,7 +87,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['3.0', '3.1', '3.2-rc-2']
+        version << ['3.0', '3.1', '3.2']
     }
 
     def 'Error in Gradle versions < 3.0'() {
