@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.impl
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.RelativeArchivePath
 import org.objectweb.asm.commons.Remapper
@@ -36,9 +37,11 @@ class RelocatorRemapper extends Remapper {
     private final Pattern classPattern = Pattern.compile("(\\[*)?L(.+)")
 
     List<Relocator> relocators
+    ShadowStats stats
 
-    RelocatorRemapper(List<Relocator> relocators) {
+    RelocatorRemapper(List<Relocator> relocators, ShadowStats stats) {
         this.relocators = relocators
+        this.stats = stats
     }
 
     boolean hasRelocators() {

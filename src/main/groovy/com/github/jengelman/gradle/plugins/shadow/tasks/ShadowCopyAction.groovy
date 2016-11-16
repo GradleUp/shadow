@@ -140,7 +140,7 @@ public class ShadowCopyAction implements CopyAction {
             this.zipOutStr = zipOutStr
             this.transformers = transformers
             this.relocators = relocators
-            this.remapper = new RelocatorRemapper(relocators)
+            this.remapper = new RelocatorRemapper(relocators, stats)
             this.patternSet = patternSet
             this.stats = stats
         }
