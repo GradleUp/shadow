@@ -28,13 +28,13 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 interface Relocator {
     String ROLE = Relocator.class.getName()
 
-    boolean canRelocatePath(String clazz)
+    boolean canRelocatePath(RelocatePathContext context)
 
-    String relocatePath(String clazz)
+    String relocatePath(RelocatePathContext context)
 
-    boolean canRelocateClass(String clazz)
+    boolean canRelocateClass(RelocateClassContext context)
 
-    String relocateClass(String clazz)
+    String relocateClass(RelocateClassContext context)
 
     String applyToSourceContent(String sourceContent)
 }

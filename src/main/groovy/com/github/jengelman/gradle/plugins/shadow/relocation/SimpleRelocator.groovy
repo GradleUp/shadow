@@ -141,7 +141,8 @@ class SimpleRelocator implements Relocator {
         return false
     }
 
-    boolean canRelocatePath(String path) {
+    boolean canRelocatePath(RelocatePathContext context) {
+        String path = context.path
         if (rawString) {
             return Pattern.compile(pathPattern).matcher(path).find()
         }
@@ -158,11 +159,14 @@ class SimpleRelocator implements Relocator {
         return path.startsWith(pathPattern) || path.startsWith("/" + pathPattern)
     }
 
-    boolean canRelocateClass(String clazz) {
-        return !rawString && clazz.indexOf('/') < 0 && canRelocatePath(clazz.replace('.', '/'))
+    boolean canRelocateClass(RelocateClassContext context) {
+        String clazz = context.className
+        RelocatePathContext pathContext = RelocatePathContext.builder().path(clazz.replace('.', '/')).stats(context.stats).build()
+        return !rawString && clazz.indexOf('/') < 0 && canRelocatePath(pathContext)
     }
 
-    String relocatePath(String path) {
+    String relocatePath(RelocatePathContext context) {
+        String path = context.path
         if (rawString) {
             return path.replaceAll(pathPattern, shadedPathPattern)
         } else {
@@ -170,7 +174,8 @@ class SimpleRelocator implements Relocator {
         }
     }
 
-    String relocateClass(String clazz) {
+    String relocateClass(RelocateClassContext context) {
+        String clazz = context.className
         return clazz.replaceFirst(pattern, shadedPattern)
     }
 

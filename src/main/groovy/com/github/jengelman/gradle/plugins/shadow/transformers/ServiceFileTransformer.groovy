@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -66,12 +67,13 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
         def lines = context.is.readLines()
         def targetPath = context.path
         context.relocators.each {rel ->
-            if(rel.canRelocateClass(new File(targetPath).name)) {
-                targetPath = rel.relocateClass(targetPath)
+            if(rel.canRelocateClass(RelocateClassContext.builder().className(new File(targetPath).name).stats(context.stats).build())) {
+                targetPath = rel.relocateClass(RelocateClassContext.builder().className(targetPath).stats(context.stats).build())
             }
             lines.eachWithIndex { String line, int i ->
-                if(rel.canRelocateClass(line)) {
-                    lines[i] = rel.relocateClass(line)
+                def lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
+                if(rel.canRelocateClass(lineContext)) {
+                    lines[i] = rel.relocateClass(lineContext)
                 }
             }
         }

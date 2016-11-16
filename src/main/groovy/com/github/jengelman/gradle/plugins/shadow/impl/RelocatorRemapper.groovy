@@ -20,6 +20,8 @@
 package com.github.jengelman.gradle.plugins.shadow.impl
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.RelativeArchivePath
 import org.objectweb.asm.commons.Remapper
@@ -63,12 +65,14 @@ class RelocatorRemapper extends Remapper {
                 name = m.group(2)
             }
 
+            RelocateClassContext classContext = RelocateClassContext.builder().className(name).stats(stats).build()
+            RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
             for (Relocator r : relocators) {
-                if (r.canRelocateClass(name)) {
-                    value = prefix + r.relocateClass(name) + suffix
+                if (r.canRelocateClass(classContext)) {
+                    value = prefix + r.relocateClass(classContext) + suffix
                     break
-                } else if (r.canRelocatePath(name)) {
-                    value = prefix + r.relocatePath(name) + suffix
+                } else if (r.canRelocatePath(pathContext)) {
+                    value = prefix + r.relocatePath(pathContext) + suffix
                     break
                 }
             }
@@ -92,9 +96,10 @@ class RelocatorRemapper extends Remapper {
             name = m.group(2)
         }
 
+        RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
         for (Relocator r : relocators) {
-            if (r.canRelocatePath(name)) {
-                value = prefix + r.relocatePath(name) + suffix
+            if (r.canRelocatePath(pathContext)) {
+                value = prefix + r.relocatePath(pathContext) + suffix
                 break
             }
         }

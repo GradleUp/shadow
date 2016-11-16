@@ -9,7 +9,8 @@
 * Build with Gradle 3.1
 * Build with Java 7
 * Restrict Plugin to Gradle 3.0+
-* _Breaking!_ Update `Transformer` interface to accept `TransformerContext` object instead of individual values
+* _Breaking!_ Updated `Transformer` interface to accept `TransformerContext` object instead of individual values
+* _Breaking!_ Updated `Relocator` interface to accept `RelocatePathContext` and `RelocateClassContext` objects
 
 [discrete]
 === v1.2.4

@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import junit.framework.TestCase
 
 /**
@@ -34,74 +35,76 @@ import junit.framework.TestCase
  */
 class SimpleRelocatorTest extends TestCase {
 
+    ShadowStats stats
+
     void testCanRelocatePath() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
-        assertEquals(true, relocator.canRelocatePath("org/foo/Class"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/Class.class"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/bar/Class"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/bar/Class.class"))
-        assertEquals(false, relocator.canRelocatePath("com/foo/bar/Class"))
-        assertEquals(false, relocator.canRelocatePath("com/foo/bar/Class.class"))
-        assertEquals(false, relocator.canRelocatePath("org/Foo/Class"))
-        assertEquals(false, relocator.canRelocatePath("org/Foo/Class.class"))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/Class")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/Class.class")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/bar/Class")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/bar/Class.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("com/foo/bar/Class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("com/foo/bar/Class.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/Foo/Class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/Foo/Class.class")))
 
         relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
                 [ "org.foo.Excluded", "org.foo.public.*", "org.foo.Public*Stuff" ] as String[]))
-        assertEquals(true, relocator.canRelocatePath("org/foo/Class"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/Class.class"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/excluded"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/Excluded"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/Excluded.class"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/public"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/public/Class"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/public/Class.class"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/publicRELOC/Class"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/PrivateStuff"))
-        assertEquals(true, relocator.canRelocatePath("org/foo/PrivateStuff.class"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/PublicStuff"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/PublicStuff.class"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/PublicUtilStuff"))
-        assertEquals(false, relocator.canRelocatePath("org/foo/PublicUtilStuff.class"))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/Class")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/Class.class")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/excluded")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/Excluded")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/Excluded.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/public")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/public/Class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/public/Class.class")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/publicRELOC/Class")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/PrivateStuff")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/PrivateStuff.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/PublicStuff")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/PublicStuff.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/PublicUtilStuff")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/PublicUtilStuff.class")))
     }
 
     void testCanRelocateClass() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
-        assertEquals(true, relocator.canRelocateClass("org.foo.Class"))
-        assertEquals(true, relocator.canRelocateClass("org.foo.bar.Class"))
-        assertEquals(false, relocator.canRelocateClass("com.foo.bar.Class"))
-        assertEquals(false, relocator.canRelocateClass("org.Foo.Class"))
+        assertEquals(true, relocator.canRelocateClass(classContext("org.foo.Class")))
+        assertEquals(true, relocator.canRelocateClass(classContext("org.foo.bar.Class")))
+        assertEquals(false, relocator.canRelocateClass(classContext("com.foo.bar.Class")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.Foo.Class")))
 
         relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
                 [ "org.foo.Excluded", "org.foo.public.*", "org.foo.Public*Stuff" ] as String[]))
-        assertEquals(true, relocator.canRelocateClass("org.foo.Class"))
-        assertEquals(true, relocator.canRelocateClass("org.foo.excluded"))
-        assertEquals(false, relocator.canRelocateClass("org.foo.Excluded"))
-        assertEquals(false, relocator.canRelocateClass("org.foo.public"))
-        assertEquals(false, relocator.canRelocateClass("org.foo.public.Class"))
-        assertEquals(true, relocator.canRelocateClass("org.foo.publicRELOC.Class"))
-        assertEquals(true, relocator.canRelocateClass("org.foo.PrivateStuff"))
-        assertEquals(false, relocator.canRelocateClass("org.foo.PublicStuff"))
-        assertEquals(false, relocator.canRelocateClass("org.foo.PublicUtilStuff"))
+        assertEquals(true, relocator.canRelocateClass(classContext("org.foo.Class")))
+        assertEquals(true, relocator.canRelocateClass(classContext("org.foo.excluded")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.Excluded")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.public")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.public.Class")))
+        assertEquals(true, relocator.canRelocateClass(classContext("org.foo.publicRELOC.Class")))
+        assertEquals(true, relocator.canRelocateClass(classContext("org.foo.PrivateStuff")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.PublicStuff")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.PublicUtilStuff")))
     }
 
     void testCanRelocateRawString() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org/foo", null, null, null, true)
-        assertEquals(true, relocator.canRelocatePath("(I)org/foo/bar/Class"))
+        assertEquals(true, relocator.canRelocatePath(pathContext("(I)org/foo/bar/Class")))
 
         relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", null, null, null, true)
-        assertEquals(true, relocator.canRelocatePath("META-INF/org.foo.xml"))
+        assertEquals(true, relocator.canRelocatePath(pathContext("META-INF/org.foo.xml")))
     }
 
     //MSHADE-119, make sure that the easy part of this works.
     void testCanRelocateAbsClassPath() {
         SimpleRelocator relocator = new SimpleRelocator("org.apache.velocity", "org.apache.momentum", null, null)
-        assertEquals("/org/apache/momentum/mass.properties", relocator.relocatePath("/org/apache/velocity/mass.properties"))
+        assertEquals("/org/apache/momentum/mass.properties", relocator.relocatePath(pathContext("/org/apache/velocity/mass.properties")))
 
     }
 
@@ -109,29 +112,37 @@ class SimpleRelocatorTest extends TestCase {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
-        assertEquals("hidden/org/foo/bar/Class.class", relocator.relocatePath("org/foo/bar/Class.class"))
+        assertEquals("hidden/org/foo/bar/Class.class", relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
 
         relocator = new SimpleRelocator("org.foo", "private.stuff", null, null)
-        assertEquals("private/stuff/bar/Class.class", relocator.relocatePath("org/foo/bar/Class.class"))
+        assertEquals("private/stuff/bar/Class.class", relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
     }
 
     void testRelocateClass() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
-        assertEquals("hidden.org.foo.bar.Class", relocator.relocateClass("org.foo.bar.Class"))
+        assertEquals("hidden.org.foo.bar.Class", relocator.relocateClass(classContext("org.foo.bar.Class")))
 
         relocator = new SimpleRelocator("org.foo", "private.stuff", null, null)
-        assertEquals("private.stuff.bar.Class", relocator.relocateClass("org.foo.bar.Class"))
+        assertEquals("private.stuff.bar.Class", relocator.relocateClass(classContext("org.foo.bar.Class")))
     }
 
     void testRelocateRawString() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("Lorg/foo", "Lhidden/org/foo", null, null, true)
-        assertEquals("(I)Lhidden/org/foo/bar/Class", relocator.relocatePath("(I)Lorg/foo/bar/Class"))
+        assertEquals("(I)Lhidden/org/foo/bar/Class", relocator.relocatePath(pathContext("(I)Lorg/foo/bar/Class")))
 
         relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", null, null, true)
-        assertEquals("META-INF/hidden.org.foo.xml", relocator.relocatePath("META-INF/org.foo.xml"))
+        assertEquals("META-INF/hidden.org.foo.xml", relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
+    }
+    
+    static RelocatePathContext pathContext(String path) {
+        return RelocatePathContext.builder().path(path).build()
+    }
+
+    static RelocateClassContext classContext(String className) {
+        return RelocateClassContext.builder().className(className).build()
     }
 }
