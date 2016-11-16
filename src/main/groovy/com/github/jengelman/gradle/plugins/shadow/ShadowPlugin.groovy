@@ -21,9 +21,11 @@ class ShadowPlugin implements Plugin<Project> {
         project.plugins.withId('com.gradle.build-scan') {
             project.buildScan.buildFinished {
                 def shadowTasks = project.tasks.withType(ShadowJar)
-                shadowTasks.each { shadowTask ->
-                    if (shadowTask.didWork) {
-                        project.buildScan.value "shadow.${shadowTask.name}.jarsProcessed".toString(), "${shadowTask.stats.jarCount}"
+                shadowTasks.each { task ->
+                    if (task.didWork) {
+                        task.stats.buildScanData.each { k, v ->
+                            project.buildScan.value "shadow.${task.name}.${k}", v.toString()
+                        }
                     }
                 }
             }

@@ -11,6 +11,21 @@ class ShadowStats {
     long jarEndTime
     int jarCount = 1
     boolean processingJar
+    Map<String, String> relocations = [:]
+
+    void relocate(String src, String dst) {
+        relocations[src] = dst
+    }
+
+    String getRelocationString() {
+        def maxLength = relocations.keySet().collect { it.length() }.max()
+        relocations.collect { k, v -> "${k} ${separator(k, maxLength)} ${v}"}.sort().join("\n")
+    }
+
+    String separator(String key, int max) {
+        //" " * (max - key.length()) + "->"
+        return "→"
+    }
 
     void startJar() {
         if (processingJar) throw new GradleException("Can only time one entry at a time")
@@ -56,5 +71,12 @@ class ShadowStats {
         sb.append "Total Time: ${totalTimeSecs}s [${totalTime}ms]\n"
         sb.append "Average Time/Jar: ${averageTimeSecsPerJar}s [${averageTimePerJar}ms]\n"
         sb.append "*******************"
+    }
+
+    Map<String, String> getBuildScanData() {
+        [
+                dependencies: jarCount,
+                relocations: relocationString
+        ]
     }
 }

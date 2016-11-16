@@ -167,6 +167,7 @@ class SimpleRelocator implements Relocator {
 
     String relocatePath(RelocatePathContext context) {
         String path = context.path
+        context.stats.relocate(pathPattern, shadedPathPattern)
         if (rawString) {
             return path.replaceAll(pathPattern, shadedPathPattern)
         } else {
@@ -176,6 +177,7 @@ class SimpleRelocator implements Relocator {
 
     String relocateClass(RelocateClassContext context) {
         String clazz = context.className
+        context.stats.relocate(pathPattern, shadedPathPattern)
         return clazz.replaceFirst(pattern, shadedPattern)
     }
 
