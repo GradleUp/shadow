@@ -37,6 +37,11 @@ class SimpleRelocatorTest extends TestCase {
 
     ShadowStats stats
 
+    @Override
+    protected void setUp() {
+      stats = new ShadowStats()
+    }
+
     void testCanRelocatePath() {
         SimpleRelocator relocator
 
@@ -138,11 +143,11 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals("META-INF/hidden.org.foo.xml", relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
     }
     
-    static RelocatePathContext pathContext(String path) {
-        return RelocatePathContext.builder().path(path).build()
+    protected RelocatePathContext pathContext(String path) {
+        return RelocatePathContext.builder().path(path).stats(stats).build()
     }
 
-    static RelocateClassContext classContext(String className) {
-        return RelocateClassContext.builder().className(className).build()
+    protected RelocateClassContext classContext(String className) {
+        return RelocateClassContext.builder().className(className).stats(stats).build()
     }
 }
