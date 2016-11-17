@@ -23,7 +23,6 @@ class ShadowStats {
     }
 
     String separator(String key, int max) {
-        //" " * (max - key.length()) + "->"
         return "→"
     }
 
