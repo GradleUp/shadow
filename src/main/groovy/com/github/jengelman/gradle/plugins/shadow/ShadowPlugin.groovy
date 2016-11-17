@@ -26,6 +26,7 @@ class ShadowPlugin implements Plugin<Project> {
                         task.stats.buildScanData.each { k, v ->
                             project.buildScan.value "shadow.${task.name}.${k}", v.toString()
                         }
+                        project.buildScan.value "shadow.${task.name}.configurations", task.configurations*.name.join(", ")
                     }
                 }
             }
