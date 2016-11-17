@@ -11,7 +11,7 @@ class ShadowPluginPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(ShadowPlugin)
 
-        ConfigureShadowRelocation relocate = project.tasks.create("configureShadowRelocation", ConfigureShadowRelocation)
+        ConfigureShadowRelocation relocate = project.tasks.create(ConfigureShadowRelocation.taskName(project.tasks.shadowJar), ConfigureShadowRelocation)
         relocate.target = (ShadowJar) project.tasks.shadowJar
 
         project.tasks.shadowJar.dependsOn relocate

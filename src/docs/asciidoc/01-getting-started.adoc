@@ -12,6 +12,7 @@ buildscript {
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
 ----
 
 Alternatively, the Gradle Plugin syntax can be used:
@@ -20,6 +21,7 @@ Alternatively, the Gradle Plugin syntax can be used:
 ----
 plugins {
   id 'com.github.johnrengelman.shadow' version '{project-version}'
+  id 'java'
 }
 ----
 
@@ -52,3 +54,43 @@ following behavior:
 * Configures the `uploadShadow` task (as part of the `maven` plugin) with the following behavior:
 ** Removes the `compile` and `runtime` configurations from the `pom.xml` file mapping.
 ** Adds the `shadow` configuration to the `pom.xml` file as `RUNTIME` scope.
+
+=== Shadowing Gradle Plugins
+
+Starting with v2.0.0, Shadow is capable of automatically configuring package relocation for your dependencies.
+This is useful especially when building Gradle plugins where you want your dependencies to not conflict with versions
+provided by the Gradle runtime.
+
+[source,groovy,subs="+attributes"]
+----
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:{project-version}'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow-plugin'
+apply plugin: 'java'
+----
+
+Alternatively, the Gradle Plugin syntax can be used:
+
+[source,groovy,subs="+attributes"]
+----
+plugins {
+  id 'com.github.johnrengelman.shadow-plugin' version '{project-version}'
+  id 'java'
+}
+----
+
+Applying the `shadow-plugin` plugin is the same as applying the standard `shadow` plugin with the additional creation
+of the `configureRelocationShadowJar` task.
+This task runs before the `shadowJar` task and scans the packages presention the dependencies that will be merged into
+the final jar and automatically configures relocation for them.
+By default the tasks relocates all packages to the `shadow.` prefix. For example `org.jdom2.JDOMException` becomes
+`shadow.org.jdom2.JDOMException`
+
+For more details see the sectinon <<Using Shadow to Package Gradle Plugins>>

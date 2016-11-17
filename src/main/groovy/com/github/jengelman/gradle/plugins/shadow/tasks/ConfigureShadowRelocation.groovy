@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -14,6 +15,9 @@ class ConfigureShadowRelocation extends DefaultTask {
 
     @Input
     ShadowJar target
+
+    @Input
+    String prefix = "shadow"
 
     @InputFiles @Optional
     List<Configuration> getConfigurations() {
@@ -35,9 +39,13 @@ class ConfigureShadowRelocation extends DefaultTask {
             }
         }
         packages.each {
-            target.relocate(it, "shadow.${it}")
+            target.relocate(it, "${prefix}.${it}")
         }
 
+    }
+
+    static String taskName(Task task) {
+        return "configureRelocation${task.name.capitalize()}"
     }
 
 }

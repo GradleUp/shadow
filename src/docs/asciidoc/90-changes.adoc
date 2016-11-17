@@ -3,14 +3,15 @@
 [discrete]
 === v2.0.0 (Unreleased)
 
-* Introducing Shadow-Plugin to automatically configure package relocation for Gradle plugins.
+* **Breaking Change!** Restrict Plugin to Gradle 3.0+
+* **Breaking Change!** Build with Java 7
+* **Breaking Change!** Updated `Transformer` interface to accept `TransformerContext` object instead of individual values
+* **Breaking Change!** Updated `Relocator` interface to accept `RelocatePathContext` and `RelocateClassContext` objects
+* __NEW__ Introducing `ConfigureShadowRelocation` task and `com.github.johnrengelman.shadow-plugin` plugin to automatically configure package relocation for Gradle plugins.
+* __NEW__ Integration with Gradle Build Scans. When running a `ShadowJar` task with Build Scans, custom values including dependencies merged anc package relocations are published in the scan.
 * Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.
-* Replace `startShadowScripts` tasks with Gradle's built-in `CreateStarScripts` type.
+* Replace `startShadowScripts` tasks with Gradle's built-in `CreateStartScripts` type.
 * Build with Gradle 3.1
-* Build with Java 7
-* Restrict Plugin to Gradle 3.0+
-* _Breaking!_ Updated `Transformer` interface to accept `TransformerContext` object instead of individual values
-* _Breaking!_ Updated `Relocator` interface to accept `RelocatePathContext` and `RelocateClassContext` objects
 
 [discrete]
 === v1.2.4
@@ -66,7 +67,7 @@
 [discrete]
 === v1.1.0
 
-* __**Breaking Change!**__ Fix leaking of `shadowJar.manifest` into `jar.manifest`. (https://github.com/johnrengelman/shadow/issues/82[Issue #82])
+* **Breaking Change!** Fix leaking of `shadowJar.manifest` into `jar.manifest`. (https://github.com/johnrengelman/shadow/issues/82[Issue #82])
   To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with `shadowJar.manifest`
 * `ShadowTask` now has a `configurations` property that is resolved to the files in the resolved configuration before
   being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task
