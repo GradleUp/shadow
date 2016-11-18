@@ -9,7 +9,7 @@ dependencies {
     compile 'org.ow2.asm:asm-commons:5.1'
     compile 'commons-io:commons-io:2.5'
     compile 'org.apache.ant:ant:1.9.7'
-    compile 'org.codehaus.plexus:plexus-utils:2.0.6'
+    compile 'org.codehaus.plexus:plexus-utils:3.0.24'
 
     testCompile gradleTestKit()
     testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
