@@ -5,7 +5,7 @@ https://docs.gradle.org/current/userguide/application_plugin.html[`application`]
 configure additional tasks for running the shadowed JAR and creating distributions containing the shadowed JAR.
 
 Just like the normal `jar` task, when the `application` plugin is applied, the `shadowJar` manifest will be
-configured to contain the `Main-Class` attribute with the value specified in the project's `mainClassName` atrribute.
+configured to contain the `Main-Class` attribute with the value specified in the project's `mainClassName` attribute.
 
 .Using Shadow with Application Plugin
 [source,groovy,indent=0]
@@ -36,10 +36,10 @@ runShadow {
 === Distributing the Shadow JAR
 
 The Shadow plugin will also configure distribution tasks when in the presence of the `application` plugin.
-The plugin will create `distShadowZip` and `distShadowTar` which creates Zip and Tar distributions
+The plugin will create `shadowDistZip` and `shadowDistTar` which creates Zip and Tar distributions
 respectively.
 Each distribution will contain the shadowed JAR file along with the necessary start scripts to launch
 the application.
 
-Additionally, the plugin will create the `installShadowApp` and `startShadowScripts` tasks which stages the necessary
-files for a distribution to `build/installShadow`.
+Additionally, the plugin will create the `installShadowDist` and `startShadowScripts` tasks which stages the necessary
+files for a distribution to `build/install/<project name>-shadow/`.

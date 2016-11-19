@@ -9,7 +9,7 @@ before hand. Shadow v2.0 corrects this by introducing a new task type `Configure
 Tasks of this type are configured to target a an instance of a `ShadowJar` task and run immediately before it.
 
 The `ConfigureShadowRelocation` task, scans the dependencies from the configurations specified on the associated
-`ShadowJar` task and collets the package names contained within them. It then configures relocation for these
+`ShadowJar` task and collects the package names contained within them. It then configures relocation for these
 packages using the specified `prefix` on the associated `ShadowJar` task.
 
 While this is useful for developing Gradle plugins, nothing about the `ConfigureShadowRelocation` task is tied to
@@ -40,5 +40,5 @@ dependencies {
 
 Note that the `localGroovy()` and `gradleApi()` dependencies are added to the `shadow` configuration instead of the
 normal `compile` configuration. These 2 dependencies are provided by Gradle to compile your project but are ultimately
-provided by the Gradle runtime when executing the plugin. Thus, it is __not__ adviseable to bundle these dependencies
+provided by the Gradle runtime when executing the plugin. Thus, it is __not__ advisable to bundle these dependencies
 with your plugin.
