@@ -48,10 +48,11 @@ public class ShadowCopyAction implements CopyAction {
     private final List<Relocator> relocators
     private final PatternSet patternSet
     private final ShadowStats stats
+    private final String encoding
 
     public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
-                            List<Transformer> transformers, List<Relocator> relocators, PatternSet patternSet,
-                            ShadowStats stats) {
+                            String encoding, List<Transformer> transformers, List<Relocator> relocators,
+                            PatternSet patternSet, ShadowStats stats) {
 
         this.zipFile = zipFile
         this.compressor = compressor
@@ -60,6 +61,7 @@ public class ShadowCopyAction implements CopyAction {
         this.relocators = relocators
         this.patternSet = patternSet
         this.stats = stats
+        this.encoding = encoding
     }
 
     @Override
@@ -76,7 +78,7 @@ public class ShadowCopyAction implements CopyAction {
             withResource(zipOutStr, new Action<ZipOutputStream>() {
                 public void execute(ZipOutputStream outputStream) {
                     try {
-                        stream.process(new StreamAction(outputStream, transformers, relocators, patternSet,
+                        stream.process(new StreamAction(outputStream, encoding, transformers, relocators, patternSet,
                                 stats))
                         processTransformers(outputStream)
                     } catch (Exception e) {
@@ -135,14 +137,17 @@ public class ShadowCopyAction implements CopyAction {
 
         private Set<String> visitedFiles = new HashSet<String>()
 
-        public StreamAction(ZipOutputStream zipOutStr, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats) {
+        public StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
+                            List<Relocator> relocators, PatternSet patternSet, ShadowStats stats) {
             this.zipOutStr = zipOutStr
             this.transformers = transformers
             this.relocators = relocators
             this.remapper = new RelocatorRemapper(relocators, stats)
             this.patternSet = patternSet
             this.stats = stats
+            if(encoding != null) {
+                this.zipOutStr.setEncoding(encoding);
+            }
         }
 
         public void processFile(FileCopyDetailsInternal details) {

@@ -16,7 +16,6 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
@@ -37,6 +36,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private final GradleVersionUtil versionUtil;
 
     public ShadowJar() {
+        super();
         versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
         setManifest(new DefaultInheritManifest(getServices().get(FileResolver.class)));
@@ -59,7 +59,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
-                transformers, relocators, getRootPatternSet(), shadowStats);
+                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats);
     }
 
     protected ZipCompressor getInternalCompressor() {
