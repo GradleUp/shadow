@@ -28,8 +28,8 @@ class ShadowBasePlugin implements Plugin<Project> {
     private void createShadowConfiguration(Project project) {
         def configuration = project.configurations.create(CONFIGURATION_NAME)
 
-        project.tasks.withType(AbstractCompile) {
-            classpath += configuration
+        project.tasks.withType(AbstractCompile) { task ->
+            task.classpath += configuration
         }
     }
 }
