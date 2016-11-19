@@ -6,7 +6,9 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.Ignore
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -544,6 +546,77 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         assert output.exists()
+
+    }
+
+    @Issue('SHADOW-143')
+    @Ignore("This spec requires > 15 minutes and > 8GB of disk space to run")
+    def "check large zip files with zip64 enabled"() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('a2.properties', 'a2')
+                .publish()
+
+        file('src/main/java/myapp/Main.java') << """
+            package myapp;
+            public class Main {
+               public static void main(String[] args) {
+                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
+               }
+            }
+        """.stripIndent()
+
+        buildFile << """
+            apply plugin: 'application'
+
+            mainClassName = 'myapp.Main'
+
+            dependencies {
+               compile 'shadow:a:1.0'
+            }
+
+            def generatedResourcesDir = new File(project.buildDir, "generated-resources")
+
+            task generateResources {
+                doLast {
+                    def rnd = new Random()
+                    def buf = new byte[128 * 1024]
+                    for (x in 0..255) {
+                        def dir = new File(generatedResourcesDir, x.toString())
+                        dir.mkdirs()
+                        for (y in 0..255) {
+                            def file = new File(dir, y.toString())
+                            rnd.nextBytes(buf)
+                            file.bytes = buf
+                        }
+                    }
+                }
+            }
+
+            sourceSets {
+                main {
+                    output.dir(generatedResourcesDir, builtBy: generateResources)
+                }
+            }
+
+            shadowJar {
+                zip64 = true
+            }
+
+            runShadow {
+               args 'foo'
+            }
+        """.stripIndent()
+
+        settingsFile << "rootProject.name = 'myapp'"
+
+        when:
+        BuildResult result = runner.withArguments('runShadow', '--stacktrace').build()
+
+        then: 'tests that runShadow executed and exited'
+        assert result.output.contains('TestApp: Hello World! (foo)')
+
 
     }
 
