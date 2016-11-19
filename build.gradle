@@ -72,10 +72,6 @@ shadowJar {
     classifier = ''
 }
 
-tasks.withType(AbstractCompile) {
-    classpath += project.configurations.shadow
-}
-
 idea {
     project {
         languageLevel = '1.7'
