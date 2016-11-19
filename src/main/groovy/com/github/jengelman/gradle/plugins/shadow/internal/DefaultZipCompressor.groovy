@@ -19,26 +19,25 @@ import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.UncheckedIOException
 
+class DefaultZipCompressor implements ZipCompressor {
+    private final int entryCompressionMethod
+    private final Zip64Mode zip64Mode
 
-public class DefaultZipCompressor implements ZipCompressor {
-    private final int entryCompressionMethod;
-    private final Zip64Mode zip64Mode;
-
-    public DefaultZipCompressor(boolean allowZip64Mode, int entryCompressionMethod) {
-        this.entryCompressionMethod = entryCompressionMethod;
-        zip64Mode = allowZip64Mode ? Zip64Mode.AsNeeded : Zip64Mode.Never;
+     DefaultZipCompressor(boolean allowZip64Mode, int entryCompressionMethod) {
+        this.entryCompressionMethod = entryCompressionMethod
+        zip64Mode = allowZip64Mode ? Zip64Mode.AsNeeded : Zip64Mode.Never
     }
 
-    public ZipOutputStream createArchiveOutputStream(File destination) {
+    ZipOutputStream createArchiveOutputStream(File destination) {
         try {
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(destination))
-            ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
-            zipOutputStream.setUseZip64(zip64Mode);
-            zipOutputStream.setMethod(entryCompressionMethod);
-            return zipOutputStream;
+            ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)
+            zipOutputStream.setUseZip64(zip64Mode)
+            zipOutputStream.setMethod(entryCompressionMethod)
+            return zipOutputStream
         } catch (Exception e) {
-            String message = String.format("Unable to create ZIP output stream for file %s.", destination);
-            throw new UncheckedIOException(message, e);
+            String message = String.format("Unable to create ZIP output stream for file %s.", destination)
+            throw new UncheckedIOException(message, e)
         }
     }
 

@@ -526,6 +526,27 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
     }
 
+    @Issue('SHADOW-203')
+    def "support ZipCompression.STORED"() {
+        given:
+
+        buildFile << """
+            dependencies { shadow 'junit:junit:3.8.2' }
+
+            shadowJar {
+                zip64 true
+                entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
+            }
+        """.stripIndent()
+
+        when:
+        runner.withArguments('shadowJar', '--stacktrace').build()
+
+        then:
+        assert output.exists()
+
+    }
+
     private String escapedPath(File file) {
         file.path.replaceAll('\\\\', '\\\\\\\\')
     }

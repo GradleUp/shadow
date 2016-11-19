@@ -12,6 +12,7 @@ import org.gradle.api.internal.java.JavaLibrary
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Upload
+import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
 
 import javax.inject.Inject
@@ -33,6 +34,11 @@ class ShadowJavaPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         configureShadowTask(project)
+
+        project.tasks.withType(AbstractCompile) {
+            it.classpath += project.configurations.shadow
+        }
+
     }
 
     protected void configureShadowTask(Project project) {
