@@ -30,8 +30,7 @@ class DefaultZipCompressor implements ZipCompressor {
 
     ZipOutputStream createArchiveOutputStream(File destination) {
         try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(destination))
-            ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)
+            ZipOutputStream zipOutputStream = new ZipOutputStream(destination)
             zipOutputStream.setUseZip64(zip64Mode)
             zipOutputStream.setMethod(entryCompressionMethod)
             return zipOutputStream
