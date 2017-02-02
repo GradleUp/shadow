@@ -47,6 +47,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         jar.doFirst {
             manifest.attributes 'Main-Class': pluginConvention.mainClassName
         }
+        jar.entryPoint(pluginConvention.mainClassName)
     }
 
     protected void addRunTask(Project project) {

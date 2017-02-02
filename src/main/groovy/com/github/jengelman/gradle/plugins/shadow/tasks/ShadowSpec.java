@@ -10,6 +10,11 @@ import org.gradle.api.Action;
 import org.gradle.api.file.CopySpec;
 
 interface ShadowSpec extends CopySpec {
+    void setMinimizeJar(boolean enabled);
+
+    boolean isMinimizeJar();
+
+    ShadowSpec entryPoint(String className);  // or reuse include?
 
     ShadowSpec dependencies(Action<DependencyFilter> configure);
 

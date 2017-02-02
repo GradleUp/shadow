@@ -31,6 +31,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private List<Relocator> relocators;
     private List<Configuration> configurations;
     private DependencyFilter dependencyFilter;
+    private boolean minimizeJar = false;
+    private List<String> entryPoints = new ArrayList<>(1);
 
     private final ShadowStats shadowStats = new ShadowStats();
     private final GradleVersionUtil versionUtil;
@@ -46,6 +48,22 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @Override
+    public void setMinimizeJar(boolean enabled) {
+        this.minimizeJar = enabled;
+    }
+
+    @Override
+    public boolean isMinimizeJar() {
+        return minimizeJar;
+    }
+
+    @Override
+    public ShadowSpec entryPoint(String className) {
+        entryPoints.add(className);
+        return this;
+    }
+
+    @Override
     public ShadowStats getStats() {
         return shadowStats;
     }
@@ -58,8 +76,10 @@ public class ShadowJar extends Jar implements ShadowSpec {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
+        final UnusedTracker unusedTracker = UnusedTracker.forProject(getProject(), entryPoints);
         return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
-                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats);
+                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(),
+                minimizeJar, unusedTracker, shadowStats);
     }
 
     protected ZipCompressor getInternalCompressor() {
