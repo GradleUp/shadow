@@ -8,7 +8,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.Ignore
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -56,13 +56,10 @@ class ShadowPluginSpec extends PluginSpecification {
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
-        GradleRunner versionRunner = GradleRunner.create()
+        GradleRunner versionRunner = runner
                 .withGradleVersion(version)
                 .withArguments('--stacktrace')
-                .withProjectDir(dir.root)
-                .forwardOutput()
                 .withDebug(true)
-                .withTestKitDir(getTestKitDir())
 
 
         File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
@@ -89,7 +86,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['3.0', '3.1', '3.2']
+        version << ['3.0', '3.1', '3.2', '3.3']
     }
 
     def 'Error in Gradle versions < 3.0'() {
@@ -379,6 +376,52 @@ class ShadowPluginSpec extends PluginSpecification {
 
         and:
         doesNotContain(output, ['b.properties'])
+    }
+
+    def "include java-library configurations by default"() {
+        given:
+        GradleRunner versionRunner = runner
+                .withGradleVersion('3.4.1')
+                .withArguments('--stacktrace')
+                .withDebug(true)
+
+        repo.module('shadow', 'api', '1.0')
+                .insertFile('api.properties', 'api')
+                .publish()
+
+        repo.module('shadow', 'implementation', '1.0')
+                .insertFile('implementation.properties', 'implementation')
+                .publish()
+
+        repo.module('shadow', 'compile', '1.0')
+                .insertFile('compile.properties', 'compile')
+                .publish()
+
+        repo.module('shadow', 'runtime', '1.0')
+                .insertFile('runtime.properties', 'runtime')
+                .publish()
+
+        repo.module('shadow', 'runtimeOnly', '1.0')
+                .insertFile('runtimeOnly.properties', 'runtimeOnly')
+                .publish()
+
+        buildFile.text = defaultBuildScript.replace('java', 'java-library')
+        buildFile << """
+            dependencies {
+               api 'shadow:api:1.0'
+               implementation 'shadow:implementation:1.0'
+               compile 'shadow:compile:1.0'
+               runtime 'shadow:runtime:1.0'
+               runtimeOnly 'shadow:runtimeOnly:1.0'
+            }
+        """.stripIndent()
+
+        when:
+        versionRunner.withArguments('shadowJar').build()
+
+        then:
+        contains(output, ['api.properties', 'implementation.properties', 'compile.properties',
+                          'runtime.properties', 'runtimeOnly.properties'])
     }
 
     def "doesn't include compileOnly configuration by default"() {
