@@ -16,6 +16,8 @@
 * Replace `startShadowScripts` tasks with Gradle's built-in `CreateStartScripts` type.
 * Build with Gradle 3.1
 * https://github.com/marcphilipp[Marc Philipp] - Add `keyTransformer` property to `PropertiesFileTransformer`
+* Update to ASM 5.2
+* https://github.com/pkubowicz[Piotr Kubowicz] - Support `api`, `implementation`, `runtimeOnly` dependency configurations introdcued in Gradle 3.3
 
 [discrete]
 === v1.2.4
