@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer
@@ -66,7 +67,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
 
         PublishArtifact shadowArtifact = project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, shadow)
-        project.components.add(new ShadowJavaLibrary(shadowArtifact, project.configurations.shadow.allDependencies))
+        project.components.add(new ShadowJavaLibrary(project.configurations, shadowArtifact))
         configureShadowUpload()
     }
 
@@ -90,8 +91,8 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     class ShadowJavaLibrary extends JavaLibrary {
 
-        ShadowJavaLibrary(PublishArtifact jarArtifact, DependencySet runtimeDependencies) {
-            super(jarArtifact, runtimeDependencies)
+        ShadowJavaLibrary(ConfigurationContainer configurations, PublishArtifact... artifacts) {
+            super(configurations, artifacts)
         }
 
         @Override
