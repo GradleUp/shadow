@@ -4,12 +4,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.DependencySet
-import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer
 import org.gradle.api.artifacts.maven.MavenPom
-import org.gradle.api.internal.java.JavaLibrary
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Upload
@@ -22,7 +18,6 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
     static final String SHADOW_UPLOAD_TASK = 'uploadShadow'
-    static final String SHADOW_COMPONENT_NAME = 'shadow'
     static final String SHADOW_GROUP = 'Shadow'
 
     private final ProjectConfigurationActionContainer configurationActionContainer;
@@ -66,14 +61,13 @@ class ShadowJavaPlugin implements Plugin<Project> {
                                          project.configurations.runtimeClasspath : project.configurations.runtime]
         shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
 
-        PublishArtifact shadowArtifact = project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, shadow)
-        project.components.add(new ShadowJavaLibrary(project.configurations, shadowArtifact))
+        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, shadow)
         configureShadowUpload()
     }
 
     private void configureShadowUpload() {
         configurationActionContainer.add(new Action<Project>() {
-            public void execute(Project project) {
+            void execute(Project project) {
                 project.plugins.withType(MavenPlugin) {
                     Upload upload = project.tasks.withType(Upload).findByName(SHADOW_UPLOAD_TASK)
                     if (!upload) {
@@ -87,17 +81,5 @@ class ShadowJavaPlugin implements Plugin<Project> {
                 }
             }
         })
-    }
-
-    class ShadowJavaLibrary extends JavaLibrary {
-
-        ShadowJavaLibrary(ConfigurationContainer configurations, PublishArtifact... artifacts) {
-            super(configurations, artifacts)
-        }
-
-        @Override
-        String getName() {
-            return SHADOW_COMPONENT_NAME
-        }
     }
 }

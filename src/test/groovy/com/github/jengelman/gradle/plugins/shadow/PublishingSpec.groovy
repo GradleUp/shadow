@@ -97,7 +97,7 @@ class PublishingSpec extends PluginSpecification {
             publishing {
                publications {
                    shadow(MavenPublication) {
-                       from components.shadow
+                       project.shadow.component(it)
                        artifactId = 'maven-all'
                    }
                }

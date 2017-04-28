@@ -10,6 +10,7 @@
 * **Breaking Change!** Distribution tasks `distShadowZip` and `distShadowTar` have been removed and replaced with the standard `shadowDistZip` and `shadowDistTar` from the Gradle Distribution plugin.
 * **Breaking Change!** The `installShadowApp` task has been removed and replaced with the standard `installShadowDist` task from the Gradle Distribution plugin.
 * **Breaking Change!** The new `installShadowDist` task outputs to `build/install/<project name>-shadow` per the standard (formerly was `build/installShadow`)
+* **Breaking Change!** `component.shadow` removed in favor of `project.shadow.component(publication)` so as to remove dependency on internal Gradle APIs.
 * __NEW__ Introducing `ConfigureShadowRelocation` task and `com.github.johnrengelman.shadow-plugin` plugin to automatically configure package relocation for Gradle plugins.
 * __NEW__ Integration with Gradle Build Scans. When running a `ShadowJar` task with Build Scans, custom values including dependencies merged anc package relocations are published in the scan.
 * Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.

@@ -17,7 +17,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 publishing {
   publications {
     shadow(MavenPublication) {
-      from components.shadow
+      project.shadow.component(it)
     }
   }
   repositories {
