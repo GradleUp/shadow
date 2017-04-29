@@ -4,7 +4,7 @@ Gradle plugin for creating fat/uber JARs with support for package relocation.
 
 ## Documentation
 
-Read the new [User Guide](http://imperceptiblethoughts.com/shadow)!
+Read the [User Guide](http://imperceptiblethoughts.com/shadow)!
 
 ## Current Status
 
@@ -16,8 +16,9 @@ Read the new [User Guide](http://imperceptiblethoughts.com/shadow)!
 
 | Gradle Version | Shadow Version |
 |----------------|----------------|
-| 3.1, 3.2-rc-2  | 1.2.4          |
-| 3.x, 4.0 nightlies | 2.0.0-SNAPSHOT|
+| 3.x, 4.0 nightlies | 2.0.0|
+
+**NOTE**: Shadow v2.0.0 is compatible with Gradle 3.0+ and Java 7+ _only_.
 
 
 ## Gradle Plugins
