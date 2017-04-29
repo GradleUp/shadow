@@ -40,9 +40,9 @@ public class ShadowJar extends Jar implements ShadowSpec {
         versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
         setManifest(new DefaultInheritManifest(getServices().get(FileResolver.class)));
-        transformers = new ArrayList<Transformer>();
-        relocators = new ArrayList<Relocator>();
-        configurations = new ArrayList<Configuration>();
+        transformers = new ArrayList<>();
+        relocators = new ArrayList<>();
+        configurations = new ArrayList<>();
     }
 
     @Override

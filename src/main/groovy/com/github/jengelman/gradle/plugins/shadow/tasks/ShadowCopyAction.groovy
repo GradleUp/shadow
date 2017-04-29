@@ -39,7 +39,7 @@ import org.objectweb.asm.commons.ClassRemapper
 import java.util.zip.ZipException
 
 @Slf4j
-public class ShadowCopyAction implements CopyAction {
+class ShadowCopyAction implements CopyAction {
 
     private final File zipFile
     private final ZipCompressor compressor
@@ -50,7 +50,7 @@ public class ShadowCopyAction implements CopyAction {
     private final ShadowStats stats
     private final String encoding
 
-    public ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
+    ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             String encoding, List<Transformer> transformers, List<Relocator> relocators,
                             PatternSet patternSet, ShadowStats stats) {
 
@@ -76,7 +76,7 @@ public class ShadowCopyAction implements CopyAction {
 
         try {
             withResource(zipOutStr, new Action<ZipOutputStream>() {
-                public void execute(ZipOutputStream outputStream) {
+                void execute(ZipOutputStream outputStream) {
                     try {
                         stream.process(new StreamAction(outputStream, encoding, transformers, relocators, patternSet,
                                 stats))
@@ -109,20 +109,20 @@ public class ShadowCopyAction implements CopyAction {
 
     private static <T extends Closeable> void withResource(T resource, Action<? super T> action) {
         try {
-            action.execute(resource);
+            action.execute(resource)
         } catch(Throwable t) {
             try {
-                resource.close();
+                resource.close()
             } catch (IOException e) {
                 // Ignored
             }
-            throw UncheckedException.throwAsUncheckedException(t);
+            throw UncheckedException.throwAsUncheckedException(t)
         }
 
         try {
-            resource.close();
+            resource.close()
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new UncheckedIOException(e)
         }
     }
 
@@ -137,7 +137,7 @@ public class ShadowCopyAction implements CopyAction {
 
         private Set<String> visitedFiles = new HashSet<String>()
 
-        public StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
+        StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
                             List<Relocator> relocators, PatternSet patternSet, ShadowStats stats) {
             this.zipOutStr = zipOutStr
             this.transformers = transformers
@@ -146,11 +146,11 @@ public class ShadowCopyAction implements CopyAction {
             this.patternSet = patternSet
             this.stats = stats
             if(encoding != null) {
-                this.zipOutStr.setEncoding(encoding);
+                this.zipOutStr.setEncoding(encoding)
             }
         }
 
-        public void processFile(FileCopyDetailsInternal details) {
+        void processFile(FileCopyDetailsInternal details) {
             if (details.directory) {
                 visitDir(details)
             } else {
