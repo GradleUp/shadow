@@ -33,7 +33,7 @@ There may be situations where the desire is to **not** bundle select dependencie
 they are still required for runtime execution.
 
 In these scenarios, Shadow creates a `shadow` configuration to declare these dependencies.
-Dependencies added to the `shadow` configuration are **not** bundled into the output JAR.
+Dependencies added to the `shadow` configuration are *not* bundled into the output JAR.
 Think of `configurations.shadow` as unmerged, runtime dependencies.
 The integration with the `maven` and `maven-publish` plugins will automatically configure dependencies added
 to `configurations.shadow` as `RUNTIME` scope dependencies in the resulting POM file.
