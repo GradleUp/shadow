@@ -21,7 +21,7 @@ like so:
 [source,groovy,subs="+attributes"]
 ----
 plugins {
-  id 'com.github.johnrengelman.shadow-plugin' version '{project-version}'
+  id 'com.github.johnrengelman.plugin-shadow' version '{project-version}'
   id 'java'
 }
 

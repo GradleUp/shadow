@@ -1,14 +1,3 @@
-import org.gradle.wrapper.Download
-import org.gradle.wrapper.GradleUserHomeLookup
-import org.gradle.wrapper.Install
-import org.gradle.wrapper.PathAssembler
-import org.gradle.wrapper.WrapperConfiguration
-import org.gradle.wrapper.WrapperExecutor
-import org.gradle.wrapper.Logger
-
-import java.util.jar.JarFile
-import java.util.jar.JarInputStream
-
 buildscript {
     repositories {
         jcenter()
@@ -19,7 +8,7 @@ buildscript {
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.5'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.0.0"
-        classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
         classpath 'org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview2'
@@ -30,13 +19,13 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.2'
+    id 'com.gradle.build-scan' version '1.7'
     id 'groovy'
     id 'project-report'
     id 'idea'
 }
 
-apply plugin: 'com.github.johnrengelman.shadow-plugin'
+apply plugin: 'com.github.johnrengelman.plugin-shadow'
 
 buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'

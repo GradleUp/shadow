@@ -5,7 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class ShadowPluginPlugin implements Plugin<Project> {
+class PluginShadowPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
