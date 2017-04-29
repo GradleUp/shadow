@@ -34,6 +34,9 @@ they are still required for runtime execution.
 
 In these scenarios, Shadow creates a `shadow` configuration to declare these dependencies.
 Dependencies added to the `shadow` configuration are **not** bundled into the output JAR.
+Think of `configurations.shadow` as unmerged, runtime dependencies.
+The integration with the `maven` and `maven-publish` plugins will automatically configure dependencies added
+to `configurations.shadow` as `RUNTIME` scope dependencies in the resulting POM file.
 
 Additionally, Shadow automatically configures the manifest of the `shadowJar` task to contain a `Class-Path` entry
 in the JAR manifest.
