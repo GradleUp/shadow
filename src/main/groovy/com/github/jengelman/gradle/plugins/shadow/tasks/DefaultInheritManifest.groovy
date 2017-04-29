@@ -21,12 +21,12 @@ class DefaultInheritManifest implements InheritManifest {
         this.fileResolver = fileResolver
     }
 
-    public InheritManifest inheritFrom(Object... inheritPaths) {
+    InheritManifest inheritFrom(Object... inheritPaths) {
         inheritFrom(inheritPaths, null)
         return this
     }
 
-    public InheritManifest inheritFrom(Object inheritPaths, Closure closure) {
+    InheritManifest inheritFrom(Object inheritPaths, Closure closure) {
         DefaultManifestMergeSpec mergeSpec = new DefaultManifestMergeSpec()
         mergeSpec.from(inheritPaths)
         inheritMergeSpecs.add(mergeSpec)
@@ -66,9 +66,8 @@ class DefaultInheritManifest implements InheritManifest {
         return base.getEffectiveManifest()
     }
 
-    @Override
     Manifest writeTo(Writer writer) {
-        this.getEffectiveManifest().writeTo(writer)
+        this.getEffectiveManifest().writeTo((Object) writer)
         return this
     }
 
