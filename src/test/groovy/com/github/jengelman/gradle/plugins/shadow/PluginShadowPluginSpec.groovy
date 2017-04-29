@@ -3,11 +3,11 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 
 
-class ShadowPluginPluginSpec extends PluginSpecification {
+class PluginShadowPluginSpec extends PluginSpecification {
 
     def "auto relocate plugin dependencies"() {
         given:
-        buildFile.text = buildFile.text.replace('com.github.johnrengelman.shadow', 'com.github.johnrengelman.shadow-plugin')
+        buildFile.text = buildFile.text.replace('com.github.johnrengelman.shadow', 'com.github.johnrengelman.plugin-shadow')
         buildFile << """
             dependencies {
 
