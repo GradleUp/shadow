@@ -515,7 +515,7 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Shadow Plugin User Guide &amp; Examples</h1>
 <div class="details">
 <span id="author" class="author">John Engelman - @johnrengelman</span><br>
-<span id="revnumber">version 1.2.4</span>
+<span id="revnumber">version 2.0.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -525,6 +525,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#benefits_of_shadow">1.1. Benefits of Shadow</a></li>
 <li><a href="#getting_started">1.2. Getting Started</a></li>
 <li><a href="#default_java_groovy_tasks">1.3. Default Java/Groovy Tasks</a></li>
+<li><a href="#shadowing_gradle_plugins">1.4. Shadowing Gradle Plugins</a></li>
 </ul>
 </li>
 <li><a href="#configuring_shadow">2. Configuring Shadow</a>
@@ -550,6 +551,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#publishing_with_maven_publish_plugin">5.1. Publishing with Maven-Publish Plugin</a></li>
 <li><a href="#publishing_with_maven_plugin">5.2. Publishing with Maven Plugin</a></li>
+<li><a href="#shadow_configuration_and_publishing">5.3. Shadow Configuration and Publishing</a></li>
 </ul>
 </li>
 <li><a href="#using_shadow_in_multi_project_builds">6. Using Shadow in Multi-Project Builds</a>
@@ -557,11 +559,12 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#depending_on_the_shadow_jar_from_another_project">6.1. Depending on the Shadow Jar from Another Project</a></li>
 </ul>
 </li>
-<li><a href="#change_log">7. Change Log</a></li>
-<li><a href="#about_this_project">8. About This Project</a>
+<li><a href="#using_shadow_to_package_gradle_plugins">7. Using Shadow to Package Gradle Plugins</a></li>
+<li><a href="#change_log">8. Change Log</a></li>
+<li><a href="#about_this_project">9. About This Project</a>
 <ul class="sectlevel2">
-<li><a href="#maintainers">8.1. Maintainers</a></li>
-<li><a href="#contributors">8.2. Contributors</a></li>
+<li><a href="#maintainers">9.1. Maintainers</a></li>
+<li><a href="#contributors">9.2. Contributors</a></li>
 </ul>
 </li>
 </ul>
@@ -647,11 +650,12 @@ library&#8217;s dependencies will not conflict with the same dependency being de
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:1.2.4</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.0</span><span class="delimiter">'</span></span>
     }
 }
 
-apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span></code></pre>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -660,7 +664,8 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">1.2.4</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -748,6 +753,51 @@ following behavior:</p>
 </ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="shadowing_gradle_plugins">1.4. Shadowing Gradle Plugins</h3>
+<div class="paragraph">
+<p>Starting with v2.0.0, Shadow is capable of automatically configuring package relocation for your dependencies.
+This is useful especially when building Gradle plugins where you want your dependencies to not conflict with versions
+provided by the Gradle runtime.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.0</span><span class="delimiter">'</span></span>
+    }
+}
+
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, the Gradle Plugin syntax can be used:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">plugins {
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Applying the <code>shadow-plugin</code> plugin is the same as applying the standard <code>shadow</code> plugin with the additional creation
+of the <code>configureRelocationShadowJar</code> task.
+This task runs before the <code>shadowJar</code> task and scans the packages presention the dependencies that will be merged into
+the final jar and automatically configures relocation for them.
+By default the tasks relocates all packages to the <code>shadow.</code> prefix. For example <code>org.jdom2.JDOMException</code> becomes
+<code>shadow.org.jdom2.JDOMException</code></p>
+</div>
+<div class="paragraph">
+<p>For more details see the sectinon <a href="#using_shadow_to_package_gradle_plugins">Using Shadow to Package Gradle Plugins</a></p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -797,7 +847,10 @@ they are still required for runtime execution.</p>
 </div>
 <div class="paragraph">
 <p>In these scenarios, Shadow creates a <code>shadow</code> configuration to declare these dependencies.
-Dependencies added to the <code>shadow</code> configuration are <strong>not</strong> bundled into the output JAR.</p>
+Dependencies added to the <code>shadow</code> configuration are <strong>not</strong> bundled into the output JAR.
+Think of <code>configurations.shadow</code> as unmerged, runtime dependencies.
+The integration with the <code>maven</code> and <code>maven-publish</code> plugins will automatically configure dependencies added
+to <code>configurations.shadow</code> as <code>RUNTIME</code> scope dependencies in the resulting POM file.</p>
 </div>
 <div class="paragraph">
 <p>Additionally, Shadow automatically configures the manifest of the <code>shadowJar</code> task to contain a <code>Class-Path</code> entry
@@ -1393,7 +1446,7 @@ configure additional tasks for running the shadowed JAR and creating distributio
 </div>
 <div class="paragraph">
 <p>Just like the normal <code>jar</code> task, when the <code>application</code> plugin is applied, the <code>shadowJar</code> manifest will be
-configured to contain the <code>Main-Class</code> attribute with the value specified in the project&#8217;s <code>mainClassName</code> atrribute.</p>
+configured to contain the <code>Main-Class</code> attribute with the value specified in the project&#8217;s <code>mainClassName</code> attribute.</p>
 </div>
 <div class="listingblock">
 <div class="title">Using Shadow with Application Plugin</div>
@@ -1427,14 +1480,14 @@ It can be configured the same as any other <code>JavaExec</code> task.</p>
 <h3 id="distributing_the_shadow_jar">4.2. Distributing the Shadow JAR</h3>
 <div class="paragraph">
 <p>The Shadow plugin will also configure distribution tasks when in the presence of the <code>application</code> plugin.
-The plugin will create <code>distShadowZip</code> and <code>distShadowTar</code> which creates Zip and Tar distributions
+The plugin will create <code>shadowDistZip</code> and <code>shadowDistTar</code> which creates Zip and Tar distributions
 respectively.
 Each distribution will contain the shadowed JAR file along with the necessary start scripts to launch
 the application.</p>
 </div>
 <div class="paragraph">
-<p>Additionally, the plugin will create the <code>installShadowApp</code> and <code>startShadowScripts</code> tasks which stages the necessary
-files for a distribution to <code>build/installShadow</code>.</p>
+<p>Additionally, the plugin will create the <code>installShadowDist</code> and <code>startShadowScripts</code> tasks which stages the necessary
+files for a distribution to <code>build/install/&lt;project name&gt;-shadow/</code>.</p>
 </div>
 </div>
 </div>
@@ -1447,8 +1500,8 @@ files for a distribution to <code>build/installShadow</code>.</p>
 <div class="paragraph">
 <p>The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle&#8217;s
 <code>maven-publish</code> plugin.
-THe plugin will create and configure a software component named <code>"shadow"</code> for use with the
-<code>publishing</code> block.</p>
+The plugin provides the <code>component</code> method from the <code>shadow</code> extension to configure the
+publication with the necessary artifact and dependencies in the POM file.</p>
 </div>
 <div class="listingblock">
 <div class="title">Publishing a Shadow JAR with the Maven-Publish Plugin</div>
@@ -1459,8 +1512,8 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 
 publishing {
   publications {
-    shadow(MavenPublication) {
-      from components.shadow
+    shadow(MavenPublication) { publication -&gt;
+      project.shadow.component(publication)
     }
   }
   repositories {
@@ -1496,6 +1549,28 @@ uploadShadow {
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="shadow_configuration_and_publishing">5.3. Shadow Configuration and Publishing</h3>
+<div class="paragraph">
+<p>The Shadow plugin provides a custom configuration (<code>configurations.shadow</code>) to specify
+runtime dependencies that are <strong>not</strong> merged into the final JAR file.
+When configuring publishing with the Shadow plugin, the dependencies in the <code>shadow</code>
+configuration, are translated to become <code>RUNTIME</code> scoped dependencies of the
+published artifact.</p>
+</div>
+<div class="paragraph">
+<p>No other dependencies are automatically configured for inclusion in the POM file.
+For example, excluded dependencies are <strong>not</strong> automatically added to the POM file or
+if the configuration for merging are modified by specifying
+<code>shadowJar.configurations = [configurations.myconfiguration]</code>, there is no automatic
+configuration of the POM file.</p>
+</div>
+<div class="paragraph">
+<p>This automatic configuration occurs <em>only</em> when using the above methods for
+configuring publishing. If this behavior is not desirable, then publishing <strong>must</strong>
+be manually configured.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1527,13 +1602,112 @@ configuration of the shadowed project.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="change_log">7. Change Log</h2>
+<h2 id="using_shadow_to_package_gradle_plugins">7. Using Shadow to Package Gradle Plugins</h2>
 <div class="sectionbody">
-<h3 id="v1_3_0_unreleased" class="discrete">v1.3.0 (Unreleased)</h3>
+<div class="paragraph">
+<p>In some scenarios, writing a Gradle plugin can be problematic because your plugin may depend on a version that
+conflicts with the same dependency provided by the Gradle runtime. If this is the case, then you can utilize Shadow
+to relocate your dependencies to a different package name to avoid the collision.</p>
+</div>
+<div class="paragraph">
+<p>Configuring the relocation has always been possible, but the build author is required to know all the package names
+before hand. Shadow v2.0 corrects this by introducing a new task type <code>ConfigureShadowRelocation</code>.
+Tasks of this type are configured to target a an instance of a <code>ShadowJar</code> task and run immediately before it.</p>
+</div>
+<div class="paragraph">
+<p>The <code>ConfigureShadowRelocation</code> task, scans the dependencies from the configurations specified on the associated
+<code>ShadowJar</code> task and collects the package names contained within them. It then configures relocation for these
+packages using the specified <code>prefix</code> on the associated <code>ShadowJar</code> task.</p>
+</div>
+<div class="paragraph">
+<p>While this is useful for developing Gradle plugins, nothing about the <code>ConfigureShadowRelocation</code> task is tied to
+Gradle projects. It can be used for standard Java or Groovy projects.</p>
+</div>
+<div class="paragraph">
+<p>A simple Gradle plugin can use this feature by applying the <code>shadow-plugin</code> plugin and configuring the dependencies
+like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">plugins {
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
+}
+
+dependencies {
+    shadow localGroovy()
+    shadow gradleApi()
+
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.jdom:jdom2:2.0.5</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.ow2.asm:asm:5.0.3</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.ow2.asm:asm-commons:5.0.3</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">commons-io:commons-io:2.4</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.apache.ant:ant:1.9.4</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.codehaus.plexus:plexus-utils:2.0.6</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the <code>localGroovy()</code> and <code>gradleApi()</code> dependencies are added to the <code>shadow</code> configuration instead of the
+normal <code>compile</code> configuration. These 2 dependencies are provided by Gradle to compile your project but are ultimately
+provided by the Gradle runtime when executing the plugin. Thus, it is <em>not</em> advisable to bundle these dependencies
+with your plugin.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="change_log">8. Change Log</h2>
+<div class="sectionbody">
+<h3 id="v2_0_0_unreleased" class="discrete">v2.0.0 (Unreleased)</h3>
 <div class="ulist">
 <ul>
 <li>
+<p><strong>Breaking Change!</strong> Restrict Plugin to Gradle 3.0+</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> Build with Java 7</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> Updated <code>Transformer</code> interface to accept <code>TransformerContext</code> object instead of individual values</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> Updated <code>Relocator</code> interface to accept <code>RelocatePathContext</code> and <code>RelocateClassContext</code> objects</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> Distribution tasks <code>distShadowZip</code> and <code>distShadowTar</code> have been removed and replaced with the standard <code>shadowDistZip</code> and <code>shadowDistTar</code> from the Gradle Distribution plugin.</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> The <code>installShadowApp</code> task has been removed and replaced with the standard <code>installShadowDist</code> task from the Gradle Distribution plugin.</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> The new <code>installShadowDist</code> task outputs to <code>build/install/&lt;project name&gt;-shadow</code> per the standard (formerly was <code>build/installShadow</code>)</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> <code>component.shadow</code> removed in favor of <code>project.shadow.component(publication)</code> so as to remove dependency on internal Gradle APIs.</p>
+</li>
+<li>
+<p><em>NEW</em> Introducing <code>ConfigureShadowRelocation</code> task and <code>com.github.johnrengelman.plugin-shadow</code> plugin to automatically configure package relocation for Gradle plugins.</p>
+</li>
+<li>
+<p><em>NEW</em> Integration with Gradle Build Scans. When running a <code>ShadowJar</code> task with Build Scans, custom values including dependencies merged anc package relocations are published in the scan.</p>
+</li>
+<li>
 <p>Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.</p>
+</li>
+<li>
+<p>Replace <code>startShadowScripts</code> tasks with Gradle&#8217;s built-in <code>CreateStartScripts</code> type.</p>
+</li>
+<li>
+<p>Build with Gradle 3.1</p>
+</li>
+<li>
+<p><a href="https://github.com/marcphilipp">Marc Philipp</a> - Add <code>keyTransformer</code> property to <code>PropertiesFileTransformer</code></p>
+</li>
+<li>
+<p>Update to ASM 5.2</p>
+</li>
+<li>
+<p><a href="https://github.com/pkubowicz">Piotr Kubowicz</a> - Support <code>api</code>, <code>implementation</code>, <code>runtimeOnly</code> dependency configurations introdcued in Gradle 3.3</p>
 </li>
 </ul>
 </div>
@@ -1648,7 +1822,7 @@ configuration of the shadowed project.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><em><strong>Breaking Change!</strong></em> Fix leaking of <code>shadowJar.manifest</code> into <code>jar.manifest</code>. (<a href="https://github.com/johnrengelman/shadow/issues/82">Issue #82</a>)
+<p><strong>Breaking Change!</strong> Fix leaking of <code>shadowJar.manifest</code> into <code>jar.manifest</code>. (<a href="https://github.com/johnrengelman/shadow/issues/82">Issue #82</a>)
 To simplify behavior, the <code>shadowJar.appendManifest</code> method has been removed. Replace uses with <code>shadowJar.manifest</code></p>
 </li>
 <li>
@@ -1840,7 +2014,7 @@ must be explicitly configured via a spec.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="about_this_project">8. About This Project</h2>
+<h2 id="about_this_project">9. About This Project</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>I started this project in December of 2012. We were working on converting from a monolithic application into a the
@@ -1865,7 +2039,7 @@ so Shadow was published there.</p>
 <p>Shadow has had nearly ~900,000 downloads from Bintray and countless more from the Gradle Plugin Portal.</p>
 </div>
 <div class="sect2">
-<h3 id="maintainers">8.1. Maintainers</h3>
+<h3 id="maintainers">9.1. Maintainers</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1875,7 +2049,7 @@ so Shadow was published there.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="contributors">8.2. Contributors</h3>
+<h3 id="contributors">9.2. Contributors</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1910,8 +2084,8 @@ so Shadow was published there.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.2.4<br>
-Last updated 2016-06-16 19:56:28 +00:00
+Version 2.0.0<br>
+Last updated 2016-11-17 16:01:01 +00:00
 </div>
 </div>
 <script>
