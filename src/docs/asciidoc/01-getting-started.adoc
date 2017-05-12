@@ -72,7 +72,7 @@ buildscript {
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow-plugin'
+apply plugin: 'com.github.johnrengelman.plugin-shadow'
 apply plugin: 'java'
 ----
 
@@ -81,14 +81,14 @@ Alternatively, the Gradle Plugin syntax can be used:
 [source,groovy,subs="+attributes"]
 ----
 plugins {
-  id 'com.github.johnrengelman.shadow-plugin' version '{project-version}'
+  id 'com.github.johnrengelman.plugin-shadow' version '{project-version}'
   id 'java'
 }
 ----
 
-Applying the `shadow-plugin` plugin is the same as applying the standard `shadow` plugin with the additional creation
+Applying the `plugin-shadow` plugin is the same as applying the standard `shadow` plugin with the additional creation
 of the `configureRelocationShadowJar` task.
-This task runs before the `shadowJar` task and scans the packages presention the dependencies that will be merged into
+This task runs before the `shadowJar` task and scans the packages present in the dependencies that will be merged into
 the final jar and automatically configures relocation for them.
 By default the tasks relocates all packages to the `shadow.` prefix. For example `org.jdom2.JDOMException` becomes
 `shadow.org.jdom2.JDOMException`
