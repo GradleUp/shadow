@@ -771,7 +771,7 @@ provided by the Gradle runtime.</p>
     }
 }
 
-apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span>
 apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span></code></pre>
 </div>
 </div>
@@ -781,15 +781,15 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Applying the <code>shadow-plugin</code> plugin is the same as applying the standard <code>shadow</code> plugin with the additional creation
+<p>Applying the <code>plugin-shadow</code> plugin is the same as applying the standard <code>shadow</code> plugin with the additional creation
 of the <code>configureRelocationShadowJar</code> task.
-This task runs before the <code>shadowJar</code> task and scans the packages presention the dependencies that will be merged into
+This task runs before the <code>shadowJar</code> task and scans the packages present in the dependencies that will be merged into
 the final jar and automatically configures relocation for them.
 By default the tasks relocates all packages to the <code>shadow.</code> prefix. For example <code>org.jdom2.JDOMException</code> becomes
 <code>shadow.org.jdom2.JDOMException</code></p>
@@ -1612,7 +1612,7 @@ to relocate your dependencies to a different package name to avoid the collision
 <div class="paragraph">
 <p>Configuring the relocation has always been possible, but the build author is required to know all the package names
 before hand. Shadow v2.0 corrects this by introducing a new task type <code>ConfigureShadowRelocation</code>.
-Tasks of this type are configured to target a an instance of a <code>ShadowJar</code> task and run immediately before it.</p>
+Tasks of this type are configured to target an instance of a <code>ShadowJar</code> task and run immediately before it.</p>
 </div>
 <div class="paragraph">
 <p>The <code>ConfigureShadowRelocation</code> task, scans the dependencies from the configurations specified on the associated
@@ -1624,7 +1624,7 @@ packages using the specified <code>prefix</code> on the associated <code>ShadowJ
 Gradle projects. It can be used for standard Java or Groovy projects.</p>
 </div>
 <div class="paragraph">
-<p>A simple Gradle plugin can use this feature by applying the <code>shadow-plugin</code> plugin and configuring the dependencies
+<p>A simple Gradle plugin can use this feature by applying the <code>plugin-shadow</code> plugin and configuring the dependencies
 like so:</p>
 </div>
 <div class="listingblock">
