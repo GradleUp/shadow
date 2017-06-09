@@ -424,6 +424,52 @@ class ShadowPluginSpec extends PluginSpecification {
                           'runtime.properties', 'runtimeOnly.properties'])
     }
 
+    def "include java-library configurations by default transitively"() {
+        given:
+        GradleRunner versionRunner = runner
+                .withGradleVersion('3.5')
+                .withArguments('--stacktrace')
+                .withDebug(true)
+
+        repo.module('shadow', 'api', '1.0')
+                .insertFile('api.properties', 'api')
+                .publish()
+
+        repo.module('shadow', 'implementation', '1.0')
+                .insertFile('implementation.properties', 'implementation')
+                .publish()
+
+        repo.module('shadow', 'compile', '1.0')
+                .insertFile('compile.properties', 'compile')
+                .publish()
+
+        repo.module('shadow', 'runtime', '1.0')
+                .insertFile('runtime.properties', 'runtime')
+                .publish()
+
+        repo.module('shadow', 'runtimeOnly', '1.0')
+                .insertFile('runtimeOnly.properties', 'runtimeOnly')
+                .publish()
+
+        repo.module('shadow', 'all', '1.0')
+                .dependsOn('api', 'implementation', 'compile', 'runtime', 'runtimeOnly')
+                .publish()
+
+        buildFile.text = defaultBuildScript.replace('java', 'java-library')
+        buildFile << """
+            dependencies {
+               implementation 'shadow:all:1.0'
+            }
+        """.stripIndent()
+
+        when:
+        versionRunner.withArguments('shadowJar').build()
+
+        then:
+        contains(output, ['api.properties', 'implementation.properties', 'compile.properties',
+                          'runtime.properties', 'runtimeOnly.properties'])
+    }
+
     def "doesn't include compileOnly configuration by default"() {
         given:
         repo.module('shadow', 'a', '1.0')
