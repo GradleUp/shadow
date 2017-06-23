@@ -1,12 +1,12 @@
 == Change Log
 
 [discrete]
-=== v2.0.1
+=== v2.0.1 (2017-06-23)
 
 * Fix `null+configuration` error (https://github.com/johnrengelman/shadow/issues/297[Issue #297])
 
 [discrete]
-=== v2.0.0
+=== v2.0.0 (2017-05-09)
 
 * **Breaking Change!** Restrict Plugin to Gradle 3.0+
 * **Breaking Change!** Build with Java 7
@@ -26,7 +26,7 @@
 * https://github.com/pkubowicz[Piotr Kubowicz] - Support `api`, `implementation`, `runtimeOnly` dependency configurations introdcued in Gradle 3.3
 
 [discrete]
-=== v1.2.4
+=== v1.2.4 (2016-11-03)
 * Don't resolve dependency configurations during config phase (https://github.com/johnrengelman/shadow/issues/129[Issue #128])
 * Build plugin with Gradle 2.14
 * Fix docs regarding inheriting Jar manifest (https://github.com/johnrengelman/shadow/issues/251[Issue #251])
@@ -36,7 +36,7 @@
 * https://github.com/jszakmeister[John Szakmeister] - Preserve timestamps on merged jar entries (https://github.com/johnrengelman/shadow/pull/260[Pull Request #260])
 
 [discrete]
-=== v1.2.3
+=== v1.2.3 (2016-01-25)
 
 * Support for Gradle 2.11-rc-1 (https://github.com/johnrengelman/shadow/issues/177[Issue #177])
 * Convert internal framework to https://docs.gradle.org/current/userguide/test_kit.html[Gradle TestKit]
@@ -45,17 +45,17 @@
 * https://github.com/siordache[Serban Iordache] - Evaluate relocation specs when merging service descriptors (https://github.com/johnrengelman/shadow/pull/165[PR #165])
 
 [discrete]
-=== v1.2.2
+=== v1.2.2 (2015-07-17)
 
 * https://github.com/Minecrell[Minecrell] - Gradle 2.5 compatibility (https://github.com/johnrengelman/shadow/issues/147[Issue #147])
 
 [discrete]
-=== v1.2.1
+=== v1.2.1 (2015-01-23)
 
 * Apply package relocations to dependency resources (https://github.com/johnrengelman/shadow/issues/114[Issue #114])
 
 [discrete]
-=== v1.2.0
+=== v1.2.0 (2014-11-24)
 
 * Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the `org.apache.tools.zip` package.
 * Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from `jdom:jdom:1.1` to `org.jdom:jdom2:2.0.5`) (https://github.com/johnrengelman/shadow/issues/98[Issue #98])
@@ -65,19 +65,19 @@
 * Apply package relocations to resource files (https://github.com/johnrengelman/shadow/issues/93[Issue #93])
 
 [discrete]
-=== v1.1.2
+=== v1.1.2 (2014-09-09)
 
 * fix bug in `runShadow` where dependencies from the `shadow` configuration are not available (https://github.com/johnrengelman/shadow/issues/94[Issue #94])
 
 [discrete]
-=== v1.1.1
+=== v1.1.1 (2014-08-27)
 
 * Fix bug in `'createStartScripts'` task that was causing it to not execute `'shadowJar'` task (https://github.com/johnrengelman/shadow/issues/90[Issue #90])
 * Do not include `null` in ShadowJar Manifest `'Class-Path'` value when `jar` task does not specify a value for it. (https://github.com/johnrengelman/shadow/issues/92[Issue #92])
 * ShadowJar Manifest `'Class-Path'` should reference jars from `'shadow'` config as relative to location of `shadowJar` output (https://github.com/johnrengelman/shadow/issues/91[Issue #91])
 
 [discrete]
-=== v1.1.0
+=== v1.1.0 (2014-08-26)
 
 * **Breaking Change!** Fix leaking of `shadowJar.manifest` into `jar.manifest`. (https://github.com/johnrengelman/shadow/issues/82[Issue #82])
   To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with `shadowJar.manifest`
@@ -96,7 +96,7 @@
 * `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the `'application'` plugin (https://github.com/johnrengelman/shadow/issues/89[Issue #89])
 
 [discrete]
-=== v1.0.3
+=== v1.0.3 (2014-07-29)
 
 * Make service files root path configurable for `ServiceFileTransformer` (https://github.com/johnrengelman/shadow/issues/72[Issue #72])
 * https://github.com/aalmiray[Andres Almiray] - Added PropertiesFileTransformer (https://github.com/johnrengelman/shadow/issues/73[Issue #73])
@@ -106,7 +106,7 @@
 * Remove support for applying individual sub-plugins by Id (easier maintenance and cleaner presentation in Gradle Portal)
 
 [discrete]
-=== v1.0.2
+=== v1.0.2 (2014-07-07)
 
 * Do not add an empty Class-Path attribute to the manifest when the `shadow` configuration contains no dependencies.
 * `runShadow` now registers `shadowJar` as an input. Previously, `runShadow` did not execute `shadowJar` and an error occurred.
@@ -114,14 +114,14 @@
 * Do not override existing 'Class-Path' Manifest attribute settings from Jar configuration. Instead combine. (https://github.com/johnrengelman/shadow/issues/65[Issue #65])
 
 [discrete]
-=== v1.0.1
+=== v1.0.1 (2014-06-28)
 
 * Fix issue where non-class files are dropped when using relocation (https://github.com/johnrengelman/shadow/issues/58[Issue #58])
 * Do not create a `/` directory inside the output jar.
 * Fix `runShadow` task to evaluate the `shadowJar.archiveFile` property at execution time. (https://github.com/johnrengelman/shadow/issues/60[Issue #60])
 
 [discrete]
-=== v1.0.0
+=== v1.0.0 (2014-06-27)
 
 * Previously known as v0.9.0
 * All changes from 0.9.0-M1 to 0.9.0-M5
