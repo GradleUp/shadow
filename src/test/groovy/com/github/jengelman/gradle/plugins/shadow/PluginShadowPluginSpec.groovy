@@ -16,7 +16,7 @@ class PluginShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        runner.withArguments('shadowJar', '-s').build()
 
         then:
         then:

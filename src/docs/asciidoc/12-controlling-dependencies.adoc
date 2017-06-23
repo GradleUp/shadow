@@ -2,7 +2,7 @@
 
 Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtime` configuration
 into the final JAR.
-The configurations to source dependencies from for the merging can be configured using the `configurations` property
+The configurations to from which to source dependencies for the merging can be configured using the `configurations` property
 of the link:{api}/tasks/ShadowJar.html[`ShadowJar`] task type.
 
 [source,groovy,indent=0]

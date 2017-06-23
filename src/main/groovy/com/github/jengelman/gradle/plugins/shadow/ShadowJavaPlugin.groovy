@@ -31,9 +31,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
     void apply(Project project) {
         configureShadowTask(project)
 
-        project.tasks.withType(AbstractCompile) {
-            it.classpath += project.configurations.shadow
-        }
+        project.configurations.compileClasspath.extendsFrom project.configurations.shadow
 
     }
 

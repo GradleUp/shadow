@@ -17,7 +17,7 @@ of the dependencies to be merged.
 include::{tests}/FilteringSpec.groovy[tags=excludeFile]
 ----
 
-Excludes and includes can be combined just like a noraml `Jar` task, with `excludes` taking precendence over `includes`.
+Excludes and includes can be combined just like a normal `Jar` task, with `excludes` taking precendence over `includes`.
 Additionally, ANT style patterns can be used to match multiple files.
 
 .Configuring output using ANT patterns

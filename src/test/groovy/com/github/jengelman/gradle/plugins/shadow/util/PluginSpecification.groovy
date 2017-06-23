@@ -30,6 +30,10 @@ class PluginSpecification extends Specification {
         '''
     }
 
+    def cleanup() {
+        println buildFile.text
+    }
+
     String getDefaultBuildScript() {
         return """
         buildscript {
@@ -45,8 +49,12 @@ class PluginSpecification extends Specification {
         version = "1.0"
         group = 'shadow'
 
-        apply plugin: 'java'
         apply plugin: 'com.github.johnrengelman.shadow'
+        apply plugin: 'java'
+
+        sourceSets {
+          integTest
+        }
 
         repositories { maven { url "${repo.uri}" } }
         """.stripIndent()

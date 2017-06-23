@@ -1,7 +1,12 @@
 == Change Log
 
 [discrete]
-=== v2.0.0 (Unreleased)
+=== v2.0.1
+
+* Fix `null+configuration` error (https://github.com/johnrengelman/shadow/issues/297[Issue #297])
+
+[discrete]
+=== v2.0.0
 
 * **Breaking Change!** Restrict Plugin to Gradle 3.0+
 * **Breaking Change!** Build with Java 7
