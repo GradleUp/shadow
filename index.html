@@ -515,7 +515,7 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Shadow Plugin User Guide &amp; Examples</h1>
 <div class="details">
 <span id="author" class="author">John Engelman - @johnrengelman</span><br>
-<span id="revnumber">version 2.0.0</span>
+<span id="revnumber">version 2.0.1</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -650,7 +650,7 @@ library&#8217;s dependencies will not conflict with the same dependency being de
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.0</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.1</span><span class="delimiter">'</span></span>
     }
 }
 
@@ -664,7 +664,7 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.1</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
@@ -767,11 +767,11 @@ provided by the Gradle runtime.</p>
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.0</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.1</span><span class="delimiter">'</span></span>
     }
 }
 
-apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span>
 apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span></code></pre>
 </div>
 </div>
@@ -781,15 +781,15 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.1</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Applying the <code>plugin-shadow</code> plugin is the same as applying the standard <code>shadow</code> plugin with the additional creation
+<p>Applying the <code>shadow-plugin</code> plugin is the same as applying the standard <code>shadow</code> plugin with the additional creation
 of the <code>configureRelocationShadowJar</code> task.
-This task runs before the <code>shadowJar</code> task and scans the packages present in the dependencies that will be merged into
+This task runs before the <code>shadowJar</code> task and scans the packages presention the dependencies that will be merged into
 the final jar and automatically configures relocation for them.
 By default the tasks relocates all packages to the <code>shadow.</code> prefix. For example <code>org.jdom2.JDOMException</code> becomes
 <code>shadow.org.jdom2.JDOMException</code></p>
@@ -947,7 +947,7 @@ of the dependencies to be merged.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Excludes and includes can be combined just like a noraml <code>Jar</code> task, with <code>excludes</code> taking precendence over <code>includes</code>.
+<p>Excludes and includes can be combined just like a normal <code>Jar</code> task, with <code>excludes</code> taking precendence over <code>includes</code>.
 Additionally, ANT style patterns can be used to match multiple files.</p>
 </div>
 <div class="listingblock">
@@ -966,7 +966,7 @@ Additionally, ANT style patterns can be used to match multiple files.</p>
 <div class="paragraph">
 <p>Shadow configures the default <code>shadowJar</code> task to merge all dependencies from the project&#8217;s <code>runtime</code> configuration
 into the final JAR.
-The configurations to source dependencies from for the merging can be configured using the <code>configurations</code> property
+The configurations to from which to source dependencies for the merging can be configured using the <code>configurations</code> property
 of the <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html"><code>ShadowJar</code></a> task type.</p>
 </div>
 <div class="listingblock">
@@ -1612,7 +1612,7 @@ to relocate your dependencies to a different package name to avoid the collision
 <div class="paragraph">
 <p>Configuring the relocation has always been possible, but the build author is required to know all the package names
 before hand. Shadow v2.0 corrects this by introducing a new task type <code>ConfigureShadowRelocation</code>.
-Tasks of this type are configured to target an instance of a <code>ShadowJar</code> task and run immediately before it.</p>
+Tasks of this type are configured to target a an instance of a <code>ShadowJar</code> task and run immediately before it.</p>
 </div>
 <div class="paragraph">
 <p>The <code>ConfigureShadowRelocation</code> task, scans the dependencies from the configurations specified on the associated
@@ -1624,13 +1624,13 @@ packages using the specified <code>prefix</code> on the associated <code>ShadowJ
 Gradle projects. It can be used for standard Java or Groovy projects.</p>
 </div>
 <div class="paragraph">
-<p>A simple Gradle plugin can use this feature by applying the <code>plugin-shadow</code> plugin and configuring the dependencies
+<p>A simple Gradle plugin can use this feature by applying the <code>shadow-plugin</code> plugin and configuring the dependencies
 like so:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.1</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }
 
@@ -1658,7 +1658,15 @@ with your plugin.</p>
 <div class="sect1">
 <h2 id="change_log">8. Change Log</h2>
 <div class="sectionbody">
-<h3 id="v2_0_0_unreleased" class="discrete">v2.0.0 (Unreleased)</h3>
+<h3 id="v2_0_1" class="discrete">v2.0.1</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix <code>null+configuration</code> error (<a href="https://github.com/johnrengelman/shadow/issues/297">Issue #297</a>)</p>
+</li>
+</ul>
+</div>
+<h3 id="v2_0_0" class="discrete">v2.0.0</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2084,8 +2092,8 @@ so Shadow was published there.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 2.0.0<br>
-Last updated 2016-11-17 16:01:01 +00:00
+Version 2.0.1<br>
+Last updated 2017-06-23 07:43:31 -05:00
 </div>
 </div>
 <script>
