@@ -59,7 +59,7 @@ When deploying a shadowed JAR as an execution JAR, it is important to note that 
 
 === Configuring the JAR Manifest
 
-Beyond the autmatic configuration of the `Class-Path` entry, the `shadowJar` manifest is configured in a number of ways.
+Beyond the automatic configuration of the `Class-Path` entry, the `shadowJar` manifest is configured in a number of ways.
 First, the manifest for the `shadowJar` task is configured to __inherit__ from the manifest of the standard `jar` task.
 This means that any configuration performed on the `jar` task will propagate to the `shadowJar` tasks.
 
