@@ -18,15 +18,16 @@ class ShadowPlugin implements Plugin<Project> {
             project.plugins.apply(ShadowApplicationPlugin)
         }
 
-        project.plugins.withId('com.gradle.build-scan') {
-            project.buildScan.buildFinished {
+        def rootProject = project.rootProject
+        rootProject.plugins.withId('com.gradle.build-scan') {
+            rootProject.buildScan.buildFinished {
                 def shadowTasks = project.tasks.withType(ShadowJar)
                 shadowTasks.each { task ->
                     if (task.didWork) {
                         task.stats.buildScanData.each { k, v ->
-                            project.buildScan.value "shadow.${task.name}.${k}", v.toString()
+                            rootProject.buildScan.value "shadow.${task.path}.${k}", v.toString()
                         }
-                        project.buildScan.value "shadow.${task.name}.configurations", task.configurations*.name.join(", ")
+                        rootProject.buildScan.value "shadow.${task.path}.configurations", task.configurations*.name.join(", ")
                     }
                 }
             }
