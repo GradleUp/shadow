@@ -31,6 +31,7 @@ import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.internal.UncheckedException
+import org.gradle.util.DeprecationLogger
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
@@ -96,7 +97,12 @@ class ShadowCopyAction implements CopyAction {
                 )
             }
         }
-        return new SimpleWorkResult(true)
+
+        WorkResult result = null
+        DeprecationLogger.whileDisabled {
+            result = new SimpleWorkResult(true)
+        }
+        return result
     }
 
     private void processTransformers(ZipOutputStream stream) {
