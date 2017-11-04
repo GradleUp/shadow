@@ -38,7 +38,7 @@ buildScan {
         } else {
             link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_BRANCH}"
         }
-        tag 'VCS Commit', "https://github.com/johnrengelman/shadow/commit/${System.env.CIRCLE_SHA1}"
+        link 'VCS Commit', "https://github.com/johnrengelman/shadow/commit/${System.env.CIRCLE_SHA1}"
         if (System.env.CI_PULL_REQUEST) {
             link 'Pull Request', "${System.env.CI_PULL_REQUEST}"
         }
