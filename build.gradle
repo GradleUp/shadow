@@ -40,7 +40,7 @@ buildScan {
         }
         tag 'VCS Commit', "https://github.com/johnrengelman/shadow/commit/${System.env.CIRCLE_SHA1}"
         if (System.env.CI_PULL_REQUEST) {
-            tag 'Pull Request', "${System.env.CI_PULL_REQUEST}"
+            link 'Pull Request', "${System.env.CI_PULL_REQUEST}"
         }
     }
 }
