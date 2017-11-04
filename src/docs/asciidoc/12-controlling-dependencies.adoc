@@ -24,6 +24,10 @@ have the intended effect, as `configurations.compile` will try to delegate to th
 the link:{api}/tasks/ShadowJar.html[`ShadowJar`] task instead of the `project`
 ====
 
+=== Embedding Jar Files Inside Your Shadow Jar
+
+Because of the way that Gradle handles dependency configuration, from a plugin perspective, shadow is unable to distinguish between a jar file configured as a dependency and a jar file included in the resource folder.  This means that any jar found in a resource directory will be merged into the shadow jar the same as any other dependency.  If your intention is to embed the jar inside, you must rename the jar as to not end with `.jar` before the shadow task begins.
+
 === Filtering Dependencies
 
 Individual dependencies can be filtered from the final JAR by using the `dependencies` block of a
