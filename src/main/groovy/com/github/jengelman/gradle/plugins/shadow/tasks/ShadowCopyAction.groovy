@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
+import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
@@ -49,10 +50,11 @@ class ShadowCopyAction implements CopyAction {
     private final PatternSet patternSet
     private final ShadowStats stats
     private final String encoding
+    private final GradleVersionUtil versionUtil
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             String encoding, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats) {
+                            PatternSet patternSet, ShadowStats stats, GradleVersionUtil util) {
 
         this.zipFile = zipFile
         this.compressor = compressor
@@ -62,6 +64,7 @@ class ShadowCopyAction implements CopyAction {
         this.patternSet = patternSet
         this.stats = stats
         this.encoding = encoding
+        this.versionUtil = util
     }
 
     @Override
@@ -96,7 +99,7 @@ class ShadowCopyAction implements CopyAction {
                 )
             }
         }
-        return new SimpleWorkResult(true)
+        return versionUtil.getWorkResult(true)
     }
 
     private void processTransformers(ZipOutputStream stream) {

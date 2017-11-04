@@ -59,7 +59,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
-                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats);
+                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
+                versionUtil);
     }
 
     protected ZipCompressor getInternalCompressor() {
