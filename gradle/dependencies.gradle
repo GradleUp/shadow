@@ -11,7 +11,6 @@ dependencies {
     compile 'org.apache.ant:ant:1.9.7'
     compile 'org.codehaus.plexus:plexus-utils:3.0.24'
 
-    testCompile gradleTestKit()
     testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
         exclude module: 'groovy-all'
     }

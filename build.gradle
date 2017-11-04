@@ -23,6 +23,7 @@ plugins {
     id 'groovy'
     id 'project-report'
     id 'idea'
+    id 'java-gradle-plugin'
 }
 
 apply plugin: 'com.github.johnrengelman.plugin-shadow'
@@ -30,6 +31,9 @@ apply plugin: 'com.github.johnrengelman.plugin-shadow'
 buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'
     licenseAgree = 'yes'
+    if (System.env.CI == 'true') {
+        tag 'CI'
+    }
 }
 
 apply from: file('gradle/docs.gradle')
@@ -39,12 +43,10 @@ apply from: file('gradle/ghPages.gradle')
 apply from: file('gradle/dependencies.gradle')
 
 repositories {
-    mavenLocal()
     jcenter()
 }
 
 test {
-    dependsOn publishToMavenLocal
     if (System.env.CI == 'true') {
         testLogging.showStandardStreams = true
         minHeapSize "1g"
@@ -71,6 +73,6 @@ sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
 task downloadDependencies(type: Exec) {
-    configurations.testRuntime.files
+    dependsOn configurations.testRuntime
     commandLine 'echo', 'Downloaded all dependencies'
 }

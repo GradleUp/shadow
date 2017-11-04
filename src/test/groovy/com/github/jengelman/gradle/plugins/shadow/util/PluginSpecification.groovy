@@ -36,21 +36,13 @@ class PluginSpecification extends Specification {
 
     String getDefaultBuildScript() {
         return """
-        buildscript {
-          repositories {
-            //maven { url "${localRepo.toURI()}" }
-            mavenLocal()
-            jcenter()
-          }
-          dependencies {
-            classpath 'com.github.jengelman.gradle.plugins:shadow:${SHADOW_VERSION}'
-          }
+        plugins {
+            id 'java'
+            id 'com.github.johnrengelman.shadow'
         }
+
         version = "1.0"
         group = 'shadow'
-
-        apply plugin: 'com.github.johnrengelman.shadow'
-        apply plugin: 'java'
 
         sourceSets {
           integTest
@@ -64,8 +56,7 @@ class PluginSpecification extends Specification {
         GradleRunner.create()
                 .withProjectDir(dir.root)
                 .forwardOutput()
-//                .withDebug(true)
-                .withTestKitDir(getTestKitDir())
+                .withPluginClasspath()
     }
 
     File getLocalRepo() {
