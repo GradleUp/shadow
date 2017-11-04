@@ -73,7 +73,7 @@ class ShadowPluginSpec extends PluginSpecification {
               compile 'junit:junit:3.8.2'
               compile files('${escapedPath(one)}')
             }
-            
+
             shadowJar {
                mergeServiceFiles()
             }
@@ -86,7 +86,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '4.0-20170428204016+0000']
+        version << ['3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '4.0', '4.1', '4.2', '4.3']
     }
 
     def 'Error in Gradle versions < 3.0'() {
@@ -141,7 +141,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             dependencies { compile 'junit:junit:3.8.2' }
-            
+
             // tag::rename[]
             shadowJar {
                baseName = 'shadow'
@@ -180,16 +180,16 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/src/main/java/server/Server.java') << """
             package server;
-            
+
             import client.Client;
-            
+
             public class Server {}
         """.stripIndent()
 
         file('server/build.gradle') << """
             apply plugin: 'java'
             apply plugin: 'com.github.johnrengelman.shadow'
-            
+
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(':client') }
 
@@ -224,7 +224,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'com.github.johnrengelman.shadow'
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile 'junit:junit:3.8.2' }
-            
+
             shadowJar {
                relocate 'junit.framework', 'client.junit.framework'
             }
@@ -232,16 +232,16 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/src/main/java/server/Server.java') << """
             package server;
-            
+
             import client.Client;
             import client.junit.framework.Test;
-            
+
             public class Server {}
         """.stripIndent()
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            
+
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
@@ -280,7 +280,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'com.github.johnrengelman.shadow'
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile 'junit:junit:3.8.2' }
-            
+
             shadowJar {
                relocate 'junit.framework', 'client.junit.framework'
             }
@@ -288,17 +288,17 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/src/main/java/server/Server.java') << """
             package server;
-            
+
             import client.Client;
             import client.junit.framework.Test;
-            
+
             public class Server {}
         """.stripIndent()
 
         file('server/build.gradle') << """
             apply plugin: 'java'
             apply plugin: 'com.github.johnrengelman.shadow'
-            
+
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
@@ -505,7 +505,7 @@ class ShadowPluginSpec extends PluginSpecification {
               shadow 'junit:junit:3.8.2'
             }
             // end::shadowConfig[]
-            
+
             // tag::jarManifest[]
             jar {
                manifest {
