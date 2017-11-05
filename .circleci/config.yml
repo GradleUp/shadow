@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - run: ./gradlew downloadDependencies
-      - run: ./gradlew check -Dscan
+      - run: ./gradlew build --scan
       - run:
           name: Save test results
           command: |
