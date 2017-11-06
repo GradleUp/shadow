@@ -1,6 +1,6 @@
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.artifactory-publish'
+apply plugin: 'com.jfrog.artifactory'
 apply plugin: "com.gradle.plugin-publish"
 
 group = 'com.github.jengelman.gradle.plugins'

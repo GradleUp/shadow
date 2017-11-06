@@ -6,8 +6,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.5'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.0.0"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.5.4"
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
@@ -85,3 +85,5 @@ task downloadDependencies(type: Exec) {
     dependsOn configurations.testRuntime
     commandLine 'echo', 'Downloaded all dependencies'
 }
+
+tasks.build.dependsOn tasks.shadowJar

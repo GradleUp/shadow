@@ -7,6 +7,7 @@ jobs:
     environment:
       - TERM: "dumb"
       - GRADLE_OPTS: "-Xmx1024m"
+      - GRADLE_USER_HOME: ".gradle"
     steps:
       - checkout
       - run: ./gradlew downloadDependencies
