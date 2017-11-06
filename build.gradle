@@ -26,6 +26,13 @@ plugins {
     id 'java-gradle-plugin'
 }
 
+// Remove the gradleApi so it isn't merged into the jar file.
+configurations.compile.dependencies.remove dependencies.gradleApi()
+
+gradlePlugin {
+    automatedPublishing = false
+}
+
 apply plugin: 'com.github.johnrengelman.plugin-shadow'
 
 buildScan {
@@ -67,6 +74,8 @@ jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
 }
+
+jar.enabled = false
 
 shadowJar {
     classifier = ''
