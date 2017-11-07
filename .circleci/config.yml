@@ -15,19 +15,19 @@ jobs:
       - checkout
 
       - restore_cache:
-        keys:
-          - gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
-          - gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-          - gradle-{{ .Branch }}
-          - gradle-master
-          - gradle
+          keys:
+            - gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
+            - gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            - gradle-{{ .Branch }}
+            - gradle-master
+            - gradle
 
       - run: ./gradlew downloadDependencies
 
       - save_cache:
-        key: gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
-        paths:
-          - .gradle
+          key: gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
+          paths:
+            - .gradle
 
       - run: ./gradlew build --scan
 
