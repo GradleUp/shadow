@@ -36,9 +36,9 @@ workflows:
   release:
     jobs:
       - build:
-        filters:
-          branches:
-            ignore: gh-pages
+          filters:
+            branches:
+              ignore: gh-pages
       - deploy-snapshot:
           requires:
             - build
