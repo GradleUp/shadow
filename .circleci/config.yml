@@ -1,11 +1,10 @@
 defaults: &defaults
-  working_directory: /tmp/shadow
+  working_directory: ~/shadow
   docker:
     - image: circleci/openjdk:8-jdk
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: "-Xmx1024m"
-
 
 version: 2
 jobs:
@@ -27,7 +26,7 @@ jobs:
       - save_cache:
           key: gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
           paths:
-            - .gradle
+            - ~/.gradle
 
       - run: ./gradlew build --scan
 
@@ -45,15 +44,17 @@ jobs:
           path: ~/junit
 
       - persist_to_workspace:
-          root: /tmp/shadow
+          root: ~/shadow
           paths:
             - build/*
 
   deploy-snapshot:
     <<: *defaults
     steps:
+      - checkout
+
       - attach_workspace:
-          at: /tmp/shadow
+          at: ~/build
 
       - run: ./gradlew artifactoryPublish
 
