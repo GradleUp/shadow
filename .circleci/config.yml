@@ -1,35 +1,62 @@
+defaults: &defaults
+  working_directory: /tmp/shadow
+  docker:
+    - image: circleci/openjdk:8-jdk
+  environment:
+    - TERM: "dumb"
+    - GRADLE_OPTS: "-Xmx1024m"
+
+
 version: 2
 jobs:
   build:
-    working_directory: ~/shadow
-    docker:
-      - image: circleci/openjdk:8-jdk
-    environment:
-      - TERM: "dumb"
-      - GRADLE_OPTS: "-Xmx1024m"
+    <<: *defaults
     steps:
       - checkout
+
+      - restore_cache:
+        keys:
+          - gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
+          - gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          - gradle-{{ .Branch }}
+          - gradle-master
+          - gradle
+
       - run: ./gradlew downloadDependencies
+
+      - save_cache:
+        key: gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
+        paths:
+          - .gradle
+
       - run: ./gradlew build --scan
+
       - run:
           name: Save test results
           command: |
             mkdir -p ~/junit/
             find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/junit/ \;
           when: always
+
       - store_test_results:
           path: ~/junit
+
       - store_artifacts:
           path: ~/junit
+
+      - persist_to_workspace:
+          root: /tmp/shadow
+          paths:
+            - build/*
+
   deploy-snapshot:
-    working_directory: ~/shadow
-    docker:
-      - image: circleci/openjdk:8-jdk
-    environment:
-      - TERM: "dumb"
-      - GRADLE_OPTS: "-Xmx1024m"
+    <<: *defaults
     steps:
+      - attach_workspace:
+          at: /tmp/shadow
+
       - run: ./gradlew artifactoryPublish
+
 workflows:
   version: 2
   build_and_publish:
