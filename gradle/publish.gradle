@@ -97,6 +97,7 @@ bintrayUpload { task ->
 
 bintray {
     publications = ['plugin']
+    publish = true
     pkg {
         repo = 'gradle-plugins'
         name = 'gradle-shadow-plugin'
