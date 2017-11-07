@@ -23,17 +23,16 @@ jobs:
           path: ~/junit
   deploy-snapshot:
     working_directory: ~/shadow
-      docker:
-        - image: circleci/openjdk:8-jdk
-      environment:
-        - TERM: "dumb"
-        - GRADLE_OPTS: "-Xmx1024m"
-      steps:
-        - run: ./gradlew artifactoryPublish
-
+    docker:
+      - image: circleci/openjdk:8-jdk
+    environment:
+      - TERM: "dumb"
+      - GRADLE_OPTS: "-Xmx1024m"
+    steps:
+      - run: ./gradlew artifactoryPublish
 workflows:
   version: 2
-  release:
+  build_and_publish:
     jobs:
       - build:
           filters:
