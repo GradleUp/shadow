@@ -663,6 +663,61 @@ class ShadowPluginSpec extends PluginSpecification {
 
     }
 
+    @Issue("SHADOW-303")
+    def "doesn't error when adding aspectj plugin"() {
+        given:
+        buildFile.text = """
+        buildscript {
+            repositories {
+                maven {
+                    url "https://maven.eveoh.nl/content/repositories/releases"
+                }
+            }
+
+            dependencies {
+                classpath "nl.eveoh:gradle-aspectj:2.0"
+            }
+        }
+        """.stripIndent()
+
+        buildFile << defaultBuildScript
+
+        buildFile << """
+            project.ext {
+                aspectjVersion = '1.8.12'
+            }
+
+            apply plugin: 'aspectj'
+            apply plugin: 'application'
+
+            mainClassName = 'myapp.Main'
+
+            repositories {
+                jcenter()
+            }
+
+            runShadow {
+               args 'foo'
+            }
+
+        """
+
+        file('src/main/java/myapp/Main.java') << """
+            package myapp;
+            public class Main {
+               public static void main(String[] args) {
+                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
+               }
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult result = runner.withArguments('runShadow', '--stacktrace').build()
+
+        then: 'tests that runShadow executed and exited'
+        assert result.output.contains('TestApp: Hello World! (foo)')
+    }
+
     private String escapedPath(File file) {
         file.path.replaceAll('\\\\', '\\\\\\\\')
     }
