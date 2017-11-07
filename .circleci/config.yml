@@ -7,7 +7,6 @@ jobs:
     environment:
       - TERM: "dumb"
       - GRADLE_OPTS: "-Xmx1024m"
-      - GRADLE_USER_HOME: ".gradle"
     steps:
       - checkout
       - run: ./gradlew downloadDependencies
@@ -22,3 +21,27 @@ jobs:
           path: ~/junit
       - store_artifacts:
           path: ~/junit
+  deploy-snapshot:
+    working_directory: ~/shadow
+      docker:
+        - image: circleci/openjdk:8-jdk
+      environment:
+        - TERM: "dumb"
+        - GRADLE_OPTS: "-Xmx1024m"
+      steps:
+        - run: ./gradlew artifactoryPublish
+
+workflows:
+  version: 2
+  release:
+    jobs:
+      - build:
+        filters:
+          branches:
+            ignore: gh-pages
+      - deploy-snapshot:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

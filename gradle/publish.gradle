@@ -5,7 +5,14 @@ apply plugin: "com.gradle.plugin-publish"
 
 group = 'com.github.jengelman.gradle.plugins'
 def versionString = file('src/main/resources/shadow-version.txt').text.trim()
-version = versionString
+if (System.env.CIRCLE_TAG && System.env.CIRCLE_TAG =~  /^\d\.\d\.\d$/) {
+    version = System.env.CIRCLE_TAG
+} else {
+    version = versionString
+    if (!version.endsWith("-SNAPSHOT")) {
+        version = version + "-SNAPSHOT"
+    }
+}
 
 ext.isSnapshot = version.endsWith("SNAPSHOT")
 
