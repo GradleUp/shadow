@@ -26,7 +26,6 @@ import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
-import org.gradle.api.internal.tasks.SimpleWorkResult
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.bundling.Zip

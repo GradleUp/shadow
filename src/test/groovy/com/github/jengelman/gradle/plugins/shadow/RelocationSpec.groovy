@@ -286,4 +286,38 @@ class RelocationSpec extends PluginSpecification {
                 'foo/dep.properties'
         ])
     }
+
+    @Issue("SHADOW-294")
+    def "does not error on relocating java9 classes"() {
+        given:
+        buildFile << """
+            repositories {
+                jcenter()
+                maven {
+                    url 'http://repository.mapr.com/nexus/content/groups/mapr-public'
+                }
+            }
+
+            dependencies {
+                compile 'org.slf4j:slf4j-api:1.7.21'
+                compile group: 'io.netty', name: 'netty-all', version: '4.0.23.Final'
+                compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
+                compile group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6'
+                compile group: 'org.hbase', name: 'asynchbase', version: '1.7.0-mapr-1603'
+            }
+
+            shadowJar {
+                zip64 true
+                relocate 'com.google.protobuf', 'shaded.com.google.protobuf'
+                relocate 'io.netty', 'shaded.io.netty'
+            }
+        """.stripIndent()
+
+        when:
+        runner.withArguments('shadowJar').build()
+
+        then:
+        noExceptionThrown()
+
+    }
 }
