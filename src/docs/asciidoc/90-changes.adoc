@@ -1,6 +1,15 @@
 == Change Log
 
 [discrete]
+=== v2.0.2 (2017-12-12)
+
+* https://github.com/ben-adazza[Ben Adazza], https://github.com/tylerbenson[Tyler Benson] - documentation
+* https://github.com/mark-vieira[Marke Vieira] - Support multi-project builds with Build-Scan integration
+* Upgrade to ASM 6 https://github.com/johnrengelman/shadow/issues/294[Issue #294], https://github.com/johnrengelman/shadow/issues/303[Issue #303]
+* https://github.com/rspieldenner[Rob Spieldenner] - Fix integration with `application` plugin in Gradle 4.3 https://github.com/johnrengelman/shadow/issues/339[Issues #339]
+* Fixed deprecation warning from Gradle 4.2+ https://github.com/johnrengelman/shadow/issues/326[Issue #326]
+
+[discrete]
 === v2.0.1 (2017-06-23)
 
 * Fix `null+configuration` error (https://github.com/johnrengelman/shadow/issues/297[Issue #297])
@@ -174,4 +183,3 @@
 * `ShadowJar` now extends `Jar`
 * Removed `signedCompile` and `signedRuntime` configurations in favor of `shadow` configuration
 * Removed `OutputSignedJars` task
-
