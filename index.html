@@ -515,7 +515,7 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Shadow Plugin User Guide &amp; Examples</h1>
 <div class="details">
 <span id="author" class="author">John Engelman - @johnrengelman</span><br>
-<span id="revnumber">version 2.0.1</span>
+<span id="revnumber">version 2.0.2</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -535,9 +535,10 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#configuring_the_jar_manifest">2.3. Configuring the JAR Manifest</a></li>
 <li><a href="#filtering_shadow_jar_contents">2.4. Filtering Shadow Jar Contents</a></li>
 <li><a href="#configuring_shadowed_dependencies">2.5. Configuring Shadowed Dependencies</a></li>
-<li><a href="#filtering_dependencies">2.6. Filtering Dependencies</a></li>
-<li><a href="#controlling_jar_content_merging">2.7. Controlling JAR Content Merging</a></li>
-<li><a href="#relocating_packages">2.8. Relocating Packages</a></li>
+<li><a href="#embedding_jar_files_inside_your_shadow_jar">2.6. Embedding Jar Files Inside Your Shadow Jar</a></li>
+<li><a href="#filtering_dependencies">2.7. Filtering Dependencies</a></li>
+<li><a href="#controlling_jar_content_merging">2.8. Controlling JAR Content Merging</a></li>
+<li><a href="#relocating_packages">2.9. Relocating Packages</a></li>
 </ul>
 </li>
 <li><a href="#creating_a_custom_shadowjar_task">3. Creating a Custom ShadowJar Task</a></li>
@@ -650,7 +651,7 @@ library&#8217;s dependencies will not conflict with the same dependency being de
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.1</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.2</span><span class="delimiter">'</span></span>
     }
 }
 
@@ -664,7 +665,7 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.1</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.2</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
@@ -767,11 +768,11 @@ provided by the Gradle runtime.</p>
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.1</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.2</span><span class="delimiter">'</span></span>
     }
 }
 
-apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span>
+apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span>
 apply <span class="key">plugin</span>: <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span></code></pre>
 </div>
 </div>
@@ -781,15 +782,15 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow-plugin</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.1</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.2</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Applying the <code>shadow-plugin</code> plugin is the same as applying the standard <code>shadow</code> plugin with the additional creation
+<p>Applying the <code>plugin-shadow</code> plugin is the same as applying the standard <code>shadow</code> plugin with the additional creation
 of the <code>configureRelocationShadowJar</code> task.
-This task runs before the <code>shadowJar</code> task and scans the packages presention the dependencies that will be merged into
+This task runs before the <code>shadowJar</code> task and scans the packages present in the dependencies that will be merged into
 the final jar and automatically configures relocation for them.
 By default the tasks relocates all packages to the <code>shadow.</code> prefix. For example <code>org.jdom2.JDOMException</code> becomes
 <code>shadow.org.jdom2.JDOMException</code></p>
@@ -881,7 +882,7 @@ for the project.</p>
 <div class="sect2">
 <h3 id="configuring_the_jar_manifest">2.3. Configuring the JAR Manifest</h3>
 <div class="paragraph">
-<p>Beyond the autmatic configuration of the <code>Class-Path</code> entry, the <code>shadowJar</code> manifest is configured in a number of ways.
+<p>Beyond the automatic configuration of the <code>Class-Path</code> entry, the <code>shadowJar</code> manifest is configured in a number of ways.
 First, the manifest for the <code>shadowJar</code> task is configured to <em>inherit</em> from the manifest of the standard <code>jar</code> task.
 This means that any configuration performed on the <code>jar</code> task will propagate to the <code>shadowJar</code> tasks.</p>
 </div>
@@ -1000,7 +1001,13 @@ the <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html
 </div>
 </div>
 <div class="sect2">
-<h3 id="filtering_dependencies">2.6. Filtering Dependencies</h3>
+<h3 id="embedding_jar_files_inside_your_shadow_jar">2.6. Embedding Jar Files Inside Your Shadow Jar</h3>
+<div class="paragraph">
+<p>Because of the way that Gradle handles dependency configuration, from a plugin perspective, shadow is unable to distinguish between a jar file configured as a dependency and a jar file included in the resource folder.  This means that any jar found in a resource directory will be merged into the shadow jar the same as any other dependency.  If your intention is to embed the jar inside, you must rename the jar as to not end with <code>.jar</code> before the shadow task begins.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="filtering_dependencies">2.7. Filtering Dependencies</h3>
 <div class="paragraph">
 <p>Individual dependencies can be filtered from the final JAR by using the <code>dependencies</code> block of a
 <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html"><code>ShadowJar</code></a> task.
@@ -1056,7 +1063,7 @@ common dependency between two 1st level dependencies when one is excluded and th
 </table>
 </div>
 <div class="sect3">
-<h4 id="using_regex_patterns_to_filter_dependencies">2.6.1. Using Regex Patterns to Filter Dependencies</h4>
+<h4 id="using_regex_patterns_to_filter_dependencies">2.7.1. Using Regex Patterns to Filter Dependencies</h4>
 <div class="paragraph">
 <p>Dependencies can be filtered using regex patterns.
 Coupled with the <code>&lt;group&gt;:&lt;artifact&gt;:&lt;version&gt;</code> notation for dependencies, this allows for excluding/including
@@ -1117,7 +1124,7 @@ shadowJar {
 </div>
 </div>
 <div class="sect3">
-<h4 id="programmatically_selecting_dependencies_to_filter">2.6.2. Programmatically Selecting Dependencies to Filter</h4>
+<h4 id="programmatically_selecting_dependencies_to_filter">2.7.2. Programmatically Selecting Dependencies to Filter</h4>
 <div class="paragraph">
 <p>If more complex decisions are needed to select the dependencies to be included, the
 <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#dependencies(Action&lt;DependencyFilter&gt;)"><code>dependencies</code></a> block provides a
@@ -1138,7 +1145,7 @@ method that accepts a <code>Closure</code> for selecting dependencies.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="controlling_jar_content_merging">2.7. Controlling JAR Content Merging</h3>
+<h3 id="controlling_jar_content_merging">2.8. Controlling JAR Content Merging</h3>
 <div class="paragraph">
 <p>Shadow allows for customizing the process by which the output JAR is generated through the
 <a href="api/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.html"><code>Transformer</code></a> interface.
@@ -1181,7 +1188,7 @@ entry and apply any modifications beforewriting the stream to the output.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="merging_service_descriptor_files">2.7.1. Merging Service Descriptor Files</h4>
+<h4 id="merging_service_descriptor_files">2.8.1. Merging Service Descriptor Files</h4>
 <div class="paragraph">
 <p>Java libraries often contain service descriptors files in the <code>META-INF/services</code> directory of the JAR.
 A service descriptor typically contains a line delimited list of classes that are supported for a particular <em>service</em>.
@@ -1260,7 +1267,7 @@ files to include or exclude from merging.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="merging_groovy_extension_modules">2.7.2. Merging Groovy Extension Modules</h4>
+<h4 id="merging_groovy_extension_modules">2.8.2. Merging Groovy Extension Modules</h4>
 <div class="paragraph">
 <p>Shadow provides a specific transformer for dealing with Groovy extension module files.
 This is due to their special syntax and how they need to be merged together.
@@ -1278,7 +1285,7 @@ The <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html
 </div>
 </div>
 <div class="sect3">
-<h4 id="appending_text_files">2.7.3. Appending Text Files</h4>
+<h4 id="appending_text_files">2.8.3. Appending Text Files</h4>
 <div class="paragraph">
 <p>Generic text files can be appended together using the
 <a href="api/com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer.html"><code>AppendingTransformer</code></a>.
@@ -1296,7 +1303,7 @@ The <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html
 </div>
 </div>
 <div class="sect3">
-<h4 id="appending_xml_files">2.7.4. Appending XML Files</h4>
+<h4 id="appending_xml_files">2.8.4. Appending XML Files</h4>
 <div class="paragraph">
 <p>XML files require a special transformer for merging.
 The <a href="api/com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer.html"><code>XmlAppendingTransformer</code></a> reads each XML document and merges
@@ -1317,7 +1324,7 @@ It must be added using the <a href="api/com/github/jengelman/gradle/plugins/shad
 </div>
 </div>
 <div class="sect2">
-<h3 id="relocating_packages">2.8. Relocating Packages</h3>
+<h3 id="relocating_packages">2.9. Relocating Packages</h3>
 <div class="paragraph">
 <p>Shade is capable of scanning a project&#8217;s classes and relocating specific dependencies to a new location.
 This is often required when one of the dependencies is susceptible to breaking changes in versions or
@@ -1389,7 +1396,7 @@ Be specific as possible when configuring relocation as to avoid unintended reloc
 </table>
 </div>
 <div class="sect3">
-<h4 id="filtering_relocation">2.8.1. Filtering Relocation</h4>
+<h4 id="filtering_relocation">2.9.1. Filtering Relocation</h4>
 <div class="paragraph">
 <p>Specific classes or files can be <code>included</code>/<code>excluded</code> from the relocation operation if necessary.</p>
 </div>
@@ -1612,7 +1619,7 @@ to relocate your dependencies to a different package name to avoid the collision
 <div class="paragraph">
 <p>Configuring the relocation has always been possible, but the build author is required to know all the package names
 before hand. Shadow v2.0 corrects this by introducing a new task type <code>ConfigureShadowRelocation</code>.
-Tasks of this type are configured to target a an instance of a <code>ShadowJar</code> task and run immediately before it.</p>
+Tasks of this type are configured to target an instance of a <code>ShadowJar</code> task and run immediately before it.</p>
 </div>
 <div class="paragraph">
 <p>The <code>ConfigureShadowRelocation</code> task, scans the dependencies from the configurations specified on the associated
@@ -1624,13 +1631,13 @@ packages using the specified <code>prefix</code> on the associated <code>ShadowJ
 Gradle projects. It can be used for standard Java or Groovy projects.</p>
 </div>
 <div class="paragraph">
-<p>A simple Gradle plugin can use this feature by applying the <code>shadow-plugin</code> plugin and configuring the dependencies
+<p>A simple Gradle plugin can use this feature by applying the <code>plugin-shadow</code> plugin and configuring the dependencies
 like so:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.1</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.2</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }
 
@@ -1638,9 +1645,9 @@ dependencies {
     shadow localGroovy()
     shadow gradleApi()
 
-    compile <span class="string"><span class="delimiter">'</span><span class="content">org.jdom:jdom2:2.0.5</span><span class="delimiter">'</span></span>
-    compile <span class="string"><span class="delimiter">'</span><span class="content">org.ow2.asm:asm:5.0.3</span><span class="delimiter">'</span></span>
-    compile <span class="string"><span class="delimiter">'</span><span class="content">org.ow2.asm:asm-commons:5.0.3</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.jdom:jdom2:2.0.6</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.ow2.asm:asm:6.0</span><span class="delimiter">'</span></span>
+    compile <span class="string"><span class="delimiter">'</span><span class="content">org.ow2.asm:asm-commons:6.0</span><span class="delimiter">'</span></span>
     compile <span class="string"><span class="delimiter">'</span><span class="content">commons-io:commons-io:2.4</span><span class="delimiter">'</span></span>
     compile <span class="string"><span class="delimiter">'</span><span class="content">org.apache.ant:ant:1.9.4</span><span class="delimiter">'</span></span>
     compile <span class="string"><span class="delimiter">'</span><span class="content">org.codehaus.plexus:plexus-utils:2.0.6</span><span class="delimiter">'</span></span>
@@ -1658,7 +1665,27 @@ with your plugin.</p>
 <div class="sect1">
 <h2 id="change_log">8. Change Log</h2>
 <div class="sectionbody">
-<h3 id="v2_0_1" class="discrete">v2.0.1</h3>
+<h3 id="v2_0_2_2017_12_12" class="discrete">v2.0.2 (2017-12-12)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/ben-adazza">Ben Adazza</a>, <a href="https://github.com/tylerbenson">Tyler Benson</a> - documentation</p>
+</li>
+<li>
+<p><a href="https://github.com/mark-vieira">Marke Vieira</a> - Support multi-project builds with Build-Scan integration</p>
+</li>
+<li>
+<p>Upgrade to ASM 6 <a href="https://github.com/johnrengelman/shadow/issues/294">Issue #294</a>, <a href="https://github.com/johnrengelman/shadow/issues/303">Issue #303</a></p>
+</li>
+<li>
+<p><a href="https://github.com/rspieldenner">Rob Spieldenner</a> - Fix integration with <code>application</code> plugin in Gradle 4.3 <a href="https://github.com/johnrengelman/shadow/issues/339">Issues #339</a></p>
+</li>
+<li>
+<p>Fixed deprecation warning from Gradle 4.2+ <a href="https://github.com/johnrengelman/shadow/issues/326">Issue #326</a></p>
+</li>
+</ul>
+</div>
+<h3 id="v2_0_1_2017_06_23" class="discrete">v2.0.1 (2017-06-23)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1666,7 +1693,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v2_0_0" class="discrete">v2.0.0</h3>
+<h3 id="v2_0_0_2017_05_09" class="discrete">v2.0.0 (2017-05-09)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1719,7 +1746,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_2_4" class="discrete">v1.2.4</h3>
+<h3 id="v1_2_4_2016_11_03" class="discrete">v1.2.4 (2016-11-03)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1745,7 +1772,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_2_3" class="discrete">v1.2.3</h3>
+<h3 id="v1_2_3_2016_01_25" class="discrete">v1.2.3 (2016-01-25)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1765,7 +1792,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_2_2" class="discrete">v1.2.2</h3>
+<h3 id="v1_2_2_2015_07_17" class="discrete">v1.2.2 (2015-07-17)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1773,7 +1800,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_2_1" class="discrete">v1.2.1</h3>
+<h3 id="v1_2_1_2015_01_23" class="discrete">v1.2.1 (2015-01-23)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1781,7 +1808,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_2_0" class="discrete">v1.2.0</h3>
+<h3 id="v1_2_0_2014_11_24" class="discrete">v1.2.0 (2014-11-24)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1804,7 +1831,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_1_2" class="discrete">v1.1.2</h3>
+<h3 id="v1_1_2_2014_09_09" class="discrete">v1.1.2 (2014-09-09)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1812,7 +1839,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_1_1" class="discrete">v1.1.1</h3>
+<h3 id="v1_1_1_2014_08_27" class="discrete">v1.1.1 (2014-08-27)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1826,7 +1853,7 @@ with your plugin.</p>
 </li>
 </ul>
 </div>
-<h3 id="v1_1_0" class="discrete">v1.1.0</h3>
+<h3 id="v1_1_0_2014_08_26" class="discrete">v1.1.0 (2014-08-26)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1858,7 +1885,7 @@ descriptor files. The existing <code>ServiceFileTransformer</code> now excludes 
 </li>
 </ul>
 </div>
-<h3 id="v1_0_3" class="discrete">v1.0.3</h3>
+<h3 id="v1_0_3_2014_07_29" class="discrete">v1.0.3 (2014-07-29)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1881,7 +1908,7 @@ descriptor files. The existing <code>ServiceFileTransformer</code> now excludes 
 </li>
 </ul>
 </div>
-<h3 id="v1_0_2" class="discrete">v1.0.2</h3>
+<h3 id="v1_0_2_2014_07_07" class="discrete">v1.0.2 (2014-07-07)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1898,7 +1925,7 @@ descriptor files. The existing <code>ServiceFileTransformer</code> now excludes 
 </li>
 </ul>
 </div>
-<h3 id="v1_0_1" class="discrete">v1.0.1</h3>
+<h3 id="v1_0_1_2014_06_28" class="discrete">v1.0.1 (2014-06-28)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1912,7 +1939,7 @@ descriptor files. The existing <code>ServiceFileTransformer</code> now excludes 
 </li>
 </ul>
 </div>
-<h3 id="v1_0_0" class="discrete">v1.0.0</h3>
+<h3 id="v1_0_0_2014_06_27" class="discrete">v1.0.0 (2014-06-27)</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2092,8 +2119,8 @@ so Shadow was published there.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 2.0.1<br>
-Last updated 2017-06-23 07:43:31 -05:00
+Version 2.0.2<br>
+Last updated 2016-11-17 16:01:01 +00:00
 </div>
 </div>
 <script>
