@@ -9,6 +9,8 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer;
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
 import groovy.lang.MetaClass;
+import java.io.File;
+import java.util.Set;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gradle.api.Action;
 import org.gradle.api.artifacts.Configuration;
@@ -31,6 +33,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private List<Relocator> relocators;
     private List<Configuration> configurations;
     private DependencyFilter dependencyFilter;
+    private boolean minimizeJar;
+    private DependencyFilter dependencyFilterForMinimize;
 
     private final ShadowStats shadowStats = new ShadowStats();
     private final GradleVersionUtil versionUtil;
@@ -39,10 +43,24 @@ public class ShadowJar extends Jar implements ShadowSpec {
         super();
         versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
+        dependencyFilterForMinimize = new DefaultDependencyFilter(getProject());
         setManifest(new DefaultInheritManifest(getServices().get(FileResolver.class)));
         transformers = new ArrayList<>();
         relocators = new ArrayList<>();
         configurations = new ArrayList<>();
+    }
+
+    public ShadowJar minimize() {
+        minimizeJar = true;
+        return this;
+    }
+
+    public ShadowJar minimize(Action<DependencyFilter> c) {
+        minimize();
+        if (c != null) {
+            c.execute(dependencyFilterForMinimize);
+        }
+        return this;
     }
 
     @Override
@@ -58,9 +76,11 @@ public class ShadowJar extends Jar implements ShadowSpec {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
+        FileCollection toMinimize = dependencyFilterForMinimize.resolve(configurations);
+        final UnusedTracker unusedTracker = UnusedTracker.forProject(getProject(), toMinimize);
         return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
-                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
-                versionUtil);
+                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), minimizeJar,
+                unusedTracker, shadowStats, versionUtil);
     }
 
     protected ZipCompressor getInternalCompressor() {

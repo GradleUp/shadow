@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil
+import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
@@ -50,10 +51,13 @@ class ShadowCopyAction implements CopyAction {
     private final ShadowStats stats
     private final String encoding
     private final GradleVersionUtil versionUtil
+    private final boolean minimizeJar
+    private final UnusedTracker unusedTracker
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             String encoding, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats, GradleVersionUtil util) {
+                            PatternSet patternSet, boolean minimizeJar, UnusedTracker unusedTracker,
+                            ShadowStats stats, GradleVersionUtil util) {
 
         this.zipFile = zipFile
         this.compressor = compressor
@@ -64,10 +68,29 @@ class ShadowCopyAction implements CopyAction {
         this.stats = stats
         this.encoding = encoding
         this.versionUtil = util
+        this.minimizeJar = minimizeJar
+        this.unusedTracker = unusedTracker
     }
 
     @Override
     WorkResult execute(CopyActionProcessingStream stream) {
+        Set<String> unusedClasses
+        if (minimizeJar) {
+            stream.process(new BaseStreamAction() {
+                @Override
+                void visitFile(FileCopyDetails fileDetails) {
+                    // All project sources are already present, we just need
+                    // to deal with JAR dependencies.
+                    if (isArchive(fileDetails)) {
+                        unusedTracker.addDependency(fileDetails.file)
+                    }
+                }
+            })
+            unusedClasses = unusedTracker.findUnused()
+        } else {
+            unusedClasses = Collections.emptySet()
+        }
+
         final ZipOutputStream zipOutStr
 
         try {
@@ -81,7 +104,7 @@ class ShadowCopyAction implements CopyAction {
                 void execute(ZipOutputStream outputStream) {
                     try {
                         stream.process(new StreamAction(outputStream, encoding, transformers, relocators, patternSet,
-                                stats))
+                                unusedClasses, stats))
                         processTransformers(outputStream)
                     } catch (Exception e) {
                         log.error('ex', e)
@@ -128,30 +151,16 @@ class ShadowCopyAction implements CopyAction {
         }
     }
 
-    class StreamAction implements CopyActionProcessingStreamAction {
-
-        private final ZipOutputStream zipOutStr
-        private final List<Transformer> transformers
-        private final List<Relocator> relocators
-        private final RelocatorRemapper remapper
-        private final PatternSet patternSet
-        private final ShadowStats stats
-
-        private Set<String> visitedFiles = new HashSet<String>()
-
-        StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
-                            List<Relocator> relocators, PatternSet patternSet, ShadowStats stats) {
-            this.zipOutStr = zipOutStr
-            this.transformers = transformers
-            this.relocators = relocators
-            this.remapper = new RelocatorRemapper(relocators, stats)
-            this.patternSet = patternSet
-            this.stats = stats
-            if(encoding != null) {
-                this.zipOutStr.setEncoding(encoding)
-            }
+    abstract class BaseStreamAction implements CopyActionProcessingStreamAction {
+        protected boolean isArchive(FileCopyDetails fileDetails) {
+            return fileDetails.relativePath.pathString.endsWith('.jar')
         }
 
+        protected boolean isClass(FileCopyDetails fileDetails) {
+            return FilenameUtils.getExtension(fileDetails.path) == 'class'
+        }
+
+        @Override
         void processFile(FileCopyDetailsInternal details) {
             if (details.directory) {
                 visitDir(details)
@@ -160,18 +169,47 @@ class ShadowCopyAction implements CopyAction {
             }
         }
 
-        private boolean isArchive(FileCopyDetails fileDetails) {
-            return fileDetails.relativePath.pathString.endsWith('.jar')
+        protected void visitDir(FileCopyDetails dirDetails) {}
+
+        protected abstract void visitFile(FileCopyDetails fileDetails)
+    }
+
+    private class StreamAction extends BaseStreamAction {
+
+        private final ZipOutputStream zipOutStr
+        private final List<Transformer> transformers
+        private final List<Relocator> relocators
+        private final RelocatorRemapper remapper
+        private final PatternSet patternSet
+        private final Set<String> unused
+        private final ShadowStats stats
+
+        private Set<String> visitedFiles = new HashSet<String>()
+
+        StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
+                            List<Relocator> relocators, PatternSet patternSet, Set<String> unused,
+                            ShadowStats stats) {
+            this.zipOutStr = zipOutStr
+            this.transformers = transformers
+            this.relocators = relocators
+            this.remapper = new RelocatorRemapper(relocators, stats)
+            this.patternSet = patternSet
+            this.unused = unused
+            this.stats = stats
+            if(encoding != null) {
+                this.zipOutStr.setEncoding(encoding)
+            }
         }
 
         private boolean recordVisit(RelativePath path) {
             return visitedFiles.add(path.pathString)
         }
 
-        private void visitFile(FileCopyDetails fileDetails) {
+        @Override
+        void visitFile(FileCopyDetails fileDetails) {
             if (!isArchive(fileDetails)) {
                 try {
-                    boolean isClass = (FilenameUtils.getExtension(fileDetails.path) == 'class')
+                    boolean isClass = isClass(fileDetails)
                     if (!remapper.hasRelocators() || !isClass) {
                         if (!isTransformable(fileDetails)) {
                             String mappedPath = remapper.map(fileDetails.relativePath.pathString)
@@ -184,7 +222,7 @@ class ShadowCopyAction implements CopyAction {
                         } else {
                             transform(fileDetails)
                         }
-                    } else if (isClass) {
+                    } else if (isClass && !isUnused(fileDetails.path)) {
                         remapClass(fileDetails)
                     }
                     recordVisit(fileDetails.relativePath)
@@ -225,7 +263,7 @@ class ShadowCopyAction implements CopyAction {
         private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive) {
             def archiveFilePath = archiveFile.relativePath
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                if (recordVisit(archiveFilePath)) {
+                if (recordVisit(archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFilePath, archive)
                     } else {
@@ -244,6 +282,16 @@ class ShadowCopyAction implements CopyAction {
                     visitArchiveDirectory(file)
                 }
             }
+        }
+
+        private boolean isUnused(String classPath) {
+            final String className = FilenameUtils.removeExtension(classPath)
+                    .replace('/' as char, '.' as char)
+            final boolean result = unused.contains(className)
+            if (result) {
+                log.debug("Dropping unused class: $className")
+            }
+            return result
         }
 
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
@@ -306,7 +354,8 @@ class ShadowCopyAction implements CopyAction {
             zipOutStr.closeEntry()
         }
 
-        private void visitDir(FileCopyDetails dirDetails) {
+        @Override
+        protected void visitDir(FileCopyDetails dirDetails) {
             try {
                 // Trailing slash in name indicates that entry is a directory
                 String path = dirDetails.relativePath.pathString + '/'
