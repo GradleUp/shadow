@@ -17,5 +17,4 @@ dependencies {
     testCompile 'xmlunit:xmlunit:1.3'
     testCompile 'commons-lang:commons-lang:2.6'
     testCompile 'com.google.guava:guava:17.0'
-    testCompile 'org.apache.maven:maven-model:3.0.4'
 }

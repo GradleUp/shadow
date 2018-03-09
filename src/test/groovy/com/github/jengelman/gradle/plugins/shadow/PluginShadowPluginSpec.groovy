@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader //TODO delete me?
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 
@@ -84,52 +83,27 @@ class PluginShadowPluginSpec extends PluginSpecification {
             publishing {
                 publications {
                     MavenPublication myPub = maybeCreate('pluginMaven', MavenPublication)
+                    myPub.artifacts.clear() //TODO doesn't have desired effect
                     project.shadow.component(myPub)
                 }
             }
         """.stripIndent()
 
         when:
-        BuildResult result = runner.withArguments('shadowJar',
-                    'generatePomFileForPluginMavenPublication',
-                    'generatePomFileForFakePluginMarkerMavenPublication', '-s').build()
+        BuildResult result = runner.withArguments('publishToMavenLocal', '-s')
+                .build() //FIXME fails with InvalidMavenPublicationException @ ValidatingMavenPublisher#checkNoDuplicateArtifacts
 
         then:
         result.task(':generatePomFileForPluginMavenPublication').outcome == TaskOutcome.SUCCESS
         result.task(':generatePomFileForFakePluginMarkerMavenPublication').outcome == TaskOutcome.SUCCESS
         result.task(':shadowJar').outcome == TaskOutcome.SUCCESS
+        result.task(':publishToMavenLocal').outcome == TaskOutcome.SUCCESS
         File fatJarPomFile = Paths.get(dir.root.absolutePath, 'build', 'publications', 'pluginMaven', 'pom-default.xml').toFile()
         File fakePluginMarker = Paths.get(dir.root.absolutePath, 'build', 'publications', 'fakePluginMarkerMaven', 'pom-default.xml').toFile()
-//        File fatJarWithoutClassifier = output() Paths.get(dir.root.absolutePath, 'build', 'libs', 'shadow-1.0.jar').toFile()
         File fatJarWithoutClassifier = output('shadow-1.0.jar')
         fatJarPomFile.exists()
         fakePluginMarker.exists()
         fatJarWithoutClassifier.exists()
-        isValid(fatJarPomFile)
-        isValid(fakePluginMarker)
-        dir
-    }
-
-    /**
-     * Simulates POM validation taking place during publish tasks, since invoking publishToMavenLocal seems to make
-     * TestKit hang.
-     * <p>
-     * Code is liberally borrowed from {@link org.gradle.api.publish.maven.internal.publisher.ValidatingMavenPublisher#readModelFromPom(File)}
-     * @param pomFile
-     * @return true if valid pom, false otherwise
-     */
-    private boolean isValid(File pomFile) {
-        FileReader reader = new FileReader(pomFile)
-        boolean result = false
-        try {
-            new MavenXpp3Reader().read(reader)
-            result = true
-        } catch (Exception e) {
-            e.printStackTrace()
-        } finally {
-            reader.close()
-        }
-        return result
     }
 
 }
