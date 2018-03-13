@@ -2,7 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            url "https://plugins.gradle.org/m2/"
+            url = "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
@@ -14,12 +14,13 @@ buildscript {
         classpath 'org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview2'
         classpath "com.bluepapa32:gradle-watch-plugin:0.1.5"
         classpath "org.kordamp.gradle:livereload-gradle-plugin:0.2.1"
-        classpath 'org.ajoberstar:gradle-git:1.5.0'
+        classpath 'org.ajoberstar:grgit:2.1.1'
+        classpath 'org.ajoberstar:gradle-git-publish:0.3.3'
     }
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.10.1'
+    id 'com.gradle.build-scan' version '1.12.1'
     id 'groovy'
     id 'project-report'
     id 'idea'
@@ -65,8 +66,8 @@ repositories {
 test {
     if (System.env.CI == 'true') {
         testLogging.showStandardStreams = true
-        minHeapSize "1g"
-        maxHeapSize "1g"
+        minHeapSize = "1g"
+        maxHeapSize = "1g"
     }
 }
 
@@ -87,8 +88,8 @@ idea {
     }
 }
 
-sourceCompatibility = '1.7'
-targetCompatibility = '1.7'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 task downloadDependencies(type: Exec) {
     dependsOn configurations.testRuntime
