@@ -5,8 +5,8 @@ dependencies {
     shadow 'org.codehaus.groovy:groovy-backports-compat23:2.4.4'
 
     compile 'org.jdom:jdom2:2.0.6'
-    compile 'org.ow2.asm:asm:6.0'
-    compile 'org.ow2.asm:asm-commons:6.0'
+    compile 'org.ow2.asm:asm:6.1'
+    compile 'org.ow2.asm:asm-commons:6.1'
     compile 'commons-io:commons-io:2.5'
     compile 'org.apache.ant:ant:1.9.7'
     compile 'org.codehaus.plexus:plexus-utils:3.0.24'
