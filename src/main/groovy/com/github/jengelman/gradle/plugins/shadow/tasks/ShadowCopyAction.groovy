@@ -249,7 +249,12 @@ class ShadowCopyAction implements CopyAction {
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
                 addParentDirectories(new RelativeArchivePath(new ZipEntry(remapper.mapPath(file) + '.class'), null))
-                remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
+                InputStream is = archive.getInputStream(file.entry)
+                try {
+                    remapClass(is, file.pathString, file.entry.time)
+                } finally {
+                    is.close()
+                }
             }
         }
 
@@ -283,15 +288,18 @@ class ShadowCopyAction implements CopyAction {
             // Need to take the .class off for remapping evaluation
             String mappedName = remapper.mapPath(path)
 
+            InputStream bis = new ByteArrayInputStream(renamedClass)
             try {
                 // Now we put it back on so the class file is written out with the right extension.
                 ZipEntry archiveEntry = new ZipEntry(mappedName + ".class")
                 archiveEntry.setTime(lastModified)
                 zipOutStr.putNextEntry(archiveEntry)
-                IOUtils.copyLarge(new ByteArrayInputStream(renamedClass), zipOutStr)
+                IOUtils.copyLarge(bis, zipOutStr)
                 zipOutStr.closeEntry()
             } catch (ZipException e) {
                 log.warn("We have a duplicate " + mappedName + " in source project")
+            } finally {
+                bis.close()
             }
         }
 
@@ -302,7 +310,12 @@ class ShadowCopyAction implements CopyAction {
             RelativeArchivePath mappedFile = new RelativeArchivePath(entry, archiveFile.details)
             addParentDirectories(mappedFile)
             zipOutStr.putNextEntry(mappedFile.entry)
-            IOUtils.copyLarge(archive.getInputStream(archiveFile.entry), zipOutStr)
+            InputStream is = archive.getInputStream(archiveFile.entry)
+            try {
+                IOUtils.copyLarge(is, zipOutStr)
+            } finally {
+                is.close()
+            }
             zipOutStr.closeEntry()
         }
 
@@ -322,7 +335,12 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private void transform(ArchiveFileTreeElement element, ZipFile archive) {
-            transform(element, archive.getInputStream(element.relativePath.entry))
+            InputStream is = archive.getInputStream(element.relativePath.entry)
+            try {
+                transform(element, is)
+            } finally {
+                is.close()
+            }
         }
 
         private void transform(FileCopyDetails details) {
