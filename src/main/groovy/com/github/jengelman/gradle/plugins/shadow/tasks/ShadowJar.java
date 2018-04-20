@@ -17,6 +17,7 @@ import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
 import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.bundling.Jar;
@@ -24,6 +25,7 @@ import org.gradle.api.tasks.util.PatternSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class ShadowJar extends Jar implements ShadowSpec {
 
@@ -46,6 +48,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @Override
+    @Internal
     public ShadowStats getStats() {
         return shadowStats;
     }
@@ -63,6 +66,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
                 versionUtil);
     }
 
+    @Internal
     protected ZipCompressor getInternalCompressor() {
         return versionUtil.getInternalCompressor(getEntryCompression(), this);
     }
@@ -74,9 +78,15 @@ public class ShadowJar extends Jar implements ShadowSpec {
         getLogger().info(shadowStats.toString());
     }
 
-    @InputFiles @Optional
+    @InputFiles
     public FileCollection getIncludedDependencies() {
-        return new DependencyFileCollection(dependencyFilter, configurations);
+        return getProject().files(new Callable<FileCollection>() {
+
+            @Override
+            public FileCollection call() throws Exception {
+                return dependencyFilter.resolve(configurations);
+            }
+        });
     }
 
     /**
@@ -84,6 +94,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      *
      * @return this
      */
+    @Internal
     protected PatternSet getRootPatternSet() {
         return versionUtil.getRootPatternSet(getMainSpec());
     }
@@ -284,6 +295,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         return this;
     }
 
+    @Internal
     public List<Transformer> getTransformers() {
         return this.transformers;
     }
@@ -292,6 +304,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.transformers = transformers;
     }
 
+    @Internal
     public List<Relocator> getRelocators() {
         return this.relocators;
     }
@@ -309,6 +322,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.configurations = configurations;
     }
 
+    @Internal
     public DependencyFilter getDependencyFilter() {
         return this.dependencyFilter;
     }
