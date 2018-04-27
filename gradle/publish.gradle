@@ -150,5 +150,5 @@ publishPlugins { task ->
 }
 
 task release() {
-    dependsOn 'assemble', 'bintrayUpload', 'publishPlugins', 'publishGhPages'
+    dependsOn 'assemble', 'bintrayUpload', 'publishPlugins', 'gitPublishPush'
 }
