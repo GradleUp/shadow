@@ -1,6 +1,14 @@
 == Change Log
 
 [discrete]
+=== v2.0.4 (2018-04-27)
+
+* Update to ASM 6.1.1 to address performance issues - https://gitlab.ow2.org/asm/asm/issues/317816
+* Close InputStreams after using them (https://github.com/johnrengelman/shadow/issues/364[Issue #364])
+* Remove usage of Gradle internal `AbstractFileCollection`.
+* Add task annotations to remove warnings when validating plugin.
+
+[discrete]
 === v2.0.3 (2018-03-24)
 
 * https://github.com/ttsiebzehntt[ttsiebzehntt] - Update to ASM 6.1
