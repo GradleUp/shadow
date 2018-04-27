@@ -2,7 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            url = "https://plugins.gradle.org/m2/"
+            url "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
@@ -66,8 +66,8 @@ repositories {
 test {
     if (System.env.CI == 'true') {
         testLogging.showStandardStreams = true
-        minHeapSize = "1g"
-        maxHeapSize = "1g"
+        minHeapSize "1g"
+        maxHeapSize "1g"
     }
 }
 
