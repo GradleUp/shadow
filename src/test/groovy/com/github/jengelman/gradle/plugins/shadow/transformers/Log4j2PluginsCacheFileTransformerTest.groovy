@@ -11,6 +11,8 @@ import java.util.zip.ZipFile
 
 import static java.util.Collections.singletonList
 import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
+import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertTrue
 
 /**
  * @author Paul Nelson Baker
@@ -51,31 +53,34 @@ class Log4j2PluginsCacheFileTransformerTest {
     void testRelocate(String source, String pattern, String target) throws IOException {
         List<Relocator> relocators = singletonList((Relocator) new SimpleRelocator(source, pattern, null, null))
         transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), relocators))
-        assertTrue(transformer.hasTransformedResource(), "Transformer didn't transform resources")
+        assertTrue("Transformer didn't transform resources", transformer.hasTransformedResource())
         // Write out to a fake jar file
-        File.createTempFile("testable-zip-file-", ".jar").withCloseable { testableZipFile ->
-            new FileOutputStream(testableZipFile).withCloseable { fileOutputStream ->
-                new BufferedOutputStream(fileOutputStream).withCloseable { bufferedOutputStream ->
-                    new ZipOutputStream(bufferedOutputStream).withCloseable { zipOutputStream ->
-                        transformer.modifyOutputStream(zipOutputStream)
-                    }
-                }
-            }
-        }
+        def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
+        def fileOutputStream = new FileOutputStream(testableZipFile)
+        def bufferedOutputStream = new BufferedOutputStream(fileOutputStream)
+        def zipOutputStream = new ZipOutputStream(bufferedOutputStream)
+        transformer.modifyOutputStream(zipOutputStream)
+        zipOutputStream.close()
+        bufferedOutputStream.close()
+        fileOutputStream.close()
         // Pull the data back out and make sure it was transformed
         ZipFile zipFile = new ZipFile(testableZipFile)
         ZipEntry zipFileEntry = zipFile.getEntry(PLUGIN_CACHE_FILE)
         InputStream inputStream = zipFile.getInputStream(zipFileEntry)
-        new Scanner(inputStream).withReader { scanner ->
+        new Scanner(inputStream).withCloseable { scanner ->
             boolean hasAtLeastOneTransform = false
             while (scanner.hasNextLine()) {
                 String nextLine = scanner.nextLine()
                 if (nextLine.contains(source)) {
                     hasAtLeastOneTransform = true
-                    assertTrue(nextLine.contains(target), "Target wasn't included in transform")
+                    assertTrue("Target wasn't included in transform", nextLine.contains(target))
                 }
             }
-            assertTrue(hasAtLeastOneTransform, "There were no transformations inside the file")
+            assertTrue("There were no transformations inside the file", hasAtLeastOneTransform)
         }
+    }
+
+    InputStream getResourceStream(String resource) {
+        return this.class.getClassLoader().getResourceAsStream(resource);
     }
 }
