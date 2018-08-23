@@ -26,10 +26,9 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginEntry
+import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
-
-import java.util.zip.ZipEntry
 
 import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE;
 
@@ -82,7 +81,7 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
     }
 
     @Override
-    void modifyOutputStream(ZipOutputStream jos) {
+    void modifyOutputStream(ZipOutputStream zipOutputStream) {
         PluginCache pluginCache = new PluginCache()
         pluginCache.loadCacheFiles(getUrlEnumeration())
         relocatePlugins(pluginCache)
