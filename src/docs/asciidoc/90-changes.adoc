@@ -36,8 +36,8 @@
 [discrete]
 === v2.0.3 (2018-03-24)
 
-* https://github.com/ttsiebzehntt[ttsiebzehntt] - Update to ASM 6.1
-* https://github.com/sgnewson[sgnewson] - Fix deprecated Gradle warnings https://github.com/johnrengelman/shadow/pull/356[#356]
+* https://github.com/ttsiebzehntt[Martin Sadowski] - Update to ASM 6.1
+* https://github.com/sgnewson[Scott Newson] - Fix deprecated Gradle warnings https://github.com/johnrengelman/shadow/pull/356[#356]
 
 [discrete]
 === v2.0.2 (2017-12-12)
