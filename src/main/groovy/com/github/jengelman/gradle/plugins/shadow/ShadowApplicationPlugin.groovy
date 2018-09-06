@@ -43,8 +43,8 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         ApplicationPluginConvention pluginConvention = (
                 ApplicationPluginConvention) project.convention.plugins.application
 
-        jar.inputs.property('mainClassName', pluginConvention.mainClassName)
         jar.doFirst {
+            jar.inputs.property('mainClassName', pluginConvention.mainClassName)
             manifest.attributes 'Main-Class': pluginConvention.mainClassName
         }
     }
