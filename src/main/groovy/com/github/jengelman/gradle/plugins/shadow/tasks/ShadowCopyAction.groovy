@@ -40,6 +40,7 @@ import java.util.zip.ZipException
 
 @Slf4j
 class ShadowCopyAction implements CopyAction {
+    private static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
 
     private final File zipFile
     private final ZipCompressor compressor
@@ -50,10 +51,12 @@ class ShadowCopyAction implements CopyAction {
     private final ShadowStats stats
     private final String encoding
     private final GradleVersionUtil versionUtil
+    private final boolean preserveFileTimestamps
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             String encoding, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats, GradleVersionUtil util) {
+                            PatternSet patternSet, ShadowStats stats, GradleVersionUtil util,
+                            boolean preserveFileTimestamps) {
 
         this.zipFile = zipFile
         this.compressor = compressor
@@ -64,6 +67,7 @@ class ShadowCopyAction implements CopyAction {
         this.stats = stats
         this.encoding = encoding
         this.versionUtil = util
+        this.preserveFileTimestamps = preserveFileTimestamps
     }
 
     @Override
@@ -107,6 +111,17 @@ class ShadowCopyAction implements CopyAction {
                 transformer.modifyOutputStream(stream)
             }
         }
+    }
+
+    private long getArchiveTimeFor(long timestamp) {
+        return preserveFileTimestamps ? timestamp : CONSTANT_TIME_FOR_ZIP_ENTRIES
+    }
+
+    private ZipEntry setArchiveTimes(ZipEntry zipEntry) {
+        if (!preserveFileTimestamps) {
+            zipEntry.setTime(CONSTANT_TIME_FOR_ZIP_ENTRIES)
+        }
+        return zipEntry
     }
 
     private static <T extends Closeable> void withResource(T resource, Action<? super T> action) {
@@ -176,7 +191,7 @@ class ShadowCopyAction implements CopyAction {
                         if (!isTransformable(fileDetails)) {
                             String mappedPath = remapper.map(fileDetails.relativePath.pathString)
                             ZipEntry archiveEntry = new ZipEntry(mappedPath)
-                            archiveEntry.setTime(fileDetails.lastModified)
+                            archiveEntry.setTime(getArchiveTimeFor(fileDetails.lastModified))
                             archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
                             zipOutStr.putNextEntry(archiveEntry)
                             fileDetails.copyTo(zipOutStr)
@@ -248,7 +263,8 @@ class ShadowCopyAction implements CopyAction {
 
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
-                addParentDirectories(new RelativeArchivePath(new ZipEntry(remapper.mapPath(file) + '.class'), null))
+                ZipEntry zipEntry = setArchiveTimes(new ZipEntry(remapper.mapPath(file) + '.class'))
+                addParentDirectories(new RelativeArchivePath(zipEntry, null))
                 InputStream is = archive.getInputStream(file.entry)
                 try {
                     remapClass(is, file.pathString, file.entry.time)
@@ -292,7 +308,7 @@ class ShadowCopyAction implements CopyAction {
             try {
                 // Now we put it back on so the class file is written out with the right extension.
                 ZipEntry archiveEntry = new ZipEntry(mappedName + ".class")
-                archiveEntry.setTime(lastModified)
+                archiveEntry.setTime(getArchiveTimeFor(lastModified))
                 zipOutStr.putNextEntry(archiveEntry)
                 IOUtils.copyLarge(bis, zipOutStr)
                 zipOutStr.closeEntry()
@@ -306,7 +322,7 @@ class ShadowCopyAction implements CopyAction {
         private void copyArchiveEntry(RelativeArchivePath archiveFile, ZipFile archive) {
             String mappedPath = remapper.map(archiveFile.entry.name)
             ZipEntry entry = new ZipEntry(mappedPath)
-            entry.setTime(archiveFile.entry.time)
+            entry.setTime(getArchiveTimeFor(archiveFile.entry.time))
             RelativeArchivePath mappedFile = new RelativeArchivePath(entry, archiveFile.details)
             addParentDirectories(mappedFile)
             zipOutStr.putNextEntry(mappedFile.entry)
@@ -324,7 +340,7 @@ class ShadowCopyAction implements CopyAction {
                 // Trailing slash in name indicates that entry is a directory
                 String path = dirDetails.relativePath.pathString + '/'
                 ZipEntry archiveEntry = new ZipEntry(path)
-                archiveEntry.setTime(dirDetails.lastModified)
+                archiveEntry.setTime(getArchiveTimeFor(dirDetails.lastModified))
                 archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
                 zipOutStr.putNextEntry(archiveEntry)
                 zipOutStr.closeEntry()
@@ -386,7 +402,7 @@ class ShadowCopyAction implements CopyAction {
             } else {
                 //Parent is always a directory so add / to the end of the path
                 String path = segments[0..-2].join('/') + '/'
-                return new RelativeArchivePath(new ZipEntry(path), null)
+                return new RelativeArchivePath(setArchiveTimes(new ZipEntry(path)), null)
             }
         }
     }
