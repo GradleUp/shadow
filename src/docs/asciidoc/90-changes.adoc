@@ -1,4 +1,14 @@
 == Change Log
+[discrete]
+=== v4.0.0 (unreleased)
+
+* **Breaking Change!** Restrict Plugin to Gradle 4.0+. Shadow major versions will align with Gradle major versions.
+* https://github.com/SerCeMan[Sergey Tselovalnikov] - Upgrade to ASM 6.2.1 to support Java 11
+* https://github.com/Macil[Chris Cowan] - Add support for `shadowJar.preserveFileTimestamps` property. See https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps
+* https://github.com/paul-nelson-baker[Paul N. Baker] - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files during merge.
+* https://github.com/felipecsl[Felipe Lima] - Fix the long standing "No property `mainClassName`" issue.
+* https://github.com/debanne[debanne] - Implement JAR minimization actions. This will attempt to exclude unused classes in your shadowed JAR.
+
 
 [discrete]
 === v2.0.4 (2018-04-27)
