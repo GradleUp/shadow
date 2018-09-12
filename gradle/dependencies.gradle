@@ -10,6 +10,7 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile 'org.apache.ant:ant:1.9.7'
     compile 'org.codehaus.plexus:plexus-utils:3.0.24'
+    compile "org.apache.logging.log4j:log4j-core:2.11.0"
 
     testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
         exclude module: 'groovy-all'
