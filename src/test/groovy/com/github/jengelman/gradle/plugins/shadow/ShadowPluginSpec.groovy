@@ -491,7 +491,7 @@ class ShadowPluginSpec extends PluginSpecification {
     def "include java-library configurations by default"() {
         given:
         GradleRunner versionRunner = runner
-                .withGradleVersion('3.4.1')
+                .withGradleVersion('4.0')
                 .withArguments('--stacktrace')
                 .withDebug(true)
 
