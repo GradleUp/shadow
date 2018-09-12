@@ -10,6 +10,9 @@ import org.gradle.api.Action;
 import org.gradle.api.file.CopySpec;
 
 interface ShadowSpec extends CopySpec {
+    ShadowSpec minimize();
+
+    ShadowSpec minimize(Action<DependencyFilter> configureClosure);
 
     ShadowSpec dependencies(Action<DependencyFilter> configure);
 

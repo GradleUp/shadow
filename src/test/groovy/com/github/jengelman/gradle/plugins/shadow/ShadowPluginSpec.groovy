@@ -208,6 +208,116 @@ class ShadowPluginSpec extends PluginSpecification {
         ])
     }
 
+    /**
+     * 'Server' depends on 'Client'. 'junit' is independent.
+     * The minimize shall remove 'junit'.
+     */
+    def 'minimize by keeping only transitive dependencies'() {
+        given:
+        file('settings.gradle') << """
+            include 'client', 'server'
+        """.stripIndent()
+
+        file('client/src/main/java/client/Client.java') << """
+            package client;
+            public class Client {}
+        """.stripIndent()
+
+        file('client/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
+
+        file('server/src/main/java/server/Server.java') << """
+            package server;
+
+            import client.Client;
+
+            public class Server {
+                private final String client = Client.class.getName();
+            }
+        """.stripIndent()
+
+        file('server/build.gradle') << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                minimize()
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(':client') }
+        """.stripIndent()
+
+        File serverOutput = file('server/build/libs/server-all.jar')
+
+        when:
+        runner.withArguments(':server:shadowJar', '--stacktrace').withDebug(true).build()
+
+        then:
+        contains(serverOutput, [
+                'client/Client.class',
+                'server/Server.class'
+        ])
+        doesNotContain(serverOutput, ['junit/framework/Test.class'])
+    }
+
+    /**
+     * 'Client', 'Server' and 'junit' are independent.
+     * 'junit' is excluded from the minimize.
+     * The minimize shall remove 'Client' but not 'junit'.
+     */
+    def 'exclude a dependency from minimize'() {
+        given:
+        file('settings.gradle') << """
+            include 'client', 'server'
+        """.stripIndent()
+
+        file('client/src/main/java/client/Client.java') << """
+            package client;
+            public class Client {}
+        """.stripIndent()
+
+        file('client/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
+
+        file('server/src/main/java/server/Server.java') << """
+            package server;
+            public class Server {}
+        """.stripIndent()
+
+        file('server/build.gradle') << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                minimize {
+                    exclude(dependency('junit:junit:.*'))
+                }
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(':client') }
+        """.stripIndent()
+
+        File serverOutput = file('server/build/libs/server-all.jar')
+
+        when:
+        runner.withArguments(':server:shadowJar', '--stacktrace').withDebug(true).build()
+
+        then:
+        contains(serverOutput, [
+                'server/Server.class',
+                'junit/framework/Test.class'
+        ])
+        doesNotContain(serverOutput, ['client/Client.class'])
+    }
+
     def 'depend on project shadow jar'() {
         given:
         file('settings.gradle') << """
