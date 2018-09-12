@@ -13,8 +13,8 @@ class ShadowBasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        if (GradleVersion.current() < GradleVersion.version("3.0")) {
-            throw new GradleException("This version of Shadow supports Gradle 3.0+ only. Please upgrade.")
+        if (GradleVersion.current() < GradleVersion.version("4.0")) {
+            throw new GradleException("This version of Shadow supports Gradle 4.0+ only. Please upgrade.")
         }
         project.extensions.create(EXTENSION_NAME, ShadowExtension, project)
         createShadowConfiguration(project)
