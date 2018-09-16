@@ -57,7 +57,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         shadow.from(convention.sourceSets.main.output)
         shadow.configurations = [project.configurations.findByName('runtimeClasspath') ?
                                          project.configurations.runtimeClasspath : project.configurations.runtime]
-        shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+        shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
 
         project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, shadow)
         configureShadowUpload()

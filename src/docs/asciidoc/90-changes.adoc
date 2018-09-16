@@ -8,6 +8,7 @@
 * https://github.com/paul-nelson-baker[Paul N. Baker] - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files during merge.
 * https://github.com/felipecsl[Felipe Lima] - Fix the long standing "No property `mainClassName`" issue.
 * https://github.com/debanne[debanne] - Implement JAR minimization actions. This will attempt to exclude unused classes in your shadowed JAR.
+* Configure exclusion of `module-info.class` from `shadowJar` when using the Shadow the Java plugin. https://github.com/johnrengelman/shadow/issues/352[#352]
 
 
 [discrete]
