@@ -499,8 +499,13 @@ class ShadowPluginSpec extends PluginSpecification {
                 .insertFile('api.properties', 'api')
                 .publish()
 
+        repo.module('shadow', 'implementation-dep', '1.0')
+                .insertFile('implementation-dep.properties', 'implementation-dep')
+                .publish()
+
         repo.module('shadow', 'implementation', '1.0')
                 .insertFile('implementation.properties', 'implementation')
+                .dependsOn('implementation-dep')
                 .publish()
 
         repo.module('shadow', 'compile', '1.0')
@@ -531,7 +536,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         contains(output, ['api.properties', 'implementation.properties', 'compile.properties',
-                          'runtime.properties', 'runtimeOnly.properties'])
+                          'runtime.properties', 'runtimeOnly.properties', 'implementation-dep.properties'])
     }
 
     def "doesn't include compileOnly configuration by default"() {
