@@ -51,3 +51,17 @@ sourceSets {
         resources.srcDirs = ['../src/main/resources']
     }
 }
+
+project.tasks.withType(JavaCompile) {
+    // This will be the default in Gradle 5.0
+    if (!options.compilerArgs.contains("-processor")) {
+        options.compilerArgs << '-proc:none'
+    }
+}
+
+project.tasks.withType(GroovyCompile) {
+    // This will be the default in Gradle 5.0
+    if (!options.compilerArgs.contains("-processor")) {
+        options.compilerArgs << '-proc:none'
+    }
+}
