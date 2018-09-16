@@ -7,8 +7,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.5.4"
-        classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.2"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.10.0"
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
         classpath 'org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview2'
