@@ -102,3 +102,5 @@ include::13-controlling-merging.adoc[]
 include::14-package-relocation.adoc[]
 
 include::15-minimizing.adoc[]
+
+include::16-reproducible-builds.adoc[]
