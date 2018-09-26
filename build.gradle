@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 buildscript {
     repositories {
         jcenter()
@@ -34,7 +36,7 @@ gradlePlugin {
     automatedPublishing = false
 }
 
-apply plugin: 'com.github.johnrengelman.plugin-shadow'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'
@@ -111,3 +113,9 @@ project.tasks.withType(GroovyCompile) {
         options.compilerArgs << '-proc:none'
     }
 }
+
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar

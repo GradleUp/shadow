@@ -3,14 +3,19 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 
 
-class PluginShadowPluginSpec extends PluginSpecification {
+class ConfigureShadowRelocationSpec extends PluginSpecification {
 
     def "auto relocate plugin dependencies"() {
         given:
-        buildFile.text = buildFile.text.replace('com.github.johnrengelman.shadow', 'com.github.johnrengelman.plugin-shadow')
         buildFile << """
-            dependencies {
 
+            task relocateShadowJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) {
+                target = tasks.shadowJar
+            }
+
+            tasks.shadowJar.dependsOn tasks.relocateShadowJar
+
+            dependencies {
                compile 'junit:junit:3.8.2'
             }
         """.stripIndent()

@@ -47,3 +47,34 @@ Specific classes or files can be `included`/`excluded` from the relocation opera
 ----
 include::{tests}/RelocationSpec.groovy[tags=relocateFilter]
 ----
+
+==== Automatically Relocating Dependencies
+
+Shadow ships with a task that can be used to automatically configure all packages from all dependencies to be relocated.
+This feature was formally shipped into a 2nd plugin (`com.github.johnrengelman.plugin-shadow`) but has been
+removed for clarity reasons in version 4.0.0.
+
+To configure automatic dependency relocation, declare a task of type `ConfigureShadowRelocation` and configure the
+`target` parameter to be the `ShadowJar` task you wish to auto configure. You will also need to declared a task
+dependency so the tasks execute in the correct order.
+
+.Configure Auto Relocation
+[source,groovy]
+----
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = "myapp" // Default value is "shadow"
+
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
+----
+
+[NOTE]
+====
+Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
+in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
+Be mindful that some Gradle plugins (such as `java-gradle-plugin` will automatically add dependencies to your class path
+(e.g. `java-gradle-plugin` automatically adds the full Gradle API to your `compile` configuratinon. You may need to
+remove these dependencies if you do not intend to shadow them into your library.
+====

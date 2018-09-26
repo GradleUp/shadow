@@ -127,11 +127,6 @@ pluginBundle {
             id = 'com.github.johnrengelman.shadow'
             displayName = 'Shadow Plugin'
         }
-        pluginShadowPlugin {
-            id = 'com.github.johnrengelman.plugin-shadow'
-            displayName = 'Plugin-Shadow Plugin'
-            description = "Auto configures shadow & package relocation for Gradle plugins."
-        }
     }
 
     mavenCoordinates {
