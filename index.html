@@ -515,7 +515,7 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Shadow Plugin User Guide &amp; Examples</h1>
 <div class="details">
 <span id="author" class="author">John Engelman - @johnrengelman</span><br>
-<span id="revnumber">version 2.0.4</span>
+<span id="revnumber">version 4.0.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -539,6 +539,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#filtering_dependencies">2.7. Filtering Dependencies</a></li>
 <li><a href="#controlling_jar_content_merging">2.8. Controlling JAR Content Merging</a></li>
 <li><a href="#relocating_packages">2.9. Relocating Packages</a></li>
+<li><a href="#minimizing">2.10. Minimizing</a></li>
+<li><a href="#reproducible_builds">2.11. Reproducible Builds</a></li>
 </ul>
 </li>
 <li><a href="#creating_a_custom_shadowjar_task">3. Creating a Custom ShadowJar Task</a></li>
@@ -651,7 +653,7 @@ library&#8217;s dependencies will not conflict with the same dependency being de
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.4</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:4.0.0</span><span class="delimiter">'</span></span>
     }
 }
 
@@ -665,7 +667,7 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.4</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.0</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
@@ -768,7 +770,7 @@ provided by the Gradle runtime.</p>
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:2.0.4</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:4.0.0</span><span class="delimiter">'</span></span>
     }
 }
 
@@ -782,7 +784,7 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.4</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.0</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
@@ -1414,6 +1416,97 @@ Be specific as possible when configuring relocation as to avoid unintended reloc
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="automatically_relocating_dependencies">2.9.2. Automatically Relocating Dependencies</h4>
+<div class="paragraph">
+<p>Shadow ships with a task that can be used to automatically configure all packages from all dependencies to be relocated.
+This feature was formally shipped into a 2nd plugin (<code>com.github.johnrengelman.plugin-shadow</code>) but has been
+removed for clarity reasons in version 4.0.0.</p>
+</div>
+<div class="paragraph">
+<p>To configure automatic dependency relocation, declare a task of type <code>ConfigureShadowRelocation</code> and configure the
+<code>target</code> parameter to be the <code>ShadowJar</code> task you wish to auto configure. You will also need to declared a task
+dependency so the tasks execute in the correct order.</p>
+</div>
+<div class="listingblock">
+<div class="title">Configure Auto Relocation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">task relocateShadowJar(<span class="key">type</span>: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = <span class="string"><span class="delimiter">&quot;</span><span class="content">myapp</span><span class="delimiter">&quot;</span></span> <span class="comment">// Default value is &quot;shadow&quot;</span>
+
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
+in the configurations declared to be shadowed. By default, this is the <code>runtime</code> or <code>runtimeClasspath</code> configurations.
+Be mindful that some Gradle plugins (such as <code>java-gradle-plugin</code> will automatically add dependencies to your class path
+(e.g. <code>java-gradle-plugin</code> automatically adds the full Gradle API to your <code>compile</code> configuratinon. You may need to
+remove these dependencies if you do not intend to shadow them into your library.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="minimizing">2.10. Minimizing</h3>
+<div class="paragraph">
+<p>Shadow can automatically remove all classes of dependencies that are not used by the project, thereby minimizing the resulting shadowed JAR.</p>
+</div>
+<div class="listingblock">
+<div class="title">Minimizing an shadow JAR</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+  minimize()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A dependency can be excluded from the minimization process thereby forcing it&#8217;s inclusion the shadow JAR.
+This is useful when the dependency analyzer cannot find the usage of a class programmatically, for example if the class
+is loaded dynamically via <code>Class.forName(String)</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Force a class to be retained during minimization</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+  minimize {
+    exclude(dependency(<span class="string"><span class="delimiter">'</span><span class="content">org.scala-lang:.*:.*</span><span class="delimiter">'</span></span>))
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="reproducible_builds">2.11. Reproducible Builds</h3>
+<div class="paragraph">
+<p>Because JRA files contain the timestamp of the included files, it is often difficult to create reproducible builds
+from a source commit that results in a hash identical file.
+Gradle supports reproducible JAR creation by setting the timestamps of included files to a consistent value.
+Shadow includes support for overriding file timestamps starting in version 4.0.0. By default, Shadow will preserve
+the file timestamps when creating the Shadow JAR. To set timestamps to a consistent value (1980/1/1 00:00:00),
+set the <code>preserveFileTimeStamps</code> property to <code>false</code> on the <code>ShadowJar</code> task.</p>
+</div>
+<div class="listingblock">
+<div class="title">Reset file timestamps</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">shadowJar {
+  preserveFileTimeStamps = <span class="predefined-constant">false</span>
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1637,7 +1730,7 @@ like so:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">2.0.4</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.0</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }
 
@@ -1665,6 +1758,35 @@ with your plugin.</p>
 <div class="sect1">
 <h2 id="change_log">8. Change Log</h2>
 <div class="sectionbody">
+<h3 id="v4_0_0_unreleased" class="discrete">v4.0.0 (unreleased)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Breaking Change!</strong> Restrict Plugin to Gradle 4.0+. Shadow major versions will align with Gradle major versions going forward.</p>
+</li>
+<li>
+<p><strong>Breaking Change!</strong> For clarity purposes <code>com.github.johnrengelman.plugin-shadow</code> has been removed. If you intend to use this feature, you will need to declare your own <code>ConfigureShadowRelocation</code> task. See section <a href="http://imperceptiblethoughts.com/shadow/#automatically_relocating_dependencies">2.9.2</a> of the User Guide</p>
+</li>
+<li>
+<p><a href="https://github.com/SerCeMan">Sergey Tselovalnikov</a> - Upgrade to ASM 6.2.1 to support Java 11</p>
+</li>
+<li>
+<p><a href="https://github.com/Macil">Chris Cowan</a> - Add support for <code>shadowJar.preserveFileTimestamps</code> property. See <a href="https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps" class="bare">https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps</a></p>
+</li>
+<li>
+<p><a href="https://github.com/paul-nelson-baker">Paul N. Baker</a> - Add <code>Log4j2PluginsCacheFileTransformer</code> to process Log4j DAT files during merge.</p>
+</li>
+<li>
+<p><a href="https://github.com/felipecsl">Felipe Lima</a> - Fix the long standing "No property `mainClassName`" issue.</p>
+</li>
+<li>
+<p><a href="https://github.com/debanne">debanne</a> - Implement JAR minimization actions. This will attempt to exclude unused classes in your shadowed JAR.</p>
+</li>
+<li>
+<p>Configure exclusion of <code>module-info.class</code> from <code>shadowJar</code> when using the Shadow the Java plugin. <a href="https://github.com/johnrengelman/shadow/issues/352">#352</a></p>
+</li>
+</ul>
+</div>
 <h3 id="v2_0_4_2018_04_27" class="discrete">v2.0.4 (2018-04-27)</h3>
 <div class="ulist">
 <ul>
@@ -2147,7 +2269,7 @@ so Shadow was published there.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 2.0.4<br>
+Version 4.0.0<br>
 Last updated 2017-11-09 10:21:39 -06:00
 </div>
 </div>
