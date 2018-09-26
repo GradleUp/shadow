@@ -1,6 +1,6 @@
 == Change Log
 [discrete]
-=== v4.0.0 (unreleased)
+=== v4.0.0 (2018-09-25)
 
 * **Breaking Change!** Restrict Plugin to Gradle 4.0+. Shadow major versions will align with Gradle major versions going forward.
 * **Breaking Change!** For clarity purposes `com.github.johnrengelman.plugin-shadow` has been removed. If you intend to use this feature, you will need to declare your own `ConfigureShadowRelocation` task. See section http://imperceptiblethoughts.com/shadow/#automatically_relocating_dependencies[2.9.2] of the User Guide
