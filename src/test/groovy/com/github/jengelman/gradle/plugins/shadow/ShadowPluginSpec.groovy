@@ -318,6 +318,65 @@ class ShadowPluginSpec extends PluginSpecification {
         doesNotContain(serverOutput, ['client/Client.class'])
     }
 
+    /**
+     * 'api' used as api for 'impl'. 'junit' is independent.
+     * The minimize shall remove 'junit', but not 'client-api'.
+     * Unused classes of api also shouldn't be removed.
+     */
+    def 'use dependencies with api scope on minimize'() {
+        given:
+        file('settings.gradle') << """
+            include 'api', 'impl'
+        """.stripIndent()
+
+        file('api/src/main/java/api/Entity.java') << """
+            package api;
+            public interface Entity {}
+        """.stripIndent()
+
+        file('api/src/main/java/api/UnusedEntity.java') << """
+            package api;
+            public class UnusedEntity implements Entity {}
+        """.stripIndent()
+
+        file('api/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
+
+        file('impl/src/main/java/impl/SimpleEntity.java') << """
+            package impl;
+            import api.Entity;
+            public class SimpleEntity implements Entity {}
+        """.stripIndent()
+
+        file('impl/build.gradle') << """
+            apply plugin: 'java-library'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                minimize()
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { api project(':api') }
+        """.stripIndent()
+
+        File serverOutput = file('impl/build/libs/impl-all.jar')
+
+        when:
+        runner.withArguments(':impl:shadowJar', '--stacktrace').withDebug(true).build()
+
+        then:
+        contains(serverOutput, [
+                'impl/SimpleEntity.class',
+                'api/Entity.class',
+                'api/UnusedEntity.class',
+        ])
+        doesNotContain(serverOutput, ['junit/framework/Test.class'])
+    }
+
     def 'depend on project shadow jar'() {
         given:
         file('settings.gradle') << """
