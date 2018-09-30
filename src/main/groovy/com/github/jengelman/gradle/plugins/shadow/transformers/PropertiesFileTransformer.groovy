@@ -217,9 +217,11 @@ class PropertiesFileTransformer implements Transformer {
     }
 
     @Override
-    void modifyOutputStream(ZipOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         propertiesEntries.each { String path, Properties props ->
-            os.putNextEntry(new ZipEntry(path))
+            ZipEntry entry = new ZipEntry(path)
+            entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+            os.putNextEntry(entry)
             IOUtil.copy(toInputStream(props), os)
             os.closeEntry()
         }

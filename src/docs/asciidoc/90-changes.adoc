@@ -1,5 +1,12 @@
 == Change Log
 [discrete]
+=== v4.0.1 (2018-09-30)
+* **Breaking Change!** `Transform.modifyOutputStream(ZipOutputStream os)`  to `Transform.modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps)`.
+  Typically breaking changes are reserved for major version releases, but this change was necessary for `preserverFileTimestamps` (introduced in v4.0.0) to work correctly
+  in the presence of transformers. https://github.com/johnrengelman/shadow/issues/404[#404]
+* Fix regression in support Java 10+ during relocation https://github.com/johnrengelman/shadow/issues/403[#403]
+
+[discrete]
 === v4.0.0 (2018-09-25)
 
 * **Breaking Change!** Restrict Plugin to Gradle 4.0+. Shadow major versions will align with Gradle major versions going forward.

@@ -93,8 +93,10 @@ class GroovyExtensionModuleTransformer implements Transformer {
     }
 
     @Override
-    void modifyOutputStream(ZipOutputStream os) {
-        os.putNextEntry(new ZipEntry(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH))
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        ZipEntry entry = new ZipEntry(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
         IOUtil.copy(toInputStream(module), os)
         os.closeEntry()
     }

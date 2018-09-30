@@ -86,9 +86,11 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
     }
 
     @Override
-    void modifyOutputStream(ZipOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         serviceEntries.each { String path, ServiceStream stream ->
-            os.putNextEntry(new ZipEntry(path))
+            ZipEntry entry = new ZipEntry(path)
+            entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+            os.putNextEntry(entry)
             IOUtil.copy(stream.toInputStream(), os)
             os.closeEntry()
         }

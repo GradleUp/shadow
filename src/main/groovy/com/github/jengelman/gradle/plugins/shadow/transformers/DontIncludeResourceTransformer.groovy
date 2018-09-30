@@ -50,7 +50,7 @@ class DontIncludeResourceTransformer implements Transformer {
         return false
     }
 
-    void modifyOutputStream(ZipOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         // no op
     }
 }

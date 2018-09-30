@@ -59,7 +59,7 @@ class Log4j2PluginsCacheFileTransformerTest {
         def fileOutputStream = new FileOutputStream(testableZipFile)
         def bufferedOutputStream = new BufferedOutputStream(fileOutputStream)
         def zipOutputStream = new ZipOutputStream(bufferedOutputStream)
-        transformer.modifyOutputStream(zipOutputStream)
+        transformer.modifyOutputStream(zipOutputStream, true)
         zipOutputStream.close()
         bufferedOutputStream.close()
         fileOutputStream.close()

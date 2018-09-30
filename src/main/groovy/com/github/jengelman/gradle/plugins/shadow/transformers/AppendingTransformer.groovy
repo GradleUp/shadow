@@ -57,8 +57,10 @@ class AppendingTransformer implements Transformer {
         return data.size() > 0
     }
 
-    void modifyOutputStream(ZipOutputStream os) {
-        os.putNextEntry(new ZipEntry(resource))
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        ZipEntry entry = new ZipEntry(resource)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
 
         IOUtil.copy(new ByteArrayInputStream(data.toByteArray()), os)
         data.reset()

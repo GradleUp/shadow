@@ -41,7 +41,7 @@ import java.util.zip.ZipException
 
 @Slf4j
 class ShadowCopyAction implements CopyAction {
-    private static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
+    static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
 
     private final File zipFile
     private final ZipCompressor compressor
@@ -130,7 +130,7 @@ class ShadowCopyAction implements CopyAction {
     private void processTransformers(ZipOutputStream stream) {
         transformers.each { Transformer transformer ->
             if (transformer.hasTransformedResource()) {
-                transformer.modifyOutputStream(stream)
+                transformer.modifyOutputStream(stream, preserveFileTimestamps)
             }
         }
     }

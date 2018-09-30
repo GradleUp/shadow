@@ -37,5 +37,5 @@ interface Transformer {
 
     boolean hasTransformedResource()
 
-    void modifyOutputStream(ZipOutputStream jos)
+    void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps)
 }

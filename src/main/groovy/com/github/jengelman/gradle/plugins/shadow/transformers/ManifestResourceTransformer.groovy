@@ -72,7 +72,7 @@ class ManifestResourceTransformer implements Transformer {
         return true
     }
 
-    void modifyOutputStream(ZipOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         // If we didn't find a manifest, then let's create one.
         if (manifest == null) {
             manifest = new Manifest()
@@ -90,7 +90,9 @@ class ManifestResourceTransformer implements Transformer {
             }
         }
 
-        os.putNextEntry(new ZipEntry(JarFile.MANIFEST_NAME))
+        ZipEntry entry = new ZipEntry(JarFile.MANIFEST_NAME)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
         manifest.write(os)
     }
 

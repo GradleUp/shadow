@@ -49,6 +49,6 @@ class ApacheLicenseResourceTransformer implements Transformer {
         return false
     }
 
-    void modifyOutputStream(ZipOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
     }
 }

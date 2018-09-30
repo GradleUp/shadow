@@ -81,11 +81,13 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
     }
 
     @Override
-    void modifyOutputStream(ZipOutputStream zipOutputStream) {
+    void modifyOutputStream(ZipOutputStream zipOutputStream, boolean preserveFileTimestamps) {
         PluginCache pluginCache = new PluginCache()
         pluginCache.loadCacheFiles(getUrlEnumeration())
         relocatePlugins(pluginCache)
-        zipOutputStream.putNextEntry(new ZipEntry(PLUGIN_CACHE_FILE))
+        ZipEntry entry = new ZipEntry(PLUGIN_CACHE_FILE)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        zipOutputStream.putNextEntry(entry)
         pluginCache.writeCache(new CloseShieldOutputStream(zipOutputStream))
         temporaryFiles.clear()
     }

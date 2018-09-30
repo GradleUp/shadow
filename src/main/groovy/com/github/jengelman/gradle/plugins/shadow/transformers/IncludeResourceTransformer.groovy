@@ -49,8 +49,10 @@ public class IncludeResourceTransformer implements Transformer {
         return file != null ? file.exists() : false
     }
 
-    public void modifyOutputStream(ZipOutputStream os) {
-        os.putNextEntry(new ZipEntry(resource))
+    public void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        ZipEntry entry = new ZipEntry(resource)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
 
         InputStream is = new FileInputStream(file)
         IOUtil.copy(is, os)

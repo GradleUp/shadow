@@ -102,8 +102,10 @@ class XmlAppendingTransformer implements Transformer {
         return doc != null
     }
 
-    void modifyOutputStream(ZipOutputStream os) {
-        os.putNextEntry(new ZipEntry(resource))
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        ZipEntry entry = new ZipEntry(resource)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
         new XMLOutputter(Format.getPrettyFormat()).output(doc, os)
 
         doc = null

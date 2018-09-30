@@ -112,10 +112,13 @@ class ComponentsXmlResourceTransformer implements Transformer {
         }
     }
 
-    void modifyOutputStream(ZipOutputStream os) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         byte[] data = getTransformedResource()
 
-        os.putNextEntry(new ZipEntry(COMPONENTS_XML_PATH))
+        ZipEntry entry = new ZipEntry(COMPONENTS_XML_PATH)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+
+        os.putNextEntry(entry)
 
         IOUtil.copy(data, os)
 
