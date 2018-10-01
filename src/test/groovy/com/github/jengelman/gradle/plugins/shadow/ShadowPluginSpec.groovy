@@ -323,7 +323,7 @@ class ShadowPluginSpec extends PluginSpecification {
      * The minimize shall remove 'junit', but not 'client-api'.
      * Unused classes of api and theirs dependencies also shouldn't be removed.
      */
-    def 'use dependencies with api scope on minimize'() {
+    def 'use minimize with dependencies with api scope'() {
         given:
         file('settings.gradle') << """
             include 'api', 'lib', 'impl'

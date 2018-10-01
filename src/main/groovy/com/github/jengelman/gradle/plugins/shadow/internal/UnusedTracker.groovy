@@ -14,9 +14,10 @@ class UnusedTracker {
     private final List<ClazzpathUnit> projectUnits
     private final Clazzpath cp = new Clazzpath()
 
-    private UnusedTracker(List<File> classDirs, FileCollection toMinimize) {
+    private UnusedTracker(List<File> classDirs, FileCollection classJars, FileCollection toMinimize) {
         this.toMinimize = toMinimize
         projectUnits = classDirs.collect { cp.addClazzpathUnit(it) }
+        projectUnits.addAll(classJars.collect { cp.addClazzpathUnit(it) })
     }
 
     Set<String> findUnused() {
@@ -43,7 +44,7 @@ class UnusedTracker {
             Iterable<File> classesDirs = sourceSet.output.hasProperty('classesDirs') ? sourceSet.output.classesDirs : [sourceSet.output.classesDir]
             classDirs.addAll(classesDirs.findAll { it.isDirectory() })
         }
-        return new UnusedTracker(classDirs, toMinimize)
+        return new UnusedTracker(classDirs, apiLibs, toMinimize)
     }
 
     private static List<File> getApiLibs(Project project) {
