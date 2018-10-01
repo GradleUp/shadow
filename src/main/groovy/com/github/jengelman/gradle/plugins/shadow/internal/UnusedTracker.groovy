@@ -37,31 +37,31 @@ class UnusedTracker {
     }
 
     static UnusedTracker forProject(Project project, List<Configuration> configurations, DependencyFilter dependencyFilter) {
-        def apiLibs = project.files(getApiLibs(project))
-        FileCollection toMinimize = dependencyFilter.resolve(configurations) - apiLibs
+        def apiJars = getApiJarsFromProject(project)
+        FileCollection toMinimize = dependencyFilter.resolve(configurations) - apiJars
 
         final List<File> classDirs = new ArrayList<>()
         for (SourceSet sourceSet in project.sourceSets) {
             Iterable<File> classesDirs = sourceSet.output.classesDirs
             classDirs.addAll(classesDirs.findAll { it.isDirectory() })
         }
-        return new UnusedTracker(classDirs, apiLibs, toMinimize)
+        return new UnusedTracker(classDirs, apiJars, toMinimize)
     }
 
-    private static List<File> getApiLibs(Project project) {
+    private static FileCollection getApiJarsFromProject(Project project) {
         def apiDependencies = project.configurations.asMap['api']?.dependencies ?: null
-        if (apiDependencies == null) return Collections.emptyList()
+        if (apiDependencies == null) return project.files()
 
         def runtimeConfiguration = project.configurations.asMap['runtimeClasspath'] ?: project.configurations.runtime
-        def apiLibs = new LinkedList<File>()
+        def apiJars = new LinkedList<File>()
         apiDependencies.each { dep ->
             if (dep instanceof ProjectDependency) {
-                apiLibs.addAll(getApiLibs(dep.dependencyProject))
+                apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
             }
 
-            apiLibs.add(runtimeConfiguration.find { it.name.startsWith(dep.name) } as File)
+            apiJars.add(runtimeConfiguration.find { it.name.startsWith(dep.name) } as File)
         }
 
-        return apiLibs
+        return project.files(apiJars)
     }
 }
