@@ -319,14 +319,29 @@ class ShadowPluginSpec extends PluginSpecification {
     }
 
     /**
-     * 'api' used as api for 'impl'. 'junit' is independent.
+     * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
      * The minimize shall remove 'junit', but not 'client-api'.
-     * Unused classes of api also shouldn't be removed.
+     * Unused classes of api and theirs dependencies also shouldn't be removed.
      */
     def 'use dependencies with api scope on minimize'() {
         given:
         file('settings.gradle') << """
-            include 'api', 'impl'
+            include 'api', 'lib', 'impl'
+        """.stripIndent()
+
+        file('lib/src/main/java/lib/LibEntity.java') << """
+            package lib;
+            public interface LibEntity {}
+        """.stripIndent()
+
+        file('lib/src/main/java/lib/UnusedLibEntity.java') << """
+            package lib;
+            public class UnusedLibEntity implements LibEntity {}
+        """.stripIndent()
+
+        file('lib/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
         """.stripIndent()
 
         file('api/src/main/java/api/Entity.java') << """
@@ -336,13 +351,17 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('api/src/main/java/api/UnusedEntity.java') << """
             package api;
-            public class UnusedEntity implements Entity {}
+            import lib.LibEntity;
+            public class UnusedEntity implements LibEntity {}
         """.stripIndent()
 
         file('api/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { 
+                compile 'junit:junit:3.8.2' 
+                compile project(':lib')
+            }
         """.stripIndent()
 
         file('impl/src/main/java/impl/SimpleEntity.java') << """
@@ -373,8 +392,9 @@ class ShadowPluginSpec extends PluginSpecification {
                 'impl/SimpleEntity.class',
                 'api/Entity.class',
                 'api/UnusedEntity.class',
+                'lib/LibEntity.class',
         ])
-        doesNotContain(serverOutput, ['junit/framework/Test.class'])
+        doesNotContain(serverOutput, ['junit/framework/Test.class', 'lib/UnusedLibEntity.class'])
     }
 
     def 'depend on project shadow jar'() {
