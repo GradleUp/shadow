@@ -23,3 +23,8 @@ shadowJar {
   }
 }
 ----
+
+[NOTE]
+====
+Dependencies scoped as `api` will automatically excluded from minimization and used as "entry points" on minimization.
+====
