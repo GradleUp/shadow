@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import org.vafer.jdependency.Clazz
@@ -52,10 +53,15 @@ class UnusedTracker {
         if (apiDependencies == null) return Collections.emptyList()
 
         def runtimeConfiguration = project.configurations.asMap['runtimeClasspath'] ?: project.configurations.runtime
-        List<File> apiFiles = apiDependencies.collect { dep ->
-            runtimeConfiguration.find { it.name.startsWith(dep.name) } as File
+        def apiLibs = new LinkedList<File>()
+        apiDependencies.each { dep ->
+            if (dep instanceof ProjectDependency) {
+                apiLibs.addAll(getApiLibs(dep.dependencyProject))
+            }
+
+            apiLibs.add(runtimeConfiguration.find { it.name.startsWith(dep.name) } as File)
         }
 
-        return apiFiles
+        return apiLibs
     }
 }
