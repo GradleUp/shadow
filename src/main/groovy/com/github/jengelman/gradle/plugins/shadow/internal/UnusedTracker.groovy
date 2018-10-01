@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import org.vafer.jdependency.Clazz
@@ -33,12 +34,27 @@ class UnusedTracker {
         }
     }
 
-    static UnusedTracker forProject(Project project, FileCollection toMinimize) {
+    static UnusedTracker forProject(Project project, List<Configuration> configurations, DependencyFilter dependencyFilter) {
+        def apiLibs = project.files(getApiLibs(project))
+        FileCollection toMinimize = dependencyFilter.resolve(configurations) - apiLibs
+
         final List<File> classDirs = new ArrayList<>()
         for (SourceSet sourceSet in project.sourceSets) {
             Iterable<File> classesDirs = sourceSet.output.hasProperty('classesDirs') ? sourceSet.output.classesDirs : [sourceSet.output.classesDir]
             classDirs.addAll(classesDirs.findAll { it.isDirectory() })
         }
         return new UnusedTracker(classDirs, toMinimize)
+    }
+
+    private static List<File> getApiLibs(Project project) {
+        def apiDependencies = project.configurations.asMap['api']?.dependencies ?: null
+        if (apiDependencies == null) return Collections.emptyList()
+
+        def runtimeConfiguration = project.configurations.asMap['runtimeClasspath'] ?: project.configurations.runtime
+        List<File> apiFiles = apiDependencies.collect { dep ->
+            runtimeConfiguration.find { it.name.startsWith(dep.name) } as File
+        }
+
+        return apiFiles
     }
 }
