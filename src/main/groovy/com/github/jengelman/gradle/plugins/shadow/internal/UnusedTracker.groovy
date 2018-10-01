@@ -42,7 +42,7 @@ class UnusedTracker {
 
         final List<File> classDirs = new ArrayList<>()
         for (SourceSet sourceSet in project.sourceSets) {
-            Iterable<File> classesDirs = sourceSet.output.hasProperty('classesDirs') ? sourceSet.output.classesDirs : [sourceSet.output.classesDir]
+            Iterable<File> classesDirs = sourceSet.output.classesDirs
             classDirs.addAll(classesDirs.findAll { it.isDirectory() })
         }
         return new UnusedTracker(classDirs, apiLibs, toMinimize)
