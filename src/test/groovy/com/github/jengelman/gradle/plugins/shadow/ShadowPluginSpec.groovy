@@ -320,8 +320,8 @@ class ShadowPluginSpec extends PluginSpecification {
 
     /**
      * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
-     * The minimize shall remove 'junit', but not 'client-api'.
-     * Unused classes of api and theirs dependencies also shouldn't be removed.
+     * The minimize shall remove 'junit', but not 'api'.
+     * Unused classes of 'api' and theirs dependencies also shouldn't be removed.
      */
     def 'use minimize with dependencies with api scope'() {
         given:
