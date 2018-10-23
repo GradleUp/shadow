@@ -1,6 +1,6 @@
 === Reproducible Builds
 
-Because JRA files contain the timestamp of the included files, it is often difficult to create reproducible builds
+Because JAR files contain the timestamp of the included files, it is often difficult to create reproducible builds
 from a source commit that results in a hash identical file.
 Gradle supports reproducible JAR creation by setting the timestamps of included files to a consistent value.
 Shadow includes support for overriding file timestamps starting in version 4.0.0. By default, Shadow will preserve
