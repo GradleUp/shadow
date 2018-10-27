@@ -318,6 +318,160 @@ class ShadowPluginSpec extends PluginSpecification {
         doesNotContain(serverOutput, ['client/Client.class'])
     }
 
+    /**
+     * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
+     * The minimize shall remove 'junit', but not 'api'.
+     * Unused classes of 'api' and theirs dependencies also shouldn't be removed.
+     */
+    def 'use minimize with dependencies with api scope'() {
+        given:
+        file('settings.gradle') << """
+            include 'api', 'lib', 'impl'
+        """.stripIndent()
+
+        file('lib/src/main/java/lib/LibEntity.java') << """
+            package lib;
+            public interface LibEntity {}
+        """.stripIndent()
+
+        file('lib/src/main/java/lib/UnusedLibEntity.java') << """
+            package lib;
+            public class UnusedLibEntity implements LibEntity {}
+        """.stripIndent()
+
+        file('lib/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+        """.stripIndent()
+
+        file('api/src/main/java/api/Entity.java') << """
+            package api;
+            public interface Entity {}
+        """.stripIndent()
+
+        file('api/src/main/java/api/UnusedEntity.java') << """
+            package api;
+            import lib.LibEntity;
+            public class UnusedEntity implements LibEntity {}
+        """.stripIndent()
+
+        file('api/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { 
+                compile 'junit:junit:3.8.2' 
+                compile project(':lib')
+            }
+        """.stripIndent()
+
+        file('impl/src/main/java/impl/SimpleEntity.java') << """
+            package impl;
+            import api.Entity;
+            public class SimpleEntity implements Entity {}
+        """.stripIndent()
+
+        file('impl/build.gradle') << """
+            apply plugin: 'java-library'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                minimize()
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { api project(':api') }
+        """.stripIndent()
+
+        File serverOutput = file('impl/build/libs/impl-all.jar')
+
+        when:
+        runner.withArguments(':impl:shadowJar', '--stacktrace').withDebug(true).build()
+
+        then:
+        contains(serverOutput, [
+                'impl/SimpleEntity.class',
+                'api/Entity.class',
+                'api/UnusedEntity.class',
+                'lib/LibEntity.class',
+        ])
+        doesNotContain(serverOutput, ['junit/framework/Test.class', 'lib/UnusedLibEntity.class'])
+    }
+
+    /**
+     * 'api' used as api for 'impl', and 'lib' used as api for 'api'.
+     * Unused classes of 'api' and 'lib' shouldn't be removed.
+     */
+    def 'use minimize with transitive dependencies with api scope'() {
+        given:
+        file('settings.gradle') << """
+            include 'api', 'lib', 'impl'
+        """.stripIndent()
+
+        file('lib/src/main/java/lib/LibEntity.java') << """
+            package lib;
+            public interface LibEntity {}
+        """.stripIndent()
+
+        file('lib/src/main/java/lib/UnusedLibEntity.java') << """
+            package lib;
+            public class UnusedLibEntity implements LibEntity {}
+        """.stripIndent()
+
+        file('lib/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+        """.stripIndent()
+
+        file('api/src/main/java/api/Entity.java') << """
+            package api;
+            public interface Entity {}
+        """.stripIndent()
+
+        file('api/src/main/java/api/UnusedEntity.java') << """
+            package api;
+            import lib.LibEntity;
+            public class UnusedEntity implements LibEntity {}
+        """.stripIndent()
+
+        file('api/build.gradle') << """
+            apply plugin: 'java-library'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { api project(':lib') }
+        """.stripIndent()
+
+        file('impl/src/main/java/impl/SimpleEntity.java') << """
+            package impl;
+            import api.Entity;
+            public class SimpleEntity implements Entity {}
+        """.stripIndent()
+
+        file('impl/build.gradle') << """
+            apply plugin: 'java-library'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                minimize()
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { api project(':api') }
+        """.stripIndent()
+
+        File serverOutput = file('impl/build/libs/impl-all.jar')
+
+        when:
+        runner.withArguments(':impl:shadowJar', '--stacktrace').withDebug(true).build()
+
+        then:
+        contains(serverOutput, [
+                'impl/SimpleEntity.class',
+                'api/Entity.class',
+                'api/UnusedEntity.class',
+                'lib/LibEntity.class',
+                'lib/UnusedLibEntity.class'
+        ])
+    }
+
     def 'depend on project shadow jar'() {
         given:
         file('settings.gradle') << """

@@ -1,6 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import org.vafer.jdependency.Clazz
@@ -13,9 +15,10 @@ class UnusedTracker {
     private final List<ClazzpathUnit> projectUnits
     private final Clazzpath cp = new Clazzpath()
 
-    private UnusedTracker(List<File> classDirs, FileCollection toMinimize) {
+    private UnusedTracker(List<File> classDirs, FileCollection classJars, FileCollection toMinimize) {
         this.toMinimize = toMinimize
         projectUnits = classDirs.collect { cp.addClazzpathUnit(it) }
+        projectUnits.addAll(classJars.collect { cp.addClazzpathUnit(it) })
     }
 
     Set<String> findUnused() {
@@ -33,12 +36,33 @@ class UnusedTracker {
         }
     }
 
-    static UnusedTracker forProject(Project project, FileCollection toMinimize) {
+    static UnusedTracker forProject(Project project, List<Configuration> configurations, DependencyFilter dependencyFilter) {
+        def apiJars = getApiJarsFromProject(project)
+        FileCollection toMinimize = dependencyFilter.resolve(configurations) - apiJars
+
         final List<File> classDirs = new ArrayList<>()
         for (SourceSet sourceSet in project.sourceSets) {
-            Iterable<File> classesDirs = sourceSet.output.hasProperty('classesDirs') ? sourceSet.output.classesDirs : [sourceSet.output.classesDir]
+            Iterable<File> classesDirs = sourceSet.output.classesDirs
             classDirs.addAll(classesDirs.findAll { it.isDirectory() })
         }
-        return new UnusedTracker(classDirs, toMinimize)
+        return new UnusedTracker(classDirs, apiJars, toMinimize)
+    }
+
+    private static FileCollection getApiJarsFromProject(Project project) {
+        def apiDependencies = project.configurations.asMap['api']?.dependencies ?: null
+        if (apiDependencies == null) return project.files()
+
+        def runtimeConfiguration = project.configurations.asMap['runtimeClasspath'] ?: project.configurations.runtime
+        def apiJars = new LinkedList<File>()
+        apiDependencies.each { dep ->
+            if (dep instanceof ProjectDependency) {
+                apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
+                apiJars.add(runtimeConfiguration.find { it.name.endsWith("${dep.name}.jar") } as File)
+            } else {
+                apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
+            }
+        }
+
+        return project.files(apiJars)
     }
 }
