@@ -251,19 +251,22 @@ class ShadowCopyAction implements CopyAction {
         private void processArchive(FileCopyDetails fileDetails) {
             stats.startJar()
             ZipFile archive = new ZipFile(fileDetails.file)
-            List<ArchiveFileTreeElement> archiveElements = archive.entries.collect {
-                new ArchiveFileTreeElement(new RelativeArchivePath(it, fileDetails))
-            }
-            Spec<FileTreeElement> patternSpec = patternSet.getAsSpec()
-            List<ArchiveFileTreeElement> filteredArchiveElements = archiveElements.findAll { ArchiveFileTreeElement archiveElement ->
-                patternSpec.isSatisfiedBy(archiveElement)
-            }
-            filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
-                if (archiveElement.relativePath.file) {
-                    visitArchiveFile(archiveElement, archive)
+            try {
+                List<ArchiveFileTreeElement> archiveElements = archive.entries.collect {
+                    new ArchiveFileTreeElement(new RelativeArchivePath(it, fileDetails))
                 }
+                Spec<FileTreeElement> patternSpec = patternSet.getAsSpec()
+                List<ArchiveFileTreeElement> filteredArchiveElements = archiveElements.findAll { ArchiveFileTreeElement archiveElement ->
+                    patternSpec.isSatisfiedBy(archiveElement)
+                }
+                filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
+                    if (archiveElement.relativePath.file) {
+                        visitArchiveFile(archiveElement, archive)
+                    }
+                }
+            } finally {
+                archive.close()
             }
-            archive.close()
             stats.finishJar()
         }
 
@@ -399,28 +402,27 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private void transform(ArchiveFileTreeElement element, ZipFile archive) {
-            InputStream is = archive.getInputStream(element.relativePath.entry)
-            try {
-                transform(element, is)
-            } finally {
-                is.close()
-            }
+            transformAndClose(element, archive.getInputStream(element.relativePath.entry))
         }
 
         private void transform(FileCopyDetails details) {
-            transform(details, details.file.newInputStream())
+            transformAndClose(details, details.file.newInputStream())
         }
 
-        private void transform(FileTreeElement element, InputStream is) {
-            String mappedPath = remapper.map(element.relativePath.pathString)
-            transformers.find { it.canTransformResource(element) }.transform(
-                    TransformerContext.builder()
-                            .path(mappedPath)
-                            .is(is)
-                            .relocators(relocators)
-                            .stats(stats)
-                            .build()
-            )
+        private void transformAndClose(FileTreeElement element, InputStream is) {
+            try {
+                String mappedPath = remapper.map(element.relativePath.pathString)
+                transformers.find { it.canTransformResource(element) }.transform(
+                        TransformerContext.builder()
+                                .path(mappedPath)
+                                .is(is)
+                                .relocators(relocators)
+                                .stats(stats)
+                                .build()
+                )
+            } finally {
+                is.close()
+            }
         }
 
         private boolean isTransformable(FileTreeElement element) {
