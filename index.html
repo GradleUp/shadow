@@ -515,7 +515,7 @@ table.CodeRay td.code>pre{padding:0}
 <h1>Shadow Plugin User Guide &amp; Examples</h1>
 <div class="details">
 <span id="author" class="author">John Engelman - @johnrengelman</span><br>
-<span id="revnumber">version 4.0.1</span>
+<span id="revnumber">version 4.0.2</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -653,7 +653,7 @@ library&#8217;s dependencies will not conflict with the same dependency being de
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:4.0.1</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:4.0.2</span><span class="delimiter">'</span></span>
     }
 }
 
@@ -667,7 +667,7 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.1</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.2</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
@@ -770,7 +770,7 @@ provided by the Gradle runtime.</p>
         jcenter()
     }
     dependencies {
-        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:4.0.1</span><span class="delimiter">'</span></span>
+        classpath <span class="string"><span class="delimiter">'</span><span class="content">com.github.jengelman.gradle.plugins:shadow:4.0.2</span><span class="delimiter">'</span></span>
     }
 }
 
@@ -784,7 +784,7 @@ apply <span class="key">plugin</span>: <span class="string"><span class="delimit
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.1</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.2</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
@@ -980,7 +980,7 @@ of the <a href="api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.h
 </div>
 </div>
 <div class="paragraph">
-<p>The above code sample would configure the <code>shadowJar</code> task to merge depdencies from only the <code>compile</code> configuration.
+<p>The above code sample would configure the <code>shadowJar</code> task to merge dependencies from only the <code>compile</code> configuration.
 This means any dependency declared in the <code>runtime</code> configuration would be <strong>not</strong> be included in the final JAR.</p>
 </div>
 <div class="admonitionblock note">
@@ -1488,11 +1488,25 @@ is loaded dynamically via <code>Class.forName(String)</code>.</p>
 }</code></pre>
 </div>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Dependencies scoped as <code>api</code> will automatically excluded from minimization and used as "entry points" on minimization.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="reproducible_builds">2.11. Reproducible Builds</h3>
 <div class="paragraph">
-<p>Because JRA files contain the timestamp of the included files, it is often difficult to create reproducible builds
+<p>Because JAR files contain the timestamp of the included files, it is often difficult to create reproducible builds
 from a source commit that results in a hash identical file.
 Gradle supports reproducible JAR creation by setting the timestamps of included files to a consistent value.
 Shadow includes support for overriding file timestamps starting in version 4.0.0. By default, Shadow will preserve
@@ -1730,7 +1744,7 @@ like so:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">plugins {
-  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.1</span><span class="delimiter">'</span></span>
+  id <span class="string"><span class="delimiter">'</span><span class="content">com.github.johnrengelman.plugin-shadow</span><span class="delimiter">'</span></span> version <span class="string"><span class="delimiter">'</span><span class="content">4.0.2</span><span class="delimiter">'</span></span>
   id <span class="string"><span class="delimiter">'</span><span class="content">java</span><span class="delimiter">'</span></span>
 }
 
@@ -1758,6 +1772,20 @@ with your plugin.</p>
 <div class="sect1">
 <h2 id="change_log">8. Change Log</h2>
 <div class="sectionbody">
+<h3 id="v4_0_2_2018_10_27" class="discrete">v4.0.2 (2018-10-27)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/petarov">Petar Petrov</a> - Update to ASM 7.0-beta and jdependency 2.1.1 to support Java 11, <a href="https://github.com/johnrengelman/shadow/pull/415" class="bare">https://github.com/johnrengelman/shadow/pull/415</a></p>
+</li>
+<li>
+<p><a href="https://github.com/roxchkplusony">Victor Tso</a> - Ensure input streams are closed, <a href="https://github.com/johnrengelman/shadow/pull/411" class="bare">https://github.com/johnrengelman/shadow/pull/411</a></p>
+</li>
+<li>
+<p><a href="https://github.com/osipxd">Osip Fatkullin</a> - Exclude <code>api</code> configuration from minimization, <a href="https://github.com/johnrengelman/shadow/pull/405" class="bare">https://github.com/johnrengelman/shadow/pull/405</a></p>
+</li>
+</ul>
+</div>
 <h3 id="v4_0_1_2018_09_30" class="discrete">v4.0.1 (2018-09-30)</h3>
 <div class="ulist">
 <ul>
@@ -2282,7 +2310,7 @@ so Shadow was published there.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 4.0.1<br>
+Version 4.0.2<br>
 Last updated 2017-11-09 10:21:39 -06:00
 </div>
 </div>
