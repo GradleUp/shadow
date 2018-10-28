@@ -16,9 +16,9 @@ Read the [User Guide](http://imperceptiblethoughts.com/shadow)!
 
 | Gradle Version | Shadow Version |
 |----------------|----------------|
-| 3.x, 4.0 nightlies | 2.0.0|
+| 4.x | 4.0.2|
 
-**NOTE**: Shadow v2.0.0 is compatible with Gradle 3.0+ and Java 7+ _only_.
+**NOTE**: Shadow v4.+ is compatible with Gradle 4.0+ and Java 7+ _only_.
 
 
 ## Gradle Plugins
