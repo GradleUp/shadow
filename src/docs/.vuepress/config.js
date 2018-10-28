@@ -1,6 +1,7 @@
 module.exports = {
   base: "/shadow-new-site/",
   dest: "build/site",
+  ga: "UA-321220-4",
   themeConfig: {
     repo: "johnrengelman/shadow",
     editLinks: true,
