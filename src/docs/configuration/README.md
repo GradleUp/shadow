@@ -4,10 +4,12 @@ api: api/com/github/jengelman/gradle/plugins/shadow
 
 # Configuring Shadow
 
-The [`ShadowJar`](/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type extends from Gradle's
+<ApiLink subPath="tasks/ShadowJar.html">`ShadowJar`</ApiLink>
+
+The [`ShadowJar`](http://imperceptiblethoughts.com/shadow-new-site/api/com/github/jengelman/gradle/plugins/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type extends from Gradle's
 [`Jar`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) type.
 This means that all attributes and methods available on `Jar` are also available on
-[`ShadowJar`](/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html).
+[`ShadowJar`](http://imperceptiblethoughts.com/shadow-new-site/api/com/github/jengelman/gradle/plugins/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html).
 Refer the _Gradle User Guide_ for [Jar](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) for
 details.
 

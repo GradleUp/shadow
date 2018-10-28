@@ -10,12 +10,12 @@ gitPublish {
     branch = 'gh-pages'
 
     contents {
-        from 'build/asciidoc/html5'
+        from 'build/site'
         into('api') {
             from project.tasks.groovydoc
         }
     }
 }
 
-tasks.gitPublishPush.dependsOn asciidoctor
-tasks.gitPublishPush.dependsOn groovydoc
+tasks.gitPublishCopy.dependsOn yarn_build
+tasks.gitPublishCopy.dependsOn groovydoc

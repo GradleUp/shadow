@@ -1,5 +1,6 @@
 module.exports = {
   base: "/shadow-new-site/",
+  dest: "build/site",
   themeConfig: {
     repo: "johnrengelman/shadow",
     editLinks: true,

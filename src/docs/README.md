@@ -9,4 +9,4 @@ actionLink: /introduction/
 
 John Engelman - @johnrengelman
 
-[API Docs](api/index.html)
+[API Docs](http://imperceptiblethoughts.com/shadow-new-site/api/index.html)

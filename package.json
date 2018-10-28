@@ -9,7 +9,7 @@
     "vuepress": "^0.14.2"
   },
   "scripts": {
-    "docs:build": "vuepress build src/docs",
-    "docs:dev": "vuepress dev src/docs"
+    "build": "vuepress build src/docs",
+    "start": "vuepress dev src/docs"
   }
 }

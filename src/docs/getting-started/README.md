@@ -88,4 +88,4 @@ the final jar and automatically configures relocation for them.
 By default the tasks relocates all packages to the `shadow.` prefix. For example `org.jdom2.JDOMException` becomes
 `shadow.org.jdom2.JDOMException`
 
-For more details see the section [Using Shadow to Package Gradle Plugins](/shadowing-plugins/)
+For more details see the section [Using Shadow to Package Gradle Plugins](/plugins/)
