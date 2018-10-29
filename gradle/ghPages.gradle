@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'org.ajoberstar.git-publish'
 
 if (project.hasProperty('githubToken')) {
@@ -14,6 +16,7 @@ gitPublish {
         into('api') {
             from project.tasks.groovydoc
         }
+        filter(ReplaceTokens, tokens: [version: project.version])
     }
 }
 

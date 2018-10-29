@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:{project-version}'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:@version@'
     }
 }
 
@@ -18,7 +18,7 @@ Alternatively, the Gradle Plugin syntax can be used:
 
 ```groovy no-plugins
 plugins {
-  id 'com.github.johnrengelman.shadow' version '{project-version}'
+  id 'com.github.johnrengelman.shadow' version '@version@'
   id 'java'
 }
 ```

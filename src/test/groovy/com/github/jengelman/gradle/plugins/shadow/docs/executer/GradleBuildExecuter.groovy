@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.docs.executer
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.SnippetFixture
+import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.rules.TemporaryFolder
 
@@ -47,11 +48,15 @@ class GradleBuildExecuter implements SnippetExecuter {
         String snippetMinusImports = fixture.transform(importsAndSnippet.get(1))
         String fullSnippet = imports + fixture.pre() + snippetMinusImports + fixture.post()
 
-        buildFile.text = fullSnippet
+        buildFile.text = replaceTokens(fullSnippet)
 
         GradleRunner runner = GradleRunner.create().withProjectDir(dir)withPluginClasspath()
 
         runner.withArguments("build", "-m").build()
 
+    }
+
+    private static String replaceTokens(String snippet) {
+        return snippet.replaceAll("@shadow-version@", PluginSpecification.SHADOW_VERSION + '-SNAPSHOT')
     }
 }

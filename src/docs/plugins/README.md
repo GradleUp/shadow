@@ -18,9 +18,9 @@ Gradle projects. It can be used for standard Java or Groovy projects.
 A simple Gradle plugin can use this feature by applying the `plugin-shadow` plugin and configuring the dependencies
 like so:
 
-```groovy
+```groovy no-plugins
 plugins {
-  id 'com.github.johnrengelman.plugin-shadow' version '{project-version}'
+  id 'com.github.johnrengelman.plugin-shadow' version '@version@'
   id 'java'
 }
 

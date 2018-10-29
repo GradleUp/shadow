@@ -48,7 +48,7 @@ class ManualSnippetExtractor {
         snippetBlocks.each { block ->
             codeIndex = source.indexOf(block, codeIndex)
             def lineNumber = source.substring(0, codeIndex).readLines().size() + 2
-            snippetBlocksByLine.put(lineNumber, performSubstitutions(extractSnippetFromBlock(block)))
+            snippetBlocksByLine.put(lineNumber, extractSnippetFromBlock(block))
             codeIndex += block.size()
         }
 
@@ -57,14 +57,6 @@ class ManualSnippetExtractor {
 
     private static String extractSnippetFromBlock(String tag) {
         tag.substring(tag.indexOf("\n") + 1, tag.lastIndexOf("\n"))
-    }
-
-    /**
-     * Perform the substitutions that {@code :ratpack-manual:tokeniseManual} would perform, as required by tested snippets.
-     */
-    private static String performSubstitutions(String snippet) {
-//        return snippet.replaceAll("@ratpack-version@", RatpackVersion.version)
-        return snippet
     }
 
     private static TestCodeSnippet createSnippet(String sourceClassName, File sourceFile, int lineNumber, String snippet, SnippetExecuter executer) {
