@@ -12,7 +12,7 @@ class ManualSnippetExtractor {
         List<TestCodeSnippet> snippets = []
 
         def snippetBlockPattern = Pattern.compile(/(?ims)```$cssClass\n(.*?)\n```/)
-        def filenames = new FileNameFinder().getFileNames(root.absolutePath, "*.md")
+        def filenames = new FileNameFinder().getFileNames(root.absolutePath, "**/*.md")
 
         filenames.each { filename ->
             def file = new File(filename)
@@ -64,6 +64,7 @@ class ManualSnippetExtractor {
      */
     private static String performSubstitutions(String snippet) {
 //        return snippet.replaceAll("@ratpack-version@", RatpackVersion.version)
+        return snippet
     }
 
     private static TestCodeSnippet createSnippet(String sourceClassName, File sourceFile, int lineNumber, String snippet, SnippetExecuter executer) {

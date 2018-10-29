@@ -1,6 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.docs
 
+import com.github.jengelman.gradle.plugins.shadow.docs.executer.GradleBuildExecuter
 import com.github.jengelman.gradle.plugins.shadow.docs.extractor.ManualSnippetExtractor
+import com.github.jengelman.gradle.plugins.shadow.docs.fixture.GroovyDslFixture
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.CodeSnippetTestCase
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.CodeSnippetTests
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter
@@ -23,19 +25,14 @@ class ManualCodeSnippetTests extends CodeSnippetTestCase {
 //                    return text.readLines()[4..-1].join("\n")
 //                }
 //            }))
+            "groovy": new GradleBuildExecuter("build.gradle", new GroovyDslFixture(), new GroovyDslFixture.ImportsExtractor())
     ]
 
     @Override
     protected void addTests(CodeSnippetTests tests) {
         File cwd = new File(StandardSystemProperty.USER_DIR.value())
-        File root
-        if (new File(cwd, "ratpack-manual.gradle").exists()) {
-            root = cwd.parentFile
-        } else {
-            root = cwd
-        }
 
-        def content = new File(root, "ratpack-manual/src/content/chapters")
+        def content = new File(cwd, "src/docs")
 
         FIXTURES.each { selector, executer ->
             ManualSnippetExtractor.extract(content, selector, executer).each {
