@@ -36,7 +36,7 @@ class GradleBuildExecuter implements SnippetExecuter {
     void execute(TestCodeSnippet snippet) throws Exception {
         TemporaryFolder tempDir = new TemporaryFolder()
         tempDir.create()
-        File dir = tempDir.newFolder(snippet.testName)
+        File dir = tempDir.newFolder()
 
         File buildFile = new File(dir, buildFile)
 
