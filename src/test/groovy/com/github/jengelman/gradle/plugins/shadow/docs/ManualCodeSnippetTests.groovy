@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.docs.fixture.GroovyDslFixture
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.CodeSnippetTestCase
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.CodeSnippetTests
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.GroovyScriptFixture
 import com.google.common.base.StandardSystemProperty
 
 class ManualCodeSnippetTests extends CodeSnippetTestCase {
@@ -25,7 +26,8 @@ class ManualCodeSnippetTests extends CodeSnippetTestCase {
 //                    return text.readLines()[4..-1].join("\n")
 //                }
 //            }))
-            "groovy": new GradleBuildExecuter("build.gradle", new GroovyDslFixture(), new GroovyDslFixture.ImportsExtractor())
+            "groovy": new GradleBuildExecuter("build.gradle", new GroovyDslFixture(), new GroovyDslFixture.ImportsExtractor()),
+            "groovy no-plugins": new GradleBuildExecuter("build.gradle", new GroovyScriptFixture(), new GroovyDslFixture.ImportsExtractor())
     ]
 
     @Override

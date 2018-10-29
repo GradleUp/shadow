@@ -17,6 +17,10 @@ plugins {
 
 version = "1.0"
 group = 'shadow'
+
+repositories {
+    mavenLocal()
+}
 """
     }
 
