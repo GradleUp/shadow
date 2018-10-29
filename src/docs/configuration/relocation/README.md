@@ -58,6 +58,8 @@ dependency so the tasks execute in the correct order.
 
 ```groovy
 // Configure Auto Relocation
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 task relocateShadowJar(type: ConfigureShadowRelocation) {
     target = tasks.shadowJar
     prefix = "myapp" // Default value is "shadow"

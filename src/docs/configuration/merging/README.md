@@ -10,6 +10,21 @@ determine if it should process a particular entry and apply any modifications be
 
 ```groovy
 // Adding a Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
+
+class MyTransformer implements Transformer {
+    boolean canTransformResource(FileTreeElement element) { true }
+
+    void transform(TransformerContext context) {}
+
+    boolean hasTransformedResource() { true }
+
+    void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps) {}
+}
+
 shadowJar {
   transform(MyTransformer.class)
 }
@@ -19,9 +34,27 @@ Additionally, a `Transformer` can accept a `Closure` to configure the provided `
 
 ```groovy
 // Configuring a Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
+
+class MyTransformer implements Transformer {
+
+    boolean enabled
+
+    boolean canTransformResource(FileTreeElement element) { true }
+
+    void transform(TransformerContext context) {}
+
+    boolean hasTransformedResource() { true }
+
+    void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps) {}
+}
+
 shadowJar {
   transform(MyTransformer.class) {
-    enable = true
+    enabled = true
   }
 }
 ```
@@ -30,6 +63,24 @@ An instantiated instance of a `Transformer` can also be provided.
 
 ```groovy
 // Adding a Transformer Instance
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
+
+class MyTransformer implements Transformer {
+
+    boolean enabled
+
+    boolean canTransformResource(FileTreeElement element) { true }
+
+    void transform(TransformerContext context) {}
+
+    boolean hasTransformedResource() { true }
+
+    void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps) {}
+}
+
 shadowJar {
   transform(new MyTransformer(enabled: true))
 }
@@ -135,8 +186,10 @@ It must be added using the [`transform`](http://imperceptiblethoughts.com/shadow
 
 ```groovy
 // Appending a XML File
+import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
+
 shadowJar {
-  tranform(XmlAppendingTransformer.class) {
+  transform(XmlAppendingTransformer.class) {
     resource = 'properties.xml'
   }
 }
