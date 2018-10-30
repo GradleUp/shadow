@@ -1,5 +1,5 @@
 module.exports = {
-  base: "/shadow-new-site/",
+  base: "/shadow/",
   dest: "build/site",
   ga: "UA-321220-4",
   themeConfig: {
