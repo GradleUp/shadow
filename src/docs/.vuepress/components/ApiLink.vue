@@ -6,7 +6,7 @@
 export default {
   data () {
     return {
-        absolutePath: "http://imperceptiblethoughts.com/shadow-new-site/api/com/github/jengelman/gradle/plugins/shadow/" + this.path
+        absolutePath: "http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/" + this.path
     }
   }
 }
