@@ -6,6 +6,7 @@ import org.gradle.api.artifacts.ResolvedDependency
 
 @Slf4j
 class MinimizeDependencyFilter extends AbstractDependencyFilter {
+    
     MinimizeDependencyFilter(Project project) {
         super(project)
     }
