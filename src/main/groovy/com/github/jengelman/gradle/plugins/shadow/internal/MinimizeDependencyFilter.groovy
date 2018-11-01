@@ -15,9 +15,16 @@ class MinimizeDependencyFilter extends AbstractDependencyFilter {
                            Set<ResolvedDependency> includedDependencies,
                            Set<ResolvedDependency> excludedDependencies) {
         dependencies.each { dependency ->
-            if (isIncluded(dependency) && includedDependencies.any { it.parents.contains(dependency) } ? includedDependencies.add(dependency) : excludedDependencies.add(dependency)) {
-                resolve(dependency.children, includedDependencies, excludedDependencies)
+            if(isIncluded(dependency) && !isParentExcluded(excludedDependencies, dependency)) {
+                includedDependencies.add(dependency)
+            } else {
+                excludedDependencies.add(dependency)
             }
+            resolve(dependency.children, includedDependencies, excludedDependencies)
         }
+    }
+
+    private boolean isParentExcluded(Set<ResolvedDependency> excludedDependencies, ResolvedDependency dependency) {
+        excludedDependencies.any { dependency.parents.contains(it) }
     }
 }
