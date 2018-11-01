@@ -373,6 +373,62 @@ class ShadowPluginSpec extends PluginSpecification {
      * 'Client', 'Server' and 'junit' are independent.
      * Unused classes of 'client' and theirs dependencies shouldn't be removed.
      */
+    def 'exclude a project from minimize - shall not excludes transitive dependencies that are used in the project'() {
+        given:
+        file('settings.gradle') << """
+            include 'client', 'server'
+        """.stripIndent()
+
+        file('client/src/main/java/client/Client.java') << """
+            package client;
+            import junit.framework.TestCase;
+            public class Client extends TestCase {
+                public static void main(String[] args) {} 
+            }
+        """.stripIndent()
+
+        file('client/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
+
+        file('server/src/main/java/server/Server.java') << """
+            package server;
+            public class Server {}
+        """.stripIndent()
+
+        file('server/build.gradle') << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                minimize {
+                    exclude(project(':client'))
+                }
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(':client') }
+        """.stripIndent()
+
+        File serverOutput = file('server/build/libs/server-all.jar')
+
+        when:
+        runner.withArguments(':server:shadowJar', '--stacktrace').withDebug(true).build()
+
+        then:
+        contains(serverOutput, [
+                'client/Client.class',
+                'server/Server.class',
+                'junit/framework/TestCase.class'
+        ])
+    }
+
+    /**
+     * 'Client', 'Server' and 'junit' are independent.
+     * Unused classes of 'client' should not be removed
+     */
     def 'exclude a project from minimize - excludes transitive dependencies that are not used in the project dependency'() {
         given:
         file('settings.gradle') << """
@@ -420,7 +476,6 @@ class ShadowPluginSpec extends PluginSpecification {
                 'server/Server.class'
         ])
         doesNotContain(serverOutput, [ 'junit/framework/Test.class'])
-
     }
 
 
