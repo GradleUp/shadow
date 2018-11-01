@@ -373,7 +373,7 @@ class ShadowPluginSpec extends PluginSpecification {
      * 'Client', 'Server' and 'junit' are independent.
      * Unused classes of 'client' and theirs dependencies shouldn't be removed.
      */
-    def 'exclude a project from minimize - shall not excludes transitive dependencies that are used in the project'() {
+    def 'exclude a project from minimize - shall not exclude transitive dependencies that are used in subproject'() {
         given:
         file('settings.gradle') << """
             include 'client', 'server'
@@ -427,9 +427,9 @@ class ShadowPluginSpec extends PluginSpecification {
 
     /**
      * 'Client', 'Server' and 'junit' are independent.
-     * Unused classes of 'client' should not be removed
+     * Unused classes of 'client' and theirs dependencies shouldn't be removed.
      */
-    def 'exclude a project from minimize - excludes transitive dependencies that are not used in the project dependency'() {
+    def 'exclude a project from minimize - shall not exclude transitive dependencies from subproject that are not used'() {
         given:
         file('settings.gradle') << """
             include 'client', 'server'
@@ -437,7 +437,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/src/main/java/client/Client.java') << """
             package client;
-            public class Client {}
+            public class Client { }
         """.stripIndent()
 
         file('client/build.gradle') << """
@@ -473,9 +473,9 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         contains(serverOutput, [
                 'client/Client.class',
-                'server/Server.class'
+                'server/Server.class',
+                'junit/framework/TestCase.class'
         ])
-        doesNotContain(serverOutput, [ 'junit/framework/Test.class'])
     }
 
 

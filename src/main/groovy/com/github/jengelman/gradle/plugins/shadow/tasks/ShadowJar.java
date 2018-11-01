@@ -9,8 +9,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer;
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
 import groovy.lang.MetaClass;
-import java.io.File;
-import java.util.Set;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gradle.api.Action;
 import org.gradle.api.artifacts.Configuration;
@@ -45,7 +43,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         super();
         versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
-        dependencyFilterForMinimize = new DefaultDependencyFilter(getProject());
+        dependencyFilterForMinimize = new MinimizeDependencyFilter(getProject());
         setManifest(new DefaultInheritManifest(getServices().get(FileResolver.class)));
         transformers = new ArrayList<>();
         relocators = new ArrayList<>();

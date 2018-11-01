@@ -5,9 +5,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolvedDependency
 
 @Slf4j
-class DefaultDependencyFilter extends AbstractDependencyFilter {
-
-    DefaultDependencyFilter(Project project) {
+class MinimizeDependencyFilter extends AbstractDependencyFilter {
+    MinimizeDependencyFilter(Project project) {
         super(project)
     }
 
@@ -15,11 +14,10 @@ class DefaultDependencyFilter extends AbstractDependencyFilter {
     protected void resolve(Set<ResolvedDependency> dependencies,
                            Set<ResolvedDependency> includedDependencies,
                            Set<ResolvedDependency> excludedDependencies) {
-        dependencies.each {
-            if (isIncluded(it) ? includedDependencies.add(it) : excludedDependencies.add(it)) {
-                resolve(it.children, includedDependencies, excludedDependencies)
+        dependencies.each { dependency ->
+            if (isIncluded(dependency) && includedDependencies.any { it.parents.contains(dependency) } ? includedDependencies.add(dependency) : excludedDependencies.add(dependency)) {
+                resolve(dependency.children, includedDependencies, excludedDependencies)
             }
         }
     }
-
 }
