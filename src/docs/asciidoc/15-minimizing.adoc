@@ -24,6 +24,17 @@ shadowJar {
 }
 ----
 
+Similar to dependencies, projects can also be excluded.
+
+[source,groovy,indent=0]
+----
+shadowJar {
+  minimize {
+    exclude(project(':client'))
+  }
+}
+----
+
 [NOTE]
 ====
 Dependencies scoped as `api` will automatically excluded from minimization and used as "entry points" on minimization.
