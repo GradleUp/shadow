@@ -45,6 +45,10 @@ class GradleBuildExecuter implements SnippetExecuter {
 rootProject.name = 'shadowTest'
 include 'api', 'main'
 """
+        File properties = new File(dir, "gradle.properties")
+        properties.text = """
+or.gradle.daemon=false
+"""
 
         File mainDir = new File(dir, "main")
         mainDir.mkdirs()
