@@ -59,7 +59,7 @@ include 'api', 'main'
 
         buildFile.text = replaceTokens(fullSnippet)
 
-        GradleRunner runner = GradleRunner.create().withProjectDir(dir).withPluginClasspath()
+        GradleRunner runner = GradleRunner.create().withProjectDir(dir).withPluginClasspath().forwardOutput()
 
         runner.withArguments(":main:build", "-m").build()
 
