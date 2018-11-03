@@ -15,12 +15,14 @@ packages using the specified `prefix` on the associated `ShadowJar` task.
 While this is useful for developing Gradle plugins, nothing about the `ConfigureShadowRelocation` task is tied to
 Gradle projects. It can be used for standard Java or Groovy projects.
 
-A simple Gradle plugin can use this feature by applying the `plugin-shadow` plugin and configuring the dependencies
-like so:
+A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the relocation task
+to execute before the `shadowJar` tasks:
 
 ```groovy no-plugins
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 plugins {
-  id 'com.github.johnrengelman.plugin-shadow' version '@version@'
+  id 'com.github.johnrengelman.shadow' version '@version@'
   id 'java'
 }
 
@@ -35,6 +37,12 @@ dependencies {
     compile 'org.apache.ant:ant:1.9.4'
     compile 'org.codehaus.plexus:plexus-utils:2.0.6'
 }
+
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
 ```
 
 Note that the `localGroovy()` and `gradleApi()` dependencies are added to the `shadow` configuration instead of the

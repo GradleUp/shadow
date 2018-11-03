@@ -1,6 +1,15 @@
 # Getting Started
 
 ```groovy no-plugins
+plugins {
+  id 'com.github.johnrengelman.shadow' version '@version@'
+  id 'java'
+}
+```
+
+Alternatively, the plugin can be added to the buildscript classpath and applied:
+
+```groovy no-plugins
 buildscript {
     repositories {
         jcenter()
@@ -12,15 +21,6 @@ buildscript {
 
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
-```
-
-Alternatively, the Gradle Plugin syntax can be used:
-
-```groovy no-plugins
-plugins {
-  id 'com.github.johnrengelman.shadow' version '@version@'
-  id 'java'
-}
 ```
 
 Shadow is a reactive plugin.

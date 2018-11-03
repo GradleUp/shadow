@@ -41,12 +41,12 @@ Gradle's `configurations` block.
 ```groovy
 // Exclude an Module Dependency
 dependencies {
-   compile 'shadow:d:1.0'
+   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
    dependencies {
-      exclude(dependency('shadow:d:1.0'))
+      exclude(dependency('org.apache.logging.log4j:log4j-core:2.11.1'))
    }
 }
 ```
@@ -77,12 +77,12 @@ using any of these individual fields.
 ```groovy
 // Exclude Any Version of a Dependency
 dependencies {
-   compile 'shadow:d:1.0'
+   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
    dependencies {
-      exclude(dependency('shadow:d:.*'))
+      exclude(dependency('org.apache.logging.log4j:log4j-core:.*'))
    }
 }
 ```
@@ -91,9 +91,13 @@ Any of the individual fields can be safely absent and will function as though a 
 
 ```groovy
 // Ignore Dependency Version
+dependencies {
+   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+}
+
 shadowJar {
   dependencies {
-    exclude(dependency('shadow:d'))
+    exclude(dependency('org.apache.logging.log4j:log4j-core'))
   }
 }
 ```
@@ -104,18 +108,26 @@ This same patten can be used for any of the dependency notation fields.
 
 ```groovy
 // Ignoring An Artifact Regardless of Group
+dependencies {
+   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+}
+
 shadowJar {
   dependencies {
-    exclude(dependency(':d:1.0'))
+    exclude(dependency(':log4j-core:2.11.1'))
   }
 }
 ```
 
 ```groovy
 // Excluding All Artifacts From Group
+dependencies {
+   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+}
+
 shadowJar {
   dependencies {
-    exclude(dependency('shadow::1.0'))
+    exclude(dependency('org.apache.logging.log4j::2.11.1'))
   }
 }
 ```
@@ -128,10 +140,14 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 
 ```groovy
 // Selecting Dependencies to Filter With a Spec
+dependencies {
+   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+}
+
 shadowJar {
    dependencies {
        exclude(dependency {
-           it.moduleGroup == 'junit'
+           it.moduleGroup == 'org.apache.logging.log4j'
        })
    }
 }

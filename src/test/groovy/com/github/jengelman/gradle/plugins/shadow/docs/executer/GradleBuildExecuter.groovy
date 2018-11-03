@@ -57,6 +57,7 @@ class GradleBuildExecuter implements SnippetExecuter {
     }
 
     private static String replaceTokens(String snippet) {
-        return snippet.replaceAll("@shadow-version@", PluginSpecification.SHADOW_VERSION + '-SNAPSHOT')
+//        return snippet.replaceAll()
+        return snippet.replaceAll("@version@", PluginSpecification.SHADOW_VERSION + '-SNAPSHOT')
     }
 }
