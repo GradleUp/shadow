@@ -9,7 +9,7 @@ plugins {
 
 Alternatively, the plugin can be added to the buildscript classpath and applied:
 
-```groovy no-plugins
+```groovy no-run
 buildscript {
     repositories {
         jcenter()

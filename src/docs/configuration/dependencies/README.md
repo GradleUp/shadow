@@ -54,12 +54,12 @@ shadowJar {
 ```groovy
 // Exclude a Project Dependency
 dependencies {
-  compile project(':client')
+  compile project(':api')
 }
 
 shadowJar {
    dependencies {
-       exclude(project(':client'))
+       exclude(project(':api'))
    }
 }
 ```

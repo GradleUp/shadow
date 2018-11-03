@@ -39,7 +39,16 @@ class GradleBuildExecuter implements SnippetExecuter {
         tempDir.create()
         File dir = tempDir.newFolder()
 
-        File buildFile = new File(dir, buildFile)
+        addSubProject(dir)
+        File settings = new File(dir, "settings.gradle")
+        settings.text = """
+rootProject.name = 'shadowTest'
+include 'api', 'main'
+"""
+
+        File mainDir = new File(dir, "main")
+        mainDir.mkdirs()
+        File buildFile = new File(mainDir, buildFile)
 
 
         List<String> importsAndSnippet = importExtractor.apply(snippet.getSnippet())
@@ -50,14 +59,30 @@ class GradleBuildExecuter implements SnippetExecuter {
 
         buildFile.text = replaceTokens(fullSnippet)
 
-        GradleRunner runner = GradleRunner.create().withProjectDir(dir)withPluginClasspath()
+        GradleRunner runner = GradleRunner.create().withProjectDir(dir).withPluginClasspath()
 
-        runner.withArguments("build", "-m").build()
+        runner.withArguments(":main:build", "-m").build()
 
     }
 
+    private void addSubProject(File dir) {
+        File api = new File(dir, "api")
+        api.mkdirs()
+        File build = new File(api, "build.gradle")
+        build.text = """
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+"""
+    }
+
     private static String replaceTokens(String snippet) {
-//        return snippet.replaceAll()
         return snippet.replaceAll("@version@", PluginSpecification.SHADOW_VERSION + '-SNAPSHOT')
     }
 }

@@ -1,2 +1,3 @@
-rootProject.name = 'shadow'
-enableFeaturePreview('STABLE_PUBLISHING')
+
+rootProject.name = 'shadowTest'
+include 'api', 'main'
