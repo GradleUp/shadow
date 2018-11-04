@@ -1,0 +1,16 @@
+*.un~
+*.iml
+*.ipr
+*.iws
+.idea
+build
+.gradle
+*.orig
+out
+.gradletasknamecache
+.gradle-test-kit
+classes/
+node_modules/
+yarn-error.log
+src/docs/.vuepress/dist/
+.DS_Store
