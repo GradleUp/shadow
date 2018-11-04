@@ -18,7 +18,7 @@ public class DelegatingTestRunner extends Suite {
     setScheduler(new RunnerScheduler() {
 
       private final ExecutorService service = Executors.newFixedThreadPool(
-        Boolean.getBoolean("cloudCi") ? 1 : Runtime.getRuntime().availableProcessors()
+        System.getenv("CI") != null ? 1 : Runtime.getRuntime().availableProcessors()
       );
 
       public void schedule(Runnable childStatement) {
