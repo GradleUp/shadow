@@ -1,5 +1,8 @@
 # Change Log
 
+## v4.0.3 (2018-11-21)
+* [Mark Vieira](https://github.com/mark-vieira) - Don't leak plugin classes to Gradle's Spec cache [#430](https://github.com/johnrengelman/shadow/pull/430)
+
 ## v4.0.2 (2018-10-27)
 * [Petar Petrov](https://github.com/petarov) - Update to ASM 7.0-beta and jdependency 2.1.1 to support Java 11, [#415](https://github.com/johnrengelman/shadow/pull/415)
 * [Victor Tso](https://github.com/roxchkplusony) - Ensure input streams are closed, [#411](https://github.com/johnrengelman/shadow/pull/411)
@@ -125,7 +128,7 @@
   files within the configured path to merge.
 * [Matt Hurne](https://github.com/mhurne) - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
   descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default.
-* `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the 
+* `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the
   `'application'` plugin, [#89](https://github.com/johnrengelman/shadow/issues/89)
 
 ## v1.0.3 (2014-07-29)
