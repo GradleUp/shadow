@@ -86,7 +86,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '4.10']
+        version << ['4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '4.10', '5.0-rc-4']
     }
 
     def 'Error in Gradle versions < 4.0'() {
@@ -358,8 +358,8 @@ class ShadowPluginSpec extends PluginSpecification {
         file('api/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { 
-                compile 'junit:junit:3.8.2' 
+            dependencies {
+                compile 'junit:junit:3.8.2'
                 compile project(':lib')
             }
         """.stripIndent()
