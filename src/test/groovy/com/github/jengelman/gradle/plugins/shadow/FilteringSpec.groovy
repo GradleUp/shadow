@@ -302,12 +302,13 @@ class FilteringSpec extends PluginSpecification {
             // end::excludeProject[]
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/server-1.0-all.jar')
+        File serverOutput = getFile('server/build/libs/server-1.0-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()
 
         then:
+        serverOutput.exists()
         doesNotContain(serverOutput, [
                 'client/Client.class',
         ])
@@ -355,12 +356,13 @@ class FilteringSpec extends PluginSpecification {
             // end::excludeSpec[]
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/server-1.0-all.jar')
+        File serverOutput = getFile('server/build/libs/server-1.0-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()
 
         then:
+        serverOutput.exists()
         doesNotContain(serverOutput, [
                 'junit/framework/Test.class'
         ])

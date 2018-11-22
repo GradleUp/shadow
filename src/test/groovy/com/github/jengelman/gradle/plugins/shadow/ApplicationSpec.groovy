@@ -58,7 +58,7 @@ class ApplicationSpec extends PluginSpecification {
         assert result.output.contains('TestApp: Hello World! (foo)')
 
         and: 'Check that the proper jar file was installed'
-        File installedJar = file('build/install/myapp-shadow/lib/myapp-1.0-all.jar')
+        File installedJar = getFile('build/install/myapp-shadow/lib/myapp-1.0-all.jar')
         assert installedJar.exists()
 
         and: 'And that jar file as the correct files in it'
@@ -70,7 +70,7 @@ class ApplicationSpec extends PluginSpecification {
         assert attributes.getValue('Main-Class') == 'myapp.Main'
 
         then: 'Check that the start scripts is written out and has the correct Java invocation'
-        File startScript = file('build/install/myapp-shadow/bin/myapp')
+        File startScript = getFile('build/install/myapp-shadow/bin/myapp')
         assert startScript.exists()
         assert startScript.text.contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
         assert startScript.text.contains("eval \\\"\$JAVACMD\\\" \$JVM_OPTS -jar \\\"\$CLASSPATH\\\" \$APP_ARGS")
@@ -116,7 +116,7 @@ class ApplicationSpec extends PluginSpecification {
         runner.withArguments('shadowDistZip', '--stacktrace').build()
 
         then: 'Check that the distribution zip was created'
-        File zip = file('build/distributions/myapp-shadow-1.0.zip')
+        File zip = getFile('build/distributions/myapp-shadow-1.0.zip')
         assert zip.exists()
 
         and: 'Check that the zip contains the correct library files & scripts'
@@ -166,7 +166,7 @@ class ApplicationSpec extends PluginSpecification {
         runner.withArguments(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME).build()
 
         then: 'Check that the proper jar file was installed'
-        File installedJar = file('build/install/myapp-shadow/lib/myapp-1.0-all.jar')
+        File installedJar = getFile('build/install/myapp-shadow/lib/myapp-1.0-all.jar')
         assert installedJar.exists()
     }
 }

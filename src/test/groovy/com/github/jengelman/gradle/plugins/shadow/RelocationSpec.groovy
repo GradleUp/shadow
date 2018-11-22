@@ -232,7 +232,7 @@ class RelocationSpec extends PluginSpecification {
         runner.withArguments(':app:shadowJar').build()
 
         then:
-        File appOutput = file('app/build/libs/app-all.jar')
+        File appOutput = getFile('app/build/libs/app-all.jar')
         assert appOutput.exists()
 
         and:

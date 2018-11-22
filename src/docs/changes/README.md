@@ -1,9 +1,9 @@
 # Change Log
 
 ## v4.0.4 (2018-11-21)
-* Automatically configure `classifier` (to `shadow`) on `shadowDistZip` and `shadowDistTar` so that the `maven` plugin
-  doesn't error when using `shadow`, `maven`, and `application` plugin together. This change may result in new file names
-  for the artifacts created and published by these tasks. [#347](https://github.com/johnrengelman/shadow/issues/347)
+* When using `shadow`, `application`, and `maven` plugins together, remove `shadowDistZip` and `shadowDistTar` from
+  `configurations.archives` so they are not published or installed by default with the `uploadArchives` or `install`
+   tasks. [#347](https://github.com/johnrengelman/shadow/issues/347)
  
 ## v4.0.3 (2018-11-21)
 * [Mark Vieira](https://github.com/mark-vieira) - Don't leak plugin classes to Gradle's Spec cache [#430](https://github.com/johnrengelman/shadow/pull/430)

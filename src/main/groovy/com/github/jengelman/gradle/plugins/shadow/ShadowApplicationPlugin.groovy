@@ -11,6 +11,7 @@ import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
+import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.application.CreateStartScripts
 
@@ -31,9 +32,6 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         DistributionContainer distributions = project.extensions.getByName("distributions")
         Distribution distribution = distributions.create("shadow")
 
-        project.tasks.shadowDistZip.classifier = 'shadow'
-        project.tasks.shadowDistTar.classifier = 'shadow'
-
         addRunTask(project)
         addCreateScriptsTask(project)
 
@@ -41,6 +39,17 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
         configureJarMainClass(project)
         configureInstallTask(project)
+
+        project.plugins.withType(MavenPlugin) {
+            project.configurations.archives.with {
+                artifacts.findAll {
+                    it.provider.get().is(project.tasks.shadowDistZip) ||
+                            it.provider.get().is(project.tasks.shadowDistTar)
+                }.each {
+                    artifacts.remove it
+                }
+            }
+        }
     }
 
     protected void configureJarMainClass(Project project) {
