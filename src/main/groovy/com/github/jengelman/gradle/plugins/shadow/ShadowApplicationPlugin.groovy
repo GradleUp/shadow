@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.distribution.Distribution
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.CopySpec
@@ -29,6 +30,9 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
         DistributionContainer distributions = project.extensions.getByName("distributions")
         Distribution distribution = distributions.create("shadow")
+
+        project.tasks.shadowDistZip.classifier = 'shadow'
+        project.tasks.shadowDistTar.classifier = 'shadow'
 
         addRunTask(project)
         addCreateScriptsTask(project)

@@ -13,6 +13,7 @@ gitPublish {
 
     contents {
         from 'build/site'
+        from '.circleci'
         into('api') {
             from project.tasks.groovydoc
         }
