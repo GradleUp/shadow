@@ -4,6 +4,7 @@
 * When using `shadow`, `application`, and `maven` plugins together, remove `shadowDistZip` and `shadowDistTar` from
   `configurations.archives` so they are not published or installed by default with the `uploadArchives` or `install`
    tasks. [#347](https://github.com/johnrengelman/shadow/issues/347)
+* [James Nelson](https://github.com/JamesXNelson) Fix `null` path when using Jar minimization and Gradle's `api` configuration. [#424](https://github.com/johnrengelman/shadow/issues/424), [#425](https://github.com/johnrengelman/shadow/issues/425)
  
 ## v4.0.3 (2018-11-21)
 * [Mark Vieira](https://github.com/mark-vieira) - Don't leak plugin classes to Gradle's Spec cache [#430](https://github.com/johnrengelman/shadow/pull/430)

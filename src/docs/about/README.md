@@ -49,3 +49,4 @@ so Shadow was published there.
 * [Victor Tso](https://github.com/roxchkplusony)
 * [Petar Petrov](https://github.com/petarov)
 * [Mark Vieira](https://github.com/mark-vieira)
+* [James Nelson](https://github.com/JamesXNelson)
