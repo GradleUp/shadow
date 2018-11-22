@@ -43,12 +43,14 @@ import static org.apache.logging.log4j.core.config.plugins.processor.PluginProce
  */
 class Log4j2PluginsCacheFileTransformer implements Transformer {
 
-    private final List<File> temporaryFiles;
-    private final List<Relocator> relocators;
+    private final List<File> temporaryFiles
+    private final List<Relocator> relocators
 
-    public Log4j2PluginsCacheFileTransformer() {
-        temporaryFiles = new ArrayList<>();
-        relocators = new ArrayList<>();
+    private ShadowStats stats
+
+    Log4j2PluginsCacheFileTransformer() {
+        temporaryFiles = new ArrayList<>()
+        relocators = new ArrayList<>()
     }
 
     @Override
@@ -62,10 +64,18 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
         def temporaryFile = File.createTempFile("Log4j2Plugins", ".dat")
         temporaryFile.deleteOnExit()
         temporaryFiles.add(temporaryFile)
-        IOUtils.copy(inputStream, new FileOutputStream(temporaryFile))
+        FileOutputStream fos = new FileOutputStream(temporaryFile)
+        try {
+            IOUtils.copy(inputStream, fos)
+        } finally {
+            fos.close()
+        }
         def contextRelocators = context.relocators
         if (contextRelocators != null) {
             this.relocators.addAll(contextRelocators)
+        }
+        if (this.stats == null) {
+            this.stats = context.stats
         }
     }
 
@@ -93,7 +103,7 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
     }
 
     private Enumeration<URL> getUrlEnumeration() {
-        def urls = temporaryFiles.collect({ it.toURL() }).asList()
+        def urls = temporaryFiles.collect({ it.toURI().toURL() }).asList()
         return Collections.enumeration(urls)
     }
 
@@ -101,16 +111,16 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
         for (Map<String, PluginEntry> currentMap : pluginCache.getAllCategories().values()) {
             pluginEntryLoop:
             for (PluginEntry currentPluginEntry : currentMap.values()) {
-                String className = currentPluginEntry.getClassName();
-                RelocateClassContext relocateClassContext = new RelocateClassContext(className, new ShadowStats());
+                String className = currentPluginEntry.getClassName()
+                RelocateClassContext relocateClassContext = new RelocateClassContext(className, stats)
                 for (Relocator currentRelocator : relocators) {
                     // If we have a relocator that can relocate our current entry...
-                    boolean canRelocateClass = currentRelocator.canRelocateClass(relocateClassContext);
+                    boolean canRelocateClass = currentRelocator.canRelocateClass(relocateClassContext)
                     if (canRelocateClass) {
                         // Then we perform that relocation and update the plugin entry to reflect the new value.
-                        String relocatedClassName = currentRelocator.relocateClass(relocateClassContext);
-                        currentPluginEntry.setClassName(relocatedClassName);
-                        continue pluginEntryLoop;
+                        String relocatedClassName = currentRelocator.relocateClass(relocateClassContext)
+                        currentPluginEntry.setClassName(relocatedClassName)
+                        continue pluginEntryLoop
                     }
                 }
             }
