@@ -1,9 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import org.gradle.api.Action
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Attributes
 import org.gradle.api.java.archives.Manifest
 import org.gradle.api.java.archives.ManifestException
+import org.gradle.api.java.archives.ManifestMergeSpec
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 import org.gradle.util.ConfigureUtil
@@ -86,6 +88,12 @@ class DefaultInheritManifest implements InheritManifest {
     @Override
     Manifest from(Object o, Closure<?> closure) {
         internalManifest.from(o, closure)
+        return this
+    }
+
+    @Override
+    Manifest from(Object o, Action<ManifestMergeSpec> action) {
+        internalManifest.from(o, action)
         return this
     }
 }

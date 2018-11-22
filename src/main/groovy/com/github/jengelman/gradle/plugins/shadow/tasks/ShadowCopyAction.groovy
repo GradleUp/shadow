@@ -30,6 +30,7 @@ import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.WorkResult
+import org.gradle.api.tasks.WorkResults
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.internal.UncheckedException
@@ -95,7 +96,7 @@ class ShadowCopyAction implements CopyAction {
             unusedClasses = Collections.emptySet()
         }
 
-        final ZipOutputStream zipOutStr
+        ZipOutputStream zipOutStr
 
         try {
             zipOutStr = compressor.createArchiveOutputStream(zipFile)
@@ -125,7 +126,7 @@ class ShadowCopyAction implements CopyAction {
                 )
             }
         }
-        return versionUtil.getWorkResult(true)
+        return WorkResults.didWork(true)
     }
 
     private void processTransformers(ZipOutputStream stream) {
