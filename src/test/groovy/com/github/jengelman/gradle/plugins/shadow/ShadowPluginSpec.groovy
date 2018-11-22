@@ -579,7 +579,7 @@ class ShadowPluginSpec extends PluginSpecification {
         runner.withArguments(':server:shadowJar').build()
 
         then:
-        exerverOutput.exists()
+        serverOutput.exists()
         contains(serverOutput, [
                 'client/Client.class',
                 'client/junit/framework/Test.class',
