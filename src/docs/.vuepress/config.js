@@ -7,7 +7,7 @@ module.exports = {
     editLinks: true,
     editLinkText: 'Help improve these docs!',
     logo: '/logo+type.svg',
-    docsDir: 'src/docs/vuepress',
+    docsDir: 'src/docs',
     title: 'Gradle Shadow Plugin',
     nav: [
       { text: 'User Guide', link: '/introduction/' }
