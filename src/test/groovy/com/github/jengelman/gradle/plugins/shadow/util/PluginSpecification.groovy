@@ -15,7 +15,7 @@ class PluginSpecification extends Specification {
 
     @Rule TemporaryFolder dir
 
-    private static final String SHADOW_VERSION = PluginSpecification.classLoader.getResource("shadow-version.txt").text.trim()
+    static final String SHADOW_VERSION = PluginSpecification.classLoader.getResource("shadow-version.txt").text.trim()
 
     AppendableMavenFileRepository repo
 
@@ -81,6 +81,10 @@ class PluginSpecification extends Specification {
         return f
     }
 
+    File getFile(String path) {
+        new File(dir.root, path)
+    }
+
     AppendableMavenFileRepository repo(String path = 'maven-repo') {
         new AppendableMavenFileRepository(new TestFile(dir.root, path))
     }
@@ -119,12 +123,12 @@ class PluginSpecification extends Specification {
         return new AppendableJar(file(path))
     }
 
-    protected getOutput() {
-        file('build/libs/shadow-1.0-all.jar')
+    protected File getOutput() {
+        getFile('build/libs/shadow-1.0-all.jar')
     }
 
-    protected output(String name) {
-        file("build/libs/${name}")
+    protected File output(String name) {
+        getFile("build/libs/${name}")
     }
 
     protected File getTestJar(String name = 'junit-3.8.2.jar') {

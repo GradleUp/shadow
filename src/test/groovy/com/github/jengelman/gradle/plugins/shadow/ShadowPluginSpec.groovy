@@ -86,7 +86,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '4.10']
+        version << ['4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '4.10', '5.0-rc-4']
     }
 
     def 'Error in Gradle versions < 4.0'() {
@@ -195,12 +195,13 @@ class ShadowPluginSpec extends PluginSpecification {
 
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/server-all.jar')
+        File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()
 
         then:
+        serverOutput.exists()
         contains(serverOutput, [
                 'client/Client.class',
                 'server/Server.class',
@@ -251,12 +252,13 @@ class ShadowPluginSpec extends PluginSpecification {
             dependencies { compile project(':client') }
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/server-all.jar')
+        File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar', '--stacktrace').withDebug(true).build()
 
         then:
+        serverOutput.exists()
         contains(serverOutput, [
                 'client/Client.class',
                 'server/Server.class'
@@ -305,12 +307,13 @@ class ShadowPluginSpec extends PluginSpecification {
             dependencies { compile project(':client') }
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/server-all.jar')
+        File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar', '--stacktrace').withDebug(true).build()
 
         then:
+        serverOutput.exists()
         contains(serverOutput, [
                 'server/Server.class',
                 'junit/framework/Test.class'
@@ -519,8 +522,8 @@ class ShadowPluginSpec extends PluginSpecification {
         file('api/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { 
-                compile 'junit:junit:3.8.2' 
+            dependencies {
+                compile 'junit:junit:3.8.2'
                 compile project(':lib')
             }
         """.stripIndent()
@@ -543,12 +546,13 @@ class ShadowPluginSpec extends PluginSpecification {
             dependencies { api project(':api') }
         """.stripIndent()
 
-        File serverOutput = file('impl/build/libs/impl-all.jar')
+        File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
         runner.withArguments(':impl:shadowJar', '--stacktrace').withDebug(true).build()
 
         then:
+        serverOutput.exists()
         contains(serverOutput, [
                 'impl/SimpleEntity.class',
                 'api/Entity.class',
@@ -618,12 +622,13 @@ class ShadowPluginSpec extends PluginSpecification {
             dependencies { api project(':api') }
         """.stripIndent()
 
-        File serverOutput = file('impl/build/libs/impl-all.jar')
+        File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
         runner.withArguments(':impl:shadowJar', '--stacktrace').withDebug(true).build()
 
         then:
+        serverOutput.exists()
         contains(serverOutput, [
                 'impl/SimpleEntity.class',
                 'api/Entity.class',
@@ -671,12 +676,13 @@ class ShadowPluginSpec extends PluginSpecification {
             dependencies { compile project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/server.jar')
+        File serverOutput = getFile('server/build/libs/server.jar')
 
         when:
         runner.withArguments(':server:jar').build()
 
         then:
+        serverOutput.exists()
         contains(serverOutput, [
                 'server/Server.class'
         ])
@@ -728,12 +734,13 @@ class ShadowPluginSpec extends PluginSpecification {
             dependencies { compile project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
-        File serverOutput = file('server/build/libs/server-all.jar')
+        File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
         runner.withArguments(':server:shadowJar').build()
 
         then:
+        serverOutput.exists()
         contains(serverOutput, [
                 'client/Client.class',
                 'client/junit/framework/Test.class',

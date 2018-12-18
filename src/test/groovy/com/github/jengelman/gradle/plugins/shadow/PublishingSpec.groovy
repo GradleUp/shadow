@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import spock.lang.Issue
 
 class PublishingSpec extends PluginSpecification {
 
@@ -68,6 +69,37 @@ class PublishingSpec extends PluginSpecification {
         assert dependency.groupId.text() == 'shadow'
         assert dependency.artifactId.text() == 'b'
         assert dependency.version.text() == '1.0'
+    }
+
+    @Issue('SHADOW-347')
+    def "maven install with application plugin"() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('a2.properties', 'a2')
+                .publish()
+        repo.module('shadow', 'b', '1.0')
+                .insertFile('b.properties', 'b')
+                .publish()
+
+        settingsFile << "rootProject.name = 'maven'"
+        buildFile << """
+            apply plugin: 'maven'
+            apply plugin: 'application'
+
+            mainClassName = 'my.App'
+
+            dependencies {
+               compile 'shadow:a:1.0'
+               shadow 'shadow:b:1.0'
+            }
+        """.stripIndent()
+
+        when:
+        runner.withArguments('install').withDebug(true).build()
+
+        then:
+        noExceptionThrown()
     }
 
     def "publish shadow jar with maven-publish plugin"() {

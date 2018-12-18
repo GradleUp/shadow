@@ -20,6 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -59,7 +60,8 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
-        return patternSet.asSpec.isSatisfiedBy(element)
+        FileTreeElement target = element instanceof ShadowCopyAction.ArchiveFileTreeElement ? element.asFileTreeElement() : element
+        return patternSet.asSpec.isSatisfiedBy(target)
     }
 
     @Override

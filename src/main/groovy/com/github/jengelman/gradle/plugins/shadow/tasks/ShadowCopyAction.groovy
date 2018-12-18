@@ -24,6 +24,7 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
+import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
@@ -253,11 +254,11 @@ class ShadowCopyAction implements CopyAction {
             ZipFile archive = new ZipFile(fileDetails.file)
             try {
                 List<ArchiveFileTreeElement> archiveElements = archive.entries.collect {
-                    new ArchiveFileTreeElement(new RelativeArchivePath(it, fileDetails))
+                    new ArchiveFileTreeElement(new RelativeArchivePath(it))
                 }
                 Spec<FileTreeElement> patternSpec = patternSet.getAsSpec()
                 List<ArchiveFileTreeElement> filteredArchiveElements = archiveElements.findAll { ArchiveFileTreeElement archiveElement ->
-                    patternSpec.isSatisfiedBy(archiveElement)
+                    patternSpec.isSatisfiedBy(archiveElement.asFileTreeElement())
                 }
                 filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
                     if (archiveElement.relativePath.file) {
@@ -314,7 +315,7 @@ class ShadowCopyAction implements CopyAction {
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
                 ZipEntry zipEntry = setArchiveTimes(new ZipEntry(remapper.mapPath(file) + '.class'))
-                addParentDirectories(new RelativeArchivePath(zipEntry, null))
+                addParentDirectories(new RelativeArchivePath(zipEntry))
                 InputStream is = archive.getInputStream(file.entry)
                 try {
                     remapClass(is, file.pathString, file.entry.time)
@@ -373,7 +374,7 @@ class ShadowCopyAction implements CopyAction {
             String mappedPath = remapper.map(archiveFile.entry.name)
             ZipEntry entry = new ZipEntry(mappedPath)
             entry.setTime(getArchiveTimeFor(archiveFile.entry.time))
-            RelativeArchivePath mappedFile = new RelativeArchivePath(entry, archiveFile.details)
+            RelativeArchivePath mappedFile = new RelativeArchivePath(entry)
             addParentDirectories(mappedFile)
             zipOutStr.putNextEntry(mappedFile.entry)
             InputStream is = archive.getInputStream(archiveFile.entry)
@@ -434,12 +435,10 @@ class ShadowCopyAction implements CopyAction {
     class RelativeArchivePath extends RelativePath {
 
         ZipEntry entry
-        FileCopyDetails details
 
-        RelativeArchivePath(ZipEntry entry, FileCopyDetails fileDetails) {
+        RelativeArchivePath(ZipEntry entry) {
             super(!entry.directory, entry.name.split('/'))
             this.entry = entry
-            this.details = fileDetails
         }
 
         boolean isClassFile() {
@@ -452,7 +451,7 @@ class ShadowCopyAction implements CopyAction {
             } else {
                 //Parent is always a directory so add / to the end of the path
                 String path = segments[0..-2].join('/') + '/'
-                return new RelativeArchivePath(setArchiveTimes(new ZipEntry(path)), null)
+                return new RelativeArchivePath(setArchiveTimes(new ZipEntry(path)))
             }
         }
     }
@@ -522,6 +521,10 @@ class ShadowCopyAction implements CopyAction {
         @Override
         int getMode() {
             return archivePath.entry.unixMode
+        }
+
+        FileTreeElement asFileTreeElement() {
+            return new DefaultFileTreeElement(null, new RelativePath(!isDirectory(), archivePath.segments), null, null)
         }
     }
 }
