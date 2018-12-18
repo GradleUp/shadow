@@ -1,0 +1,16 @@
+{
+  "name": "shadow",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:johnrengelman/shadow.git",
+  "author": "John Engelman <john.engelman@target.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^0.14.2",
+    "prismjs": "^1.15.0"
+  },
+  "scripts": {
+    "build": "vuepress build src/docs",
+    "start": "vuepress dev src/docs"
+  }
+}

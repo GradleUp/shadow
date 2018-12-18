@@ -5,11 +5,13 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.distribution.Distribution
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
+import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.application.CreateStartScripts
 
@@ -37,6 +39,17 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
         configureJarMainClass(project)
         configureInstallTask(project)
+
+        project.plugins.withType(MavenPlugin) {
+            project.configurations.archives.with {
+                artifacts.findAll {
+                    it.provider.get().is(project.tasks.shadowDistZip) ||
+                            it.provider.get().is(project.tasks.shadowDistTar)
+                }.each {
+                    artifacts.remove it
+                }
+            }
+        }
     }
 
     protected void configureJarMainClass(Project project) {

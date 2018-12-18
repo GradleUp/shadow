@@ -1,0 +1,8 @@
+apply plugin: "com.moowork.node"
+
+node {
+    yarnVersion = '1.5.1'
+}
+
+tasks.yarn_build.inputs.files project.fileTree('src/docs')
+tasks.yarn_build.outputs.dir project.file('build/site')

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'org.ajoberstar.git-publish'
 
 if (project.hasProperty('githubToken')) {
@@ -10,12 +12,14 @@ gitPublish {
     branch = 'gh-pages'
 
     contents {
-        from 'build/asciidoc/html5'
+        from 'build/site'
+        from '.circleci'
         into('api') {
             from project.tasks.groovydoc
         }
+        filter(ReplaceTokens, tokens: [version: project.version])
     }
 }
 
-tasks.gitPublishPush.dependsOn asciidoctor
-tasks.gitPublishPush.dependsOn groovydoc
+tasks.gitPublishCopy.dependsOn yarn_build
+tasks.gitPublishCopy.dependsOn groovydoc
