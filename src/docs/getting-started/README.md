@@ -49,8 +49,8 @@ following behavior:
   * `META-INF/*.RSA`
 * Creates and registers the `shadow` component in the project (used for integrating with `maven-publish`).
 * Configures the `uploadShadow` task (as part of the `maven` plugin) with the following behavior:
-** Removes the `compile` and `runtime` configurations from the `pom.xml` file mapping.
-** Adds the `shadow` configuration to the `pom.xml` file as `RUNTIME` scope.
+  * Removes the `compile` and `runtime` configurations from the `pom.xml` file mapping.
+  * Adds the `shadow` configuration to the `pom.xml` file as `RUNTIME` scope.
 
 ## Shadowing Gradle Plugins
 
