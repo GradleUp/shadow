@@ -29,7 +29,7 @@ Similar to dependencies, projects can also be excluded.
 ```groovy
 shadowJar {
     minimize {
-        exclude(project(":client"))
+        exclude(project(":api"))
     }
 }
 ```
