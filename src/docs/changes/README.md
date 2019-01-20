@@ -1,6 +1,6 @@
 # Change Log
 
-## v5.0.0 (Unreleased)
+## v5.0.0 (2019-01-19)
 * Require Gradle 5.0+
 * Fix issue with build classifier `-all` being dropped in Gradle 5.1+
 
