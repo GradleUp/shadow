@@ -3,6 +3,7 @@
 ## v5.0.0 (2019-01-19)
 * Require Gradle 5.0+
 * Fix issue with build classifier `-all` being dropped in Gradle 5.1+
+* [Roberto Perez Alcolea](https://github.com/rpalcolea) - Exclude project dependencies from minimization [#420](https://github.com/johnrengelman/shadow/pull/420)
 
 
 ## v4.0.4 (2019-01-19)

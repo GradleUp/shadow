@@ -50,3 +50,4 @@ so Shadow was published there.
 * [Petar Petrov](https://github.com/petarov)
 * [Mark Vieira](https://github.com/mark-vieira)
 * [James Nelson](https://github.com/JamesXNelson)
+* [Roberto Perez Alcolea](https://github.com/rpalcolea)
