@@ -11,6 +11,7 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
+import org.gradle.util.GradleVersion
 
 import javax.inject.Inject
 
@@ -44,6 +45,9 @@ class ShadowJavaPlugin implements Plugin<Project> {
             map('classifier') {
                 'all'
             }
+        }
+        if (GradleVersion.current() >= GradleVersion.version("5.1")) {
+            shadow.archiveClassifier.set("all")
         }
         shadow.manifest.inheritFrom project.tasks.jar.manifest
         shadow.doFirst {

@@ -18,7 +18,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.16'
+    id 'com.gradle.build-scan' version '2.1'
     id 'groovy'
     id 'project-report'
     id 'idea'
@@ -35,8 +35,8 @@ gradlePlugin {
 apply plugin: 'com.github.johnrengelman.shadow'
 
 buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
     if (System.env.CI == 'true') {
         tag 'CI'
         if (System.env.CIRCLE_TAG) {

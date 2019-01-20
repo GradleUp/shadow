@@ -1,10 +1,15 @@
 # Change Log
 
-## v4.0.4 (2018-11-21)
+## v5.0.0 (Unreleased)
+* Require Gradle 5.0+
+* Fix issue with build classifier `-all` being dropped in Gradle 5.1+
+
+
+## v4.0.4 (2019-01-19)
 * When using `shadow`, `application`, and `maven` plugins together, remove `shadowDistZip` and `shadowDistTar` from
   `configurations.archives` so they are not published or installed by default with the `uploadArchives` or `install`
    tasks. [#347](https://github.com/johnrengelman/shadow/issues/347)
-* [James Nelson](https://github.com/JamesXNelson) Fix `null` path when using Jar minimization and Gradle's `api` configuration. [#424](https://github.com/johnrengelman/shadow/issues/424), [#425](https://github.com/johnrengelman/shadow/issues/425)
+* [James Nelson](https://github.com/JamesXNelson) - Fix `null` path when using Jar minimization and Gradle's `api` configuration. [#424](https://github.com/johnrengelman/shadow/issues/424), [#425](https://github.com/johnrengelman/shadow/issues/425)
  
 ## v4.0.3 (2018-11-21)
 * [Mark Vieira](https://github.com/mark-vieira) - Don't leak plugin classes to Gradle's Spec cache [#430](https://github.com/johnrengelman/shadow/pull/430)
