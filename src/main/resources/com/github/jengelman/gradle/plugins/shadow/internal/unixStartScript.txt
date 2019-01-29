@@ -156,7 +156,7 @@ fi
 
 # Escape application args
 for s in "\${@}" ; do
-    s="$'"$(echo "$s" | sed "s/'/\\\\'/g" )"'"
+    s="\$'"\$(echo "\$s" | sed "s/'/\\\\'/g" )"'"
     APP_ARGS=\$APP_ARGS" "\$s
 done
 
