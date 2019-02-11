@@ -49,3 +49,13 @@ Note that the `localGroovy()` and `gradleApi()` dependencies are added to the `s
 normal `compile` configuration. These 2 dependencies are provided by Gradle to compile your project but are ultimately
 provided by the Gradle runtime when executing the plugin. Thus, it is **not** advisable to bundle these dependencies
 with your plugin.
+
+## Special Handling of the Java Gradle Plugin Development Plugin
+
+The Java Gradle Plugin Development plugin, `java-gradle-plugin`, automatically adds the full Gradle API to the `compile` 
+configuration; thus overriding a possible assignment of `gradleApi()` to the `shadow` configuration.  Since it is never
+a good idea to include the Gradle API when creating a Gradle plugin, the dependency is removed so that it is not 
+included in the resultant shadow jar.  Virtually:
+
+    // needed to prevent inclusion of gradle-api into shadow JAR
+    configurations.compile.dependencies.remove dependencies.gradleApi()
