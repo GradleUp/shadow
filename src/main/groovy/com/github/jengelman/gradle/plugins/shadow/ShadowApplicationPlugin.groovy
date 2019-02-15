@@ -43,8 +43,10 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         project.plugins.withType(MavenPlugin) {
             project.configurations.archives.with {
                 artifacts.findAll {
-                    it.provider.get().is(project.tasks.shadowDistZip) ||
-                            it.provider.get().is(project.tasks.shadowDistTar)
+                    if (it.hasProperty("provider")) {
+                        it.provider.get().is(project.tasks.shadowDistZip) ||
+                                it.provider.get().is(project.tasks.shadowDistTar)
+                    }
                 }.each {
                     artifacts.remove it
                 }
