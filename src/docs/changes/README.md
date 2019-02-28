@@ -1,10 +1,12 @@
 # Change Log
 
-## v5.0.0 (2019-01-19)
+## v5.0.0 (2019-02-28)
 * Require Gradle 5.0+
 * Fix issue with build classifier `-all` being dropped in Gradle 5.1+
 * [Roberto Perez Alcolea](https://github.com/rpalcolea) - Exclude project dependencies from minimization [#420](https://github.com/johnrengelman/shadow/pull/420)
-
+* [Matt King](https://github.com/kyrrigle), [Richard Marbach](https://github.com/RichardMarbach) - Fix escaping in start script [#453](https://github.com/johnrengelman/shadow/pull/454), [#455](https://github.com/johnrengelman/shadow/pull/455)
+* [Dennis Schumann](https://github.com/Hillkorn) - Fix Gradle 5.2 incompatibility with `ShadowJar.getMetaClass()` [#456](https://github.com/johnrengelman/shadow/pull/456)
+* [Brane F. Gračnar](https://github.com/bfg) - Fix compatibility with `com.palantir.docker` [#460](https://github.com/johnrengelman/shadow/pull/460)
 
 ## v4.0.4 (2019-01-19)
 * When using `shadow`, `application`, and `maven` plugins together, remove `shadowDistZip` and `shadowDistTar` from

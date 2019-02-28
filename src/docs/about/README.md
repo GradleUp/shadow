@@ -51,3 +51,7 @@ so Shadow was published there.
 * [Mark Vieira](https://github.com/mark-vieira)
 * [James Nelson](https://github.com/JamesXNelson)
 * [Roberto Perez Alcolea](https://github.com/rpalcolea)
+* [Matt King](https://github.com/kyrrigle)
+* [Richard Marbach](https://github.com/RichardMarbach)
+* [Dennis Schumann](https://github.com/Hillkorn)
+* [Brane F. Gračnar](https://github.com/bfg)
