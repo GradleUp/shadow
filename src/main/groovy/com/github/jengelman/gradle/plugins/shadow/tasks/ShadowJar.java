@@ -330,7 +330,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.relocators = relocators;
     }
 
-    @InputFiles @Optional
+    @Internal("tracked by includedDependencies")
     public List<Configuration> getConfigurations() {
         return this.configurations;
     }
