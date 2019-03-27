@@ -12,9 +12,14 @@ class ManifestAppenderTransformer implements Transformer {
     private static final byte[] EOL = "\r\n".getBytes(UTF_8)
     private static final byte[] SEPARATOR = ": ".getBytes(UTF_8)
 
-    private byte[] manifestContents
+    private byte[] manifestContents = []
+    private final List<Tuple2<String, ? extends Comparable<?>>> attributes = []
 
-    List<Tuple2<String, ? extends Comparable<?>>> attributes = []
+    List<Tuple2<String, ? extends Comparable<?>>> getAttributes() { attributes }
+
+    boolean attribute(String name, Comparable<?> value) {
+        attributes.add(new Tuple2<String, ? extends Comparable<?>>(name, value))
+    }
 
     @Override
     boolean canTransformResource(FileTreeElement element) {

@@ -12,7 +12,7 @@ import static java.util.Arrays.asList
 import static org.junit.Assert.*
 
 class ManifestAppenderTransformerTest extends TransformerTestSupport {
-    public static final String MANIFEST_FILE = "META-INF/MANIFEST.MF"
+    static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
     private ManifestAppenderTransformer transformer
 
@@ -23,20 +23,16 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
 
     @Test
     void testCanTransformResource() {
-        transformer.attributes = [
-            new Tuple2( 'Name', 'org/foo/bar/' ),
-            new Tuple2( 'Sealed', true )
-        ]
+        transformer.attribute('Name', 'org/foo/bar/')
+        transformer.attribute('Sealed', true)
 
-        assertTrue(transformer.canTransformResource(getFileElement(MANIFEST_FILE)))
-        assertTrue(transformer.canTransformResource(getFileElement(MANIFEST_FILE.toLowerCase())))
+        assertTrue(transformer.canTransformResource(getFileElement(MANIFEST_NAME)))
+        assertTrue(transformer.canTransformResource(getFileElement(MANIFEST_NAME.toLowerCase())))
     }
 
     @Test
     void testHasTransformedResource() {
-        transformer.attributes = [
-            new Tuple2( 'Tag', 'Something' )
-        ]
+        transformer.attribute('Tag', 'Something')
 
         assertTrue(transformer.hasTransformedResource())
     }
@@ -48,14 +44,12 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
 
     @Test
     void testTransformation() {
-        transformer.attributes = [
-            new Tuple2( 'Name', 'org/foo/bar/' ),
-            new Tuple2( 'Sealed', true ),
-            new Tuple2( 'Name', 'com/example/' ),
-            new Tuple2( 'Sealed', false )
-        ]
+        transformer.attribute('Name', 'org/foo/bar/')
+        transformer.attribute('Sealed', true)
+        transformer.attribute('Name', 'com/example/')
+        transformer.attribute('Sealed', false)
 
-        transformer.transform(new TransformerContext(MANIFEST_FILE, getResourceStream(MANIFEST_FILE), Collections.<Relocator>emptyList(), new ShadowStats()))
+        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
 
         def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
         def fileOutputStream = new FileOutputStream(testableZipFile)
@@ -68,11 +62,11 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
             zipOutputStream.close()
         }
 
-        def targetLines = readFrom(testableZipFile, MANIFEST_FILE)
+        def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
         assertFalse(targetLines.isEmpty())
         assertTrue(targetLines.size() > 4)
 
-        def trailer = targetLines.subList(targetLines.size() - 5, targetLines.size())
+        def trailer = targetLines.with { subList(size() - 5, size()) }
         assertEquals(asList(
             "Name: org/foo/bar/",
             "Sealed: true",
@@ -84,9 +78,9 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
 
     @Test
     void testNoTransformation() {
-        def sourceLines = getResourceStream(MANIFEST_FILE).readLines()
+        def sourceLines = getResourceStream(MANIFEST_NAME).readLines()
 
-        transformer.transform(new TransformerContext(MANIFEST_FILE, getResourceStream(MANIFEST_FILE), Collections.<Relocator>emptyList(), new ShadowStats()))
+        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
 
         def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
         def fileOutputStream = new FileOutputStream(testableZipFile)
@@ -98,7 +92,7 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
         } finally {
             zipOutputStream.close()
         }
-        def targetLines = readFrom(testableZipFile, MANIFEST_FILE)
+        def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
 
         assertEquals(sourceLines, targetLines)
     }
@@ -108,7 +102,7 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
         try {
             def entry = zip.getEntry(resourceName)
             if (!entry) {
-                return Collections.<String>emptyList()
+                return Collections.emptyList()
             }
             return zip.getInputStream(entry).readLines()
         } finally {
@@ -117,6 +111,6 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
     }
 
     InputStream getResourceStream(String resource) {
-        this.class.getClassLoader().getResourceAsStream(resource)
+        this.class.classLoader.getResourceAsStream(resource)
     }
 }
