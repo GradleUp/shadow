@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License") you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipEntry
@@ -8,6 +27,14 @@ import org.gradle.api.file.FileTreeElement
 import static java.nio.charset.StandardCharsets.*
 import static java.util.jar.JarFile.*
 
+/**
+ * A resource processor that can append arbitrary attributes to the first MANIFEST.MF
+ * that is found in the set of JARs being processed. The attributes are appended in
+ * the specified order, and duplicates are allowed.
+ * <p>
+ * Modified from {@link ManifestResourceTransformer}.
+ * @author Chris Rankin
+ */
 class ManifestAppenderTransformer implements Transformer {
     private static final byte[] EOL = "\r\n".getBytes(UTF_8)
     private static final byte[] SEPARATOR = ": ".getBytes(UTF_8)
@@ -17,8 +44,9 @@ class ManifestAppenderTransformer implements Transformer {
 
     List<Tuple2<String, ? extends Comparable<?>>> getAttributes() { attributes }
 
-    boolean attribute(String name, Comparable<?> value) {
+    ManifestAppenderTransformer append(String name, Comparable<?> value) {
         attributes.add(new Tuple2<String, ? extends Comparable<?>>(name, value))
+        this
     }
 
     @Override
@@ -28,8 +56,10 @@ class ManifestAppenderTransformer implements Transformer {
 
     @Override
     void transform(TransformerContext context) {
-        manifestContents = IOUtil.toByteArray(context.is)
-        IOUtil.close(context.is)
+        if (manifestContents.length == 0) {
+            manifestContents = IOUtil.toByteArray(context.is)
+            IOUtil.close(context.is)
+        }
     }
 
     @Override
