@@ -1028,6 +1028,55 @@ class ShadowPluginSpec extends PluginSpecification {
 
     }
 
+    def 'api project dependency with version'() {
+        given:
+        file('settings.gradle') << """
+            include 'api', 'lib', 'impl'
+        """.stripIndent()
+
+        file('lib/build.gradle') << """
+            apply plugin: 'java'
+            version = '1.0'
+            repositories { maven { url "${repo.uri}" } }
+        """.stripIndent()
+
+        file('api/src/main/java/api/UnusedEntity.java') << """
+            package api;
+            public class UnusedEntity {}
+        """.stripIndent()
+
+        file('api/build.gradle') << """
+            apply plugin: 'java'
+            version = '1.0'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies {
+                implementation 'junit:junit:3.8.2'
+                implementation project(':lib')
+            }
+        """.stripIndent()
+
+        file('impl/build.gradle') << """
+            apply plugin: 'java-library'
+            apply plugin: 'com.github.johnrengelman.shadow'
+            version = '1.0'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { api project(':api') }
+            
+            shadowJar.minimize()
+        """.stripIndent()
+
+        File serverOutput = getFile('impl/build/libs/impl-1.0-all.jar')
+
+        when:
+        runner.withArguments(':impl:shadowJar', '--stacktrace').withDebug(true).build()
+
+        then:
+        serverOutput.exists()
+        contains(serverOutput, [
+                'api/UnusedEntity.class',
+        ])
+    }
+
     @Issue('SHADOW-143')
     @Ignore("This spec requires > 15 minutes and > 8GB of disk space to run")
     def "check large zip files with zip64 enabled"() {
