@@ -58,11 +58,13 @@ class UnusedTracker {
         apiDependencies.each { dep ->
             if (dep instanceof ProjectDependency) {
                 apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
-                apiJars.add(runtimeConfiguration.find { it.name.endsWith("${dep.name}.jar") } as File)
+                def jar = runtimeConfiguration.find { it.name.contains("${dep.name}") && it.name.endsWith(".jar") }
+                if (jar != null) apiJars.add(jar as File)
             } else if (dep instanceof SelfResolvingDependency) {
                 apiJars.addAll(dep.resolve())
             } else {
-                apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
+                def jar = runtimeConfiguration.find { it.name.startsWith("${dep.name}-") }
+                if (jar != null) apiJars.add(jar as File)
             }
         }
 
