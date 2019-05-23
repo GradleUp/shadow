@@ -11,7 +11,7 @@ shadowJar {
 }
 ```
 
-The above code sample would configure the `shadowJar` task to merge depdencies from only the `compile` configuration.
+The above code sample would configure the `shadowJar` task to merge dependencies from only the `compile` configuration.
 This means any dependency declared in the `runtime` configuration would be **not** be included in the final JAR.
 
 > Note the literal use of `project.configurations` when setting the `configurations` attribute of a
