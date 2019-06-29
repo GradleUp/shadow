@@ -6,29 +6,39 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 
+import static java.util.Objects.nonNull
+
 class ShadowPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.plugins.apply(ShadowBasePlugin)
-        project.plugins.withType(JavaPlugin) {
-            project.plugins.apply(ShadowJavaPlugin)
-        }
-        project.plugins.withType(ApplicationPlugin) {
-            project.plugins.apply(ShadowApplicationPlugin)
-        }
+        project.with {
+            plugins.apply(ShadowBasePlugin)
+            plugins.withType(JavaPlugin) {
+                plugins.apply(ShadowJavaPlugin)
+            }
+            plugins.withType(ApplicationPlugin) {
+                plugins.apply(ShadowApplicationPlugin)
+            }
 
-        def rootProject = project.rootProject
-        rootProject.plugins.withId('com.gradle.build-scan') {
-            rootProject.buildScan.buildFinished {
-                def shadowTasks = project.tasks.withType(ShadowJar)
-                shadowTasks.each { task ->
-                    if (task.didWork) {
-                        task.stats.buildScanData.each { k, v ->
-                            rootProject.buildScan.value "shadow.${task.path}.${k}", v.toString()
+            rootProject.plugins.withId('com.gradle.build-scan') {
+                rootProject.buildScan.buildFinished {
+                    def shadowTasks = tasks.withType(ShadowJar)
+                    shadowTasks.each { task ->
+                        if (task.didWork) {
+                            task.stats.buildScanData.each { k, v ->
+                                rootProject.buildScan.value "shadow.${task.path}.${k}", v.toString()
+                            }
+                            rootProject.buildScan.value "shadow.${task.path}.configurations", task.configurations*.name.join(", ")
                         }
-                        rootProject.buildScan.value "shadow.${task.path}.configurations", task.configurations*.name.join(", ")
                     }
+                }
+            }
+
+            afterEvaluate {
+                plugins.withId('java-gradle-plugin') {
+                    // needed to prevent inclusion of gradle-api into shadow JAR
+                    configurations.compile.dependencies.remove dependencies.gradleApi()
                 }
             }
         }

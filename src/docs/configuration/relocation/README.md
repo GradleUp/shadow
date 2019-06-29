@@ -71,6 +71,7 @@ tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
 > Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
 in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
-Be mindful that some Gradle plugins (such as `java-gradle-plugin` will automatically add dependencies to your class path
-(e.g. `java-gradle-plugin` automatically adds the full Gradle API to your `compile` configuratinon. You may need to
-remove these dependencies if you do not intend to shadow them into your library.
+Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these 
+dependencies if you do not intend to shadow them into your library.  The `java-gradle-plugin` would normally cause such
+problems if it were not for the special handling that Shadow provides as described in 
+[Special Handling of the Java Gradle Plugin Development Plugin](/plugins/#special-handling-of-the-java-gradle-plugin-gevelopmeny-plugin).
