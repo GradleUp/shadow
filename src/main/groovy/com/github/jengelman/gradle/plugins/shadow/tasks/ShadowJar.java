@@ -8,8 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransfor
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer;
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer;
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
-import groovy.lang.MetaClass;
-import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gradle.api.Action;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.FileCollection;
@@ -77,7 +75,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
-        final UnusedTracker unusedTracker = UnusedTracker.forProject(getProject(), configurations, dependencyFilterForMinimize);
+        final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getProject(), configurations, dependencyFilterForMinimize) : null;
         return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
                 this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
                 versionUtil, isPreserveFileTimestamps(), minimizeJar, unusedTracker);
