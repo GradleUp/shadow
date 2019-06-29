@@ -16,7 +16,7 @@ Read the [User Guide](http://imperceptiblethoughts.com/shadow)!
 
 | Gradle Version | Shadow Version |
 |----------------|----------------|
-| 5.x | 5.0.0|
+| 5.x | 5.1.0|
 
 **NOTE**: Shadow v5.+ is compatible with Gradle 5.0+ and Java 7+ _only_.
 
