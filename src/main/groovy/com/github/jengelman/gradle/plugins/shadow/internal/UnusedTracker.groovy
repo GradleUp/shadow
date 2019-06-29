@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.file.FileCollection
@@ -49,6 +50,21 @@ class UnusedTracker {
         return new UnusedTracker(classDirs, apiJars, toMinimize)
     }
 
+    private static boolean isProjectDependencyFile(File file, Dependency dep) {
+        def fileName = file.name
+        def dependencyName = dep.name
+
+        return (fileName == "${dependencyName}.jar") ||
+                (fileName.startsWith("${dependencyName}-") && fileName.endsWith('.jar'))
+    }
+
+    private static void addJar(Configuration config, Dependency dep, List<File> result) {
+        def file = config.find { isProjectDependencyFile(it, dep) } as File
+        if (file != null) {
+            result.add(file)
+        }
+    }
+
     private static FileCollection getApiJarsFromProject(Project project) {
         def apiDependencies = project.configurations.asMap['api']?.dependencies ?: null
         if (apiDependencies == null) return project.files()
@@ -58,10 +74,11 @@ class UnusedTracker {
         apiDependencies.each { dep ->
             if (dep instanceof ProjectDependency) {
                 apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
-                apiJars.add(runtimeConfiguration.find { it.name.endsWith("${dep.name}.jar") } as File)
+                addJar(runtimeConfiguration, dep, apiJars)
             } else if (dep instanceof SelfResolvingDependency) {
                 apiJars.addAll(dep.resolve())
             } else {
+                addJar(runtimeConfiguration, dep, apiJars)
                 apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
             }
         }
