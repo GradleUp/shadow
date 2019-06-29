@@ -4,6 +4,7 @@
 * [Min-Ken Lai](https://github.com/minkenlai) - Additional escaping fixes in start script [#487](https://github.com/johnrengelman/shadow/pull/487)
 * [Alan D. Cabrera](https://github.com/maguro) - Automatically remove `gradleApi` from `compile` scope in the presence of `shadow` [#459](https://github.com/johnrengelman/shadow/pull/459)
 * [Christian Stein](https://github.com/sormuras) - Do not initialize `UnusedTracker` when not requested [#480](https://github.com/johnrengelman/shadow/pull/480), [#479](https://github.com/johnrengelman/shadow/issues/479)
+* [Attila Kelemen](https://github.com/kelemen) - Fix `NullPointerException` when using java minimization and api project dependency with version [#477](https://github.com/johnrengelman/shadow/pull/477)
 
 ## v5.0.0 (2019-02-28)
 * Require Gradle 5.0+
