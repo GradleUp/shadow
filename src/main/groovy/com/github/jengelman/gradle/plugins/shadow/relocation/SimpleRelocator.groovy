@@ -151,12 +151,11 @@ class SimpleRelocator implements Relocator {
             path = path.substring(0, path.length() - 6)
         }
 
-        if (!isIncluded(path) || isExcluded(path)) {
-            return false
-        }
-
         // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
-        return path.startsWith(pathPattern) || path.startsWith("/" + pathPattern)
+        if (path.startsWith(pathPattern) || path.startsWith("/" + pathPattern)) {
+            return isIncluded(path) && !isExcluded(path)
+        }
+        return false
     }
 
     boolean canRelocateClass(RelocateClassContext context) {
