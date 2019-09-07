@@ -41,13 +41,14 @@ class ShadowJavaPlugin implements Plugin<Project> {
         ShadowJar shadow = project.tasks.create(SHADOW_JAR_TASK_NAME, ShadowJar)
         shadow.group = SHADOW_GROUP
         shadow.description = 'Create a combined JAR of project and runtime dependencies'
-        shadow.conventionMapping.with {
-            map('classifier') {
-                'all'
-            }
-        }
         if (GradleVersion.current() >= GradleVersion.version("5.1")) {
             shadow.archiveClassifier.set("all")
+        } else {
+            shadow.conventionMapping.with {
+                map('classifier') {
+                    'all'
+                }
+            }
         }
         shadow.manifest.inheritFrom project.tasks.jar.manifest
         shadow.doFirst {
