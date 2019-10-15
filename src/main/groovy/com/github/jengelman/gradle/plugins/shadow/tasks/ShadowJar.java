@@ -40,7 +40,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     public ShadowJar() {
         super();
-        setDuplicatesStrategy(DuplicatesStrategy.INHERIT);
+        setDuplicatesStrategy(DuplicatesStrategy.INCLUDE); //shadow filters out files later. This was the default behavior in  Gradle < 6.x
         versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
         dependencyFilterForMinimize = new MinimizeDependencyFilter(getProject());
