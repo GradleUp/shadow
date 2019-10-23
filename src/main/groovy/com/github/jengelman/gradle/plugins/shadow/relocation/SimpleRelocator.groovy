@@ -20,6 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import org.codehaus.plexus.util.SelectorUtils
+import org.gradle.api.tasks.Input
 
 import java.util.regex.Pattern
 
@@ -32,18 +33,25 @@ import java.util.regex.Pattern
  */
 class SimpleRelocator implements Relocator {
 
+    @Input
     private final String pattern
 
+    @Input
     private final String pathPattern
 
+    @Input
     private final String shadedPattern
 
+    @Input
     private final String shadedPathPattern
 
+    @Input
     private final Set<String> includes
 
+    @Input
     private final Set<String> excludes
 
+    @Input
     private final boolean rawString
 
     SimpleRelocator() {
@@ -187,5 +195,40 @@ class SimpleRelocator implements Relocator {
         } else {
             return sourceContent.replaceAll("\\b" + pattern, shadedPattern)
         }
+    }
+
+    @Input
+    String getPattern() {
+        return pattern
+    }
+
+    @Input
+    String getPathPattern() {
+        return pathPattern
+    }
+
+    @Input
+    String getShadedPattern() {
+        return shadedPattern
+    }
+
+    @Input
+    String getShadedPathPattern() {
+        return shadedPathPattern
+    }
+
+    @Input
+    Set<String> getIncludes() {
+        return includes
+    }
+
+    @Input
+    Set<String> getExcludes() {
+        return excludes
+    }
+
+    @Input
+    boolean getRawString() {
+        return rawString
     }
 }

@@ -23,6 +23,7 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
 
 /**
  * A resource processor that appends content for a resource, separated by a newline.
@@ -64,5 +65,10 @@ class AppendingTransformer implements Transformer {
 
         IOUtil.copy(new ByteArrayInputStream(data.toByteArray()), os)
         data.reset()
+    }
+
+    @Input
+    String getResource() {
+        return resource
     }
 }

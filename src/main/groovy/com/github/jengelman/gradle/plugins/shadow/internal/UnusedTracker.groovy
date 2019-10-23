@@ -6,6 +6,7 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.SourceSet
 import org.vafer.jdependency.Clazz
 import org.vafer.jdependency.Clazzpath
@@ -48,6 +49,11 @@ class UnusedTracker {
             classDirs.addAll(classesDirs.findAll { it.isDirectory() })
         }
         return new UnusedTracker(classDirs, apiJars, toMinimize)
+    }
+
+    @InputFiles
+    FileCollection getToMinimize() {
+        return toMinimize
     }
 
     private static boolean isProjectDependencyFile(File file, Dependency dep) {
