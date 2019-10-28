@@ -1,9 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
-import org.gradle.testkit.runner.BuildResult
-
-import static org.gradle.testkit.runner.TaskOutcome.*
-
 class RelocationCachingSpec extends AbstractCachingSpec {
     /**
      * Ensure that we get a cache miss when relocation changes and that caching works with relocation
@@ -23,7 +19,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         when:
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -40,7 +36,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
                relocate 'junit.framework', 'foo.junit.framework'
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -55,7 +51,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()

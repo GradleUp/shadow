@@ -4,11 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransfor
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-import org.gradle.testkit.runner.BuildResult
 import spock.lang.Unroll
-
-import static org.gradle.testkit.runner.TaskOutcome.*
-
 
 class TransformCachingSpec extends AbstractCachingSpec {
     /**
@@ -56,7 +52,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         when:
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -65,7 +61,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -87,7 +83,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         when:
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -104,7 +100,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                }
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -113,7 +109,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
@@ -130,7 +126,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                }
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -139,7 +135,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
@@ -162,7 +158,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         when:
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -179,7 +175,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                }
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -189,7 +185,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
@@ -209,7 +205,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                }
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -219,7 +215,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
@@ -243,7 +239,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         when:
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -260,7 +256,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                }
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -270,7 +266,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
@@ -290,7 +286,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                }
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -300,7 +296,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
@@ -323,7 +319,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         when:
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -338,7 +334,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                transform(${GroovyExtensionModuleTransformer.name})
             }
         """
-        assertShadowJarNotCached()
+        assertShadowJarExecutes()
 
         then:
         output.exists()
@@ -347,7 +343,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        assertShadowJarCached()
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
