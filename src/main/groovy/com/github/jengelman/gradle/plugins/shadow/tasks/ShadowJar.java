@@ -15,7 +15,6 @@ import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Nested;
@@ -36,7 +35,6 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private List<Configuration> configurations;
     private DependencyFilter dependencyFilter;
     private boolean minimizeJar;
-    private boolean hasUncacheableActions;
     private DependencyFilter dependencyFilterForMinimize;
 
     private final ShadowStats shadowStats = new ShadowStats();
@@ -61,7 +59,17 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.getOutputs().doNotCacheIf("Has one or more transforms or relocators that are not cacheable", new Spec<Task>() {
             @Override
             public boolean isSatisfiedBy(Task task) {
-                return hasUncacheableActions;
+                for (Transformer transformer : transformers) {
+                    if (!isCacheableTransform(transformer.getClass())) {
+                        return true;
+                    }
+                }
+                for (Relocator relocator : relocators) {
+                    if (!isCacheableRelocator(relocator.getClass())) {
+                        return true;
+                    }
+                }
+                return false;
             }
         });
     }
@@ -164,7 +172,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public <T extends Transformer> ShadowJar transform(Class<T> clazz, Action<T> c) throws InstantiationException, IllegalAccessException {
         T transformer = clazz.newInstance();
-        addTransform(transformer, c, isCacheableTransform(clazz));
+        addTransform(transformer, c);
         return this;
     }
 
@@ -179,15 +187,11 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     public ShadowJar transform(Transformer transformer) {
-        addTransform(transformer, null, isCacheableTransform(transformer.getClass()));
+        addTransform(transformer, null);
         return this;
     }
 
-    private <T extends Transformer> void addTransform(T transformer, Action<T> c, boolean isCacheable) {
-        if (!isCacheable) {
-            hasUncacheableActions = true;
-        }
-
+    private <T extends Transformer> void addTransform(T transformer, Action<T> c) {
         if (c != null) {
             c.execute(transformer);
         }
@@ -297,7 +301,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public ShadowJar relocate(String pattern, String destination, Action<SimpleRelocator> configure) {
         SimpleRelocator relocator = new SimpleRelocator(pattern, destination, new ArrayList<String>(), new ArrayList<String>());
-        addRelocator(relocator, configure, isCacheableRelocator(relocator.getClass()));
+        addRelocator(relocator, configure);
         return this;
     }
 
@@ -308,7 +312,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     public ShadowJar relocate(Relocator relocator) {
-        addRelocator(relocator, null, isCacheableRelocator(relocator.getClass()));
+        addRelocator(relocator, null);
         return this;
     }
 
@@ -322,11 +326,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         return relocate(relocatorClass, null);
     }
 
-    private <R extends Relocator> void addRelocator(R relocator, Action<R> configure, boolean isCacheableRelocator) {
-        if (!isCacheableRelocator) {
-            hasUncacheableActions = true;
-        }
-
+    private <R extends Relocator> void addRelocator(R relocator, Action<R> configure) {
         if (configure != null) {
             configure.execute(relocator);
         }
@@ -343,7 +343,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public <R extends Relocator> ShadowJar relocate(Class<R> relocatorClass, Action<R> configure) throws InstantiationException, IllegalAccessException {
         R relocator = relocatorClass.newInstance();
-        addRelocator(relocator, configure, isCacheableRelocator(relocatorClass));
+        addRelocator(relocator, configure);
         return this;
     }
 
@@ -357,7 +357,6 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     public void setTransformers(List<Transformer> transformers) {
-        hasUncacheableActions = true;
         this.transformers = transformers;
     }
 
@@ -367,7 +366,6 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     public void setRelocators(List<Relocator> relocators) {
-        hasUncacheableActions = true;
         this.relocators = relocators;
     }
 
