@@ -33,6 +33,7 @@ import org.gradle.api.tasks.Input
  * Modifications
  * @author John Engelman
  */
+@CacheableTransformer
 class AppendingTransformer implements Transformer {
     String resource
 

@@ -43,6 +43,7 @@ import org.codehaus.plexus.util.IOUtil
  * @author Charlie Knudsen
  * @author John Engelman
  */
+@CacheableTransformer
 class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     private static final String SERVICES_PATTERN = "META-INF/services/**"

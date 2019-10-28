@@ -42,6 +42,7 @@ import org.xml.sax.SAXException
  *
  * @author John Engelman
  */
+@CacheableTransformer
 class XmlAppendingTransformer implements Transformer {
     static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 

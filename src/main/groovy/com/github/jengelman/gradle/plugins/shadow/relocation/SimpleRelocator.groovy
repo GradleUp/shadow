@@ -31,27 +31,21 @@ import java.util.regex.Pattern
  * @author Mauro Talevi
  * @author John Engelman
  */
+@CacheableRelocator
 class SimpleRelocator implements Relocator {
 
-    @Input
     private final String pattern
 
-    @Input
     private final String pathPattern
 
-    @Input
     private final String shadedPattern
 
-    @Input
     private final String shadedPathPattern
 
-    @Input
     private final Set<String> includes
 
-    @Input
     private final Set<String> excludes
-
-    @Input
+    
     private final boolean rawString
 
     SimpleRelocator() {
