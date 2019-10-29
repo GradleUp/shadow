@@ -56,13 +56,13 @@ class AbstractCachingSpec extends PluginSpecification {
     }
 
     void assertShadowJarHasResult(TaskOutcome expectedOutcome) {
-        def result = runWithCacheEnabled("shadowJar")
-        assert result.task(':shadowJar').outcome == expectedOutcome
+        def result = runWithCacheEnabled(shadowJarTask)
+        assert result.task(shadowJarTask).outcome == expectedOutcome
     }
 
     void assertShadowJarHasResultInAlternateDir(TaskOutcome expectedOutcome) {
-        def result = runInAlternateDirWithCacheEnabled("shadowJar")
-        assert result.task(':shadowJar').outcome == expectedOutcome
+        def result = runInAlternateDirWithCacheEnabled(shadowJarTask)
+        assert result.task(shadowJarTask).outcome == expectedOutcome
     }
 
     void copyToAlternateDir() {
@@ -90,5 +90,9 @@ class AbstractCachingSpec extends PluginSpecification {
         if (output.exists()) {
             assert output.delete()
         }
+    }
+
+    String getShadowJarTask() {
+        return ":shadowJar"
     }
 }

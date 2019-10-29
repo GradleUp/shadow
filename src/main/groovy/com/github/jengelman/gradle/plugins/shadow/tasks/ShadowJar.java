@@ -14,12 +14,7 @@ import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
 import org.gradle.api.specs.Spec;
-import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.Internal;
-import org.gradle.api.tasks.Nested;
-import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.util.PatternSet;
 
@@ -119,7 +114,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         getLogger().info(shadowStats.toString());
     }
 
-    @InputFiles
+    @Classpath
     public FileCollection getIncludedDependencies() {
         return getProject().files(new Callable<FileCollection>() {
 
@@ -369,7 +364,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.relocators = relocators;
     }
 
-    @InputFiles @Optional
+    @Classpath @Optional
     public List<Configuration> getConfigurations() {
         return this.configurations;
     }

@@ -5,6 +5,9 @@ import org.gradle.testkit.runner.BuildResult
 import static org.gradle.testkit.runner.TaskOutcome.*
 
 class MinimizationCachingSpec extends AbstractCachingSpec {
+    File output
+    String shadowJarTask = ":server:shadowJar"
+
     /**
      * Ensure that we get a cache miss when minimization is added and that caching works with minimization
      */
@@ -38,24 +41,20 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
             dependencies { compile project(':client') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        output = getFile('server/build/libs/server-all.jar')
 
         when:
-        BuildResult result = runWithCacheEnabled(':server:shadowJar')
+        assertShadowJarExecutes()
 
         then:
-        serverOutput.exists()
-        contains(serverOutput, [
+        output.exists()
+        contains(output, [
                 'server/Server.class',
                 'junit/framework/Test.class',
                 'client/Client.class'
         ])
 
-        and:
-        result.task(':server:shadowJar').outcome == SUCCESS
-
         when:
-        serverOutput.delete()
         file('server/build.gradle').text = """
             apply plugin: 'java'
             apply plugin: 'com.github.johnrengelman.shadow'
@@ -69,32 +68,25 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
             repositories { maven { url "${repo.uri}" } }
             dependencies { compile project(':client') }
         """.stripIndent()
-        runWithCacheEnabled(':server:shadowJar')
+        assertShadowJarExecutes()
 
         then:
-        serverOutput.exists()
-        contains(serverOutput, [
+        output.exists()
+        contains(output, [
                 'server/Server.class',
                 'junit/framework/Test.class'
         ])
-        doesNotContain(serverOutput, ['client/Client.class'])
-
-        and:
-        result.task(':server:shadowJar').outcome == SUCCESS
+        doesNotContain(output, ['client/Client.class'])
 
         when:
-        serverOutput.delete()
-        result = runWithCacheEnabled(':server:shadowJar')
+        assertShadowJarIsCachedAndRelocatable()
 
         then:
-        serverOutput.exists()
-        contains(serverOutput, [
+        output.exists()
+        contains(output, [
                 'server/Server.class',
                 'junit/framework/Test.class'
         ])
-        doesNotContain(serverOutput, ['client/Client.class'])
-
-        and:
-        result.task(':server:shadowJar').outcome == FROM_CACHE
+        doesNotContain(output, ['client/Client.class'])
     }
 }
