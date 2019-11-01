@@ -353,8 +353,10 @@ class ShadowCopyAction implements CopyAction {
 
             byte[] renamedClass = cw.toByteArray()
 
-            // Need to take the .class off for remapping evaluation
-            String mappedName = remapper.mapPath(path)
+            // Temporarily remove the multi-release prefix.
+            String multiReleasePrefix = path.find("^META-INF/versions/\\d+/") ?: ""
+            path = path.replace(multiReleasePrefix, "")
+            String mappedName = multiReleasePrefix + remapper.mapPath(path)
 
             InputStream bis = new ByteArrayInputStream(renamedClass)
             try {
