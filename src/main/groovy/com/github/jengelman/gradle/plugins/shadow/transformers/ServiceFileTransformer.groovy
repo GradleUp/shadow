@@ -25,6 +25,7 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 import org.codehaus.plexus.util.IOUtil
@@ -42,6 +43,7 @@ import org.codehaus.plexus.util.IOUtil
  * @author Charlie Knudsen
  * @author John Engelman
  */
+@CacheableTransformer
 class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     private static final String SERVICES_PATTERN = "META-INF/services/**"
@@ -193,6 +195,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
      * {@inheritDoc}
      */
     @Override
+    @Input
     Set<String> getIncludes() {
         return patternSet.includes
     }
@@ -210,6 +213,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
      * {@inheritDoc}
      */
     @Override
+    @Input
     Set<String> getExcludes() {
         return patternSet.excludes
     }
@@ -222,5 +226,4 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
         patternSet.excludes = excludes
         return this
     }
-
 }

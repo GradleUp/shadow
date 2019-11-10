@@ -2,23 +2,20 @@ package com.github.jengelman.gradle.plugins.shadow.tasks;
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats;
 import com.github.jengelman.gradle.plugins.shadow.internal.*;
+import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator;
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator;
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator;
-import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer;
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer;
-import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer;
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
+import com.github.jengelman.gradle.plugins.shadow.transformers.*;
 import org.gradle.api.Action;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
-import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.Internal;
-import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.specs.Spec;
+import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.util.PatternSet;
 
@@ -26,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+@CacheableTask
 public class ShadowJar extends Jar implements ShadowSpec {
 
     private List<Transformer> transformers;
@@ -48,6 +46,29 @@ public class ShadowJar extends Jar implements ShadowSpec {
         transformers = new ArrayList<>();
         relocators = new ArrayList<>();
         configurations = new ArrayList<>();
+
+        this.getInputs().property("minimize", new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return minimizeJar;
+            }
+        });
+        this.getOutputs().doNotCacheIf("Has one or more transforms or relocators that are not cacheable", new Spec<Task>() {
+            @Override
+            public boolean isSatisfiedBy(Task task) {
+                for (Transformer transformer : transformers) {
+                    if (!isCacheableTransform(transformer.getClass())) {
+                        return true;
+                    }
+                }
+                for (Relocator relocator : relocators) {
+                    if (!isCacheableRelocator(relocator.getClass())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     public ShadowJar minimize() {
@@ -95,7 +116,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         getLogger().info(shadowStats.toString());
     }
 
-    @InputFiles
+    @Classpath
     public FileCollection getIncludedDependencies() {
         return getProject().files(new Callable<FileCollection>() {
 
@@ -148,11 +169,12 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public <T extends Transformer> ShadowJar transform(Class<T> clazz, Action<T> c) throws InstantiationException, IllegalAccessException {
         T transformer = clazz.newInstance();
-        if (c != null) {
-            c.execute(transformer);
-        }
-        transformers.add(transformer);
+        addTransform(transformer, c);
         return this;
+    }
+
+    private boolean isCacheableTransform(Class<? extends Transformer> clazz) {
+        return clazz.isAnnotationPresent(CacheableTransformer.class);
     }
 
     /**
@@ -162,8 +184,16 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     public ShadowJar transform(Transformer transformer) {
-        transformers.add(transformer);
+        addTransform(transformer, null);
         return this;
+    }
+
+    private <T extends Transformer> void addTransform(T transformer, Action<T> c) {
+        if (c != null) {
+            c.execute(transformer);
+        }
+
+        transformers.add(transformer);
     }
 
     /**
@@ -268,10 +298,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public ShadowJar relocate(String pattern, String destination, Action<SimpleRelocator> configure) {
         SimpleRelocator relocator = new SimpleRelocator(pattern, destination, new ArrayList<String>(), new ArrayList<String>());
-        if (configure != null) {
-            configure.execute(relocator);
-        }
-        relocators.add(relocator);
+        addRelocator(relocator, configure);
         return this;
     }
 
@@ -282,7 +309,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     public ShadowJar relocate(Relocator relocator) {
-        relocators.add(relocator);
+        addRelocator(relocator, null);
         return this;
     }
 
@@ -296,6 +323,14 @@ public class ShadowJar extends Jar implements ShadowSpec {
         return relocate(relocatorClass, null);
     }
 
+    private <R extends Relocator> void addRelocator(R relocator, Action<R> configure) {
+        if (configure != null) {
+            configure.execute(relocator);
+        }
+
+        relocators.add(relocator);
+    }
+
     /**
      * Add a relocator of the provided class and configure.
      *
@@ -305,14 +340,15 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public <R extends Relocator> ShadowJar relocate(Class<R> relocatorClass, Action<R> configure) throws InstantiationException, IllegalAccessException {
         R relocator = relocatorClass.newInstance();
-        if (configure != null) {
-            configure.execute(relocator);
-        }
-        relocators.add(relocator);
+        addRelocator(relocator, configure);
         return this;
     }
 
-    @Internal
+    private boolean isCacheableRelocator(Class<? extends Relocator> relocatorClass) {
+        return relocatorClass.isAnnotationPresent(CacheableRelocator.class);
+    }
+
+    @Nested
     public List<Transformer> getTransformers() {
         return this.transformers;
     }
@@ -321,7 +357,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.transformers = transformers;
     }
 
-    @Internal
+    @Nested
     public List<Relocator> getRelocators() {
         return this.relocators;
     }
@@ -330,7 +366,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         this.relocators = relocators;
     }
 
-    @InputFiles @Optional
+    @Classpath @Optional
     public List<Configuration> getConfigurations() {
         return this.configurations;
     }

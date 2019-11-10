@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
 import org.jdom2.Attribute
 import org.jdom2.Content
 import org.jdom2.Document
@@ -41,6 +42,7 @@ import org.xml.sax.SAXException
  *
  * @author John Engelman
  */
+@CacheableTransformer
 class XmlAppendingTransformer implements Transformer {
     static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 
@@ -109,5 +111,10 @@ class XmlAppendingTransformer implements Transformer {
         new XMLOutputter(Format.getPrettyFormat()).output(doc, os)
 
         doc = null
+    }
+
+    @Input
+    String getResource() {
+        return resource
     }
 }

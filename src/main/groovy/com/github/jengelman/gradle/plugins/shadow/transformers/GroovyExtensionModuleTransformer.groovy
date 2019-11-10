@@ -32,6 +32,7 @@ import org.codehaus.plexus.util.IOUtil
  * entries will all be merged into a single META-INF/services/org.codehaus.groovy.runtime.ExtensionModule resource
  * packaged into the resultant JAR produced by the shadowing process.
  */
+@CacheableTransformer
 class GroovyExtensionModuleTransformer implements Transformer {
 
     private static final GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
