@@ -1,4 +1,12 @@
 # Change Log
+## v5.2.0 (2019-11-10)
+* [Inez Korczyński](https://github.com/inez) - Performance optimization when evaluating relocation paths [#507](https://github.com/johnrengelman/shadow/pull/507)
+* [Jeff Adler](https://github.com/jeffalder) - Fix remapping issues with multi release JARS [#526](https://github.com/johnrengelman/shadow/pull/526)
+* [Gary Hale](https://github.com/ghale) - Implement support for Gradle build cache [#524](https://github.com/johnrengelman/shadow/pull/524)
+* [Roberto Perez Alcolea](https://github.com/rpalcolea) - Gradle 6.x support [#517](https://github.com/johnrengelman/shadow/pull/517)
+* [Konstantin Gribov](https://github.com/grossws) - Return support for 5.0 for convention mapping [#502](https://github.com/johnrengelman/shadow/pull/502)
+* [Lai Jiang](https://github.com/jianglai) - Documentation updates on how to reconfigure `classifier` and `version` [#512](https://github.com/johnrengelman/shadow/pull/512)
+
 ## v5.1.0 (2019-06-29)
 * [Chris Rankin](https://github.com/chrisr3) - Add `ManifestAppenderTransformer` to support appending to Jar manifest [#474](https://github.com/johnrengelman/shadow/pull/474)
 * [Min-Ken Lai](https://github.com/minkenlai) - Additional escaping fixes in start script [#487](https://github.com/johnrengelman/shadow/pull/487)
