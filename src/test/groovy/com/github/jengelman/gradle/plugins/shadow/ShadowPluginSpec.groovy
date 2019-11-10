@@ -86,7 +86,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6']
+        version << ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '6.0']
     }
 
     def 'Error in Gradle versions < 5.0'() {
