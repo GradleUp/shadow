@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.5"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.9"
         classpath "com.gradle.publish:plugin-publish-plugin:0.10.0"
         classpath 'org.ajoberstar:grgit:2.1.1'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.3'
