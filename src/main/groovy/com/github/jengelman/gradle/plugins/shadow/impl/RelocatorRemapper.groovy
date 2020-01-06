@@ -65,13 +65,13 @@ class RelocatorRemapper extends Remapper {
                 name = m.group(2)
             }
 
-            RelocateClassContext classContext = RelocateClassContext.builder().className(name).stats(stats).build()
-            RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
             for (Relocator r : relocators) {
-                if (r.canRelocateClass(classContext)) {
+                if (r.canRelocateClass(name)) {
+                    RelocateClassContext classContext = RelocateClassContext.builder().className(name).stats(stats).build()
                     value = prefix + r.relocateClass(classContext) + suffix
                     break
-                } else if (r.canRelocatePath(pathContext)) {
+                } else if (r.canRelocatePath(name)) {
+                    RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
                     value = prefix + r.relocatePath(pathContext) + suffix
                     break
                 }
@@ -96,9 +96,9 @@ class RelocatorRemapper extends Remapper {
             name = m.group(2)
         }
 
-        RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
         for (Relocator r : relocators) {
-            if (r.canRelocatePath(pathContext)) {
+            if (r.canRelocatePath(name)) {
+                RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
                 value = prefix + r.relocatePath(pathContext) + suffix
                 break
             }

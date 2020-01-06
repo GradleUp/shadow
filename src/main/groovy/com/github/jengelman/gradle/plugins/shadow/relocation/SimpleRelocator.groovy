@@ -143,27 +143,37 @@ class SimpleRelocator implements Relocator {
         return false
     }
 
-    boolean canRelocatePath(RelocatePathContext context) {
-        String path = context.path
+    boolean canRelocatePath(String path) {
         if (rawString) {
             return Pattern.compile(pathPattern).matcher(path).find()
         }
 
+        // If string is too short - no need to perform expensive string operations
+        if (path.length() < pathPattern.length()) {
+            return false
+        }
+
         if (path.endsWith(".class")) {
+            // Safeguard against strings containing only ".class"
+            if (path.length() == 6) {
+                return false
+            }
             path = path.substring(0, path.length() - 6)
         }
 
         // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
-        if (path.startsWith(pathPattern) || path.startsWith("/" + pathPattern)) {
+        boolean pathStartsWithPattern =
+                path.charAt(0) == '/' ? path.startsWith(pathPattern, 1) : path.startsWith(pathPattern)
+        if (pathStartsWithPattern) {
             return isIncluded(path) && !isExcluded(path)
         }
         return false
     }
 
-    boolean canRelocateClass(RelocateClassContext context) {
-        String clazz = context.className
-        RelocatePathContext pathContext = RelocatePathContext.builder().path(clazz.replace('.', '/')).stats(context.stats).build()
-        return !rawString && clazz.indexOf('/') < 0 && canRelocatePath(pathContext)
+    boolean canRelocateClass(String className) {
+        return !rawString &&
+                className.indexOf('/') < 0 &&
+                canRelocatePath(className.replace('.', '/'))
     }
 
     String relocatePath(RelocatePathContext context) {
