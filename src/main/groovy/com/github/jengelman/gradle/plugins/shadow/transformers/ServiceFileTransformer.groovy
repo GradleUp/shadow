@@ -71,12 +71,12 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
         def lines = context.is.readLines()
         def targetPath = context.path
         context.relocators.each {rel ->
-            if(rel.canRelocateClass(RelocateClassContext.builder().className(new File(targetPath).name).stats(context.stats).build())) {
+            if (rel.canRelocateClass(new File(targetPath).name)) {
                 targetPath = rel.relocateClass(RelocateClassContext.builder().className(targetPath).stats(context.stats).build())
             }
             lines.eachWithIndex { String line, int i ->
-                def lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
-                if(rel.canRelocateClass(lineContext)) {
+                if (rel.canRelocateClass(line)) {
+                    def lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
                     lines[i] = rel.relocateClass(lineContext)
                 }
             }
