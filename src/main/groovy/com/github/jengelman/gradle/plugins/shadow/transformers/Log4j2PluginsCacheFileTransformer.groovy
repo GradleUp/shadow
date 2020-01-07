@@ -112,11 +112,11 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
             pluginEntryLoop:
             for (PluginEntry currentPluginEntry : currentMap.values()) {
                 String className = currentPluginEntry.getClassName()
+                RelocateClassContext relocateClassContext = new RelocateClassContext(className, stats)
                 for (Relocator currentRelocator : relocators) {
                     // If we have a relocator that can relocate our current entry...
                     if (currentRelocator.canRelocateClass(className)) {
                         // Then we perform that relocation and update the plugin entry to reflect the new value.
-                        RelocateClassContext relocateClassContext = new RelocateClassContext(className, stats)
                         String relocatedClassName = currentRelocator.relocateClass(relocateClassContext)
                         currentPluginEntry.setClassName(relocatedClassName)
                         continue pluginEntryLoop
