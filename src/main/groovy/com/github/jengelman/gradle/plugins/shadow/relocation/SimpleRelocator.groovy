@@ -98,6 +98,16 @@ class SimpleRelocator implements Relocator {
         return this
     }
 
+    SimpleRelocator includeRegex(String pattern) {
+        this.includes.add("%regex[$pattern]")
+        return this
+    }
+
+    SimpleRelocator excludeRegex(String pattern) {
+        this.excludes.add("%regex[$pattern]")
+        return this
+    }
+
     private static Set<String> normalizePatterns(Collection<String> patterns) {
         Set<String> normalized = null
 
