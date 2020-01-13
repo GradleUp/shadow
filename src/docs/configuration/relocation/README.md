@@ -26,7 +26,7 @@ In the resulting JAR, the class file is relocated from `junit/textui/TestRunner.
 It is not necessary to specify any patterns for matching, it will operate simply on the prefix
 provided.
 
-> Relocation will be applied globally to all instance of the matched prefix.
+> Relocation will be applied globally to all instances of the matched prefix.
 That is, it does **not** scope to _only_ the dependencies being shadowed.
 Be specific as possible when configuring relocation as to avoid unintended relocations.
 
@@ -48,12 +48,12 @@ shadowJar {
 
 ## Automatically Relocating Dependencies
 
-Shadow ships with a task that can be used to automatically configure all packages from all dependencies to be relocated.
+Shadow is shipped with a task that can be used to automatically configure all packages from all dependencies to be relocated.
 This feature was formally shipped into a 2nd plugin (`com.github.johnrengelman.plugin-shadow`) but has been
 removed for clarity reasons in version 4.0.0.
 
 To configure automatic dependency relocation, declare a task of type `ConfigureShadowRelocation` and configure the
-`target` parameter to be the `ShadowJar` task you wish to auto configure. You will also need to declared a task
+`target` parameter to be the `ShadowJar` task you wish to auto configure. You will also need to declare a task
 dependency so the tasks execute in the correct order.
 
 ```groovy
