@@ -123,7 +123,7 @@ class SimpleRelocator implements Relocator {
     private boolean isIncluded(String path) {
         if (includes != null && !includes.isEmpty()) {
             for (String include : includes) {
-                if (SelectorUtils.matchPath(include, path, true)) {
+                if (SelectorUtils.matchPath(include, path, '/', true)) {
                     return true
                 }
             }
@@ -135,7 +135,7 @@ class SimpleRelocator implements Relocator {
     private boolean isExcluded(String path) {
         if (excludes != null && !excludes.isEmpty()) {
             for (String exclude : excludes) {
-                if (SelectorUtils.matchPath(exclude, path, true)) {
+                if (SelectorUtils.matchPath(exclude, path, '/', true)) {
                     return true
                 }
             }

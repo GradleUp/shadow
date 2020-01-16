@@ -56,7 +56,7 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocatePath(pathContext("org/Foo/Class.class")))
 
         relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
-                [ "org.foo.Excluded", "org.foo.public.*", "org.foo.Public*Stuff" ] as String[]))
+                [ "org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff" ] as String[]))
         assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/Class")))
         assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/Class.class")))
         assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/excluded")))
@@ -65,6 +65,8 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/public")))
         assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/public/Class")))
         assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/public/Class.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/public/sub")))
+        assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/public/sub/Class")))
         assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/publicRELOC/Class")))
         assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/PrivateStuff")))
         assertEquals(true, relocator.canRelocatePath(pathContext("org/foo/PrivateStuff.class")))
@@ -72,6 +74,12 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/PublicStuff.class")))
         assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/PublicUtilStuff")))
         assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/PublicUtilStuff.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/recurse")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/recurse/Class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/recurse/Class.class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/recurse/sub")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/recurse/sub/Class")))
+        assertEquals(false, relocator.canRelocatePath(pathContext("org/foo/recurse/sub/Class.class")))
     }
 
     void testCanRelocateClass() {
@@ -84,16 +92,22 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocateClass(classContext("org.Foo.Class")))
 
         relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
-                [ "org.foo.Excluded", "org.foo.public.*", "org.foo.Public*Stuff" ] as String[]))
+                [ "org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff" ] as String[]))
         assertEquals(true, relocator.canRelocateClass(classContext("org.foo.Class")))
         assertEquals(true, relocator.canRelocateClass(classContext("org.foo.excluded")))
         assertEquals(false, relocator.canRelocateClass(classContext("org.foo.Excluded")))
         assertEquals(false, relocator.canRelocateClass(classContext("org.foo.public")))
         assertEquals(false, relocator.canRelocateClass(classContext("org.foo.public.Class")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.public.sub")))
+        assertEquals(true, relocator.canRelocateClass(classContext("org.foo.public.sub.Class")))
         assertEquals(true, relocator.canRelocateClass(classContext("org.foo.publicRELOC.Class")))
         assertEquals(true, relocator.canRelocateClass(classContext("org.foo.PrivateStuff")))
         assertEquals(false, relocator.canRelocateClass(classContext("org.foo.PublicStuff")))
         assertEquals(false, relocator.canRelocateClass(classContext("org.foo.PublicUtilStuff")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.recurse")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.recurse.Class")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.recurse.sub")))
+        assertEquals(false, relocator.canRelocateClass(classContext("org.foo.recurse.sub.Class")))
     }
 
     void testCanRelocateRawString() {
