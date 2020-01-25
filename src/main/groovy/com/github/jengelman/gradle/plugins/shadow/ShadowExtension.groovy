@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.file.CopySpec
 import org.gradle.api.publish.maven.MavenPom
@@ -24,7 +25,7 @@ class ShadowExtension {
                 def dependenciesNode = xml.asNode().appendNode('dependencies')
 
                 project.configurations.shadow.allDependencies.each {
-                    if (! (it instanceof SelfResolvingDependency)) {
+                    if ((it instanceof ProjectDependency) || ! (it instanceof SelfResolvingDependency)) {
                         def dependencyNode = dependenciesNode.appendNode('dependency')
                         dependencyNode.appendNode('groupId', it.group)
                         dependencyNode.appendNode('artifactId', it.name)
