@@ -94,8 +94,8 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(true, relocator.canRelocatePath("org/f"))   // equal to path pattern
         assertEquals(true, relocator.canRelocatePath("/org/f"))  // equal to path pattern with /
     }
-
-    void testCanRelocatePathWithRegex() {
+  
+   void testCanRelocatePathWithRegex() {
         SimpleRelocator relocator
 
         // Include with Regex
@@ -126,7 +126,7 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(true, relocator.canRelocatePath("org/foo/public/Bar.class"))
         assertEquals(false, relocator.canRelocatePath("org/foo/Factory.class"))
         assertEquals(false, relocator.canRelocatePath("org/foo/R.class"))
-    }
+   }
 
     void testCanRelocateClass() {
         SimpleRelocator relocator
