@@ -32,7 +32,9 @@ Be specific as possible when configuring relocation as to avoid unintended reloc
 
 ## Filtering Relocation
 
-Specific classes or files can be `included`/`excluded` from the relocation operation if necessary.
+Specific classes or files can be `included`/`excluded` from the relocation operation if necessary. Use
+[Ant Path Matcher](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html) 
+syntax to specify matching path for your files and directories.
 
 ```groovy
 // Configuring Filtering for Relocation
@@ -42,6 +44,18 @@ shadowJar {
    }
    relocate('junit.framework', 'b') {
        include 'junit.framework.Test*'
+   }
+}
+```
+
+For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the expresion in `%regex[]` before
+passing it to `include`/`exclude`.
+ 
+```groovy
+// Configuring Filtering for Relocation with Regex
+shadowJar {
+   relocate('org.foo', 'a') {
+       include '%regex[org/foo/.*Factory[0-9].*]'
    }
 }
 ```
