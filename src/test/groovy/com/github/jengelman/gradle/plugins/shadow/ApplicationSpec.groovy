@@ -73,7 +73,7 @@ class ApplicationSpec extends PluginSpecification {
         File startScript = getFile('build/install/myapp-shadow/bin/myapp')
         assert startScript.exists()
         assert startScript.text.contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
-        assert startScript.text.contains("eval set -- \"\$DEFAULT_JVM_OPTS\" \"\$JAVA_OPTS\" \"\$GRADLE_OPTS\" -jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
+        assert startScript.text.contains("-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
         assert startScript.text.contains("exec \"\$JAVACMD\" \"\$@\"")
 
         cleanup:
