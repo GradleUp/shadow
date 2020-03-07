@@ -94,6 +94,39 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(true, relocator.canRelocatePath("org/f"))   // equal to path pattern
         assertEquals(true, relocator.canRelocatePath("/org/f"))  // equal to path pattern with /
     }
+  
+   void testCanRelocatePathWithRegex() {
+        SimpleRelocator relocator
+
+        // Include with Regex
+        relocator = new SimpleRelocator("org.foo", null, Collections.singletonList("%regex[org/foo/R(\\\$.*)?\$]"), null)
+        assertEquals(true, relocator.canRelocatePath("org/foo/R.class"))
+        assertEquals(true, relocator.canRelocatePath("org/foo/R\$string.class"))
+        assertEquals(true, relocator.canRelocatePath("org/foo/R\$layout.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/Recording/R.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/Recording.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/bar/R\$string.class"))
+        assertEquals(false, relocator.canRelocatePath("org/R.class"))
+        assertEquals(false, relocator.canRelocatePath("org/R\$string.class"))
+
+        // Exclude with Regex
+        relocator = new SimpleRelocator("org.foo", null, null, null)
+        relocator.exclude("%regex[org/foo/.*Factory[0-9].*]")
+        assertEquals(true, relocator.canRelocatePath("org/foo/Factory.class"))
+        assertEquals(true, relocator.canRelocatePath("org/foo/FooFactoryMain.class"))
+        assertEquals(true, relocator.canRelocatePath("org/foo/BarFactory.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/Factory0.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/FooFactory1Main.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/BarFactory2.class"))
+
+        // Include with Regex and normal pattern
+        relocator = new SimpleRelocator("org.foo", null,
+                Arrays.asList("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"), null)
+        assertEquals(true, relocator.canRelocatePath("org/foo/Factory1.class"))
+        assertEquals(true, relocator.canRelocatePath("org/foo/public/Bar.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/Factory.class"))
+        assertEquals(false, relocator.canRelocatePath("org/foo/R.class"))
+   }
 
     void testCanRelocateClass() {
         SimpleRelocator relocator

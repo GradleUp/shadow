@@ -105,6 +105,11 @@ class SimpleRelocator implements Relocator {
             normalized = new LinkedHashSet<String>()
 
             for (String pattern : patterns) {
+                // Regex patterns don't need to be normalized and stay as is
+                if (pattern.startsWith(SelectorUtils.REGEX_HANDLER_PREFIX)) {
+                    normalized.add(pattern)
+                    continue
+                }
 
                 String classPattern = pattern.replace('.', '/')
 
