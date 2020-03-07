@@ -1,4 +1,13 @@
 # Change Log
+## v6.0.0 (2020-03-07)
+* Required Gradle 6.0+
+* Fix Gradle 7 deprecation warnings [#530](https://github.com/johnrengelman/shadow/issues/530)
+* [Yahor Berdnikau](https://github.com/Tapchicoma) - Fix issues with Gradle API being embedded into published JAR [#527](https://github.com/johnrengelman/shadow/issues/527)
+* [Dmitry Vyazelenko](https://github.com/vyazelenko) - ASM updates to support latest Java verisons [#549](https://github.com/johnrengelman/shadow/pull/549)
+* [ejjcase](https://github.com/ejjcase) - Support exposing shadowed project dependencies via POM [#543](https://github.com/johnrengelman/shadow/pull/543)
+* [Artem Chubaryan](https://github.com/Armaxis) - Performance optimizations [#535](https://github.com/johnrengelman/shadow/pull/535)
+* [Trask Stalnaker](https://github.com/trask) - Fix exclude patterns on Windows [#539](https://github.com/johnrengelman/shadow/pull/539)
+
 ## v5.2.0 (2019-11-10)
 * [Inez Korczyński](https://github.com/inez) - Performance optimization when evaluating relocation paths [#507](https://github.com/johnrengelman/shadow/pull/507)
 * [Jeff Adler](https://github.com/jeffalder) - Fix remapping issues with multi release JARS [#526](https://github.com/johnrengelman/shadow/pull/526)

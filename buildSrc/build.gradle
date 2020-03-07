@@ -16,7 +16,7 @@ File projectBuildFile = file('../gradle/dependencies.gradle')
 
 //Use this parse command because Groovy wants to use the file name as the classname
 //which fails if your Gradle build file has been renamed to contain an invalid character (i.e. '-')
-DelegatingScript script = (DelegatingScript)sh.parse(projectBuildFile.text.replaceAll('shadow', 'compile'), 'GradlePlugins')
+DelegatingScript script = (DelegatingScript)sh.parse(projectBuildFile.text.replaceAll('shadow', 'implementation'), 'GradlePlugins')
 script.setDelegate(holder)
 
 //Resolve the project main Gradle file against our ScriptHolder
