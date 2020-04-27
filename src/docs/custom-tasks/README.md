@@ -16,6 +16,6 @@ task testJar(type: ShadowJar) {
 }
 ```
 
-The code snippet above will geneated a shadowed JAR contain both the `main` and `test` sources as well as all `runtime`
+The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all `runtime`
 and `testRuntime` dependencies.
 The file is output to `build/libs/<project>-<version>-tests.jar`.
