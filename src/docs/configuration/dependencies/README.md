@@ -104,7 +104,7 @@ shadowJar {
 
 The above code snippet is functionally equivalent to the previous example.
 
-This same patten can be used for any of the dependency notation fields.
+This same pattern can be used for any of the dependency notation fields.
 
 ```groovy
 // Ignoring An Artifact Regardless of Group
