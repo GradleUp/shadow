@@ -294,7 +294,7 @@ class RelocationSpec extends PluginSpecification {
             repositories {
                 jcenter()
                 maven {
-                    url 'http://repository.mapr.com/nexus/content/groups/mapr-public'
+                    url 'http://repository.mapr.com/nexus/content/groups/mapr-public/releases'
                 }
             }
 
