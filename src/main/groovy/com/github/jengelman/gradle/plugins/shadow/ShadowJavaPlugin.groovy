@@ -6,10 +6,14 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer
 import org.gradle.api.artifacts.maven.MavenPom
+import org.gradle.api.attributes.Bundling
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Upload
-import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.gradle.util.GradleVersion
 
@@ -33,6 +37,28 @@ class ShadowJavaPlugin implements Plugin<Project> {
         configureShadowTask(project)
 
         project.configurations.compileClasspath.extendsFrom project.configurations.shadow
+
+        project.configurations {
+            shadowRuntimeElements {
+                canBeConsumed = true
+                canBeResolved = false
+                attributes {
+                    it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage, Usage.JAVA_RUNTIME))
+                    it.attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category, Category.LIBRARY))
+                    it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
+                    it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.EMBEDDED))
+                    // means no relocation of packages
+                    it.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 8)
+                }
+                outgoing.artifact(project.tasks.getByName(SHADOW_JAR_TASK_NAME))
+            }
+        }
+
+        project.components.java {
+            addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+                mapToOptional() // make it a Maven optional dependency
+            }
+        }
 
     }
 

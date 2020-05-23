@@ -21,7 +21,7 @@ class ShadowPlugin implements Plugin<Project> {
                 plugins.apply(ShadowApplicationPlugin)
             }
 
-            rootProject.plugins.withId('com.gradle.build-scan') {
+            rootProject.plugins.withId('com.gradle.enterprise') {
                 rootProject.buildScan.buildFinished {
                     def shadowTasks = tasks.withType(ShadowJar)
                     shadowTasks.each { task ->
@@ -38,7 +38,9 @@ class ShadowPlugin implements Plugin<Project> {
             afterEvaluate {
                 plugins.withId('java-gradle-plugin') {
                     // needed to prevent inclusion of gradle-api into shadow JAR
-                    configurations.compile.dependencies.remove dependencies.gradleApi()
+                    configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
+                        dependencies.remove(project.dependencies.gradleApi())
+                    }
                 }
             }
         }
