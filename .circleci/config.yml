@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/shadow
   docker:
-    - image: circleci/openjdk:8-jdk
+    - image: circleci/openjdk:11-jdk
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: "-Xmx1024m"
