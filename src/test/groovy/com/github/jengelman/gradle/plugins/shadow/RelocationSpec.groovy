@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import spock.lang.Ignore
 import spock.lang.Issue
 
 import java.util.jar.Attributes
@@ -288,6 +289,7 @@ class RelocationSpec extends PluginSpecification {
     }
 
     @Issue("SHADOW-294")
+    @Ignore
     def "does not error on relocating java9 classes"() {
         given:
         buildFile << """
