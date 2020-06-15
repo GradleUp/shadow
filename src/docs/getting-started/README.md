@@ -37,7 +37,7 @@ following behavior:
 * Adds a `shadowJar` task to the project.
 * Adds a `shadow` configuration to the project.
 * Configures the `shadowJar` task to include all sources from the project's `main` sourceSet.
-* Configures the `shadowJar` task to bundle all dependencies from the `runtime` configuration.
+* Configures the `shadowJar` task to bundle all dependencies from the `runtimeClasspath` configuration.
 * Configures the _classifier_ attribute of the `shadowJar` task to be `'all'` .
 * Configures the `shadowJar` task to generate a `Manifest` with:
   * Inheriting all configuration from the standard `jar` task.
