@@ -1,9 +1,9 @@
 # Introduction
 
-Shadow is a Gradle plugin for combining dependency classes and resources with a project's into a single
+Shadow is a Gradle plugin for combining a project's dependency classes and resources into a single
 output Jar.
 The combined Jar is often referred to a _fat-jar_ or _uber-jar_.
-Shadow utilizes `JarInputStream` and `JarOutputStream` to efficiently process dependent libraries
+Shadow utilizes [`JarInputStream`](https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarInputStream.html) and [`JarOutputStream`](https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarOutputStream.html) to efficiently process dependent libraries
 into the output jar without incurring the I/O overhead of expanding the jars to disk.
 
 ## Benefits of Shadow
@@ -15,7 +15,7 @@ Shadowing a project output has 2 major use cases:
 
 ### Executable Distributions
 
-Executable distribution is the main use case for _application_ an be deployed and executed/run in the runtime
+Executable distribution is the main use case for deploying an _application_ that can be executed/run in the runtime
 environment.
 In the case of Shadow, this is a single _uber_ or _fat_ JAR.
 The JAR file contains all the application code and dependent libraries to execute (not including the standard JVM
