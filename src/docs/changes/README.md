@@ -10,6 +10,7 @@
 * [ejjcase](https://github.com/ejjcase) - Support exposing shadowed project dependencies via POM [#543](https://github.com/johnrengelman/shadow/pull/543)
 * [Artem Chubaryan](https://github.com/Armaxis) - Performance optimizations [#535](https://github.com/johnrengelman/shadow/pull/535)
 * [Trask Stalnaker](https://github.com/trask) - Fix exclude patterns on Windows [#539](https://github.com/johnrengelman/shadow/pull/539)
+* [Artem Chubaryan](https://github.com/Armaxis) - Allow usage of true regex patterns for include/exclude by the `%regex[<pattern>]` syntax [#536](https://github.com/johnrengelman/shadow/pull/536)
 
 ## v5.2.0 (2019-11-10)
 * [Inez Korczyński](https://github.com/inez) - Performance optimization when evaluating relocation paths [#507](https://github.com/johnrengelman/shadow/pull/507)
