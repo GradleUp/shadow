@@ -9,6 +9,8 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
 import org.gradle.api.Action;
 import org.gradle.api.file.CopySpec;
 
+import java.lang.reflect.InvocationTargetException;
+
 interface ShadowSpec extends CopySpec {
     ShadowSpec minimize();
 
@@ -16,9 +18,9 @@ interface ShadowSpec extends CopySpec {
 
     ShadowSpec dependencies(Action<DependencyFilter> configure);
 
-    ShadowSpec transform(Class<? extends Transformer> clazz) throws InstantiationException, IllegalAccessException;
+    ShadowSpec transform(Class<? extends Transformer> clazz) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException;
 
-    <T extends Transformer> ShadowSpec transform(Class<T> clazz, Action<T> configure) throws InstantiationException, IllegalAccessException;
+    <T extends Transformer> ShadowSpec transform(Class<T> clazz, Action<T> configure) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException;
 
     ShadowSpec transform(Transformer transformer);
 
@@ -38,9 +40,9 @@ interface ShadowSpec extends CopySpec {
 
     ShadowSpec relocate(Relocator relocator);
 
-    ShadowSpec relocate(Class<? extends Relocator> clazz) throws InstantiationException, IllegalAccessException;
+    ShadowSpec relocate(Class<? extends Relocator> clazz) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException;
 
-    <R extends Relocator> ShadowSpec relocate(Class<R> clazz, Action<R> configure) throws InstantiationException, IllegalAccessException;
+    <R extends Relocator> ShadowSpec relocate(Class<R> clazz, Action<R> configure) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException;
 
     ShadowStats getStats();
 }

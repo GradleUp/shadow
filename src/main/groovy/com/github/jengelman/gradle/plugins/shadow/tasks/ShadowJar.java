@@ -19,6 +19,7 @@ import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.util.PatternSet;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -99,7 +100,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getProject(), configurations, dependencyFilterForMinimize) : null;
-        return new ShadowCopyAction(getArchivePath(), getInternalCompressor(), documentationRegistry,
+        return new ShadowCopyAction(getArchiveFile().get().getAsFile(), getInternalCompressor(), documentationRegistry,
                 this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
                 versionUtil, isPreserveFileTimestamps(), minimizeJar, unusedTracker);
     }
@@ -156,7 +157,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param clazz the transformer to add. Must have a no-arg constructor
      * @return this
      */
-    public ShadowJar transform(Class<? extends Transformer> clazz) throws InstantiationException, IllegalAccessException {
+    public ShadowJar transform(Class<? extends Transformer> clazz) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         return transform(clazz, null);
     }
 
@@ -167,8 +168,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param c the configuration for the transformer
      * @return this
      */
-    public <T extends Transformer> ShadowJar transform(Class<T> clazz, Action<T> c) throws InstantiationException, IllegalAccessException {
-        T transformer = clazz.newInstance();
+    public <T extends Transformer> ShadowJar transform(Class<T> clazz, Action<T> c) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        T transformer = clazz.getDeclaredConstructor().newInstance();
         addTransform(transformer, c);
         return this;
     }
@@ -206,6 +207,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
             transform(ServiceFileTransformer.class);
         } catch (IllegalAccessException e) {
         } catch (InstantiationException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
         }
         return this;
     }
@@ -226,6 +229,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
             });
         } catch (IllegalAccessException e) {
         } catch (InstantiationException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
         }
         return this;
     }
@@ -240,6 +245,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
             transform(ServiceFileTransformer.class, configureClosure);
         } catch (IllegalAccessException e) {
         } catch (InstantiationException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
         }
         return this;
     }
@@ -254,6 +261,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
             transform(GroovyExtensionModuleTransformer.class);
         } catch (IllegalAccessException e) {
         } catch (InstantiationException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
         }
         return this;
     }
@@ -273,6 +282,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
             });
         } catch (IllegalAccessException e) {
         } catch (InstantiationException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
         }
         return this;
     }
@@ -319,7 +330,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param relocatorClass the relocator class to add. Must have a no-arg constructor.
      * @return this
      */
-    public ShadowJar relocate(Class<? extends Relocator> relocatorClass) throws InstantiationException, IllegalAccessException {
+    public ShadowJar relocate(Class<? extends Relocator> relocatorClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         return relocate(relocatorClass, null);
     }
 
@@ -338,8 +349,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param configure the configuration for the relocator
      * @return this
      */
-    public <R extends Relocator> ShadowJar relocate(Class<R> relocatorClass, Action<R> configure) throws InstantiationException, IllegalAccessException {
-        R relocator = relocatorClass.newInstance();
+    public <R extends Relocator> ShadowJar relocate(Class<R> relocatorClass, Action<R> configure) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        R relocator = relocatorClass.getDeclaredConstructor().newInstance();
         addRelocator(relocator, configure);
         return this;
     }
