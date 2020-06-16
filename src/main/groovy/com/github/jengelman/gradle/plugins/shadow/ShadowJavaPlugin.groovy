@@ -46,13 +46,13 @@ class ShadowJavaPlugin implements Plugin<Project> {
                     it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage, Usage.JAVA_RUNTIME))
                     it.attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category, Category.LIBRARY))
                     it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
-                    it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.EMBEDDED))
-                    // means no relocation of packages
-                    it.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 8)
+                    it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.SHADOWED))
                 }
                 outgoing.artifact(project.tasks.getByName(SHADOW_JAR_TASK_NAME))
             }
         }
+
+        project.configurations.shadowRuntimeElements.extendsFrom project.configurations.shadow
 
         project.components.java {
             addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
