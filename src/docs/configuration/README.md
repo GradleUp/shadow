@@ -13,9 +13,9 @@ details.
 
 ## Configuring Output Name
 
-Shadow configures the default `shadowJar` task to set the output JAR's `destinationDir`, `baseName`, `appendix`,
+Shadow configures the default `shadowJar` task to set the output JAR's `destinationDir`, `archiveBaseName`, `appendix`,
 `archiveVersion`, and `extension` to the same default values as Gradle does for all `Jar` tasks.
-Additionally, it configures the `classifier` to be `all`.
+Additionally, it configures the `archiveClassifier` to be `all`.
 
 If working with a Gradle project with the name `myApp` and archiveVersion `1.0`, the default `shadowJar` task will output a
 file at: `build/libs/myApp-1.0-all.jar`
@@ -25,9 +25,9 @@ As with all `Jar` tasks in Gradle, these values can be overridden:
 ```groovy
 // Output to build/libs/shadow.jar
 shadowJar {
-   baseName = 'shadow'
-   classifier = ''
-   archiveVersion = ''
+   archiveBaseName.set('shadow')
+   archiveClassifier.set('')
+   archiveVersion.set('')
 }
 ```
 
