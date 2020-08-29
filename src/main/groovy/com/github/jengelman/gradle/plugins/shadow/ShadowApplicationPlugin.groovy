@@ -12,6 +12,7 @@ import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 
 class ShadowApplicationPlugin implements Plugin<Project> {
@@ -57,9 +58,11 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         ApplicationPluginConvention pluginConvention = (
                 ApplicationPluginConvention) project.convention.plugins.application
 
-        jar.inputs.property('mainClassName', { pluginConvention.mainClassName })
-        jar.doFirst {
-            manifest.attributes 'Main-Class': pluginConvention.mainClassName
+        jar.configure { jar ->
+            jar.inputs.property('mainClassName', { pluginConvention.mainClassName })
+            jar.doFirst {
+                manifest.attributes 'Main-Class': pluginConvention.mainClassName
+            }
         }
     }
 
@@ -67,15 +70,16 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         ApplicationPluginConvention pluginConvention = (
                 ApplicationPluginConvention) project.convention.plugins.application
 
-        def run = project.tasks.create(SHADOW_RUN_TASK_NAME, JavaJarExec)
-        Sync install = project.tasks.getByName(SHADOW_INSTALL_TASK_NAME)
-        run.dependsOn SHADOW_INSTALL_TASK_NAME
-        run.setMain('-jar')
-        run.description  = 'Runs this project as a JVM application using the shadow jar'
-        run.group = ApplicationPlugin.APPLICATION_GROUP
-        run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
-        run.conventionMapping.jarFile = {
-            project.file("${install.destinationDir.path}/lib/${jar.archivePath.name}")
+        project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec) { run ->
+            def install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync)
+            run.dependsOn SHADOW_INSTALL_TASK_NAME
+            run.setMain('-jar')
+            run.description = 'Runs this project as a JVM application using the shadow jar'
+            run.group = ApplicationPlugin.APPLICATION_GROUP
+            run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
+            run.conventionMapping.jarFile = {
+                project.file("${install.get().destinationDir.path}/lib/${jar.get().archivePath.name}")
+            }
         }
     }
 
@@ -83,42 +87,43 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
 
-        def startScripts = project.tasks.create(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts)
-        startScripts.unixStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/unixStartScript.txt").text)
-        startScripts.windowsStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/windowsStartScript.txt").text)
-        startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
-        startScripts.group = ApplicationPlugin.APPLICATION_GROUP
-        startScripts.classpath = project.files(jar)
-        startScripts.conventionMapping.mainClassName = { pluginConvention.mainClassName }
-        startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
-        startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
-        startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
-        startScripts.inputs.files jar
-
+        project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts) { startScripts ->
+            startScripts.unixStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/unixStartScript.txt").text)
+            startScripts.windowsStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/windowsStartScript.txt").text)
+            startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
+            startScripts.group = ApplicationPlugin.APPLICATION_GROUP
+            startScripts.classpath = project.files(jar)
+            startScripts.conventionMapping.mainClassName = { pluginConvention.mainClassName }
+            startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
+            startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
+            startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
+            startScripts.inputs.files jar
+        }
     }
 
     protected void configureInstallTask(Project project) {
         ApplicationPluginConvention pluginConvention =
                 (ApplicationPluginConvention) project.convention.plugins.application
 
-        Sync installTask = project.tasks.getByName(SHADOW_INSTALL_TASK_NAME)
-        installTask.doFirst { Sync task ->
-            if (task.destinationDir.directory) {
-                if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
-                    throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${pluginConvention.applicationName}'.\n" +
-                            "If you really want to install to this directory, delete it and run the install task again.\n" +
-                            "Alternatively, choose a different installation directory."
-                    )
+        project.tasks.named(SHADOW_INSTALL_TASK_NAME).configure { installTask ->
+            installTask.doFirst { Sync task ->
+                if (task.destinationDir.directory) {
+                    if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
+                        throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${pluginConvention.applicationName}'.\n" +
+                                "If you really want to install to this directory, delete it and run the install task again.\n" +
+                                "Alternatively, choose a different installation directory."
+                        )
+                    }
                 }
             }
-        }
-        installTask.doLast { Sync task ->
-            project.ant.chmod(file: "${task.destinationDir.absolutePath}/bin/${pluginConvention.applicationName}", perm: 'ugo+x')
+            installTask.doLast { Sync task ->
+                project.ant.chmod(file: "${task.destinationDir.absolutePath}/bin/${pluginConvention.applicationName}", perm: 'ugo+x')
+            }
         }
     }
 
     protected CopySpec configureDistSpec(Project project, CopySpec distSpec) {
-        def startScripts = project.tasks.getByName(SHADOW_SCRIPTS_TASK_NAME)
+        def startScripts = project.tasks.named(SHADOW_SCRIPTS_TASK_NAME)
 
         distSpec.with {
             from(project.file("src/dist"))
@@ -136,7 +141,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         distSpec
     }
 
-    private ShadowJar getJar() {
-        project.tasks.findByName(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME)
+    private TaskProvider<ShadowJar> getJar() {
+        project.tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar)
     }
 }

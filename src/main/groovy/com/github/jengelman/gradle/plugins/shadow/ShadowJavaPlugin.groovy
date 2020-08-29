@@ -48,7 +48,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
                     it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
                     it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.SHADOWED))
                 }
-                outgoing.artifact(project.tasks.getByName(SHADOW_JAR_TASK_NAME))
+                outgoing.artifact(project.tasks.named(SHADOW_JAR_TASK_NAME))
             }
         }
 
@@ -59,38 +59,37 @@ class ShadowJavaPlugin implements Plugin<Project> {
                 mapToOptional() // make it a Maven optional dependency
             }
         }
-
     }
 
     protected void configureShadowTask(Project project) {
         JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
-        ShadowJar shadow = project.tasks.create(SHADOW_JAR_TASK_NAME, ShadowJar)
-        shadow.group = SHADOW_GROUP
-        shadow.description = 'Create a combined JAR of project and runtime dependencies'
-        if (GradleVersion.current() >= GradleVersion.version("5.1")) {
-            shadow.archiveClassifier.set("all")
-        } else {
-            shadow.conventionMapping.with {
-                map('classifier') {
-                    'all'
+        project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
+            shadow.group = SHADOW_GROUP
+            shadow.description = 'Create a combined JAR of project and runtime dependencies'
+            if (GradleVersion.current() >= GradleVersion.version("5.1")) {
+                shadow.archiveClassifier.set("all")
+            } else {
+                shadow.conventionMapping.with {
+                    map('classifier') {
+                        'all'
+                    }
                 }
             }
-        }
-        shadow.manifest.inheritFrom project.tasks.jar.manifest
-        shadow.doFirst {
-            def files = project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME).files
-            if (files) {
-                def libs = [project.tasks.jar.manifest.attributes.get('Class-Path')]
-                libs.addAll files.collect { "${it.name}" }
-                manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
+            shadow.manifest.inheritFrom project.tasks.jar.manifest
+            shadow.doFirst {
+                def files = project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME).files
+                if (files) {
+                    def libs = [project.tasks.jar.manifest.attributes.get('Class-Path')]
+                    libs.addAll files.collect { "${it.name}" }
+                    manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
+                }
             }
+            shadow.from(convention.sourceSets.main.output)
+            shadow.configurations = [project.configurations.findByName('runtimeClasspath') ?
+                                             project.configurations.runtimeClasspath : project.configurations.runtime]
+            shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
         }
-        shadow.from(convention.sourceSets.main.output)
-        shadow.configurations = [project.configurations.findByName('runtimeClasspath') ?
-                                         project.configurations.runtimeClasspath : project.configurations.runtime]
-        shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
-
-        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, shadow)
+        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, project.tasks.named(SHADOW_JAR_TASK_NAME))
         configureShadowUpload()
     }
 
@@ -98,15 +97,16 @@ class ShadowJavaPlugin implements Plugin<Project> {
         configurationActionContainer.add(new Action<Project>() {
             void execute(Project project) {
                 project.plugins.withType(MavenPlugin) {
-                    Upload upload = project.tasks.withType(Upload).findByName(SHADOW_UPLOAD_TASK)
-                    if (!upload) {
-                        return
+                    project.tasks.withType(Upload).configureEach { upload ->
+                        if (upload.name != SHADOW_UPLOAD_TASK) {
+                            return
+                        }
+                        upload.configuration = project.configurations.shadow
+                        MavenPom pom = upload.repositories.mavenDeployer.pom
+                        pom.scopeMappings.mappings.remove(project.configurations.compile)
+                        pom.scopeMappings.mappings.remove(project.configurations.runtime)
+                        pom.scopeMappings.addMapping(MavenPlugin.RUNTIME_PRIORITY, project.configurations.shadow, Conf2ScopeMappingContainer.RUNTIME)
                     }
-                    upload.configuration = project.configurations.shadow
-                    MavenPom pom = upload.repositories.mavenDeployer.pom
-                    pom.scopeMappings.mappings.remove(project.configurations.compile)
-                    pom.scopeMappings.mappings.remove(project.configurations.runtime)
-                    pom.scopeMappings.addMapping(MavenPlugin.RUNTIME_PRIORITY, project.configurations.shadow, Conf2ScopeMappingContainer.RUNTIME)
                 }
             }
         })

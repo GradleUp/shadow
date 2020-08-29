@@ -19,9 +19,10 @@ class ShadowBasePlugin implements Plugin<Project> {
         project.extensions.create(EXTENSION_NAME, ShadowExtension, project)
         createShadowConfiguration(project)
 
-        KnowsTask knows = project.tasks.create(KnowsTask.NAME, KnowsTask)
-        knows.group = ShadowJavaPlugin.SHADOW_GROUP
-        knows.description = KnowsTask.DESC
+        project.tasks.register(KnowsTask.NAME, KnowsTask) { knows ->
+            knows.group = ShadowJavaPlugin.SHADOW_GROUP
+            knows.description = KnowsTask.DESC
+        }
     }
 
     private void createShadowConfiguration(Project project) {

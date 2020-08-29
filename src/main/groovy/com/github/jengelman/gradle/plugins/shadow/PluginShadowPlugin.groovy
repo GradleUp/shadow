@@ -11,12 +11,13 @@ class PluginShadowPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(ShadowPlugin)
 
-        project.tasks.withType(ShadowJar) { ShadowJar task ->
+        project.tasks.withType(ShadowJar).configureEach { ShadowJar task ->
             if (task.name == ShadowJavaPlugin.SHADOW_JAR_TASK_NAME) {
-                ConfigureShadowRelocation relocate = project.tasks.create(ConfigureShadowRelocation.taskName(project.tasks.shadowJar), ConfigureShadowRelocation)
-                relocate.target = (ShadowJar) project.tasks.shadowJar
+                project.tasks.register(ConfigureShadowRelocation.taskName(task), ConfigureShadowRelocation) { relocate ->
+                    relocate.target = (ShadowJar) task
 
-                project.tasks.shadowJar.dependsOn relocate
+                    task.dependsOn relocate
+                }
             }
         }
     }
