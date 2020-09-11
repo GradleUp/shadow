@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import groovy.transform.NotYetImplemented
 import org.gradle.util.GradleVersion
 import spock.lang.IgnoreIf
 
@@ -82,6 +83,63 @@ class ConfigurationCacheSpec extends PluginSpecification {
 
         and:
         doesNotContain(output, ['a2.properties'])
+        result.output.contains("Reusing configuration cache.")
+    }
+
+    @NotYetImplemented
+    def "configuration caching supports minimize"() {
+        given:
+        file('settings.gradle') << """
+            include 'client', 'server'
+        """.stripIndent()
+
+        and:
+        file('client/src/main/java/client/Client.java') << """
+            package client;
+            public class Client {}
+        """.stripIndent()
+        file('client/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile 'junit:junit:3.8.2' }
+        """.stripIndent()
+
+        and:
+        file('server/src/main/java/server/Server.java') << """
+            package server;
+            public class Server {}
+        """.stripIndent()
+        file('server/build.gradle') << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                minimize {
+                    exclude(dependency('junit:junit:.*'))
+                }
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { compile project(':client') }
+        """.stripIndent()
+
+        and:
+        def output = getFile('server/build/libs/server-all.jar')
+
+        when:
+        runner.withArguments('--configuration-cache', 'shadowJar', '-s').build()
+        output.delete()
+        def result = runner.withArguments('--configuration-cache', 'shadowJar', '-s').build()
+
+        then:
+        output.exists()
+        contains(output, [
+                'server/Server.class',
+                'junit/framework/Test.class'
+        ])
+        doesNotContain(output, ['client/Client.class'])
+
+        and:
         result.output.contains("Reusing configuration cache.")
     }
 }
