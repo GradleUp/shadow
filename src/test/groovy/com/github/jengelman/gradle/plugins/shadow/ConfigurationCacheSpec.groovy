@@ -1,10 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import org.gradle.util.GradleVersion
-import spock.lang.IgnoreIf
 
-@IgnoreIf({ GradleVersion.current().baseVersion < GradleVersion.version("6.6") })
 class ConfigurationCacheSpec extends PluginSpecification {
 
     def setup() {
