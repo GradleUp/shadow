@@ -27,11 +27,6 @@ class ConfigurationCacheSpec extends PluginSpecification {
 
     def "supports configuration cache"() {
         given:
-        repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
-
         file('src/main/java/myapp/Main.java') << """
             package myapp;
             public class Main {
