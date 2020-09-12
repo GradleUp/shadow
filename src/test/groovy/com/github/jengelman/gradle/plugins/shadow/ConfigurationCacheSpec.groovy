@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import groovy.transform.NotYetImplemented
 import org.gradle.util.GradleVersion
 import spock.lang.IgnoreIf
 
@@ -81,7 +80,6 @@ class ConfigurationCacheSpec extends PluginSpecification {
         result.output.contains("Reusing configuration cache.")
     }
 
-    @NotYetImplemented
     def "configuration caching supports minimize"() {
         given:
         file('settings.gradle') << """

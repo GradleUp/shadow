@@ -20,6 +20,7 @@ import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.util.PatternSet;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +31,14 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     private List<Transformer> transformers;
     private List<Relocator> relocators;
-    private List<Configuration> configurations;
+    private transient List<Configuration> configurations;
     private transient DependencyFilter dependencyFilter;
+
     private boolean minimizeJar;
     private transient DependencyFilter dependencyFilterForMinimize;
+    private FileCollection toMinimize;
+    private FileCollection apiJars;
+    private FileCollection sourceSetsClassesDirs;
 
     private final ShadowStats shadowStats = new ShadowStats();
     private final GradleVersionUtil versionUtil;
@@ -108,10 +113,53 @@ public class ShadowJar extends Jar implements ShadowSpec {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
-        final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getProject(), configurations, dependencyFilterForMinimize) : null;
+        final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) : null;
         return new ShadowCopyAction(getArchiveFile().get().getAsFile(), getInternalCompressor(), documentationRegistry,
                 this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
                 versionUtil, isPreserveFileTimestamps(), minimizeJar, unusedTracker);
+    }
+
+    @Classpath
+    FileCollection getToMinimize() {
+        if (toMinimize == null) {
+            toMinimize = minimizeJar
+                    ? dependencyFilterForMinimize.resolve(configurations).minus(getApiJars())
+                    : getProject().getObjects().fileCollection();
+        }
+        return toMinimize;
+    }
+
+
+    @Classpath
+    FileCollection getApiJars() {
+        if (apiJars == null) {
+            apiJars = minimizeJar
+                    ? UnusedTracker.getApiJarsFromProject(getProject())
+                    : getProject().getObjects().fileCollection();
+        }
+        return apiJars;
+    }
+
+
+    @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
+    FileCollection getSourceSetsClassesDirs() {
+        if (sourceSetsClassesDirs == null) {
+            ConfigurableFileCollection allClassesDirs = getProject().getObjects().fileCollection();
+            if (minimizeJar) {
+                for (SourceSet sourceSet : getProject().getExtensions().getByType(SourceSetContainer.class)) {
+                    FileCollection classesDirs = sourceSet.getOutput().getClassesDirs();
+                    allClassesDirs.from(classesDirs);
+                }
+            }
+            sourceSetsClassesDirs = allClassesDirs.filter(new Spec<File>() {
+                @Override
+                public boolean isSatisfiedBy(File file) {
+                    return file.isDirectory();
+                }
+            });
+        }
+        return sourceSetsClassesDirs;
     }
 
     @Internal
