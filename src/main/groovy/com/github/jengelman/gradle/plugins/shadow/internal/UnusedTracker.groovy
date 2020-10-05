@@ -7,7 +7,6 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.SourceSet
 import org.vafer.jdependency.Clazz
 import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
@@ -18,7 +17,7 @@ class UnusedTracker {
     private final List<ClazzpathUnit> projectUnits
     private final Clazzpath cp = new Clazzpath()
 
-    private UnusedTracker(List<File> classDirs, FileCollection classJars, FileCollection toMinimize) {
+    private UnusedTracker(Iterable<File> classDirs, FileCollection classJars, FileCollection toMinimize) {
         this.toMinimize = toMinimize
         projectUnits = classDirs.collect { cp.addClazzpathUnit(it) }
         projectUnits.addAll(classJars.collect { cp.addClazzpathUnit(it) })
@@ -39,16 +38,8 @@ class UnusedTracker {
         }
     }
 
-    static UnusedTracker forProject(Project project, List<Configuration> configurations, DependencyFilter dependencyFilter) {
-        def apiJars = getApiJarsFromProject(project)
-        FileCollection toMinimize = dependencyFilter.resolve(configurations) - apiJars
-
-        final List<File> classDirs = new ArrayList<>()
-        for (SourceSet sourceSet in project.sourceSets) {
-            Iterable<File> classesDirs = sourceSet.output.classesDirs
-            classDirs.addAll(classesDirs.findAll { it.isDirectory() })
-        }
-        return new UnusedTracker(classDirs, apiJars, toMinimize)
+    static UnusedTracker forProject(FileCollection apiJars, Iterable<File> sourceSetsClassesDirs, FileCollection toMinimize) {
+        return new UnusedTracker(sourceSetsClassesDirs, apiJars, toMinimize)
     }
 
     @InputFiles
@@ -71,7 +62,7 @@ class UnusedTracker {
         }
     }
 
-    private static FileCollection getApiJarsFromProject(Project project) {
+    static FileCollection getApiJarsFromProject(Project project) {
         def apiDependencies = project.configurations.asMap['api']?.dependencies ?: null
         if (apiDependencies == null) return project.files()
 
