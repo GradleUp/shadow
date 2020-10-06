@@ -4,6 +4,7 @@
 * [Caleb](https://github.com/MuffinTheMan) - doc updates [#583](https://github.com/johnrengelman/shadow/pull/593)
 * [Schalk W. Cronjé](https://github.com/ysb33r) - log4j version update for CVE-2020-9488 [#590](https://github.com/johnrengelman/shadow/pull/590)
 * [Victor Tso](https://github.com/roxchkplusony) - Input stream handling for large projects [#587](https://github.com/johnrengelman/shadow/pull/587)
+* [Matthew Haughton](https://github.com/3flex) - Implement Task Configuration Avoidance pattern [#597](https://github.com/johnrengelman/shadow/pull/597)
 
 ## v6.0.0 (2020-06-15)
 * Required Gradle 6.0+
