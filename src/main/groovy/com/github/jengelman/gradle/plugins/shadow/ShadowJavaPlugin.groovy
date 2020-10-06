@@ -7,10 +7,9 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer
 import org.gradle.api.artifacts.maven.MavenPom
 import org.gradle.api.attributes.Bundling
-import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Upload
@@ -76,10 +75,13 @@ class ShadowJavaPlugin implements Plugin<Project> {
                 }
             }
             shadow.manifest.inheritFrom project.tasks.jar.manifest
+            def libsProvider = project.provider { -> [project.tasks.jar.manifest.attributes.get('Class-Path')] }
+            def files = project.objects.fileCollection().from { ->
+                project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME)
+            }
             shadow.doFirst {
-                def files = project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME).files
-                if (files) {
-                    def libs = [project.tasks.jar.manifest.attributes.get('Class-Path')]
+                if (!files.empty) {
+                    def libs = libsProvider.get()
                     libs.addAll files.collect { "${it.name}" }
                     manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
                 }

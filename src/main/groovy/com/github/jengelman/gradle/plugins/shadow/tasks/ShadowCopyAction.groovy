@@ -317,12 +317,7 @@ class ShadowCopyAction implements CopyAction {
             if (file.classFile) {
                 ZipEntry zipEntry = setArchiveTimes(new ZipEntry(remapper.mapPath(file) + '.class'))
                 addParentDirectories(new RelativeArchivePath(zipEntry))
-                InputStream is = archive.getInputStream(file.entry)
-                try {
-                    remapClass(is, file.pathString, file.entry.time)
-                } finally {
-                    is.close()
-                }
+                remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
             }
         }
 
@@ -332,6 +327,11 @@ class ShadowCopyAction implements CopyAction {
             }
         }
 
+        /**
+         * Applies remapping to the given class with the specified relocation path. The remapped class is then written
+         * to the zip file. <code>classInputStream</code> is closed automatically to prevent future file leaks.
+         * See #364 and #408.
+         */
         private void remapClass(InputStream classInputStream, String path, long lastModified) {
             InputStream is = classInputStream
             ClassReader cr = new ClassReader(is)
@@ -349,6 +349,8 @@ class ShadowCopyAction implements CopyAction {
                 cr.accept(cv, ClassReader.EXPAND_FRAMES)
             } catch (Throwable ise) {
                 throw new GradleException("Error in ASM processing class " + path, ise)
+            } finally {
+                is.close()
             }
 
             byte[] renamedClass = cw.toByteArray()

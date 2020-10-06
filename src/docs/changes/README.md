@@ -1,4 +1,10 @@
 # Change Log
+## v6.1.0 (2020-10-05)
+* [Tim Yates](https://github.com/timyates), [Benedikt Ritter](https://github.com/britter) - Enable Configuration Caching for Gradle 6.6+ [#591](https://github.com/johnrengelman/shadow/pull/591)
+* [Caleb](https://github.com/MuffinTheMan) - doc updates [#583](https://github.com/johnrengelman/shadow/pull/593)
+* [Schalk W. Cronjé](https://github.com/ysb33r) - log4j version update for CVE-2020-9488 [#590](https://github.com/johnrengelman/shadow/pull/590)
+* [Victor Tso](https://github.com/roxchkplusony) - Input stream handling for large projects [#587](https://github.com/johnrengelman/shadow/pull/587)
+
 ## v6.0.0 (2020-06-15)
 * Required Gradle 6.0+
 * *NEW*: Support for Gradle Metadata publication via the `shadowRuntimeElements` configuration. This is a _beta_ feature

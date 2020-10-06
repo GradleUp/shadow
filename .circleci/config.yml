@@ -13,7 +13,7 @@ jobs:
     steps:
       - checkout
       - run: curl -k -o /tmp/gd_bundle-g2.crt https://certs.godaddy.com/repository/gd_bundle-g2.crt
-      - run: sudo /usr/bin/keytool -importcert -alias gd_bundle-g2 -cacerts -file /tmp/gd_bundle-g2.crt -storepass changeit
+      - run: sudo $JAVA_HOME/bin/keytool -importcert -alias gd_bundle-g2 -cacerts -file /tmp/gd_bundle-g2.crt -storepass changeit
       - restore_cache:
           keys:
             - v1-gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}

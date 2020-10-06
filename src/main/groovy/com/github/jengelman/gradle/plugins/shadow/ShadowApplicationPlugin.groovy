@@ -55,13 +55,11 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
 
     protected void configureJarMainClass(Project project) {
-        ApplicationPluginConvention pluginConvention = (
-                ApplicationPluginConvention) project.convention.plugins.application
-
+        def classNameProvider = project.provider { project.convention.plugins.application.mainClassName }
         jar.configure { jar ->
-            jar.inputs.property('mainClassName', { pluginConvention.mainClassName })
+            jar.inputs.property('mainClassName', classNameProvider)
             jar.doFirst {
-                manifest.attributes 'Main-Class': pluginConvention.mainClassName
+                manifest.attributes 'Main-Class': classNameProvider.get()
             }
         }
     }
@@ -97,7 +95,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
             startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
             startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
-            startScripts.inputs.files jar
+            startScripts.inputs.files project.objects.fileCollection().from { -> jar }
         }
     }
 
