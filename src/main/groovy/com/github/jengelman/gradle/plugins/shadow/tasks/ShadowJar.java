@@ -190,7 +190,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     /**
-     * Configure inclusion/exclusion of module & project dependencies into uber jar.
+     * Configure inclusion/exclusion of module and project dependencies into uber jar.
      *
      * @param c the configuration of the filter
      * @return this
