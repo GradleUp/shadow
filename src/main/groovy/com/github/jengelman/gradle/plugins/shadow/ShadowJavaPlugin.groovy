@@ -22,7 +22,6 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
     static final String SHADOW_UPLOAD_TASK = 'uploadShadow'
-    static final String SHADOW_GROUP = 'Shadow'
 
     private final ProjectConfigurationActionContainer configurationActionContainer;
 
@@ -63,8 +62,8 @@ class ShadowJavaPlugin implements Plugin<Project> {
     protected void configureShadowTask(Project project) {
         JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
         project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
-            shadow.group = SHADOW_GROUP
-            shadow.description = 'Create a combined JAR of project and runtime dependencies'
+            shadow.group = 'distribution'
+            shadow.description = 'Create a JAR combining project and runtime dependencies'
             if (GradleVersion.current() >= GradleVersion.version("5.1")) {
                 shadow.archiveClassifier.set("all")
             } else {
