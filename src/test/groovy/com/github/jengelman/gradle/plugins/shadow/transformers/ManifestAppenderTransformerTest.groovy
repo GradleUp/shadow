@@ -89,6 +89,7 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
         }
 
         def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
+        println(targetLines)
         assertFalse(targetLines.isEmpty())
         assertTrue(targetLines.size() > 4)
 
@@ -124,8 +125,15 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
     }
 
     @Test
-    void testTransformationComposes() {
+    void testTransformationTrimmingTrailingWhitespace() {
+        def sourceLines = getResourceStream(MANIFEST_NAME).readLines()
+        def trimmedContent = sourceLines
+        while (trimmedContent.last().trim().isEmpty()) {
+            trimmedContent.removeLast()
+        }
+
         transformer.with {
+            trimTrailingWhitespace()
             append('Name', 'org/foo/bar/')
             transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
         }
@@ -137,21 +145,12 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
 
         try {
             transformer.modifyOutputStream(zipOutputStream, true)
-            transformer.modifyOutputStream(zipOutputStream, true)
         } finally {
             zipOutputStream.close()
         }
 
         def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
-        assertFalse(targetLines.isEmpty())
-        assertTrue(targetLines.size() > 2)
-
-        def trailer = targetLines.with { subList(size() - 3, size()) }
-        assertEquals(asList(
-                "Name: org/foo/bar/",
-                "Name: org/foo/bar/",
-                ""), trailer
-        )
+        assertEquals(trimmedContent + "Name: org/foo/bar/" + "", targetLines)
     }
 
     static List<String> readFrom(File jarFile, String resourceName) {
