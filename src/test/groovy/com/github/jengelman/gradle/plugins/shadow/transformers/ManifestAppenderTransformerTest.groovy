@@ -89,7 +89,6 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
         }
 
         def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
-        println(targetLines)
         assertFalse(targetLines.isEmpty())
         assertTrue(targetLines.size() > 4)
 
