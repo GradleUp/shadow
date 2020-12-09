@@ -72,7 +72,8 @@ class ManifestAppenderTransformer implements Transformer {
         ZipEntry entry = new ZipEntry(MANIFEST_NAME)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         os.putNextEntry(entry)
-        os.write(manifestContents)
+        os.write(trimTrailingWhitespace(manifestContents))
+        os.write(EOL)
 
         if (!attributes.isEmpty()) {
             for (attribute in attributes) {
@@ -84,5 +85,9 @@ class ManifestAppenderTransformer implements Transformer {
             os.write(EOL)
             attributes.clear()
         }
+    }
+
+    static byte[] trimTrailingWhitespace(byte[] contents) {
+        new String(contents, UTF_8).replaceFirst("\\n++$", "").getBytes(UTF_8)
     }
 }

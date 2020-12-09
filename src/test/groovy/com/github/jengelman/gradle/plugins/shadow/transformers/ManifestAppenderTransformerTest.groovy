@@ -123,6 +123,37 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport {
         assertEquals(sourceLines, targetLines)
     }
 
+    @Test
+    void testTransformationComposes() {
+        transformer.with {
+            append('Name', 'org/foo/bar/')
+            transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
+        }
+
+        def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
+        def fileOutputStream = new FileOutputStream(testableZipFile)
+        def bufferedOutputStream = new BufferedOutputStream(fileOutputStream)
+        def zipOutputStream = new ZipOutputStream(bufferedOutputStream)
+
+        try {
+            transformer.modifyOutputStream(zipOutputStream, true)
+            transformer.modifyOutputStream(zipOutputStream, true)
+        } finally {
+            zipOutputStream.close()
+        }
+
+        def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
+        assertFalse(targetLines.isEmpty())
+        assertTrue(targetLines.size() > 2)
+
+        def trailer = targetLines.with { subList(size() - 3, size()) }
+        assertEquals(asList(
+                "Name: org/foo/bar/",
+                "Name: org/foo/bar/",
+                ""), trailer
+        )
+    }
+
     static List<String> readFrom(File jarFile, String resourceName) {
         def zip = new ZipFile(jarFile)
         try {
