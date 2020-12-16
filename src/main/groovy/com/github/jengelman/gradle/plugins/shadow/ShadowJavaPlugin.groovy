@@ -98,7 +98,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
     private void configureShadowUpload() {
         configurationActionContainer.add(new Action<Project>() {
             void execute(Project project) {
-                project.plugins.withType(MavenPlugin) {
+                project.pluginManager.withPlugin('maven') {
                     project.tasks.withType(Upload).configureEach { upload ->
                         if (upload.name != SHADOW_UPLOAD_TASK) {
                             return

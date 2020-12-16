@@ -10,7 +10,6 @@ import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
-import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
@@ -40,7 +39,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         configureJarMainClass(project)
         configureInstallTask(project)
 
-        project.plugins.withType(MavenPlugin) {
+        project.pluginManager.withPlugin('maven') {
             project.configurations.archives.with {
                 artifacts.findAll {
                     if (it.hasProperty("provider")) {
