@@ -79,7 +79,7 @@ jar {
 }
 ```
 
-Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will revel the following attribute:
+Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the following attribute:
 
 ```property
 Class-Path: /libs/a.jar
