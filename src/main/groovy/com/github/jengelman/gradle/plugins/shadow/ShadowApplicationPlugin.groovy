@@ -10,10 +10,13 @@ import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
+import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.MavenPlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
+import org.gradle.util.GradleVersion
 
 class ShadowApplicationPlugin implements Plugin<Project> {
 
@@ -55,12 +58,21 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
 
     protected void configureJarMainClass(Project project) {
-        def classNameProvider = project.provider { project.convention.plugins.application.mainClassName }
+        def classNameProvider = getMainClass(project)
         jar.configure { jar ->
             jar.inputs.property('mainClassName', classNameProvider)
             jar.doFirst {
                 manifest.attributes 'Main-Class': classNameProvider.get()
             }
+        }
+    }
+
+    private static Provider<String> getMainClass(Project project) {
+        def application = (JavaApplication) project.extensions.application
+        if (GradleVersion.current() >= GradleVersion.version("6.4")) {
+            return application.mainClass.orElse(project.provider { application.mainClassName })
+        } else {
+            return project.provider { application.mainClassName }
         }
     }
 
@@ -91,7 +103,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
             startScripts.group = ApplicationPlugin.APPLICATION_GROUP
             startScripts.classpath = project.files(jar)
-            startScripts.conventionMapping.mainClassName = { pluginConvention.mainClassName }
+            startScripts.conventionMapping.mainClassName = { getMainClass(project).get() }
             startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
             startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
             startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
