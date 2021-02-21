@@ -10,6 +10,7 @@ import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
+import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
@@ -54,13 +55,22 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
 
     protected void configureJarMainClass(Project project) {
-        def classNameProvider = project.provider { project.convention.plugins.application.mainClassName }
+        def classNameProvider = project.provider { getMainClassName() }
         jar.configure { jar ->
             jar.inputs.property('mainClassName', classNameProvider)
             jar.doFirst {
                 manifest.attributes 'Main-Class': classNameProvider.get()
             }
         }
+    }
+
+    private Object getMainClassName() {
+        def mainClassName = project.convention.plugins.application.mainClassName
+        if (Objects.nonNull(mainClassName)) {
+            return mainClassName
+        }
+
+        return project.extensions.getByType(JavaApplication.class).mainClass.get()
     }
 
     protected void addRunTask(Project project) {

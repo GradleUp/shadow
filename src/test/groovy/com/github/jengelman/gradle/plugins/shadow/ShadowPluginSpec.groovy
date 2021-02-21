@@ -1205,6 +1205,48 @@ class ShadowPluginSpec extends PluginSpecification {
         assert result.output.contains('TestApp: Hello World! (foo)')
     }
 
+    @Issue("https://github.com/johnrengelman/shadow/issues/609")
+    def "doesn't error when using application mainClass property"() {
+        given:
+        buildFile.text = defaultBuildScript
+
+        buildFile << """
+            project.ext {
+                aspectjVersion = '1.8.12'
+            }
+
+            apply plugin: 'application'
+
+            application {
+                mainClass.set('myapp.Main')
+            }
+
+            repositories {
+                jcenter()
+            }
+
+            runShadow {
+               args 'foo'
+            }
+
+        """
+
+        file('src/main/java/myapp/Main.java') << """
+            package myapp;
+            public class Main {
+               public static void main(String[] args) {
+                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
+               }
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult result = runner.withArguments('runShadow', '--stacktrace').build()
+
+        then: 'tests that runShadow executed and exited'
+        assert result.output.contains('TestApp: Hello World! (foo)')
+    }
+
     private String escapedPath(File file) {
         file.path.replaceAll('\\\\', '\\\\\\\\')
     }
