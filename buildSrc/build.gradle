@@ -4,6 +4,7 @@ apply plugin: 'groovy'
 
 repositories {
     gradlePluginPortal()
+    mavenCentral()
 }
 
 ScriptHolder holder = new ScriptHolder()
