@@ -31,7 +31,7 @@ class ConfigureShadowRelocation extends DefaultTask {
             configuration.files.each { jar ->
                 JarFile jf = new JarFile(jar)
                 jf.entries().each { entry ->
-                    if (entry.name.endsWith(".class")) {
+                    if (entry.name.endsWith(".class") && entry.name != "module-info.class") {
                         packages << entry.name[0..entry.name.lastIndexOf('/')-1].replaceAll('/', '.')
                     }
                 }
