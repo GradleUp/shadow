@@ -105,7 +105,11 @@ class ShadowJavaPlugin implements Plugin<Project> {
                         }
                         upload.configuration = project.configurations.shadow
                         MavenPom pom = upload.repositories.mavenDeployer.pom
+                        if (project.configurations.findByName("api")) {
+                            pom.scopeMappings.mappings.remove(project.configurations.api)
+                        }
                         pom.scopeMappings.mappings.remove(project.configurations.compile)
+                        pom.scopeMappings.mappings.remove(project.configurations.implementation)
                         pom.scopeMappings.mappings.remove(project.configurations.runtime)
                         pom.scopeMappings.addMapping(MavenPlugin.RUNTIME_PRIORITY, project.configurations.shadow, Conf2ScopeMappingContainer.RUNTIME)
                     }

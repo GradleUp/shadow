@@ -74,6 +74,53 @@ class PublishingSpec extends PluginSpecification {
         assert dependency.version.text() == '1.0'
     }
 
+    def "exclude api and implementation dependencies when publishing shadow jar with maven plugin"() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('a2.properties', 'a2')
+                .publish()
+        repo.module('shadow', 'b', '1.0')
+                .insertFile('b.properties', 'b')
+                .publish()
+
+        settingsFile << "rootProject.name = 'maven'"
+        buildFile << """
+            apply plugin: 'java-library'
+            apply plugin: 'maven'
+
+            dependencies {
+               api 'shadow:a:1.0'
+               implementation 'shadow:b:1.0'
+            }
+            
+            uploadShadow {
+               repositories {
+                   mavenDeployer {
+                       repository(url: "${publishingRepo.uri}")
+                   }
+               }
+            }
+        """.stripIndent()
+
+        when:
+        runner.withArguments('uploadShadow').build()
+
+        then: 'Check that shadow artifact exists'
+        File publishedFile = publishingRepo.rootDir.file('shadow/maven/1.0/maven-1.0-all.jar').canonicalFile
+        assert publishedFile.exists()
+
+        and: 'Check contents of shadow artifact'
+        contains(publishedFile, ['a.properties', 'a2.properties'])
+
+        and: 'Check that shadow artifact pom exists and contents'
+        File pom = publishingRepo.rootDir.file('shadow/maven/1.0/maven-1.0.pom').canonicalFile
+        assert pom.exists()
+
+        def contents = new XmlSlurper().parse(pom)
+        assert contents.dependencies.size() == 0
+    }
+
     @Issue('SHADOW-347')
     def "maven install with application plugin"() {
         given:
