@@ -12,7 +12,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 ```groovy no-run
 buildscript {
     repositories {
-        jcenter()
+        gradlePluginPortal()
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:@version@'
