@@ -294,7 +294,7 @@ class RelocationSpec extends PluginSpecification {
         given:
         buildFile << """
             repositories {
-                jcenter()
+                mavenCentral()
                 maven {
                     url 'https://repository.mapr.com/nexus/content/groups/mapr-public/releases'
                 }

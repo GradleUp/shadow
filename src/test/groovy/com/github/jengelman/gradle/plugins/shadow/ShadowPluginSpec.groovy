@@ -1181,7 +1181,7 @@ class ShadowPluginSpec extends PluginSpecification {
             mainClassName = 'myapp.Main'
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             runShadow {
@@ -1223,7 +1223,7 @@ class ShadowPluginSpec extends PluginSpecification {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             runShadow {

@@ -20,7 +20,7 @@ group = 'shadow'
 
 repositories {
     mavenLocal()
-    jcenter()
+    mavenCentral()
 }
 """
     }
