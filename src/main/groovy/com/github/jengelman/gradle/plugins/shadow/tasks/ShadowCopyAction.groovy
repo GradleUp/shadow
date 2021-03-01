@@ -323,7 +323,12 @@ class ShadowCopyAction implements CopyAction {
 
         private void remapClass(FileCopyDetails fileCopyDetails) {
             if (FilenameUtils.getExtension(fileCopyDetails.name) == 'class') {
-                remapClass(fileCopyDetails.file.newInputStream(), fileCopyDetails.path, fileCopyDetails.lastModified)
+                InputStream is = fileCopyDetails.file.newInputStream()
+                try {
+                    remapClass(is, fileCopyDetails.path, fileCopyDetails.lastModified)
+                } finally {
+                    is.close()
+                }
             }
         }
 
