@@ -21,6 +21,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
 
 /**
  * A resource processor that prevents the inclusion of an arbitrary
@@ -31,6 +32,7 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 class DontIncludeResourceTransformer implements Transformer {
+    @Input
     String resource
 
     boolean canTransformResource(FileTreeElement element) {

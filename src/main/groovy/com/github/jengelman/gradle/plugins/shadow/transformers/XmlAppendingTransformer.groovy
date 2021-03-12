@@ -23,6 +23,8 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.jdom2.Attribute
 import org.jdom2.Content
 import org.jdom2.Document
@@ -34,7 +36,6 @@ import org.jdom2.output.XMLOutputter
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
-
 /**
  * Appends multiple occurrences of some XML file.
  * <p>
@@ -46,10 +47,14 @@ import org.xml.sax.SAXException
 class XmlAppendingTransformer implements Transformer {
     static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 
+    @Input
     boolean ignoreDtd = true
 
+    @Optional
+    @Input
     String resource
 
+    @Internal
     Document doc
 
     boolean canTransformResource(FileTreeElement element) {
@@ -111,10 +116,5 @@ class XmlAppendingTransformer implements Transformer {
         new XMLOutputter(Format.getPrettyFormat()).output(doc, os)
 
         doc = null
-    }
-
-    @Input
-    String getResource() {
-        return resource
     }
 }

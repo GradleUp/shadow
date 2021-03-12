@@ -23,6 +23,8 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.codehaus.plexus.util.IOUtil
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 
 import static groovy.lang.Closure.IDENTITY
 
@@ -116,13 +118,20 @@ class PropertiesFileTransformer implements Transformer {
     private static final String PROPERTIES_SUFFIX = '.properties'
 
     // made public for testing
+    @Internal
     Map<String, Properties> propertiesEntries = [:]
 
     // Transformer properties
+    @Input
     List<String> paths = []
+    @Input
     Map<String, Map<String, String>> mappings = [:]
+    @Input
     String mergeStrategy = 'first' // latest, append
+    @Input
     String mergeSeparator = ','
+    // Gradle can't track the implementation for this closure
+    @Internal
     Closure<String> keyTransformer = IDENTITY
 
     @Override

@@ -21,9 +21,13 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.codehaus.plexus.util.IOUtil
-
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 /**
  * A resource processor that allows the addition of an arbitrary file
  * content into the shaded JAR.
@@ -32,24 +36,33 @@ import org.codehaus.plexus.util.IOUtil
  *
  * @author John Engelman
  */
-public class IncludeResourceTransformer implements Transformer {
+class IncludeResourceTransformer implements Transformer {
     File file
 
+    @Optional
+    @PathSensitive(PathSensitivity.NONE)
+    @InputFile
+    File getFile() {
+        file?.exists() ? file : null
+    }
+
+    @Optional
+    @Input
     String resource
 
-    public boolean canTransformResource(FileTreeElement element) {
+    boolean canTransformResource(FileTreeElement element) {
         return false
     }
 
-    public void transform(TransformerContext context) {
+    void transform(TransformerContext context) {
         // no op
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return file != null ? file.exists() : false
     }
 
-    public void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         ZipEntry entry = new ZipEntry(resource)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         os.putNextEntry(entry)

@@ -22,13 +22,14 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.codehaus.plexus.util.IOUtil
 import org.codehaus.plexus.util.ReaderFactory
 import org.codehaus.plexus.util.WriterFactory
 import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Internal
 
 /**
  * A resource processor that aggregates plexus <code>components.xml</code> files.
@@ -129,6 +130,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
         return !components.isEmpty()
     }
 
+    @Internal
     byte[] getTransformedResource()
     throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024 * 4)

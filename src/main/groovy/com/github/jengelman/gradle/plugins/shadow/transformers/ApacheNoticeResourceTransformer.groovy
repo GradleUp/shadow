@@ -23,6 +23,9 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.StringUtils
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 
 import java.text.SimpleDateFormat
 
@@ -34,34 +37,48 @@ import java.text.SimpleDateFormat
  * @author John Engelman
  */
 class ApacheNoticeResourceTransformer implements Transformer {
+    @Internal
     Set<String> entries = new LinkedHashSet<String>()
 
+    @Internal
     Map<String, Set<String>> organizationEntries = new LinkedHashMap<String, Set<String>>()
 
+    @Input
     String projectName = "" // MSHADE-101 :: NullPointerException when projectName is missing
 
+    @Input
     boolean addHeader = true
 
+    @Input
     String preamble1 = "// ------------------------------------------------------------------\n" +
             "// NOTICE file corresponding to the section 4d of The Apache License,\n" +
             "// Version 2.0, in this case for "
 
+    @Input
     String preamble2 = "\n// ------------------------------------------------------------------\n"
 
+    @Input
     String preamble3 = "This product includes software developed at\n"
 
     //defaults overridable via config in pom
+    @Input
     String organizationName = "The Apache Software Foundation"
 
+    @Input
     String organizationURL = "http://www.apache.org/"
 
+    @Input
     String inceptionYear = "2006"
 
+    @Optional
+    @Input
     String copyright
 
     /**
      * The file encoding of the <code>NOTICE</code> file.
      */
+    @Optional
+    @Input
     String encoding
 
     private static final String NOTICE_PATH = "META-INF/NOTICE"
