@@ -32,13 +32,14 @@ class PublishingSpec extends PluginSpecification {
             apply plugin: 'maven'
 
             dependencies {
-               compile 'shadow:a:1.0'
+               implementation 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
             }
             
             shadowJar {
-               baseName = 'maven-all'
-               classifier = null
+               archiveBaseName = 'maven-all'
+               archiveClassifier = null
+               archiveClassifier.convention(null)
             }
             
             uploadShadow {
@@ -51,7 +52,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('uploadShadow')
+        runWithDeprecationWarnings('uploadShadow')
 
         then: 'Check that shadow artifact exists'
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
@@ -104,7 +105,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('uploadShadow')
+        runWithDeprecationWarnings('uploadShadow')
 
         then: 'Check that shadow artifact exists'
         File publishedFile = publishingRepo.rootDir.file('shadow/maven/1.0/maven-1.0-all.jar').canonicalFile
@@ -140,13 +141,14 @@ class PublishingSpec extends PluginSpecification {
             mainClassName = 'my.App'
 
             dependencies {
-               compile 'shadow:a:1.0'
+               implementation 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
             }
         """.stripIndent()
 
         when:
-        runWithDebug('install')
+        // The Maven plugin is deprecated
+        runWithDeprecationWarnings('install')
 
         then:
         noExceptionThrown()
@@ -167,13 +169,13 @@ class PublishingSpec extends PluginSpecification {
             apply plugin: 'maven-publish'
 
             dependencies {
-               compile 'shadow:a:1.0'
+               implementation 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
             }
             
             shadowJar {
-               classifier = ''
-               baseName = 'maven-all'
+               archiveClassifier = ''
+               archiveBaseName = 'maven-all'
             }
             
             publishing {
@@ -269,13 +271,13 @@ class PublishingSpec extends PluginSpecification {
             }
             
             dependencies {
-                compile project(':a')
+                implementation project(':a')
                 shadow project(':b')
             }
 
             shadowJar {
-               classifier = ''
-               baseName = 'maven-all'
+               archiveClassifier = ''
+               archiveBaseName = 'maven-all'
             }
             
             publishing {
@@ -328,8 +330,8 @@ class PublishingSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'maven-publish'
             dependencies {
-               compile 'shadow:a:1.0'
-               compile 'shadow:b:1.0'
+               implementation 'shadow:a:1.0'
+               implementation 'shadow:b:1.0'
                shadow 'shadow:b:1.0'
             }
             group = 'com.acme'
@@ -391,14 +393,13 @@ class PublishingSpec extends PluginSpecification {
         def apiVariant = gmmContents.variants.find { it.name == 'apiElements' }
         apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_API
         apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.EXTERNAL
-        apiVariant.dependencies.size() == 2
-        apiVariant.dependencies.module as Set == ['a', 'b'] as Set
+        !apiVariant.dependencies
 
         def runtimeVariant = gmmContents.variants.find { it.name == 'runtimeElements' }
         runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
         runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.EXTERNAL
         runtimeVariant.dependencies.size() == 2
-        apiVariant.dependencies.module as Set == ['a', 'b'] as Set
+        runtimeVariant.dependencies.module as Set == ['a', 'b'] as Set
 
         def shadowRuntimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
         shadowRuntimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME

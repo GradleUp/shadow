@@ -64,6 +64,11 @@ class PluginSpecification extends Specification {
         run(tasks.toList())
     }
 
+    BuildResult runWithDeprecationWarnings(String... tasks) {
+        def result = runner(tasks.toList()).build()
+        return result
+    }
+
     BuildResult run(List<String> tasks) {
         def result = runner(tasks).build()
         assertNoDeprecationWarnings(result)
