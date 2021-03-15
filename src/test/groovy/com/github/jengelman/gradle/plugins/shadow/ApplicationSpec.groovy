@@ -52,7 +52,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        BuildResult result = runner.withArguments('runShadow', '--stacktrace').build()
+        BuildResult result = run('runShadow', '--stacktrace')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -114,7 +114,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.withArguments('shadowDistZip', '--stacktrace').build()
+        run('shadowDistZip', '--stacktrace')
 
         then: 'Check that the distribution zip was created'
         File zip = getFile('build/distributions/myapp-shadow-1.0.zip')
@@ -164,7 +164,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.withArguments(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME).build()
+        run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
         then: 'Check that the proper jar file was installed'
         File installedJar = getFile('build/install/myapp-shadow/lib/myapp-1.0-all.jar')

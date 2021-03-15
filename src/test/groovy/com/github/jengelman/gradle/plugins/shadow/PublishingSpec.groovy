@@ -51,7 +51,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('uploadShadow').build()
+        run('uploadShadow')
 
         then: 'Check that shadow artifact exists'
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
@@ -104,7 +104,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('uploadShadow').build()
+        run('uploadShadow')
 
         then: 'Check that shadow artifact exists'
         File publishedFile = publishingRepo.rootDir.file('shadow/maven/1.0/maven-1.0-all.jar').canonicalFile
@@ -146,7 +146,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('install').withDebug(true).build()
+        runWithDebug('install')
 
         then:
         noExceptionThrown()
@@ -192,7 +192,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('publish').build()
+        run('publish')
 
         then:
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
@@ -289,7 +289,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        runner.withArguments('publish').build()
+        run('publish')
 
         then:
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
@@ -349,7 +349,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('publish').build()
+        run('publish')
 
         then:
         File mainJar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.jar').canonicalFile

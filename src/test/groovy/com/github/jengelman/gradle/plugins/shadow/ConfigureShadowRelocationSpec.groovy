@@ -21,7 +21,7 @@ class ConfigureShadowRelocationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar', '-s').build()
+        run('shadowJar', '-s')
 
         then:
         then:

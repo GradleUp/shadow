@@ -40,7 +40,7 @@ class TransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -80,7 +80,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-            runner.withArguments('shadowJar').build()
+            run('shadowJar')
 
         then:
             assert output.exists()
@@ -120,7 +120,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -175,7 +175,7 @@ com.mysql.jdbc.Driver'''.stripIndent())
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -223,7 +223,7 @@ org.mortbay.log.Factory'''.stripIndent()
         """.stripIndent()
 
         when:
-            runner.withArguments('shadowJar').build()
+            run('shadowJar')
 
         then:
             assert output.exists()
@@ -260,7 +260,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
                 'three # NOTE: No newline terminates this line/file'
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -296,7 +296,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -329,7 +329,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -365,7 +365,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -409,7 +409,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -461,7 +461,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -508,7 +508,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('jar', 'shadowJar').build()
+        run('jar', 'shadowJar')
 
         then:
         File jar = getFile('build/libs/shadow-1.0.jar')
@@ -568,7 +568,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        runner.withArguments('jar', 'shadowJar').build()
+        run('jar', 'shadowJar')
 
         then:
         File jar = getFile('build/libs/shadow-1.0.jar')
@@ -627,7 +627,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             """.stripIndent()
 
         when:
-            runner.withArguments('shadowJar').build()
+            run('shadowJar')
 
         then:
             assert output.exists()
@@ -669,7 +669,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             """.stripIndent()
 
         when:
-            runner.withArguments('shadowJar').build()
+            run('shadowJar')
 
         then:
             assert output.exists()

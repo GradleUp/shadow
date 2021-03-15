@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.util
 import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import com.google.common.base.StandardSystemProperty
 import org.codehaus.plexus.util.IOUtil
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -59,12 +60,33 @@ class PluginSpecification extends Specification {
                 .withPluginClasspath()
     }
 
-    GradleRunner runner(String... tasks) {
-        runner(tasks.toList())
+    BuildResult run(String... tasks) {
+        run(tasks.toList())
+    }
+
+    BuildResult run(List<String> tasks) {
+        def result = runner(tasks).build()
+        assertNoDeprecationWarnings(result)
+        return result
+    }
+
+    BuildResult runWithDebug(String... tasks) {
+        def result = runner(tasks.toList()).withDebug(true).build()
+        assertNoDeprecationWarnings(result)
+        return result
     }
 
     GradleRunner runner(Collection<String> tasks) {
         runner.withArguments(["-Dorg.gradle.warning.mode=all"] + tasks.toList())
+    }
+
+    boolean containsDeprecationWarning(BuildResult result) {
+        result.output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
+                result.output.contains("has been deprecated. This is scheduled to be removed in Gradle")
+    }
+
+    void assertNoDeprecationWarnings(BuildResult result) {
+//        assert !containsDeprecationWarning(result)
     }
 
     File getLocalRepo() {
