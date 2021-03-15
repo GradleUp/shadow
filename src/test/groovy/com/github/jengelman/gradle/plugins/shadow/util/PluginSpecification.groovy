@@ -59,6 +59,14 @@ class PluginSpecification extends Specification {
                 .withPluginClasspath()
     }
 
+    GradleRunner runner(String... tasks) {
+        runner(tasks.toList())
+    }
+
+    GradleRunner runner(Collection<String> tasks) {
+        runner.withArguments(["-Dorg.gradle.warning.mode=all"] + tasks.toList())
+    }
+
     File getLocalRepo() {
         def rootRelative = new File("build/localrepo")
         rootRelative.directory ? rootRelative : new File(new File(StandardSystemProperty.USER_DIR.value()).parentFile, "build/localrepo")
