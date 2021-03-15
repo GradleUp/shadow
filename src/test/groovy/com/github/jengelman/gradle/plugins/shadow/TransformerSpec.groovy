@@ -1,11 +1,20 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.DontIncludeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.IncludeResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import spock.lang.Issue
+import spock.lang.Unroll
 
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -682,6 +691,40 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             assert props.getProperty('moduleVersion') == '1.0.0'
             assert props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
             assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
+    }
+
+    @Unroll
+    def "#transformerClass.simpleName transformer has no deprecation warnings"() {
+        given:
+        buildFile << """
+            shadowJar {
+                transform(${transformerClass.name}) {
+                    $configuration
+                }
+            }            
+        """
+
+        when:
+        run('jar', 'shadowJar')
+
+        then:
+        output.exists()
+
+        where:
+        transformerClass                  | configuration
+        AppendingTransformer              | 'resource = "some/excluded.txt"'
+        DontIncludeResourceTransformer    | 'resource = "some/excluded.txt"'
+        ManifestAppenderTransformer       | ''
+        ApacheNoticeResourceTransformer   | ''
+        ApacheLicenseResourceTransformer  | ''
+        ComponentsXmlResourceTransformer  | ''
+        Log4j2PluginsCacheFileTransformer | ''
+        GroovyExtensionModuleTransformer  | ''
+        PropertiesFileTransformer         | ''
+        ServiceFileTransformer            | ''
+        IncludeResourceTransformer        | ''
+        XmlAppendingTransformer           | ''
+        // ManifestResourceTransformer seems to always produce an NPE, so I am not testing it here.
     }
 
     private String escapedPath(File file) {
