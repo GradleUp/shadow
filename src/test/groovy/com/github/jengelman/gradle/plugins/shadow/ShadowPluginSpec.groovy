@@ -140,13 +140,14 @@ class ShadowPluginSpec extends PluginSpecification {
         '''.stripIndent()
 
         buildFile << """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
 
             // tag::rename[]
             shadowJar {
-               baseName = 'shadow'
-               classifier = null
-               version = null
+               archiveBaseName = 'shadow'
+               archiveClassifier = null
+               archiveVersion = null
+               archiveVersion.convention(null)
             }
             // end::rename[]
         """.stripIndent()
