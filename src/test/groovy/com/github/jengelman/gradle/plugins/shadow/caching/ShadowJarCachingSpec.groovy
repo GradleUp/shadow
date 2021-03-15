@@ -65,7 +65,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         when:
         changeConfigurationTo """
             shadowJar {
-                baseName = "foo"
+                archiveBaseName = "foo"
                 from('${artifact.path}')
                 from('${project.path}')
             }
