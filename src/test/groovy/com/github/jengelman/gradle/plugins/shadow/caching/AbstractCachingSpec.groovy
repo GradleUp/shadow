@@ -35,7 +35,7 @@ abstract class AbstractCachingSpec extends PluginSpecification {
     BuildResult runWithCacheEnabled(String... arguments) {
         List<String> cacheArguments = [ '--build-cache' ]
         cacheArguments.addAll(arguments)
-        return runner(cacheArguments).build()
+        return run(cacheArguments)
     }
 
     BuildResult runInAlternateDirWithCacheEnabled(String... arguments) {
@@ -58,12 +58,6 @@ abstract class AbstractCachingSpec extends PluginSpecification {
     void assertShadowJarHasResult(TaskOutcome expectedOutcome) {
         def result = runWithCacheEnabled(shadowJarTask)
         assert result.task(shadowJarTask).outcome == expectedOutcome
-        assert !containsDeprecationWarning(result.output)
-    }
-
-    boolean containsDeprecationWarning(String output) {
-        output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
-                output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
 
     void assertShadowJarHasResultInAlternateDir(TaskOutcome expectedOutcome) {
