@@ -20,7 +20,7 @@ abstract class AbstractCachingSpec extends PluginSpecification {
         // test and we won't accidentally use cached outputs from a different test or a different build.
         settingsFile << """
             buildCache {
-                local(DirectoryBuildCache) {
+                local {
                     directory = new File(rootDir, 'build-cache')
                 }
             }
