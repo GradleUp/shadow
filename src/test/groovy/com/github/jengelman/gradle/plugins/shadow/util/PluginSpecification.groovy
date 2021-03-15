@@ -86,7 +86,7 @@ class PluginSpecification extends Specification {
     }
 
     void assertNoDeprecationWarnings(BuildResult result) {
-//        assert !containsDeprecationWarning(result)
+        assert !containsDeprecationWarning(result)
     }
 
     File getLocalRepo() {
