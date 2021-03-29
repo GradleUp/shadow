@@ -85,13 +85,15 @@ class PluginSpecification extends Specification {
         runner.withArguments(["-Dorg.gradle.warning.mode=all"] + tasks.toList())
     }
 
-    boolean containsDeprecationWarning(BuildResult result) {
-        result.output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
-                result.output.contains("has been deprecated. This is scheduled to be removed in Gradle")
+    void assertNoDeprecationWarnings(BuildResult result) {
+        result.output.eachLine {
+            assert !containsDeprecationWarning(it)
+        }
     }
 
-    void assertNoDeprecationWarnings(BuildResult result) {
-        assert !containsDeprecationWarning(result)
+    private static boolean containsDeprecationWarning(String output) {
+        output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
+                output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
 
     File getLocalRepo() {
@@ -170,7 +172,7 @@ class PluginSpecification extends Specification {
         return new File(this.class.classLoader.getResource(name).toURI())
     }
 
-    public static File getTestKitDir() {
+    static File getTestKitDir() {
         def gradleUserHome = System.getenv("GRADLE_USER_HOME")
         if (!gradleUserHome) {
             gradleUserHome = new File(System.getProperty("user.home"), ".gradle").absolutePath
