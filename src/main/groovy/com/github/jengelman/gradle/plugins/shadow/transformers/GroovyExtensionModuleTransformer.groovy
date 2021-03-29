@@ -21,8 +21,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.codehaus.plexus.util.IOUtil
+import org.gradle.api.file.FileTreeElement
 
 /**
  * Modified from eu.appsatori.gradle.fatjar.tasks.PrepareFiles.groovy

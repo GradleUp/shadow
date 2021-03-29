@@ -20,7 +20,10 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipOutputStream
+import org.codehaus.plexus.util.StringUtils
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 
 /**
  * A resource processor that prevents the inclusion of an arbitrary
@@ -31,11 +34,14 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 class DontIncludeResourceTransformer implements Transformer {
+
+    @Optional
+    @Input
     String resource
 
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
-        if (path.endsWith(resource)) {
+        if (StringUtils.isNotEmpty(resource) && path.endsWith(resource)) {
             return true
         }
 

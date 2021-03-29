@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import spock.lang.Issue
+import spock.lang.Unroll
 
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
@@ -597,7 +598,7 @@ two # NOTE: No newline terminates this line/file
         jis?.close()
         jis2?.close()
     }
-    
+
     def 'Groovy extension module transformer'() {
         given:
             def one = buildJar('one.jar')
@@ -682,6 +683,46 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             assert props.getProperty('moduleVersion') == '1.0.0'
             assert props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
             assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
+    }
+
+    @Unroll
+    def '#transformer should not have deprecated behaviours'() {
+        given:
+        if (configuration.contains('test/some.file')) {
+            file('test/some.file') << 'some content'
+        }
+        buildFile << """
+            import com.github.jengelman.gradle.plugins.shadow.transformers.${transformer}
+
+            shadowJar {
+                transform(${transformer})${configuration}
+            }
+        """.stripIndent()
+
+        when:
+        def result = runner.withArguments('shadowJar', '--warning-mode=all', '--stacktrace').build()
+
+        then:
+        assert output.exists()
+        if (result.getOutput()) {
+            result.getOutput().eachLine { assert !it.contains('This behaviour has been deprecated') }
+        }
+
+        where:
+        transformer                         | configuration
+        'ApacheLicenseResourceTransformer'  | ''
+        'ApacheNoticeResourceTransformer'   | ''
+        'AppendingTransformer'              | ''
+        'ComponentsXmlResourceTransformer'  | ''
+        'DontIncludeResourceTransformer'    | ''
+        'GroovyExtensionModuleTransformer'  | ''
+        'IncludeResourceTransformer'        | '{ resource = "test.file"; file = file("test/some.file") }'
+        'Log4j2PluginsCacheFileTransformer' | ''
+        'ManifestAppenderTransformer'       | ''
+        // 'ManifestResourceTransformer'       | ''
+        'PropertiesFileTransformer'         | '{ keyTransformer = { it.toLowerCase() } }'
+        'ServiceFileTransformer'            | ''
+        'XmlAppendingTransformer'           | ''
     }
 
     private String escapedPath(File file) {

@@ -21,11 +21,15 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.codehaus.plexus.util.IOUtil
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 
-import java.util.jar.*
+import java.util.jar.Attributes
 import java.util.jar.Attributes.Name
+import java.util.jar.JarFile
+import java.util.jar.Manifest
 
 /**
  * A resource processor that allows the arbitrary addition of attributes to
@@ -39,9 +43,13 @@ import java.util.jar.Attributes.Name
 class ManifestResourceTransformer implements Transformer {
 
     // Configuration
-    private String mainClass
+    @Optional
+    @Input
+    String mainClass
 
-    private Map<String, Attributes> manifestEntries
+    @Optional
+    @Input
+    Map<String, Attributes> manifestEntries
 
     // Fields
     private boolean manifestDiscovered

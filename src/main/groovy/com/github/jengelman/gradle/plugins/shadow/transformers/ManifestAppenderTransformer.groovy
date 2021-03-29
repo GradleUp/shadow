@@ -23,9 +23,10 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
 
-import static java.nio.charset.StandardCharsets.*
-import static java.util.jar.JarFile.*
+import static java.nio.charset.StandardCharsets.UTF_8
+import static java.util.jar.JarFile.MANIFEST_NAME
 
 /**
  * A resource processor that can append arbitrary attributes to the first MANIFEST.MF
@@ -42,6 +43,7 @@ class ManifestAppenderTransformer implements Transformer {
     private byte[] manifestContents = []
     private final List<Tuple2<String, ? extends Comparable<?>>> attributes = []
 
+    @Input
     List<Tuple2<String, ? extends Comparable<?>>> getAttributes() { attributes }
 
     ManifestAppenderTransformer append(String name, Comparable<?> value) {

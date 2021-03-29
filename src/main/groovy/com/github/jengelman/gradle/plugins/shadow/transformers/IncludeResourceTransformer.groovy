@@ -21,8 +21,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.codehaus.plexus.util.IOUtil
+import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 
 /**
  * A resource processor that allows the addition of an arbitrary file
@@ -33,8 +37,12 @@ import org.codehaus.plexus.util.IOUtil
  * @author John Engelman
  */
 public class IncludeResourceTransformer implements Transformer {
+
+    @InputFile
+    @PathSensitive(PathSensitivity.NONE)
     File file
 
+    @Input
     String resource
 
     public boolean canTransformResource(FileTreeElement element) {
