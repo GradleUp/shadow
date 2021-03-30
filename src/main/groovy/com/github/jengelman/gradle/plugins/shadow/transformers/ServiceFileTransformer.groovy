@@ -107,7 +107,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
         }
 
         public void append( InputStream is ) throws IOException {
-            if ( count > 0 && buf[count - 1] != '\n' && buf[count - 1] != '\r' ) {
+            if ( super.count > 0 && super.buf[super.count - 1] != '\n' && super.buf[super.count - 1] != '\r' ) {
                 byte[] newline = '\n'.bytes
                 write(newline, 0, newline.length)
             }
@@ -115,7 +115,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
         }
 
         public InputStream toInputStream() {
-            return new ByteArrayInputStream( buf, 0, count )
+            return new ByteArrayInputStream( super.buf, 0, super.count )
         }
     }
 
