@@ -23,6 +23,7 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.jdom2.Attribute
 import org.jdom2.Content
 import org.jdom2.Document
@@ -46,11 +47,14 @@ import org.xml.sax.SAXException
 class XmlAppendingTransformer implements Transformer {
     static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 
+    @Input
     boolean ignoreDtd = true
 
+    @Optional
+    @Input
     String resource
 
-    Document doc
+    private Document doc
 
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
@@ -111,10 +115,5 @@ class XmlAppendingTransformer implements Transformer {
         new XMLOutputter(Format.getPrettyFormat()).output(doc, os)
 
         doc = null
-    }
-
-    @Input
-    String getResource() {
-        return resource
     }
 }

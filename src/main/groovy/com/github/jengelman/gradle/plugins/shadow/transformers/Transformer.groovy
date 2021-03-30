@@ -20,7 +20,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.Named
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Internal
 
 /**
  * Modified from org.apache.maven.plugins.shade.resource.ResourceTransformer.java
@@ -29,13 +31,18 @@ import org.gradle.api.file.FileTreeElement
  * @author Charlie Knudsen
  * @author John Engelman
  */
-interface Transformer {
+trait Transformer implements Named {
 
-    boolean canTransformResource(FileTreeElement element)
+    abstract boolean canTransformResource(FileTreeElement element)
 
-    void transform(TransformerContext context)
+    abstract void transform(TransformerContext context)
 
-    boolean hasTransformedResource()
+    abstract boolean hasTransformedResource()
 
-    void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps)
+    abstract void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps)
+
+    @Internal
+    String getName() {
+        return getClass().simpleName
+    }
 }
