@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.util
 import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import com.google.common.base.StandardSystemProperty
 import org.codehaus.plexus.util.IOUtil
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -57,6 +58,42 @@ class PluginSpecification extends Specification {
                 .withProjectDir(dir.root)
                 .forwardOutput()
                 .withPluginClasspath()
+    }
+
+    BuildResult run(String... tasks) {
+        run(tasks.toList())
+    }
+
+    BuildResult runWithDeprecationWarnings(String... tasks) {
+        def result = runner(tasks.toList()).build()
+        return result
+    }
+
+    BuildResult run(List<String> tasks) {
+        def result = runner(tasks).build()
+        assertNoDeprecationWarnings(result)
+        return result
+    }
+
+    BuildResult runWithDebug(String... tasks) {
+        def result = runner(tasks.toList()).withDebug(true).build()
+        assertNoDeprecationWarnings(result)
+        return result
+    }
+
+    GradleRunner runner(Collection<String> tasks) {
+        runner.withArguments(["-Dorg.gradle.warning.mode=all"] + tasks.toList())
+    }
+
+    void assertNoDeprecationWarnings(BuildResult result) {
+        result.output.eachLine {
+            assert !containsDeprecationWarning(it)
+        }
+    }
+
+    private static boolean containsDeprecationWarning(String output) {
+        output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
+                output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
 
     File getLocalRepo() {
@@ -135,7 +172,7 @@ class PluginSpecification extends Specification {
         return new File(this.class.classLoader.getResource(name).toURI())
     }
 
-    public static File getTestKitDir() {
+    static File getTestKitDir() {
         def gradleUserHome = System.getenv("GRADLE_USER_HOME")
         if (!gradleUserHome) {
             gradleUserHome = new File(System.getProperty("user.home"), ".gradle").absolutePath

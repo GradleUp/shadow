@@ -4,7 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Issue
 
 class FilteringSpec extends PluginSpecification {
@@ -29,7 +28,7 @@ class FilteringSpec extends PluginSpecification {
 
     def 'include all dependencies'() {
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'a2.properties', 'b.properties'])
@@ -46,7 +45,7 @@ class FilteringSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'b.properties'])
@@ -80,7 +79,7 @@ class FilteringSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
@@ -115,7 +114,7 @@ class FilteringSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
@@ -149,7 +148,7 @@ class FilteringSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
@@ -161,7 +160,7 @@ class FilteringSpec extends PluginSpecification {
         buildFile.text = buildFile.text.replace('exclude(dependency(\'shadow:d:1.0\'))',
                                                 'exclude(dependency(\'shadow:c:1.0\'))')
 
-        BuildResult result = runner.withArguments('shadowJar').build()
+        BuildResult result = run('shadowJar')
 
         then:
         assert result.task(':shadowJar').outcome == TaskOutcome.SUCCESS
@@ -198,7 +197,7 @@ class FilteringSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
@@ -213,7 +212,7 @@ class FilteringSpec extends PluginSpecification {
             }
         '''.stripIndent()
 
-        BuildResult result = runner.withArguments('shadowJar').build()
+        BuildResult result = run('shadowJar')
 
         then:
         assert result.task(':shadowJar').outcome == TaskOutcome.SUCCESS
@@ -253,7 +252,7 @@ class FilteringSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['d.properties', 'shadow/Passed.class'])
@@ -305,7 +304,7 @@ class FilteringSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-1.0-all.jar')
 
         when:
-        runner.withArguments(':server:shadowJar').build()
+        run(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -359,7 +358,7 @@ class FilteringSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-1.0-all.jar')
 
         when:
-        runner.withArguments(':server:shadowJar').build()
+        run(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -387,7 +386,7 @@ class FilteringSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'b.properties'])
@@ -421,7 +420,7 @@ class FilteringSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        runner.withArguments('shadowJar').build()
+        run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])

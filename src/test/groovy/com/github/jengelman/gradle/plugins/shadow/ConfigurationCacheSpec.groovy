@@ -49,8 +49,8 @@ class ConfigurationCacheSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        runner.withArguments('--configuration-cache', 'shadowJar').build()
-        def result = runner.withArguments('--configuration-cache', 'shadowJar').build()
+        run('--configuration-cache', 'shadowJar')
+        def result = run('--configuration-cache', 'shadowJar')
 
         then:
         result.output.contains("Reusing configuration cache.")
@@ -65,9 +65,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runner.withArguments('--configuration-cache', 'shadowJar').build()
+        run('--configuration-cache', 'shadowJar')
         output.delete()
-        def result = runner.withArguments('--configuration-cache', 'shadowJar').build()
+        def result = run('--configuration-cache', 'shadowJar')
 
         then:
         contains(output, ['a.properties', 'b.properties'])
@@ -117,9 +117,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         def output = getFile('server/build/libs/server-all.jar')
 
         when:
-        runner.withArguments('--configuration-cache', 'shadowJar', '-s').build()
+        run('--configuration-cache', 'shadowJar', '-s')
         output.delete()
-        def result = runner.withArguments('--configuration-cache', 'shadowJar', '-s').build()
+        def result = run('--configuration-cache', 'shadowJar', '-s')
 
         then:
         output.exists()

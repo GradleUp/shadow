@@ -12,7 +12,7 @@ import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 
-class AbstractCachingSpec extends PluginSpecification {
+abstract class AbstractCachingSpec extends PluginSpecification {
     @Rule TemporaryFolder alternateDir
 
     def setup() {
@@ -20,7 +20,7 @@ class AbstractCachingSpec extends PluginSpecification {
         // test and we won't accidentally use cached outputs from a different test or a different build.
         settingsFile << """
             buildCache {
-                local(DirectoryBuildCache) {
+                local {
                     directory = new File(rootDir, 'build-cache')
                 }
             }
@@ -35,7 +35,7 @@ class AbstractCachingSpec extends PluginSpecification {
     BuildResult runWithCacheEnabled(String... arguments) {
         List<String> cacheArguments = [ '--build-cache' ]
         cacheArguments.addAll(arguments)
-        return runner.withArguments(cacheArguments).build()
+        return run(cacheArguments)
     }
 
     BuildResult runInAlternateDirWithCacheEnabled(String... arguments) {
