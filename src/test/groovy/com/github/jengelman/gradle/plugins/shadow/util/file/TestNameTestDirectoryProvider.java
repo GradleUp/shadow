@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util.file;
 
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
