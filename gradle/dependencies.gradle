@@ -20,5 +20,5 @@ dependencies {
     }
     testImplementation 'xmlunit:xmlunit:1.6'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
-    testImplementation 'com.google.guava:guava:30.1-jre'
+    testImplementation 'com.google.guava:guava:30.1.1-jre'
 }
