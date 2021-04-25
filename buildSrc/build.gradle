@@ -3,7 +3,7 @@ import org.codehaus.groovy.control.CompilerConfiguration
 apply plugin: 'groovy'
 
 repositories {
-    mavenCentral()
+   gradlePluginPortal()
 }
 
 ScriptHolder holder = new ScriptHolder()
