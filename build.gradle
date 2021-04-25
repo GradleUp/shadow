@@ -2,10 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocatio
 
 buildscript {
     repositories {
-        jcenter()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        gradlePluginPortal()
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
@@ -59,7 +56,7 @@ apply from: file('gradle/ghPages.gradle')
 apply from: file('gradle/dependencies.gradle')
 
 repositories {
-    jcenter()
+    gradlePluginPortal()
 }
 
 test {
