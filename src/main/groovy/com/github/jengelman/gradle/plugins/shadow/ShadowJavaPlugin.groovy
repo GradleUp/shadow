@@ -4,14 +4,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer
-import org.gradle.api.artifacts.maven.MavenPom
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Upload
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.gradle.util.GradleVersion
@@ -104,14 +101,16 @@ class ShadowJavaPlugin implements Plugin<Project> {
                             return
                         }
                         upload.configuration = project.configurations.shadow
-                        MavenPom pom = upload.repositories.mavenDeployer.pom
+                        def pom = upload.repositories.mavenDeployer.pom
                         if (project.configurations.findByName("api")) {
                             pom.scopeMappings.mappings.remove(project.configurations.api)
                         }
                         pom.scopeMappings.mappings.remove(project.configurations.compile)
                         pom.scopeMappings.mappings.remove(project.configurations.implementation)
                         pom.scopeMappings.mappings.remove(project.configurations.runtime)
-                        pom.scopeMappings.addMapping(MavenPlugin.RUNTIME_PRIORITY, project.configurations.shadow, Conf2ScopeMappingContainer.RUNTIME)
+                        pom.scopeMappings.addMapping(org.gradle.api.plugins.MavenPlugin.RUNTIME_PRIORITY,
+                                project.configurations.shadow,
+                                org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer.RUNTIME)
                     }
                 }
             }

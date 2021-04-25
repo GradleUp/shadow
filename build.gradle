@@ -93,7 +93,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 task downloadDependencies(type: Exec) {
-    dependsOn configurations.testRuntime
+    dependsOn configurations.testRuntimeClasspath
     commandLine 'echo', 'Downloaded all dependencies'
 }
 
