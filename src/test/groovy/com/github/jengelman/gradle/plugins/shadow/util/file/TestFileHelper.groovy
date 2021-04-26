@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util.file;
 
 import org.apache.commons.io.FileUtils
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.tools.ant.Project
 import org.apache.tools.ant.taskdefs.Expand
 import org.apache.tools.ant.taskdefs.Tar
