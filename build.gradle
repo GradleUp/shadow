@@ -20,6 +20,7 @@ plugins {
     id 'project-report'
     id 'idea'
     id 'java-gradle-plugin'
+    id 'signing'
 }
 
 // Remove the gradleApi so it isn't merged into the jar file.

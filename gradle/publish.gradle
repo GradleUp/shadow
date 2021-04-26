@@ -144,6 +144,10 @@ publishPlugins { task ->
     }
 }
 
+signing {
+    sign publishing.publications.plugin
+}
+
 task release() {
-    dependsOn 'assemble', 'bintrayUpload', 'publishPlugins', 'gitPublishPush'
+    dependsOn 'assemble', 'publishPlugins', 'gitPublishPush'
 }
