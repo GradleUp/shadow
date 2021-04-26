@@ -70,8 +70,8 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             dependencies {
-              compile 'junit:junit:3.8.2'
-              compile files('${escapedPath(one)}')
+              implementation 'junit:junit:3.8.2'
+              implementation files('${escapedPath(one)}')
             }
 
             shadowJar {
@@ -101,7 +101,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             dependencies {
-              compile 'junit:junit:3.8.2'
+              implementation 'junit:junit:3.8.2'
             }
 
             shadowJar {
@@ -176,7 +176,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -192,7 +192,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'com.github.johnrengelman.shadow'
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
 
         """.stripIndent()
 
@@ -228,7 +228,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -250,7 +250,7 @@ class ShadowPluginSpec extends PluginSpecification {
             }
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server-all.jar')
@@ -286,7 +286,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -305,7 +305,7 @@ class ShadowPluginSpec extends PluginSpecification {
             }
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server-all.jar')
@@ -358,7 +358,7 @@ class ShadowPluginSpec extends PluginSpecification {
             }
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
 
         File serverOutput = file('server/build/libs/server-all.jar')
@@ -394,7 +394,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -413,7 +413,7 @@ class ShadowPluginSpec extends PluginSpecification {
             }
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
 
         File serverOutput = file('server/build/libs/server-all.jar')
@@ -447,7 +447,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -466,7 +466,7 @@ class ShadowPluginSpec extends PluginSpecification {
             }
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
 
         File serverOutput = file('server/build/libs/server-all.jar')
@@ -524,8 +524,8 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
             dependencies {
-                compile 'junit:junit:3.8.2'
-                compile project(':lib')
+                implementation 'junit:junit:3.8.2'
+                implementation project(':lib')
             }
         """.stripIndent()
 
@@ -654,7 +654,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'java'
             apply plugin: 'com.github.johnrengelman.shadow'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
 
             shadowJar {
                relocate 'junit.framework', 'client.junit.framework'
@@ -674,7 +674,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'java'
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(path: ':client', configuration: 'shadow') }
+            dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server.jar')
@@ -711,7 +711,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'java'
             apply plugin: 'com.github.johnrengelman.shadow'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
 
             shadowJar {
                relocate 'junit.framework', 'client.junit.framework'
@@ -732,7 +732,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'com.github.johnrengelman.shadow'
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(path: ':client', configuration: 'shadow') }
+            dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server-all.jar')
@@ -771,7 +771,7 @@ class ShadowPluginSpec extends PluginSpecification {
         '''.stripIndent()
 
         buildFile << """
-            dependencies { compile 'shadow:a:1.0' }
+            dependencies { implementation 'shadow:a:1.0' }
         """.stripIndent()
 
         when:

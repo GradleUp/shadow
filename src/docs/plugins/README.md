@@ -30,12 +30,12 @@ dependencies {
     shadow localGroovy()
     shadow gradleApi()
 
-    compile 'org.jdom:jdom2:2.0.6'
-    compile 'org.ow2.asm:asm:6.0'
-    compile 'org.ow2.asm:asm-commons:6.0'
-    compile 'commons-io:commons-io:2.4'
-    compile 'org.apache.ant:ant:1.9.4'
-    compile 'org.codehaus.plexus:plexus-utils:2.0.6'
+    implementation 'org.jdom:jdom2:2.0.6'
+    implementation 'org.ow2.asm:asm:6.0'
+    implementation 'org.ow2.asm:asm-commons:6.0'
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'org.apache.ant:ant:1.9.4'
+    implementation 'org.codehaus.plexus:plexus-utils:2.0.6'
 }
 
 task relocateShadowJar(type: ConfigureShadowRelocation) {

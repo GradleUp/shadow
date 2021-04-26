@@ -15,6 +15,6 @@ configuration of the shadowed project.
 ```groovy
 // Depending On Shadow Output of Project
 dependencies {
-  compile project(path: ':api', configuration: 'shadow')
+  implementation project(path: ':api', configuration: 'shadow')
 }
 ```

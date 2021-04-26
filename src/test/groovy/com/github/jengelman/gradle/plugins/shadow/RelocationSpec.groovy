@@ -14,7 +14,7 @@ class RelocationSpec extends PluginSpecification {
         given:
         buildFile << """
             dependencies {
-               compile 'junit:junit:3.8.2'
+               implementation 'junit:junit:3.8.2'
             }
             
             shadowJar {
@@ -79,7 +79,7 @@ class RelocationSpec extends PluginSpecification {
         given:
         buildFile << """
             dependencies {
-               compile 'junit:junit:3.8.2'
+               implementation 'junit:junit:3.8.2'
             }
             
             // tag::relocateFilter[]
@@ -136,7 +136,7 @@ class RelocationSpec extends PluginSpecification {
         given:
         buildFile << """
             dependencies {
-               compile 'junit:junit:3.8.2'
+               implementation 'junit:junit:3.8.2'
             }
             
             // tag::relocate[]
@@ -187,7 +187,7 @@ class RelocationSpec extends PluginSpecification {
         apply plugin: 'java'
         
         repositories { maven { url "${repo.uri}" } }
-        dependencies { compile 'junit:junit:3.8.2' }
+        dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('core/src/main/resources/TEST') << 'TEST RESOURCE'
@@ -206,7 +206,7 @@ class RelocationSpec extends PluginSpecification {
         apply plugin: 'com.github.johnrengelman.shadow'
         
         repositories { maven { url "${repo.uri}" } }
-        dependencies { compile project(':core') }
+        dependencies { implementation project(':core') }
         
         shadowJar {
           relocate 'core', 'app.core'
@@ -262,7 +262,7 @@ class RelocationSpec extends PluginSpecification {
 
         buildFile << """
             dependencies {
-               compile 'shadow:dep:1.0'
+               implementation 'shadow:dep:1.0'
             }
             
             shadowJar {
@@ -301,11 +301,11 @@ class RelocationSpec extends PluginSpecification {
             }
 
             dependencies {
-                compile 'org.slf4j:slf4j-api:1.7.21'
-                compile group: 'io.netty', name: 'netty-all', version: '4.0.23.Final'
-                compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
-                compile group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6'
-                compile group: 'org.hbase', name: 'asynchbase', version: '1.7.0-mapr-1603'
+                implementation 'org.slf4j:slf4j-api:1.7.21'
+                implementation group: 'io.netty', name: 'netty-all', version: '4.0.23.Final'
+                implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
+                implementation group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6'
+                implementation group: 'org.hbase', name: 'asynchbase', version: '1.7.0-mapr-1603'
             }
 
             shadowJar {

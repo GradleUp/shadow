@@ -15,8 +15,8 @@ class ConfigurationCacheSpec extends PluginSpecification {
 
         buildFile << """
             dependencies {
-               compile 'shadow:a:1.0'
-               compile 'shadow:b:1.0'
+               implementation 'shadow:a:1.0'
+               implementation 'shadow:b:1.0'
             }
         """.stripIndent()
     }
@@ -38,7 +38,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
             mainClassName = 'myapp.Main'
             
             dependencies {
-               compile 'shadow:a:1.0'
+               implementation 'shadow:a:1.0'
             }
             
             runShadow {
@@ -91,7 +91,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         and:
@@ -110,7 +110,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
             }
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
 
         and:

@@ -25,7 +25,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         file('client/build.gradle') << """
             apply plugin: 'java'
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -38,7 +38,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
             apply plugin: 'com.github.johnrengelman.shadow'
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
 
         output = getFile('server/build/libs/server-all.jar')
@@ -66,7 +66,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
             }
 
             repositories { maven { url "${repo.uri}" } }
-            dependencies { compile project(':client') }
+            dependencies { implementation project(':client') }
         """.stripIndent()
         assertShadowJarExecutes()
 

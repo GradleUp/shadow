@@ -41,7 +41,7 @@ class ApplicationSpec extends PluginSpecification {
             mainClassName = 'myapp.Main'
             
             dependencies {
-               compile 'shadow:a:1.0'
+               implementation 'shadow:a:1.0'
             }
             
             runShadow {
@@ -153,7 +153,7 @@ class ApplicationSpec extends PluginSpecification {
             mainClassName = 'myapp.Main'
             
             dependencies {
-               compile 'shadow:a:1.0'
+               implementation 'shadow:a:1.0'
             }
             
             runShadow {

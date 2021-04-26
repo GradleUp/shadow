@@ -83,7 +83,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
     def 'shadowJar is cached correctly when using includes/excludes'() {
         given:
         buildFile << """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
             
             shadowJar {
                 exclude 'junit/*'
@@ -118,7 +118,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         when:
         changeConfigurationTo """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
 
             shadowJar {
                include 'server/*'
@@ -161,7 +161,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
     def 'shadowJar is cached correctly when using dependency includes/excludes'() {
         given:
         buildFile << """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('src/main/java/server/Server.java') << """

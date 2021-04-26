@@ -1,18 +1,18 @@
 # Configuring Shadowed Dependencies
 
-Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtime` configuration
+Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtimeClasspath` configuration
 into the final JAR.
 The configurations to from which to source dependencies for the merging can be configured using the `configurations` property
 of the [`ShadowJar`](http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type.
 
 ```groovy
 shadowJar {
-  configurations = [project.configurations.compile]
+  configurations = [project.configurations.compileClasspath]
 }
 ```
 
-The above code sample would configure the `shadowJar` task to merge dependencies from only the `compile` configuration.
-This means any dependency declared in the `runtime` configuration would be **not** be included in the final JAR.
+The above code sample would configure the `shadowJar` task to merge dependencies from only the `compileClasspath` configuration.
+This means any dependency declared in the `runtimeOnly` configuration would be **not** be included in the final JAR.
 
 > Note the literal use of `project.configurations` when setting the `configurations` attribute of a
 [`ShadowJar`](http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task.
@@ -41,26 +41,26 @@ Gradle's `configurations` block.
 ```groovy
 // Exclude an Module Dependency
 dependencies {
-   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
-   dependencies {
-      exclude(dependency('org.apache.logging.log4j:log4j-core:2.11.1'))
-   }
+  dependencies {
+    exclude(dependency('org.apache.logging.log4j:log4j-core:2.11.1'))
+  }
 }
 ```
 
 ```groovy
 // Exclude a Project Dependency
 dependencies {
-  compile project(':api')
+  implementation project(':api')
 }
 
 shadowJar {
-   dependencies {
-       exclude(project(':api'))
-   }
+  dependencies {
+    exclude(project(':api'))
+  }
 }
 ```
 
@@ -77,13 +77,13 @@ using any of these individual fields.
 ```groovy
 // Exclude Any Version of a Dependency
 dependencies {
-   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
-   dependencies {
-      exclude(dependency('org.apache.logging.log4j:log4j-core:.*'))
-   }
+  dependencies {
+    exclude(dependency('org.apache.logging.log4j:log4j-core:.*'))
+  }
 }
 ```
 
@@ -92,7 +92,7 @@ Any of the individual fields can be safely absent and will function as though a 
 ```groovy
 // Ignore Dependency Version
 dependencies {
-   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
@@ -109,7 +109,7 @@ This same pattern can be used for any of the dependency notation fields.
 ```groovy
 // Ignoring An Artifact Regardless of Group
 dependencies {
-   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
@@ -122,7 +122,7 @@ shadowJar {
 ```groovy
 // Excluding All Artifacts From Group
 dependencies {
-   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
@@ -141,14 +141,14 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 ```groovy
 // Selecting Dependencies to Filter With a Spec
 dependencies {
-   compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
 shadowJar {
-   dependencies {
-       exclude(dependency {
-           it.moduleGroup == 'org.apache.logging.log4j'
-       })
-   }
+  dependencies {
+    exclude(dependency {
+      it.moduleGroup == 'org.apache.logging.log4j'
+    })
+  }
 }
 ```

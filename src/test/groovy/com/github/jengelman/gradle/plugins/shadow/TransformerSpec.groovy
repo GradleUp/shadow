@@ -248,8 +248,8 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
         buildFile << """
             dependencies {
-              compile 'shadow:two:1.0'
-              compile files('${escapedPath(one)}')
+              implementation 'shadow:two:1.0'
+              implementation files('${escapedPath(one)}')
             }
             
             shadowJar {
