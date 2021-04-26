@@ -53,6 +53,13 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
+            - v1-gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            - v1-gradle-{{ .Branch }}
+            - v1-gradle-master
+            - v1-gradle
 
       - attach_workspace:
           at: ~/build
