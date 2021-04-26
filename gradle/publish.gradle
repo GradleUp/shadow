@@ -126,13 +126,9 @@ pluginBundle {
         shadowPlugin {
             id = 'com.github.johnrengelman.shadow'
             displayName = 'Shadow Plugin'
+            description = "Gradle plugin to create fat/uber JARs, apply file transforms, and relocate packages for applications and libraries. Gradle version of Maven's Shade plugin."
+            implementationClass = 'com.github.jengelman.gradle.plugins.shadow.ShadowPlugin'
         }
-    }
-
-    mavenCoordinates {
-        groupId = project.group
-        artifactId = project.name
-
     }
 }
 
