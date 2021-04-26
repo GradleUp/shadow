@@ -120,9 +120,7 @@ pluginBundle {
     website = 'https://github.com/johnrengelman/shadow'
     vcsUrl = 'https://github.com/johnrengelman/shadow'
     tags = ['onejar', 'shade', 'fatjar', 'uberjar']
-}
 
-gradlePlugin {
     plugins {
         shadowPlugin {
             id = 'com.github.johnrengelman.shadow'
