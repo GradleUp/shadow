@@ -119,9 +119,10 @@ bintray {
 pluginBundle {
     website = 'https://github.com/johnrengelman/shadow'
     vcsUrl = 'https://github.com/johnrengelman/shadow'
-    description = 'A Gradle plugin for collapsing all dependencies and project code into a single Jar file.'
     tags = ['onejar', 'shade', 'fatjar', 'uberjar']
+}
 
+gradlePlugin {
     plugins {
         shadowPlugin {
             id = 'com.github.johnrengelman.shadow'
