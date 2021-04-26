@@ -3,7 +3,8 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: "com.gradle.plugin-publish"
 
-group = 'com.github.jengelman.gradle.plugins'
+group = 'com.github.johnrengelman'
+
 def versionString = file('src/main/resources/shadow-version.txt').text.trim()
 if (System.env.CIRCLE_TAG && System.env.CIRCLE_TAG =~  /^\d\.\d\.\d$/) {
     version = System.env.CIRCLE_TAG
