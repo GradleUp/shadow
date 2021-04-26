@@ -1,6 +1,17 @@
 # Change Log
+## v7.0.0 (2021-04-26)
+* Required Gradle 7.0+
+* Support for Java 16
+* Removes JCenter references
+* [Cédric Champeau](https://github.com/melix) - Support Gradle 7 [#624](https://github.com/johnrengelman/shadow/pull/624)
+* [Daniel Oakey](https://github.com/danieloakey) - Close `FileInputStream` when remapping close to avoid classloader locks [#642](https://github.com/johnrengelman/shadow/pull/642)
+* [Maximilian Müller](https://github.com/maxm123) - Groovy error in `ServiceFileTransformer` in Gradle 3 [#655](https://github.com/johnrengelman/shadow/pull/655)
+* [Helder Pereira](https://github.com/helfper) - Fix deprecations errors in transformers and add CI testing around future deprecations [#647](https://github.com/johnrengelman/shadow/pull/647)
+* [Nicolas Humblot](https://github.com/nhumblot) - Handle deprecation of `mainClassName` configuration [#609](https://github.com/johnrengelman/shadow/pull/609), [#612](https://github.com/johnrengelman/shadow/pull/612)
+* [Bernie Schelberg](https://github.com/bschelberg) - Exclude `api` and `implementations` from legacy `maven` POM [#615](https://github.com/johnrengelman/shadow/pull/615)
+
 ## v6.1.0 (2020-10-05)
-* As of this version, Shadow is compiled with Java 8 source and target compatability. This aligns the plugin with the minimum required Java version
+* As of this version, Shadow is compiled with Java 8 source and target compatibility. This aligns the plugin with the minimum required Java version
   for Gradle 6.0 (https://docs.gradle.org/6.0/release-notes.html).
 * Update ASM to 9.0 to support JDK 16.
 * [Tim Yates](https://github.com/timyates), [Benedikt Ritter](https://github.com/britter) - Enable Configuration Caching for Gradle 6.6+ [#591](https://github.com/johnrengelman/shadow/pull/591)
