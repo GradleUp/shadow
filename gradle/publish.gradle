@@ -147,7 +147,7 @@ publishPlugins { task ->
 signing {
     if (System.env.CI == 'true') {
         def encodedSigningKey = findProperty("signingKey")
-        def signingKey = new String(encodedSigningKey?.decodeBase64())
+        def signingKey = encodedSigningKey ? new String(encodedSigningKey.decodeBase64()) : null
         def signingPassword = findProperty("signingPassword")
         useInMemoryPgpKeys(signingKey, signingPassword)
     }
