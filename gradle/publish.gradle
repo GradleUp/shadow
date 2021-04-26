@@ -56,7 +56,7 @@ artifactory {
             repoKey = 'oss-snapshot-local'
         }
         defaults {
-            publications 'plugin'
+            publications 'pluginMaven'
         }
     }
 }
@@ -113,6 +113,34 @@ bintray {
                     'gradle-plugin': 'com.github.johnrengelman.shadow:com.github.jengelman.gradle.plugins:shadow'
             ]
         }
+    }
+}
+
+// Workaround for configuring the artifact that publish-plugins uses: https://github.com/JLLeitschuh/ktlint-gradle/blob/master/plugin/build.gradle.kts
+// Need to move publishing configuration into afterEvaluate {}
+// to override changes done by "com.gradle.plugin-publish" plugin in afterEvaluate {} block
+// See PublishPlugin class for details
+afterEvaluate {
+    publishing {
+        publications {
+            withType(MavenPublication) {
+                // Special workaround to publish shadow jar instead of normal one. Name to override peeked here:
+                // https://github.com/gradle/gradle/blob/master/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/MavenPluginPublishPlugin.java#L73
+                if (name == "pluginMaven") {
+                    setArtifacts([
+                        tasks.shadowJar,
+                        tasks.sourcesJar,
+                        tasks.javadocJar
+                    ])
+                }
+            }
+        }
+    }
+}
+
+tasks.whenTaskAdded {
+    if (name == "publishPluginJar" || name == "generateMetadataFileForPluginMavenPublication") {
+        dependsOn(tasks.named("shadowJar"))
     }
 }
 

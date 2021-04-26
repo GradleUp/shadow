@@ -4,6 +4,7 @@ dependencies {
     shadow gradleApi()
     shadow 'org.codehaus.groovy:groovy-backports-compat23:3.0.7'
 
+    implementation "com.gradle.publish:plugin-publish-plugin:0.14.0"
     implementation 'org.jdom:jdom2:2.0.6'
     implementation 'org.ow2.asm:asm:9.1'
     implementation 'org.ow2.asm:asm-commons:9.1'
