@@ -16,7 +16,7 @@ Read the [User Guide](http://imperceptiblethoughts.com/shadow)!
 
 | Gradle Version | Shadow Version |
 |----------------|----------------|
-| 5.x | 5.2.0 - 6.1.0|
+| 5.x | 5.2.0 - 6.0.0|
 | 6.x | 5.2.0 - 6.1.0|
 | 7.x | 7.0.0+|
 
