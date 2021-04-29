@@ -3,6 +3,21 @@
 * Required Gradle 7.0+
 * Support for Java 16
 * Removes JCenter references
+* **Breaking Change!** - The maven group coordinate has changed to be `gradle.plugin.com.github.jengelman.gradle.plugins`. Users explicitly declaring the buildscript classpath will need to update their configuration.
+  ```
+  buildscript {
+    repositories {
+      maven {
+        url "https://plugins.gradle.org/m2/"
+      }
+    }
+    dependencies {
+      classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
+    }
+  }
+
+  apply plugin: "com.github.johnrengelman.shadow"
+  ```
 * [Cédric Champeau](https://github.com/melix) - Support Gradle 7 [#624](https://github.com/johnrengelman/shadow/pull/624)
 * [Daniel Oakey](https://github.com/danieloakey) - Close `FileInputStream` when remapping close to avoid classloader locks [#642](https://github.com/johnrengelman/shadow/pull/642)
 * [Maximilian Müller](https://github.com/maxm123) - Groovy error in `ServiceFileTransformer` in Gradle 3 [#655](https://github.com/johnrengelman/shadow/pull/655)
@@ -15,7 +30,7 @@
   for Gradle 6.0 (https://docs.gradle.org/6.0/release-notes.html).
 * Update ASM to 9.0 to support JDK 16.
 * [Tim Yates](https://github.com/timyates), [Benedikt Ritter](https://github.com/britter) - Enable Configuration Caching for Gradle 6.6+ [#591](https://github.com/johnrengelman/shadow/pull/591)
-* [Caleb](https://github.com/MuffinTheMan) - doc updates [#583](https://github.com/johnrengelman/shadow/pull/593)
+* [Caleb Larsen](https://github.com/MuffinTheMan) - doc updates [#583](https://github.com/johnrengelman/shadow/pull/593)
 * [Schalk W. Cronjé](https://github.com/ysb33r) - log4j version update for CVE-2020-9488 [#590](https://github.com/johnrengelman/shadow/pull/590)
 * [Victor Tso](https://github.com/roxchkplusony) - Input stream handling for large projects [#587](https://github.com/johnrengelman/shadow/pull/587)
 * [Matthew Haughton](https://github.com/3flex) - Implement Task Configuration Avoidance pattern [#597](https://github.com/johnrengelman/shadow/pull/597)
