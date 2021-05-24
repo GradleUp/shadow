@@ -34,15 +34,6 @@ class ShadowPlugin implements Plugin<Project> {
                     }
                 }
             }
-
-            afterEvaluate {
-                plugins.withId('java-gradle-plugin') {
-                    // needed to prevent inclusion of gradle-api into shadow JAR
-                    configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
-                        dependencies.remove(project.dependencies.gradleApi())
-                    }
-                }
-            }
         }
     }
 }
