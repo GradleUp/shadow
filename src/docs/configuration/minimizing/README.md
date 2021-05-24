@@ -9,9 +9,10 @@ shadowJar {
 }
 ```
 
-A dependency can be excluded from the minimization process thereby forcing it's inclusion the shadow JAR.
+A dependency can be excluded from the minimization process, thereby forcing it's inclusion the shadow JAR.
 This is useful when the dependency analyzer cannot find the usage of a class programmatically, for example if the class
-is loaded dynamically via `Class.forName(String)`.
+is loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of
+a `dependency` is interpreted as a regular expression.
 
 ```groovy
 // Force a class to be retained during minimization
