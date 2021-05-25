@@ -184,10 +184,10 @@ class RelocationSpec extends PluginSpecification {
     def "relocate does not drop dependency resources"() {
         given: 'Core project with dependency and resource'
         file('core/build.gradle') << """
-        apply plugin: 'java'
+        apply plugin: 'java-library'
         
         repositories { maven { url "${repo.uri}" } }
-        dependencies { implementation 'junit:junit:3.8.2' }
+        dependencies { api 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('core/src/main/resources/TEST') << 'TEST RESOURCE'

@@ -7,7 +7,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
     def 'shadowJar is cached correctly when relocation is added'() {
         given:
         buildFile << """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         file('src/main/java/server/Server.java') << """
@@ -30,7 +30,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
 
         when:
         changeConfigurationTo """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
 
             shadowJar {
                relocate 'junit.framework', 'foo.junit.framework'

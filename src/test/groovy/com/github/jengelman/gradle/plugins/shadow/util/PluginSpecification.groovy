@@ -35,11 +35,11 @@ class PluginSpecification extends Specification {
         println buildFile.text
     }
 
-    String getDefaultBuildScript() {
+    String getDefaultBuildScript(String javaPlugin = 'java') {
         return """
         plugins {
-            id 'java'
-            id 'com.github.johnrengelman.shadow'
+            id '${javaPlugin}'
+            id 'com.github.johnrengelman.shadow' version '${SHADOW_VERSION}'
         }
 
         version = "1.0"
@@ -91,7 +91,7 @@ class PluginSpecification extends Specification {
         }
     }
 
-    private static boolean containsDeprecationWarning(String output) {
+    static boolean containsDeprecationWarning(String output) {
         output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
                 output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }

@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 public class TestFile extends File {
