@@ -80,7 +80,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec) { run ->
             def install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync)
             run.dependsOn SHADOW_INSTALL_TASK_NAME
-            run.setMain('-jar')
+            run.mainClass.set('-jar')
             run.description = 'Runs this project as a JVM application using the shadow jar'
             run.group = ApplicationPlugin.APPLICATION_GROUP
             run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
