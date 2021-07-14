@@ -11,9 +11,13 @@ import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.ApplicationPluginConvention
 import org.gradle.api.plugins.JavaApplication
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
+import org.gradle.jvm.toolchain.JavaLauncher
+import org.gradle.jvm.toolchain.JavaToolchainService
 
 class ShadowApplicationPlugin implements Plugin<Project> {
 
@@ -87,7 +91,15 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             run.conventionMapping.jarFile = {
                 project.file("${install.get().destinationDir.path}/lib/${jar.get().archivePath.name}")
             }
+            configureJavaLauncher(run)
         }
+    }
+
+    private void configureJavaLauncher(JavaJarExec run) {
+        def toolchain = project.getExtensions().getByType(JavaPluginExtension.class).toolchain
+        JavaToolchainService service = project.getExtensions().getByType(JavaToolchainService.class)
+        Provider<JavaLauncher> defaultLauncher = service.launcherFor(toolchain)
+        run.getJavaLauncher().set(defaultLauncher)
     }
 
     protected void addCreateScriptsTask(Project project) {

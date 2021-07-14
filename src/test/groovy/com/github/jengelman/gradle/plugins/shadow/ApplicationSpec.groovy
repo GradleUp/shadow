@@ -71,6 +71,77 @@ class ApplicationSpec extends PluginSpecification {
         jar?.close()
     }
 
+    def 'integration with application plugin and java toolchains'() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('a2.properties', 'a2')
+                .publish()
+
+        file('src/main/java/myapp/Main.java') << """
+            package myapp;
+            public class Main {
+               public static void main(String[] args) {
+                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
+               }
+            }
+        """.stripIndent()
+
+        buildFile << """
+            apply plugin: 'application'
+
+            mainClassName = 'myapp.Main'
+            
+            dependencies {
+               implementation 'shadow:a:1.0'
+            }
+            
+            java {
+                toolchain {
+                    languageVersion = JavaLanguageVersion.of(16)
+                }
+            }
+            
+            runShadow {
+               args 'foo'
+               doFirst {
+                project.logger.lifecycle("Running application with JDK \${it.javaLauncher.get().metadata.languageVersion.asInt()}")
+               }
+            }          
+        """.stripIndent()
+
+        settingsFile << "rootProject.name = 'myapp'"
+
+        when:
+        BuildResult result = run('runShadow', '--stacktrace')
+
+        then: 'tests that runShadow executed and exited'
+        assert result.output.contains('Running application with JDK 16')
+        assert result.output.contains('TestApp: Hello World! (foo)')
+
+        and: 'Check that the proper jar file was installed'
+        File installedJar = getFile('build/install/myapp-shadow/lib/myapp-1.0-all.jar')
+        assert installedJar.exists()
+
+        and: 'And that jar file as the correct files in it'
+        contains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
+
+        and: 'Check the manifest attributes in the jar file are correct'
+        JarFile jar = new JarFile(installedJar)
+        Attributes attributes = jar.manifest.mainAttributes
+        assert attributes.getValue('Main-Class') == 'myapp.Main'
+
+        then: 'Check that the start scripts is written out and has the correct Java invocation'
+        File startScript = getFile('build/install/myapp-shadow/bin/myapp')
+        assert startScript.exists()
+        assert startScript.text.contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
+        assert startScript.text.contains("-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
+        assert startScript.text.contains("exec \"\$JAVACMD\" \"\$@\"")
+
+        cleanup:
+        jar?.close()
+    }
+
     @Issue('SHADOW-89')
     def 'shadow application distributions should use shadow jar'() {
         given:
