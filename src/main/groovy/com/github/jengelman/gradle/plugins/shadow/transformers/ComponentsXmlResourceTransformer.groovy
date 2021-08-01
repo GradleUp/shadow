@@ -19,6 +19,8 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -77,13 +79,13 @@ class ComponentsXmlResourceTransformer implements Transformer {
             Xpp3Dom component = children[i]
 
             String role = getValue(component, "role")
-            role = getRelocatedClass(role, context.relocators)
+            role = getRelocatedClass(role, context)
             setValue(component, "role", role)
 
             String roleHint = getValue(component, "role-hint")
 
             String impl = getValue(component, "implementation")
-            impl = getRelocatedClass(impl, context.relocators)
+            impl = getRelocatedClass(impl, context)
             setValue(component, "implementation", impl)
 
             String key = role + ':' + roleHint
@@ -103,7 +105,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
                     Xpp3Dom requirement = requirements.getChild(r)
 
                     String requiredRole = getValue(requirement, "role")
-                    requiredRole = getRelocatedClass(requiredRole, context.relocators)
+                    requiredRole = getRelocatedClass(requiredRole, context)
                     setValue(requirement, "role", requiredRole)
                 }
             }
@@ -154,11 +156,14 @@ class ComponentsXmlResourceTransformer implements Transformer {
         return baos.toByteArray()
     }
 
-    private String getRelocatedClass(String className, List<Relocator> relocators) {
+    private static String getRelocatedClass(String className, TransformerContext context) {
+        List<Relocator> relocators = context.relocators
+        ShadowStats stats = context.stats
         if (className != null && className.length() > 0 && relocators != null) {
             for (Relocator relocator : relocators) {
                 if (relocator.canRelocateClass(className)) {
-                    return relocator.relocateClass(className)
+                    RelocateClassContext relocateClassContext = new RelocateClassContext(className, stats)
+                    return relocator.relocateClass(relocateClassContext)
                 }
             }
         }
