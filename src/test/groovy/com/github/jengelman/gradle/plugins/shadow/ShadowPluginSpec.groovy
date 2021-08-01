@@ -86,13 +86,13 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['6.0', '6.1', '6.2']
+        version << ['7.0']
     }
 
-    def 'Error in Gradle versions < 6.0'() {
+    def 'Error in Gradle versions < 7.0'() {
         given:
         GradleRunner versionRunner = GradleRunner.create()
-                .withGradleVersion('5.5')
+                .withGradleVersion('6.9')
                 .withArguments('--stacktrace')
                 .withProjectDir(dir.root)
                 .forwardOutput()
@@ -796,7 +796,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             dependencies {
-               runtime 'shadow:a:1.0'
+               runtimeOnly 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
             }
         """.stripIndent()
@@ -830,25 +830,15 @@ class ShadowPluginSpec extends PluginSpecification {
                 .dependsOn('implementation-dep')
                 .publish()
 
-        repo.module('shadow', 'compile', '1.0')
-                .insertFile('compile.properties', 'compile')
-                .publish()
-
-        repo.module('shadow', 'runtime', '1.0')
-                .insertFile('runtime.properties', 'runtime')
-                .publish()
-
         repo.module('shadow', 'runtimeOnly', '1.0')
                 .insertFile('runtimeOnly.properties', 'runtimeOnly')
                 .publish()
 
-        buildFile.text = defaultBuildScript.replace('java', 'java-library')
+        buildFile.text = getDefaultBuildScript('java-library')
         buildFile << """
             dependencies {
                api 'shadow:api:1.0'
                implementation 'shadow:implementation:1.0'
-               compile 'shadow:compile:1.0'
-               runtime 'shadow:runtime:1.0'
                runtimeOnly 'shadow:runtimeOnly:1.0'
             }
         """.stripIndent()
@@ -857,8 +847,8 @@ class ShadowPluginSpec extends PluginSpecification {
         versionRunner.withArguments('shadowJar').build()
 
         then:
-        contains(output, ['api.properties', 'implementation.properties', 'compile.properties',
-                          'runtime.properties', 'runtimeOnly.properties', 'implementation-dep.properties'])
+        contains(output, ['api.properties', 'implementation.properties',
+                          'runtimeOnly.properties', 'implementation-dep.properties'])
     }
 
     def "doesn't include compileOnly configuration by default"() {
@@ -873,7 +863,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             dependencies {
-               runtime 'shadow:a:1.0'
+               runtimeOnly 'shadow:a:1.0'
                compileOnly 'shadow:b:1.0'
             }
         """.stripIndent()
@@ -900,8 +890,8 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             dependencies {
-               runtime 'shadow:a:1.0'
-               runtime 'shadow:b:1.0'
+               runtimeOnly 'shadow:a:1.0'
+               runtimeOnly 'shadow:b:1.0'
             }
         """.stripIndent()
 
@@ -917,7 +907,7 @@ class ShadowPluginSpec extends PluginSpecification {
         given:
 
         buildFile << """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
         when:
@@ -986,26 +976,6 @@ class ShadowPluginSpec extends PluginSpecification {
         String classpath = attributes.getValue('Class-Path')
         assert classpath == 'junit-3.8.2.jar'
 
-    }
-
-    @Issue('SHADOW-256')
-    def "allow configuration of non-maven projects with uploads"() {
-        given:
-        buildFile << """
-            configurations.each { configuration ->
-              def upload = project.getTasks().getByName(configuration.getUploadTaskName())
-              upload.repositories.ivy {
-                layout 'ivy'
-                url "\$buildDir/repo"
-              }
-            }
-        """
-
-        when:
-        run('shadowJar')
-
-        then:
-        assert output.exists()
     }
 
     @Issue('SHADOW-203')
@@ -1103,7 +1073,7 @@ class ShadowPluginSpec extends PluginSpecification {
             mainClassName = 'myapp.Main'
 
             dependencies {
-               compile 'shadow:a:1.0'
+               implementation 'shadow:a:1.0'
             }
 
             def generatedResourcesDir = new File(project.buildDir, "generated-resources")

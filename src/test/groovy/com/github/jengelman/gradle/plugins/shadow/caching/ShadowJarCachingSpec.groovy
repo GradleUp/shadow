@@ -184,7 +184,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         when:
         changeConfigurationTo """
-            dependencies { compile 'junit:junit:3.8.2' }
+            dependencies { implementation 'junit:junit:3.8.2' }
 
             shadowJar {
                dependencies {

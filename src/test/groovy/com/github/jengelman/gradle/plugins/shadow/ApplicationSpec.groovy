@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.apache.tools.zip.ZipFile
 import org.gradle.testkit.runner.BuildResult
@@ -10,14 +9,6 @@ import java.util.jar.Attributes
 import java.util.jar.JarFile
 
 class ApplicationSpec extends PluginSpecification {
-
-    AppendableMavenFileRepository repo
-    AppendableMavenFileRepository publishingRepo
-
-    def setup() {
-        repo = repo()
-        publishingRepo = repo('remote_repo')
-    }
 
     def 'integration with application plugin'() {
         given:
@@ -124,7 +115,7 @@ class ApplicationSpec extends PluginSpecification {
         ZipFile zipFile = new ZipFile(zip)
         println zipFile.entries.collect { it.name }
         assert zipFile.entries.find { it.name == 'myapp-shadow-1.0/lib/myapp-1.0-all.jar' }
-        assert zipFile.entries.find { it.name == 'myapp-shadow-1.0/lib/a-1.0.jar'}
+        assert zipFile.entries.find { it.name == 'myapp-shadow-1.0/lib/a-1.0.jar' }
 
         cleanup:
         zipFile?.close()
