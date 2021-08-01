@@ -74,11 +74,11 @@ workflows:
           filters:
             branches:
               ignore: gh-pages
-      - deploy-snapshot:
-          requires:
-            - build
-          context:
-            - release
-          filters:
-            branches:
-              only: master
+#      - deploy-snapshot:
+#          requires:
+#            - build
+#          context:
+#            - release
+#          filters:
+#            branches:
+#              only: master

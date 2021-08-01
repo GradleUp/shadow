@@ -1,4 +1,3 @@
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: "com.gradle.plugin-publish"
@@ -78,41 +77,6 @@ artifactoryPublish { task ->
                     }
                 }
             }
-        }
-    }
-}
-
-bintrayUpload { task ->
-    doFirst {
-        if (isSnapshot) {
-            throw new GradleException('Cannot publish SNAPSHOT versions to BinTray!')
-        }
-    }
-    gradle.taskGraph.whenReady { taskGraph ->
-        if (taskGraph.hasTask(task)) {
-            task.user = bintrayUser
-            task.apiKey = bintrayKey
-        }
-    }
-}
-
-bintray {
-    publications = ['plugin']
-    publish = true
-    pkg {
-        repo = 'gradle-plugins'
-        name = 'gradle-shadow-plugin'
-        licenses = ['Apache-2.0']
-        desc = 'Create uber-jar containing application code and dependencies.'
-        labels = ['gradle', 'onejar', 'fatjar', 'uberjar', 'shade']
-        websiteUrl = 'https://github.com/johnrengelman/shadow'
-        issueTrackerUrl = 'https://github.com/johnrengelman/shadow/issues'
-        vcsUrl = 'https://github.com/johnrengelman/shadow.git'
-        version {
-            vcsTag = versionString
-            attributes = [
-                    'gradle-plugin': 'com.github.johnrengelman.shadow:com.github.jengelman.gradle.plugins:shadow'
-            ]
         }
     }
 }
