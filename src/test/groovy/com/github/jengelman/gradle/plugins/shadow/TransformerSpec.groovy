@@ -716,7 +716,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         'IncludeResourceTransformer'        | '{ resource = "test.file"; file = file("test/some.file") }'
         'Log4j2PluginsCacheFileTransformer' | ''
         'ManifestAppenderTransformer'       | ''
-        // 'ManifestResourceTransformer'       | ''
+        'ManifestResourceTransformer'       | ''
         'PropertiesFileTransformer'         | '{ keyTransformer = { it.toLowerCase() } }'
         'ServiceFileTransformer'            | ''
         'XmlAppendingTransformer'           | ''
