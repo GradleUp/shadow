@@ -27,30 +27,6 @@ publishing {
 }
 ```
 
-## Publishing with Maven Plugin
-
-> The `maven` plugin has been deprecated in recent versions of Gradle.
-The documentation is kept here for reference, but is not longer tested as part of the CI process.
-
-The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle's
-`maven` plugin.
-To publish the JAR, simply configure the publish location for the `uploadShadow` task and execute it.
-
-```
-// Publishing a Shadow JAR with the Maven Plugin
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'com.github.johnrengelman.shadow'
-
-uploadShadow {
-  repositories {
-    mavenDeployer {
-      repository(url: "http://repo.myorg.com")
-    }
-  }
-}
-```
-
 ## Shadow Configuration and Publishing
 
 The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify
