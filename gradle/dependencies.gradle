@@ -2,15 +2,15 @@ dependencies {
 
     shadow localGroovy()
     shadow gradleApi()
-    shadow 'org.codehaus.groovy:groovy-backports-compat23:3.0.7'
+    shadow 'org.codehaus.groovy:groovy-backports-compat23:3.0.8'
 
-    implementation "com.gradle.publish:plugin-publish-plugin:0.14.0"
+    implementation "com.gradle.publish:plugin-publish-plugin:0.15.0"
     implementation 'org.jdom:jdom2:2.0.6'
     implementation 'org.ow2.asm:asm:9.2'
     implementation 'org.ow2.asm:asm-commons:9.2'
-    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'commons-io:commons-io:2.11.0'
     implementation 'org.apache.ant:ant:1.10.11'
-    implementation 'org.codehaus.plexus:plexus-utils:3.3.0'
+    implementation 'org.codehaus.plexus:plexus-utils:3.4.0'
     implementation "org.apache.logging.log4j:log4j-core:2.14.1"
     implementation('org.vafer:jdependency:2.7.0') {
         exclude group: 'org.ow2.asm'
