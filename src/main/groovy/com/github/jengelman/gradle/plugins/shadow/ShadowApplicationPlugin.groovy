@@ -43,19 +43,6 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
         configureJarMainClass(project)
         configureInstallTask(project)
-
-        project.pluginManager.withPlugin('maven') {
-            project.configurations.archives.with {
-                artifacts.findAll {
-                    if (it.hasProperty("provider")) {
-                        it.provider.get().is(project.tasks.shadowDistZip) ||
-                                it.provider.get().is(project.tasks.shadowDistTar)
-                    }
-                }.each {
-                    artifacts.remove it
-                }
-            }
-        }
     }
 
     protected void configureJarMainClass(Project project) {
