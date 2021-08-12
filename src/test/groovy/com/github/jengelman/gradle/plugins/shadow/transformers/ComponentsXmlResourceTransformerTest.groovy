@@ -61,8 +61,7 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
                         .relocators(Collections.<Relocator> emptyList())
                         .stats(stats)
                         .build())
-        Diff diff = DiffBuilder.compare(
         assertEquals( IOUtil.toString( getClass().getResourceAsStream( "/components-expected.xml" ), "UTF-8" ),
-                IOUtil.toString( transformer.getTransformedResource(), "UTF-8" ).replaceAll("\r\n", "\n") ) )
+                IOUtil.toString( transformer.getTransformedResource(), "UTF-8" ).replaceAll("\r\n", "\n") )
     }
 }
