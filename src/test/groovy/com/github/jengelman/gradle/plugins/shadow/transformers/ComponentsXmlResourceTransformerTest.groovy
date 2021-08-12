@@ -47,6 +47,9 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
 
     void testConfigurationMerging() {
 
+        formatXml = true
+        diffBuilder.normalizeWhitespace()
+
         transformer.transform(
                 TransformerContext.builder()
                         .path("components-1.xml")
@@ -62,6 +65,6 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
                         .stats(stats)
                         .build())
         assertEquals( IOUtil.toString( getClass().getResourceAsStream( "/components-expected.xml" ), "UTF-8" ),
-                IOUtil.toString( transformer.getTransformedResource(), "UTF-8" ).replaceAll("\r\n", "\n") )
+                IOUtil.toString( transformer.getTransformedResource(), "UTF-8" ) )
     }
 }
