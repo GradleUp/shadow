@@ -53,7 +53,6 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
                         .is(getClass().getResourceAsStream("/components-1.xml"))
                         .relocators(Collections.<Relocator> emptyList())
                         .stats(stats)
-                        .normalizeWhitespace()
                         .build())
         transformer.transform(
                 TransformerContext.builder()
@@ -61,7 +60,6 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
                         .is(getClass().getResourceAsStream("/components-2.xml"))
                         .relocators(Collections.<Relocator> emptyList())
                         .stats(stats)
-                        .normalizeWhitespace()
                         .build())
         Diff diff = DiffBuilder.compare(
         assertEquals( IOUtil.toString( getClass().getResourceAsStream( "/components-expected.xml" ), "UTF-8" ),
