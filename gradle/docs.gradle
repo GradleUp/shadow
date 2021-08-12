@@ -1,4 +1,4 @@
-def javaApiUrl = 'https://docs.oracle.com/javase/7/docs/api'
+def javaApiUrl = 'https://docs.oracle.com/javase/8/docs/api'
 def groovyApiUrl = "https://docs.groovy-lang.org/3.0.8/html/gapi/"
 
 tasks.withType(Javadoc).configureEach {

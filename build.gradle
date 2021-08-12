@@ -97,12 +97,18 @@ task downloadDependencies(type: Exec) {
 
 tasks.build.dependsOn tasks.shadowJar
 
+java {
+    toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
 project.tasks.withType(JavaCompile).configureEach {
     // This will be the default in Gradle 5.0
     if (!options.compilerArgs.contains("-processor")) {
         options.compilerArgs << '-proc:none'
     }
-    def targetVersion = 8
+   def targetVersion = 8
     if (JavaVersion.current().isJava9Compatible()) {
 	it.options.release = targetVersion
     } else {
