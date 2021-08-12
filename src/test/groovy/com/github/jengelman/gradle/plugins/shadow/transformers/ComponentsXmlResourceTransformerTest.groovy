@@ -47,7 +47,7 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
 
     void testConfigurationMerging() {
 
-        DiffBuilder.normalizeWhitespace(true)
+        DiffBuilder.normalizeWhitespace()
 
         transformer.transform(
                 TransformerContext.builder()
