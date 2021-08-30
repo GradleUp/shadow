@@ -15,8 +15,8 @@ import javax.inject.Inject
 
 class ShadowJavaPlugin implements Plugin<Project> {
 
-    static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
-    static final String SHADOW_GROUP = 'Shadow'
+    public static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
+    public static final String SHADOW_GROUP = 'Shadow'
 
     private final ProjectConfigurationActionContainer configurationActionContainer;
 

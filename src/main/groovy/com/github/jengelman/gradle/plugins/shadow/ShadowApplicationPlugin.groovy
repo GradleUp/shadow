@@ -21,9 +21,9 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 
 class ShadowApplicationPlugin implements Plugin<Project> {
 
-    static final String SHADOW_RUN_TASK_NAME = 'runShadow'
-    static final String SHADOW_SCRIPTS_TASK_NAME = 'startShadowScripts'
-    static final String SHADOW_INSTALL_TASK_NAME = 'installShadowDist'
+    public static final String SHADOW_RUN_TASK_NAME = 'runShadow'
+    public static final String SHADOW_SCRIPTS_TASK_NAME = 'startShadowScripts'
+    public static final String SHADOW_INSTALL_TASK_NAME = 'installShadowDist'
 
     private Project project
     private ApplicationPluginConvention pluginConvention

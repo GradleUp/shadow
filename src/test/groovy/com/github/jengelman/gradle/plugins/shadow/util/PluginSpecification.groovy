@@ -16,7 +16,7 @@ class PluginSpecification extends Specification {
 
     @Rule TemporaryFolder dir
 
-    static final String SHADOW_VERSION = PluginSpecification.classLoader.getResource("shadow-version.txt").text.trim()
+    public static final String SHADOW_VERSION = PluginSpecification.classLoader.getResource("shadow-version.txt").text.trim()
 
     AppendableMavenFileRepository repo
 

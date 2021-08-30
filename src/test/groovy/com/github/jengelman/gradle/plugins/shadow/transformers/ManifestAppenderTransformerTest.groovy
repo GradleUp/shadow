@@ -34,7 +34,7 @@ import static org.junit.Assert.*
  * Test for {@link ManifestAppenderTransformer}.
  */
 class ManifestAppenderTransformerTest extends TransformerTestSupport {
-    static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
+    public static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
     private ManifestAppenderTransformer transformer
 
