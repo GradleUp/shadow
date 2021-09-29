@@ -1,8 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo
 
+import com.github.jengelman.gradle.plugins.shadow.util.HashUtil
 import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
-import org.gradle.internal.hash.HashUtil
-
 
 abstract class AbstractModule {
     /**
