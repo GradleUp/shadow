@@ -1,5 +1,4 @@
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.artifactory'
 apply plugin: "com.gradle.plugin-publish"
 
 group = 'com.github.johnrengelman'
@@ -44,38 +43,6 @@ publishing {
                 def root = asNode()
                 root.appendNode('description', 'Gradle plugin to combine/relocate dependencies in a single Jar.')
                 root.children().last() + pomConfig
-            }
-        }
-    }
-}
-
-artifactory {
-    contextUrl = 'https://oss.jfrog.org/artifactory'
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local'
-        }
-        defaults {
-            publications 'pluginMaven'
-        }
-    }
-}
-
-artifactoryPublish { task ->
-    doFirst {
-        if (!isSnapshot) {
-            throw new GradleException('Cannot publish non-SNAPSHOT versions to OJO!')
-        }
-    }
-    gradle.taskGraph.whenReady { taskGraph ->
-        if (taskGraph.hasTask(task)) {
-            project.artifactory {
-                publish {
-                    repository {
-                        username = bintrayUser
-                        password = bintrayKey
-                    }
-                }
             }
         }
     }
