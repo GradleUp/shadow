@@ -6,9 +6,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.gradle.publish:plugin-publish-plugin:0.14.0"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.16.0"
         classpath 'org.ajoberstar:gradle-git-publish:3.0.0'
-        classpath "com.github.node-gradle:gradle-node-plugin:3.0.1"
+        classpath "com.github.node-gradle:gradle-node-plugin:3.1.1"
     }
 }
 
