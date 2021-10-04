@@ -6,8 +6,8 @@ import org.gradle.api.tasks.TaskAction
 
 class KnowsTask extends DefaultTask {
 
-    static final String NAME = "knows"
-    static final String DESC = "Do you know who knows?"
+    public static final String NAME = "knows"
+    public static final String DESC = "Do you know who knows?"
 
     @TaskAction
     def knows() {
