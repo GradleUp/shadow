@@ -42,7 +42,7 @@ import org.gradle.api.file.FileTreeElement
 class ComponentsXmlResourceTransformer implements Transformer {
     private Map<String, Xpp3Dom> components = new LinkedHashMap<String, Xpp3Dom>()
 
-    static final String COMPONENTS_XML_PATH = "META-INF/plexus/components.xml"
+    public static final String COMPONENTS_XML_PATH = "META-INF/plexus/components.xml"
 
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString

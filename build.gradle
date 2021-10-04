@@ -6,11 +6,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.24.14"
-        classpath "com.gradle.publish:plugin-publish-plugin:0.15.0"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.16.0"
         classpath 'org.ajoberstar:gradle-git-publish:3.0.0'
-        classpath "com.github.node-gradle:gradle-node-plugin:3.1.0"
+        classpath "com.github.node-gradle:gradle-node-plugin:3.1.1"
     }
 }
 

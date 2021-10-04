@@ -31,7 +31,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     private List<Transformer> transformers;
     private List<Relocator> relocators;
-    private transient List<Configuration> configurations;
+    private List<FileCollection> configurations;
     private transient DependencyFilter dependencyFilter;
 
     private boolean minimizeJar;
@@ -429,11 +429,11 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @Classpath @Optional
-    public List<Configuration> getConfigurations() {
+    public List<FileCollection> getConfigurations() {
         return this.configurations;
     }
 
-    public void setConfigurations(List<Configuration> configurations) {
+    public void setConfigurations(List<FileCollection> configurations) {
         this.configurations = configurations;
     }
 
