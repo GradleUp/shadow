@@ -132,4 +132,38 @@ class ConfigurationCacheSpec extends PluginSpecification {
         and:
         result.output.contains("Reusing configuration cache.")
     }
+
+    def "configuration caching of configurations is up-to-date"() {
+        given:
+        file('settings.gradle') << """
+            include 'lib'
+        """.stripIndent()
+
+        and:
+        file('lib/src/main/java/lib/Lib.java') << """
+            package lib;
+            public class Lib {}
+        """.stripIndent()
+        file('lib/build.gradle') << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies {
+                implementation "junit:junit:3.8.2"
+            }
+
+            shadowJar {
+                configurations = [project.configurations.compileClasspath]
+            }
+
+        """.stripIndent()
+
+        when:
+        run('--configuration-cache', 'shadowJar', '-s')
+        def result = run('--configuration-cache', 'shadowJar', '-s')
+
+        then:
+        result.output.contains(":lib:shadowJar UP-TO-DATE")
+    }
 }
