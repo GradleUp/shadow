@@ -1,6 +1,7 @@
 # Change Log
 
 ## v7.1.0 (2021-10-04)
+* **BREAKING** - The maven coordinates for the plugins have changed as of this version. The proper `group:artifact` is `gradle.plugin.com.github.johnrengelman:shadow`
 * [Jeff](https://github.com/mathjeff) - Fix `shadowJar` Out-Of-Date with configuration caching [#708](https://github.com/johnrengelman/shadow/pull/708)
 * [Fiouz](https://github.com/Fiouz) - Better support for statically typed languages. This change may require code changes if you are utilizing the Groovy generated getters for properties in some Shadow transformers [#706](https://github.com/johnrengelman/shadow/pull/706)
 * [Helder Pereira](https://github.com/helfper) - Various cleanups [#672](https://github.com/johnrengelman/shadow/pull/672), [#700](https://github.com/johnrengelman/shadow/pull/700), [#701](https://github.com/johnrengelman/shadow/pull/701), [#702](https://github.com/johnrengelman/shadow/pull/702)
