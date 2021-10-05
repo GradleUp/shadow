@@ -1,4 +1,17 @@
 # Change Log
+
+## v7.1.0 (2021-10-04)
+* **BREAKING** - The maven coordinates for the plugins have changed as of this version. The proper `group:artifact` is `gradle.plugin.com.github.johnrengelman:shadow`
+* [Jeff](https://github.com/mathjeff) - Fix `shadowJar` Out-Of-Date with configuration caching [#708](https://github.com/johnrengelman/shadow/pull/708)
+* [Fiouz](https://github.com/Fiouz) - Better support for statically typed languages. This change may require code changes if you are utilizing the Groovy generated getters for properties in some Shadow transformers [#706](https://github.com/johnrengelman/shadow/pull/706)
+* [Helder Pereira](https://github.com/helfper) - Various cleanups [#672](https://github.com/johnrengelman/shadow/pull/672), [#700](https://github.com/johnrengelman/shadow/pull/700), [#701](https://github.com/johnrengelman/shadow/pull/701), [#702](https://github.com/johnrengelman/shadow/pull/702)
+* [Roberto Perez Alcolea](https://github.com/rpalcolea) - Support JVM Toolchains [#691](https://github.com/johnrengelman/shadow/pull/691)
+* [mjulianotq](https://github.com/mjulianotq) - Fix `Project.afterEvaluate` conflicts [#675](https://github.com/johnrengelman/shadow/pull/675)
+* [Ilya Muradyan](https://github.com/ileasile) - Fix relocation for `ComponentsXmlResourceTransformer` [#678](https://github.com/johnrengelman/shadow/pull/678)
+* [Vaidotas Valuckas](https://github.com/rieske) - Fix `JavaExec.main` deprecation [#686](https://github.com/johnrengelman/shadow/pull/686)
+* [Dmitry Vyazelenko](https://github.com/vyazelenko) - Support Java 18 with ASM 9.2 [#698](https://github.com/johnrengelman/shadow/pull/698)
+* [Jason](https://github.com/jpenilla) - Support Records with JDependency 2.7.0 [#681](https://github.com/johnrengelman/shadow/pull/681)
+
 ## v7.0.0 (2021-04-26)
 * Required Gradle 7.0+
 * Support for Java 16

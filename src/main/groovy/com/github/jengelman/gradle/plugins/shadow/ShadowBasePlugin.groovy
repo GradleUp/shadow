@@ -8,8 +8,8 @@ import org.gradle.util.GradleVersion
 
 class ShadowBasePlugin implements Plugin<Project> {
 
-    static final String EXTENSION_NAME = 'shadow'
-    static final String CONFIGURATION_NAME = 'shadow'
+    public static final String EXTENSION_NAME = 'shadow'
+    public static final String CONFIGURATION_NAME = 'shadow'
 
     @Override
     void apply(Project project) {
