@@ -1,4 +1,6 @@
 # Change Log
+## v7.1.1 (2021-12-14)
+* Upgrade log4j to 2.16.0 due to CVE-2021-44228 and CVE-2021-45046
 
 ## v7.1.0 (2021-10-04)
 * **BREAKING** - The maven coordinates for the plugins have changed as of this version. The proper `group:artifact` is `gradle.plugin.com.github.johnrengelman:shadow`
