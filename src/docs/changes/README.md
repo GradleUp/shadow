@@ -1,4 +1,7 @@
 # Change Log
+## v7.1.2 (2021-12-20)
+* Upgrade log4j to 2.17.0 due to CVE-2021-45105
+
 ## v7.1.1 (2021-12-14)
 * Upgrade log4j to 2.16.0 due to CVE-2021-44228 and CVE-2021-45046
 
