@@ -15,7 +15,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:@version@'
+        classpath 'gradle.plugin.com.github.johnrengelman:shadow:@version@'
     }
 }
 
