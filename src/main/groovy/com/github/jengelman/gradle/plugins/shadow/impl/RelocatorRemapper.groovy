@@ -50,9 +50,13 @@ class RelocatorRemapper extends Remapper {
         this.stats = stats
         this.scalaRenamer =
             new FunctionWrappers.FromJavaFunction(
-                (String string) -> {
-                    Optional<Relocator> maybe = relocators.stream().filter(x -> x.canRelocateClass(string)).findAny()
-                    Option.apply(maybe.map(it.relocateClass(new RelocateClassContext(string, stats))).orElse(null))
+                (String name) -> {
+                    Optional<Relocator> maybeRelocator = relocators.stream().filter(x -> x.canRelocateClass(name)).findAny()
+                    String rewritten =
+                        maybeRelocator
+                            .map(relocator -> relocator.relocateClass(new RelocateClassContext(name, stats)))
+                            .orElse(null)
+                    Option.apply(rewritten)
                 }
             )
     }
