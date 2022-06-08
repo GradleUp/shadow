@@ -154,7 +154,7 @@ class ShadowCopyAction implements CopyAction {
         } catch(Throwable t) {
             try {
                 resource.close()
-            } catch (IOException e) {
+            } catch (IOException ignored) {
                 // Ignored
             }
             throw UncheckedException.throwAsUncheckedException(t)
@@ -200,7 +200,7 @@ class ShadowCopyAction implements CopyAction {
         private final Set<String> unused
         private final ShadowStats stats
 
-        private Set<String> visitedFiles = new HashSet<String>()
+        private Map<String, Map> visitedFiles = new HashMap<String, Map>()
 
         StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
                             List<Relocator> relocators, PatternSet patternSet, Set<String> unused,
@@ -217,8 +217,25 @@ class ShadowCopyAction implements CopyAction {
             }
         }
 
-        private boolean recordVisit(RelativePath path) {
-            return visitedFiles.add(path.pathString)
+        private boolean recordVisit(String path, long size, RelativePath originJar) {
+            if (visitedFiles.containsKey(path)) {
+                return false
+            }
+
+            if (originJar == null) {
+                originJar = new RelativePath(false)
+            }
+
+            visitedFiles.put(path, [size: size, originJar: originJar])
+            return true
+        }
+
+        private boolean recordVisit(String path) {
+            return recordVisit(path, 0, null)
+        }
+
+        private boolean recordVisit(FileCopyDetails fileCopyDetails) {
+            return recordVisit(fileCopyDetails.relativePath.toString(), fileCopyDetails.size, null)
         }
 
         @Override
@@ -241,7 +258,7 @@ class ShadowCopyAction implements CopyAction {
                     } else if (isClass && !isUnused(fileDetails.path)) {
                         remapClass(fileDetails)
                     }
-                    recordVisit(fileDetails.relativePath)
+                    recordVisit(fileDetails)
                 } catch (Exception e) {
                     throw new GradleException(String.format("Could not add %s to ZIP '%s'.", fileDetails, zipFile), e)
                 }
@@ -263,7 +280,7 @@ class ShadowCopyAction implements CopyAction {
                 }
                 filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
                     if (archiveElement.relativePath.file) {
-                        visitArchiveFile(archiveElement, archive)
+                    visitArchiveFile(archiveElement, archive, fileDetails)
                     }
                 }
             } finally {
@@ -273,20 +290,32 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private void visitArchiveDirectory(RelativeArchivePath archiveDir) {
-            if (recordVisit(archiveDir)) {
+            if (recordVisit(archiveDir.toString())) {
                 zipOutStr.putNextEntry(archiveDir.entry)
                 zipOutStr.closeEntry()
             }
         }
 
-        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive) {
+        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive, FileCopyDetails fileDetails) {
             def archiveFilePath = archiveFile.relativePath
+            def archiveFileSize = archiveFile.size
+
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                if (recordVisit(archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
+                if (recordVisit(archiveFilePath.toString(), archiveFileSize, fileDetails.relativePath) && !isUnused(archiveFilePath.entry.name)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFilePath, archive)
                     } else {
                         remapClass(archiveFilePath, archive)
+                    }
+                } else {
+                    def archiveFileInVisitedFiles = visitedFiles.get(archiveFilePath.toString())
+                    if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size)) {
+                        log.warn("IGNORING ${archiveFilePath} from ${fileDetails.relativePath}, size is different (${fileDetails.size} vs ${archiveFileInVisitedFiles.size})")
+                        if (archiveFileInVisitedFiles.originJar) {
+                            log.warn("  --> origin JAR was ${archiveFileInVisitedFiles.originJar}")
+                        } else {
+                            log.warn("  --> file originated from project sourcecode")
+                        }
                     }
                 }
             } else {
@@ -373,7 +402,7 @@ class ShadowCopyAction implements CopyAction {
                 zipOutStr.putNextEntry(archiveEntry)
                 IOUtils.copyLarge(bis, zipOutStr)
                 zipOutStr.closeEntry()
-            } catch (ZipException e) {
+            } catch (ZipException ignored) {
                 log.warn("We have a duplicate " + mappedName + " in source project")
             } finally {
                 bis.close()
@@ -406,7 +435,7 @@ class ShadowCopyAction implements CopyAction {
                 archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
                 zipOutStr.putNextEntry(archiveEntry)
                 zipOutStr.closeEntry()
-                recordVisit(dirDetails.relativePath)
+                recordVisit(dirDetails.relativePath.toString())
             } catch (Exception e) {
                 throw new GradleException(String.format("Could not add %s to ZIP '%s'.", dirDetails, zipFile), e)
             }

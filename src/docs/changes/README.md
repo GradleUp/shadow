@@ -1,4 +1,7 @@
 # Change Log
+## v7.1.3 (2022-06-08)
+* Added collision logging from chapmajs. 
+
 ## v7.1.2 (2021-12-28)
 * Upgrade log4j to 2.17.1 due to CVE-2021-45105 and CVE-2021-44832
 

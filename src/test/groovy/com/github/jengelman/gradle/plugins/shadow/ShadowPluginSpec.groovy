@@ -5,9 +5,11 @@ import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.internal.execution.ExecutionResult
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Unroll
@@ -130,6 +132,30 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         assert output.exists()
+    }
+
+    def 'warns when a file is masked by a previously shadowed resource'() {
+        given:
+        URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
+        URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
+
+        buildFile.text = defaultBuildScript
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDirectory = buildDir
+            |    archiveBaseName = 'shadow'
+            |    from('${artifact.path}')
+            |    from('${project.path}')
+            |}
+        """.stripMargin()
+
+        when:
+        BuildResult result = run('shadow')
+
+        then:
+        assert result.tasks(TaskOutcome.FAILED).size() == 0
+        assert result.output =~ /IGNORING META-INF\/MANIFEST\.MF from test-artifact-1\.0-SNAPSHOT\.jar, size is different \(3115 vs 25\)\s+--> file originated from project sourcecode/
+        assert result.output =~ /IGNORING META-INF\/MANIFEST\.MF from test-project-1\.0-SNAPSHOT\.jar, size is different \(3906 vs 25\)\s+--> file originated from project sourcecode/
     }
 
     def 'include project sources'() {
