@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.internal.execution.ExecutionResult
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
