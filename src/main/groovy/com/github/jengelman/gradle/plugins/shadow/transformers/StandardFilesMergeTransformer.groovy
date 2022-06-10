@@ -33,8 +33,9 @@ import org.gradle.api.file.FileTreeElement
  *
  * @author Jan-Hendrik Diederich
  */
+@CacheableTransformer
 class StandardFilesMergeTransformer implements Transformer {
-    private class StandardFile {
+    private class StandardFile implements Serializable {
         List<String> origins = new ArrayList<>();
         String content;
 
