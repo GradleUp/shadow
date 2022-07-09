@@ -72,8 +72,7 @@ class RelocatorRemapper extends Remapper {
                 boolean canRelocate = r.canRelocateSourceFile(currentFilePath)
                 if (!canRelocate) {
                     String info = String.format("skipped %s as src path %s excluded", r, currentFilePath)
-                    println(info)
-                    log.info(info)
+                    log.debug(info)
                     continue
                 }
                 if (r.canRelocateClass(name)) {
@@ -110,8 +109,7 @@ class RelocatorRemapper extends Remapper {
             boolean canRelocate = r.canRelocateSourceFile(currentFilePath)
             if (!canRelocate) {
                 String info = String.format("skipped %s as src path %s excluded", r, currentFilePath)
-                println(info)
-                log.info(info)
+                log.debug(info)
                 continue
             }
 

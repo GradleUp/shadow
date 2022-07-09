@@ -156,10 +156,10 @@ class SimpleRelocator implements Relocator {
         return false
     }
 
-    private boolean isExcludedSource(String srPath) {
-        if (srPath != null && excludeSources != null && !excludeSources.isEmpty()) {
+    private boolean isExcludedSource(String srcPath) {
+        if (srcPath != null && excludeSources != null && !excludeSources.isEmpty()) {
             for (String excludeSource : excludeSources) {
-                if (srPath.startsWith(excludeSource)) {
+                if (srcPath.startsWith(excludeSource)) {
                     return true
                 }
             }
