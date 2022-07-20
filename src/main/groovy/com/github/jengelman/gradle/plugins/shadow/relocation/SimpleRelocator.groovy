@@ -21,6 +21,7 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 
 import java.util.regex.Pattern
 
@@ -206,6 +207,7 @@ class SimpleRelocator implements Relocator {
     }
 
     @Input
+    @Optional
     String getPattern() {
         return pattern
     }
@@ -216,6 +218,7 @@ class SimpleRelocator implements Relocator {
     }
 
     @Input
+    @Optional
     String getShadedPattern() {
         return shadedPattern
     }
