@@ -41,6 +41,7 @@ import static org.apache.logging.log4j.core.config.plugins.processor.PluginProce
  * @see <a href="https://github.com/edwgiz/maven-shaded-log4j-transformer">edwgiz/maven-shaded-log4j-transformer</a>
  * @see <a href="https://github.com/edwgiz/maven-shaded-log4j-transformer/blob/master/src/main/java/com/github/edwgiz/mavenShadePlugin/log4j2CacheTransformer/PluginsCacheFileTransformer.java">PluginsCacheFileTransformer.java</a>
  */
+@CacheableTransformer
 class Log4j2PluginsCacheFileTransformer implements Transformer {
 
     private final List<File> temporaryFiles
