@@ -27,16 +27,25 @@ import org.gradle.api.file.FileTreeElement
 /**
  * Modified from eu.appsatori.gradle.fatjar.tasks.PrepareFiles.groovy
  * <p>
- * Resource transformer that merges Groovy extension module descriptor files into a single file. If there are several
- * META-INF/services/org.codehaus.groovy.runtime.ExtensionModule resources spread across many JARs the individual
- * entries will all be merged into a single META-INF/services/org.codehaus.groovy.runtime.ExtensionModule resource
+ * Resource transformer that merges Groovy extension module descriptor files into a single file.
+ * Groovy extension module descriptor files have the name org.codehaus.groovy.runtime.ExtensionModule
+ * and live in the META-INF/services (Groovy up to 2.4) or META-INF/groovy (Groovy 2.5+) directory.
+ * See https://issues.apache.org/jira/browse/GROOVY-8480 for more details of the change.
+ *
+ * If there are several descriptor files spread across many JARs the individual
+ * entries will be merged into a single descriptor file which will be
  * packaged into the resultant JAR produced by the shadowing process.
+ * It will live in the legacy directory (META-INF/services) if all of the processed descriptor
+ * files came from the legacy location, otherwise it will be written into the now standard location (META-INF/groovy).
+ * Note that certain JDK9+ tooling will break when using the legacy location.
  */
 @CacheableTransformer
 class GroovyExtensionModuleTransformer implements Transformer {
 
-    private static final GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+    private static final GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =
             "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+    private static final GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+            "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
 
     private static final MODULE_NAME_KEY = 'moduleName'
     private static final MODULE_VERSION_KEY = 'moduleVersion'
@@ -47,10 +56,16 @@ class GroovyExtensionModuleTransformer implements Transformer {
     private static final MERGED_MODULE_VERSION = '1.0.0'
 
     private final Properties module = new Properties()
+    private boolean legacy = true // default to Groovy 2.4 or earlier
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
-        return element.relativePath.pathString == GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH
+        def path = element.relativePath.pathString
+        if (path == GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH) {
+            legacy = false // Groovy 2.5+
+            return true
+        }
+        return path == GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH
     }
 
     @Override
@@ -95,7 +110,7 @@ class GroovyExtensionModuleTransformer implements Transformer {
 
     @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
-        ZipEntry entry = new ZipEntry(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH)
+        ZipEntry entry = new ZipEntry(legacy ? GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH : GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         os.putNextEntry(entry)
         IOUtil.copy(toInputStream(module), os)
