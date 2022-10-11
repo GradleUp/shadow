@@ -34,6 +34,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private List<FileCollection> configurations;
     private transient DependencyFilter dependencyFilter;
 
+    private boolean useR8;
     private boolean minimizeJar;
     private transient DependencyFilter dependencyFilterForMinimize;
     private FileCollection toMinimize;
@@ -86,6 +87,11 @@ public class ShadowJar extends Jar implements ShadowSpec {
         });
     }
 
+    public ShadowJar useR8(boolean enabled) {
+        useR8 = enabled;
+        return this;
+    }
+
     public ShadowJar minimize() {
         minimizeJar = true;
         return this;
@@ -113,7 +119,13 @@ public class ShadowJar extends Jar implements ShadowSpec {
     @Override
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
-        final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) : null;
+        final UnusedTracker unusedTracker =
+            minimizeJar ?
+                (useR8 ?
+                    UnusedTrackerUsingR8.forProject(getProject(), getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) :
+                    UnusedTrackerUsingJDependency.forProject(getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize())) :
+                null;
+
         return new ShadowCopyAction(getArchiveFile().get().getAsFile(), getInternalCompressor(), documentationRegistry,
                 this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
                 versionUtil, isPreserveFileTimestamps(), minimizeJar, unusedTracker);

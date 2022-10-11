@@ -39,6 +39,8 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.zip.ZipException
 
 @Slf4j
@@ -173,7 +175,11 @@ class ShadowCopyAction implements CopyAction {
         }
 
         protected boolean isClass(FileCopyDetails fileDetails) {
-            return FilenameUtils.getExtension(fileDetails.path) == 'class'
+            return isClass(fileDetails.path)
+        }
+
+        protected boolean isClass(String path) {
+            return FilenameUtils.getExtension(path) == 'class'
         }
 
         @Override
@@ -313,17 +319,38 @@ class ShadowCopyAction implements CopyAction {
             return result
         }
 
+        private InputStream getClassInputStreamFromUnusedTracker(String className) {
+            InputStream is = null
+            if (unusedTracker != null) {
+                Path path = unusedTracker.getPathToProcessedClass(className)
+                if (path != null && Files.exists(path)) {
+                    is = path.newInputStream()
+                }
+            }
+            return is
+        }
+
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
                 ZipEntry zipEntry = setArchiveTimes(new ZipEntry(remapper.mapPath(file) + '.class'))
                 addParentDirectories(new RelativeArchivePath(zipEntry))
-                remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
+
+                InputStream is = getClassInputStreamFromUnusedTracker(file.entry.name)
+                if (is == null) {
+                    is = archive.getInputStream(file.entry)
+                }
+
+                remapClass(is, file.pathString, file.entry.time)
             }
         }
 
         private void remapClass(FileCopyDetails fileCopyDetails) {
-            if (FilenameUtils.getExtension(fileCopyDetails.name) == 'class') {
-                InputStream is = fileCopyDetails.file.newInputStream()
+            if (isClass(fileCopyDetails)) {
+                InputStream is = getClassInputStreamFromUnusedTracker(fileCopyDetails.relativePath.pathString)
+                if (is == null) {
+                    is = fileCopyDetails.file.newInputStream()
+                }
+
                 try {
                     remapClass(is, fileCopyDetails.path, fileCopyDetails.lastModified)
                 } finally {
@@ -387,7 +414,16 @@ class ShadowCopyAction implements CopyAction {
             RelativeArchivePath mappedFile = new RelativeArchivePath(entry)
             addParentDirectories(mappedFile)
             zipOutStr.putNextEntry(mappedFile.entry)
-            InputStream is = archive.getInputStream(archiveFile.entry)
+
+            InputStream is =
+                    isClass(archiveFile.entry.name) ?
+                            getClassInputStreamFromUnusedTracker(archiveFile.entry.name) :
+                            null
+
+            if (is == null) {
+                is = archive.getInputStream(archiveFile.entry)
+            }
+
             try {
                 IOUtils.copyLarge(is, zipOutStr)
             } finally {

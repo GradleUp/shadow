@@ -5,6 +5,9 @@ apply plugin: 'groovy'
 repositories {
     gradlePluginPortal()
     mavenCentral()
+
+    // for r8 dependency
+    google()
 }
 
 ScriptHolder holder = new ScriptHolder()

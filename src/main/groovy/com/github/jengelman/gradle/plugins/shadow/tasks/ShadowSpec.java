@@ -12,6 +12,8 @@ import org.gradle.api.file.CopySpec;
 import java.lang.reflect.InvocationTargetException;
 
 interface ShadowSpec extends CopySpec {
+    ShadowSpec useR8(boolean enabled);
+
     ShadowSpec minimize();
 
     ShadowSpec minimize(Action<DependencyFilter> configureClosure);
