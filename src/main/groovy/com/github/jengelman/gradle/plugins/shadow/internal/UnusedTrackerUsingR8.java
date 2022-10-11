@@ -175,7 +175,7 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
      * Returns a collection of necessary keep rules. For this purpose, R8 is executed
      * in a kind of pass through mode where we collect all classes that should
      * be kept as is (classes from each source set and api dependencies).
-     * 
+     * <p>
      * This could be achieved differently and more efficiently, but is done like
      * that for convenience reasons atm.
      */
@@ -257,16 +257,16 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
     }
 
     private static void addJDKLibrary(R8Command.Builder builder) throws IOException {
-        String JAVA_HOME = System.getProperty("java.home");
-        if (JAVA_HOME == null) {
-            JAVA_HOME = System.getenv("JAVA_HOME");
+        String javaHome = System.getProperty("java.home");
+        if (javaHome == null) {
+            javaHome = System.getenv("JAVA_HOME");
         }
 
-        if (JAVA_HOME == null) {
+        if (javaHome == null) {
             throw new RuntimeException("unable to determine 'java.home' environment variable");
         }
 
-        builder.addLibraryResourceProvider(JdkClassFileProvider.fromJdkHome(Paths.get(JAVA_HOME)));
+        builder.addLibraryResourceProvider(JdkClassFileProvider.fromJdkHome(Paths.get(javaHome)));
     }
 
     @Override
