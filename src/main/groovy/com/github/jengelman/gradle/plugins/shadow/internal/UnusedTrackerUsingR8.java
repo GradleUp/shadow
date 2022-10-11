@@ -289,7 +289,7 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
 
     private static class GradleDiagnosticHandler implements DiagnosticsHandler {
 
-        private static final Logger logger = LoggerFactory.getLogger(GradleVersionUtil.class);
+        private static final Logger logger = LoggerFactory.getLogger(GradleDiagnosticHandler.class);
 
         private final boolean enableInfo;
 
