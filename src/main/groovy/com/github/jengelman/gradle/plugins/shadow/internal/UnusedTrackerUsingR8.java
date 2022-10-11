@@ -16,7 +16,12 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * An implementation of an UnusedTracker using R8.
+ * An implementation of an {@code UnusedTracker} using R8, the optimization and shrinking tool
+ * of the Android project.
+ * <p>
+ * Contrary to the {@code UnusedTrackerUsingJDependency} this {@code UnusedTracker} is able to
+ * fully remove unused fields / methods, leading to much better results for complex dependencies
+ * like e.g. guava.
  * <p>
  * This class is written in Java to avoid groovy madness especially in combination with R8.
  */
@@ -103,6 +108,10 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
             proguardConfig.add("-dontoptimize");
             proguardConfig.add("-dontobfuscate");
             proguardConfig.add("-ignorewarnings");
+            // TODO: consider keeping all attributes by default to avoid negative side-effects.
+            // proguardConfig.add("-keepattributes **")
+
+            // TODO: add support for custom rules that can be configured via the shadowSpec.
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -162,6 +171,14 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
         return !name.equals("module-info.class") && name.endsWith(".class");
     }
 
+    /**
+     * Returns a collection of necessary keep rules. For this purpose, R8 is executed
+     * in a kind of pass through mode where we collect all classes that should
+     * be kept as is (classes from each source set and api dependencies).
+     * 
+     * This could be achieved differently and more efficiently, but is done like
+     * that for convenience reasons atm.
+     */
     private List<String> getKeepRules() throws IOException, CompilationFailedException {
         R8Command.Builder builder = R8Command.builder(new GradleDiagnosticHandler(false));
 

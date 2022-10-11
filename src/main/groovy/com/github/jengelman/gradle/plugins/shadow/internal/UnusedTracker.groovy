@@ -10,7 +10,9 @@ import org.gradle.api.tasks.InputFiles
 
 import java.nio.file.Path
 
-/** Tracks unused classes in the project classpath. */
+/**
+ * A base class for implementations that can track unused classes in the project classpath.
+ */
 abstract class UnusedTracker {
     protected final FileCollection toMinimize
 
