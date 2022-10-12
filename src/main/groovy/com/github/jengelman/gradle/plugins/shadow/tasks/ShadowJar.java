@@ -8,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator;
 import com.github.jengelman.gradle.plugins.shadow.transformers.*;
 import org.gradle.api.Action;
 import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileCollection;
@@ -35,6 +34,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private transient DependencyFilter dependencyFilter;
 
     private boolean useR8;
+    private R8Configuration r8Configuration;
     private boolean minimizeJar;
     private transient DependencyFilter dependencyFilterForMinimize;
     private FileCollection toMinimize;
@@ -87,8 +87,19 @@ public class ShadowJar extends Jar implements ShadowSpec {
         });
     }
 
-    public ShadowJar useR8(boolean enabled) {
-        useR8 = enabled;
+    @Override
+    public ShadowSpec useR8() {
+        useR8 = true;
+        r8Configuration = new DefaultR8Configuration();
+        return this;
+    }
+
+    @Override
+    public ShadowSpec useR8(Action<R8Configuration> configure) {
+        useR8();
+        if (configure != null) {
+            configure.execute(r8Configuration);
+        }
         return this;
     }
 
@@ -122,7 +133,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         final UnusedTracker unusedTracker =
             minimizeJar ?
                 (useR8 ?
-                    UnusedTrackerUsingR8.forProject(getProject(), getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) :
+                    UnusedTrackerUsingR8.forProject(getProject(), r8Configuration, getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) :
                     UnusedTrackerUsingJDependency.forProject(getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize())) :
                 null;
 

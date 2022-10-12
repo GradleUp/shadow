@@ -31,14 +31,20 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
     private final Path tmpDir;
     private final Collection<File> projectFiles;
     private final Collection<File> dependencies;
+    private final Collection<String> additionalRules;
 
-    private UnusedTrackerUsingR8(Path tmpDir, Iterable<File> classDirs, FileCollection classJars, FileCollection toMinimize) {
+    private UnusedTrackerUsingR8(Path               tmpDir,
+                                 Collection<String> additionalRules,
+                                 Iterable<File>     classDirs,
+                                 FileCollection     classJars,
+                                 FileCollection     toMinimize) {
         super(toMinimize);
 
         this.tmpDir = tmpDir;
 
-        this.projectFiles = new ArrayList<>();
-        this.dependencies = new ArrayList<>();
+        this.projectFiles    = new ArrayList<>();
+        this.dependencies    = new ArrayList<>();
+        this.additionalRules = new ArrayList<>(additionalRules);
 
         for (File dir : classDirs) {
             Path path = Paths.get(dir.getAbsolutePath());
@@ -108,10 +114,7 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
             proguardConfig.add("-dontoptimize");
             proguardConfig.add("-dontobfuscate");
             proguardConfig.add("-ignorewarnings");
-            // TODO: consider keeping all attributes by default to avoid negative side-effects.
-            // proguardConfig.add("-keepattributes **")
-
-            // TODO: add support for custom rules that can be configured via the shadowSpec.
+            proguardConfig.addAll(additionalRules);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -276,12 +279,16 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
         }
     }
 
-    public static UnusedTracker forProject(Project project, FileCollection apiJars, Iterable<File> sourceSetsClassesDirs, FileCollection toMinimize) {
+    public static UnusedTrackerUsingR8 forProject(Project         project,
+                                                  R8Configuration configuration,
+                                                  FileCollection  apiJars,
+                                                  Iterable<File>  sourceSetsClassesDirs,
+                                                  FileCollection  toMinimize) {
         try {
             Path tmpDir = Paths.get(project.getBuildDir().getAbsolutePath(), TMP_DIR);
             Files.createDirectories(tmpDir);
 
-            return new UnusedTrackerUsingR8(tmpDir, sourceSetsClassesDirs, apiJars, toMinimize);
+            return new UnusedTrackerUsingR8(tmpDir, configuration.getRules(), sourceSetsClassesDirs, apiJars, toMinimize);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }

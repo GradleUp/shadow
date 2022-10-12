@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks;
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats;
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
+import com.github.jengelman.gradle.plugins.shadow.internal.R8Configuration;
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator;
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator;
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer;
@@ -12,7 +13,9 @@ import org.gradle.api.file.CopySpec;
 import java.lang.reflect.InvocationTargetException;
 
 interface ShadowSpec extends CopySpec {
-    ShadowSpec useR8(boolean enabled);
+    ShadowSpec useR8();
+
+    ShadowSpec useR8(Action<R8Configuration> configure);
 
     ShadowSpec minimize();
 
