@@ -335,10 +335,8 @@ class ShadowCopyAction implements CopyAction {
                 ZipEntry zipEntry = setArchiveTimes(new ZipEntry(remapper.mapPath(file) + '.class'))
                 addParentDirectories(new RelativeArchivePath(zipEntry))
 
-                InputStream is = getClassInputStreamFromUnusedTracker(file.entry.name)
-                if (is == null) {
-                    is = archive.getInputStream(file.entry)
-                }
+                InputStream is =
+                    getClassInputStreamFromUnusedTracker(file.entry.name) ?: archive.getInputStream(file.entry)
 
                 remapClass(is, file.pathString, file.entry.time)
             }
@@ -346,10 +344,8 @@ class ShadowCopyAction implements CopyAction {
 
         private void remapClass(FileCopyDetails fileCopyDetails) {
             if (isClass(fileCopyDetails)) {
-                InputStream is = getClassInputStreamFromUnusedTracker(fileCopyDetails.relativePath.pathString)
-                if (is == null) {
-                    is = fileCopyDetails.file.newInputStream()
-                }
+                InputStream is =
+                    getClassInputStreamFromUnusedTracker(fileCopyDetails.relativePath.pathString) ?: fileCopyDetails.file.newInputStream()
 
                 try {
                     remapClass(is, fileCopyDetails.path, fileCopyDetails.lastModified)
@@ -416,13 +412,8 @@ class ShadowCopyAction implements CopyAction {
             zipOutStr.putNextEntry(mappedFile.entry)
 
             InputStream is =
-                    isClass(archiveFile.entry.name) ?
-                            getClassInputStreamFromUnusedTracker(archiveFile.entry.name) :
-                            null
-
-            if (is == null) {
-                is = archive.getInputStream(archiveFile.entry)
-            }
+                (isClass(archiveFile.entry.name) ? getClassInputStreamFromUnusedTracker(archiveFile.entry.name) : null) ?:
+                archive.getInputStream(archiveFile.entry)
 
             try {
                 IOUtils.copyLarge(is, zipOutStr)
