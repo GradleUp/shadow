@@ -171,8 +171,11 @@ public class ShadowJar extends Jar implements ShadowSpec {
             ConfigurableFileCollection allClassesDirs = getProject().getObjects().fileCollection();
             if (minimizeJar) {
                 for (SourceSet sourceSet : getProject().getExtensions().getByType(SourceSetContainer.class)) {
-                    FileCollection classesDirs = sourceSet.getOutput().getClassesDirs();
-                    allClassesDirs.from(classesDirs);
+                    // do not include test sources
+                    if (!sourceSet.getName().equals(SourceSet.TEST_SOURCE_SET_NAME)) {
+                        FileCollection classesDirs = sourceSet.getOutput().getClassesDirs();
+                        allClassesDirs.from(classesDirs);
+                    }
                 }
             }
             sourceSetsClassesDirs = allClassesDirs.filter(new Spec<File>() {
