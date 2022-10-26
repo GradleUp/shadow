@@ -31,20 +31,20 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
     private final Path tmpDir;
     private final Collection<File> projectFiles;
     private final Collection<File> dependencies;
-    private final Collection<String> additionalRules;
+    private final R8Configuration configuration;
 
-    private UnusedTrackerUsingR8(Path               tmpDir,
-                                 Collection<String> additionalRules,
-                                 Iterable<File>     classDirs,
-                                 FileCollection     classJars,
-                                 FileCollection     toMinimize) {
+    private UnusedTrackerUsingR8(Path            tmpDir,
+                                 R8Configuration configuration,
+                                 Iterable<File>  classDirs,
+                                 FileCollection  classJars,
+                                 FileCollection  toMinimize) {
         super(toMinimize);
 
         this.tmpDir = tmpDir;
 
-        this.projectFiles    = new ArrayList<>();
-        this.dependencies    = new ArrayList<>();
-        this.additionalRules = new ArrayList<>(additionalRules);
+        this.projectFiles  = new ArrayList<>();
+        this.dependencies  = new ArrayList<>();
+        this.configuration = configuration;
 
         for (File dir : classDirs) {
             Path path = Paths.get(dir.getAbsolutePath());
@@ -107,6 +107,12 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
             }
         });
 
+        Path[] configurationFiles = configuration.getConfigurationFiles().stream().map(File::toPath).toArray(Path[]::new);
+        System.out.println(Arrays.toString(configurationFiles));
+        if (configurationFiles.length > 0) {
+            builder.addProguardConfigurationFiles(configurationFiles);
+        }
+
         List<String> proguardConfig;
 
         try {
@@ -114,7 +120,7 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
             proguardConfig.add("-dontoptimize");
             proguardConfig.add("-dontobfuscate");
             proguardConfig.add("-ignorewarnings");
-            proguardConfig.addAll(additionalRules);
+            proguardConfig.addAll(configuration.getRules());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -288,7 +294,7 @@ public class UnusedTrackerUsingR8 extends UnusedTracker {
             Path tmpDir = Paths.get(project.getBuildDir().getAbsolutePath(), TMP_DIR);
             Files.createDirectories(tmpDir);
 
-            return new UnusedTrackerUsingR8(tmpDir, configuration.getRules(), sourceSetsClassesDirs, apiJars, toMinimize);
+            return new UnusedTrackerUsingR8(tmpDir, configuration, sourceSetsClassesDirs, apiJars, toMinimize);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }

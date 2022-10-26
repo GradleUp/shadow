@@ -65,3 +65,15 @@ shadowJar {
     minimize()
 }
 ```
+
+Rules can also be loaded from an external file:
+
+```groovy
+shadowJar {
+    useR8 {
+      configuration file('mydefaultrules.pro')
+      rule '-keep class x.y.z.** { *; }'
+    }
+    minimize()
+}
+```

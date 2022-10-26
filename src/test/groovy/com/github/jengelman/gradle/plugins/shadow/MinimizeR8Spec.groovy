@@ -592,4 +592,66 @@ class MinimizeR8Spec extends PluginSpecification {
         ])
     }
 
+    /**
+     * 'Client', 'Server' and 'junit' are independent.
+     * 'junit' is excluded from the minimize.
+     * An additional keep rule is there to keep 'Client'.
+     * The minimize shall keep 'Client' and 'junit'.
+     */
+    def 'additional configuration'() {
+        given:
+        file('settings.gradle') << """
+            include 'client', 'server'
+        """.stripIndent()
+
+        file('client/src/main/java/client/Client.java') << """
+            package client;
+            public class Client {}
+        """.stripIndent()
+
+        file('client/build.gradle') << """
+            apply plugin: 'java'
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { implementation 'junit:junit:3.8.2' }
+        """.stripIndent()
+
+        file('server/src/main/java/server/Server.java') << """
+            package server;
+            public class Server {}
+        """.stripIndent()
+
+        file('server/r8.pro') << """
+            -keep class **.Client { *; }
+        """.stripIndent()
+
+        file('server/build.gradle') << """
+            apply plugin: 'java'
+            apply plugin: 'com.github.johnrengelman.shadow'
+
+            shadowJar {
+                useR8 {
+                    configuration file('r8.pro')
+                }
+                minimize {
+                    exclude(dependency('junit:junit:.*'))
+                }
+            }
+
+            repositories { maven { url "${repo.uri}" } }
+            dependencies { implementation project(':client') }
+        """.stripIndent()
+
+        File serverOutput = getFile('server/build/libs/server-all.jar')
+
+        when:
+        runWithDebug(':server:shadowJar', '--stacktrace')
+
+        then:
+        serverOutput.exists()
+        contains(serverOutput, [
+                'server/Server.class',
+                'client/Client.class',
+                'junit/framework/Test.class'
+        ])
+    }
 }

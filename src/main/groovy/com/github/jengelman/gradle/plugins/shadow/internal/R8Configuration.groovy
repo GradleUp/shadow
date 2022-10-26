@@ -5,4 +5,8 @@ interface R8Configuration {
     Collection<String> getRules()
 
     void rule(String rule)
+
+    Collection<File> getConfigurationFiles()
+
+    void configuration(File configurationFile)
 }
