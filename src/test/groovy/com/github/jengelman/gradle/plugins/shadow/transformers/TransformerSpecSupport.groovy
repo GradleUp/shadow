@@ -24,9 +24,11 @@ class TransformerSpecSupport extends Specification {
         return new ByteArrayInputStream(str.bytes)
     }
 
-    protected static InputStream toInputStream(Properties props) {
+    protected static InputStream toInputStream(Properties props, String charset) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        props.store(baos, '')
+        baos.withWriter(charset) { w ->
+            props.store(w, '')
+        }
         new ByteArrayInputStream(baos.toByteArray())
     }
 
@@ -44,8 +46,8 @@ class TransformerSpecSupport extends Specification {
         }
     }
 
-    protected TransformerContext context(String path, Map input) {
-        TransformerContext.builder().path(path).is(toInputStream(toProperties(input))).relocators([]).stats(stats).build()
+    protected TransformerContext context(String path, Map input, String charset = 'ISO_8859_1') {
+        TransformerContext.builder().path(path).is(toInputStream(toProperties(input), charset)).relocators([]).stats(stats).build()
     }
 
     protected TransformerContext context(String path, String input) {
