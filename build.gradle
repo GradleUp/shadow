@@ -79,7 +79,7 @@ jar {
 jar.enabled = false
 
 shadowJar {
-    classifier = ''
+    archiveClassifier = ''
 }
 
 idea {

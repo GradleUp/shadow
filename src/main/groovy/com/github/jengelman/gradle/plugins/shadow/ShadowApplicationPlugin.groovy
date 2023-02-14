@@ -76,7 +76,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             run.group = ApplicationPlugin.APPLICATION_GROUP
             run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
             run.conventionMapping.jarFile = {
-                project.file("${install.get().destinationDir.path}/lib/${jar.get().archivePath.name}")
+                project.file("${install.get().destinationDir.path}/lib/${jar.get().archiveFile.get().asFile.name}")
             }
             configureJavaLauncher(run)
         }
