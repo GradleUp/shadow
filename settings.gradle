@@ -1,5 +1,25 @@
 plugins {
-    id 'com.gradle.enterprise' version '3.1.1'
+    id 'com.gradle.enterprise' version '3.12.3'
+}
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+        publishAlways()
+        if (System.env.CI == 'true') {
+            tag 'CI'
+            if (System.env.CIRCLE_TAG) {
+                link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_TAG}"
+            } else {
+                link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_BRANCH}"
+            }
+            link 'VCS Commit', "https://github.com/johnrengelman/shadow/commit/${System.env.CIRCLE_SHA1}"
+            if (System.env.CI_PULL_REQUEST) {
+                link 'Pull Request', "${System.env.CI_PULL_REQUEST}"
+            }
+        }
+    }
 }
 
 rootProject.name = 'shadow'

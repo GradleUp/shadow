@@ -31,23 +31,6 @@ gradlePlugin {
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
-buildScan {
-    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
-    if (System.env.CI == 'true') {
-        tag 'CI'
-        if (System.env.CIRCLE_TAG) {
-            link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_TAG}"
-        } else {
-            link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_BRANCH}"
-        }
-        link 'VCS Commit', "https://github.com/johnrengelman/shadow/commit/${System.env.CIRCLE_SHA1}"
-        if (System.env.CI_PULL_REQUEST) {
-            link 'Pull Request', "${System.env.CI_PULL_REQUEST}"
-        }
-    }
-}
-
 apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
 apply from: file('gradle/vuepress.gradle')
