@@ -9,7 +9,6 @@ import org.gradle.api.distribution.Distribution
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
-import org.gradle.api.plugins.ApplicationPluginConvention
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
@@ -26,12 +25,12 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     public static final String SHADOW_INSTALL_TASK_NAME = 'installShadowDist'
 
     private Project project
-    private ApplicationPluginConvention pluginConvention
+    private JavaApplication javaApplication
 
     @Override
     void apply(Project project) {
         this.project = project
-        this.pluginConvention = (ApplicationPluginConvention) project.convention.plugins.application
+        this.javaApplication = project.extensions.getByType(JavaApplication)
 
         DistributionContainer distributions = project.extensions.getByName("distributions")
         Distribution distribution = distributions.create("shadow")
@@ -46,7 +45,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
 
     protected void configureJarMainClass(Project project) {
-        def classNameProvider = project.provider { getMainClassName() }
+        def classNameProvider = javaApplication.mainClass
         jar.configure { jar ->
             jar.inputs.property('mainClassName', classNameProvider)
             jar.doFirst {
@@ -55,18 +54,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         }
     }
 
-    private Object getMainClassName() {
-        def mainClassName = project.convention.plugins.application.mainClassName
-        if (Objects.nonNull(mainClassName)) {
-            return mainClassName
-        }
-
-        return project.extensions.getByType(JavaApplication.class).mainClass.get()
-    }
-
     protected void addRunTask(Project project) {
-        ApplicationPluginConvention pluginConvention = (
-                ApplicationPluginConvention) project.convention.plugins.application
 
         project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec) { run ->
             def install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync)
@@ -74,7 +62,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             run.mainClass.set('-jar')
             run.description = 'Runs this project as a JVM application using the shadow jar'
             run.group = ApplicationPlugin.APPLICATION_GROUP
-            run.conventionMapping.jvmArgs = { pluginConvention.applicationDefaultJvmArgs }
+            run.conventionMapping.jvmArgs = { javaApplication.applicationDefaultJvmArgs }
             run.conventionMapping.jarFile = {
                 project.file("${install.get().destinationDir.path}/lib/${jar.get().archivePath.name}")
             }
@@ -90,32 +78,26 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
 
     protected void addCreateScriptsTask(Project project) {
-        ApplicationPluginConvention pluginConvention =
-                (ApplicationPluginConvention) project.convention.plugins.application
-
         project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts) { startScripts ->
             startScripts.unixStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/unixStartScript.txt").text)
             startScripts.windowsStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/windowsStartScript.txt").text)
             startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
             startScripts.group = ApplicationPlugin.APPLICATION_GROUP
             startScripts.classpath = project.files(jar)
-            startScripts.conventionMapping.mainClassName = { pluginConvention.mainClassName }
-            startScripts.conventionMapping.applicationName = { pluginConvention.applicationName }
+            startScripts.conventionMapping.mainClassName = { javaApplication.mainClass.get() }
+            startScripts.conventionMapping.applicationName = { javaApplication.applicationName }
             startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
-            startScripts.conventionMapping.defaultJvmOpts = { pluginConvention.applicationDefaultJvmArgs }
+            startScripts.conventionMapping.defaultJvmOpts = { javaApplication.applicationDefaultJvmArgs }
             startScripts.inputs.files project.objects.fileCollection().from { -> jar }
         }
     }
 
     protected void configureInstallTask(Project project) {
-        ApplicationPluginConvention pluginConvention =
-                (ApplicationPluginConvention) project.convention.plugins.application
-
         project.tasks.named(SHADOW_INSTALL_TASK_NAME).configure { installTask ->
             installTask.doFirst { Sync task ->
                 if (task.destinationDir.directory) {
                     if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
-                        throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${pluginConvention.applicationName}'.\n" +
+                        throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
                                 "If you really want to install to this directory, delete it and run the install task again.\n" +
                                 "Alternatively, choose a different installation directory."
                         )
@@ -123,7 +105,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
                 }
             }
             installTask.doLast { Sync task ->
-                project.ant.chmod(file: "${task.destinationDir.absolutePath}/bin/${pluginConvention.applicationName}", perm: 'ugo+x')
+                project.ant.chmod(file: "${task.destinationDir.absolutePath}/bin/${javaApplication.applicationName}", perm: 'ugo+x')
             }
         }
     }

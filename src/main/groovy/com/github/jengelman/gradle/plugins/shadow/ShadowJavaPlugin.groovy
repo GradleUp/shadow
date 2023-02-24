@@ -7,7 +7,7 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.gradle.util.GradleVersion
 
@@ -55,7 +55,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
     }
 
     protected void configureShadowTask(Project project) {
-        JavaPluginConvention convention = project.convention.getPlugin(JavaPluginConvention)
+        SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
         project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
             shadow.group = SHADOW_GROUP
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
@@ -80,7 +80,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
                     manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
                 }
             }
-            shadow.from(convention.sourceSets.main.output)
+            shadow.from(sourceSets.main.output)
             shadow.configurations = [project.configurations.findByName('runtimeClasspath') ?
                                              project.configurations.runtimeClasspath : project.configurations.runtime]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
