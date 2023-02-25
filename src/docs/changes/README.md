@@ -1,4 +1,8 @@
 # Change Log
+## v8.0.0 (2023-02-24)
+
+[Release Notes](https://github.com/johnrengelman/shadow/releases/tag/8.0.0)
+
 ## v7.1.3 (unreleased)
 * The GroovyExtensionModuleTransformer now also works for Groovy 2.5+.
 
