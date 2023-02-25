@@ -38,6 +38,7 @@ tasks.named('publishPlugins') {
             throw new GradleException('Cannot publish SNAPSHOT versions to Plugin Portal!')
         }
     }
+    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
 }
 
 signing {
@@ -49,6 +50,10 @@ signing {
     }
     required = gradle.taskGraph.hasTask("artifactoryPublish")
     sign(publishing.publications)
+}
+
+tasks.withType(Sign).configureEach {
+    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13470")
 }
 
 tasks.register('release') {

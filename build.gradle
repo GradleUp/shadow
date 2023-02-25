@@ -59,6 +59,10 @@ idea {
     }
 }
 
+tasks.named('ideaModule') {
+    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13480")
+}
+
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
