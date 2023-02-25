@@ -98,7 +98,7 @@ class ApplicationSpec extends PluginSpecification {
             
             java {
                 toolchain {
-                    languageVersion = JavaLanguageVersion.of(16)
+                    languageVersion = JavaLanguageVersion.of(17)
                 }
             }
             
@@ -110,13 +110,20 @@ class ApplicationSpec extends PluginSpecification {
             }          
         """.stripIndent()
 
-        settingsFile << "rootProject.name = 'myapp'"
+        settingsFile.write """ 
+            plugins {
+              // https://docs.gradle.org/8.0.1/userguide/toolchains.html#sub:download_repositories
+              id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
+            }
+            
+            rootProject.name = 'myapp'
+        """.stripIndent()
 
         when:
         BuildResult result = run('runShadow', '--stacktrace')
 
         then: 'tests that runShadow executed and exited'
-        assert result.output.contains('Running application with JDK 16')
+        assert result.output.contains('Running application with JDK 17')
         assert result.output.contains('TestApp: Hello World! (foo)')
 
         and: 'Check that the proper jar file was installed'
