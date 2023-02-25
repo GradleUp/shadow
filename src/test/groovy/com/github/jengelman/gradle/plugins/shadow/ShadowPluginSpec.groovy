@@ -86,13 +86,13 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['7.0']
+        version << ['8.0']
     }
 
-    def 'Error in Gradle versions < 7.0'() {
+    def 'Error in Gradle versions < 8.0'() {
         given:
         GradleRunner versionRunner = GradleRunner.create()
-                .withGradleVersion('6.9')
+                .withGradleVersion('7.0')
                 .withArguments('--stacktrace')
                 .withProjectDir(dir.root)
                 .forwardOutput()
