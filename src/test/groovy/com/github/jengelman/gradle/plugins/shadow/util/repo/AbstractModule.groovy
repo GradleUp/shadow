@@ -65,7 +65,8 @@ abstract class AbstractModule {
 
     private TestFile hashFile(TestFile file, String algorithm, int len) {
         def hashFile = getHashFile(file, algorithm)
-        hashFile.text = getHash(file, algorithm)
+        def hash = getHash(file, algorithm)
+        hashFile.text = String.format("%0${len}x", hash)
         return hashFile
     }
 
@@ -73,18 +74,7 @@ abstract class AbstractModule {
         file.parentFile.file("${file.name}.${algorithm}")
     }
 
-    protected String getHash(TestFile file, String algorithm) {
-        file.newInputStream().withCloseable {
-            switch (algorithm) {
-                case 'sha1':
-                    DigestUtils.sha1Hex(it)
-                    break
-                case 'md5' :
-                    DigestUtils.md5Hex(it)
-                    break
-                default:
-                    throw new IOException("Unsupported algorithm " + algorithm)
-            }
-        }
+    protected BigInteger getHash(TestFile file, String algorithm) {
+        HashUtil.createHash(file, algorithm.toUpperCase()).asBigInteger()
     }
 }
