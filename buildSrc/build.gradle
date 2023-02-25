@@ -53,14 +53,14 @@ sourceSets {
     }
 }
 
-project.tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     // This will be the default in Gradle 5.0
     if (!options.compilerArgs.contains("-processor")) {
         options.compilerArgs << '-proc:none'
     }
 }
 
-project.tasks.withType(GroovyCompile) {
+tasks.withType(GroovyCompile).configureEach {
     // This will be the default in Gradle 5.0
     if (!options.compilerArgs.contains("-processor")) {
         options.compilerArgs << '-proc:none'

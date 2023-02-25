@@ -55,7 +55,7 @@ publishing {
 afterEvaluate {
     publishing {
         publications {
-            withType(MavenPublication) {
+            withType(MavenPublication).configureEach {
                 // Special workaround to publish shadow jar instead of normal one. Name to override peeked here:
                 // https://github.com/gradle/gradle/blob/master/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/MavenPluginPublishPlugin.java#L73
                 if (name == "pluginMaven") {
@@ -70,7 +70,7 @@ afterEvaluate {
     }
 }
 
-tasks.whenTaskAdded {
+tasks.configureEach {
     if (name == "publishPluginJar" || name == "generateMetadataFileForPluginMavenPublication") {
         dependsOn(tasks.named("shadowJar"))
     }
@@ -111,6 +111,6 @@ signing {
     sign publishing.publications.plugin
 }
 
-task release() {
+tasks.register('release') {
     dependsOn 'assemble', 'publishPlugins', 'gitPublishPush'
 }

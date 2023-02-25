@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 
 class MavenFileModule extends AbstractMavenModule {
-    private boolean uniqueSnapshots = true;
+    private boolean uniqueSnapshots = true
 
     MavenFileModule(TestFile moduleDir, String groupId, String artifactId, String version) {
         super(moduleDir, groupId, artifactId, version)
@@ -14,8 +14,8 @@ class MavenFileModule extends AbstractMavenModule {
     }
 
     MavenModule withNonUniqueSnapshots() {
-        uniqueSnapshots = false;
-        return this;
+        uniqueSnapshots = false
+        return this
     }
 
     @Override

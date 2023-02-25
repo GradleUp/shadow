@@ -74,29 +74,29 @@ idea {
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-task downloadDependencies(type: Exec) {
+tasks.register('downloadDependencies', Exec) {
     dependsOn configurations.testRuntimeClasspath
     commandLine 'echo', 'Downloaded all dependencies'
 }
 
-tasks.build.dependsOn tasks.shadowJar
+tasks.named('build') { dependsOn tasks.named('shadowJar') }
 
-project.tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     // This will be the default in Gradle 5.0
     if (!options.compilerArgs.contains("-processor")) {
         options.compilerArgs << '-proc:none'
     }
 }
 
-project.tasks.withType(GroovyCompile) {
+tasks.withType(GroovyCompile).configureEach {
     // This will be the default in Gradle 5.0
     if (!options.compilerArgs.contains("-processor")) {
         options.compilerArgs << '-proc:none'
     }
 }
 
-task relocateShadowJar(type: ConfigureShadowRelocation) {
+tasks.register('relocateShadowJar', ConfigureShadowRelocation) {
     target = tasks.shadowJar
 }
 
-tasks.shadowJar.dependsOn tasks.relocateShadowJar
+tasks.named('shadowJar') { dependsOn tasks.relocateShadowJar }

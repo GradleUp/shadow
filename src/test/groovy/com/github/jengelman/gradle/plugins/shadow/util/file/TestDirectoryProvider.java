@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.util.file;
 
 /**
  * Implementations provide a working space to be used in tests.
- *
+ * <p>
  * The client is not responsible for removing any files.
  */
 public interface TestDirectoryProvider {

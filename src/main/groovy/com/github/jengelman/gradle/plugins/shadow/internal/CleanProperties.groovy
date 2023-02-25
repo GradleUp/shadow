@@ -15,11 +15,11 @@ class CleanProperties extends Properties {
         @Override
         void write(final int b) throws IOException {
             if (firstLineSeen) {
-                super.write(b);
+                super.write(b)
             } else if (b == '\n') {
-                super.write(b);
+                super.write(b)
 
-                firstLineSeen = true;
+                firstLineSeen = true
             }
         }
 

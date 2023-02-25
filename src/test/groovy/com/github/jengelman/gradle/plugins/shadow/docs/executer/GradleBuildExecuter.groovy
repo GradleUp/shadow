@@ -65,7 +65,7 @@ include 'api', 'main'
 
     }
 
-    private void addSubProject(File dir) {
+    private static void addSubProject(File dir) {
         File api = new File(dir, "api")
         api.mkdirs()
         File build = new File(api, "build.gradle")
