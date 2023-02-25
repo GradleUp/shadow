@@ -1,5 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id 'groovy'
@@ -87,8 +87,6 @@ tasks.withType(GroovyCompile).configureEach {
     }
 }
 
-tasks.register('relocateShadowJar', ConfigureShadowRelocation) {
-    target = tasks.shadowJar
+tasks.named('shadowJar', ShadowJar) {
+    enableRelocation true
 }
-
-tasks.named('shadowJar') { dependsOn tasks.relocateShadowJar }

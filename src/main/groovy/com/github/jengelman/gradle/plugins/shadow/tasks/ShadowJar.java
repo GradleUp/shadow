@@ -31,7 +31,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private List<Relocator> relocators;
     private List<FileCollection> configurations;
     private transient DependencyFilter dependencyFilter;
-
+    private boolean enableRelocation;
+    private String relocationPrefix = "shadow";
     private boolean minimizeJar;
     private final transient DependencyFilter dependencyFilterForMinimize;
     private FileCollection toMinimize;
@@ -153,6 +154,9 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     @TaskAction
     protected void copy() {
+        if (enableRelocation) {
+            RelocationUtil.configureRelocation(this, relocationPrefix);
+        }
         from(getIncludedDependencies());
         super.copy();
         getLogger().info(shadowStats.toString());
@@ -407,5 +411,23 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     public void setDependencyFilter(DependencyFilter filter) {
         this.dependencyFilter = filter;
+    }
+
+    @Input
+    public boolean isEnableRelocation() {
+        return enableRelocation;
+    }
+
+    public void setEnableRelocation(boolean enableRelocation) {
+        this.enableRelocation = enableRelocation;
+    }
+
+    @Input
+    public String getRelocationPrefix() {
+        return relocationPrefix;
+    }
+
+    public void setRelocationPrefix(String relocationPrefix) {
+        this.relocationPrefix = relocationPrefix;
     }
 }

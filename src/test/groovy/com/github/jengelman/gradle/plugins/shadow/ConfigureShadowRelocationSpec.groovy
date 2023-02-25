@@ -8,12 +8,9 @@ class ConfigureShadowRelocationSpec extends PluginSpecification {
     def "auto relocate plugin dependencies"() {
         given:
         buildFile << """
-
-            task relocateShadowJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) {
-                target = tasks.shadowJar
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+                enableRelocation true
             }
-
-            tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
             dependencies {
                implementation 'junit:junit:3.8.2'
