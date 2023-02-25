@@ -16,3 +16,4 @@ src/docs/.vuepress/dist/
 .DS_Store
 jd-gui.cfg
 bin/
+.vscode/
