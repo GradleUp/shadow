@@ -1,23 +1,14 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath "com.gradle.publish:plugin-publish-plugin:0.16.0"
-        classpath 'org.ajoberstar:gradle-git-publish:3.0.0'
-        classpath "com.github.node-gradle:gradle-node-plugin:3.1.1"
-    }
-}
-
 plugins {
     id 'groovy'
     id 'project-report'
     id 'idea'
     id 'java-gradle-plugin'
     id 'signing'
+    id 'com.gradle.plugin-publish' version '0.16.0'
+    id 'org.ajoberstar.git-publish' version '3.0.0'
+    id 'com.github.node-gradle.node' version '3.0.0'
 }
 
 // Remove the gradleApi so it isn't merged into the jar file.
