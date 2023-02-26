@@ -72,15 +72,12 @@ dependency so the tasks execute in the correct order.
 
 ```groovy
 // Configure Auto Relocation
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-task relocateShadowJar(type: ConfigureShadowRelocation) {
-    target = tasks.shadowJar
-    prefix = "myapp" // Default value is "shadow"
-
+tasks.named('shadowJar', ShadowJar) {
+    enableRelocation true
+    relocationPrefix "myapp"
 }
-
-tasks.shadowJar.dependsOn tasks.relocateShadowJar
 ```
 
 > Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
