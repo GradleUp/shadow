@@ -1,11 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id 'groovy'
     id 'project-report'
     id 'idea'
     id 'java-gradle-plugin'
-    // id 'signing'
     id 'com.gradle.plugin-publish' version '1.1.0'
     id 'org.ajoberstar.git-publish' version '4.1.1'
     id 'com.github.node-gradle.node' version '3.5.1'
@@ -41,18 +41,10 @@ test {
     systemProperty 'java.io.tmpdir', buildDir.absolutePath
 }
 
-// jar {
-//     from rootProject.file('LICENSE')
-//     from rootProject.file('NOTICE')
-// }
-
-// jar.enabled = false
-
-shadowJar {
+tasks.named('shadowJar', ShadowJar) {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
     enableRelocation true
-    // archiveClassifier = ''
 }
 
 idea {
@@ -72,19 +64,3 @@ tasks.register('downloadDependencies', Exec) {
     dependsOn configurations.testRuntimeClasspath
     commandLine 'echo', 'Downloaded all dependencies'
 }
-
-// tasks.named('build') { dependsOn tasks.named('shadowJar') }
-
-// tasks.withType(JavaCompile).configureEach {
-//     // This will be the default in Gradle 5.0
-//     if (!options.compilerArgs.contains("-processor")) {
-//         options.compilerArgs << '-proc:none'
-//     }
-// }
-
-// tasks.withType(GroovyCompile).configureEach {
-//     // This will be the default in Gradle 5.0
-//     if (!options.compilerArgs.contains("-processor")) {
-//         options.compilerArgs << '-proc:none'
-//     }
-// }
