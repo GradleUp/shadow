@@ -25,7 +25,7 @@ class ShadowBasePlugin implements Plugin<Project> {
         }
     }
 
-    private void createShadowConfiguration(Project project) {
+    private static void createShadowConfiguration(Project project) {
         project.configurations.create(CONFIGURATION_NAME)
     }
 }

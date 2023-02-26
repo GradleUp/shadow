@@ -18,7 +18,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.internal.file.archive.compression.ArchiveOutputStreamFactory
 
-public interface ZipCompressor extends ArchiveOutputStreamFactory {
+interface ZipCompressor extends ArchiveOutputStreamFactory {
 
     ZipOutputStream createArchiveOutputStream(File destination)
 

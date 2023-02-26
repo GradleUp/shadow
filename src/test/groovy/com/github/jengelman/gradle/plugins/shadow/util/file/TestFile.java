@@ -106,7 +106,7 @@ public class TestFile extends File {
     }
 
     public List<TestFile> files(Object... paths) {
-        List<TestFile> files = new ArrayList<TestFile>();
+        List<TestFile> files = new ArrayList<>();
         for (Object path : paths) {
             files.add(file(path));
         }
@@ -163,16 +163,13 @@ public class TestFile extends File {
         assertIsFile();
         Properties properties = new Properties();
         try {
-            FileInputStream inStream = new FileInputStream(this);
-            try {
+            try (FileInputStream inStream = new FileInputStream(this)) {
                 properties.load(inStream);
-            } finally {
-                inStream.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         for (Object key : properties.keySet()) {
             map.put(key.toString(), properties.getProperty(key.toString()));
         }
@@ -182,11 +179,8 @@ public class TestFile extends File {
     public Manifest getManifest() {
         assertIsFile();
         try {
-            JarFile jarFile = new JarFile(this);
-            try {
+            try (JarFile jarFile = new JarFile(this)) {
                 return jarFile.getManifest();
-            } finally {
-                jarFile.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -195,9 +189,8 @@ public class TestFile extends File {
 
     public List<String> linesThat(Matcher<? super String> matcher) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(this));
-            try {
-                List<String> lines = new ArrayList<String>();
+            try (BufferedReader reader = new BufferedReader(new FileReader(this))) {
+                List<String> lines = new ArrayList<>();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (matcher.matches(line)) {
@@ -205,8 +198,6 @@ public class TestFile extends File {
                     }
                 }
                 return lines;
-            } finally {
-                reader.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -383,14 +374,14 @@ public class TestFile extends File {
      * Asserts that this file contains exactly the given set of descendants.
      */
     public TestFile assertHasDescendants(String... descendants) {
-        Set<String> actual = new TreeSet<String>();
+        Set<String> actual = new TreeSet<>();
         assertIsDir();
         visit(actual, "", this);
-        Set<String> expected = new TreeSet<String>(Arrays.asList(descendants));
+        Set<String> expected = new TreeSet<>(Arrays.asList(descendants));
 
-        Set<String> extras = new TreeSet<String>(actual);
+        Set<String> extras = new TreeSet<>(actual);
         extras.removeAll(expected);
-        Set<String> missing = new TreeSet<String>(expected);
+        Set<String> missing = new TreeSet<>(expected);
         missing.removeAll(actual);
 
         assertEquals(String.format("For dir: %s, extra files: %s, missing files: %s, expected: %s", this, extras, missing, expected), expected, actual);
@@ -544,11 +535,8 @@ public class TestFile extends File {
         Properties props = new Properties();
         props.putAll(properties);
         try {
-            FileOutputStream stream = new FileOutputStream(this);
-            try {
+            try (FileOutputStream stream = new FileOutputStream(this)) {
                 props.store(stream, "comment");
-            } finally {
-                stream.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

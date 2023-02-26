@@ -24,7 +24,6 @@ class ConfigureShadowRelocationSpec extends PluginSpecification {
         run('shadowJar', '-s')
 
         then:
-        then:
         contains(output, [
                 'META-INF/MANIFEST.MF',
                 'shadow/junit/textui/ResultPrinter.class',

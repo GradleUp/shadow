@@ -59,7 +59,7 @@ class DefaultInheritManifest implements InheritManifest {
     }
 
     @Override
-    public DefaultManifest getEffectiveManifest() {
+    DefaultManifest getEffectiveManifest() {
         DefaultManifest base = new DefaultManifest(fileResolver)
         inheritMergeSpecs.each {
             base = it.merge(base, fileResolver)

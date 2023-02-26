@@ -18,7 +18,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
     public static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
     public static final String SHADOW_GROUP = 'Shadow'
 
-    private final ProjectConfigurationActionContainer configurationActionContainer;
+    private final ProjectConfigurationActionContainer configurationActionContainer
 
     @Inject
     ShadowJavaPlugin(ProjectConfigurationActionContainer configurationActionContainer) {
@@ -54,7 +54,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         }
     }
 
-    protected void configureShadowTask(Project project) {
+    protected static void configureShadowTask(Project project) {
         SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
         project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
             shadow.group = SHADOW_GROUP

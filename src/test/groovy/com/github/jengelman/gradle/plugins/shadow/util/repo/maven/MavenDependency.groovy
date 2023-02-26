@@ -13,7 +13,7 @@ class MavenDependency {
     }
 
     @Override
-    public String toString() {
+    String toString() {
         return String.format("MavenDependency %s:%s:%s:%s@%s", groupId, artifactId, version, classifier, type)
     }
 }

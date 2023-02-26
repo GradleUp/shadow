@@ -23,7 +23,7 @@ class MinimizeDependencyFilter extends AbstractDependencyFilter {
         }
     }
 
-    private boolean isParentExcluded(Set<ResolvedDependency> excludedDependencies, ResolvedDependency dependency) {
+    private static boolean isParentExcluded(Set<ResolvedDependency> excludedDependencies, ResolvedDependency dependency) {
         excludedDependencies.any { dependency.parents.contains(it) }
     }
 }
