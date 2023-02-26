@@ -11,11 +11,11 @@ if (System.env.CIRCLE_TAG && System.env.CIRCLE_TAG =~  /^\d\.\d\.\d$/) {
     }
 }
 
-tasks.configureEach {
-    if (name == "publishPluginJar" || name == "generateMetadataFileForPluginMavenPublication") {
-        dependsOn(tasks.named("shadowJar"))
-    }
-}
+// tasks.configureEach {
+//     if (name == "publishPluginJar" || name == "generateMetadataFileForPluginMavenPublication") {
+//         dependsOn(tasks.named("shadowJar"))
+//     }
+// }
 
 gradlePlugin {
     website = 'https://github.com/johnrengelman/shadow'
@@ -41,20 +41,20 @@ tasks.named('publishPlugins') {
     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
 }
 
-signing {
-    if (System.env.CI == 'true') {
-        def encodedSigningKey = findProperty("signingKey")
-        def signingKey = encodedSigningKey ? new String(encodedSigningKey.decodeBase64()) : null
-        def signingPassword = findProperty("signingPassword")
-        useInMemoryPgpKeys(signingKey, signingPassword)
-    }
-    required = gradle.taskGraph.hasTask("artifactoryPublish")
-    sign(publishing.publications)
-}
+// signing {
+//     if (System.env.CI == 'true') {
+//         def encodedSigningKey = findProperty("signingKey")
+//         def signingKey = encodedSigningKey ? new String(encodedSigningKey.decodeBase64()) : null
+//         def signingPassword = findProperty("signingPassword")
+//         useInMemoryPgpKeys(signingKey, signingPassword)
+//     }
+//     required = gradle.taskGraph.hasTask("artifactoryPublish")
+//     sign(publishing.publications)
+// }
 
-tasks.withType(Sign).configureEach {
-    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13470")
-}
+// tasks.withType(Sign).configureEach {
+//     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13470")
+// }
 
 tasks.register('release') {
     dependsOn 'assemble', 'publishPlugins', 'gitPublishPush'
