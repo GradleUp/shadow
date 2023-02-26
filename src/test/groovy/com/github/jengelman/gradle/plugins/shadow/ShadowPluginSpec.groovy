@@ -40,16 +40,16 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         ShadowJar shadow = project.tasks.findByName('shadowJar')
         assert shadow
-        assert shadow.baseName == projectName
-        assert shadow.destinationDir == new File(project.buildDir, 'libs')
-        assert shadow.version == version
-        assert shadow.classifier == 'all'
-        assert shadow.extension == 'jar'
+        assert shadow.archiveBaseName.get() == projectName
+        assert shadow.destinationDirectory.get().asFile == new File(project.buildDir, 'libs')
+        assert shadow.archiveVersion.get() == version
+        assert shadow.archiveClassifier.get() == 'all'
+        assert shadow.archiveExtension.get() == 'jar'
 
         and:
         Configuration shadowConfig = project.configurations.findByName('shadow')
         assert shadowConfig
-        shadowConfig.artifacts.file.contains(shadow.archivePath)
+        shadowConfig.artifacts.file.contains(shadow.archiveFile.get().asFile)
 
     }
 
@@ -86,13 +86,13 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['7.0']
+        version << ['8.0']
     }
 
-    def 'Error in Gradle versions < 7.0'() {
+    def 'Error in Gradle versions < 8.0'() {
         given:
         GradleRunner versionRunner = GradleRunner.create()
-                .withGradleVersion('6.9')
+                .withGradleVersion('7.0')
                 .withArguments('--stacktrace')
                 .withProjectDir(dir.root)
                 .forwardOutput()

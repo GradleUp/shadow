@@ -48,7 +48,7 @@ class AppendableMavenFileModule extends MavenFileModule {
         return artifactFile
     }
 
-    void writeJar(OutputStream os, Map<String, String> contents) {
+    static void writeJar(OutputStream os, Map<String, String> contents) {
         if (contents) {
             JarBuilder builder = new JarBuilder(os)
             contents.each { path, content ->

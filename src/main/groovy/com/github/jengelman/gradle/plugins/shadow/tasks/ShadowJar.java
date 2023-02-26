@@ -7,18 +7,16 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator;
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator;
 import com.github.jengelman.gradle.plugins.shadow.transformers.*;
 import org.gradle.api.Action;
-import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
-import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.util.PatternSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -33,20 +31,20 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private List<Relocator> relocators;
     private List<FileCollection> configurations;
     private transient DependencyFilter dependencyFilter;
-
+    private boolean enableRelocation;
+    private String relocationPrefix = "shadow";
     private boolean minimizeJar;
-    private transient DependencyFilter dependencyFilterForMinimize;
+    private final transient DependencyFilter dependencyFilterForMinimize;
     private FileCollection toMinimize;
     private FileCollection apiJars;
     private FileCollection sourceSetsClassesDirs;
 
     private final ShadowStats shadowStats = new ShadowStats();
-    private final GradleVersionUtil versionUtil;
 
     private final ConfigurableFileCollection includedDependencies = getProject().files(new Callable<FileCollection>() {
 
         @Override
-        public FileCollection call() throws Exception {
+        public FileCollection call() {
             return dependencyFilter.resolve(configurations);
         }
     });
@@ -54,7 +52,6 @@ public class ShadowJar extends Jar implements ShadowSpec {
     public ShadowJar() {
         super();
         setDuplicatesStrategy(DuplicatesStrategy.INCLUDE); //shadow filters out files later. This was the default behavior in  Gradle < 6.x
-        versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
         dependencyFilterForMinimize = new MinimizeDependencyFilter(getProject());
         setManifest(new DefaultInheritManifest(getServices().get(FileResolver.class)));
@@ -62,27 +59,19 @@ public class ShadowJar extends Jar implements ShadowSpec {
         relocators = new ArrayList<>();
         configurations = new ArrayList<>();
 
-        this.getInputs().property("minimize", new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return minimizeJar;
-            }
-        });
-        this.getOutputs().doNotCacheIf("Has one or more transforms or relocators that are not cacheable", new Spec<Task>() {
-            @Override
-            public boolean isSatisfiedBy(Task task) {
-                for (Transformer transformer : transformers) {
-                    if (!isCacheableTransform(transformer.getClass())) {
-                        return true;
-                    }
+        this.getInputs().property("minimize", (Callable<Boolean>) () -> minimizeJar);
+        this.getOutputs().doNotCacheIf("Has one or more transforms or relocators that are not cacheable", task -> {
+            for (Transformer transformer : transformers) {
+                if (!isCacheableTransform(transformer.getClass())) {
+                    return true;
                 }
-                for (Relocator relocator : relocators) {
-                    if (!isCacheableRelocator(relocator.getClass())) {
-                        return true;
-                    }
-                }
-                return false;
             }
+            for (Relocator relocator : relocators) {
+                if (!isCacheableRelocator(relocator.getClass())) {
+                    return true;
+                }
+            }
+            return false;
         });
     }
 
@@ -111,12 +100,13 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @Override
+    @NotNull
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) : null;
         return new ShadowCopyAction(getArchiveFile().get().getAsFile(), getInternalCompressor(), documentationRegistry,
                 this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
-                versionUtil, isPreserveFileTimestamps(), minimizeJar, unusedTracker);
+                isPreserveFileTimestamps(), minimizeJar, unusedTracker);
     }
 
     @Classpath
@@ -152,23 +142,21 @@ public class ShadowJar extends Jar implements ShadowSpec {
                     allClassesDirs.from(classesDirs);
                 }
             }
-            sourceSetsClassesDirs = allClassesDirs.filter(new Spec<File>() {
-                @Override
-                public boolean isSatisfiedBy(File file) {
-                    return file.isDirectory();
-                }
-            });
+            sourceSetsClassesDirs = allClassesDirs.filter(File::isDirectory);
         }
         return sourceSetsClassesDirs;
     }
 
     @Internal
     protected ZipCompressor getInternalCompressor() {
-        return versionUtil.getInternalCompressor(getEntryCompression(), this);
+        return GradleVersionUtil.getInternalCompressor(getEntryCompression(), this);
     }
 
     @TaskAction
     protected void copy() {
+        if (enableRelocation) {
+            RelocationUtil.configureRelocation(this, relocationPrefix);
+        }
         from(getIncludedDependencies());
         super.copy();
         getLogger().info(shadowStats.toString());
@@ -186,7 +174,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     @Internal
     protected PatternSet getRootPatternSet() {
-        return versionUtil.getRootPatternSet(getMainSpec());
+        return GradleVersionUtil.getRootPatternSet(getMainSpec());
     }
 
     /**
@@ -256,10 +244,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     public ShadowJar mergeServiceFiles() {
         try {
             transform(ServiceFileTransformer.class);
-        } catch (IllegalAccessException e) {
-        } catch (InstantiationException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 InstantiationException ignored) {
         }
         return this;
     }
@@ -271,17 +257,9 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public ShadowJar mergeServiceFiles(final String rootPath) {
         try {
-            transform(ServiceFileTransformer.class, new Action<ServiceFileTransformer>() {
-
-                @Override
-                public void execute(ServiceFileTransformer serviceFileTransformer) {
-                    serviceFileTransformer.setPath(rootPath);
-                }
-            });
-        } catch (IllegalAccessException e) {
-        } catch (InstantiationException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (InvocationTargetException e) {
+            transform(ServiceFileTransformer.class, serviceFileTransformer -> serviceFileTransformer.setPath(rootPath));
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 InstantiationException ignored) {
         }
         return this;
     }
@@ -294,10 +272,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     public ShadowJar mergeServiceFiles(Action<ServiceFileTransformer> configureClosure) {
         try {
             transform(ServiceFileTransformer.class, configureClosure);
-        } catch (IllegalAccessException e) {
-        } catch (InstantiationException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 InstantiationException ignored) {
         }
         return this;
     }
@@ -310,10 +286,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
     public ShadowJar mergeGroovyExtensionModules() {
         try {
             transform(GroovyExtensionModuleTransformer.class);
-        } catch (IllegalAccessException e) {
-        } catch (InstantiationException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 InstantiationException ignored) {
         }
         return this;
     }
@@ -325,16 +299,9 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     public ShadowJar append(final String resourcePath) {
         try {
-            transform(AppendingTransformer.class, new Action<AppendingTransformer>() {
-                @Override
-                public void execute(AppendingTransformer transformer) {
-                    transformer.setResource(resourcePath);
-                }
-            });
-        } catch (IllegalAccessException e) {
-        } catch (InstantiationException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (InvocationTargetException e) {
+            transform(AppendingTransformer.class, transformer -> transformer.setResource(resourcePath));
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 InstantiationException ignored) {
         }
         return this;
     }
@@ -359,7 +326,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     public ShadowJar relocate(String pattern, String destination, Action<SimpleRelocator> configure) {
-        SimpleRelocator relocator = new SimpleRelocator(pattern, destination, new ArrayList<String>(), new ArrayList<String>());
+        SimpleRelocator relocator = new SimpleRelocator(pattern, destination, new ArrayList<>(), new ArrayList<>());
         addRelocator(relocator, configure);
         return this;
     }
@@ -444,5 +411,23 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     public void setDependencyFilter(DependencyFilter filter) {
         this.dependencyFilter = filter;
+    }
+
+    @Input
+    public boolean isEnableRelocation() {
+        return enableRelocation;
+    }
+
+    public void setEnableRelocation(boolean enableRelocation) {
+        this.enableRelocation = enableRelocation;
+    }
+
+    @Input
+    public String getRelocationPrefix() {
+        return relocationPrefix;
+    }
+
+    public void setRelocationPrefix(String relocationPrefix) {
+        this.relocationPrefix = relocationPrefix;
     }
 }

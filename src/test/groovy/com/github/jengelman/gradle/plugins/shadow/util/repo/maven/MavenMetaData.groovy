@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-public interface MavenMetaData {
+interface MavenMetaData {
     List<String> getVersions();
 
 }

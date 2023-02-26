@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
@@ -117,7 +118,7 @@ import static groovy.lang.Closure.IDENTITY
 class PropertiesFileTransformer implements Transformer {
     private static final String PROPERTIES_SUFFIX = '.properties'
 
-    private Map<String, Properties> propertiesEntries = [:]
+    private Map<String, CleanProperties> propertiesEntries = [:]
 
     @Input
     List<String> paths = []
@@ -179,15 +180,17 @@ class PropertiesFileTransformer implements Transformer {
     }
 
     private Properties loadAndTransformKeys(InputStream is) {
-        Properties props = new Properties()
-        props.load(is)
+        Properties props = new CleanProperties()
+        if (is != null) {
+            props.load(is)
+        }
         return transformKeys(props)
     }
 
     private Properties transformKeys(Properties properties) {
         if (keyTransformer == IDENTITY)
             return properties
-        def result = new Properties()
+        def result = new CleanProperties()
         properties.each { key, value ->
             result.put(keyTransformer.call(key), value)
         }

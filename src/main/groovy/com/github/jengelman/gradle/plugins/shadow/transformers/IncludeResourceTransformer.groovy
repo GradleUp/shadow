@@ -36,7 +36,7 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
-public class IncludeResourceTransformer implements Transformer {
+class IncludeResourceTransformer implements Transformer {
 
     @InputFile
     @PathSensitive(PathSensitivity.NONE)
@@ -45,19 +45,19 @@ public class IncludeResourceTransformer implements Transformer {
     @Input
     String resource
 
-    public boolean canTransformResource(FileTreeElement element) {
+    boolean canTransformResource(FileTreeElement element) {
         return false
     }
 
-    public void transform(TransformerContext context) {
+    void transform(TransformerContext context) {
         // no op
     }
 
-    public boolean hasTransformedResource() {
+    boolean hasTransformedResource() {
         return file != null ? file.exists() : false
     }
 
-    public void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         ZipEntry entry = new ZipEntry(resource)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         os.putNextEntry(entry)

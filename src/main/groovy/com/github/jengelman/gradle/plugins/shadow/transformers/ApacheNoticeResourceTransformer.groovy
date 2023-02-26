@@ -94,7 +94,7 @@ class ApacheNoticeResourceTransformer implements Transformer {
     void transform(TransformerContext context) {
         if (entries.isEmpty()) {
             String year = new SimpleDateFormat("yyyy").format(new Date())
-            if (!inceptionYear.equals(year)) {
+            if (inceptionYear != year) {
                 year = inceptionYear + "-" + year
             }
 
@@ -190,7 +190,7 @@ class ApacheNoticeResourceTransformer implements Transformer {
         int count = 0
         for (String line : entries) {
             ++count
-            if (line.equals(copyright) && count != 2) {
+            if (line == copyright && count != 2) {
                 continue
             }
 

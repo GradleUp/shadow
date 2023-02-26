@@ -11,7 +11,7 @@ class JavaJarExec extends JavaExec {
 
     @Override
     @TaskAction
-    public void exec() {
+    void exec() {
         List<String> allArgs = [getJarFile().path] + getArgs()
         setArgs(allArgs)
         super.exec()

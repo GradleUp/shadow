@@ -1,7 +1,7 @@
-def javaApiUrl = 'http://docs.oracle.com/javase/1.7.0/docs/api'
-def groovyApiUrl = "http://docs.groovy-lang.org/2.4.7/html/gapi/"
+def javaApiUrl = 'https://docs.oracle.com/javase/17/docs/api'
+def groovyApiUrl = "https://docs.groovy-lang.org/2.4.7/html/gapi/"
 
-tasks.withType(Javadoc) {
+tasks.withType(Javadoc).configureEach {
     classpath += project.configurations.shadow
     options.links(javaApiUrl, groovyApiUrl)
     if (JavaVersion.current().java8Compatible) {
@@ -9,18 +9,19 @@ tasks.withType(Javadoc) {
     }
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
     archiveClassifier.set('javadoc')
     from 'build/docs/javadoc'
 }
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     archiveClassifier.set('sources')
     from sourceSets.main.allSource
 }
 
-project.tasks.groovydoc {
+tasks.named('groovydoc') {
     classpath += project.configurations.shadow
 }
 
-build.dependsOn javadocJar, sourcesJar
+tasks.named('build') { dependsOn javadocJar, sourcesJar }

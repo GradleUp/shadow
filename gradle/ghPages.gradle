@@ -3,7 +3,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 apply plugin: 'org.ajoberstar.git-publish'
 
 if (project.hasProperty('githubToken')) {
-  System.setProperty('org.ajoberstar.grgit.auth.username', project.githubToken)
+    System.setProperty('org.ajoberstar.grgit.auth.username', project.githubToken)
 }
 
 gitPublish {
@@ -23,5 +23,5 @@ gitPublish {
     }
 }
 
-tasks.gitPublishCopy.dependsOn yarn_build
-tasks.gitPublishCopy.dependsOn groovydoc
+tasks.named('gitPublishCopy') { dependsOn yarn_build }
+tasks.named('gitPublishCopy') { dependsOn groovydoc }

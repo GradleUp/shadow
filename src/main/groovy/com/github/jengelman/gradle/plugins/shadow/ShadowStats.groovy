@@ -22,7 +22,7 @@ class ShadowStats {
         relocations.collect { k, v -> "${k} ${separator(k, maxLength)} ${v}"}.sort().join("\n")
     }
 
-    String separator(String key, int max) {
+    static String separator(String key, int max) {
         return "→"
     }
 

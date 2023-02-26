@@ -46,7 +46,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
 
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
-        return COMPONENTS_XML_PATH.equals(path)
+        return COMPONENTS_XML_PATH == path
     }
 
     void transform(TransformerContext context) {
