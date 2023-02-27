@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/shadow
   docker:
-    - image: cimg/openjdk:17.0
+    - image: cimg/openjdk:19.0
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: "-Xmx1024m"
