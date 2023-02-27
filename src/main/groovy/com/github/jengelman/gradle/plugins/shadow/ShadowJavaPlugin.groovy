@@ -9,7 +9,6 @@ import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
-import org.gradle.util.GradleVersion
 
 import javax.inject.Inject
 
@@ -59,15 +58,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
             shadow.group = SHADOW_GROUP
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
-            if (GradleVersion.current() >= GradleVersion.version("5.1")) {
-                shadow.archiveClassifier.set("all")
-            } else {
-                shadow.conventionMapping.with {
-                    map('classifier') {
-                        'all'
-                    }
-                }
-            }
+            shadow.archiveClassifier.set("all")
             shadow.manifest.inheritFrom(project, project.tasks.jar.manifest)
             def libsProvider = project.provider { -> [project.tasks.jar.manifest.attributes.get('Class-Path')] }
             def files = project.objects.fileCollection().from { ->

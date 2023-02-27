@@ -6,7 +6,6 @@ import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.file.CopySpec
 import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.util.GradleVersion
 
 class ShadowExtension {
 
@@ -19,12 +18,7 @@ class ShadowExtension {
     }
 
     void component(MavenPublication publication) {
-
-        if (GradleVersion.current() >= GradleVersion.version("6.6")) {
-            publication.artifact(project.tasks.named("shadowJar"))
-        } else {
-            publication.artifact(project.tasks.shadowJar)
-        }
+        publication.artifact(project.tasks.named("shadowJar"))
 
         publication.pom { MavenPom pom ->
             pom.withXml { xml ->
