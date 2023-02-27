@@ -43,7 +43,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -120,7 +120,7 @@ class ApplicationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('Running application with JDK 17')
@@ -183,7 +183,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        run('shadowDistZip', '--stacktrace')
+        run('shadowDistZip')
 
         then: 'Check that the distribution zip was created'
         File zip = getFile('build/distributions/myapp-shadow-1.0.zip')
