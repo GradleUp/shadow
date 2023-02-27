@@ -35,6 +35,22 @@ tasks.named('publishPlugins') {
     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
 }
 
+signing {
+    if (System.env.CI == 'true') {
+        def encodedSigningKey = findProperty("signingKey")
+        def signingKey = encodedSigningKey ? new String(encodedSigningKey.decodeBase64()) : null
+        def signingPassword = findProperty("signingPassword") as String
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+    // See https://github.com/johnrengelman/shadow/pull/831#discussion_r1119012328
+    required = false && gradle.taskGraph.hasTask("artifactoryPublish")
+    sign(publishing.publications)
+}
+
+tasks.withType(Sign).configureEach {
+    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13470")
+}
+
 tasks.register('release') {
     dependsOn tasks.named('assemble'), tasks.named('publishPlugins'), tasks.named('gitPublishPush')
 }
