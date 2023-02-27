@@ -36,5 +36,5 @@ tasks.named('publishPlugins') {
 }
 
 tasks.register('release') {
-    dependsOn 'assemble', 'publishPlugins', 'gitPublishPush'
+    dependsOn tasks.named('assemble'), tasks.named('publishPlugins'), tasks.named('gitPublishPush')
 }
