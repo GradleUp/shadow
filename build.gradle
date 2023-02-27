@@ -11,11 +11,6 @@ plugins {
     id 'com.github.node-gradle.node' version '3.5.1'
 }
 
-// Remove the gradleApi so it isn't merged into the jar file.
-configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
-    dependencies.remove(project.dependencies.gradleApi())
-}
-
 apply plugin: ShadowPlugin
 
 apply from: file('gradle/docs.gradle')
