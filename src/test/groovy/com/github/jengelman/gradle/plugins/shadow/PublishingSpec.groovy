@@ -52,6 +52,10 @@ class PublishingSpec extends PluginSpecification {
                    }
                }
             }
+            
+            tasks.withType(org.gradle.api.publish.maven.tasks.GenerateMavenPom).configureEach {
+                notCompatibleWithConfigurationCache('https://github.com/gradle/gradle/issues/21926')
+            }
         """.stripIndent()
 
         when:
@@ -148,6 +152,10 @@ class PublishingSpec extends PluginSpecification {
                        artifactId = 'maven-all'
                    }
                }
+            }
+            
+            tasks.withType(org.gradle.api.publish.maven.tasks.GenerateMavenPom).configureEach {
+                notCompatibleWithConfigurationCache('https://github.com/gradle/gradle/issues/21926')
             }
         """.stripMargin()
 
