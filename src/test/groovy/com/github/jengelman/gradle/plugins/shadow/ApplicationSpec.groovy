@@ -105,7 +105,7 @@ class ApplicationSpec extends PluginSpecification {
             runShadow {
                args 'foo'
                doFirst {
-                project.logger.lifecycle("Running application with JDK \${it.javaLauncher.get().metadata.languageVersion.asInt()}")
+                   logger.lifecycle("Running application with JDK \${it.javaLauncher.get().metadata.languageVersion.asInt()}")
                }
             }          
         """.stripIndent()
