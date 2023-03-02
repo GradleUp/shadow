@@ -42,7 +42,7 @@ class PublishingSpec extends PluginSpecification {
             publishing {
                publications {
                    shadow(MavenPublication) { publication ->
-                       project.shadow.component(publication)
+                       project.shadow.component(project, publication)
                        artifactId = 'maven-all'
                    }
                }
@@ -51,10 +51,6 @@ class PublishingSpec extends PluginSpecification {
                        url "${publishingRepo.uri}"
                    }
                }
-            }
-            
-            tasks.withType(org.gradle.api.publish.maven.tasks.GenerateMavenPom).configureEach {
-                notCompatibleWithConfigurationCache('https://github.com/gradle/gradle/issues/21926')
             }
         """.stripIndent()
 
@@ -148,14 +144,10 @@ class PublishingSpec extends PluginSpecification {
             publishing {
                publications {
                    shadow(MavenPublication) { publication ->
-                       project.shadow.component(publication)
+                       project.shadow.component(project, publication)
                        artifactId = 'maven-all'
                    }
                }
-            }
-            
-            tasks.withType(org.gradle.api.publish.maven.tasks.GenerateMavenPom).configureEach {
-                notCompatibleWithConfigurationCache('https://github.com/gradle/gradle/issues/21926')
             }
         """.stripMargin()
 
