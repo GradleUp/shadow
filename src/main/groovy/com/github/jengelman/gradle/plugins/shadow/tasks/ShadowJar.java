@@ -7,11 +7,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.annotation.Nonnull;
+
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats;
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter;
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
 import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil;
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter;
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationUtil;
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker;
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor;
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator;
@@ -24,16 +27,15 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.StandardFilesMergeTransformer;
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
 import org.gradle.api.Action;
-import org.gradle.api.Task;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
-import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Nested;
@@ -45,7 +47,6 @@ import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.util.PatternSet;
-import org.jetbrains.annotations.NotNull;
 
 @CacheableTask
 public class ShadowJar extends Jar implements ShadowSpec {
@@ -133,7 +134,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     protected CopyAction createCopyAction() {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getApiJars(),
