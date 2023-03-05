@@ -94,7 +94,6 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
     protected void configureInstallTask(Project project) {
         project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync).configure { task ->
-            notCompatibleWithConfigurationCache('https://github.com/johnrengelman/shadow/issues/775')
             task.doFirst {
                 if (task.destinationDir.directory) {
                     if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
@@ -106,7 +105,11 @@ class ShadowApplicationPlugin implements Plugin<Project> {
                 }
             }
             task.doLast {
-                project.ant.chmod(file: "${task.destinationDir.absolutePath}/bin/${javaApplication.applicationName}", perm: 'ugo+x')
+                task.eachFile {
+                    if (it.path == "bin/${javaApplication.applicationName}") {
+                        it.mode = 0x755
+                    }
+                }
             }
         }
     }
