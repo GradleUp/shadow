@@ -42,7 +42,7 @@ class PublishingSpec extends PluginSpecification {
             publishing {
                publications {
                    shadow(MavenPublication) { publication ->
-                       project.shadow.component(project, publication)
+                       project.shadow.component(publication)
                        artifactId = 'maven-all'
                    }
                }
@@ -144,7 +144,7 @@ class PublishingSpec extends PluginSpecification {
             publishing {
                publications {
                    shadow(MavenPublication) { publication ->
-                       project.shadow.component(project, publication)
+                       project.shadow.component(publication)
                        artifactId = 'maven-all'
                    }
                }
