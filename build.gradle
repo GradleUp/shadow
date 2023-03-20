@@ -50,6 +50,13 @@ tasks.withType(Test).configureEach {
     )
 }
 
+// Remove the gradleApi so it isn't merged into the jar file.
+// This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
+// See https://github.com/gradle/gradle/blob/master/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L162
+configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
+    dependencies.remove(project.dependencies.gradleApi())
+}
+
 tasks.named('shadowJar', ShadowJar) {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
