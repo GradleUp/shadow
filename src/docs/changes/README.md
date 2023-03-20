@@ -2,6 +2,8 @@
 
 ## v8.1.1 (2023-03-20)
 
+**NOTE: ** As of this version, the Github repository has migrated to the `main` branch as the default branch for releases.
+
 [Release Notes](https://github.com/johnrengelman/shadow/releases/tag/8.1.1)
 
 ## v8.1.0 (2023-02-26)
