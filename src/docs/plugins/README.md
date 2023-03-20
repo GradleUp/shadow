@@ -5,18 +5,10 @@ conflicts with the same dependency provided by the Gradle runtime. If this is th
 to relocate your dependencies to a different package name to avoid the collision.
 
 Configuring the relocation has always been possible, but the build author is required to know all the package names
-before hand. Shadow v2.0 corrects this by introducing a new task type `ConfigureShadowRelocation`.
-Tasks of this type are configured to target an instance of a `ShadowJar` task and run immediately before it.
+beforehand. As of Shadow v8.1.0, automatic package relocation can be enabled by setting the `enabledRelocation` 
+and `relocationPrefix` settings on any `ShadowJar` task.
 
-The `ConfigureShadowRelocation` task, scans the dependencies from the configurations specified on the associated
-`ShadowJar` task and collects the package names contained within them. It then configures relocation for these
-packages using the specified `prefix` on the associated `ShadowJar` task.
-
-While this is useful for developing Gradle plugins, nothing about the `ConfigureShadowRelocation` task is tied to
-Gradle projects. It can be used for standard Java or Groovy projects.
-
-A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the relocation task
-to execute before the `shadowJar` tasks:
+A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the `shadowJar` task for relocation.
 
 ```groovy no-plugins
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -48,6 +40,12 @@ normal `compile` configuration. These 2 dependencies are provided by Gradle to c
 provided by the Gradle runtime when executing the plugin. Thus, it is **not** advisable to bundle these dependencies
 with your plugin.
 
+## Publishing shadowed Gradle plugins
+The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
+Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be
+automatically configured to publish the output of the `shadowJar` tasks as the consumable artifact for the plugin.
+See the [Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies) for details.
+
 ## Special Handling of the Java Gradle Plugin Development Plugin
 
 The Java Gradle Plugin Development plugin, `java-gradle-plugin`, automatically adds the full Gradle API to the `compile` 
@@ -57,3 +55,15 @@ included in the resultant shadow jar.  Virtually:
 
     // needed to prevent inclusion of gradle-api into shadow JAR
     configurations.compile.dependencies.remove dependencies.gradleApi()
+
+## Automatic package relocation with Shadow prior to v8.1.0
+
+Prior to Shadow v8.1.0, Shadow handled this by introducing a new task type `ConfigureShadowRelocation`.
+Tasks of this type are configured to target an instance of a `ShadowJar` task and run immediately before it.
+
+The `ConfigureShadowRelocation` task, scans the dependencies from the configurations specified on the associated
+`ShadowJar` task and collects the package names contained within them. It then configures relocation for these
+packages using the specified `prefix` on the associated `ShadowJar` task.
+
+While this is useful for developing Gradle plugins, nothing about the `ConfigureShadowRelocation` task is tied to
+Gradle projects. It can be used for standard Java or Groovy projects.
