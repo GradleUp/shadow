@@ -6,5 +6,5 @@ interface InheritManifest extends Manifest {
 
     InheritManifest inheritFrom(Object... inheritPaths)
 
-    InheritManifest inheritFrom(Object inheritPaths, Closure closure)
+    InheritManifest inheritFrom(inheritPaths, Closure closure)
 }

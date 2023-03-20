@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture;
+package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture
 
 class GroovyScriptFixture extends SnippetFixture {
 

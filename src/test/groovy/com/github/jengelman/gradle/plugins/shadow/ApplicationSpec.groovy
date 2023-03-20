@@ -43,7 +43,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -98,25 +98,32 @@ class ApplicationSpec extends PluginSpecification {
             
             java {
                 toolchain {
-                    languageVersion = JavaLanguageVersion.of(16)
+                    languageVersion = JavaLanguageVersion.of(17)
                 }
             }
             
             runShadow {
                args 'foo'
                doFirst {
-                project.logger.lifecycle("Running application with JDK \${it.javaLauncher.get().metadata.languageVersion.asInt()}")
+                   logger.lifecycle("Running application with JDK \${it.javaLauncher.get().metadata.languageVersion.asInt()}")
                }
             }          
         """.stripIndent()
 
-        settingsFile << "rootProject.name = 'myapp'"
+        settingsFile.write """ 
+            plugins {
+              // https://docs.gradle.org/8.0.1/userguide/toolchains.html#sub:download_repositories
+              id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
+            }
+            
+            rootProject.name = 'myapp'
+        """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
-        assert result.output.contains('Running application with JDK 16')
+        assert result.output.contains('Running application with JDK 17')
         assert result.output.contains('TestApp: Hello World! (foo)')
 
         and: 'Check that the proper jar file was installed'
@@ -176,7 +183,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        run('shadowDistZip', '--stacktrace')
+        run('shadowDistZip')
 
         then: 'Check that the distribution zip was created'
         File zip = getFile('build/distributions/myapp-shadow-1.0.zip')

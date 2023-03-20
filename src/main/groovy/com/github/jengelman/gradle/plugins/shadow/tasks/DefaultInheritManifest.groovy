@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import org.gradle.api.Action
+import org.gradle.api.Project
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Attributes
 import org.gradle.api.java.archives.Manifest
@@ -8,17 +9,19 @@ import org.gradle.api.java.archives.ManifestException
 import org.gradle.api.java.archives.ManifestMergeSpec
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
-import org.gradle.util.ConfigureUtil
 
 class DefaultInheritManifest implements InheritManifest {
 
     private List<DefaultManifestMergeSpec> inheritMergeSpecs = []
 
+    private final transient Project project
+
     private final FileResolver fileResolver
 
     private final Manifest internalManifest
 
-    DefaultInheritManifest(FileResolver fileResolver) {
+    DefaultInheritManifest(Project project, FileResolver fileResolver) {
+        this.project = project
         this.internalManifest = new DefaultManifest(fileResolver)
         this.fileResolver = fileResolver
     }
@@ -32,7 +35,7 @@ class DefaultInheritManifest implements InheritManifest {
         DefaultManifestMergeSpec mergeSpec = new DefaultManifestMergeSpec()
         mergeSpec.from(inheritPaths)
         inheritMergeSpecs.add(mergeSpec)
-        ConfigureUtil.configure(closure, mergeSpec)
+        project.configure(mergeSpec, closure)
         return this
     }
 
@@ -59,7 +62,7 @@ class DefaultInheritManifest implements InheritManifest {
     }
 
     @Override
-    public DefaultManifest getEffectiveManifest() {
+    DefaultManifest getEffectiveManifest() {
         DefaultManifest base = new DefaultManifest(fileResolver)
         inheritMergeSpecs.each {
             base = it.merge(base, fileResolver)

@@ -3,7 +3,7 @@
 Shadow can automatically remove all classes of dependencies that are not used by the project, thereby minimizing the resulting shadowed JAR.
 
 ```groovy
-// Minimizing an shadow JAR
+// Minimizing a shadow JAR
 shadowJar {
   minimize()
 }

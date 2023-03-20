@@ -42,11 +42,11 @@ class SimpleRelocatorParameterTest extends TestCase {
         constructThenFailOnNullPointerException("", null)
     }
 
-    private void constructThenFailOnNullPointerException(String pattern, String shadedPattern) {
+    private static void constructThenFailOnNullPointerException(String pattern, String shadedPattern) {
         try {
             new SimpleRelocator(pattern, shadedPattern, Collections.<String> emptyList(), Collections.<String> emptyList())
         }
-        catch (NullPointerException e) {
+        catch (NullPointerException ignored) {
             fail("Constructor should not throw null pointer exceptions")
         }
     }

@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
-import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -53,14 +52,13 @@ class ShadowCopyAction implements CopyAction {
     private final PatternSet patternSet
     private final ShadowStats stats
     private final String encoding
-    private final GradleVersionUtil versionUtil
     private final boolean preserveFileTimestamps
     private final boolean minimizeJar
     private final UnusedTracker unusedTracker
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             String encoding, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats, GradleVersionUtil util,
+                            PatternSet patternSet, ShadowStats stats,
                             boolean preserveFileTimestamps, boolean minimizeJar, UnusedTracker unusedTracker) {
 
         this.zipFile = zipFile
@@ -71,7 +69,6 @@ class ShadowCopyAction implements CopyAction {
         this.patternSet = patternSet
         this.stats = stats
         this.encoding = encoding
-        this.versionUtil = util
         this.preserveFileTimestamps = preserveFileTimestamps
         this.minimizeJar = minimizeJar
         this.unusedTracker = unusedTracker
@@ -154,7 +151,7 @@ class ShadowCopyAction implements CopyAction {
         } catch(Throwable t) {
             try {
                 resource.close()
-            } catch (IOException e) {
+            } catch (IOException ignored) {
                 // Ignored
             }
             throw UncheckedException.throwAsUncheckedException(t)
@@ -373,7 +370,7 @@ class ShadowCopyAction implements CopyAction {
                 zipOutStr.putNextEntry(archiveEntry)
                 IOUtils.copyLarge(bis, zipOutStr)
                 zipOutStr.closeEntry()
-            } catch (ZipException e) {
+            } catch (ZipException ignored) {
                 log.warn("We have a duplicate " + mappedName + " in source project")
             } finally {
                 bis.close()
