@@ -19,7 +19,7 @@ jobs:
             - v1-gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
             - v1-gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
             - v1-gradle-{{ .Branch }}
-            - v1-gradle-master
+            - v1-gradle-main
             - v1-gradle
 
       - run: ./gradlew downloadDependencies
@@ -58,7 +58,7 @@ jobs:
             - v1-gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "gradle/dependencies.gradle" }}
             - v1-gradle-{{ .Branch }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
             - v1-gradle-{{ .Branch }}
-            - v1-gradle-master
+            - v1-gradle-main
             - v1-gradle
 
       - attach_workspace:
@@ -81,4 +81,4 @@ workflows:
 #            - release
 #          filters:
 #            branches:
-#              only: master
+#              only: main
