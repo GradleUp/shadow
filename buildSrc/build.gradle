@@ -1,6 +1,8 @@
 import org.codehaus.groovy.control.CompilerConfiguration
 
-apply plugin: 'groovy'
+plugins {
+    id 'groovy'
+}
 
 repositories {
     gradlePluginPortal()
@@ -50,19 +52,5 @@ sourceSets {
         java.srcDirs = ['../src/main/java']
         groovy.srcDirs = ['../src/main/groovy']
         resources.srcDirs = ['../src/main/resources']
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    // This will be the default in Gradle 5.0
-    if (!options.compilerArgs.contains("-processor")) {
-        options.compilerArgs << '-proc:none'
-    }
-}
-
-tasks.withType(GroovyCompile).configureEach {
-    // This will be the default in Gradle 5.0
-    if (!options.compilerArgs.contains("-processor")) {
-        options.compilerArgs << '-proc:none'
     }
 }

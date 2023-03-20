@@ -5,7 +5,6 @@ import org.gradle.api.internal.file.copy.CopySpecInternal
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.util.PatternSet
-import org.gradle.util.GradleVersion
 
 class GradleVersionUtil {
 
