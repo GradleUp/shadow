@@ -8,6 +8,8 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
@@ -19,39 +21,41 @@ class ShadowJavaPlugin implements Plugin<Project> {
     public static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
     public static final String SHADOW_GROUP = 'Shadow'
 
-    private final ProjectConfigurationActionContainer configurationActionContainer
+    private final SoftwareComponentFactory softwareComponentFactory
 
     @Inject
-    ShadowJavaPlugin(ProjectConfigurationActionContainer configurationActionContainer) {
-        this.configurationActionContainer = configurationActionContainer
+    ShadowJavaPlugin(SoftwareComponentFactory softwareComponentFactory) {
+        this.softwareComponentFactory = softwareComponentFactory
     }
 
     @Override
     void apply(Project project) {
-        configureShadowTask(project)
+        def shadowTask = configureShadowTask(project)
 
         project.configurations.compileClasspath.extendsFrom project.configurations.shadow
 
-        project.configurations {
-            shadowRuntimeElements {
-                canBeConsumed = true
-                canBeResolved = false
-                attributes {
-                    it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage, Usage.JAVA_RUNTIME))
-                    it.attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category, Category.LIBRARY))
-                    it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
-                    it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.SHADOWED))
-                }
-                outgoing.artifact(project.tasks.named(SHADOW_JAR_TASK_NAME))
+        project.configurations.register("shadowRuntimeElements") {
+            extendsFrom(project.configurations.shadow)
+            canBeResolved = false
+            canBeConsumed = true
+            attributes {
+                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage, Usage.JAVA_RUNTIME))
+                it.attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category, Category.LIBRARY))
+                it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
+                it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.SHADOWED))
             }
+            outgoing.artifact(shadowTask)
         }
 
-        project.configurations.shadowRuntimeElements.extendsFrom project.configurations.shadow
+        AdhocComponentWithVariants javaComponent = (AdhocComponentWithVariants) project.components.findByName("java")
+        javaComponent.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+            mapToOptional()
+        }
 
-        project.components.java {
-            addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-                mapToOptional() // make it a Maven optional dependency
-            }
+        AdhocComponentWithVariants shadow = softwareComponentFactory.adhoc("shadow")
+        project.components.add(shadow)
+        shadow.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+            mapToMavenScope("runtime")
         }
 
         project.plugins.withType(JavaGradlePluginPlugin).configureEach {
@@ -68,9 +72,9 @@ class ShadowJavaPlugin implements Plugin<Project> {
         }
     }
 
-    protected static void configureShadowTask(Project project) {
+    protected static ShadowJar configureShadowTask(Project project) {
         SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
-        project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
+        def taskProvider = project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
             shadow.group = SHADOW_GROUP
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.archiveClassifier.set("all")
@@ -91,6 +95,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
                                              project.configurations.runtimeClasspath : project.configurations.runtime]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
         }
-        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, project.tasks.named(SHADOW_JAR_TASK_NAME))
+        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, taskProvider.get())
+        return taskProvider.get()
     }
 }
