@@ -1070,7 +1070,9 @@ class ShadowPluginSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application {
+               mainClass = 'myapp.Main'
+            }
 
             dependencies {
                implementation 'shadow:a:1.0'
@@ -1148,7 +1150,9 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'aspectj'
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application {
+               mainClass = 'myapp.Main'
+            }
 
             repositories {
                 mavenCentral()

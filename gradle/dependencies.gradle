@@ -24,4 +24,5 @@ dependencies {
     testImplementation 'com.google.guava:guava:32.1.1-jre'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.9.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
