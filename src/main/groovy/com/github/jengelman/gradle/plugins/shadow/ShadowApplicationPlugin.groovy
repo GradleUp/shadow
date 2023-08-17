@@ -86,7 +86,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             startScripts.classpath = project.files(jar)
             startScripts.conventionMapping.mainClassName = { javaApplication.mainClass.get() }
             startScripts.conventionMapping.applicationName = { javaApplication.applicationName }
-            startScripts.conventionMapping.outputDir = { new File(project.buildDir, 'scriptsShadow') }
+            startScripts.conventionMapping.outputDir = { new File(project.layout.buildDirectory.asFile.get(), 'scriptsShadow') }
             startScripts.conventionMapping.defaultJvmOpts = { javaApplication.applicationDefaultJvmArgs }
             startScripts.inputs.files project.objects.fileCollection().from { -> jar }
         }

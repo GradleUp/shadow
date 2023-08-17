@@ -19,10 +19,12 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
+import org.gradle.api.internal.file.DefaultFilePermissions
 import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
@@ -528,6 +530,11 @@ class ShadowCopyAction implements CopyAction {
         @Override
         int getMode() {
             return archivePath.entry.unixMode
+        }
+
+        @Override
+        FilePermissions getPermissions() {
+            return this.isDirectory() ? DefaultFilePermissions.DEFAULT_DIR_PERMISSIONS : DefaultFilePermissions.DEFAULT_FILE_PERMISSIONS
         }
 
         FileTreeElement asFileTreeElement() {

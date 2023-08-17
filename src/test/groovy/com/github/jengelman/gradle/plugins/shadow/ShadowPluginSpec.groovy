@@ -41,7 +41,7 @@ class ShadowPluginSpec extends PluginSpecification {
         ShadowJar shadow = project.tasks.findByName('shadowJar')
         assert shadow
         assert shadow.archiveBaseName.get() == projectName
-        assert shadow.destinationDirectory.get().asFile == new File(project.buildDir, 'libs')
+        assert shadow.destinationDirectory.get().asFile == new File(project.layout.buildDirectory.asFile.get(), 'libs')
         assert shadow.archiveVersion.get() == version
         assert shadow.archiveClassifier.get() == 'all'
         assert shadow.archiveExtension.get() == 'jar'
@@ -86,10 +86,10 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['8.0']
+        version << ['8.3']
     }
 
-    def 'Error in Gradle versions < 8.0'() {
+    def 'Error in Gradle versions < 8.3'() {
         given:
         GradleRunner versionRunner = GradleRunner.create()
                 .withGradleVersion('7.0')
@@ -1078,7 +1078,7 @@ class ShadowPluginSpec extends PluginSpecification {
                implementation 'shadow:a:1.0'
             }
 
-            def generatedResourcesDir = new File(project.buildDir, "generated-resources")
+            def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
 
             task generateResources {
                 doLast {

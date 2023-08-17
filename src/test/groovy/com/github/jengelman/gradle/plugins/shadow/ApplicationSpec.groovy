@@ -117,7 +117,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile.write """ 
             plugins {
               // https://docs.gradle.org/8.0.1/userguide/toolchains.html#sub:download_repositories
-              id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
+              id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
             }
             
             rootProject.name = 'myapp'
