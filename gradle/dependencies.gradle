@@ -4,7 +4,7 @@ dependencies {
     shadow 'org.codehaus.groovy:groovy-backports-compat23:3.0.8'
 
     implementation 'org.jdom:jdom2:2.0.6.1'
-    implementation 'org.ow2.asm:asm:9.5'
+    implementation 'org.ow2.asm:asm:9.6'
     implementation 'org.ow2.asm:asm-commons:9.6'
     implementation 'commons-io:commons-io:2.13.0'
     implementation 'org.apache.ant:ant:1.10.14'
