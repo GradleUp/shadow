@@ -534,7 +534,7 @@ class ShadowCopyAction implements CopyAction {
 
         @Override
         FilePermissions getPermissions() {
-            return this.isDirectory() ? DefaultFilePermissions.DEFAULT_DIR_PERMISSIONS : DefaultFilePermissions.DEFAULT_FILE_PERMISSIONS
+            return new DefaultFilePermissions(getMode())
         }
 
         FileTreeElement asFileTreeElement() {
