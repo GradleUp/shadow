@@ -21,7 +21,7 @@ class ShadowBasePlugin implements Plugin<Project> {
 
         project.tasks.register(KnowsTask.NAME, KnowsTask) { knows ->
             knows.group = ShadowJavaPlugin.SHADOW_GROUP
-            knows.description = KnowsTask.DESC
+            knows.description = DESC
         }
     }
 
