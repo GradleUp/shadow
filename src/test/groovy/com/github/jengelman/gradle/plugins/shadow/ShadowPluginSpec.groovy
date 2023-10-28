@@ -7,7 +7,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Unroll
@@ -56,12 +55,6 @@ class ShadowPluginSpec extends PluginSpecification {
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
-        GradleRunner versionRunner = runner
-                .withGradleVersion(version)
-                .withArguments('--stacktrace')
-                .withDebug(true)
-
-
         File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
                 'one # NOTE: No newline terminates this line/file').write()
 
@@ -80,7 +73,11 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        versionRunner.withArguments('shadowJar', '--stacktrace').build()
+        run(['shadowJar']) {
+            it.withGradleVersion(version)
+            it.withDebug(true)
+            it.withTestKitDir(getTestKitDir())
+        }
 
         then:
         assert output.exists()
@@ -91,14 +88,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
     def 'Error in Gradle versions < 8.3'() {
         given:
-        GradleRunner versionRunner = GradleRunner.create()
-                .withGradleVersion('7.0')
-                .withArguments('--stacktrace')
-                .withProjectDir(dir.root)
-                .forwardOutput()
-                .withDebug(true)
-                .withTestKitDir(getTestKitDir())
-
         buildFile << """
             dependencies {
               implementation 'junit:junit:3.8.2'
@@ -110,7 +99,11 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         expect:
-        versionRunner.withArguments('shadowJar', '--stacktrace').buildAndFail()
+        runWithFailure(['shadowJar']) {
+            it.withGradleVersion('7.0')
+            it.withDebug(true)
+            it.withTestKitDir(getTestKitDir())
+        }
     }
 
     def 'shadow copy'() {
@@ -813,10 +806,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
     def "include java-library configurations by default"() {
         given:
-        GradleRunner versionRunner = runner
-                .withArguments('--stacktrace')
-                .withDebug(true)
-
         repo.module('shadow', 'api', '1.0')
                 .insertFile('api.properties', 'api')
                 .publish()
@@ -844,7 +833,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        versionRunner.withArguments('shadowJar').build()
+        runWithDebug('shadowJar')
 
         then:
         contains(output, ['api.properties', 'implementation.properties',
