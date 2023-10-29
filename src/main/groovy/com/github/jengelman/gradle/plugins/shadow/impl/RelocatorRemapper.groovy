@@ -115,32 +115,4 @@ class RelocatorRemapper extends Remapper {
         mapPath(path.pathString)
     }
 
-    @Override
-    String mapInnerClassName(String name, String ownerName, String innerName) {
-        final String remappedInnerName = this.mapType(name)
-
-        if (remappedInnerName == name) {
-            return innerName
-        } else {
-            int originSplit = name.lastIndexOf('/')
-            int remappedSplit = remappedInnerName.lastIndexOf('/')
-            if (originSplit != -1 && remappedSplit != -1) {
-                if (name.substring(originSplit) == remappedInnerName.substring(remappedSplit)) {
-                    // class name not changed
-                    return innerName
-                }
-            }
-        }
-
-        if (remappedInnerName.contains('$')) {
-            int index = remappedInnerName.lastIndexOf('$') + 1
-            while (index < remappedInnerName.length()
-                    && Character.isDigit(remappedInnerName.charAt(index))) {
-                index++
-            }
-            return remappedInnerName.substring(index)
-        } else {
-            return innerName
-        }
-    }
 }

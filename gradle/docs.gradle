@@ -9,15 +9,9 @@ tasks.withType(Javadoc).configureEach {
     }
 }
 
-tasks.register('javadocJar', Jar) {
-    dependsOn javadoc
-    archiveClassifier.set('javadoc')
-    from 'build/docs/javadoc'
-}
-
-tasks.register('sourcesJar', Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 tasks.named('groovydoc') {

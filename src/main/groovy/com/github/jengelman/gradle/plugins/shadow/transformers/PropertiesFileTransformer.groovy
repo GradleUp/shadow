@@ -132,6 +132,9 @@ class PropertiesFileTransformer implements Transformer {
     @Input
     String mergeSeparator = ','
 
+    @Input
+    String charset = 'ISO_8859_1'
+
     @Internal
     Closure<String> keyTransformer = IDENTITY
 
@@ -181,15 +184,17 @@ class PropertiesFileTransformer implements Transformer {
 
     private Properties loadAndTransformKeys(InputStream is) {
         Properties props = new CleanProperties()
+        // InputStream closed by caller, so we don't do it here.
         if (is != null) {
-            props.load(is)
+            props.load(new InputStreamReader(is, charset))
         }
         return transformKeys(props)
     }
 
     private Properties transformKeys(Properties properties) {
-        if (keyTransformer == IDENTITY)
+        if (keyTransformer == IDENTITY) {
             return properties
+        }
         def result = new CleanProperties()
         properties.each { key, value ->
             result.put(keyTransformer.call(key), value)
@@ -230,18 +235,23 @@ class PropertiesFileTransformer implements Transformer {
 
     @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        // cannot close the writer as the OutputStream needs to remain open
+        def zipWriter = new OutputStreamWriter(os, charset)
         propertiesEntries.each { String path, Properties props ->
             ZipEntry entry = new ZipEntry(path)
             entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
             os.putNextEntry(entry)
-            IOUtil.copy(toInputStream(props), os)
+            IOUtil.copy(readerFor(props, charset), zipWriter)
+            zipWriter.flush()
             os.closeEntry()
         }
     }
 
-    private static InputStream toInputStream(Properties props) {
+    private static InputStreamReader readerFor(Properties props, String charset) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        props.store(baos, '')
-        new ByteArrayInputStream(baos.toByteArray())
+        baos.withWriter(charset) { w ->
+            props.store(w, '')
+        }
+        new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), charset)
     }
 }

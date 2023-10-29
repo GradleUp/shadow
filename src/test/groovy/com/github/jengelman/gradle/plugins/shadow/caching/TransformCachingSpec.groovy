@@ -47,6 +47,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
             }
 
             shadowJar {
+                notCompatibleWithConfigurationCache('CustomTransformer is not cacheable')
                 transform(CustomTransformer)
             }
         """.stripIndent()
