@@ -41,7 +41,10 @@ class AppendingTransformer implements Transformer {
     @Input
     String resource
 
-    private ByteArrayOutputStream data = new ByteArrayOutputStream()
+    /**
+     * Defer initialization, see https://github.com/johnrengelman/shadow/issues/763
+     */
+    private ByteArrayOutputStream data
 
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
@@ -53,6 +56,10 @@ class AppendingTransformer implements Transformer {
     }
 
     void transform(TransformerContext context) {
+        if (data == null) {
+            data = new ByteArrayOutputStream()
+        }
+
         IOUtil.copy(context.is, data)
         data.write('\n'.bytes)
 
@@ -60,10 +67,14 @@ class AppendingTransformer implements Transformer {
     }
 
     boolean hasTransformedResource() {
-        return data.size() > 0
+        return data?.size() > 0
     }
 
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        if (data == null) {
+            data = new ByteArrayOutputStream()
+        }
+
         ZipEntry entry = new ZipEntry(resource)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         os.putNextEntry(entry)

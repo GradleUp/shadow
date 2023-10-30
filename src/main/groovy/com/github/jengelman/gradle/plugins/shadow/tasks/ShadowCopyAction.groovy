@@ -242,7 +242,7 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private boolean recordVisit(FileCopyDetails fileCopyDetails) {
-            return recordVisit(fileCopyDetails.relativePath, fileCopyDetails.size, null)
+            return recordVisit(fileCopyDetails.relativePath.toString(), fileCopyDetails.size, null)
         }
 
         @Override
@@ -308,7 +308,7 @@ class ShadowCopyAction implements CopyAction {
             long archiveFileSize = archiveFile.size
 
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                def path = archiveFilePath.toString()
+                String path = archiveFilePath.toString()
                 if (recordVisit(path, archiveFileSize, archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFilePath, archive)

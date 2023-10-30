@@ -142,4 +142,23 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         'foo.properties' | { key -> 'bar.' + key.toLowerCase() }         | ['foo': 'bar'] | ['FOO': 'baz'] || ['bar.foo': 'bar,baz']
         'foo.properties' | { key -> key.replaceAll('^(foo)', 'bar.$1') } | ['foo': 'bar'] | ['FOO': 'baz'] || ['bar.foo': 'bar', 'FOO': 'baz']
     }
+
+    void appliesCharset() {
+        given:
+        def element = getFileElement(path)
+        def transformer = new PropertiesFileTransformer()
+        transformer.charset = charset
+
+        when:
+        if (transformer.canTransformResource(element)) {
+            transformer.transform(context(path, input, charset))
+        }
+
+        then:
+        output == toMap(transformer.propertiesEntries[path])
+
+        where:
+        path                    | charset      | input                 || output
+        'utf8.properties'       | 'utf-8'      | ['foo': '传傳磨宿说説'] || ['foo': '传傳磨宿说説']
+    }
 }

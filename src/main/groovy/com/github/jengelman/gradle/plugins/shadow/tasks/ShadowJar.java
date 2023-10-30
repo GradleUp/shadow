@@ -78,7 +78,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         setDuplicatesStrategy(DuplicatesStrategy.INCLUDE); //shadow filters out files later. This was the default behavior in  Gradle < 6.x
         dependencyFilter = new DefaultDependencyFilter(getProject());
         dependencyFilterForMinimize = new MinimizeDependencyFilter(getProject());
-        setManifest(new DefaultInheritManifest(getServices().get(FileResolver.class)));
+        setManifest(new DefaultInheritManifest(getProject(), getServices().get(FileResolver.class)));
         /*
          Add as default the StandardFilesMergeTransformer, remove it with "removeDefaultTransformers()".
          This is added by default, because otherwise:

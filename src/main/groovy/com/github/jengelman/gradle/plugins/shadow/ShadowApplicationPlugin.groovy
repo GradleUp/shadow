@@ -93,8 +93,8 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
 
     protected void configureInstallTask(Project project) {
-        project.tasks.named(SHADOW_INSTALL_TASK_NAME).configure { installTask ->
-            installTask.doFirst { Sync task ->
+        project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync).configure { task ->
+            task.doFirst {
                 if (task.destinationDir.directory) {
                     if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
                         throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
@@ -104,8 +104,12 @@ class ShadowApplicationPlugin implements Plugin<Project> {
                     }
                 }
             }
-            installTask.doLast { Sync task ->
-                project.ant.chmod(file: "${task.destinationDir.absolutePath}/bin/${javaApplication.applicationName}", perm: 'ugo+x')
+            task.doLast {
+                task.eachFile {
+                    if (it.path == "bin/${javaApplication.applicationName}") {
+                        it.mode = 0x755
+                    }
+                }
             }
         }
     }

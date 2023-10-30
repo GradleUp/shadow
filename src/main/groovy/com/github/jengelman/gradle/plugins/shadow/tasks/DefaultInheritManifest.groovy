@@ -14,21 +14,24 @@ class DefaultInheritManifest implements InheritManifest {
 
     private List<DefaultManifestMergeSpec> inheritMergeSpecs = []
 
+    private final transient Project project
+
     private final FileResolver fileResolver
 
     private final Manifest internalManifest
 
-    DefaultInheritManifest(FileResolver fileResolver) {
+    DefaultInheritManifest(Project project, FileResolver fileResolver) {
+        this.project = project
         this.internalManifest = new DefaultManifest(fileResolver)
         this.fileResolver = fileResolver
     }
 
-    InheritManifest inheritFrom(Project project, Object... inheritPaths) {
-        inheritFrom(project, inheritPaths, null)
+    InheritManifest inheritFrom(Object... inheritPaths) {
+        inheritFrom(inheritPaths, null)
         return this
     }
 
-    InheritManifest inheritFrom(Project project, Object inheritPaths, Closure closure) {
+    InheritManifest inheritFrom(Object inheritPaths, Closure closure) {
         DefaultManifestMergeSpec mergeSpec = new DefaultManifestMergeSpec()
         mergeSpec.from(inheritPaths)
         inheritMergeSpecs.add(mergeSpec)
