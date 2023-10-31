@@ -150,7 +150,7 @@ class ShadowPluginSpec extends PluginSpecification {
         BuildResult result = run('shadowJar')
 
         then:
-        assert result.output =~ /\s*IGNORING META-INF\/MANIFEST\.MF from test-artifact-1\.0-SNAPSHOT\.jar, size is different \([0-9]{4} vs 25\)\s+--> file originated from project sourcecode/
+        assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar, size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/
     }
 
     def 'include project sources'() {
