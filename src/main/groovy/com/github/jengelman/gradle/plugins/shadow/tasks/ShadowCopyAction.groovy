@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.StandardFilesMergeTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+import groovy.util.logging.Log
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
@@ -16,6 +17,7 @@ import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
+import org.codehaus.groovy.transform.LogASTTransformation
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.UncheckedIOException
@@ -38,13 +40,17 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.annotation.Nullable
 import java.util.zip.ZipException
 
-@Slf4j
+
 class ShadowCopyAction implements CopyAction {
     static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
+
+    final static Logger log = LoggerFactory.getLogger(ShadowCopyAction.class);
 
     private final File zipFile
     private final ZipCompressor compressor
@@ -318,14 +324,27 @@ class ShadowCopyAction implements CopyAction {
                 } else {
                     def archiveFileInVisitedFiles = visitedFiles.get(path)
                     if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size)) {
-                        log.warn("IGNORING ${archiveFilePath} from ${fileDetails.relativePath}, size is different (${fileDetails.size} vs ${archiveFileInVisitedFiles.size})")
-                        if (archiveFileInVisitedFiles.originJar) {
-                            log.warn("\t--> origin JAR was ${archiveFileInVisitedFiles.originJar}")
+                        // Give of only a debug-level warning for this file:
+                        final String lowLevelWarningFile = "META-INF/MANIFEST.MF"
+
+                        final logDebug = (String msg) -> { log.debug(msg) }
+                        final logWarn = (String msg) -> { log.warn(msg) }
+
+                        final Closure logger
+                        if (archiveFilePath.toString() == lowLevelWarningFile) {
+                            logger = logDebug
                         } else {
-                            log.warn("\t--> file originated from project sourcecode")
+                            logger = logWarn
+                        }
+                        logger("IGNORING ${archiveFilePath} from ${fileDetails.relativePath}," +
+                                " size is different (${fileDetails.size} vs ${archiveFileInVisitedFiles.size})")
+                        if (archiveFileInVisitedFiles.originJar) {
+                            logger("\t--> origin JAR was ${archiveFileInVisitedFiles.originJar}")
+                        } else {
+                            logger("\t--> file originated from project sourcecode")
                         }
                         if (new StandardFilesMergeTransformer().canTransformResource(archiveFile)) {
-                            log.warn("\t--> Recommended transformer is " + StandardFilesMergeTransformer.class.name)
+                            logger("\t--> Recommended transformer is " + StandardFilesMergeTransformer.class.name)
                         }
                     }
                 }
