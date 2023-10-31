@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.util.file;
+package com.github.jengelman.gradle.plugins.shadow.util.file
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
@@ -81,7 +81,7 @@ class TestFileHelper {
         untar.execute()
     }
 
-    private boolean isUnix() {
+    private static boolean isUnix() {
         return !System.getProperty('os.name').toLowerCase().contains('windows')
     }
 
@@ -119,7 +119,7 @@ class TestFileHelper {
         }
     }
 
-    private int toMode(String permissions) {
+    private static int toMode(String permissions) {
         int m = [6, 3, 0].inject(0) { mode, pos ->
             mode |= permissions[9 - pos - 3] == 'r' ? 4 << pos : 0
             mode |= permissions[9 - pos - 2] == 'w' ? 2 << pos : 0
@@ -142,7 +142,7 @@ class TestFileHelper {
                 throw new RuntimeException("Could not delete '$file': $error")
             }
         } else {
-            FileUtils.deleteQuietly(file);
+            FileUtils.deleteQuietly(file)
         }
     }
 
@@ -170,32 +170,32 @@ class TestFileHelper {
         return new ExecOutput(output, error)
     }
 
-    public void zipTo(TestFile zipFile, boolean nativeTools) {
+    void zipTo(TestFile zipFile, boolean nativeTools) {
         if (nativeTools && isUnix()) {
             def process = ['zip', zipFile.absolutePath, "-r", file.name].execute(null, zipFile.parentFile)
             process.consumeProcessOutput(System.out, System.err)
             assert process.waitFor() == 0
         } else {
-            Zip zip = new Zip();
-            zip.setBasedir(file);
-            zip.setDestFile(zipFile);
-            zip.setProject(new Project());
+            Zip zip = new Zip()
+            zip.setBasedir(file)
+            zip.setDestFile(zipFile)
+            zip.setProject(new Project())
             def whenEmpty = new Zip.WhenEmpty()
             whenEmpty.setValue("create")
-            zip.setWhenempty(whenEmpty);
-            zip.execute();
+            zip.setWhenempty(whenEmpty)
+            zip.execute()
         }
     }
 
-    public void tarTo(TestFile tarFile, boolean nativeTools) {
+    void tarTo(TestFile tarFile, boolean nativeTools) {
         if (nativeTools && isUnix()) {
             def process = ['tar', "-cf", tarFile.absolutePath, file.name].execute(null, tarFile.parentFile)
             process.consumeProcessOutput(System.out, System.err)
             assert process.waitFor() == 0
         } else {
-            Tar tar = new Tar();
-            tar.setBasedir(file);
-            tar.setDestFile(tarFile);
+            Tar tar = new Tar()
+            tar.setBasedir(file)
+            tar.setDestFile(tarFile)
             tar.setProject(new Project())
             tar.execute()
         }

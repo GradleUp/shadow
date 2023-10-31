@@ -6,9 +6,9 @@ package com.github.jengelman.gradle.plugins.shadow.util.file
  * Should be inner class of TestFile, but can't because Groovy has issues with inner classes as delegates.
  */
 class TestWorkspaceBuilder {
-    def TestFile baseDir
+    TestFile baseDir
 
-    def TestWorkspaceBuilder(TestFile baseDir) {
+    TestWorkspaceBuilder(TestFile baseDir) {
         this.baseDir = baseDir
     }
 

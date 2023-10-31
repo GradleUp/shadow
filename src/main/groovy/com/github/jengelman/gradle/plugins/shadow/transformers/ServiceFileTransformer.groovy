@@ -102,11 +102,11 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     static class ServiceStream extends ByteArrayOutputStream {
 
-        public ServiceStream(){
+        ServiceStream(){
             super( 1024 )
         }
 
-        public void append( InputStream is ) throws IOException {
+        void append(InputStream is ) throws IOException {
             if ( super.count > 0 && super.buf[super.count - 1] != '\n' && super.buf[super.count - 1] != '\r' ) {
                 byte[] newline = '\n'.bytes
                 write(newline, 0, newline.length)
@@ -114,7 +114,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
             IOUtil.copy(is, this)
         }
 
-        public InputStream toInputStream() {
+        InputStream toInputStream() {
             return new ByteArrayInputStream( super.buf, 0, super.count )
         }
     }

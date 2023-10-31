@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets
 
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.junit.SnippetRunner;
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.junit.SnippetRunner
 import org.junit.runner.Runner
 
 class DefaultCodeSnippetTests implements CodeSnippetTests {

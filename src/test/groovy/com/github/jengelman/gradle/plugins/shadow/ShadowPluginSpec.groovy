@@ -8,7 +8,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Unroll
@@ -41,16 +40,16 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         ShadowJar shadow = project.tasks.findByName('shadowJar')
         assert shadow
-        assert shadow.baseName == projectName
-        assert shadow.destinationDir == new File(project.buildDir, 'libs')
-        assert shadow.version == version
-        assert shadow.classifier == 'all'
-        assert shadow.extension == 'jar'
+        assert shadow.archiveBaseName.get() == projectName
+        assert shadow.destinationDirectory.get().asFile == new File(project.buildDir, 'libs')
+        assert shadow.archiveVersion.get() == version
+        assert shadow.archiveClassifier.get() == 'all'
+        assert shadow.archiveExtension.get() == 'jar'
 
         and:
         Configuration shadowConfig = project.configurations.findByName('shadow')
         assert shadowConfig
-        shadowConfig.artifacts.file.contains(shadow.archivePath)
+        shadowConfig.artifacts.file.contains(shadow.archiveFile.get().asFile)
 
     }
 
@@ -87,13 +86,13 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
 
         where:
-        version << ['7.0']
+        version << ['8.0']
     }
 
-    def 'Error in Gradle versions < 7.0'() {
+    def 'Error in Gradle versions < 8.0'() {
         given:
         GradleRunner versionRunner = GradleRunner.create()
-                .withGradleVersion('6.9')
+                .withGradleVersion('7.0')
                 .withArguments('--stacktrace')
                 .withProjectDir(dir.root)
                 .forwardOutput()
@@ -138,9 +137,8 @@ class ShadowPluginSpec extends PluginSpecification {
         URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
-        buildFile.text = defaultBuildScript
         buildFile << """
-            |task shadow(type: ${ShadowJar.name}) {
+            shadowJar {
             |    destinationDirectory = buildDir
             |    archiveBaseName = 'shadow'
             |    from('${artifact.path}')
@@ -149,12 +147,10 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        BuildResult result = run('shadow')
+        BuildResult result = run('shadowJar')
 
         then:
-        assert result.tasks(TaskOutcome.FAILED).size() == 0
-        assert result.output =~ /IGNORING META-INF\/MANIFEST\.MF from test-artifact-1\.0-SNAPSHOT\.jar, size is different \(3115 vs 25\)\s+--> file originated from project sourcecode/
-        assert result.output =~ /IGNORING META-INF\/MANIFEST\.MF from test-project-1\.0-SNAPSHOT\.jar, size is different \(3906 vs 25\)\s+--> file originated from project sourcecode/
+        assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar, size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/
     }
 
     def 'include project sources'() {
@@ -281,7 +277,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -336,7 +332,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -389,7 +385,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -444,7 +440,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -497,7 +493,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -575,7 +571,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar', '--stacktrace')
+        runWithDebug(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -651,7 +647,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar', '--stacktrace')
+        runWithDebug(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -1017,7 +1013,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar', '--stacktrace')
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -1065,7 +1061,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-1.0-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar', '--stacktrace')
+        runWithDebug(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -1137,7 +1133,7 @@ class ShadowPluginSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -1195,7 +1191,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -1237,7 +1233,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')

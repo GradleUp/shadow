@@ -19,7 +19,7 @@ A simple Gradle plugin can use this feature by applying the `shadow` plugin and 
 to execute before the `shadowJar` tasks:
 
 ```groovy no-plugins
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
   id 'com.github.johnrengelman.shadow' version '@version@'
@@ -38,11 +38,9 @@ dependencies {
     implementation 'org.codehaus.plexus:plexus-utils:2.0.6'
 }
 
-task relocateShadowJar(type: ConfigureShadowRelocation) {
-    target = tasks.shadowJar
+tasks.named('shadowJar', ShadowJar) {
+    enableRelocation true
 }
-
-tasks.shadowJar.dependsOn tasks.relocateShadowJar
 ```
 
 Note that the `localGroovy()` and `gradleApi()` dependencies are added to the `shadow` configuration instead of the

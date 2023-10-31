@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
@@ -117,7 +118,7 @@ import static groovy.lang.Closure.IDENTITY
 class PropertiesFileTransformer implements Transformer {
     private static final String PROPERTIES_SUFFIX = '.properties'
 
-    private Map<String, Properties> propertiesEntries = [:]
+    private Map<String, CleanProperties> propertiesEntries = [:]
 
     @Input
     List<String> paths = []
@@ -130,6 +131,9 @@ class PropertiesFileTransformer implements Transformer {
 
     @Input
     String mergeSeparator = ','
+
+    @Input
+    String charset = 'ISO_8859_1'
 
     @Internal
     Closure<String> keyTransformer = IDENTITY
@@ -179,15 +183,19 @@ class PropertiesFileTransformer implements Transformer {
     }
 
     private Properties loadAndTransformKeys(InputStream is) {
-        Properties props = new Properties()
-        props.load(is)
+        Properties props = new CleanProperties()
+        // InputStream closed by caller, so we don't do it here.
+        if (is != null) {
+            props.load(new InputStreamReader(is, charset))
+        }
         return transformKeys(props)
     }
 
     private Properties transformKeys(Properties properties) {
-        if (keyTransformer == IDENTITY)
+        if (keyTransformer == IDENTITY) {
             return properties
-        def result = new Properties()
+        }
+        def result = new CleanProperties()
         properties.each { key, value ->
             result.put(keyTransformer.call(key), value)
         }
@@ -227,18 +235,23 @@ class PropertiesFileTransformer implements Transformer {
 
     @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        // cannot close the writer as the OutputStream needs to remain open
+        def zipWriter = new OutputStreamWriter(os, charset)
         propertiesEntries.each { String path, Properties props ->
             ZipEntry entry = new ZipEntry(path)
             entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
             os.putNextEntry(entry)
-            IOUtil.copy(toInputStream(props), os)
+            IOUtil.copy(readerFor(props, charset), zipWriter)
+            zipWriter.flush()
             os.closeEntry()
         }
     }
 
-    private static InputStream toInputStream(Properties props) {
+    private static InputStreamReader readerFor(Properties props, String charset) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        props.store(baos, '')
-        new ByteArrayInputStream(baos.toByteArray())
+        baos.withWriter(charset) { w ->
+            props.store(w, '')
+        }
+        new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), charset)
     }
 }
