@@ -8,8 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.StandardFilesMergeTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-import groovy.util.logging.Log
-import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.apache.tools.zip.UnixStat
@@ -17,7 +15,6 @@ import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
-import org.codehaus.groovy.transform.LogASTTransformation
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.UncheckedIOException
@@ -314,7 +311,40 @@ class ShadowCopyAction implements CopyAction {
             long archiveFileSize = archiveFile.size
 
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                def path = archiveFilePath.toString()
+                String path = archiveFilePath.toString()
+
+                if (path.endsWith("module-info.class")) {
+                    log.warn("module-info collision")
+
+                    def moduleFileName = "module-info"
+                    def moduleFileSuffix = ".class"
+                    File disassembleModFile = File.createTempFile(moduleFileName, moduleFileSuffix)
+
+                    try (InputStream is = archive.getInputStream(archiveFilePath.entry)) {
+                        try (OutputStream os = new FileOutputStream(disassembleModFile)) {
+                            IOUtils.copyLarge(is, os)
+                        }
+                    }
+
+                    ProcessBuilder processBuilder = new ProcessBuilder("javap", disassembleModFile.absolutePath)
+                    processBuilder.redirectErrorStream(true)
+                    Process process = processBuilder.start()
+                    InputStream inputStream = process.getInputStream()
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))
+                    String line
+
+                    while ((line = reader.readLine()) != null) {
+                        log.warn(line)
+                    }
+
+                    int exitCode = process.waitFor()
+                    if (exitCode != 0) {
+                        log.warn("Process exited with code " + exitCode)
+                    }
+
+                    log.warn("module-info collision end")
+                }
+
                 if (recordVisit(path, archiveFileSize, archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFilePath, archive)
