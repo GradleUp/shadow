@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/shadow
   docker:
-    - image: azul/zulu-openjdk:17-latest
+    - image: azul/zulu-openjdk:21-latest
   environment:
     - TERM: "dumb"
     - GRADLE_OPTS: "-Xmx1024m"
