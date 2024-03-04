@@ -126,7 +126,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             }
             into("bin") {
                 from(startScripts)
-                fileMode = 493
+                filePermissions { unix(493) }
             }
         }
 
