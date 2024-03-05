@@ -230,7 +230,7 @@ class ShadowCopyAction implements CopyAction {
                             String mappedPath = remapper.map(fileDetails.relativePath.pathString)
                             ZipEntry archiveEntry = new ZipEntry(mappedPath)
                             archiveEntry.setTime(getArchiveTimeFor(fileDetails.lastModified))
-                            archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
+                            archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.permissions.toUnixNumeric())
                             zipOutStr.putNextEntry(archiveEntry)
                             fileDetails.copyTo(zipOutStr)
                             zipOutStr.closeEntry()
@@ -402,7 +402,7 @@ class ShadowCopyAction implements CopyAction {
                 String path = dirDetails.relativePath.pathString + '/'
                 ZipEntry archiveEntry = new ZipEntry(path)
                 archiveEntry.setTime(getArchiveTimeFor(dirDetails.lastModified))
-                archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
+                archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.permissions.toUnixNumeric())
                 zipOutStr.putNextEntry(archiveEntry)
                 zipOutStr.closeEntry()
                 recordVisit(dirDetails.relativePath)
