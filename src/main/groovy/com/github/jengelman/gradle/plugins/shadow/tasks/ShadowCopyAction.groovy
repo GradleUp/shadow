@@ -122,6 +122,7 @@ class ShadowCopyAction implements CopyAction {
                                 e.cause.message, documentationRegistry.getDslRefForProperty(Zip, "zip64"))
                 )
             }
+            throw e
         }
         return WorkResults.didWork(true)
     }
