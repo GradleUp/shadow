@@ -19,6 +19,7 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
@@ -508,6 +509,11 @@ class ShadowCopyAction implements CopyAction {
         @Override
         boolean copyTo(File file) {
             return false
+        }
+
+        @Override
+        FilePermissions getPermissions() {
+            return null
         }
 
         @Override

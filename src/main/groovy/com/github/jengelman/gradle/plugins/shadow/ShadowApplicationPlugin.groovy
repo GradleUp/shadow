@@ -7,6 +7,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.distribution.Distribution
 import org.gradle.api.distribution.DistributionContainer
+import org.gradle.api.file.CopyProcessingSpec
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaApplication
@@ -17,6 +18,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.jvm.toolchain.JavaToolchainService
+import org.gradle.util.GradleVersion
 
 class ShadowApplicationPlugin implements Plugin<Project> {
 
@@ -126,7 +128,13 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             }
             into("bin") {
                 from(startScripts)
-                fileMode = 493
+                if (GradleVersion.current() >= GradleVersion.version("8.3")) {
+                    filePermissions {
+                        it.unix(493)
+                    }
+                } else {
+                    fileMode = 493
+                }
             }
         }
 
