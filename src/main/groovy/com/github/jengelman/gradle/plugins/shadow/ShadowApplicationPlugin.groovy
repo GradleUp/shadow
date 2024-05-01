@@ -128,13 +128,9 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             }
             into("bin") {
                 from(startScripts)
-                if (GradleVersion.current() >= GradleVersion.version("8.3")) {
                     filePermissions {
                         it.unix(493)
                     }
-                } else {
-                    fileMode = 493
-                }
             }
         }
 
