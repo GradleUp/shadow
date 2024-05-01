@@ -29,7 +29,7 @@ class ApplicationSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application.mainClass = 'myapp.Main'
             
             dependencies {
                implementation 'shadow:a:1.0'
@@ -90,7 +90,7 @@ class ApplicationSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application.mainClass = 'myapp.Main'
             
             dependencies {
                implementation 'shadow:a:1.0'
@@ -169,7 +169,7 @@ class ApplicationSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application.mainClass = 'myapp.Main'
             
             dependencies {
                shadow 'shadow:a:1.0'
@@ -219,7 +219,7 @@ class ApplicationSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application.mainClass = 'myapp.Main'
             
             dependencies {
                implementation 'shadow:a:1.0'
