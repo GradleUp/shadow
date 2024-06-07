@@ -29,6 +29,6 @@ class CleanProperties extends Properties {
 
     @Override
     void store(final Writer writer, final String comments) throws IOException {
-        super.store(new StripCommentsWithTimestampBufferedWriter(writer), comments);
+        super.store(new StripCommentsWithTimestampBufferedWriter(writer), comments)
     }
 }
