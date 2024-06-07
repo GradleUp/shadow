@@ -7,7 +7,7 @@ class CleanProperties extends Properties {
         private final int lengthOfExpectedTimestamp
 
         StripCommentsWithTimestampBufferedWriter(final Writer out) {
-            super(out);
+            super(out)
 
             lengthOfExpectedTimestamp = ("#" + new Date().toString()).length()
         }
@@ -17,7 +17,6 @@ class CleanProperties extends Properties {
             if (couldBeCommentWithTimestamp(str)) {
                 return
             }
-
             super.write(str)
         }
 
