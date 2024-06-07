@@ -75,7 +75,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport {
             zipOutputStream.close()
         }
 
-        return testableZipFile;
+        return testableZipFile
     }
 
     static List<String> readFrom(File jarFile, String resourceName) {
