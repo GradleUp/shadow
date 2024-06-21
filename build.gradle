@@ -23,6 +23,9 @@ apply from: file('gradle/dependencies.gradle')
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 
+    // https://docs.gradle.org/8.8/userguide/performance.html#execute_tests_in_parallel
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
     if (System.env.CI == 'true') {
         testLogging.showStandardStreams = true
         minHeapSize "1g"
