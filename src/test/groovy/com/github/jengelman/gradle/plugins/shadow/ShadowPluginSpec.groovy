@@ -2,12 +2,14 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -52,6 +54,10 @@ class ShadowPluginSpec extends PluginSpecification {
 
     }
 
+    @IgnoreIf({
+        // Gradle 8.3 doesn't support Java 21.
+        JavaVersion.current().majorVersion.toInteger() >= 21
+    })
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
