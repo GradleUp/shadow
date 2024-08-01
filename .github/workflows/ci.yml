@@ -30,8 +30,7 @@ jobs:
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
-    # I'll add github.ref == 'refs/heads/main' check before merging this PR.
-    if: github.repository == 'GradleUp/shadow'
+    if: github.repository == 'GradleUp/shadow' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
