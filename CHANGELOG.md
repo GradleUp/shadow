@@ -11,7 +11,7 @@
 **Fixed**
 
 - Fix for PropertiesFileTransformer breaks Reproducible builds in
-  8.1.1 ([#858](https://github.com/johnrengelman/shadow/pull/858))
+  `8.1.1`. ([#858](https://github.com/johnrengelman/shadow/pull/858))
 
 ## [8.1.1] - 2023-03-21
 
