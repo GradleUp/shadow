@@ -2,7 +2,7 @@
 
 ```groovy no-plugins
 plugins {
-  id 'com.github.johnrengelman.shadow' version '@version@'
+  id 'com.gradleup.shadow' version '@version@'
   id 'java'
 }
 ```
@@ -19,11 +19,11 @@ buildscript {
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 apply plugin: 'java'
 ```
 
-**NOTE:** The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin documentation [here](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow).
+**NOTE:** The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
 
 Shadow is a reactive plugin.
 This means that applying Shadow by itself will perform no configuration on your project.
