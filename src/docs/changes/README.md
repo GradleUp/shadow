@@ -4,6 +4,10 @@
 
 **Changed**
 
+- **BREAKING CHANGE:** the GitHub has been transferred from `johnrengelman/shadow` to `GradleUp/shadow`, you can view 
+  more details in [GradleUp/shadow/issues/908](https://github.com/GradleUp/shadow/issues/908).  
+  We also update the plugin ID from `com.github.johnrengelman.shadow` to `com.gradleup.shadow`, and the 
+  Maven coordinate from `com.github.johnrengelman:shadow` to `com.gradleup.shadow:shadow-gradle-plugin`.
 - Bump the min Gradle requirement from `8.0.0` to `8.3`. ([#876](https://github.com/GradleUp/shadow/pull/876))
 - Support Java 21. ([#876](https://github.com/GradleUp/shadow/pull/876))
 - Use new file permission API from Gradle 8.3. ([#876](https://github.com/GradleUp/shadow/pull/876))
@@ -12,6 +16,7 @@
 
 - Fix for PropertiesFileTransformer breaks Reproducible builds in
   `8.1.1`. ([#858](https://github.com/GradleUp/shadow/pull/858))
+
 
 ## [v8.1.1] (2023-03-20)
 
@@ -29,6 +34,7 @@ For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct
 Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task type.
 
 [Release Notes](https://github.com/GradleUp/shadow/releases/tag/8.1.0)
+
 
 ## [v8.0.0] (2023-02-24)
 
