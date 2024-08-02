@@ -1175,7 +1175,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert result.output.contains('TestApp: Hello World! (foo)')
     }
 
-    @Issue("https://github.com/johnrengelman/shadow/issues/609")
+    @Issue("https://github.com/GradleUp/shadow/issues/609")
     def "doesn't error when using application mainClass property"() {
         given:
         buildFile.text = defaultBuildScript
