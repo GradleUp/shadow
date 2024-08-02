@@ -1,12 +1,25 @@
 # Change Log
 
-## v8.1.1 (2023-03-20)
+## [Unreleased]
+
+**Changed**
+
+- Bump the min Gradle requirement from `8.0.0` to `8.3`. ([#876](https://github.com/johnrengelman/shadow/pull/876))
+- Support Java 21. ([#876](https://github.com/johnrengelman/shadow/pull/876))
+- Use new file permission API from Gradle 8.3. ([#876](https://github.com/johnrengelman/shadow/pull/876))
+
+**Fixed**
+
+- Fix for PropertiesFileTransformer breaks Reproducible builds in
+  `8.1.1`. ([#858](https://github.com/johnrengelman/shadow/pull/858))
+
+## [v8.1.1] (2023-03-20)
 
 **NOTE: ** As of this version, the Github repository has migrated to the `main` branch as the default branch for releases.
 
 [Release Notes](https://github.com/johnrengelman/shadow/releases/tag/8.1.1)
 
-## v8.1.0 (2023-02-26)
+## [v8.1.0] (2023-02-26)
 
 **BREAKING CHANGE:** Due to adoption of the latest version of the `com.gradle.plugin-publish` plugin, the maven GAV coordinates have changed as of this version.
 The correct coordinates now align with the plugin ID itself: `group=com.github.johnrengelman, artifact=shadow, version=<version>`.
@@ -17,7 +30,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 [Release Notes](https://github.com/johnrengelman/shadow/releases/tag/8.1.0)
 
-## v8.0.0 (2023-02-24)
+## [v8.0.0] (2023-02-24)
 
 [Release Notes](https://github.com/johnrengelman/shadow/releases/tag/8.0.0)
 
@@ -338,3 +351,10 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - `ShadowJar` now extends `Jar`
 - Removed `signedCompile` and `signedRuntime` configurations in favor of `shadow` configuration
 - Removed `OutputSignedJars` task
+
+
+
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.1.1...HEAD
+[v8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
+[v8.1.0]: https://github.com/GradleUp/shadow/releases/tag/8.1.0
+[v8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
