@@ -22,7 +22,3 @@ gradlePlugin {
 tasks.named('publishPlugins') {
     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
 }
-
-mavenPublishing {
-    signAllPublications()
-}
