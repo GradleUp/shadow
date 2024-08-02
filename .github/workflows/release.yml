@@ -20,7 +20,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: true
-      - run: ./gradlew publish
+      # Disable CC due to https://github.com/gradle/gradle/issues/22779
+      - run: ./gradlew publish --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
