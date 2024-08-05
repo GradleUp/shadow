@@ -153,8 +153,8 @@ class ShadowCopyAction implements CopyAction {
         } catch(Throwable t) {
             try {
                 resource.close()
-            } catch (IOException ignored) {
-                // Ignored
+            } catch (IOException e) {
+                log.warn("Could not close resource $resource", e)
             }
             throw UncheckedException.throwAsUncheckedException(t)
         }
