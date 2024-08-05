@@ -6,15 +6,23 @@ pluginManagement {
 }
 
 plugins {
-    id 'com.gradle.enterprise' version '3.12.6'
+    id 'com.gradle.develocity' version '3.17.6'
 }
 
-gradleEnterprise {
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
+def isCI = providers.environmentVariable('CI').present
+
+develocity {
     buildScan {
-        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-        termsOfServiceAgree = 'yes'
-        publishAlways()
-        if (System.env.CI == 'true') {
+        termsOfUseUrl = 'https://gradle.com/terms-of-service'
+        termsOfUseAgree = 'yes'
+        publishing.onlyIf { isCI }
+        if (isCI) {
             tag 'CI'
             if (System.env.CIRCLE_TAG) {
                 link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_TAG}"
