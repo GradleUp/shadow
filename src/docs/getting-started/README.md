@@ -23,6 +23,30 @@ apply plugin: 'com.gradleup.shadow'
 apply plugin: 'java'
 ```
 
+<details>
+<summary>Snapshots of the development version are available in Sonatype's snapshots repository.</summary>
+<p>
+
+```groovy no-run
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+    dependencies {
+        classpath 'com.gradleup.shadow:shadow-gradle-plugin:@snapshot-version@'
+    }
+}
+
+apply plugin: 'com.gradleup.shadow'
+apply plugin: 'java'
+```
+
+</p>
+</details>
+
 **NOTE:** The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
 
 Shadow is a reactive plugin.
