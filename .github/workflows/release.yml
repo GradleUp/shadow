@@ -20,6 +20,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
+      - uses: actions/setup-node
+        with:
+          # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
+          node-version: '16'
       # Disable CC due to https://github.com/gradle/gradle/issues/22779
       - run: ./gradlew release --no-configuration-cache
         env:
