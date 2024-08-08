@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased]
+## [v8.3.0]
 
 **Changed**
 
@@ -360,7 +360,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.1.1...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.0...HEAD
+[v8.3.0]: https://github.com/GradleUp/shadow/releases/tag/8.3.0
 [v8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
 [v8.1.0]: https://github.com/GradleUp/shadow/releases/tag/8.1.0
 [v8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
