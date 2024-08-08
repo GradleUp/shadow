@@ -44,12 +44,20 @@ class ManifestAppenderTransformer implements Transformer {
 
     private byte[] manifestContents = []
     private final List<Tuple2<String, ? extends Comparable<?>>> attributes = []
+    private boolean trimTrailingWhitespace = false
+
+    ManifestAppenderTransformer() {}
 
     @Input
     List<Tuple2<String, ? extends Comparable<?>>> getAttributes() { attributes }
 
     ManifestAppenderTransformer append(String name, Comparable<?> value) {
         attributes.add(new Tuple2<String, ? extends Comparable<?>>(name, value))
+        this
+    }
+
+    ManifestAppenderTransformer trimTrailingWhitespace() {
+        trimTrailingWhitespace = true
         this
     }
 
@@ -80,7 +88,13 @@ class ManifestAppenderTransformer implements Transformer {
         ZipEntry entry = new ZipEntry(MANIFEST_NAME)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         os.putNextEntry(entry)
-        os.write(manifestContents)
+
+        if (trimTrailingWhitespace) {
+            os.write(trimTrailingWhitespace(manifestContents))
+            os.write(EOL)
+        } else {
+            os.write(manifestContents)
+        }
 
         if (!attributes.isEmpty()) {
             for (attribute in attributes) {
@@ -92,5 +106,9 @@ class ManifestAppenderTransformer implements Transformer {
             os.write(EOL)
             attributes.clear()
         }
+    }
+
+    static byte[] trimTrailingWhitespace(byte[] contents) {
+        new String(contents, UTF_8).replaceFirst("\\s++\$", "").getBytes(UTF_8)
     }
 }
