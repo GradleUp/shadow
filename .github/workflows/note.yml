@@ -1,0 +1,22 @@
+name: Note
+
+on:
+  push:
+    branches:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cat src/docs/changes/README.md
+      - name: Extract release notes
+        uses: ffurrer2/extract-release-notes@v2
+        with:
+          changelog_file: src/docs/changes/README.md
+          release_notes_file: RELEASE_NOTES.md
+      - run: |
+          cat RELEASE_NOTES.md
+          ls .
+          ls -lh RELEASE_NOTES.md
