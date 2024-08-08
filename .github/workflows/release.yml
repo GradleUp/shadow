@@ -20,7 +20,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
-      - uses: actions/setup-node
+      - uses: actions/setup-node@v4
         with:
           # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
           node-version: '16'
