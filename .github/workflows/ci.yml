@@ -61,4 +61,5 @@ jobs:
       - run: ./gradlew gitPublishPush --no-configuration-cache
         env:
           # https://ajoberstar.org/grgit/main/grgit-authentication.html#_environment_variables
-          GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
+          GRGIT_USER: ${{ github.repository_owner }}
+          GRGIT_PASS: ${{ secrets.GITHUB_TOKEN }}
