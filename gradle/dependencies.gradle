@@ -23,6 +23,7 @@ dependencies {
     testImplementation 'org.apache.commons:commons-lang3:3.16.0'
     testImplementation 'com.google.guava:guava:33.3.0-jre'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testImplementation 'org.gradle.toolchains:foojay-resolver:0.8.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.11.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
