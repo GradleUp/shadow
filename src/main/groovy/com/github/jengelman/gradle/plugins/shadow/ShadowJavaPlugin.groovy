@@ -7,8 +7,10 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
+import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 import javax.inject.Inject
 
@@ -49,6 +51,13 @@ class ShadowJavaPlugin implements Plugin<Project> {
         project.components.java {
             addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
                 mapToOptional() // make it a Maven optional dependency
+            }
+        }
+
+        project.plugins.withType(JavaGradlePluginPlugin).configureEach {
+            // needed to prevent inclusion of gradle-api into shadow JAR
+            project.configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
+                it.dependencies.remove(project.dependencies.gradleApi())
             }
         }
     }
