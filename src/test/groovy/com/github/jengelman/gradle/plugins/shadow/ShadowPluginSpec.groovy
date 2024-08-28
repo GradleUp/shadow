@@ -1221,11 +1221,6 @@ class ShadowPluginSpec extends PluginSpecification {
     def 'exclude gradleApi() by default'() {
         given:
         buildFile.text = getDefaultBuildScript('java-gradle-plugin')
-        buildFile << """
-            dependencies {
-                compileOnly gradleApi()
-            }
-        """.stripIndent()
 
         file('src/main/java/my/plugin/MyPlugin.java') << """
             package my.plugin;

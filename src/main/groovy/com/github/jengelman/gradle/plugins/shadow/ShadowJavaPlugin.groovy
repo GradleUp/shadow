@@ -54,13 +54,16 @@ class ShadowJavaPlugin implements Plugin<Project> {
             }
         }
 
-        // Remove the gradleApi so it isn't merged into the jar file.
-        // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
-        // See https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161
         project.plugins.withType(JavaGradlePluginPlugin).configureEach {
-            // needed to prevent inclusion of gradle-api into shadow JAR
+            // Remove the gradleApi so it isn't merged into the jar file.
+            // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
+            // See https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161
             project.configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
                 it.dependencies.remove(project.dependencies.gradleApi())
+            }
+            // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
+            project.configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME) {
+                it.dependencies.add(project.dependencies.gradleApi())
             }
         }
     }
