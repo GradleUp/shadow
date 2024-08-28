@@ -46,17 +46,6 @@ Starting with this version, plugin projects that apply both Shadow and the Gradl
 automatically configured to publish the output of the `shadowJar` tasks as the consumable artifact for the plugin.
 See the [Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies) for details.
 
-## Special Handling of the Java Gradle Plugin Development Plugin
-
-The Java Gradle Plugin Development plugin, `java-gradle-plugin`, [automatically adds the full Gradle API to the `api` 
-configuration](https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161)
-; thus overriding a possible assignment of `gradleApi()` to the `shadow` configuration.  Since it is never
-a good idea to include the Gradle API when creating a Gradle plugin, the dependency is removed so that it is not 
-included in the resultant shadow jar.  Virtually:
-
-    // needed to prevent inclusion of gradle-api into shadow JAR
-    configurations.api.dependencies.remove dependencies.gradleApi()
-
 ## Automatic package relocation with Shadow prior to v8.1.0
 
 Prior to Shadow v8.1.0, Shadow handled this by introducing a new task type `ConfigureShadowRelocation`.
