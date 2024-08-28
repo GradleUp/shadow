@@ -75,9 +75,6 @@ class ShadowJavaPlugin implements Plugin<Project> {
             shadow.configurations = [project.configurations.findByName('runtimeClasspath') ?
                                              project.configurations.runtimeClasspath : project.configurations.runtime]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
-            shadow.dependencies {
-                exclude(dependency(project.dependencies.gradleApi()))
-            }
         }
         project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, project.tasks.named(SHADOW_JAR_TASK_NAME))
     }

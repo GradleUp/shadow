@@ -40,6 +40,15 @@ class ShadowPlugin implements Plugin<Project> {
                     rootProject.buildScan.value "shadow.${task.path}.configurations", task.configurations*.name.join(", ")
                 }
             }
+
+            afterEvaluate {
+                plugins.withId('java-gradle-plugin') {
+                    // needed to prevent inclusion of gradle-api into shadow JAR
+                    configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
+                        dependencies.remove(project.dependencies.gradleApi())
+                    }
+                }
+            }
         }
     }
 }
