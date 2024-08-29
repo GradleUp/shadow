@@ -12,7 +12,7 @@ jobs:
       - run: |
           cat src/docs/changes/README.md
       - name: Extract release notes
-        uses: Goooler/extract-release-notes@91331f3eca864b907326a662f41f78d565ea5cb4
+        uses: Goooler/extract-release-notes@69a05474cfcb205f998ed8e094972870787f632e
         with:
           changelog_file: src/docs/changes/README.md
           release_notes_file: RELEASE_NOTES.md
