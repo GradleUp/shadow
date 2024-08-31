@@ -1,6 +1,5 @@
 dependencies {
     compileOnly localGroovy()
-    compileOnly gradleApi()
     shadow 'org.codehaus.groovy:groovy-backports-compat23:3.0.8'
 
     implementation 'org.jdom:jdom2:2.0.6.1'

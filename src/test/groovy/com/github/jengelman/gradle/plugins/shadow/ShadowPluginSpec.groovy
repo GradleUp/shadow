@@ -1217,6 +1217,36 @@ class ShadowPluginSpec extends PluginSpecification {
         assert result.output.contains('TestApp: Hello World! (foo)')
     }
 
+    @Issue("https://github.com/GradleUp/shadow/pull/459")
+    def 'exclude gradleApi() by default'() {
+        given:
+        buildFile.text = getDefaultBuildScript('java-gradle-plugin')
+
+        file('src/main/java/my/plugin/MyPlugin.java') << """
+            package my.plugin;
+            import org.gradle.api.Plugin;
+            import org.gradle.api.Project;
+            public class MyPlugin implements Plugin<Project> {
+                public void apply(Project project) {
+                    System.out.println("MyPlugin: Hello World!");
+                }
+            }
+        """.stripIndent()
+        file('src/main/resources/META-INF/gradle-plugins/my.plugin.properties') << """
+            implementation-class=my.plugin.MyPlugin
+        """.stripIndent()
+
+        when:
+        run('shadowJar')
+
+        then:
+        assert output.exists()
+
+        and:
+        JarFile jar = new JarFile(output)
+        assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
+    }
+
     private String escapedPath(File file) {
         file.path.replaceAll('\\\\', '\\\\\\\\')
     }
