@@ -20,6 +20,17 @@ apply from: file('gradle/vuepress.gradle')
 apply from: file('gradle/ghPages.gradle')
 apply from: file('gradle/dependencies.gradle')
 
+java {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+idea {
+    project {
+        languageLevel = '1.8'
+    }
+}
+
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 
@@ -50,18 +61,9 @@ tasks.named('shadowJar', ShadowJar) {
     enableRelocation true
 }
 
-idea {
-    project {
-        languageLevel = '1.8'
-    }
-}
-
 tasks.named('ideaModule') {
     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13480")
 }
-
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
 
 tasks.register('downloadDependencies', Exec) {
     dependsOn configurations.testRuntimeClasspath
