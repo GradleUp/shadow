@@ -1,5 +1,18 @@
 # Change Log
 
+
+## [Unreleased]
+
+**Added**
+
+**Changed**
+
+**Fixed**
+
+- Explicitly add classifier to maven publication. ([#904](https://github.com/GradleUp/shadow/pull/904))
+
+
+
 ## [v8.3.0]
 
 **Changed**
