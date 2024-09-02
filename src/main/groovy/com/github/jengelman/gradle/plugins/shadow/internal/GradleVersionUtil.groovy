@@ -5,21 +5,14 @@ import org.gradle.api.internal.file.copy.CopySpecInternal
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.util.PatternSet
-import org.gradle.util.GradleVersion
 
 class GradleVersionUtil {
 
-    private final GradleVersion version
-
-    GradleVersionUtil(String version) {
-        this.version = GradleVersion.version(version)
-    }
-
-    PatternSet getRootPatternSet(CopySpecInternal mainSpec) {
+    static PatternSet getRootPatternSet(CopySpecInternal mainSpec) {
         return mainSpec.buildRootResolver().getPatternSet()
     }
 
-    ZipCompressor getInternalCompressor(ZipEntryCompression entryCompression, Jar jar) {
+    static ZipCompressor getInternalCompressor(ZipEntryCompression entryCompression, Jar jar) {
         switch (entryCompression) {
             case ZipEntryCompression.DEFLATED:
                 return new DefaultZipCompressor(jar.zip64, ZipOutputStream.DEFLATED)

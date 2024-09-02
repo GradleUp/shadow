@@ -643,6 +643,51 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             assert props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
     }
 
+    def 'Groovy extension module transformer works for Groovy2_5+'() {
+        given:
+            def one = buildJar('one.jar')
+                    .insertFile('META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule',
+'''moduleName=foo
+moduleVersion=1.0.5
+extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripIndent()).write()
+
+            def two = buildJar('two.jar')
+                    .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+'''moduleName=bar
+moduleVersion=2.3.5
+extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
+
+            buildFile << """
+                import ${GroovyExtensionModuleTransformer.name}
+                shadowJar {
+                    from('${escapedPath(one)}')
+                    from('${escapedPath(two)}')
+                }
+
+                shadowJar {
+                    transform(GroovyExtensionModuleTransformer)
+                }
+            """.stripIndent()
+
+        when:
+            run('shadowJar')
+
+        then:
+            output.exists()
+
+        and:
+            def text = getJarFileContents(output, 'META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule')
+            def props = new Properties()
+            props.load(new StringReader(text))
+            props.getProperty('moduleName') == 'MergedByShadowJar'
+            props.getProperty('moduleVersion') == '1.0.0'
+            props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
+            props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
+            doesNotContain(output, ['META-INF/services/org.codehaus.groovy.runtime.ExtensionModule'])
+    }
+
     def 'Groovy extension module transformer short syntax'() {
         given:
             def one = buildJar('one.jar')
@@ -700,7 +745,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         """.stripIndent()
 
         when:
-        run('shadowJar', '--warning-mode=all', '--stacktrace')
+        run('shadowJar', '--warning-mode=all')
 
         then:
         assert output.exists()

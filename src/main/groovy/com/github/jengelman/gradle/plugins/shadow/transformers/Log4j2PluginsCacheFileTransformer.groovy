@@ -30,7 +30,7 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
-import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE;
+import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 
 /**
  * Modified from the maven equivalent to work with gradle
@@ -41,6 +41,7 @@ import static org.apache.logging.log4j.core.config.plugins.processor.PluginProce
  * @see <a href="https://github.com/edwgiz/maven-shaded-log4j-transformer">edwgiz/maven-shaded-log4j-transformer</a>
  * @see <a href="https://github.com/edwgiz/maven-shaded-log4j-transformer/blob/master/src/main/java/com/github/edwgiz/mavenShadePlugin/log4j2CacheTransformer/PluginsCacheFileTransformer.java">PluginsCacheFileTransformer.java</a>
  */
+@CacheableTransformer
 class Log4j2PluginsCacheFileTransformer implements Transformer {
 
     private final List<File> temporaryFiles
@@ -98,7 +99,7 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
         ZipEntry entry = new ZipEntry(PLUGIN_CACHE_FILE)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         zipOutputStream.putNextEntry(entry)
-        pluginCache.writeCache(new CloseShieldOutputStream(zipOutputStream))
+        pluginCache.writeCache(CloseShieldOutputStream.wrap(zipOutputStream))
         temporaryFiles.clear()
     }
 

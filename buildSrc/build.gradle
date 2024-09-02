@@ -1,6 +1,8 @@
 import org.codehaus.groovy.control.CompilerConfiguration
 
-apply plugin: 'groovy'
+plugins {
+    id 'groovy'
+}
 
 repositories {
     gradlePluginPortal()
@@ -39,7 +41,7 @@ class ScriptHolder {
 
 //Grab the dependencies closure and resolve it against
 //the buildSrc project dependencies
-//This effectively applies the same dependenices from build.gradle into buildSrc/build.gradle
+//This effectively applies the same dependencies from build.gradle into buildSrc/build.gradle
 //This is required so that when buildSrc is compiled it has the dependencies to compile the source code
 def closure = holder.dependencies.clone()
 closure.delegate = project.dependencies
@@ -50,19 +52,5 @@ sourceSets {
         java.srcDirs = ['../src/main/java']
         groovy.srcDirs = ['../src/main/groovy']
         resources.srcDirs = ['../src/main/resources']
-    }
-}
-
-project.tasks.withType(JavaCompile) {
-    // This will be the default in Gradle 5.0
-    if (!options.compilerArgs.contains("-processor")) {
-        options.compilerArgs << '-proc:none'
-    }
-}
-
-project.tasks.withType(GroovyCompile) {
-    // This will be the default in Gradle 5.0
-    if (!options.compilerArgs.contains("-processor")) {
-        options.compilerArgs << '-proc:none'
     }
 }

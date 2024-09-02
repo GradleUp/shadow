@@ -1,5 +1,30 @@
-plugins {
-    id 'com.gradle.enterprise' version '3.1.1'
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
+
+plugins {
+    id 'com.gradle.develocity' version '3.18'
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
+def isCI = providers.environmentVariable('CI').present
+
+develocity {
+    buildScan {
+        termsOfUseUrl = 'https://gradle.com/terms-of-service'
+        termsOfUseAgree = 'yes'
+        publishing.onlyIf { isCI }
+    }
+}
+
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
 rootProject.name = 'shadow'

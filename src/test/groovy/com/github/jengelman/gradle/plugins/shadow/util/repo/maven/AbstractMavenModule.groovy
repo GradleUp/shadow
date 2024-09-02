@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import com.github.jengelman.gradle.plugins.shadow.util.repo.AbstractModule
 import groovy.xml.MarkupBuilder
+import groovy.xml.XmlParser
 import java.text.SimpleDateFormat
 
 abstract class AbstractMavenModule extends AbstractModule implements MavenModule {
@@ -228,7 +229,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         }
 
         publish(pomFile) { Writer writer ->
-            def pomPackaging = packaging ?: type;
+            def pomPackaging = packaging ?: type
             writer << """
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <!-- ${getArtifactContent()} -->
@@ -271,7 +272,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
     private void updateRootMavenMetaData(TestFile rootMavenMetaData) {
         def allVersions = rootMavenMetaData.exists() ? new XmlParser().parseText(rootMavenMetaData.text).versioning.versions.version*.value().flatten() : []
-        allVersions << version;
+        allVersions << version
         publish(rootMavenMetaData) { Writer writer ->
             def builder = new MarkupBuilder(writer)
             builder.metadata {

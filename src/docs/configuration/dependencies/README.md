@@ -2,7 +2,7 @@
 
 Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtimeClasspath` configuration
 into the final JAR.
-The configurations to from which to source dependencies for the merging can be configured using the `configurations` property
+The configurations from which to source dependencies for the merging can be configured using the `configurations` property
 of the [`ShadowJar`](http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type.
 
 ```groovy
@@ -127,7 +127,7 @@ dependencies {
 
 shadowJar {
   dependencies {
-    exclude(dependency('org.apache.logging.log4j::2.11.1'))
+    exclude(dependency('org.apache.logging.log4j:2.11.1'))
   }
 }
 ```
@@ -146,9 +146,9 @@ dependencies {
 
 shadowJar {
   dependencies {
-    exclude(dependency {
+    exclude {
       it.moduleGroup == 'org.apache.logging.log4j'
-    })
+    }
   }
 }
 ```

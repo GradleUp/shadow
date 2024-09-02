@@ -13,7 +13,7 @@ details.
 
 ## Configuring Output Name
 
-Shadow configures the default `shadowJar` task to set the output JAR's `destinationDir`, `archiveBaseName`, `appendix`,
+Shadow configures the default `shadowJar` task to set the output JAR's `destinationDirectory`, `archiveBaseName`, `appendix`,
 `archiveVersion`, and `extension` to the same default values as Gradle does for all `Jar` tasks.
 Additionally, it configures the `archiveClassifier` to be `all`.
 
@@ -97,7 +97,7 @@ task testJar(type: Jar) {
 
 shadowJar {
   manifest {
-    inheritFrom project.tasks.testJar.manifest
+    inheritFrom(project.tasks.testJar.manifest)
   }
 }
 ```

@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import groovy.util.logging.Slf4j
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
@@ -36,6 +37,7 @@ import static java.util.jar.JarFile.MANIFEST_NAME
  * Modified from {@link ManifestResourceTransformer}.
  * @author Chris Rankin
  */
+@Slf4j
 class ManifestAppenderTransformer implements Transformer {
     private static final byte[] EOL = "\r\n".getBytes(UTF_8)
     private static final byte[] SEPARATOR = ": ".getBytes(UTF_8)
@@ -60,7 +62,11 @@ class ManifestAppenderTransformer implements Transformer {
     void transform(TransformerContext context) {
         if (manifestContents.length == 0) {
             manifestContents = IOUtil.toByteArray(context.is)
-            IOUtil.close(context.is)
+            try {
+                context.is
+            } catch (IOException e) {
+                log.warn("Failed to read MANIFEST.MF", e)
+            }
         }
     }
 
@@ -78,9 +84,9 @@ class ManifestAppenderTransformer implements Transformer {
 
         if (!attributes.isEmpty()) {
             for (attribute in attributes) {
-                os.write(attribute.first.getBytes(UTF_8))
+                os.write(attribute.v1.getBytes(UTF_8))
                 os.write(SEPARATOR)
-                os.write(attribute.second.toString().getBytes(UTF_8))
+                os.write(attribute.v2.toString().getBytes(UTF_8))
                 os.write(EOL)
             }
             os.write(EOL)

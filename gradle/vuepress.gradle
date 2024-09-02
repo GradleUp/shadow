@@ -4,5 +4,8 @@ node {
     yarnVersion = '1.5.1'
 }
 
-tasks.yarn_build.inputs.files project.fileTree('src/docs')
-tasks.yarn_build.outputs.dir project.file('build/site')
+tasks.named('yarn_build') {
+    inputs.files project.fileTree('src/docs')
+    outputs.dir project.file('build/site')
+    dependsOn("yarn")
+}

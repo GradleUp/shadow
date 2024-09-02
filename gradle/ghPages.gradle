@@ -2,20 +2,13 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'org.ajoberstar.git-publish'
 
-if (project.hasProperty('githubToken')) {
-  System.setProperty('org.ajoberstar.grgit.auth.username', project.githubToken)
-}
-
 gitPublish {
-    repoUri = 'https://github.com/johnrengelman/shadow.git'
+    repoUri = 'https://github.com/GradleUp/shadow.git'
 
     branch = 'gh-pages'
 
     contents {
         from 'build/site'
-        into('.circleci') {
-            from '.circleci'
-        }
         into('api') {
             from project.tasks.groovydoc
         }
@@ -23,5 +16,5 @@ gitPublish {
     }
 }
 
-tasks.gitPublishCopy.dependsOn yarn_build
-tasks.gitPublishCopy.dependsOn groovydoc
+tasks.named('gitPublishCopy') { dependsOn tasks.named('yarn_build') }
+tasks.named('gitPublishCopy') { dependsOn tasks.named('groovydoc') }

@@ -35,7 +35,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application {
+               mainClass = 'myapp.Main'
+            }
             
             dependencies {
                implementation 'shadow:a:1.0'
@@ -49,8 +51,8 @@ class ConfigurationCacheSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        run('--configuration-cache', 'shadowJar')
-        def result = run('--configuration-cache', 'shadowJar')
+        run('shadowJar')
+        def result = run('shadowJar')
 
         then:
         result.output.contains("Reusing configuration cache.")
@@ -65,9 +67,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('--configuration-cache', 'shadowJar')
+        run('shadowJar')
         output.delete()
-        def result = run('--configuration-cache', 'shadowJar')
+        def result = run('shadowJar')
 
         then:
         contains(output, ['a.properties', 'b.properties'])
@@ -101,7 +103,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -117,9 +119,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         def output = getFile('server/build/libs/server-all.jar')
 
         when:
-        run('--configuration-cache', 'shadowJar', '-s')
+        run('shadowJar', '-s')
         output.delete()
-        def result = run('--configuration-cache', 'shadowJar', '-s')
+        def result = run('shadowJar', '-s')
 
         then:
         output.exists()
@@ -146,7 +148,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
         file('lib/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             repositories { maven { url "${repo.uri}" } }
             dependencies {
@@ -160,8 +162,8 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('--configuration-cache', 'shadowJar', '-s')
-        def result = run('--configuration-cache', 'shadowJar', '-s')
+        run('shadowJar', '-s')
+        def result = run('shadowJar', '-s')
 
         then:
         result.output.contains(":lib:shadowJar UP-TO-DATE")

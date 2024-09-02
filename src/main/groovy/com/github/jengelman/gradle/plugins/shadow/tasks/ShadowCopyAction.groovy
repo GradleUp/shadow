@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
-import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -20,10 +19,12 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
+import org.gradle.api.internal.file.DefaultFilePermissions
 import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
@@ -53,14 +54,13 @@ class ShadowCopyAction implements CopyAction {
     private final PatternSet patternSet
     private final ShadowStats stats
     private final String encoding
-    private final GradleVersionUtil versionUtil
     private final boolean preserveFileTimestamps
     private final boolean minimizeJar
     private final UnusedTracker unusedTracker
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             String encoding, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats, GradleVersionUtil util,
+                            PatternSet patternSet, ShadowStats stats,
                             boolean preserveFileTimestamps, boolean minimizeJar, UnusedTracker unusedTracker) {
 
         this.zipFile = zipFile
@@ -71,7 +71,6 @@ class ShadowCopyAction implements CopyAction {
         this.patternSet = patternSet
         this.stats = stats
         this.encoding = encoding
-        this.versionUtil = util
         this.preserveFileTimestamps = preserveFileTimestamps
         this.minimizeJar = minimizeJar
         this.unusedTracker = unusedTracker
@@ -155,7 +154,7 @@ class ShadowCopyAction implements CopyAction {
             try {
                 resource.close()
             } catch (IOException e) {
-                // Ignored
+                log.warn("Could not close resource $resource", e)
             }
             throw UncheckedException.throwAsUncheckedException(t)
         }
@@ -231,7 +230,7 @@ class ShadowCopyAction implements CopyAction {
                             String mappedPath = remapper.map(fileDetails.relativePath.pathString)
                             ZipEntry archiveEntry = new ZipEntry(mappedPath)
                             archiveEntry.setTime(getArchiveTimeFor(fileDetails.lastModified))
-                            archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.mode)
+                            archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.permissions.toUnixNumeric())
                             zipOutStr.putNextEntry(archiveEntry)
                             fileDetails.copyTo(zipOutStr)
                             zipOutStr.closeEntry()
@@ -374,7 +373,7 @@ class ShadowCopyAction implements CopyAction {
                 zipOutStr.putNextEntry(archiveEntry)
                 IOUtils.copyLarge(bis, zipOutStr)
                 zipOutStr.closeEntry()
-            } catch (ZipException e) {
+            } catch (ZipException ignored) {
                 log.warn("We have a duplicate " + mappedName + " in source project")
             } finally {
                 bis.close()
@@ -404,7 +403,7 @@ class ShadowCopyAction implements CopyAction {
                 String path = dirDetails.relativePath.pathString + '/'
                 ZipEntry archiveEntry = new ZipEntry(path)
                 archiveEntry.setTime(getArchiveTimeFor(dirDetails.lastModified))
-                archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.mode)
+                archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.permissions.toUnixNumeric())
                 zipOutStr.putNextEntry(archiveEntry)
                 zipOutStr.closeEntry()
                 recordVisit(dirDetails.relativePath)
@@ -532,6 +531,11 @@ class ShadowCopyAction implements CopyAction {
         @Override
         int getMode() {
             return archivePath.entry.unixMode
+        }
+
+        @Override
+        FilePermissions getPermissions() {
+            return new DefaultFilePermissions(getMode())
         }
 
         FileTreeElement asFileTreeElement() {

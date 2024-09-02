@@ -25,8 +25,8 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
-import org.codehaus.plexus.util.ReaderFactory
-import org.codehaus.plexus.util.WriterFactory
+import org.codehaus.plexus.util.xml.XmlStreamReader
+import org.codehaus.plexus.util.xml.XmlStreamWriter
 import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
@@ -46,7 +46,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
 
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
-        return COMPONENTS_XML_PATH.equals(path)
+        return COMPONENTS_XML_PATH == path
     }
 
     void transform(TransformerContext context) {
@@ -60,7 +60,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
                 }
             }
 
-            Reader reader = ReaderFactory.newXmlReader(bis)
+            Reader reader = new XmlStreamReader(bis)
 
             newDom = Xpp3DomBuilder.build(reader)
         }
@@ -135,8 +135,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
             throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024 * 4)
 
-        Writer writer = WriterFactory.newXmlWriter(baos)
-        try {
+        try (Writer writer = new XmlStreamWriter(baos)) {
             Xpp3Dom dom = new Xpp3Dom("component-set")
 
             Xpp3Dom componentDom = new Xpp3Dom("components")
@@ -148,9 +147,6 @@ class ComponentsXmlResourceTransformer implements Transformer {
             }
 
             Xpp3DomWriter.write(writer, dom)
-        }
-        finally {
-            IOUtil.close(writer)
         }
 
         return baos.toByteArray()

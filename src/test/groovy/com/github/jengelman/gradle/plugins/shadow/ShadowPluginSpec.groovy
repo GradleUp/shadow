@@ -2,13 +2,14 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -40,28 +41,26 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         ShadowJar shadow = project.tasks.findByName('shadowJar')
         assert shadow
-        assert shadow.baseName == projectName
-        assert shadow.destinationDir == new File(project.buildDir, 'libs')
-        assert shadow.version == version
-        assert shadow.classifier == 'all'
-        assert shadow.extension == 'jar'
+        assert shadow.archiveBaseName.get() == projectName
+        assert shadow.destinationDirectory.get().asFile == new File(project.layout.buildDirectory.asFile.get(), 'libs')
+        assert shadow.archiveVersion.get() == version
+        assert shadow.archiveClassifier.get() == 'all'
+        assert shadow.archiveExtension.get() == 'jar'
 
         and:
         Configuration shadowConfig = project.configurations.findByName('shadow')
         assert shadowConfig
-        shadowConfig.artifacts.file.contains(shadow.archivePath)
+        shadowConfig.artifacts.file.contains(shadow.archiveFile.get().asFile)
 
     }
 
+    @IgnoreIf({
+        // Gradle 8.3 doesn't support Java 21.
+        JavaVersion.current().majorVersion.toInteger() >= 21
+    })
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
-        GradleRunner versionRunner = runner
-                .withGradleVersion(version)
-                .withArguments('--stacktrace')
-                .withDebug(true)
-
-
         File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
                 'one # NOTE: No newline terminates this line/file').write()
 
@@ -80,25 +79,21 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        versionRunner.withArguments('shadowJar', '--stacktrace').build()
+        run(['shadowJar']) {
+            it.withGradleVersion(version)
+            it.withDebug(true)
+            it.withTestKitDir(getTestKitDir())
+        }
 
         then:
         assert output.exists()
 
         where:
-        version << ['7.0']
+        version << ['8.3']
     }
 
-    def 'Error in Gradle versions < 7.0'() {
+    def 'Error in Gradle versions < 8.3'() {
         given:
-        GradleRunner versionRunner = GradleRunner.create()
-                .withGradleVersion('6.9')
-                .withArguments('--stacktrace')
-                .withProjectDir(dir.root)
-                .forwardOutput()
-                .withDebug(true)
-                .withTestKitDir(getTestKitDir())
-
         buildFile << """
             dependencies {
               implementation 'junit:junit:3.8.2'
@@ -110,7 +105,11 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         expect:
-        versionRunner.withArguments('shadowJar', '--stacktrace').buildAndFail()
+        runWithFailure(['shadowJar']) {
+            it.withGradleVersion('7.0')
+            it.withDebug(true)
+            it.withTestKitDir(getTestKitDir())
+        }
     }
 
     def 'shadow copy'() {
@@ -189,7 +188,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation project(':client') }
@@ -243,7 +242,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize()
@@ -256,7 +255,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -296,7 +295,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -311,7 +310,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -349,7 +348,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -364,7 +363,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -404,7 +403,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -419,7 +418,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -457,7 +456,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -472,7 +471,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar', '--stacktrace')
+        runWithDebug(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -537,7 +536,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('impl/build.gradle') << """
             apply plugin: 'java-library'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize()
@@ -550,7 +549,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar', '--stacktrace')
+        runWithDebug(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -613,7 +612,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('impl/build.gradle') << """
             apply plugin: 'java-library'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize()
@@ -626,7 +625,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar', '--stacktrace')
+        runWithDebug(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -652,7 +651,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -709,7 +708,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -729,7 +728,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
@@ -813,10 +812,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
     def "include java-library configurations by default"() {
         given:
-        GradleRunner versionRunner = runner
-                .withArguments('--stacktrace')
-                .withDebug(true)
-
         repo.module('shadow', 'api', '1.0')
                 .insertFile('api.properties', 'api')
                 .publish()
@@ -844,7 +839,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        versionRunner.withArguments('shadowJar').build()
+        runWithDebug('shadowJar')
 
         then:
         contains(output, ['api.properties', 'implementation.properties',
@@ -992,7 +987,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar', '--stacktrace')
+        run('shadowJar')
 
         then:
         assert output.exists()
@@ -1028,7 +1023,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('impl/build.gradle') << """
             apply plugin: 'java-library'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             version = '1.0'
             repositories { maven { url "${repo.uri}" } }
@@ -1040,7 +1035,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-1.0-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar', '--stacktrace')
+        runWithDebug(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -1070,13 +1065,15 @@ class ShadowPluginSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application {
+               mainClass = 'myapp.Main'
+            }
 
             dependencies {
                implementation 'shadow:a:1.0'
             }
 
-            def generatedResourcesDir = new File(project.buildDir, "generated-resources")
+            def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
 
             task generateResources {
                 doLast {
@@ -1112,7 +1109,7 @@ class ShadowPluginSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -1148,7 +1145,9 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'aspectj'
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application {
+               mainClass = 'myapp.Main'
+            }
 
             repositories {
                 mavenCentral()
@@ -1170,13 +1169,13 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
     }
 
-    @Issue("https://github.com/johnrengelman/shadow/issues/609")
+    @Issue("https://github.com/GradleUp/shadow/issues/609")
     def "doesn't error when using application mainClass property"() {
         given:
         buildFile.text = defaultBuildScript
@@ -1212,10 +1211,40 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow', '--stacktrace')
+        BuildResult result = run('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
+    }
+
+    @Issue("https://github.com/GradleUp/shadow/pull/459")
+    def 'exclude gradleApi() by default'() {
+        given:
+        buildFile.text = getDefaultBuildScript('java-gradle-plugin')
+
+        file('src/main/java/my/plugin/MyPlugin.java') << """
+            package my.plugin;
+            import org.gradle.api.Plugin;
+            import org.gradle.api.Project;
+            public class MyPlugin implements Plugin<Project> {
+                public void apply(Project project) {
+                    System.out.println("MyPlugin: Hello World!");
+                }
+            }
+        """.stripIndent()
+        file('src/main/resources/META-INF/gradle-plugins/my.plugin.properties') << """
+            implementation-class=my.plugin.MyPlugin
+        """.stripIndent()
+
+        when:
+        run('shadowJar')
+
+        then:
+        assert output.exists()
+
+        and:
+        JarFile jar = new JarFile(output)
+        assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
     }
 
     private String escapedPath(File file) {

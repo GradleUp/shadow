@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.util.file;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -17,8 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TestNameTestDirectoryProvider implements MethodRule, TestRule, TestDirectoryProvider {
     private TestFile dir;
     private String prefix;
-    private static TestFile root;
-    private static AtomicInteger testCounter = new AtomicInteger(1);
+    private static final TestFile root;
+    private static final AtomicInteger testCounter = new AtomicInteger(1);
 
     static {
         // NOTE: the space in the directory name is intentional
@@ -47,7 +48,7 @@ public class TestNameTestDirectoryProvider implements MethodRule, TestRule, Test
         };
     }
 
-    public Statement apply(final Statement base, Description description) {
+    public Statement apply(final @NotNull Statement base, Description description) {
         init(description.getMethodName(), description.getTestClass().getSimpleName());
         return new Statement() {
             @Override
@@ -101,14 +102,14 @@ public class TestNameTestDirectoryProvider implements MethodRule, TestRule, Test
     }
 
     public TestFile file(Object... path) {
-        return getTestDirectory().file((Object[]) path);
+        return getTestDirectory().file(path);
     }
 
     public TestFile createFile(Object... path) {
-        return file((Object[]) path).createFile();
+        return file(path).createFile();
     }
 
     public TestFile createDir(Object... path) {
-        return file((Object[]) path).createDir();
+        return file(path).createDir();
     }
 }
