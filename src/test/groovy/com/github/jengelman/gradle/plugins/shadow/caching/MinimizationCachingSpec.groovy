@@ -35,7 +35,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation project(':client') }
@@ -57,7 +57,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         when:
         file('server/build.gradle').text = """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {

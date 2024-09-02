@@ -42,7 +42,7 @@ class AppendingTransformer implements Transformer {
     String resource
 
     /**
-     * Defer initialization, see https://github.com/johnrengelman/shadow/issues/763
+     * Defer initialization, see https://github.com/GradleUp/shadow/issues/763
      */
     private ByteArrayOutputStream data
 

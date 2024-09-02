@@ -35,7 +35,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         buildFile << """
             apply plugin: 'application'
 
-            mainClassName = 'myapp.Main'
+            application {
+               mainClass = 'myapp.Main'
+            }
             
             dependencies {
                implementation 'shadow:a:1.0'
@@ -101,7 +103,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -146,7 +148,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
         file('lib/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             repositories { maven { url "${repo.uri}" } }
             dependencies {

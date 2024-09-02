@@ -3,7 +3,7 @@ module.exports = {
   dest: "build/site",
   ga: "UA-321220-4",
   themeConfig: {
-    repo: "johnrengelman/shadow",
+    repo: "GradleUp/shadow",
     editLinks: true,
     editLinkText: 'Help improve these docs!',
     logo: '/logo+type.svg',

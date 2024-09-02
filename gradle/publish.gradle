@@ -1,27 +1,20 @@
 apply plugin: "com.gradle.plugin-publish"
+apply plugin: "com.vanniktech.maven.publish"
 
-group = 'com.github.johnrengelman'
-
-if (System.env.CIRCLE_TAG && System.env.CIRCLE_TAG =~  /^\d\.\d\.\d$/) {
-    version = System.env.CIRCLE_TAG
-} else {
-    version = file('src/main/resources/shadow-version.txt').text.trim()
-    if (!version.endsWith("-SNAPSHOT")) {
-        version = version + "-SNAPSHOT"
-    }
-}
+group = providers.gradleProperty("GROUP").get()
+version = providers.gradleProperty("VERSION_NAME").get()
 
 gradlePlugin {
-    website = 'https://github.com/johnrengelman/shadow'
-    vcsUrl = 'https://github.com/johnrengelman/shadow'
+    website = providers.gradleProperty("POM_URL")
+    vcsUrl = providers.gradleProperty("POM_URL")
 
     plugins {
         shadowPlugin {
-            id = 'com.github.johnrengelman.shadow'
+            id = 'com.gradleup.shadow'
             implementationClass = 'com.github.jengelman.gradle.plugins.shadow.ShadowPlugin'
-            displayName = 'Shadow Plugin'
-            description = "Gradle plugin to create fat/uber JARs, apply file transforms, and relocate packages for applications and libraries. Gradle version of Maven's Shade plugin."
-            tags.set(['onejar', 'shade', 'fatjar', 'uberjar'])
+            displayName = providers.gradleProperty("POM_NAME").get()
+            description = providers.gradleProperty("POM_DESCRIPTION").get()
+            tags = ['onejar', 'shade', 'fatjar', 'uberjar']
         }
     }
 }
@@ -35,22 +28,6 @@ tasks.named('publishPlugins') {
     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
 }
 
-signing {
-    if (System.env.CI == 'true') {
-        def encodedSigningKey = findProperty("signingKey")
-        def signingKey = encodedSigningKey ? new String(encodedSigningKey.decodeBase64()) : null
-        def signingPassword = findProperty("signingPassword") as String
-        useInMemoryPgpKeys(signingKey, signingPassword)
-    }
-    // See https://github.com/johnrengelman/shadow/pull/831#discussion_r1119012328
-    required = false && gradle.taskGraph.hasTask("artifactoryPublish")
-    sign(publishing.publications)
-}
-
-tasks.withType(Sign).configureEach {
-    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13470")
-}
-
 tasks.register('release') {
-    dependsOn tasks.named('assemble'), tasks.named('publishPlugins'), tasks.named('gitPublishPush')
+    dependsOn tasks.named('publish'), tasks.named('publishPlugins'), tasks.named('gitPublishPush')
 }

@@ -11,7 +11,7 @@ class GroovyDslFixture extends GroovyScriptFixture {
         """
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow'
+    id 'com.gradleup.shadow'
     id 'application'
 }
 

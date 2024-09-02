@@ -7,4 +7,5 @@ node {
 tasks.named('yarn_build') {
     inputs.files project.fileTree('src/docs')
     outputs.dir project.file('build/site')
+    dependsOn("yarn")
 }
