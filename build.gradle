@@ -6,10 +6,10 @@ plugins {
     id 'project-report'
     id 'idea'
     id 'java-gradle-plugin'
-    id 'signing'
-    id 'com.gradle.plugin-publish' version '1.2.1'
+    id 'com.gradle.plugin-publish' version '1.2.2'
     id 'org.ajoberstar.git-publish' version '4.2.2'
     id 'com.github.node-gradle.node' version '7.0.2'
+    id 'com.vanniktech.maven.publish' version "0.29.0"
 }
 
 apply plugin: ShadowPlugin
@@ -19,6 +19,17 @@ apply from: file('gradle/publish.gradle')
 apply from: file('gradle/vuepress.gradle')
 apply from: file('gradle/ghPages.gradle')
 apply from: file('gradle/dependencies.gradle')
+
+java {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+idea {
+    project {
+        languageLevel = '1.8'
+    }
+}
 
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
@@ -32,7 +43,7 @@ tasks.withType(Test).configureEach {
         maxHeapSize "1g"
     }
 
-    systemProperty 'java.io.tmpdir', project.layout.buildDirectory.asFile.get().absolutePath
+    systemProperty 'shadowVersion', version
 
     // Required to test configuration cache in tests when using withDebug()
     // https://github.com/gradle/gradle/issues/22765#issuecomment-1339427241
@@ -44,31 +55,15 @@ tasks.withType(Test).configureEach {
     )
 }
 
-// Remove the gradleApi so it isn't merged into the jar file.
-// This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
-// See https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161
-configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
-    dependencies.remove(project.dependencies.gradleApi())
-}
-
 tasks.named('shadowJar', ShadowJar) {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
     enableRelocation true
 }
 
-idea {
-    project {
-        languageLevel = '1.8'
-    }
-}
-
 tasks.named('ideaModule') {
     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13480")
 }
-
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
 
 tasks.register('downloadDependencies', Exec) {
     dependsOn configurations.testRuntimeClasspath

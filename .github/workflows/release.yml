@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.repository == 'GradleUp/shadow'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+      - uses: actions/setup-node@v4
+        with:
+          # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
+          node-version: '16'
+      # Disable CC due to https://github.com/gradle/gradle/issues/22779
+      - run: ./gradlew release --no-configuration-cache
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_SECRET }}
+          # We must declare repository_owner as the user, workaround for https://github.com/ajoberstar/gradle-git-publish/issues/109.
+          GRGIT_USER: ${{ github.repository_owner }}
+          # https://ajoberstar.org/grgit/main/grgit-authentication.html#_environment_variables
+          GRGIT_PASS: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
+      - name: Extract release notes
+        # TODO: replace this after https://github.com/ffurrer2/extract-release-notes/pull/355 is merged.
+        uses: Goooler/extract-release-notes@69a05474cfcb205f998ed8e094972870787f632e
+        with:
+          changelog_file: src/docs/changes/README.md
+          release_notes_file: RELEASE_NOTES.md
+      - name: Create release
+        run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

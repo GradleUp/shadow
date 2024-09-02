@@ -188,7 +188,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation project(':client') }
@@ -242,7 +242,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize()
@@ -295,7 +295,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -348,7 +348,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -403,7 +403,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -456,7 +456,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize {
@@ -536,7 +536,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('impl/build.gradle') << """
             apply plugin: 'java-library'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize()
@@ -612,7 +612,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('impl/build.gradle') << """
             apply plugin: 'java-library'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             shadowJar {
                 minimize()
@@ -651,7 +651,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -708,7 +708,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -728,7 +728,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('server/build.gradle') << """
             apply plugin: 'java'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
@@ -1023,7 +1023,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('impl/build.gradle') << """
             apply plugin: 'java-library'
-            apply plugin: 'com.github.johnrengelman.shadow'
+            apply plugin: 'com.gradleup.shadow'
 
             version = '1.0'
             repositories { maven { url "${repo.uri}" } }
@@ -1175,7 +1175,7 @@ class ShadowPluginSpec extends PluginSpecification {
         assert result.output.contains('TestApp: Hello World! (foo)')
     }
 
-    @Issue("https://github.com/johnrengelman/shadow/issues/609")
+    @Issue("https://github.com/GradleUp/shadow/issues/609")
     def "doesn't error when using application mainClass property"() {
         given:
         buildFile.text = defaultBuildScript
@@ -1215,6 +1215,36 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
+    }
+
+    @Issue("https://github.com/GradleUp/shadow/pull/459")
+    def 'exclude gradleApi() by default'() {
+        given:
+        buildFile.text = getDefaultBuildScript('java-gradle-plugin')
+
+        file('src/main/java/my/plugin/MyPlugin.java') << """
+            package my.plugin;
+            import org.gradle.api.Plugin;
+            import org.gradle.api.Project;
+            public class MyPlugin implements Plugin<Project> {
+                public void apply(Project project) {
+                    System.out.println("MyPlugin: Hello World!");
+                }
+            }
+        """.stripIndent()
+        file('src/main/resources/META-INF/gradle-plugins/my.plugin.properties') << """
+            implementation-class=my.plugin.MyPlugin
+        """.stripIndent()
+
+        when:
+        run('shadowJar')
+
+        then:
+        assert output.exists()
+
+        and:
+        JarFile jar = new JarFile(output)
+        assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
     }
 
     private String escapedPath(File file) {

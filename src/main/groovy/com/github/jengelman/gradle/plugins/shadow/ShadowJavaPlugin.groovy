@@ -7,8 +7,10 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.configuration.project.ProjectConfigurationActionContainer
+import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 import javax.inject.Inject
 
@@ -51,6 +53,19 @@ class ShadowJavaPlugin implements Plugin<Project> {
                 mapToOptional() // make it a Maven optional dependency
             }
         }
+
+        project.plugins.withType(JavaGradlePluginPlugin).configureEach {
+            // Remove the gradleApi so it isn't merged into the jar file.
+            // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
+            // See https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161
+            project.configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
+                it.dependencies.remove(project.dependencies.gradleApi())
+            }
+            // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
+            project.configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME) {
+                it.dependencies.add(project.dependencies.gradleApi())
+            }
+        }
     }
 
     protected static void configureShadowTask(Project project) {
@@ -75,9 +90,6 @@ class ShadowJavaPlugin implements Plugin<Project> {
             shadow.configurations = [project.configurations.findByName('runtimeClasspath') ?
                                              project.configurations.runtimeClasspath : project.configurations.runtime]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
-            shadow.dependencies {
-                exclude(dependency(project.dependencies.gradleApi()))
-            }
         }
         project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, project.tasks.named(SHADOW_JAR_TASK_NAME))
     }

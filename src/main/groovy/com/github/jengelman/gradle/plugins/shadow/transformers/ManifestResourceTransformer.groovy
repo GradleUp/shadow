@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import groovy.util.logging.Slf4j
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -39,6 +40,7 @@ import java.util.jar.Manifest
  * @author Jason van Zyl
  * @author John Engelman
  */
+@Slf4j
 class ManifestResourceTransformer implements Transformer {
 
     // Configuration
@@ -73,7 +75,8 @@ class ManifestResourceTransformer implements Transformer {
             manifestDiscovered = true
             try {
                 context.is
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                log.warn("Failed to read MANIFEST.MF", e)
             }
         }
     }

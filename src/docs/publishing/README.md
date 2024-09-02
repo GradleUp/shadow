@@ -11,7 +11,7 @@ publication with the necessary artifact and dependencies in the POM file.
 // Publishing a Shadow JAR with the Maven-Publish Plugin
 apply plugin: 'java'
 apply plugin: 'maven-publish'
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 
 publishing {
   publications {

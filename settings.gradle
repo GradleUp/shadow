@@ -6,7 +6,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'com.gradle.develocity' version '3.17.6'
+    id 'com.gradle.develocity' version '3.18'
 }
 
 dependencyResolutionManagement {
@@ -22,18 +22,6 @@ develocity {
         termsOfUseUrl = 'https://gradle.com/terms-of-service'
         termsOfUseAgree = 'yes'
         publishing.onlyIf { isCI }
-        if (isCI) {
-            tag 'CI'
-            if (System.env.CIRCLE_TAG) {
-                link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_TAG}"
-            } else {
-                link 'VCS', "https://github.com/johnrengelman/shadow/tree/${System.env.CIRCLE_BRANCH}"
-            }
-            link 'VCS Commit', "https://github.com/johnrengelman/shadow/commit/${System.env.CIRCLE_SHA1}"
-            if (System.env.CI_PULL_REQUEST) {
-                link 'Pull Request', "${System.env.CI_PULL_REQUEST}"
-            }
-        }
     }
 }
 
