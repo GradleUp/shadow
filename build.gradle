@@ -64,8 +64,3 @@ tasks.named('shadowJar', ShadowJar) {
 tasks.named('ideaModule') {
     notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13480")
 }
-
-tasks.register('downloadDependencies', Exec) {
-    dependsOn configurations.testRuntimeClasspath
-    commandLine 'echo', 'Downloaded all dependencies'
-}
