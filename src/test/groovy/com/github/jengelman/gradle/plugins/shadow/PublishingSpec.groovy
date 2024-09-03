@@ -6,6 +6,7 @@ import groovy.json.JsonSlurper
 import groovy.xml.XmlSlurper
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Usage
+import spock.lang.Issue
 
 class PublishingSpec extends PluginSpecification {
 
@@ -78,6 +79,7 @@ class PublishingSpec extends PluginSpecification {
         assert dependency.version.text() == '1.0'
     }
 
+    @Issue(["https://github.com/GradleUp/shadow/issues/860", "https://github.com/GradleUp/shadow/issues/945"])
     def "publish shadow jar with maven-publish plugin using custom classifier and extension"() {
         given:
         repo.module('shadow', 'a', '1.0')
@@ -122,8 +124,11 @@ class PublishingSpec extends PluginSpecification {
         run('publish')
 
         then:
-        File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext').canonicalFile
-        assert publishedFile.exists()
+        def publishedFiles = publishingRepo.rootDir.file('shadow/maven-all/1.0/').canonicalFile
+                .listFiles()
+                .findAll { it.exists() }
+                .collect { it.name }
+        assert publishedFiles.contains('maven-all-1.0-my-classifier.my-ext')
     }
 
     def "publish multiproject shadow jar with maven-publish plugin"() {
