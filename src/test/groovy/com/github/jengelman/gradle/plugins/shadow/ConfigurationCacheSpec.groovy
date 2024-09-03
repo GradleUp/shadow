@@ -61,7 +61,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
     def "configuration caching supports includes"() {
         given:
         buildFile << """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                exclude 'a2.properties'
             }
         """.stripIndent()
@@ -105,7 +105,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 minimize {
                     exclude(dependency('junit:junit:.*'))
                 }
@@ -155,7 +155,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
                 implementation "junit:junit:3.8.2"
             }
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 configurations = [project.configurations.compileClasspath]
             }
 

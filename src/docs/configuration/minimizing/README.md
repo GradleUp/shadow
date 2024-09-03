@@ -4,7 +4,7 @@ Shadow can automatically remove all classes of dependencies that are not used by
 
 ```groovy
 // Minimizing a shadow JAR
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   minimize()
 }
 ```
@@ -16,7 +16,7 @@ a `dependency` is interpreted as a regular expression.
 
 ```groovy
 // Force a class to be retained during minimization
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   minimize {
     exclude(dependency('org.scala-lang:.*:.*'))
   }
@@ -28,7 +28,7 @@ shadowJar {
 Similar to dependencies, projects can also be excluded.
 
 ```groovy
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     minimize {
         exclude(project(":api"))
     }
