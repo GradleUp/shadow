@@ -139,16 +139,15 @@ class ShadowPluginSpec extends PluginSpecification {
 
         buildFile << """
             |task shadow(type: ${ShadowJar.name}) {
-            |    destinationDir = buildDir
-            |    baseName = 'shadow'
+            |    destinationDirectory = buildDir
+            |    archiveBaseName = 'shadow'
             |    from('${artifact.path}')
             |    from('${project.path}')
             |}
         """.stripMargin()
 
         when:
-        runner.arguments << 'shadow'
-        ExecutionResult result = runner.run()
+        BuildResult result = run('shadow')
 
         then:
         assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar, size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/

@@ -19,10 +19,12 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
+import org.gradle.api.internal.file.DefaultFilePermissions
 import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
@@ -42,7 +44,6 @@ import org.slf4j.LoggerFactory
 
 import javax.annotation.Nullable
 import java.util.zip.ZipException
-
 
 class ShadowCopyAction implements CopyAction {
     static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
@@ -245,7 +246,7 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private boolean recordVisit(FileCopyDetails fileCopyDetails) {
-            return recordVisit(fileCopyDetails.relativePath, fileCopyDetails.size, null)
+            return recordVisit(fileCopyDetails.relativePath.toString(), fileCopyDetails.size, null)
         }
 
         @Override
@@ -282,11 +283,11 @@ class ShadowCopyAction implements CopyAction {
             ZipFile archive = new ZipFile(fileDetails.file)
             try {
                 List<ArchiveFileTreeElement> archiveElements = archive.entries.collect {
-                    new ArchiveFileTreeElement(new RelativeArchivePath(it, fileDetails))
+                    new ArchiveFileTreeElement(new RelativeArchivePath(it))
                 }
                 Spec<FileTreeElement> patternSpec = patternSet.getAsSpec()
                 List<ArchiveFileTreeElement> filteredArchiveElements = archiveElements.findAll { ArchiveFileTreeElement archiveElement ->
-                    patternSpec.isSatisfiedBy(archiveElement)
+                    patternSpec.isSatisfiedBy(archiveElement.asFileTreeElement())
                 }
                 filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
                     if (archiveElement.relativePath.file) {

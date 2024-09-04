@@ -27,12 +27,14 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.StandardFilesMergeTransformer;
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
 import org.gradle.api.Action;
+import org.gradle.api.Task;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
+import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
@@ -78,10 +80,9 @@ public class ShadowJar extends Jar implements ShadowSpec {
         super();
         setDuplicatesStrategy(
                 DuplicatesStrategy.INCLUDE); //shadow filters out files later. This was the default behavior in  Gradle < 6.x
-        versionUtil = new GradleVersionUtil(getProject().getGradle().getGradleVersion());
         dependencyFilter = new DefaultDependencyFilter(getProject());
         dependencyFilterForMinimize = new MinimizeDependencyFilter(getProject());
-        setManifest(new DefaultInheritManifest(getServices().get(FileResolver.class)));
+        setManifest(new DefaultInheritManifest(getProject(), getServices().get(FileResolver.class)));
         /*
          Add as default the StandardFilesMergeTransformer, remove it with "removeDefaultTransformers()".
          This is added by default, because otherwise:
@@ -96,28 +97,20 @@ public class ShadowJar extends Jar implements ShadowSpec {
         relocators = new ArrayList<>();
         configurations = new ArrayList<>();
 
-        this.getInputs().property("minimize", new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return minimizeJar;
-            }
-        });
+        this.getInputs().property("minimize", (Callable<Boolean>) () -> minimizeJar);
         this.getOutputs().doNotCacheIf("Has one or more transforms or relocators that are not cacheable",
-                new Spec<Task>() {
-                    @Override
-                    public boolean isSatisfiedBy(Task task) {
-                        for (Transformer transformer : transformers) {
-                            if (!isCacheableTransform(transformer.getClass())) {
-                                return true;
-                            }
+                task -> {
+                    for (Transformer transformer : transformers) {
+                        if (!isCacheableTransform(transformer.getClass())) {
+                            return true;
                         }
-                        for (Relocator relocator : relocators) {
-                            if (!isCacheableRelocator(relocator.getClass())) {
-                                return true;
-                            }
-                        }
-                        return false;
                     }
+                    for (Relocator relocator : relocators) {
+                        if (!isCacheableRelocator(relocator.getClass())) {
+                            return true;
+                        }
+                    }
+                    return false;
                 });
     }
 
