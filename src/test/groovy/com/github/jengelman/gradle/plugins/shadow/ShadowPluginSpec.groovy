@@ -156,6 +156,8 @@ class ShadowPluginSpec extends PluginSpecification {
         /* Shouldn't appear, because the default StandardFileTransformer should've merged it,
            instead of just dropping all following licenses. */
         assert !result.output.contains('license.txt')
+        // No module listing should appear. module-info.class is excluded by default.
+        assert !result.output.contains('open module org.example')
     }
 
     def 'Tests the removal of the default transformer'() {
@@ -167,7 +169,7 @@ class ShadowPluginSpec extends PluginSpecification {
             |task shadow(type: ${ShadowJar.name}) {
             |    destinationDirectory = buildDir
             |    archiveBaseName = 'shadow'
-            |    removeDefaultTransformers()            
+            |    removeDefaultTransformers()
             |    from('${artifact.path}')
             |    from('${project.path}')
             |}
@@ -182,6 +184,32 @@ class ShadowPluginSpec extends PluginSpecification {
                                 /\s+IGNORING test\.json from test-project-1\.0-SNAPSHOT.jar, size is different/
         // Without the StandardFileTransformer there should be a warning about multiple license files with the same name.
         assert result.output.contains('license.txt')
+        // No module listing should appear. module-info.class is excluded by default.
+        assert !result.output.contains('open module org.example')
+    }
+
+    def 'Tests the info about the module-info.class, if removed from standard excludes'() {
+        given:
+        URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
+        URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
+
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDirectory = buildDir
+            |    archiveBaseName = 'shadow'
+            |    allowModuleInfos()
+            |    from('${artifact.path}')
+            |    from('${project.path}')
+            |}
+        """.stripMargin()
+
+        when:
+        BuildResult result = run('shadow')
+
+        then:
+        assert result.output.contains('module-info.class')
+        // Because allowModuleInfos() is used, the module listing should appear.
+        assert result.output.contains('open module org.example')
     }
 
     def 'include project sources'() {

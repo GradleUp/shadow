@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks;
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin;
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats;
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter;
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
@@ -71,6 +72,8 @@ public class ShadowJar extends Jar implements ShadowSpec {
             return dependencyFilter.resolve(configurations);
         }
     });
+
+    private boolean isAllowModuleInfos;
 
     public ShadowJar() {
         super();
@@ -144,7 +147,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
                 getSourceSetsClassesDirs().getFiles(), getToMinimize()) : null;
         return new ShadowCopyAction(getArchiveFile().get().getAsFile(), getInternalCompressor(), documentationRegistry,
                 this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
-                isPreserveFileTimestamps(), minimizeJar, unusedTracker);
+                isPreserveFileTimestamps(), minimizeJar, unusedTracker, isAllowModuleInfos);
     }
 
     @Classpath
@@ -267,6 +270,23 @@ public class ShadowJar extends Jar implements ShadowSpec {
                 .findAny();
         standardFilesMergeTransformer.ifPresent(transformer -> transformers.remove(transformer));
         return this;
+    }
+
+    /**
+     * Allows module-info.class's to be included in the final jar, and informs about the contents
+     * of the module-info.class files it finds.
+     *
+     * @return this
+     */
+    public ShadowJar allowModuleInfos() {
+        this.isAllowModuleInfos = true;
+        getExcludes().remove(ShadowJavaPlugin.MODULE_INFO_CLASS);
+        return this;
+    }
+
+    @Internal
+    public boolean isAllowModuleInfos() {
+        return isAllowModuleInfos;
     }
 
     private boolean isCacheableTransform(Class<? extends Transformer> clazz) {

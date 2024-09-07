@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
@@ -41,6 +42,7 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
+import javax.annotation.Nonnull
 import javax.annotation.Nullable
 import java.util.zip.ZipException
 
@@ -59,11 +61,13 @@ class ShadowCopyAction implements CopyAction {
     private final boolean preserveFileTimestamps
     private final boolean minimizeJar
     private final UnusedTracker unusedTracker
+    private final boolean allowModuleInfos
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                      String encoding, List<Transformer> transformers, List<Relocator> relocators,
                      PatternSet patternSet, ShadowStats stats,
-                     boolean preserveFileTimestamps, boolean minimizeJar, UnusedTracker unusedTracker) {
+                     boolean preserveFileTimestamps, boolean minimizeJar, UnusedTracker unusedTracker,
+                     boolean allowModuleInfos) {
 
         this.zipFile = zipFile
         this.compressor = compressor
@@ -76,6 +80,7 @@ class ShadowCopyAction implements CopyAction {
         this.preserveFileTimestamps = preserveFileTimestamps
         this.minimizeJar = minimizeJar
         this.unusedTracker = unusedTracker
+        this.allowModuleInfos = allowModuleInfos
     }
 
     @Override
@@ -201,7 +206,17 @@ class ShadowCopyAction implements CopyAction {
         private final Set<String> unused
         private final ShadowStats stats
 
-        private Map<String, Map> visitedFiles = new HashMap<>()
+        private class VisitedFileInfo {
+            long size
+            RelativePath originJar
+
+            VisitedFileInfo(long size, @Nonnull RelativePath originJar) {
+                this.size = size
+                this.originJar = originJar
+            }
+        }
+
+        private Map<String, VisitedFileInfo> visitedFiles = new HashMap<>()
 
         StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
                      List<Relocator> relocators, PatternSet patternSet, Set<String> unused,
@@ -235,7 +250,7 @@ class ShadowCopyAction implements CopyAction {
                 originJar = new RelativePath(false)
             }
 
-            visitedFiles.put(path.toString(), [size: size, originJar: originJar])
+            visitedFiles.put(path.toString(), new VisitedFileInfo(size, originJar))
             return true
         }
 
@@ -312,37 +327,7 @@ class ShadowCopyAction implements CopyAction {
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
                 String path = archiveFilePath.toString()
 
-                if (path.endsWith("module-info.class")) {
-                    log.warn("module-info collision")
-
-                    def moduleFileName = "module-info"
-                    def moduleFileSuffix = ".class"
-                    File disassembleModFile = File.createTempFile(moduleFileName, moduleFileSuffix)
-
-                    try (InputStream is = archive.getInputStream(archiveFilePath.entry)) {
-                        try (OutputStream os = new FileOutputStream(disassembleModFile)) {
-                            IOUtils.copyLarge(is, os)
-                        }
-                    }
-
-                    ProcessBuilder processBuilder = new ProcessBuilder("javap", disassembleModFile.absolutePath)
-                    processBuilder.redirectErrorStream(true)
-                    Process process = processBuilder.start()
-                    InputStream inputStream = process.getInputStream()
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))
-                    String line
-
-                    while ((line = reader.readLine()) != null) {
-                        log.warn(line)
-                    }
-
-                    int exitCode = process.waitFor()
-                    if (exitCode != 0) {
-                        log.warn("Process exited with code " + exitCode)
-                    }
-
-                    log.warn("module-info collision end")
-                }
+                listModuleInfoOnDemand(path, archive, archiveFilePath)
 
                 if (recordVisit(path, archiveFileSize, archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
@@ -379,6 +364,52 @@ class ShadowCopyAction implements CopyAction {
                 }
             } else {
                 transform(archiveFile, archive)
+            }
+        }
+
+        /**
+         Information about the 'module-info.class' if it isn't excluded. Including can be done with
+         <code>allowModuleInfos()</code>, like this:
+         <pre><code>
+         shadowJar {
+            ...
+            allowModuleInfos()
+         }
+         </code></pre>
+         Based on the discussion in issue 710: <a href="https://github.com/GradleUp/shadow/issues/710">GitHub Issue #710</a>.
+         */
+        private void listModuleInfoOnDemand(String path, ZipFile archive, RelativeArchivePath archiveFilePath) {
+            if (path.endsWith(ShadowJavaPlugin.MODULE_INFO_CLASS) && allowModuleInfos) {
+                log.warn("======== Warning: {}/{} contains module-info - Listing content ========",
+                        RelativePath.parse(true, archive.name).lastName, path)
+
+                def moduleFileName = "module-info"
+                def moduleFileSuffix = ".class"
+                File disassembleModFile = File.createTempFile(moduleFileName, moduleFileSuffix)
+
+                try (InputStream is = archive.getInputStream(archiveFilePath.entry)) {
+                    try (OutputStream os = new FileOutputStream(disassembleModFile)) {
+                        IOUtils.copyLarge(is, os)
+                    }
+                }
+
+                ProcessBuilder processBuilder = new ProcessBuilder("javap", disassembleModFile.absolutePath)
+                processBuilder.redirectErrorStream(true)
+                Process process = processBuilder.start()
+                InputStream inputStream = process.getInputStream()
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))
+
+                String line
+                while ((line = reader.readLine()) != null) {
+                    log.warn(line)
+                }
+
+                int exitCode = process.waitFor()
+                if (exitCode != 0) {
+                    log.warn("Process exited with code " + exitCode)
+                }
+
+                log.warn("======== module-info content listing end ========")
             }
         }
 
