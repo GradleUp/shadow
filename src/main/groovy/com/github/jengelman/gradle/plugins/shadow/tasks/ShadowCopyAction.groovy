@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.StandardFilesMergeTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.apache.tools.zip.UnixStat
@@ -39,16 +40,13 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import javax.annotation.Nullable
 import java.util.zip.ZipException
 
+@Slf4j
 class ShadowCopyAction implements CopyAction {
     static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
-
-    final static Logger log = LoggerFactory.getLogger(ShadowCopyAction.class);
 
     private final File zipFile
     private final ZipCompressor compressor

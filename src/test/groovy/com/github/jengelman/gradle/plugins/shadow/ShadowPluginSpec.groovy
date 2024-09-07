@@ -150,7 +150,38 @@ class ShadowPluginSpec extends PluginSpecification {
         BuildResult result = run('shadow')
 
         then:
-        assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar, size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/
+        assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar,/
+                                 / size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/
+
+        /* Shouldn't appear, because the default StandardFileTransformer should've merged it,
+           instead of just dropping all following licenses. */
+        assert !result.output.contains('license.txt')
+    }
+
+    def 'Tests the removal of the default transformer'() {
+        given:
+        URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
+        URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
+
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDirectory = buildDir
+            |    archiveBaseName = 'shadow'
+            |    removeDefaultTransformers()            
+            |    from('${artifact.path}')
+            |    from('${project.path}')
+            |}
+        """.stripMargin()
+
+        when:
+        BuildResult result = run('shadow')
+
+        then:
+        assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar,/
+                                / size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/
+                                /\s+IGNORING test\.json from test-project-1\.0-SNAPSHOT.jar, size is different/
+        // Without the StandardFileTransformer there should be a warning about multiple license files with the same name.
+        assert result.output.contains('license.txt')
     }
 
     def 'include project sources'() {
@@ -214,7 +245,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation project(':client') }
-
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server-all.jar')
