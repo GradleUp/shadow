@@ -30,7 +30,7 @@ dependencies {
     implementation 'org.codehaus.plexus:plexus-utils:2.0.6'
 }
 
-tasks.named('shadowJar', ShadowJar) {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     enableRelocation true
 }
 ```

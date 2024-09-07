@@ -46,7 +46,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
                 }
             }
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 notCompatibleWithConfigurationCache('CustomTransformer is not cacheable')
                 transform(CustomTransformer)
             }
@@ -95,7 +95,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         when:
         // Add a transform
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(${ServiceFileTransformer.name}) {
                     path = 'META-INF/foo'
                }
@@ -121,7 +121,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         when:
         // Change the transform configuration
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(${ServiceFileTransformer.name}) {
                     path = 'META-INF/bar'
                }
@@ -170,7 +170,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         when:
         // Add a transform
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(${AppendingTransformer.name}) {
                     resource = 'foo/bar.properties'
                }
@@ -200,7 +200,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         assert file('src/main/resources/foo/bar.properties').delete()
         file('src/main/resources/foo/baz.properties') << "foo=baz"
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(${AppendingTransformer.name}) {
                     resource = 'foo/baz.properties'
                }
@@ -251,7 +251,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         when:
         // Add a transform
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(${XmlAppendingTransformer.name}) {
                     resource = 'foo/bar.xml'
                }
@@ -281,7 +281,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         assert file('src/main/resources/foo/bar.xml').delete()
         file('src/main/resources/foo/baz.xml') << "<foo>baz</foo>"
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(${AppendingTransformer.name}) {
                     resource = 'foo/baz.xml'
                }
@@ -331,7 +331,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         when:
         // Add a transform
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(${GroovyExtensionModuleTransformer.name})
             }
         """

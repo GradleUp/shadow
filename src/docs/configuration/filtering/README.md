@@ -13,7 +13,7 @@ of the dependencies to be merged.
 
 ```groovy
 // Exclude a file from Shadow Jar
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
    exclude 'a2.properties'
 }
 ```
@@ -24,7 +24,7 @@ Additionally, ANT style patterns can be used to match multiple files.
 
 ```groovy
 // Configuring output using ANT patterns
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
    include '*.jar'
    include '*.properties'
    exclude 'a2.properties'

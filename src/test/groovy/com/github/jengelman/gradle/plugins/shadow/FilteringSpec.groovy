@@ -38,7 +38,7 @@ class FilteringSpec extends PluginSpecification {
         given:
         buildFile << """
             // tag::excludeFile[]
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                exclude 'a2.properties'
             }
             // end::excludeFile[]
@@ -70,7 +70,7 @@ class FilteringSpec extends PluginSpecification {
                implementation 'shadow:d:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
@@ -105,7 +105,7 @@ class FilteringSpec extends PluginSpecification {
                implementation 'shadow:d:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:.*'))
                }
@@ -140,7 +140,7 @@ class FilteringSpec extends PluginSpecification {
                implementation 'shadow:d:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
@@ -189,7 +189,7 @@ class FilteringSpec extends PluginSpecification {
                implementation 'shadow:d:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
@@ -207,7 +207,7 @@ class FilteringSpec extends PluginSpecification {
 
         when: 'Update build file shadowJar dependency exclusion'
         buildFile.text << '''
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                exclude 'a.properties'
             }
         '''.stripIndent()
@@ -244,7 +244,7 @@ class FilteringSpec extends PluginSpecification {
                implementation 'shadow:d:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                    include(dependency('shadow:d:1.0'))
                }
@@ -293,7 +293,7 @@ class FilteringSpec extends PluginSpecification {
               implementation project(':client')
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                    exclude(project(':client'))
                }
@@ -345,7 +345,7 @@ class FilteringSpec extends PluginSpecification {
             dependencies { implementation project(':client') }
 
             // tag::excludeSpec[]
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                    exclude(dependency {
                        it.moduleGroup == 'junit'
@@ -377,7 +377,7 @@ class FilteringSpec extends PluginSpecification {
         given:
         buildFile << """
             // tag::excludeOverInclude[]
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                include '*.jar'
                include '*.properties'
                exclude 'a2.properties'
@@ -412,7 +412,7 @@ class FilteringSpec extends PluginSpecification {
                implementation 'shadow:d:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
