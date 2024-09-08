@@ -5,6 +5,9 @@
 
 **Added**
 
+- Apply an empty plugin that has the legacy `com.github.johnrengelman.shadow` plugin ID.
+  This allows existing build logic to keep on reacting to the legacy plugin as the replacement is drop-in currently.
+
 **Changed**
 
 **Fixed**
