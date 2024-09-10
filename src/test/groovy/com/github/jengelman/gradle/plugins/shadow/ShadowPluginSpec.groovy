@@ -31,7 +31,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         project.plugins.hasPlugin(ShadowPlugin)
-        project.plugins.hasPlugin(LegacyShadowPlugin)
+        project.plugins.hasPlugin(com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin)
 
         and:
         assert !project.tasks.findByName('shadowJar')
