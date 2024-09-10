@@ -31,7 +31,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         project.plugins.hasPlugin(ShadowPlugin)
-        project.plugins.hasPlugin("com.github.johnrengelman.shadow")
+        project.plugins.hasPlugin(LegacyShadowPlugin)
 
         and:
         assert !project.tasks.findByName('shadowJar')
