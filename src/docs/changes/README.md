@@ -1,14 +1,12 @@
 # Change Log
 
 
-## [Unreleased]
+## [v8.3.1]
 
 **Added**
 
 - Apply an empty plugin that has the legacy `com.github.johnrengelman.shadow` plugin ID.
   This allows existing build logic to keep on reacting to the legacy plugin as the replacement is drop-in currently.
-
-**Changed**
 
 **Fixed**
 
@@ -378,6 +376,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 [Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.0...HEAD
+[v8.3.1]: https://github.com/GradleUp/shadow/releases/tag/8.3.1
 [v8.3.0]: https://github.com/GradleUp/shadow/releases/tag/8.3.0
 [v8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
 [v8.1.0]: https://github.com/GradleUp/shadow/releases/tag/8.1.0
