@@ -13,6 +13,7 @@
 **Fixed**
 
 - Explicitly add classifier to maven publication. ([#904](https://github.com/GradleUp/shadow/pull/904))
+- Refix excluding Gradle APIs for java-gradle-plugin. ([#948](https://github.com/GradleUp/shadow/pull/948))
 
 
 
