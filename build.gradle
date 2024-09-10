@@ -59,6 +59,7 @@ tasks.named('shadowJar', ShadowJar) {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
     enableRelocation true
+    archiveClassifier = ''
 }
 
 tasks.named('ideaModule') {
