@@ -1,6 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id 'groovy'
     id 'project-report'
@@ -11,8 +8,6 @@ plugins {
     id 'com.github.node-gradle.node' version '7.0.2'
     id 'com.vanniktech.maven.publish' version "0.29.0"
 }
-
-apply plugin: ShadowPlugin
 
 apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
@@ -53,13 +48,6 @@ tasks.withType(Test).configureEach {
             "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
             "--add-opens", "java.base/java.net=ALL-UNNAMED",
     )
-}
-
-tasks.named('shadowJar', ShadowJar) {
-    from rootProject.file('LICENSE')
-    from rootProject.file('NOTICE')
-    enableRelocation true
-    archiveClassifier = ''
 }
 
 tasks.named('ideaModule') {

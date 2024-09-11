@@ -2,7 +2,6 @@ def javaApiUrl = 'https://docs.oracle.com/javase/17/docs/api'
 def groovyApiUrl = "https://docs.groovy-lang.org/2.4.7/html/gapi/"
 
 tasks.withType(Javadoc).configureEach {
-    classpath += project.configurations.shadow
     options.links(javaApiUrl, groovyApiUrl)
     if (JavaVersion.current().java8Compatible) {
         options.addStringOption('Xdoclint:none', '-quiet')
@@ -12,10 +11,6 @@ tasks.withType(Javadoc).configureEach {
 java {
     withJavadocJar()
     withSourcesJar()
-}
-
-tasks.named('groovydoc') {
-    classpath += project.configurations.shadow
 }
 
 tasks.named('build') { dependsOn javadocJar, sourcesJar }
