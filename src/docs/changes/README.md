@@ -9,6 +9,8 @@
 
 **Fixed**
 
+- Stop publishing Shadow self fat jar to Maven repository. ([#967](https://github.com/GradleUp/shadow/pull/967))
+
 
 ## [v8.3.1]
 
