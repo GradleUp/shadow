@@ -11,12 +11,13 @@ plugins {
     id("com.vanniktech.maven.publish") version "0.29.0"
 }
 
-apply(from = "gradle/docs.gradle")
 apply(from = "gradle/publish.gradle")
 apply(from = "gradle/vuepress.gradle")
 apply(from = "gradle/ghPages.gradle")
 
 java {
+    withJavadocJar()
+    withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
@@ -52,6 +53,16 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.withType<Javadoc>().configureEach {
+    (options as? StandardJavadocDocletOptions)?.let {
+        it.links(
+            "https://docs.oracle.com/javase/17/docs/api",
+            "https://docs.groovy-lang.org/2.4.7/html/gapi/"
+        )
+        it.addStringOption("Xdoclint:none", "-quiet")
+    }
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
