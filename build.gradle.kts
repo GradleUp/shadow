@@ -1,6 +1,5 @@
 plugins {
     id("groovy")
-    id("project-report")
     id("java-gradle-plugin")
     id("shadow.convention.publish")
     id("shadow.convention.deploy")
