@@ -2,22 +2,13 @@ plugins {
     id("groovy")
     id("project-report")
     id("java-gradle-plugin")
-    id("com.gradle.plugin-publish") version "1.3.0"
+    id("shadow.convention.publish")
     id("org.ajoberstar.git-publish") version "4.2.2"
     id("com.github.node-gradle.node") version "7.0.2"
-    id("com.vanniktech.maven.publish") version "0.29.0"
 }
 
-apply(from = "gradle/publish.gradle")
 apply(from = "gradle/vuepress.gradle")
 apply(from = "gradle/ghPages.gradle")
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
 
 dependencies {
     compileOnly(localGroovy())
@@ -46,16 +37,6 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<Javadoc>().configureEach {
-    (options as? StandardJavadocDocletOptions)?.let {
-        it.links(
-            "https://docs.oracle.com/javase/17/docs/api",
-            "https://docs.groovy-lang.org/2.4.7/html/gapi/"
-        )
-        it.addStringOption("Xdoclint:none", "-quiet")
-    }
-}
-
 val isCI = providers.environmentVariable("CI").isPresent
 
 tasks.withType<Test>().configureEach {
@@ -79,5 +60,13 @@ tasks.withType<Test>().configureEach {
         "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
         "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
         "--add-opens", "java.base/java.net=ALL-UNNAMED",
+    )
+}
+
+tasks.register("release") {
+    dependsOn(
+        tasks.publish,
+        tasks.publishPlugins,
+        tasks.gitPublishPush,
     )
 }
