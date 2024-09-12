@@ -1,9 +1,6 @@
-import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
-
 plugins {
     id("groovy")
     id("project-report")
-    id("idea")
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish") version "1.3.0"
     id("org.ajoberstar.git-publish") version "4.2.2"
@@ -20,12 +17,6 @@ java {
     withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-idea {
-    project {
-        languageLevel = IdeaLanguageLevel(JavaVersion.VERSION_1_8)
-    }
 }
 
 dependencies {
@@ -89,8 +80,4 @@ tasks.withType<Test>().configureEach {
         "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
         "--add-opens", "java.base/java.net=ALL-UNNAMED",
     )
-}
-
-tasks.ideaModule {
-    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13480")
 }
