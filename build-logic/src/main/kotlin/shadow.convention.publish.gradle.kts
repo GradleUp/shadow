@@ -41,7 +41,7 @@ tasks.publishPlugins {
 tasks.withType<Javadoc>().configureEach {
     (options as? StandardJavadocDocletOptions)?.let {
         it.links(
-            "https://docs.oracle.com/en/java/javase/17/docs/api/index.html",
+            "https://docs.oracle.com/javase/17/docs/api",
             "https://docs.groovy-lang.org/2.4.7/html/gapi/"
         )
         it.addStringOption("Xdoclint:none", "-quiet")
