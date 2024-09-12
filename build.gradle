@@ -13,7 +13,6 @@ apply from: file('gradle/docs.gradle')
 apply from: file('gradle/publish.gradle')
 apply from: file('gradle/vuepress.gradle')
 apply from: file('gradle/ghPages.gradle')
-apply from: file('gradle/dependencies.gradle')
 
 java {
     sourceCompatibility = '1.8'
@@ -24,6 +23,33 @@ idea {
     project {
         languageLevel = '1.8'
     }
+}
+
+dependencies {
+    compileOnly localGroovy()
+
+    implementation 'org.jdom:jdom2:2.0.6.1'
+    implementation 'org.ow2.asm:asm:9.7'
+    implementation 'org.ow2.asm:asm-commons:9.7'
+    implementation 'commons-io:commons-io:2.16.1'
+    implementation 'org.apache.ant:ant:1.10.15'
+    implementation 'org.codehaus.plexus:plexus-utils:4.0.1'
+    implementation 'org.codehaus.plexus:plexus-xml:4.0.4'
+    implementation "org.apache.logging.log4j:log4j-core:2.24.0"
+    implementation('org.vafer:jdependency:2.10') {
+        exclude group: 'org.ow2.asm'
+    }
+
+    testImplementation('org.spockframework:spock-core:2.3-groovy-3.0') {
+        exclude group: 'org.codehaus.groovy'
+    }
+    testImplementation 'org.spockframework:spock-junit4:2.3-groovy-3.0'
+    testImplementation 'xmlunit:xmlunit:1.6'
+    testImplementation 'org.apache.commons:commons-lang3:3.17.0'
+    testImplementation 'com.google.guava:guava:33.3.0-jre'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.withType(Test).configureEach {
