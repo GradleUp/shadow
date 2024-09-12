@@ -21,7 +21,7 @@ gradlePlugin {
 
     plugins {
         create("shadowPlugin") {
-            id = "me.champeau.gradle.japicmp"
+            id = "com.gradleup.shadow"
             implementationClass = "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
             displayName = providers.gradleProperty("POM_NAME").get()
             description = providers.gradleProperty("POM_DESCRIPTION").get()
