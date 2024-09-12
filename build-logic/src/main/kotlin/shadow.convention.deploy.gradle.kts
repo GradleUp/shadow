@@ -13,12 +13,11 @@ gitPublish {
         into("api") {
             from(tasks.named("groovydoc"))
         }
-        filter(
-            mapOf(
+        filter<ReplaceTokens>(
+            "tokens" to mapOf(
                 "version" to project.version,
                 "snapshot-version" to "${project.version}-SNAPSHOT",
-            ),
-            ReplaceTokens::class.java
+            )
         )
     }
 }
