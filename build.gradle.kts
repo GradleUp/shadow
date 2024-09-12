@@ -3,12 +3,8 @@ plugins {
     id("project-report")
     id("java-gradle-plugin")
     id("shadow.convention.publish")
-    id("org.ajoberstar.git-publish") version "4.2.2"
-    id("com.github.node-gradle.node") version "7.0.2"
+    id("shadow.convention.deploy")
 }
-
-apply(from = "gradle/vuepress.gradle")
-apply(from = "gradle/ghPages.gradle")
 
 dependencies {
     compileOnly(localGroovy())
