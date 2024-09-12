@@ -1,5 +1,4 @@
 plugins {
-    `java-gradle-plugin`
     id("com.gradle.plugin-publish")
     id("com.vanniktech.maven.publish")
 }

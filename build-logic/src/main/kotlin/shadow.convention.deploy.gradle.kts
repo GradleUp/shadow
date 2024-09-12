@@ -34,8 +34,5 @@ val yarnBuild = tasks.named("yarn_build") {
 }
 
 tasks.gitPublishCopy {
-    dependsOn(yarnBuild)
-}
-tasks.gitPublishCopy {
-    dependsOn(tasks.named("groovydoc"))
+    dependsOn(yarnBuild, tasks.named("groovydoc"))
 }

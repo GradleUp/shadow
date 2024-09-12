@@ -1,6 +1,6 @@
 plugins {
-    id("groovy")
-    id("java-gradle-plugin")
+    groovy
+    `java-gradle-plugin`
     id("shadow.convention.publish")
     id("shadow.convention.deploy")
 }
@@ -37,8 +37,8 @@ val isCI = providers.environmentVariable("CI").isPresent
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 
-    // https://docs.gradle.org/8.8/userguide/performance.html#execute_tests_in_parallel
-    maxParallelForks = Runtime.getRuntime().availableProcessors()
+    // https://docs.gradle.org/8.10/userguide/performance.html#execute_tests_in_parallel
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 
     if (isCI) {
         testLogging.showStandardStreams = true
