@@ -16,6 +16,7 @@ gitPublish {
         filter(
             mapOf(
                 "version" to project.version,
+                "snapshot-version" to "${project.version}-SNAPSHOT",
             ),
             ReplaceTokens::class.java
         )
