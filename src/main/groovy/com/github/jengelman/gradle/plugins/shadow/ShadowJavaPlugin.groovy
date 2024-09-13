@@ -11,7 +11,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 import javax.inject.Inject
@@ -35,27 +34,27 @@ class ShadowJavaPlugin implements Plugin<Project> {
         project.configurations.compileClasspath.extendsFrom project.configurations.shadow
 
         project.configurations.register("shadowRuntimeElements") {
-            extendsFrom(project.configurations.shadow)
-            canBeResolved = false
-            canBeConsumed = true
-            attributes {
+            it.extendsFrom(project.configurations.shadow)
+            it.canBeConsumed = true
+            it.canBeResolved = false
+            it.attributes {
                 it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage, Usage.JAVA_RUNTIME))
                 it.attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category, Category.LIBRARY))
                 it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
                 it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.SHADOWED))
             }
-            outgoing.artifact(shadowTask)
+            it.outgoing.artifact(shadowTask)
         }
 
         AdhocComponentWithVariants javaComponent = (AdhocComponentWithVariants) project.components.findByName("java")
         javaComponent.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-            mapToOptional()
+            it.mapToOptional()
         }
 
         AdhocComponentWithVariants shadow = softwareComponentFactory.adhoc("shadow")
         project.components.add(shadow)
         shadow.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-            mapToMavenScope("runtime")
+            it.mapToMavenScope("runtime")
         }
 
         project.plugins.withType(JavaGradlePluginPlugin).configureEach {
