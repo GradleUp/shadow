@@ -6,7 +6,7 @@ The configurations from which to source dependencies for the merging can be conf
 of the [`ShadowJar`](http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type.
 
 ```groovy
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+tasks.named('shadowJar', ShadowJar) {
   configurations = [project.configurations.compileClasspath]
 }
 ```
