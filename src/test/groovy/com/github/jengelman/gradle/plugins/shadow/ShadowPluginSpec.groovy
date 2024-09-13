@@ -1245,7 +1245,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         and:
         JarFile jar = new JarFile(output)
-        assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 0
+        assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
     }
 
     private String escapedPath(File file) {
