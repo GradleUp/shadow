@@ -11,6 +11,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 import javax.inject.Inject
@@ -29,7 +30,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        def shadowTask = configureShadowTask(project)
+        def shadowTaskProvider = configureShadowTask(project)
 
         project.configurations.compileClasspath.extendsFrom project.configurations.shadow
 
@@ -43,12 +44,13 @@ class ShadowJavaPlugin implements Plugin<Project> {
                 it.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
                 it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling, Bundling.SHADOWED))
             }
-            it.outgoing.artifact(shadowTask)
+            it.outgoing.artifact(shadowTaskProvider)
         }
 
-        AdhocComponentWithVariants javaComponent = (AdhocComponentWithVariants) project.components.findByName("java")
-        javaComponent.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-            it.mapToOptional()
+        project.components.named("java") { AdhocComponentWithVariants it ->
+            it.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+                it.mapToOptional()
+            }
         }
 
         AdhocComponentWithVariants shadow = softwareComponentFactory.adhoc("shadow")
@@ -71,7 +73,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         }
     }
 
-    protected static ShadowJar configureShadowTask(Project project) {
+    protected static TaskProvider<ShadowJar> configureShadowTask(Project project) {
         SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
         def taskProvider = project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
             shadow.group = SHADOW_GROUP
@@ -94,7 +96,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
                                              project.configurations.runtimeClasspath : project.configurations.runtime]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
         }
-        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, taskProvider.get())
-        return taskProvider.get()
+        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, taskProvider)
+        return taskProvider
     }
 }
