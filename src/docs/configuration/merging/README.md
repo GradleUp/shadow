@@ -25,7 +25,7 @@ class MyTransformer implements Transformer {
     void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps) {}
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   transform(MyTransformer.class)
 }
 ```
@@ -52,7 +52,7 @@ class MyTransformer implements Transformer {
     void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps) {}
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   transform(MyTransformer.class) {
     enabled = true
   }
@@ -81,7 +81,7 @@ class MyTransformer implements Transformer {
     void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps) {}
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   transform(new MyTransformer(enabled: true))
 }
 ```
@@ -100,7 +100,7 @@ single file in the output JAR.
 
 ```groovy
 // Merging Service Files
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   mergeServiceFiles()
 }
 ```
@@ -122,7 +122,7 @@ This directory can be overridden to merge descriptor files in a different locati
 
 ```groovy
 // Merging Service Files in a Specific Directory
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   mergeServiceFiles {
     path = 'META-INF/custom'
   }
@@ -136,7 +136,7 @@ class supports specifying specific files to include or exclude from merging.
 
 ```groovy
 // Excluding a Service Descriptor From Merging
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   mergeServiceFiles {
     exclude 'META-INF/services/com.acme.*'
   }
@@ -154,7 +154,7 @@ method to add this transformer.
 
 ```groovy
 // Merging Groovy Extension Modules
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   mergeGroovyExtensionModules()
 }
 ```
@@ -171,7 +171,7 @@ configure this transformer.
 
 ```groovy
 // Appending a Property File
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   append 'test.properties'
 }
 ```
@@ -188,7 +188,7 @@ It must be added using the [`transform`](http://imperceptiblethoughts.com/shadow
 // Appending a XML File
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   transform(XmlAppendingTransformer.class) {
     resource = 'properties.xml'
   }

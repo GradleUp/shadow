@@ -17,7 +17,7 @@ class RelocationSpec extends PluginSpecification {
                implementation 'junit:junit:3.8.2'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate 'junit.textui', 'a'
                relocate 'junit.framework', 'b'
                manifest {
@@ -83,7 +83,7 @@ class RelocationSpec extends PluginSpecification {
             }
             
             // tag::relocateFilter[]
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate('junit.textui', 'a') {
                    exclude 'junit.textui.TestRunner'
                }
@@ -140,7 +140,7 @@ class RelocationSpec extends PluginSpecification {
             }
             
             // tag::relocate[]
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate 'junit.framework', 'shadow.junit'
             }
             // end::relocate[]
@@ -203,12 +203,12 @@ class RelocationSpec extends PluginSpecification {
         and: 'App project with shadow, relocation, and project dependency'
         file('app/build.gradle') << """
         apply plugin: 'java'
-        apply plugin: 'com.github.johnrengelman.shadow'
+        apply plugin: 'com.gradleup.shadow'
         
         repositories { maven { url "${repo.uri}" } }
         dependencies { implementation project(':core') }
         
-        shadowJar {
+        tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
           relocate 'core', 'app.core'
           relocate 'junit.framework', 'app.junit.framework'
         }
@@ -265,7 +265,7 @@ class RelocationSpec extends PluginSpecification {
                implementation 'shadow:dep:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate 'foo', 'bar'
             }
         """.stripIndent()
@@ -308,7 +308,7 @@ class RelocationSpec extends PluginSpecification {
                 implementation group: 'org.hbase', name: 'asynchbase', version: '1.7.0-mapr-1603'
             }
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 zip64 true
                 relocate 'com.google.protobuf', 'shaded.com.google.protobuf'
                 relocate 'io.netty', 'shaded.io.netty'

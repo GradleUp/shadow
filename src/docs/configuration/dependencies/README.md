@@ -2,11 +2,11 @@
 
 Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtimeClasspath` configuration
 into the final JAR.
-The configurations to from which to source dependencies for the merging can be configured using the `configurations` property
+The configurations from which to source dependencies for the merging can be configured using the `configurations` property
 of the [`ShadowJar`](http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type.
 
 ```groovy
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   configurations = [project.configurations.compileClasspath]
 }
 ```
@@ -44,7 +44,7 @@ dependencies {
   implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   dependencies {
     exclude(dependency('org.apache.logging.log4j:log4j-core:2.11.1'))
   }
@@ -57,7 +57,7 @@ dependencies {
   implementation project(':api')
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   dependencies {
     exclude(project(':api'))
   }
@@ -80,7 +80,7 @@ dependencies {
   implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   dependencies {
     exclude(dependency('org.apache.logging.log4j:log4j-core:.*'))
   }
@@ -95,7 +95,7 @@ dependencies {
   implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   dependencies {
     exclude(dependency('org.apache.logging.log4j:log4j-core'))
   }
@@ -112,7 +112,7 @@ dependencies {
   implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   dependencies {
     exclude(dependency(':log4j-core:2.11.1'))
   }
@@ -125,9 +125,9 @@ dependencies {
   implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   dependencies {
-    exclude(dependency('org.apache.logging.log4j::2.11.1'))
+    exclude(dependency('org.apache.logging.log4j:2.11.1'))
   }
 }
 ```
@@ -144,11 +144,11 @@ dependencies {
   implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   dependencies {
-    exclude(dependency {
+    exclude {
       it.moduleGroup == 'org.apache.logging.log4j'
-    })
+    }
   }
 }
 ```

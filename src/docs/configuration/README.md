@@ -13,7 +13,7 @@ details.
 
 ## Configuring Output Name
 
-Shadow configures the default `shadowJar` task to set the output JAR's `destinationDir`, `archiveBaseName`, `appendix`,
+Shadow configures the default `shadowJar` task to set the output JAR's `destinationDirectory`, `archiveBaseName`, `appendix`,
 `archiveVersion`, and `extension` to the same default values as Gradle does for all `Jar` tasks.
 Additionally, it configures the `archiveClassifier` to be `all`.
 
@@ -24,7 +24,7 @@ As with all `Jar` tasks in Gradle, these values can be overridden:
 
 ```groovy
 // Output to build/libs/shadow.jar
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
    archiveBaseName.set('shadow')
    archiveClassifier.set('')
    archiveVersion.set('')
@@ -95,7 +95,7 @@ task testJar(type: Jar) {
   }
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   manifest {
     inheritFrom(project.tasks.testJar.manifest)
   }

@@ -100,7 +100,7 @@ import static groovy.lang.Closure.IDENTITY
  * <p>Example:</p>
  * <pre>
  * import org.codehaus.griffon.gradle.shadow.transformers.*
- * shadowJar {
+ * tasks.named('shadowJar', ShadowJar) {
  *     transform(PropertiesFileTransformer) {
  *         paths = [
  *             'META-INF/editors/java.beans.PropertyEditor'

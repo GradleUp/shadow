@@ -34,7 +34,7 @@ class PublishingSpec extends PluginSpecification {
                shadow 'shadow:b:1.0'
             }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                archiveClassifier = ''
                archiveBaseName = 'maven-all'
             }
@@ -76,6 +76,54 @@ class PublishingSpec extends PluginSpecification {
         assert dependency.groupId.text() == 'shadow'
         assert dependency.artifactId.text() == 'b'
         assert dependency.version.text() == '1.0'
+    }
+
+    def "publish shadow jar with maven-publish plugin using custom classifier and extension"() {
+        given:
+        repo.module('shadow', 'a', '1.0')
+                .insertFile('a.properties', 'a')
+                .insertFile('a2.properties', 'a2')
+                .publish()
+        repo.module('shadow', 'b', '1.0')
+                .insertFile('b.properties', 'b')
+                .publish()
+
+        settingsFile << "rootProject.name = 'maven'"
+        buildFile << """
+            apply plugin: 'maven-publish'
+
+            dependencies {
+               implementation 'shadow:a:1.0'
+               shadow 'shadow:b:1.0'
+            }
+            
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+               archiveClassifier = 'my-classifier'
+               archiveExtension = 'my-ext'
+               archiveBaseName = 'maven-all'
+            }
+            
+            publishing {
+               publications {
+                   shadow(MavenPublication) { publication ->
+                       project.shadow.component(publication)
+                       artifactId = 'maven-all'
+                   }
+               }
+               repositories {
+                   maven {
+                       url "${publishingRepo.uri}"
+                   }
+               }
+            }
+        """.stripIndent()
+
+        when:
+        run('publish')
+
+        then:
+        File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext').canonicalFile
+        assert publishedFile.exists()
     }
 
     def "publish multiproject shadow jar with maven-publish plugin"() {
@@ -128,7 +176,7 @@ class PublishingSpec extends PluginSpecification {
 
         file('c/build.gradle') << """
             plugins {
-                id 'com.github.johnrengelman.shadow'
+                id 'com.gradleup.shadow'
             }
             
             dependencies {
@@ -136,7 +184,7 @@ class PublishingSpec extends PluginSpecification {
                 shadow project(':b')
             }
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                archiveClassifier = ''
                archiveBaseName = 'maven-all'
             }
