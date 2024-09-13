@@ -8,8 +8,6 @@ group = providers.gradleProperty("GROUP").get()
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
     withJavadocJar()
 }
