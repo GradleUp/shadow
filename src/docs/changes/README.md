@@ -7,6 +7,8 @@
 
 **Changed**
 
+- `ShadowExtension.component` has been deprecated, now you can use `component.shadow` instead.
+
 **Fixed**
 
 - Stop publishing Shadow self fat jar to Maven repository. ([#967](https://github.com/GradleUp/shadow/pull/967))
