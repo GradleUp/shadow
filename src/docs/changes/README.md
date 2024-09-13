@@ -198,7 +198,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 ## v4.0.0 (2018-09-25)
 
 - **Breaking Change!** Restrict Plugin to Gradle 4.0+. Shadow major versions will align with Gradle major versions going forward.
-- **Breaking Change!** For clarity purposes `com.github.johnrengelman.plugin-shadow` has been removed. If you intend to use this feature, you will need to declare your own `ConfigureShadowRelocation` task. See section [2.9.2](http://imperceptiblethoughts.com/shadow/#automatically_relocating_dependencies) of the User Guide
+- **Breaking Change!** For clarity purposes `com.github.johnrengelman.plugin-shadow` has been removed. If you intend to use this feature, you will need to declare your own `ConfigureShadowRelocation` task. See section [2.9.2](https://gradleup.com/shadow/#automatically_relocating_dependencies) of the User Guide
 - [Sergey Tselovalnikov](https://github.com/SerCeMan) - Upgrade to ASM 6.2.1 to support Java 11
 - [Chris Cowan](https://github.com/Macil) - Add support for `shadowJar.preserveFileTimestamps` property. See [Jar.preserveFileTimestamps](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps)
 - [Paul N. Baker](https://github.com/paul-nelson-baker) - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files during merge.
