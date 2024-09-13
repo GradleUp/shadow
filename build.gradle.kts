@@ -42,8 +42,7 @@ val isCI = providers.environmentVariable("CI").isPresent
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 
-    // https://docs.gradle.org/8.10/userguide/performance.html#execute_tests_in_parallel
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
 
     if (isCI) {
         testLogging.showStandardStreams = true
