@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
@@ -31,12 +32,13 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        def shadowTaskProvider = configureShadowTask(project)
+        def shadowConfiguration = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+        def shadowTaskProvider = configureShadowTask(project, shadowConfiguration)
 
-        project.configurations.compileClasspath.extendsFrom project.configurations.shadow
+        project.configurations.compileClasspath.extendsFrom shadowConfiguration
 
         project.configurations.register("shadowRuntimeElements") {
-            it.extendsFrom(project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME))
+            it.extendsFrom(shadowConfiguration)
             it.canBeConsumed = true
             it.canBeResolved = false
             it.attributes {
@@ -74,7 +76,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         }
     }
 
-    protected static TaskProvider<ShadowJar> configureShadowTask(Project project) {
+    protected static TaskProvider<ShadowJar> configureShadowTask(Project project, Configuration shadowConfiguration) {
         SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
         def taskProvider = project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
             shadow.group = SHADOW_GROUP
@@ -86,8 +88,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
                         (project.tasks.getByName('jar') as Jar).manifest.attributes.get('Class-Path')
                 ]
             }
-            def files = project.objects.fileCollection()
-                    .from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
+            def files = project.objects.fileCollection().from(shadowConfiguration)
             shadow.doFirst {
                 if (!files.empty) {
                     def libs = libsProvider.get()
@@ -101,7 +102,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
             ]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
         }
-        project.artifacts.add(ShadowBasePlugin.CONFIGURATION_NAME, taskProvider)
+        project.artifacts.add(shadowConfiguration.name, taskProvider)
         return taskProvider
     }
 }
