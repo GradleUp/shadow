@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.component.SoftwareComponentContainer
 import org.gradle.api.publish.maven.MavenPublication
 
+@Deprecated
 class ShadowExtension {
     private final SoftwareComponentContainer components
 
@@ -12,8 +13,7 @@ class ShadowExtension {
     }
 
     /**
-     * @param publication
-     * @deprecated configure publication using component.shadow directly
+     * @deprecated configure publication using component.shadow directly.
      */
     @Deprecated
     void component(MavenPublication publication) {
