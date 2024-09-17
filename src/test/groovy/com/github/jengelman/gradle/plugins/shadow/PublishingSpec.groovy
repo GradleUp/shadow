@@ -127,11 +127,8 @@ class PublishingSpec extends PluginSpecification {
         run('publish')
 
         then:
-        def publishedFiles = publishingRepo.rootDir.file('shadow/maven-all/1.0/').canonicalFile
-                .listFiles()
-                .findAll { it.exists() }
-                .collect { it.name }
-        assert publishedFiles.contains('maven-all-1.0-my-classifier.my-ext')
+        File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext').canonicalFile
+        assert publishedFile.exists()
     }
 
     def "publish multiproject shadow jar with maven-publish plugin"() {
