@@ -79,7 +79,10 @@ class PublishingSpec extends PluginSpecification {
         assert dependency.version.text() == '1.0'
     }
 
-    @Issue(["https://github.com/GradleUp/shadow/issues/860", "https://github.com/GradleUp/shadow/issues/945"])
+    @Issue([
+            "https://github.com/GradleUp/shadow/issues/860",
+            "https://github.com/GradleUp/shadow/issues/945",
+    ])
     def "publish shadow jar with maven-publish plugin using custom classifier and extension"() {
         given:
         repo.module('shadow', 'a', '1.0')
@@ -271,90 +274,96 @@ class PublishingSpec extends PluginSpecification {
         when:
         run('publish')
 
-        then: "verify java publication with shadow variant"
-        assertions {
-            File jar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.jar').canonicalFile
-            assert jar.exists()
-        }
-        assertions {
-            File jar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0-all.jar').canonicalFile
-            assert jar.exists()
-            contains(jar, ['a.properties', 'a2.properties'])
-        }
-        assertions {
-            File pom = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.pom').canonicalFile
-            assert pom.exists()
-            def pomContents = new XmlSlurper().parse(pom)
-            assert pomContents.dependencies[0].dependency.size() == 2
+        then:
+        File mainJar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.jar').canonicalFile
+        File shadowJar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0-all.jar').canonicalFile
+        assert mainJar.exists()
+        assert shadowJar.exists()
 
-            def dependency1 = pomContents.dependencies[0].dependency[0]
-            assert dependency1.groupId.text() == 'shadow'
-            assert dependency1.artifactId.text() == 'a'
-            assert dependency1.version.text() == '1.0'
+        and:
+        contains(shadowJar, ['a.properties', 'a2.properties'])
 
-            def dependency2 = pomContents.dependencies[0].dependency[1]
-            assert dependency2.groupId.text() == 'shadow'
-            assert dependency2.artifactId.text() == 'b'
-            assert dependency2.version.text() == '1.0'
-        }
+        and: "publishes both a POM file and a Gradle metadata file"
+        File pom = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.pom').canonicalFile
+        File gmm = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.module').canonicalFile
+        pom.exists()
+        gmm.exists()
 
-        assertions {
-            File gmm = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.module').canonicalFile
-            assert gmm.exists()
-            def gmmContents = new JsonSlurper().parse(gmm)
-            assert gmmContents.variants.size() == 3
-            assert gmmContents.variants.name as Set == ['apiElements', 'runtimeElements', 'shadowRuntimeElements'] as Set
+        when: "POM file corresponds to a regular Java publication"
+        def pomContents = new XmlSlurper().parse(pom)
+        pomContents.dependencies.size() == 2
 
-            def apiVariant = gmmContents.variants.find { it.name == 'apiElements' }
-            assert apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_API
-            assert apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.EXTERNAL
-            assert !apiVariant.dependencies
+        then:
+        def dependency1 = pomContents.dependencies[0].dependency[0]
+        dependency1.groupId.text() == 'shadow'
+        dependency1.artifactId.text() == 'a'
+        dependency1.version.text() == '1.0'
 
-            def runtimeVariant = gmmContents.variants.find { it.name == 'runtimeElements' }
-            assert runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
-            assert runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.EXTERNAL
-            assert  runtimeVariant.dependencies.size() == 2
-            assert runtimeVariant.dependencies.module as Set == ['a', 'b'] as Set
+        def dependency2 = pomContents.dependencies[0].dependency[1]
+        dependency2.groupId.text() == 'shadow'
+        dependency2.artifactId.text() == 'b'
+        dependency2.version.text() == '1.0'
 
-            def shadowRuntimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
-            assert shadowRuntimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
-            assert shadowRuntimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.SHADOWED
-            assert shadowRuntimeVariant.dependencies.size() == 1
-            assert shadowRuntimeVariant.dependencies.module as Set == ['b'] as Set
-        }
+        when: "Gradle module metadata contains the Shadow variants"
+        def gmmContents = new JsonSlurper().parse(gmm)
+
+        then:
+        gmmContents.variants.size() == 3
+        gmmContents.variants.name as Set == ['apiElements', 'runtimeElements', 'shadowRuntimeElements'] as Set
+
+        def apiVariant = gmmContents.variants.find { it.name == 'apiElements' }
+        apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_API
+        apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.EXTERNAL
+        !apiVariant.dependencies
+
+        def runtimeVariant = gmmContents.variants.find { it.name == 'runtimeElements' }
+        runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
+        runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.EXTERNAL
+        runtimeVariant.dependencies.size() == 2
+        runtimeVariant.dependencies.module as Set == ['a', 'b'] as Set
+
+        def shadowRuntimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
+        shadowRuntimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
+        shadowRuntimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.SHADOWED
+        shadowRuntimeVariant.dependencies.size() == 1
+        shadowRuntimeVariant.dependencies.module as Set == ['b'] as Set
 
         and: "verify shadow publication"
         assertions {
-            File jar = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0-all.jar').canonicalFile
-            assert jar.exists()
-            contains(jar, ['a.properties', 'a2.properties'])
+            shadowJar = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0-all.jar').canonicalFile
+            assert shadowJar.exists()
+            contains(shadowJar, ['a.properties', 'a2.properties'])
         }
 
         assertions {
-            File pom = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.pom').canonicalFile
+            pom = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.pom').canonicalFile
             assert pom.exists()
-            def pomContents = new XmlSlurper().parse(pom)
+            pomContents = new XmlSlurper().parse(pom)
             assert pomContents.dependencies[0].dependency.size() == 1
 
-            def dependency1 = pomContents.dependencies[0].dependency[0]
+            dependency1 = pomContents.dependencies[0].dependency[0]
             assert dependency1.groupId.text() == 'shadow'
             assert dependency1.artifactId.text() == 'b'
             assert dependency1.version.text() == '1.0'
+
+            dependency2 = pomContents.dependencies[0].dependency[1]
+            dependency2.groupId.text() == 'shadow'
+            dependency2.artifactId.text() == 'b'
+            dependency2.version.text() == '1.0'
         }
 
         assertions {
-            File gmm = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.module').canonicalFile
+            gmm = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.module').canonicalFile
             assert gmm.exists()
-            def gmmContents = new JsonSlurper().parse(gmm)
+            gmmContents = new JsonSlurper().parse(gmm)
             assert gmmContents.variants.size() == 1
             assert gmmContents.variants.name as Set == ['shadowRuntimeElements'] as Set
 
-            def runtimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
+            runtimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
             assert runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
             assert runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.SHADOWED
             assert runtimeVariant.dependencies.size() == 1
             assert runtimeVariant.dependencies.module as Set == ['b'] as Set
         }
-
     }
 }

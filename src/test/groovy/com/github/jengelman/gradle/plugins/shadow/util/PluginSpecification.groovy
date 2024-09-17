@@ -150,9 +150,11 @@ abstract class PluginSpecification extends Specification {
         jar.close()
     }
 
-    // Helper method to allow scoping variables into a closure in a spock test
-    // Prevents variable expansion
-    // When using this you *must* include explicit `assert` statements as Spock will not do it for you
+    /**
+     * Helper method to allow scoping variables into a closure in a spock test
+     * Prevents variable expansion
+     * When using this you *must* include explicit `assert` statements as Spock will not do it for you
+     */
     void assertions(Closure closure) {
         closure()
     }
