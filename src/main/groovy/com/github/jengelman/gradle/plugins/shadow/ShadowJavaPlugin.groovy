@@ -35,7 +35,9 @@ class ShadowJavaPlugin implements Plugin<Project> {
         def shadowConfiguration = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
         def shadowTaskProvider = configureShadowTask(project, shadowConfiguration)
 
-        project.configurations.compileClasspath.extendsFrom shadowConfiguration
+        project.configurations.named(JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME) {
+            it.extendsFrom(shadowConfiguration)
+        }
 
         project.configurations.register("shadowRuntimeElements") {
             it.extendsFrom(shadowConfiguration)
@@ -98,7 +100,8 @@ class ShadowJavaPlugin implements Plugin<Project> {
             }
             shadow.from(sourceSets.main.output)
             shadow.configurations = [
-                    project.configurations.findByName('runtimeClasspath') ?: project.configurations.runtime
+                    project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME) ?:
+                            project.configurations.runtime,
             ]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
         }
