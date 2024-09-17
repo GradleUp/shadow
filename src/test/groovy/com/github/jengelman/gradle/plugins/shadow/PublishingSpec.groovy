@@ -6,6 +6,7 @@ import groovy.json.JsonSlurper
 import groovy.xml.XmlSlurper
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Usage
+import spock.lang.Issue
 
 class PublishingSpec extends PluginSpecification {
 
@@ -41,8 +42,8 @@ class PublishingSpec extends PluginSpecification {
             
             publishing {
                publications {
-                   shadow(MavenPublication) { publication ->
-                       project.shadow.component(publication)
+                   shadow(MavenPublication) {
+                       from components.shadow
                        artifactId = 'maven-all'
                    }
                }
@@ -78,6 +79,10 @@ class PublishingSpec extends PluginSpecification {
         assert dependency.version.text() == '1.0'
     }
 
+    @Issue([
+            "https://github.com/GradleUp/shadow/issues/860",
+            "https://github.com/GradleUp/shadow/issues/945",
+    ])
     def "publish shadow jar with maven-publish plugin using custom classifier and extension"() {
         given:
         repo.module('shadow', 'a', '1.0')
@@ -97,12 +102,6 @@ class PublishingSpec extends PluginSpecification {
                shadow 'shadow:b:1.0'
             }
             
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-               archiveClassifier = 'my-classifier'
-               archiveExtension = 'my-ext'
-               archiveBaseName = 'maven-all'
-            }
-            
             publishing {
                publications {
                    shadow(MavenPublication) { publication ->
@@ -115,6 +114,12 @@ class PublishingSpec extends PluginSpecification {
                        url "${publishingRepo.uri}"
                    }
                }
+            }
+            
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+               archiveClassifier = 'my-classifier'
+               archiveExtension = 'my-ext'
+               archiveBaseName = 'maven-all'
             }
         """.stripIndent()
 
@@ -191,8 +196,8 @@ class PublishingSpec extends PluginSpecification {
             
             publishing {
                publications {
-                   shadow(MavenPublication) { publication ->
-                       project.shadow.component(publication)
+                   shadow(MavenPublication) {
+                       from components.shadow
                        artifactId = 'maven-all'
                    }
                }
@@ -249,6 +254,10 @@ class PublishingSpec extends PluginSpecification {
                publications {
                    java(MavenPublication) {
                        from components.java
+                   }
+                   shadow(MavenPublication) {
+                       from components.shadow
+                       artifactId = "maven-all"
                    }
                }
                repositories {
@@ -316,5 +325,42 @@ class PublishingSpec extends PluginSpecification {
         shadowRuntimeVariant.dependencies.size() == 1
         shadowRuntimeVariant.dependencies.module as Set == ['b'] as Set
 
+        and: "verify shadow publication"
+        assertions {
+            shadowJar = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0-all.jar').canonicalFile
+            assert shadowJar.exists()
+            contains(shadowJar, ['a.properties', 'a2.properties'])
+        }
+
+        assertions {
+            pom = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.pom').canonicalFile
+            assert pom.exists()
+            pomContents = new XmlSlurper().parse(pom)
+            assert pomContents.dependencies[0].dependency.size() == 1
+
+            dependency1 = pomContents.dependencies[0].dependency[0]
+            assert dependency1.groupId.text() == 'shadow'
+            assert dependency1.artifactId.text() == 'b'
+            assert dependency1.version.text() == '1.0'
+
+            dependency2 = pomContents.dependencies[0].dependency[1]
+            dependency2.groupId.text() == 'shadow'
+            dependency2.artifactId.text() == 'b'
+            dependency2.version.text() == '1.0'
+        }
+
+        assertions {
+            gmm = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.module').canonicalFile
+            assert gmm.exists()
+            gmmContents = new JsonSlurper().parse(gmm)
+            assert gmmContents.variants.size() == 1
+            assert gmmContents.variants.name as Set == ['shadowRuntimeElements'] as Set
+
+            runtimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
+            assert runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
+            assert runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.SHADOWED
+            assert runtimeVariant.dependencies.size() == 1
+            assert runtimeVariant.dependencies.module as Set == ['b'] as Set
+        }
     }
 }

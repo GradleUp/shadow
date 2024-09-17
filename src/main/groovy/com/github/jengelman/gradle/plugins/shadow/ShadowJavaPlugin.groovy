@@ -8,8 +8,9 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.configuration.project.ProjectConfigurationActionContainer
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 import javax.inject.Inject
@@ -19,11 +20,11 @@ class ShadowJavaPlugin implements Plugin<Project> {
     public static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
     public static final String SHADOW_GROUP = 'Shadow'
 
-    private final ProjectConfigurationActionContainer configurationActionContainer
+    private final SoftwareComponentFactory softwareComponentFactory
 
     @Inject
-    ShadowJavaPlugin(ProjectConfigurationActionContainer configurationActionContainer) {
-        this.configurationActionContainer = configurationActionContainer
+    ShadowJavaPlugin(SoftwareComponentFactory softwareComponentFactory) {
+        this.softwareComponentFactory = softwareComponentFactory
     }
 
     @Override
@@ -52,6 +53,12 @@ class ShadowJavaPlugin implements Plugin<Project> {
             addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
                 mapToOptional() // make it a Maven optional dependency
             }
+        }
+
+        AdhocComponentWithVariants shadow = softwareComponentFactory.adhoc("shadow")
+        project.components.add(shadow)
+        shadow.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+            it.mapToMavenScope("runtime")
         }
 
         project.plugins.withType(JavaGradlePluginPlugin).configureEach {
