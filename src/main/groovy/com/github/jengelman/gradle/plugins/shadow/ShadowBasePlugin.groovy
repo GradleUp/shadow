@@ -10,6 +10,7 @@ class ShadowBasePlugin implements Plugin<Project> {
 
     public static final String EXTENSION_NAME = 'shadow'
     public static final String CONFIGURATION_NAME = 'shadow'
+    public static final String COMPONENT_NAME = 'shadow'
 
     @Override
     void apply(Project project) {

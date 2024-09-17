@@ -54,9 +54,9 @@ class ShadowJavaPlugin implements Plugin<Project> {
             }
         }
 
-        AdhocComponentWithVariants shadow = softwareComponentFactory.adhoc("shadow")
-        project.components.add(shadow)
-        shadow.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        AdhocComponentWithVariants shadowComponent = softwareComponentFactory.adhoc(ShadowBasePlugin.COMPONENT_NAME)
+        project.components.add(shadowComponent)
+        shadowComponent.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
             it.mapToMavenScope("runtime")
         }
 
