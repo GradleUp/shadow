@@ -81,22 +81,18 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     protected static TaskProvider<ShadowJar> configureShadowTask(Project project, Configuration shadowConfiguration) {
         SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
+        def jarTask = project.tasks.named(JavaPlugin.JAR_TASK_NAME, Jar)
         def taskProvider = project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
             shadow.group = SHADOW_GROUP
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.archiveClassifier.set("all")
-            shadow.manifest.inheritFrom(project.tasks.jar.manifest)
-            def libsProvider = project.provider { ->
-                [
-                        (project.tasks.getByName('jar') as Jar).manifest.attributes.get('Class-Path')
-                ]
-            }
+            shadow.manifest.inheritFrom(jarTask.get().manifest)
+            def attrProvider = jarTask.map { it.manifest.attributes.get('Class-Path') }
             def files = project.objects.fileCollection().from(shadowConfiguration)
             shadow.doFirst {
                 if (!files.empty) {
-                    def libs = libsProvider.get()
-                    libs.addAll files.collect { "${it.name}" }
-                    shadow.manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
+                    def attrs = [attrProvider.getOrElse('')] + files.collect { it.name }
+                    shadow.manifest.attributes 'Class-Path': attrs.join(' ').trim()
                 }
             }
             shadow.from(sourceSets.main.output)
