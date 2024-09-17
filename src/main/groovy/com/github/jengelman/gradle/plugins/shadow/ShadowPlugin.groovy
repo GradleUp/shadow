@@ -14,10 +14,10 @@ class ShadowPlugin implements Plugin<Project> {
         project.with {
             plugins.apply(ShadowBasePlugin)
             plugins.apply(LegacyShadowPlugin)
-            plugins.withType(JavaPlugin).configureEach {
+            plugins.withType(JavaPlugin) {
                 plugins.apply(ShadowJavaPlugin)
             }
-            plugins.withType(ApplicationPlugin).configureEach {
+            plugins.withType(ApplicationPlugin) {
                 plugins.apply(ShadowApplicationPlugin)
             }
 
