@@ -26,7 +26,6 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     public static final String MODULE_INFO_CLASS = 'module-info.class'
 
-    private final ProjectConfigurationActionContainer configurationActionContainer
     private final SoftwareComponentFactory softwareComponentFactory
 
     @Inject
@@ -103,9 +102,6 @@ class ShadowJavaPlugin implements Plugin<Project> {
                     project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME) ?:
                             project.configurations.runtime,
             ]
-            shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
-            shadow.configurations = [project.configurations.findByName('runtimeClasspath') ?
-                                             project.configurations.runtimeClasspath : project.configurations.runtime]
             /*
              Remove excludes like this:
              shadowJar {
