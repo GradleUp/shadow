@@ -22,6 +22,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
 
     public static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
     public static final String SHADOW_GROUP = 'Shadow'
+    public static final String SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME = 'shadowRuntimeElements'
 
     private final SoftwareComponentFactory softwareComponentFactory
 
@@ -39,7 +40,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
             it.extendsFrom(shadowConfiguration)
         }
 
-        project.configurations.register("shadowRuntimeElements") {
+        def shadowRuntimeElements = project.configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
             it.extendsFrom(shadowConfiguration)
             it.canBeConsumed = true
             it.canBeResolved = false
@@ -53,14 +54,14 @@ class ShadowJavaPlugin implements Plugin<Project> {
         }
 
         project.components.named("java", AdhocComponentWithVariants) {
-            it.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+            it.addVariantsFromConfiguration(shadowRuntimeElements) {
                 it.mapToOptional()
             }
         }
 
         AdhocComponentWithVariants shadowComponent = softwareComponentFactory.adhoc(ShadowBasePlugin.COMPONENT_NAME)
         project.components.add(shadowComponent)
-        shadowComponent.addVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) {
             it.mapToMavenScope("runtime")
         }
 
