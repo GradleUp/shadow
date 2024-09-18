@@ -40,7 +40,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
             it.extendsFrom(shadowConfiguration)
         }
 
-        def shadowRuntimeElements = project.configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
+        def shadowRuntimeElements = project.configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) { Configuration it ->
             it.extendsFrom(shadowConfiguration)
             it.canBeConsumed = true
             it.canBeResolved = false
