@@ -49,7 +49,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         jar.configure { jar ->
             jar.inputs.property('mainClassName', classNameProvider)
             jar.doFirst {
-                manifest.attributes 'Main-Class': classNameProvider.get()
+                jar.manifest.attributes 'Main-Class': classNameProvider.get()
             }
         }
     }
@@ -126,7 +126,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             }
             into("bin") {
                 from(startScripts)
-                filePermissions { unix(493) }
+                filePermissions { it.unix(493) }
             }
         }
 
