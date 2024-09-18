@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         # Always test on the latest version and all LTS.
-        java: [ 11, 17, 21, 22 ]
+        java: [ 11, 17, 21, 23 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

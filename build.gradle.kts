@@ -14,16 +14,13 @@ dependencies {
     compileOnly(localGroovy())
 
     implementation("org.jdom:jdom2:2.0.6.1")
-    implementation("org.ow2.asm:asm:9.7")
     implementation("org.ow2.asm:asm-commons:9.7")
     implementation("commons-io:commons-io:2.16.1")
     implementation("org.apache.ant:ant:1.10.15")
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
     implementation("org.codehaus.plexus:plexus-xml:4.0.4")
     implementation("org.apache.logging.log4j:log4j-core:2.24.0")
-    implementation("org.vafer:jdependency:2.10") {
-        exclude(group = "org.ow2.asm")
-    }
+    implementation("org.vafer:jdependency:2.11")
 
     testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
         exclude(group = "org.codehaus.groovy")

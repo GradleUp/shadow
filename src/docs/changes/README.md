@@ -8,6 +8,7 @@
 **Changed**
 
 - `ShadowExtension.component` has been deprecated, now you can use `component.shadow` instead. ([#956](https://github.com/GradleUp/shadow/pull/956))
+- Support Java 23. ([#974](https://github.com/GradleUp/shadow/pull/974))
 
 **Fixed**
 
