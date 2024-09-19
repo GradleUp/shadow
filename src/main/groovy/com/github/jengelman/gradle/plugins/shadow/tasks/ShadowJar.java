@@ -75,11 +75,13 @@ public class ShadowJar extends Jar implements ShadowSpec {
         });
     }
 
+    @Override
     public ShadowJar minimize() {
         minimizeJar = true;
         return this;
     }
 
+    @Override
     public ShadowJar minimize(Action<DependencyFilter> c) {
         minimize();
         if (c != null) {
@@ -153,6 +155,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     }
 
     @TaskAction
+    @Override
     protected void copy() {
         if (enableRelocation) {
             RelocationUtil.configureRelocation(this, relocationPrefix);
@@ -183,6 +186,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param c the configuration of the filter
      * @return this
      */
+    @Override
     public ShadowJar dependencies(Action<DependencyFilter> c) {
         if (c != null) {
             c.execute(dependencyFilter);
@@ -196,6 +200,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param clazz the transformer to add. Must have a no-arg constructor
      * @return this
      */
+    @Override
     public ShadowJar transform(Class<? extends Transformer> clazz) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         return transform(clazz, null);
     }
@@ -207,6 +212,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param c the configuration for the transformer
      * @return this
      */
+    @Override
     public <T extends Transformer> ShadowJar transform(Class<T> clazz, Action<T> c) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         T transformer = clazz.getDeclaredConstructor().newInstance();
         addTransform(transformer, c);
@@ -223,6 +229,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param transformer the transformer instance to add
      * @return this
      */
+    @Override
     public ShadowJar transform(Transformer transformer) {
         addTransform(transformer, null);
         return this;
@@ -241,6 +248,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      *
      * @return this
      */
+    @Override
     public ShadowJar mergeServiceFiles() {
         try {
             transform(ServiceFileTransformer.class);
@@ -255,6 +263,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      *
      * @return this
      */
+    @Override
     public ShadowJar mergeServiceFiles(final String rootPath) {
         try {
             transform(ServiceFileTransformer.class, serviceFileTransformer -> serviceFileTransformer.setPath(rootPath));
@@ -269,6 +278,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      *
      * @return this
      */
+    @Override
     public ShadowJar mergeServiceFiles(Action<ServiceFileTransformer> configureClosure) {
         try {
             transform(ServiceFileTransformer.class, configureClosure);
@@ -283,6 +293,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      *
      * @return this
      */
+    @Override
     public ShadowJar mergeGroovyExtensionModules() {
         try {
             transform(GroovyExtensionModuleTransformer.class);
@@ -297,6 +308,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      *
      * @return this
      */
+    @Override
     public ShadowJar append(final String resourcePath) {
         try {
             transform(AppendingTransformer.class, transformer -> transformer.setResource(resourcePath));
@@ -313,6 +325,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param destination the destination package
      * @return this
      */
+    @Override
     public ShadowJar relocate(String pattern, String destination) {
         return relocate(pattern, destination, null);
     }
@@ -325,6 +338,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param configure the configuration of the relocator
      * @return this
      */
+    @Override
     public ShadowJar relocate(String pattern, String destination, Action<SimpleRelocator> configure) {
         SimpleRelocator relocator = new SimpleRelocator(pattern, destination, new ArrayList<>(), new ArrayList<>());
         addRelocator(relocator, configure);
@@ -337,6 +351,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param relocator the relocator instance to add
      * @return this
      */
+    @Override
     public ShadowJar relocate(Relocator relocator) {
         addRelocator(relocator, null);
         return this;
@@ -348,6 +363,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param relocatorClass the relocator class to add. Must have a no-arg constructor.
      * @return this
      */
+    @Override
     public ShadowJar relocate(Class<? extends Relocator> relocatorClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         return relocate(relocatorClass, null);
     }
@@ -367,6 +383,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @param configure the configuration for the relocator
      * @return this
      */
+    @Override
     public <R extends Relocator> ShadowJar relocate(Class<R> relocatorClass, Action<R> configure) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         R relocator = relocatorClass.getDeclaredConstructor().newInstance();
         addRelocator(relocator, configure);

@@ -62,6 +62,7 @@ class AppendableMavenFileModule extends MavenFileModule {
      * Adds an additional artifact to this module.
      * @param options Can specify any of: type or classifier
      */
+    @Override
     AppendableMavenFileModule artifact(Map<String, ?> options) {
         artifacts << options
         return this

@@ -57,6 +57,7 @@ class XmlAppendingTransformer implements Transformer {
 
     private Document doc
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
         if (resource != null && resource.equalsIgnoreCase(path)) {
@@ -66,6 +67,7 @@ class XmlAppendingTransformer implements Transformer {
         return false
     }
 
+    @Override
     void transform(TransformerContext context) {
         Document r
         try {
@@ -105,10 +107,12 @@ class XmlAppendingTransformer implements Transformer {
         }
     }
 
+    @Override
     boolean hasTransformedResource() {
         return doc != null
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         ZipEntry entry = new ZipEntry(resource)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)

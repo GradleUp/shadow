@@ -39,6 +39,7 @@ class DontIncludeResourceTransformer implements Transformer {
     @Input
     String resource
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
         if (StringUtils.isNotEmpty(resource) && path.endsWith(resource)) {
@@ -48,14 +49,17 @@ class DontIncludeResourceTransformer implements Transformer {
         return false
     }
 
+    @Override
     void transform(TransformerContext context) {
         // no op
     }
 
+    @Override
     boolean hasTransformedResource() {
         return false
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         // no op
     }

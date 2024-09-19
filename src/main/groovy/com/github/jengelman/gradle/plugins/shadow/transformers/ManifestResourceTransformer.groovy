@@ -57,6 +57,7 @@ class ManifestResourceTransformer implements Transformer {
 
     private Manifest manifest
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
         if (JarFile.MANIFEST_NAME.equalsIgnoreCase(path)) {
@@ -66,6 +67,7 @@ class ManifestResourceTransformer implements Transformer {
         return false
     }
 
+    @Override
     void transform(TransformerContext context) {
         // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
         // now which is situational at best. Right now there is no context passed in with the processing so we cannot
@@ -81,10 +83,12 @@ class ManifestResourceTransformer implements Transformer {
         }
     }
 
+    @Override
     boolean hasTransformedResource() {
         return true
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         // If we didn't find a manifest, then let's create one.
         if (manifest == null) {

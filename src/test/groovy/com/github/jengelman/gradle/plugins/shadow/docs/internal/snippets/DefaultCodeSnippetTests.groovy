@@ -13,6 +13,7 @@ class DefaultCodeSnippetTests implements CodeSnippetTests {
     this.runners = runners
   }
 
+  @Override
   void add(TestCodeSnippet snippet) {
     runners.add(new SnippetRunner(clazz, snippet))
   }

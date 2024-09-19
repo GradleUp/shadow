@@ -34,6 +34,7 @@ class ApacheNoticeResourceTransformerParameterTests extends TestCase {
     private ApacheNoticeResourceTransformer subject
     private ShadowStats stats
 
+    @Override
     protected void setUp() {
         super.setUp()
         subject = new ApacheNoticeResourceTransformer()

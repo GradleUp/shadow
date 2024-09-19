@@ -13,6 +13,7 @@ abstract public class CodeSnippetTestCase implements RunnerProvider {
 
     protected abstract void addTests(CodeSnippetTests tests);
 
+    @Override
     public final List<Runner> getRunners() {
         List<Runner> runners = new LinkedList<>();
         CodeSnippetTests tests = new DefaultCodeSnippetTests(getClass(), runners);

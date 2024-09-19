@@ -26,11 +26,13 @@ class DefaultInheritManifest implements InheritManifest {
         this.fileResolver = fileResolver
     }
 
+    @Override
     InheritManifest inheritFrom(Object... inheritPaths) {
         inheritFrom(inheritPaths, null)
         return this
     }
 
+    @Override
     InheritManifest inheritFrom(Object inheritPaths, Closure closure) {
         DefaultManifestMergeSpec mergeSpec = new DefaultManifestMergeSpec()
         mergeSpec.from(inheritPaths)
