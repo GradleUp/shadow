@@ -29,7 +29,7 @@ import junit.framework.TestCase
  * @version $Id: SimpleRelocatorTest.java 1342979 2012-05-26 22:05:45Z bimargulies $
  *
  * Modified from org.apache.maven.plugins.shade.relocation.SimpleRelocatorTest.java
- * 
+ *
  * Modifications
  * @author John Engelman
  */
@@ -94,7 +94,7 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(true, relocator.canRelocatePath("org/f"))   // equal to path pattern
         assertEquals(true, relocator.canRelocatePath("/org/f"))  // equal to path pattern with /
     }
-  
+
    void testCanRelocatePathWithRegex() {
         SimpleRelocator relocator
 
@@ -202,12 +202,12 @@ class SimpleRelocatorTest extends TestCase {
         relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", null, null, true)
         assertEquals("META-INF/hidden.org.foo.xml", relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
     }
-    
+
     protected RelocatePathContext pathContext(String path) {
-        return RelocatePathContext.builder().path(path).stats(stats).build()
+        return new RelocatePathContext(path, stats)
     }
 
     protected RelocateClassContext classContext(String className) {
-        return RelocateClassContext.builder().className(className).stats(stats).build()
+        return new RelocateClassContext(className, stats)
     }
 }
