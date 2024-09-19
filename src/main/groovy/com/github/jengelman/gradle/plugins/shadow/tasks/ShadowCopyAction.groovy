@@ -6,7 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
@@ -44,7 +44,7 @@ import java.util.zip.ZipException
 
 @Slf4j
 class ShadowCopyAction implements CopyAction {
-    static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
+    public static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = (new GregorianCalendar(1980, 1, 1, 0, 0, 0)).getTimeInMillis()
 
     private final File zipFile
     private final ZipCompressor compressor
