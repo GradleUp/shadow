@@ -55,7 +55,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
         Xpp3Dom newDom
 
         try {
-            BufferedInputStream bis = new BufferedInputStream(context.is) {
+            BufferedInputStream bis = new BufferedInputStream(context.inputStream) {
                 void close()
                 throws IOException {
                     // leave ZIP open
@@ -67,7 +67,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
             newDom = Xpp3DomBuilder.build(reader)
         }
         catch (Exception e) {
-            throw (IOException) new IOException("Error parsing components.xml in " + context.is).initCause(e)
+            throw (IOException) new IOException("Error parsing components.xml in " + context.inputStream).initCause(e)
         }
 
         // Only try to merge in components if there are some elements in the component-set

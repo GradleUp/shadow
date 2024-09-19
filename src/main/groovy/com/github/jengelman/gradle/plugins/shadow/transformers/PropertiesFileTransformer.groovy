@@ -157,7 +157,7 @@ class PropertiesFileTransformer implements Transformer {
     @Override
     void transform(TransformerContext context) {
         Properties props = propertiesEntries[context.path]
-        Properties incoming = loadAndTransformKeys(context.is)
+        Properties incoming = loadAndTransformKeys(context.inputStream)
         if (props == null) {
             propertiesEntries[context.path] = incoming
         } else {

@@ -71,7 +71,7 @@ class GroovyExtensionModuleTransformer implements Transformer {
     @Override
     void transform(TransformerContext context) {
         def props = new Properties()
-        props.load(context.is)
+        props.load(context.inputStream)
         props.each { String key, String value ->
             switch (key) {
                 case MODULE_NAME_KEY:

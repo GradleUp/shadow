@@ -73,7 +73,7 @@ class ApacheNoticeResourceTransformerParameterTests extends TestCase {
         try {
             final ByteArrayInputStream noticeInputStream = new ByteArrayInputStream(noticeText.getBytes())
             final List<Relocator> emptyList = Collections.emptyList()
-            subject.transform(TransformerContext.builder().path(NOTICE_RESOURCE).is(noticeInputStream).relocators(emptyList).stats(stats).build())
+            subject.transform(TransformerContext.builder().path(NOTICE_RESOURCE).inputStream(noticeInputStream).relocators(emptyList).stats(stats).build())
         }
         catch (NullPointerException ignored) {
             fail("Null pointer should not be thrown when no parameters are set.")

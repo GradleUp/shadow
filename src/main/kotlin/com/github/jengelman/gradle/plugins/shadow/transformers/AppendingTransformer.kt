@@ -55,10 +55,10 @@ class AppendingTransformer : Transformer {
       data = ByteArrayOutputStream()
     }
 
-    context.`is`.copyTo(data!!)
+    context.getIs().copyTo(data!!)
     data!!.write('\n'.code)
 
-    context.`is`.close()
+    context.getIs().close()
   }
 
   override fun hasTransformedResource(): Boolean {
