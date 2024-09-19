@@ -20,7 +20,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipOutputStream
-import org.codehaus.plexus.util.StringUtils
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
@@ -28,39 +27,25 @@ import org.gradle.api.tasks.Optional
 /**
  * A resource processor that prevents the inclusion of an arbitrary
  * resource into the shaded JAR.
- * <p>
+ *
  * Modified from org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer.java
  *
  * @author John Engelman
  */
-class DontIncludeResourceTransformer implements Transformer {
+class DontIncludeResourceTransformer : Transformer {
 
-    @Optional
-    @Input
-    String resource
+  @Optional
+  @Input
+  var resource: String? = null
 
-    @Override
-    boolean canTransformResource(FileTreeElement element) {
-        def path = element.relativePath.pathString
-        if (StringUtils.isNotEmpty(resource) && path.endsWith(resource)) {
-            return true
-        }
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    val path = element.relativePath.pathString
+    return !resource.isNullOrEmpty() && path.endsWith(resource!!)
+  }
 
-        return false
-    }
+  override fun transform(context: TransformerContext) = Unit
 
-    @Override
-    void transform(TransformerContext context) {
-        // no op
-    }
+  override fun hasTransformedResource(): Boolean = false
 
-    @Override
-    boolean hasTransformedResource() {
-        return false
-    }
-
-    @Override
-    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
-        // no op
-    }
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) = Unit
 }
