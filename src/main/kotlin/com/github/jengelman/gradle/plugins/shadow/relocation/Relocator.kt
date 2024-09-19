@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 /**
@@ -26,15 +25,18 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
  * @author John Engelman
  */
 interface Relocator {
-    String ROLE = Relocator.class.getName()
+  fun canRelocatePath(path: String): Boolean
 
-    boolean canRelocatePath(String path)
+  fun relocatePath(context: RelocatePathContext): String
 
-    String relocatePath(RelocatePathContext context)
+  fun canRelocateClass(className: String): Boolean
 
-    boolean canRelocateClass(String className)
+  fun relocateClass(context: RelocateClassContext): String
 
-    String relocateClass(RelocateClassContext context)
+  fun applyToSourceContent(sourceContent: String): String
 
-    String applyToSourceContent(String sourceContent)
+  companion object {
+    @JvmField
+    val ROLE: String = Relocator::class.java.name
+  }
 }
