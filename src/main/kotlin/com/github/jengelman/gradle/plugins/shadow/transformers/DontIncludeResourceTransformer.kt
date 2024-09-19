@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
@@ -32,7 +31,7 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
-class DontIncludeResourceTransformer : Transformer {
+class DontIncludeResourceTransformer : Transformer by NoOpTransformer {
 
   @Optional
   @Input
@@ -42,10 +41,4 @@ class DontIncludeResourceTransformer : Transformer {
     val path = element.relativePath.pathString
     return !resource.isNullOrEmpty() && path.endsWith(resource!!)
   }
-
-  override fun transform(context: TransformerContext) = Unit
-
-  override fun hasTransformedResource(): Boolean = false
-
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) = Unit
 }

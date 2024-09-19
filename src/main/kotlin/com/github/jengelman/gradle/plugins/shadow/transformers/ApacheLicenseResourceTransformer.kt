@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 /**
@@ -29,19 +28,13 @@ import org.gradle.api.file.FileTreeElement
  *
  * @author John Engelman
  */
-class ApacheLicenseResourceTransformer : Transformer {
+class ApacheLicenseResourceTransformer : Transformer by NoOpTransformer {
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
     return LICENSE_PATH.equals(path, ignoreCase = true) ||
       LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true)
   }
-
-  override fun transform(context: TransformerContext) = Unit
-
-  override fun hasTransformedResource(): Boolean = false
-
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) = Unit
 
   companion object {
     private const val LICENSE_PATH = "META-INF/LICENSE"

@@ -42,3 +42,10 @@ interface Transformer : Named {
   @Internal
   override fun getName(): String = this::class.java.simpleName
 }
+
+object NoOpTransformer : Transformer {
+  override fun canTransformResource(element: FileTreeElement) = false
+  override fun transform(context: TransformerContext) = Unit
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) = Unit
+  override fun hasTransformedResource() = false
+}
