@@ -31,7 +31,7 @@ import org.gradle.api.tasks.Internal
  * @author John Engelman
  */
 interface Transformer : Named {
-  fun canTransformResource(element: FileTreeElement?): Boolean
+  fun canTransformResource(element: FileTreeElement): Boolean
 
   fun transform(context: TransformerContext)
 

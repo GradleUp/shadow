@@ -52,8 +52,4 @@ class ShadowStats {
     append("Average Time/Jar: ${averageTimeSecsPerJar}s [${averageTimePerJar}ms]\n")
     append("*******************")
   }
-
-  companion object {
-    const val SEPARATOR = "→"
-  }
 }
