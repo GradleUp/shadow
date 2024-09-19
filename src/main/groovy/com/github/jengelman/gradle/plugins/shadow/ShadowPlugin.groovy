@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,6 +13,7 @@ class ShadowPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.with {
             plugins.apply(ShadowBasePlugin)
+            plugins.apply(LegacyShadowPlugin)
             plugins.withType(JavaPlugin) {
                 plugins.apply(ShadowJavaPlugin)
             }

@@ -11,7 +11,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
         buildFile << """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 from('${artifact.path}')
                 from('${project.path}')
             }
@@ -31,7 +31,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         when:
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 from('${artifact.path}')
             }
         """
@@ -50,7 +50,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
         buildFile << """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 from('${artifact.path}')
                 from('${project.path}')
             }
@@ -64,7 +64,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         when:
         changeConfigurationTo """
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 archiveBaseName = "foo"
                 from('${artifact.path}')
                 from('${project.path}')
@@ -85,7 +85,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         buildFile << """
             dependencies { implementation 'junit:junit:3.8.2' }
             
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 exclude 'junit/*'
             }
         """.stripIndent()
@@ -120,7 +120,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         changeConfigurationTo """
             dependencies { implementation 'junit:junit:3.8.2' }
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                include 'server/*'
                exclude '*/Util.*'
             }
@@ -186,7 +186,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         changeConfigurationTo """
             dependencies { implementation 'junit:junit:3.8.2' }
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                     exclude(dependency('junit:junit'))
                }

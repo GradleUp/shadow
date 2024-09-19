@@ -32,7 +32,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         changeConfigurationTo """
             dependencies { implementation 'junit:junit:3.8.2' }
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate 'junit.framework', 'foo.junit.framework'
             }
         """

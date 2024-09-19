@@ -59,7 +59,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
 
-            shadowJar {
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 minimize {
                     exclude(dependency('junit:junit:.*'))
                 }

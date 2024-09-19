@@ -4,10 +4,10 @@ api: api/com/github/jengelman/gradle/plugins/shadow
 
 # Configuring Shadow
 
-The [`ShadowJar`](http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type extends from Gradle's
+The [`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type extends from Gradle's
 [`Jar`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) type.
 This means that all attributes and methods available on `Jar` are also available on
-[`ShadowJar`](http://imperceptiblethoughts.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html).
+[`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html).
 Refer the _Gradle User Guide_ for [Jar](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) for
 details.
 
@@ -24,7 +24,7 @@ As with all `Jar` tasks in Gradle, these values can be overridden:
 
 ```groovy
 // Output to build/libs/shadow.jar
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
    archiveBaseName.set('shadow')
    archiveClassifier.set('')
    archiveVersion.set('')
@@ -95,7 +95,7 @@ task testJar(type: Jar) {
   }
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   manifest {
     inheritFrom(project.tasks.testJar.manifest)
   }
