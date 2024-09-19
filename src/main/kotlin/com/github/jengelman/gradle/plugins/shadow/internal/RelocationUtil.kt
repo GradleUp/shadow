@@ -7,20 +7,14 @@ internal object RelocationUtil {
 
   @JvmStatic
   fun configureRelocation(target: ShadowJar, prefix: String) {
-    val packages = mutableSetOf<String>()
-    target.configurations.forEach { configuration ->
-      configuration.files.forEach { jar ->
-        JarFile(jar).use { jf ->
-          for (entry in jf.entries()) {
-            if (entry.name.endsWith(".class") && entry.name != "module-info.class") {
-              packages += entry.name.substring(0, entry.name.lastIndexOf('/')).replace('/', '.')
-            }
-          }
-        }
+    target.configurations
+      .asSequence()
+      .flatMap { it.files }
+      .flatMap { JarFile(it).entries().asSequence() }
+      .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
+      .forEach {
+        val pkg = it.name.substring(0, it.name.lastIndexOf('/')).replace('/', '.')
+        target.relocate(pkg, "$prefix.$pkg")
       }
-    }
-    packages.forEach {
-      target.relocate(it, "$prefix.$it")
-    }
   }
 }
