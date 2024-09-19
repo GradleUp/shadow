@@ -77,7 +77,6 @@ class RelocatorRemapper extends Remapper {
                     value = prefix + r.relocatePath(pathContext) + suffix
                     break
                 }
-                }
             }
 
             return value
@@ -116,10 +115,6 @@ class RelocatorRemapper extends Remapper {
 
     String mapPath(RelativeArchivePath path) {
         mapPath(path.pathString)
-    }
-
-    void currentFilePath(String path) {
-        currentFilePath = path
     }
 
 }
