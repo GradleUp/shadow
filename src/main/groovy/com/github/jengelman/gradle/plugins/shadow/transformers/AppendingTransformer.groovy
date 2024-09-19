@@ -46,6 +46,7 @@ class AppendingTransformer implements Transformer {
      */
     private ByteArrayOutputStream data
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
         if (resource != null && resource.equalsIgnoreCase(path)) {
@@ -55,6 +56,7 @@ class AppendingTransformer implements Transformer {
         return false
     }
 
+    @Override
     void transform(TransformerContext context) {
         if (data == null) {
             data = new ByteArrayOutputStream()
@@ -66,10 +68,12 @@ class AppendingTransformer implements Transformer {
         context.is.close()
     }
 
+    @Override
     boolean hasTransformedResource() {
         return data?.size() > 0
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         if (data == null) {
             data = new ByteArrayOutputStream()

@@ -454,6 +454,7 @@ class ShadowCopyAction implements CopyAction {
             return lastName.endsWith('.class')
         }
 
+        @Override
         RelativeArchivePath getParent() {
             if (!segments || segments.length == 1) {
                 return null

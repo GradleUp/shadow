@@ -24,6 +24,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
                                     Set<ResolvedDependency> includedDependencies,
                                     Set<ResolvedDependency> excludedDependencies)
 
+    @Override
     FileCollection resolve(FileCollection configuration) {
         Set<ResolvedDependency> includedDeps = []
         Set<ResolvedDependency> excludedDeps = []
@@ -33,6 +34,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
         }.flatten())
     }
 
+    @Override
     FileCollection resolve(Collection<FileCollection> configurations) {
         configurations.collect {
             resolve(it)
@@ -45,6 +47,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @param spec
      * @return
      */
+    @Override
     DependencyFilter exclude(Spec<? super ResolvedDependency> spec) {
         excludeSpecs << spec
         return this
@@ -56,6 +59,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @param spec
      * @return
      */
+    @Override
     DependencyFilter include(Spec<? super ResolvedDependency> spec) {
         includeSpecs << spec
         return this
@@ -66,6 +70,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @param notation
      * @return
      */
+    @Override
     Spec<? super ResolvedDependency> project(Map<String, ?> notation) {
         dependency(project.dependencies.project(notation))
     }
@@ -76,6 +81,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @param notation
      * @return
      */
+    @Override
     Spec<? super ResolvedDependency> project(String notation) {
         dependency(project.dependencies.project(path: notation, configuration: 'default'))
     }
@@ -85,6 +91,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @param notation
      * @return
      */
+    @Override
     Spec<? super ResolvedDependency> dependency(Object notation) {
         dependency(project.dependencies.create(notation))
     }
@@ -94,6 +101,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @param dependency
      * @return
      */
+    @Override
     Spec<? super ResolvedDependency> dependency(Dependency dependency) {
         this.dependency({ ResolvedDependency it ->
             (!dependency.group || it.moduleGroup.matches(dependency.group)) &&
@@ -107,6 +115,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @param spec
      * @return
      */
+    @Override
     Spec<? super ResolvedDependency> dependency(Closure spec) {
         return Specs.<ResolvedDependency>convertClosureToSpec(spec)
     }

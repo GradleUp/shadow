@@ -140,6 +140,7 @@ public class TestFile extends File {
         }
     }
 
+    @Override
     public TestFile[] listFiles() {
         File[] children = super.listFiles();
         TestFile[] files = new TestFile[children.length];

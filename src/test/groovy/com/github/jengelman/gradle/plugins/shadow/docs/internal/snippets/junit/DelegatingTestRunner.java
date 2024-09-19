@@ -22,10 +22,12 @@ public class DelegatingTestRunner extends Suite {
         System.getenv("CI") != null ? 1 : Runtime.getRuntime().availableProcessors()
       );
 
+      @Override
       public void schedule(Runnable childStatement) {
         service.submit(childStatement);
       }
 
+      @Override
       public void finished() {
         try {
           service.shutdown();

@@ -82,6 +82,7 @@ class ApacheNoticeResourceTransformer implements Transformer {
 
     private static final String NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
         if (NOTICE_PATH.equalsIgnoreCase(path) || NOTICE_TXT_PATH.equalsIgnoreCase(path)) {
@@ -91,6 +92,7 @@ class ApacheNoticeResourceTransformer implements Transformer {
         return false
     }
 
+    @Override
     void transform(TransformerContext context) {
         if (entries.isEmpty()) {
             String year = new SimpleDateFormat("yyyy").format(new Date())
@@ -170,10 +172,12 @@ class ApacheNoticeResourceTransformer implements Transformer {
         }
     }
 
+    @Override
     boolean hasTransformedResource() {
         return true
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         ZipEntry zipEntry = new ZipEntry(NOTICE_PATH)
         zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)

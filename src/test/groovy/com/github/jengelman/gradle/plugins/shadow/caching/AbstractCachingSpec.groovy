@@ -13,6 +13,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 abstract class AbstractCachingSpec extends PluginSpecification {
     @Rule TemporaryFolder alternateDir
 
+    @Override
     def setup() {
         // Use a test-specific build cache directory.  This ensures that we'll only use cached outputs generated during this
         // test and we won't accidentally use cached outputs from a different test or a different build.

@@ -9,10 +9,12 @@ class MavenFileModule extends AbstractMavenModule {
         super(moduleDir, groupId, artifactId, version)
     }
 
+    @Override
     boolean getUniqueSnapshots() {
         return uniqueSnapshots
     }
 
+    @Override
     MavenModule withNonUniqueSnapshots() {
         uniqueSnapshots = false
         return this

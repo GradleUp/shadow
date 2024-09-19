@@ -40,6 +40,7 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
     private ComponentsXmlResourceTransformer transformer
     private ShadowStats stats
 
+    @Override
     void setUp() {
         this.transformer = new ComponentsXmlResourceTransformer()
         stats = new ShadowStats()

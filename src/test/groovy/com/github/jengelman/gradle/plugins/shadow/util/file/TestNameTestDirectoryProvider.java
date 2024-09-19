@@ -36,6 +36,7 @@ public class TestNameTestDirectoryProvider implements MethodRule, TestRule, Test
         return "unknown-test-class-" + testCounter.getAndIncrement();
     }
 
+    @Override
     public Statement apply(final Statement base, final FrameworkMethod method, final Object target) {
         init(method.getName(), target.getClass().getSimpleName());
         return new Statement() {
@@ -48,6 +49,7 @@ public class TestNameTestDirectoryProvider implements MethodRule, TestRule, Test
         };
     }
 
+    @Override
     public Statement apply(final @NotNull Statement base, Description description) {
         init(description.getMethodName(), description.getTestClass().getSimpleName());
         return new Statement() {

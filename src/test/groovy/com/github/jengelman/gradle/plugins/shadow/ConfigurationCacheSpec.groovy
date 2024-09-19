@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 
 class ConfigurationCacheSpec extends PluginSpecification {
 
+    @Override
     def setup() {
         repo.module('shadow', 'a', '1.0')
                 .insertFile('a.properties', 'a')

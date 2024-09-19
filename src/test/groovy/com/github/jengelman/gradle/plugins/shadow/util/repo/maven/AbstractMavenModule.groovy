@@ -28,6 +28,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         this.version = version
     }
 
+    @Override
     MavenModule parent(String group, String artifactId, String version) {
         parentPomSection = """
 <parent>
@@ -39,6 +40,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         return this
     }
 
+    @Override
     TestFile getArtifactFile(Map options = [:]) {
         if (version.endsWith("-SNAPSHOT") && !metaDataFile.exists() && uniqueSnapshots) {
             def artifact = toArtifact(options)
@@ -74,11 +76,13 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         return this
     }
 
+    @Override
     MavenModule dependsOn(String group, String artifactId, String version, String type = null) {
         this.dependencies << [groupId: group, artifactId: artifactId, version: version, type: type]
         return this
     }
 
+    @Override
     MavenModule hasPackaging(String packaging) {
         this.packaging = packaging
         return this
@@ -87,6 +91,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     /**
      * Specifies the type of the main artifact.
      */
+    @Override
     MavenModule hasType(String type) {
         this.type = type
         return this
@@ -171,18 +176,22 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
     //abstract String getPublishArtifactVersion()
 
+    @Override
     MavenPom getParsedPom() {
         return new MavenPom(pomFile)
     }
 
+    @Override
     DefaultMavenMetaData getRootMetaData() {
         new DefaultMavenMetaData(rootMetaDataFile)
     }
 
+    @Override
     TestFile getPomFile() {
         return moduleDir.file("$artifactId-${publishArtifactVersion}.pom")
     }
 
+    @Override
     TestFile getMetaDataFile() {
         moduleDir.file(MAVEN_METADATA_FILE)
     }
@@ -200,6 +209,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         return moduleDir.file(fileName)
     }
 
+    @Override
     MavenModule publishWithChangedContent() {
         publishCount++
         return publish()
@@ -216,6 +226,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         return new Date(updateFormat.parse("20100101120000").time + publishCount * 1000)
     }
 
+    @Override
     MavenModule publishPom() {
         moduleDir.createDir()
         def rootMavenMetaData = getRootMetaDataFile()
@@ -300,6 +311,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
     abstract String getMetaDataFileContent()
 
+    @Override
     MavenModule publish() {
 
         publishPom()

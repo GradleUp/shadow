@@ -29,7 +29,7 @@ import junit.framework.TestCase
  */
 class SimpleRelocatorParameterTest extends TestCase {
 
-
+    @Override
     protected void setUp() {
         super.setUp()
     }

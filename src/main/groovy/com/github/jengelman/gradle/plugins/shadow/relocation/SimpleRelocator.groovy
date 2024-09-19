@@ -149,6 +149,7 @@ class SimpleRelocator implements Relocator {
         return false
     }
 
+    @Override
     boolean canRelocatePath(String path) {
         if (rawString) {
             return Pattern.compile(pathPattern).matcher(path).find()
@@ -176,12 +177,14 @@ class SimpleRelocator implements Relocator {
         return false
     }
 
+    @Override
     boolean canRelocateClass(String className) {
         return !rawString &&
                 className.indexOf('/') < 0 &&
                 canRelocatePath(className.replace('.', '/'))
     }
 
+    @Override
     String relocatePath(RelocatePathContext context) {
         String path = context.path
         context.stats.relocate(pathPattern, shadedPathPattern)
@@ -192,12 +195,14 @@ class SimpleRelocator implements Relocator {
         }
     }
 
+    @Override
     String relocateClass(RelocateClassContext context) {
         String clazz = context.className
         context.stats.relocate(pathPattern, shadedPathPattern)
         return clazz.replaceFirst(pattern, shadedPattern)
     }
 
+    @Override
     String applyToSourceContent(String sourceContent) {
         if (rawString) {
             return sourceContent

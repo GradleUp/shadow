@@ -35,20 +35,24 @@ class ApacheLicenseResourceTransformer implements Transformer {
 
     private static final String LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
         return LICENSE_PATH.equalsIgnoreCase(path) ||
                 LICENSE_TXT_PATH.regionMatches(true, 0, path, 0, LICENSE_TXT_PATH.length())
     }
 
+    @Override
     void transform(TransformerContext context) {
 
     }
 
+    @Override
     boolean hasTransformedResource() {
         return false
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
     }
 }
