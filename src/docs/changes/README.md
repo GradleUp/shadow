@@ -13,6 +13,7 @@
 **Changed**
 
 - `ShadowExtension.component` has been deprecated, now you can use `component.shadow` instead. ([#956](https://github.com/GradleUp/shadow/pull/956))
+- **BREAKING CHANGE:** update to [jdependency 2.11.0](https://github.com/tcurdt/jdependency/blob/master/HISTORY.md#version-2110-release-18112024), this requires Java 11 or above to run. ([#974](https://github.com/GradleUp/shadow/pull/974))
 
 **Fixed**
 
