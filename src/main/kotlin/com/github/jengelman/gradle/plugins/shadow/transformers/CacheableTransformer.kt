@@ -6,5 +6,5 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
  * determining the cache key.
  */
 @Retention(AnnotationRetention.RUNTIME)
-@Target
+@Target(AnnotationTarget.CLASS)
 annotation class CacheableTransformer
