@@ -67,16 +67,16 @@ class RelocatorRemapper extends Remapper {
             }
 
             for (Relocator r : relocators) {
-                if (r.canRelocateSourceFile(currentFilePath)) {
-                    if (r.canRelocateClass(name)) {
-                        RelocateClassContext classContext = RelocateClassContext.builder().className(name).stats(stats).build()
-                        value = prefix + r.relocateClass(classContext) + suffix
-                        break
-                    } else if (r.canRelocatePath(name)) {
-                        RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
-                        value = prefix + r.relocatePath(pathContext) + suffix
-                        break
-                    }
+                if (!r.canRelocateSourceFile(currentFilePath)) continue
+                if (r.canRelocateClass(name)) {
+                    RelocateClassContext classContext = RelocateClassContext.builder().className(name).stats(stats).build()
+                    value = prefix + r.relocateClass(classContext) + suffix
+                    break
+                } else if (r.canRelocatePath(name)) {
+                    RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
+                    value = prefix + r.relocatePath(pathContext) + suffix
+                    break
+                }
                 }
             }
 
