@@ -15,7 +15,7 @@ internal interface DependencyFilter {
   /**
    * Resolve all FileCollections against the include/exclude ruels in the filter and combine the results
    */
-  fun resolve(configurations: MutableCollection<FileCollection>): FileCollection
+  fun resolve(configurations: Collection<FileCollection>): FileCollection
 
   /**
    * Exclude dependencies that match the provided spec.
