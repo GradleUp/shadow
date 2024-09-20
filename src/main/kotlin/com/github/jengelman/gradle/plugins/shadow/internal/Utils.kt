@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.io.InputStream
 import java.util.jar.JarFile
 import java.util.zip.ZipOutputStream
 import org.gradle.api.internal.file.copy.CopySpecInternal
@@ -36,5 +37,13 @@ internal object Utils {
       ZipEntryCompression.STORED -> DefaultZipCompressor(jar.isZip64, ZipOutputStream.STORED)
       else -> throw IllegalArgumentException("Unknown Compression type $entryCompression")
     }
+  }
+
+  fun requireResourceAsText(name: String): String {
+    return requireResourceAsStream(name).bufferedReader().readText()
+  }
+
+  private fun requireResourceAsStream(name: String): InputStream {
+    return this::class.java.getResourceAsStream(name) ?: error("Resource $name not found.")
   }
 }
