@@ -19,10 +19,9 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import java.io.File
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.codehaus.plexus.util.IOUtil
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.PathSensitive
@@ -31,43 +30,29 @@ import org.gradle.api.tasks.PathSensitivity
 /**
  * A resource processor that allows the addition of an arbitrary file
  * content into the shaded JAR.
- * <p>
+ *
  * Modified from org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java
  *
  * @author John Engelman
  */
-class IncludeResourceTransformer implements Transformer {
+class IncludeResourceTransformer : Transformer by NoOpTransformer {
 
-    @InputFile
-    @PathSensitive(PathSensitivity.NONE)
-    File file
+  @InputFile
+  @PathSensitive(PathSensitivity.NONE)
+  lateinit var file: File
 
-    @Input
-    String resource
+  @Input
+  lateinit var resource: String
 
-    @Override
-    boolean canTransformResource(FileTreeElement element) {
-        return false
-    }
+  override fun hasTransformedResource(): Boolean {
+    return this::file.isInitialized && file.exists()
+  }
 
-    @Override
-    void transform(TransformerContext context) {
-        // no op
-    }
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    val entry = ZipEntry(resource)
+    entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+    os.putNextEntry(entry)
 
-    @Override
-    boolean hasTransformedResource() {
-        return file != null ? file.exists() : false
-    }
-
-    @Override
-    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
-        ZipEntry entry = new ZipEntry(resource)
-        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-        os.putNextEntry(entry)
-
-        InputStream is = new FileInputStream(file)
-        IOUtil.copy(is, os)
-        is.close()
-    }
+    file.inputStream().copyTo(os)
+  }
 }
