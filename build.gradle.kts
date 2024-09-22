@@ -6,7 +6,6 @@ plugins {
   `java-gradle-plugin`
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
-  id("shadow.convention.japicmp")
   id("com.diffplug.spotless") version "7.0.0.BETA2"
   id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.16.3"
 }
