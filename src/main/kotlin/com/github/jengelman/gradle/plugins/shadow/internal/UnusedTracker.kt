@@ -12,7 +12,7 @@ import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
 
 /** Tracks unused classes in the project classpath. */
-internal class UnusedTracker private constructor(
+class UnusedTracker private constructor(
   classDirs: Iterable<File>,
   classJars: FileCollection,
   @InputFiles val toMinimize: FileCollection,
