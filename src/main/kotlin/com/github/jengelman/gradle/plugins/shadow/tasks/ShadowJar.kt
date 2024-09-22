@@ -1,13 +1,16 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
+import com.github.jengelman.gradle.plugins.shadow.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
-import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.ShadowSpec
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker.Companion.getApiJarsFromProject
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
+import com.github.jengelman.gradle.plugins.shadow.internal.runOrThrow
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -46,7 +49,6 @@ import org.jetbrains.annotations.NotNull
 class ShadowJar :
   Jar(),
   ShadowSpec {
-
   private val _transformers = mutableListOf<Transformer>()
   private val _relocators = mutableListOf<Relocator>()
   private val _configurations = mutableListOf<FileCollection>()
@@ -167,15 +169,13 @@ class ShadowJar :
       return (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
     }
 
-  override fun minimize(): ShadowJar {
+  override fun minimize(): ShadowJar = apply {
     minimizeJar = true
-    return this
   }
 
-  override fun minimize(action: Action<DependencyFilter>?): ShadowJar {
+  override fun minimize(action: Action<DependencyFilter>?): ShadowJar = apply {
     minimize()
     action?.execute(dependencyFilterForMinimize)
-    return this
   }
 
   override fun getManifest(): InheritManifest {
@@ -215,89 +215,67 @@ class ShadowJar :
     logger.info(stats.toString())
   }
 
-  override fun dependencies(action: Action<DependencyFilter>?): ShadowJar {
+  override fun dependencies(action: Action<DependencyFilter>?): ShadowJar = apply {
     action?.execute(dependencyFilter)
-    return this
   }
 
   override fun <T : Transformer> transform(clazz: Class<T>): ShadowJar {
     return transform(clazz, null)
   }
 
-  override fun <T : Transformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar {
+  override fun <T : Transformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
     val transformer = clazz.getDeclaredConstructor().newInstance()
     addTransform(transformer, action)
-    return this
   }
 
-  override fun transform(transformer: Transformer): ShadowJar {
+  override fun transform(transformer: Transformer): ShadowJar = apply {
     addTransform(transformer, null)
-    return this
   }
 
-  override fun mergeServiceFiles(): ShadowJar {
-    return try {
-      transform(ServiceFileTransformer::class.java)
-    } catch (e: Exception) {
-      throw RuntimeException(e)
-    }
+  override fun mergeServiceFiles(): ShadowJar = runOrThrow {
+    transform(ServiceFileTransformer::class.java)
   }
 
-  override fun mergeServiceFiles(rootPath: String): ShadowJar {
-    return try {
-      transform(ServiceFileTransformer::class.java) { it.setPath(rootPath) }
-    } catch (e: Exception) {
-      throw RuntimeException(e)
-    }
+  override fun mergeServiceFiles(rootPath: String): ShadowJar = runOrThrow {
+    transform(ServiceFileTransformer::class.java) { it.setPath(rootPath) }
   }
 
-  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?): ShadowJar {
-    return try {
-      transform(ServiceFileTransformer::class.java, action)
-    } catch (e: Exception) {
-      throw RuntimeException(e)
-    }
+  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?): ShadowJar = runOrThrow {
+    transform(ServiceFileTransformer::class.java, action)
   }
 
-  override fun mergeGroovyExtensionModules(): ShadowJar {
-    return try {
-      transform(GroovyExtensionModuleTransformer::class.java)
-    } catch (e: Exception) {
-      throw RuntimeException(e)
-    }
+  override fun mergeGroovyExtensionModules(): ShadowJar = runOrThrow {
+    transform(GroovyExtensionModuleTransformer::class.java)
   }
 
-  override fun append(resourcePath: String): ShadowJar {
-    return try {
-      transform(AppendingTransformer::class.java) { it.resource = resourcePath }
-    } catch (e: Exception) {
-      throw RuntimeException(e)
-    }
+  override fun append(resourcePath: String): ShadowJar = runOrThrow {
+    transform(AppendingTransformer::class.java) { it.resource = resourcePath }
   }
 
   override fun relocate(pattern: String, destination: String): ShadowJar {
     return relocate(pattern, destination, null)
   }
 
-  override fun relocate(pattern: String, destination: String, action: Action<SimpleRelocator>?): ShadowJar {
+  override fun relocate(
+    pattern: String,
+    destination: String,
+    action: Action<SimpleRelocator>?,
+  ): ShadowJar = apply {
     val relocator = SimpleRelocator(pattern, destination, mutableListOf(), mutableListOf())
     addRelocator(relocator, action)
-    return this
   }
 
-  override fun relocate(relocator: Relocator): ShadowJar {
+  override fun relocate(relocator: Relocator): ShadowJar = apply {
     addRelocator(relocator, null)
-    return this
   }
 
-  override fun relocate(clazz: Class<out Relocator>): ShadowJar {
+  override fun relocate(clazz: Class<Relocator>): ShadowJar {
     return relocate(clazz, null)
   }
 
-  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowJar {
+  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowJar = apply {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
-    return this
   }
 
   private fun isCacheableTransform(clazz: Class<out Transformer>): Boolean {

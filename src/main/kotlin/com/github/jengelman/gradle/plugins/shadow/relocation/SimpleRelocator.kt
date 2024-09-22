@@ -61,14 +61,12 @@ class SimpleRelocator @JvmOverloads constructor(
     this.excludes += normalizePatterns(excludes)
   }
 
-  fun include(pattern: String): SimpleRelocator {
+  fun include(pattern: String): SimpleRelocator = apply {
     includes.addAll(normalizePatterns(listOf(pattern)))
-    return this
   }
 
-  fun exclude(pattern: String): SimpleRelocator {
+  fun exclude(pattern: String): SimpleRelocator = apply {
     excludes.addAll(normalizePatterns(listOf(pattern)))
-    return this
   }
 
   override fun canRelocatePath(path: String): Boolean {

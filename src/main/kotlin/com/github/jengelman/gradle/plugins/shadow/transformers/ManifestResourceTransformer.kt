@@ -68,11 +68,10 @@ class ManifestResourceTransformer : Transformer {
     manifest!!.write(os)
   }
 
-  fun attributes(attributes: Map<String, *>): ManifestResourceTransformer {
+  fun attributes(attributes: Map<String, *>): ManifestResourceTransformer = apply {
     if (manifestEntries == null) {
       manifestEntries = mutableMapOf()
     }
     manifestEntries!!.putAll(attributes.mapValues { Attributes().apply { putValue(it.key, it.value.toString()) } })
-    return this
   }
 }

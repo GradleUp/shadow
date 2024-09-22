@@ -21,9 +21,8 @@ class ManifestAppenderTransformer : Transformer {
   @Input
   val attributes: List<Pair<String, Comparable<*>>> = _attributes
 
-  fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer {
+  fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
     _attributes.add(name to value)
-    return this
   }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {

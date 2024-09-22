@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.internal
+package com.github.jengelman.gradle.plugins.shadow
 
 import groovy.lang.Closure
 import org.gradle.api.artifacts.Dependency
@@ -20,35 +20,35 @@ interface DependencyFilter {
   /**
    * Exclude dependencies that match the provided spec.
    */
-  fun exclude(spec: Spec<in ResolvedDependency>): DependencyFilter
+  fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter
 
   /**
    * Include dependencies that match the provided spec.
    */
-  fun include(spec: Spec<in ResolvedDependency>): DependencyFilter
+  fun include(spec: Spec<ResolvedDependency>): DependencyFilter
 
   /**
    * Create a spec that matches the provided project notation on group, name, and version
    */
-  fun project(notation: Map<String, *>): Spec<in ResolvedDependency>
+  fun project(notation: Map<String, *>): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the default configuration for the provided project path on group, name, and version
    */
-  fun project(notation: String): Spec<in ResolvedDependency>
+  fun project(notation: String): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches dependencies using the provided notation on group, name, and version
    */
-  fun dependency(notation: Any): Spec<in ResolvedDependency>
+  fun dependency(notation: Any): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the provided dependency on group, name, and version
    */
-  fun dependency(dependency: Dependency): Spec<in ResolvedDependency>
+  fun dependency(dependency: Dependency): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the provided closure
    */
-  fun dependency(spec: Closure<*>): Spec<in ResolvedDependency>
+  fun dependency(spec: Closure<*>): Spec<ResolvedDependency>
 }

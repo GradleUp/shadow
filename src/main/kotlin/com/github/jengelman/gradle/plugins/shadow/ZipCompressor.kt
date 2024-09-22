@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.internal
+package com.github.jengelman.gradle.plugins.shadow
 
 import org.gradle.api.internal.file.archive.compression.ArchiveOutputStreamFactory
 

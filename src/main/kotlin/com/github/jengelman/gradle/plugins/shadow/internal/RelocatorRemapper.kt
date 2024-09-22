@@ -1,5 +1,4 @@
-
-package com.github.jengelman.gradle.plugins.shadow.impl
+package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
@@ -14,7 +13,7 @@ import org.objectweb.asm.commons.Remapper
  *
  * @author John Engelman
  */
-class RelocatorRemapper(
+internal class RelocatorRemapper(
   internal val relocators: List<Relocator>,
   internal val stats: ShadowStats,
 ) : Remapper() {

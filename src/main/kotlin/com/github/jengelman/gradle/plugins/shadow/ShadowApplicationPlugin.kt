@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.JavaJarExec
-import com.github.jengelman.gradle.plugins.shadow.internal.Utils
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.io.File
 import org.gradle.api.GradleException
@@ -74,9 +74,9 @@ class ShadowApplicationPlugin : Plugin<Project> {
   private fun addCreateScriptsTask(project: Project) {
     project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { startScripts ->
       (startScripts.unixStartScriptGenerator as DefaultTemplateBasedStartScriptGenerator).template =
-        project.resources.text.fromString(Utils.requireResourceAsText("internal/unixStartScript.txt"))
+        project.resources.text.fromString(requireResourceAsText("internal/unixStartScript.txt"))
       (startScripts.windowsStartScriptGenerator as DefaultTemplateBasedStartScriptGenerator).template =
-        project.resources.text.fromString(Utils.requireResourceAsText("internal/windowsStartScript.txt"))
+        project.resources.text.fromString(requireResourceAsText("internal/windowsStartScript.txt"))
       startScripts.description =
         "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       startScripts.group = ApplicationPlugin.APPLICATION_GROUP
@@ -107,9 +107,11 @@ class ShadowApplicationPlugin : Plugin<Project> {
         }
       }
       task.doLast {
-        task.eachFile {
-          if (it.path == "bin/${javaApplication.applicationName}") {
-            it.mode = 0x755
+        task.eachFile { file ->
+          if (file.path == "bin/${javaApplication.applicationName}") {
+            file.permissions {
+              it.unix(0x755)
+            }
           }
         }
       }

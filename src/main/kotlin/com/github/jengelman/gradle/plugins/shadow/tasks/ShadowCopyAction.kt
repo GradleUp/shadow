@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
+import com.github.jengelman.gradle.plugins.shadow.ZipCompressor
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
@@ -12,7 +12,9 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
-import org.apache.commons.io.FilenameUtils
+import kotlin.io.path.Path
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 import org.apache.log4j.LogManager
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
@@ -40,7 +42,7 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
-class ShadowCopyAction(
+class ShadowCopyAction internal constructor(
   private val zipFile: File,
   private val compressor: ZipCompressor,
   private val documentationRegistry: DocumentationRegistry,
@@ -123,7 +125,7 @@ class ShadowCopyAction(
     }
 
     protected fun isClass(fileDetails: FileCopyDetails): Boolean {
-      return FilenameUtils.getExtension(fileDetails.path) == "class"
+      return Path(fileDetails.path).extension == "class"
     }
 
     override fun processFile(details: FileCopyDetailsInternal) {
@@ -238,7 +240,7 @@ class ShadowCopyAction(
     }
 
     private fun isUnused(classPath: String): Boolean {
-      val className = FilenameUtils.removeExtension(classPath)
+      val className = Path(classPath).nameWithoutExtension
         .replace('/', '.')
       val result = unused.contains(className)
       if (result) {
@@ -256,7 +258,7 @@ class ShadowCopyAction(
     }
 
     private fun remapClass(fileCopyDetails: FileCopyDetails) {
-      if (FilenameUtils.getExtension(fileCopyDetails.name) == "class") {
+      if (Path(fileCopyDetails.name).extension == "class") {
         fileCopyDetails.file.inputStream().use { inputStream ->
           remapClass(
             inputStream,

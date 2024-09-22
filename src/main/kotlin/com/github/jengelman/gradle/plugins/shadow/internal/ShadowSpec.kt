@@ -1,7 +1,7 @@
-package com.github.jengelman.gradle.plugins.shadow.tasks
+package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
@@ -57,7 +57,7 @@ internal interface ShadowSpec : CopySpec {
     NoSuchMethodException::class,
     InvocationTargetException::class,
   )
-  fun relocate(clazz: Class<out Relocator>): ShadowSpec
+  fun relocate(clazz: Class<Relocator>): ShadowSpec
 
   @Throws(
     InstantiationException::class,

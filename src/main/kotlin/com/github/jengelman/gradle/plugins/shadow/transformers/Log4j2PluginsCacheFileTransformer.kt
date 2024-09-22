@@ -10,7 +10,6 @@ import java.io.FileOutputStream
 import java.net.URL
 import java.util.Collections
 import java.util.Enumeration
-import org.apache.commons.io.IOUtils
 import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.tools.zip.ZipEntry
@@ -34,7 +33,7 @@ class Log4j2PluginsCacheFileTransformer : Transformer {
     temporaryFile.deleteOnExit()
     temporaryFiles.add(temporaryFile)
     FileOutputStream(temporaryFile).use { fos ->
-      IOUtils.copy(inputStream, fos)
+      inputStream.copyTo(fos)
     }
     relocators.addAll(context.relocators)
     if (stats == null) {

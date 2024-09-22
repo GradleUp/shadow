@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.DependencyFilter
 import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -11,9 +12,8 @@ import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 
 internal abstract class AbstractDependencyFilter(protected val project: Project) : DependencyFilter {
-
-  protected val includeSpecs: MutableList<Spec<in ResolvedDependency>> = mutableListOf()
-  protected val excludeSpecs: MutableList<Spec<in ResolvedDependency>> = mutableListOf()
+  private val includeSpecs = mutableListOf<Spec<ResolvedDependency>>()
+  private val excludeSpecs = mutableListOf<Spec<ResolvedDependency>>()
 
   protected abstract fun resolve(
     dependencies: Set<ResolvedDependency>,
@@ -38,29 +38,27 @@ internal abstract class AbstractDependencyFilter(protected val project: Project)
       ?: project.files()
   }
 
-  override fun exclude(spec: Spec<in ResolvedDependency>): DependencyFilter {
+  override fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
     excludeSpecs.add(spec)
-    return this
   }
 
-  override fun include(spec: Spec<in ResolvedDependency>): DependencyFilter {
+  override fun include(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
     includeSpecs.add(spec)
-    return this
   }
 
-  override fun project(notation: Map<String, *>): Spec<in ResolvedDependency> {
+  override fun project(notation: Map<String, *>): Spec<ResolvedDependency> {
     return dependency(project.dependencies.project(notation))
   }
 
-  override fun project(notation: String): Spec<in ResolvedDependency> {
+  override fun project(notation: String): Spec<ResolvedDependency> {
     return dependency(project.dependencies.project(mapOf("path" to notation, "configuration" to "default")))
   }
 
-  override fun dependency(notation: Any): Spec<in ResolvedDependency> {
+  override fun dependency(notation: Any): Spec<ResolvedDependency> {
     return dependency(project.dependencies.create(notation))
   }
 
-  override fun dependency(dependency: Dependency): Spec<in ResolvedDependency> {
+  override fun dependency(dependency: Dependency): Spec<ResolvedDependency> {
     return dependency { it: ResolvedDependency ->
       (dependency.group == null || it.moduleGroup.matches(dependency.group!!.toRegex())) &&
         (it.moduleName.matches(dependency.name.toRegex())) &&
@@ -68,7 +66,7 @@ internal abstract class AbstractDependencyFilter(protected val project: Project)
     }
   }
 
-  override fun dependency(spec: Closure<*>): Spec<in ResolvedDependency> {
+  override fun dependency(spec: Closure<*>): Spec<ResolvedDependency> {
     return Specs.convertClosureToSpec(spec)
   }
 

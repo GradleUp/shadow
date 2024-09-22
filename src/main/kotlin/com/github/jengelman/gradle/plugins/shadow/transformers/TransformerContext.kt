@@ -33,12 +33,10 @@ data class TransformerContext(
   }
 
   companion object {
-    @JvmStatic
     fun getEntryTimestamp(preserveFileTimestamps: Boolean, entryTime: Long): Long {
       return if (preserveFileTimestamps) entryTime else ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
     }
 
-    @JvmStatic
     fun builder() = Builder()
   }
 }
