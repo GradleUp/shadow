@@ -14,6 +14,8 @@ java {
 spotless {
   kotlinGradle {
     ktlint()
+    target("**/*.kts")
+    targetExclude("build-logic/build/**")
   }
 }
 
