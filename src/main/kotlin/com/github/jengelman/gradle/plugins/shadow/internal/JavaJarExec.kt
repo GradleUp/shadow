@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import java.io.File
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
@@ -8,11 +8,11 @@ import org.gradle.api.tasks.TaskAction
 internal abstract class JavaJarExec : JavaExec() {
 
   @get:InputFile
-  abstract val jarFile: File
+  val jarFile: RegularFileProperty = objectFactory.fileProperty()
 
   @TaskAction
   override fun exec() {
-    val allArgs = listOf(jarFile.path) + args
+    val allArgs = listOf(jarFile.get().asFile.path) + args
     setArgs(allArgs)
     super.exec()
   }

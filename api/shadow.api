@@ -219,10 +219,12 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 	public final fun length ()I
 }
 
-public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar, com/github/jengelman/gradle/plugins/shadow/internal/ShadowSpec {
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar, com/github/jengelman/gradle/plugins/shadow/internal/ShadowSpec {
 	public fun <init> ()V
 	public synthetic fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/internal/ShadowSpec;
 	public fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	protected fun copy ()V
+	protected fun createCopyAction ()Lorg/gradle/api/internal/file/copy/CopyAction;
 	public synthetic fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/internal/ShadowSpec;
 	public fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public final fun getApiJars ()Lorg/gradle/api/file/FileCollection;

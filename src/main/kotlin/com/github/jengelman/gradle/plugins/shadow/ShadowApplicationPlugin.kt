@@ -74,9 +74,9 @@ class ShadowApplicationPlugin : Plugin<Project> {
   private fun addCreateScriptsTask(project: Project) {
     project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { startScripts ->
       (startScripts.unixStartScriptGenerator as DefaultTemplateBasedStartScriptGenerator).template =
-        project.resources.text.fromString(requireResourceAsText("internal/unixStartScript.txt"))
+        project.resources.text.fromString(this::class.java.requireResourceAsText("internal/unixStartScript.txt"))
       (startScripts.windowsStartScriptGenerator as DefaultTemplateBasedStartScriptGenerator).template =
-        project.resources.text.fromString(requireResourceAsText("internal/windowsStartScript.txt"))
+        project.resources.text.fromString(this::class.java.requireResourceAsText("internal/windowsStartScript.txt"))
       startScripts.description =
         "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       startScripts.group = ApplicationPlugin.APPLICATION_GROUP

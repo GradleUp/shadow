@@ -8,7 +8,7 @@ class KnowsTask : DefaultTask() {
   @TaskAction
   fun knows() {
     logger.info("No, The Shadow Knows....")
-    logger.info(requireResourceAsText("/shadowBanner.txt"))
+    logger.info(this::class.java.requireResourceAsText("/shadowBanner.txt"))
   }
 
   companion object {

@@ -46,7 +46,7 @@ import org.gradle.api.tasks.util.PatternSet
 import org.jetbrains.annotations.NotNull
 
 @CacheableTask
-class ShadowJar :
+abstract class ShadowJar :
   Jar(),
   ShadowSpec {
   private val _transformers = mutableListOf<Transformer>()

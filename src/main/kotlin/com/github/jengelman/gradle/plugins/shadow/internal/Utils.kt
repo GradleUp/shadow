@@ -2,10 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import java.io.InputStream
 
-internal fun requireResourceAsText(name: String): String {
-  return requireResourceAsStream(name).bufferedReader().readText()
-}
-
 internal inline fun <R> runOrThrow(
   error: (e: Exception) -> Nothing = { throw RuntimeException(it) },
   block: () -> R,
@@ -17,6 +13,10 @@ internal inline fun <R> runOrThrow(
   }
 }
 
-private fun requireResourceAsStream(name: String): InputStream {
-  return Unit::class.java.getResourceAsStream(name) ?: error("Resource $name not found.")
+internal fun Class<*>.requireResourceAsText(name: String): String {
+  return requireResourceAsStream(name).bufferedReader().readText()
+}
+
+private fun Class<*>.requireResourceAsStream(name: String): InputStream {
+  return getResourceAsStream(name) ?: error("Resource $name not found.")
 }
