@@ -7,11 +7,6 @@ version = providers.gradleProperty("VERSION_NAME").get()
 group = providers.gradleProperty("GROUP").get()
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
 gradlePlugin {
     website = providers.gradleProperty("POM_URL")
     vcsUrl = providers.gradleProperty("POM_URL")
