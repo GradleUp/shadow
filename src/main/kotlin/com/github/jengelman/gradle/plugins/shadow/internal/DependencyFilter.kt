@@ -6,7 +6,7 @@ import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.specs.Spec
 
-internal interface DependencyFilter {
+interface DependencyFilter {
   /**
    * Resolve a FileCollection against the include/exclude rules in the filter
    */
