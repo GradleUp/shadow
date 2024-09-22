@@ -21,8 +21,11 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
-import java.io.*
-import java.util.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -32,7 +35,8 @@ import org.gradle.api.tasks.util.PatternSet
 @CacheableTransformer
 class ServiceFileTransformer private constructor(
   private val patternSet: PatternSet,
-) : Transformer, PatternFilterable by patternSet {
+) : Transformer,
+  PatternFilterable by patternSet {
   private val serviceEntries = mutableMapOf<String, ServiceStream>()
 
   constructor() : this(
@@ -65,7 +69,7 @@ class ServiceFileTransformer private constructor(
       }
     }
     lines.forEach { line ->
-      serviceEntries.getOrPut(targetPath) { ServiceStream() }.append(ByteArrayInputStream(line.toByteArray()))
+      serviceEntries.getOrPut(targetPath) { ServiceStream() }.append(line.toByteArray().inputStream())
     }
   }
 

@@ -19,6 +19,9 @@ kotlin {
 }
 
 spotless {
+  kotlin {
+    ktlint()
+  }
   kotlinGradle {
     ktlint()
   }

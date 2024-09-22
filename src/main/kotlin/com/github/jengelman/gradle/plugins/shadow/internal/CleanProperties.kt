@@ -3,7 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.Writer
-import java.util.*
+import java.util.Date
+import java.util.Properties
 
 internal class CleanProperties : Properties() {
   @Throws(IOException::class)

@@ -43,7 +43,9 @@ import org.gradle.api.tasks.util.PatternSet
 import org.jetbrains.annotations.NotNull
 
 @CacheableTask
-class ShadowJar : Jar(), ShadowSpec {
+class ShadowJar :
+  Jar(),
+  ShadowSpec {
 
   private val _transformers = mutableListOf<Transformer>()
   private val _relocators = mutableListOf<Relocator>()
@@ -64,7 +66,6 @@ class ShadowJar : Jar(), ShadowSpec {
         _relocators.any { !isCacheableRelocator(it::class.java) }
     }
   }
-
 
   var transformers: List<Transformer>
     @Nested get() = _transformers
@@ -126,11 +127,11 @@ class ShadowJar : Jar(), ShadowSpec {
   val apiJars: FileCollection
     get() {
       if (_apiJars == null) {
-        _apiJars = if (minimizeJar)
+        _apiJars = if (minimizeJar) {
           getApiJarsFromProject(project)
-        else
+        } else {
           project.objects.fileCollection()
-
+        }
       }
       return _apiJars!!
     }
@@ -228,7 +229,6 @@ class ShadowJar : Jar(), ShadowSpec {
     addTransform(transformer, action)
     return this
   }
-
 
   override fun transform(transformer: Transformer): ShadowJar {
     addTransform(transformer, null)

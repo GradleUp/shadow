@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.java.archives.Manifest
 
