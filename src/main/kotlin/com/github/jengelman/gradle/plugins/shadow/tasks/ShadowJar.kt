@@ -177,13 +177,17 @@ class ShadowJar : Jar(), ShadowSpec {
     return this
   }
 
+  override fun getManifest(): InheritManifest {
+    return super.getManifest() as InheritManifest
+  }
+
   @NotNull
   override fun createCopyAction(): CopyAction {
     val documentationRegistry = services.get(DocumentationRegistry::class.java)
     val unusedTracker = if (minimizeJar) {
       UnusedTracker.forProject(apiJars, _sourceSetsClassesDirs!!.files, toMinimize)
     } else {
-      null
+      UnusedTracker.forProject(project.files(), project.files(), project.files())
     }
     return ShadowCopyAction(
       archiveFile.get().asFile,
