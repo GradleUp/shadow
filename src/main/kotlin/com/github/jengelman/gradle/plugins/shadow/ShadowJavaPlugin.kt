@@ -77,7 +77,7 @@ class ShadowJavaPlugin @Inject constructor(
     const val SHADOW_GROUP = "Shadow"
     const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME = "shadowRuntimeElements"
 
-    protected fun configureShadowTask(
+    fun configureShadowTask(
       project: Project,
       shadowConfiguration: Configuration,
     ): TaskProvider<ShadowJar> {

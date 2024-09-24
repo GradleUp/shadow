@@ -4,7 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 /**
- * Empty plugin to still have the `com.github.johnrengelman.shadow` plugin applied.
+ * Empty plugin to still have the [com.github.johnrengelman.shadow](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow) plugin applied.
  *
  * This allows older build logic to keep on working as if that old plugin ID was applied.
  */

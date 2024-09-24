@@ -59,13 +59,15 @@ class ShadowCopyAction internal constructor(
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
     val unusedClasses: Set<String> = if (minimizeJar) {
-      stream.process(object : BaseStreamAction() {
-        override fun visitFile(fileDetails: FileCopyDetails) {
-          if (isArchive(fileDetails)) {
-            unusedTracker.addDependency(fileDetails.file)
+      stream.process(
+        object : BaseStreamAction() {
+          override fun visitFile(fileDetails: FileCopyDetails) {
+            if (fileDetails.isArchive) {
+              unusedTracker.addDependency(fileDetails.file)
+            }
           }
-        }
-      })
+        },
+      )
       unusedTracker.findUnused()
     } else {
       emptySet()
@@ -119,15 +121,7 @@ class ShadowCopyAction internal constructor(
     return zipEntry
   }
 
-  abstract inner class BaseStreamAction : CopyActionProcessingStreamAction {
-    protected fun isArchive(fileDetails: FileCopyDetails): Boolean {
-      return fileDetails.relativePath.pathString.endsWith(".jar")
-    }
-
-    protected fun isClass(fileDetails: FileCopyDetails): Boolean {
-      return Path(fileDetails.path).extension == "class"
-    }
-
+  abstract class BaseStreamAction : CopyActionProcessingStreamAction {
     override fun processFile(details: FileCopyDetailsInternal) {
       if (details.isDirectory) {
         visitDir(details)
@@ -139,6 +133,10 @@ class ShadowCopyAction internal constructor(
     protected open fun visitDir(dirDetails: FileCopyDetails) = Unit
 
     protected abstract fun visitFile(fileDetails: FileCopyDetails)
+
+    protected val FileCopyDetails.isArchive: Boolean get() = path.endsWith(".jar")
+
+    protected val FileCopyDetails.isClass: Boolean get() = path.endsWith(".class")
   }
 
   private inner class StreamAction(
@@ -165,9 +163,9 @@ class ShadowCopyAction internal constructor(
     }
 
     override fun visitFile(fileDetails: FileCopyDetails) {
-      if (!isArchive(fileDetails)) {
+      if (!fileDetails.isArchive) {
         try {
-          val isClass = isClass(fileDetails)
+          val isClass = fileDetails.isClass
           if (!remapper.hasRelocators() || !isClass) {
             if (!isTransformable(fileDetails)) {
               val mappedPath = remapper.map(fileDetails.relativePath.pathString)

@@ -10,7 +10,7 @@ internal class MinimizeDependencyFilter(project: Project) : AbstractDependencyFi
     excludedDependencies: MutableSet<ResolvedDependency>,
   ) {
     dependencies.forEach {
-      val flag = isIncluded(it) && !isParentExcluded(excludedDependencies, it)
+      val flag = it.isIncluded() && !isParentExcluded(excludedDependencies, it)
       if (if (flag) includedDependencies.add(it) else excludedDependencies.add(it)) {
         resolve(it.children, includedDependencies, excludedDependencies)
       }

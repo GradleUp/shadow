@@ -12,7 +12,7 @@ internal class DefaultInheritManifest(
   private val internalManifest: Manifest = DefaultManifest(fileResolver),
 ) : InheritManifest,
   Manifest by internalManifest {
-  private val inheritMergeSpecs: MutableList<DefaultManifestMergeSpec> = ArrayList()
+  private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
 
   override fun inheritFrom(vararg inheritPaths: Any): InheritManifest = apply {
     inheritFrom(inheritPaths, action = null)
@@ -25,7 +25,7 @@ internal class DefaultInheritManifest(
     action?.execute(this)
   }
 
-  override fun getEffectiveManifest(): DefaultManifest {
+  override fun getEffectiveManifest(): Manifest {
     var base = DefaultManifest(fileResolver)
     inheritMergeSpecs.forEach {
       base = it.merge(base, fileResolver)

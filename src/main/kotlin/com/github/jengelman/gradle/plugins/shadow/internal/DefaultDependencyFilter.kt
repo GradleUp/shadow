@@ -10,7 +10,7 @@ internal class DefaultDependencyFilter(project: Project) : AbstractDependencyFil
     excludedDependencies: MutableSet<ResolvedDependency>,
   ) {
     dependencies.forEach {
-      if (if (isIncluded(it)) includedDependencies.add(it) else excludedDependencies.add(it)) {
+      if (if (it.isIncluded()) includedDependencies.add(it) else excludedDependencies.add(it)) {
         resolve(it.children, includedDependencies, excludedDependencies)
       }
     }

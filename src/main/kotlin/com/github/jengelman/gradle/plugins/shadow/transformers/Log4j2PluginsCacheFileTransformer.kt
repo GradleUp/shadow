@@ -19,8 +19,8 @@ import org.gradle.api.file.FileTreeElement
 @CacheableTransformer
 class Log4j2PluginsCacheFileTransformer : Transformer {
 
-  private val temporaryFiles: MutableList<File> = mutableListOf()
-  private val relocators: MutableList<Relocator> = mutableListOf()
+  private val temporaryFiles = mutableListOf<File>()
+  private val relocators = mutableListOf<Relocator>()
   private var stats: ShadowStats? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {

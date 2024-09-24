@@ -34,8 +34,8 @@ internal abstract class AbstractDependencyFilter(protected val project: Project)
   }
 
   override fun resolve(configurations: Collection<FileCollection>): FileCollection {
-    return configurations.map { resolve(it) }.reduceOrNull { acc, fileCollection -> acc + fileCollection }
-      ?: project.files()
+    return configurations.map { resolve(it) }
+      .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
   }
 
   override fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
@@ -51,7 +51,14 @@ internal abstract class AbstractDependencyFilter(protected val project: Project)
   }
 
   override fun project(notation: String): Spec<ResolvedDependency> {
-    return dependency(project.dependencies.project(mapOf("path" to notation, "configuration" to "default")))
+    return dependency(
+      project.dependencies.project(
+        mapOf(
+          "path" to notation,
+          "configuration" to "default",
+        ),
+      ),
+    )
   }
 
   override fun dependency(notation: Any): Spec<ResolvedDependency> {
@@ -70,9 +77,9 @@ internal abstract class AbstractDependencyFilter(protected val project: Project)
     return Specs.convertClosureToSpec(spec)
   }
 
-  protected fun isIncluded(dependency: ResolvedDependency): Boolean {
-    val include = includeSpecs.isEmpty() || includeSpecs.any { it.isSatisfiedBy(dependency) }
-    val exclude = excludeSpecs.isNotEmpty() && excludeSpecs.any { it.isSatisfiedBy(dependency) }
+  protected fun ResolvedDependency.isIncluded(): Boolean {
+    val include = includeSpecs.isEmpty() || includeSpecs.any { it.isSatisfiedBy(this) }
+    val exclude = excludeSpecs.isNotEmpty() && excludeSpecs.any { it.isSatisfiedBy(this) }
     return include && !exclude
   }
 }

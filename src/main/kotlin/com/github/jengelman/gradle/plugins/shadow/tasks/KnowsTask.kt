@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-class KnowsTask : DefaultTask() {
+abstract class KnowsTask : DefaultTask() {
   @TaskAction
   fun knows() {
     logger.info("No, The Shadow Knows....")
