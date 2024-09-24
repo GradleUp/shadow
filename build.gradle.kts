@@ -26,7 +26,7 @@ dependencies {
   implementation("org.ow2.asm:asm-commons:9.7")
   implementation("commons-io:commons-io:2.17.0")
   implementation("org.apache.ant:ant:1.10.15")
-  implementation("org.codehaus.plexus:plexus-utils:4.0.1")
+  implementation("org.codehaus.plexus:plexus-utils:4.0.2")
   implementation("org.codehaus.plexus:plexus-xml:4.0.4")
   implementation("org.apache.logging.log4j:log4j-core:2.24.0")
   implementation("org.vafer:jdependency:2.11")
