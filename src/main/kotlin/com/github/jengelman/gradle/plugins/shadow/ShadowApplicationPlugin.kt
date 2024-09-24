@@ -18,7 +18,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.toolchain.JavaToolchainService
 
-class ShadowApplicationPlugin : Plugin<Project> {
+public class ShadowApplicationPlugin : Plugin<Project> {
   private val shadowJar: TaskProvider<ShadowJar>
     get() = project.tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
@@ -134,9 +134,9 @@ class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  companion object {
-    const val SHADOW_RUN_TASK_NAME = "runShadow"
-    const val SHADOW_SCRIPTS_TASK_NAME = "startShadowScripts"
-    const val SHADOW_INSTALL_TASK_NAME = "installShadowDist"
+  public companion object {
+    public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
+    public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"
+    public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
   }
 }

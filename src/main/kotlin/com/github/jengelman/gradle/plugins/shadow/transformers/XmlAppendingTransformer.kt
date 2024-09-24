@@ -18,14 +18,14 @@ import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 
 @CacheableTransformer
-class XmlAppendingTransformer : Transformer {
+public class XmlAppendingTransformer : Transformer {
 
   @Input
-  var ignoreDtd: Boolean = true
+  public var ignoreDtd: Boolean = true
 
   @Optional
   @Input
-  var resource: String? = null
+  public var resource: String? = null
 
   private var doc: Document? = null
 

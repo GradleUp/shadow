@@ -97,29 +97,29 @@ import org.gradle.api.tasks.Internal
  * }
  * </pre>
  */
-class PropertiesFileTransformer : Transformer {
+public class PropertiesFileTransformer : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
 
   @Input
-  var paths: List<String> = listOf()
+  public var paths: List<String> = listOf()
 
   @Input
-  var mappings: Map<String, Map<String, String>> = mapOf()
+  public var mappings: Map<String, Map<String, String>> = mapOf()
 
   /**
    * latest, append
    */
   @Input
-  var mergeStrategy: String = "first"
+  public var mergeStrategy: String = "first"
 
   @Input
-  var mergeSeparator: String = ","
+  public var mergeSeparator: String = ","
 
   @Input
-  var charset: Charset = Charsets.ISO_8859_1
+  public var charset: Charset = Charsets.ISO_8859_1
 
   @Internal
-  var keyTransformer: (String) -> String = defaultKeyTransformer
+  public var keyTransformer: (String) -> String = defaultKeyTransformer
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
@@ -220,8 +220,8 @@ class PropertiesFileTransformer : Transformer {
     return baos.toByteArray().inputStream().reader(charset)
   }
 
-  companion object {
-    private const val PROPERTIES_SUFFIX = ".properties"
-    private val defaultKeyTransformer: (String) -> String = { it }
+  private companion object {
+    const val PROPERTIES_SUFFIX = ".properties"
+    val defaultKeyTransformer: (String) -> String = { it }
   }
 }

@@ -22,7 +22,7 @@ import org.gradle.api.file.FileTreeElement
  *
  * @author John Engelman
  */
-class ComponentsXmlResourceTransformer : Transformer {
+public class ComponentsXmlResourceTransformer : Transformer {
   private val components: MutableMap<String, Xpp3Dom> = LinkedHashMap()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
@@ -139,7 +139,7 @@ class ComponentsXmlResourceTransformer : Transformer {
     }
   }
 
-  companion object {
-    const val COMPONENTS_XML_PATH = "META-INF/plexus/components.xml"
+  public companion object {
+    public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
   }
 }

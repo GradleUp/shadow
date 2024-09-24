@@ -9,7 +9,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 @CacheableTransformer
-class GroovyExtensionModuleTransformer : Transformer {
+public class GroovyExtensionModuleTransformer : Transformer {
 
   private val module = Properties()
 
@@ -77,16 +77,16 @@ class GroovyExtensionModuleTransformer : Transformer {
     return baos.toByteArray().inputStream()
   }
 
-  companion object {
-    private const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+  private companion object {
+    const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =
       "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-    private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+    const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
       "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
-    private const val MODULE_NAME_KEY = "moduleName"
-    private const val MODULE_VERSION_KEY = "moduleVersion"
-    private const val EXTENSION_CLASSES_KEY = "extensionClasses"
-    private const val STATIC_EXTENSION_CLASSES_KEY = "staticExtensionClasses"
-    private const val MERGED_MODULE_NAME = "MergedByShadowJar"
-    private const val MERGED_MODULE_VERSION = "1.0.0"
+    const val MODULE_NAME_KEY = "moduleName"
+    const val MODULE_VERSION_KEY = "moduleVersion"
+    const val EXTENSION_CLASSES_KEY = "extensionClasses"
+    const val STATIC_EXTENSION_CLASSES_KEY = "staticExtensionClasses"
+    const val MERGED_MODULE_NAME = "MergedByShadowJar"
+    const val MERGED_MODULE_VERSION = "1.0.0"
   }
 }

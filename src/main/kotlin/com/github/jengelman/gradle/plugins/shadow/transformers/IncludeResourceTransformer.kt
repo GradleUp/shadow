@@ -18,14 +18,14 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
-class IncludeResourceTransformer : Transformer by NoOpTransformer {
+public class IncludeResourceTransformer : Transformer by NoOpTransformer {
 
   @InputFile
   @PathSensitive(PathSensitivity.NONE)
-  lateinit var file: File
+  public lateinit var file: File
 
   @Input
-  lateinit var resource: String
+  public lateinit var resource: String
 
   override fun hasTransformedResource(): Boolean {
     return this::file.isInitialized && file.exists()

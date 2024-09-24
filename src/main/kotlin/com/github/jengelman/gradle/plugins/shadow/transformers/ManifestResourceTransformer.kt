@@ -14,16 +14,16 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
 @CacheableTransformer
-class ManifestResourceTransformer : Transformer {
+public class ManifestResourceTransformer : Transformer {
   private val logger = LogManager.getLogger(this::class.java)
 
   @Optional
   @Input
-  var mainClass: String? = null
+  public var mainClass: String? = null
 
   @Optional
   @Input
-  var manifestEntries: MutableMap<String, Attributes>? = null
+  public var manifestEntries: MutableMap<String, Attributes>? = null
 
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
@@ -68,7 +68,7 @@ class ManifestResourceTransformer : Transformer {
     manifest!!.write(os)
   }
 
-  fun attributes(attributes: Map<String, *>): ManifestResourceTransformer = apply {
+  public fun attributes(attributes: Map<String, *>): ManifestResourceTransformer = apply {
     if (manifestEntries == null) {
       manifestEntries = mutableMapOf()
     }

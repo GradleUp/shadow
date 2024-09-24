@@ -2,35 +2,35 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import org.gradle.api.GradleException
 
-class ShadowStats {
+public class ShadowStats {
   private val relocations = mutableMapOf<String, String>()
 
-  var totalTime: Long = 0
-  var jarStartTime: Long = 0
-  var jarEndTime: Long = 0
-  var jarCount: Int = 0
-  var processingJar: Boolean = false
+  public var totalTime: Long = 0
+  public var jarStartTime: Long = 0
+  public var jarEndTime: Long = 0
+  public var jarCount: Int = 0
+  public var processingJar: Boolean = false
 
-  inline val jarTiming: Long get() = jarEndTime - jarStartTime
-  inline val totalTimeSecs: Double get() = totalTime / 1000.0
-  inline val averageTimePerJar: Double get() = totalTime / jarCount.toDouble()
-  inline val averageTimeSecsPerJar: Double get() = averageTimePerJar / 1000
+  public inline val jarTiming: Long get() = jarEndTime - jarStartTime
+  public inline val totalTimeSecs: Double get() = totalTime / 1000.0
+  public inline val averageTimePerJar: Double get() = totalTime / jarCount.toDouble()
+  public inline val averageTimeSecsPerJar: Double get() = averageTimePerJar / 1000
 
-  fun relocate(src: String, dest: String) {
+  public fun relocate(src: String, dest: String) {
     relocations[src] = dest
   }
 
-  fun getRelocationString(): String {
+  public fun getRelocationString(): String {
     return relocations.entries.joinToString("\n") { "${it.key} → ${it.value}" }
   }
 
-  fun startJar() {
+  public fun startJar() {
     if (processingJar) throw GradleException("Can only time one entry at a time")
     processingJar = true
     jarStartTime = System.currentTimeMillis()
   }
 
-  fun finishJar() {
+  public fun finishJar() {
     if (processingJar) {
       jarEndTime = System.currentTimeMillis()
       jarCount++
@@ -39,7 +39,7 @@ class ShadowStats {
     }
   }
 
-  fun printStats() {
+  public fun printStats() {
     println(this)
   }
 

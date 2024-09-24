@@ -6,49 +6,49 @@ import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.specs.Spec
 
-interface DependencyFilter {
+public interface DependencyFilter {
   /**
    * Resolve a FileCollection against the include/exclude rules in the filter
    */
-  fun resolve(configuration: FileCollection): FileCollection
+  public fun resolve(configuration: FileCollection): FileCollection
 
   /**
    * Resolve all FileCollections against the include/exclude ruels in the filter and combine the results
    */
-  fun resolve(configurations: Collection<FileCollection>): FileCollection
+  public fun resolve(configurations: Collection<FileCollection>): FileCollection
 
   /**
    * Exclude dependencies that match the provided spec.
    */
-  fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter
+  public fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter
 
   /**
    * Include dependencies that match the provided spec.
    */
-  fun include(spec: Spec<ResolvedDependency>): DependencyFilter
+  public fun include(spec: Spec<ResolvedDependency>): DependencyFilter
 
   /**
    * Create a spec that matches the provided project notation on group, name, and version
    */
-  fun project(notation: Map<String, *>): Spec<ResolvedDependency>
+  public fun project(notation: Map<String, *>): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the default configuration for the provided project path on group, name, and version
    */
-  fun project(notation: String): Spec<ResolvedDependency>
+  public fun project(notation: String): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches dependencies using the provided notation on group, name, and version
    */
-  fun dependency(notation: Any): Spec<ResolvedDependency>
+  public fun dependency(notation: Any): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the provided dependency on group, name, and version
    */
-  fun dependency(dependency: Dependency): Spec<ResolvedDependency>
+  public fun dependency(dependency: Dependency): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the provided closure
    */
-  fun dependency(spec: Closure<*>): Spec<ResolvedDependency>
+  public fun dependency(spec: Closure<*>): Spec<ResolvedDependency>
 }

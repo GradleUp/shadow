@@ -42,7 +42,7 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
-class ShadowCopyAction internal constructor(
+public class ShadowCopyAction internal constructor(
   private val zipFile: File,
   private val compressor: ZipCompressor,
   private val documentationRegistry: DocumentationRegistry,
@@ -121,7 +121,7 @@ class ShadowCopyAction internal constructor(
     return zipEntry
   }
 
-  abstract class BaseStreamAction : CopyActionProcessingStreamAction {
+  public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
     override fun processFile(details: FileCopyDetailsInternal) {
       if (details.isDirectory) {
         visitDir(details)
@@ -130,7 +130,7 @@ class ShadowCopyAction internal constructor(
       }
     }
 
-    protected open fun visitDir(dirDetails: FileCopyDetails) = Unit
+    protected open fun visitDir(dirDetails: FileCopyDetails): Unit = Unit
 
     protected abstract fun visitFile(fileDetails: FileCopyDetails)
 
@@ -348,13 +348,13 @@ class ShadowCopyAction internal constructor(
     }
   }
 
-  inner class RelativeArchivePath(val entry: ZipEntry) :
+  public inner class RelativeArchivePath(public val entry: ZipEntry) :
     RelativePath(
       !entry.isDirectory,
       *entry.name.split("/").toTypedArray(),
     ) {
 
-    val isClassFile: Boolean
+    public val isClassFile: Boolean
       get() = lastName.endsWith(".class")
 
     override fun getParent(): RelativeArchivePath {
@@ -368,9 +368,9 @@ class ShadowCopyAction internal constructor(
     }
   }
 
-  class ArchiveFileTreeElement(private val archivePath: RelativeArchivePath) : FileTreeElement {
+  public class ArchiveFileTreeElement(private val archivePath: RelativeArchivePath) : FileTreeElement {
 
-    val isClassFile: Boolean
+    public val isClassFile: Boolean
       get() = archivePath.isClassFile
 
     override fun getFile(): File = error("Not supported")
@@ -397,7 +397,7 @@ class ShadowCopyAction internal constructor(
 
     override fun getPermissions(): FilePermissions = DefaultFilePermissions(mode)
 
-    fun asFileTreeElement(): FileTreeElement {
+    public fun asFileTreeElement(): FileTreeElement {
       // TODO: the param types must be non-nullable
       return DefaultFileTreeElement(
         null!!,
@@ -408,7 +408,9 @@ class ShadowCopyAction internal constructor(
     }
   }
 
-  companion object {
-    val CONSTANT_TIME_FOR_ZIP_ENTRIES = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+  public companion object {
+    @JvmField
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
+      GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }
 }

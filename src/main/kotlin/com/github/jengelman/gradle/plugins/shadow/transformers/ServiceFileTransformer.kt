@@ -15,19 +15,19 @@ import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 
 @CacheableTransformer
-class ServiceFileTransformer private constructor(
+public class ServiceFileTransformer private constructor(
   private val patternSet: PatternSet,
 ) : Transformer,
   PatternFilterable by patternSet {
   private val serviceEntries = mutableMapOf<String, ServiceStream>()
 
-  constructor() : this(
+  public constructor() : this(
     PatternSet()
       .include(SERVICES_PATTERN)
       .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
   )
 
-  fun setPath(path: String) {
+  public fun setPath(path: String) {
     patternSet.setIncludes(listOf("$path/**"))
   }
 
@@ -67,9 +67,9 @@ class ServiceFileTransformer private constructor(
     }
   }
 
-  class ServiceStream : ByteArrayOutputStream(1024) {
+  public class ServiceStream : ByteArrayOutputStream(1024) {
     @Throws(IOException::class)
-    fun append(inputStream: InputStream) {
+    public fun append(inputStream: InputStream) {
       if (count > 0 && buf[count - 1] != '\n'.code.toByte() && buf[count - 1] != '\r'.code.toByte()) {
         val newline = "\n".toByteArray()
         write(newline, 0, newline.size)
@@ -77,12 +77,12 @@ class ServiceFileTransformer private constructor(
       inputStream.copyTo(this)
     }
 
-    fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
+    public fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
   }
 
-  companion object {
-    private const val SERVICES_PATTERN = "META-INF/services/**"
-    private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
+  private companion object {
+    const val SERVICES_PATTERN = "META-INF/services/**"
+    const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
       "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
   }
 }

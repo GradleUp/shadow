@@ -17,7 +17,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 @CacheableTransformer
-class Log4j2PluginsCacheFileTransformer : Transformer {
+public class Log4j2PluginsCacheFileTransformer : Transformer {
 
   private val temporaryFiles = mutableListOf<File>()
   private val relocators = mutableListOf<Relocator>()
@@ -81,7 +81,7 @@ class Log4j2PluginsCacheFileTransformer : Transformer {
     }
   }
 
-  companion object {
-    private const val PLUGIN_CACHE_FILE = "org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat"
+  private companion object {
+    const val PLUGIN_CACHE_FILE = "org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat"
   }
 }

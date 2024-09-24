@@ -12,16 +12,16 @@ import org.gradle.api.tasks.Input
 import org.slf4j.LoggerFactory
 
 @CacheableTransformer
-class ManifestAppenderTransformer : Transformer {
+public class ManifestAppenderTransformer : Transformer {
   private val logger = LoggerFactory.getLogger(this::class.java)
 
   private val _attributes = mutableListOf<Pair<String, Comparable<*>>>()
   private var manifestContents = ByteArray(0)
 
   @Input
-  val attributes: List<Pair<String, Comparable<*>>> = _attributes
+  public val attributes: List<Pair<String, Comparable<*>>> = _attributes
 
-  fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
+  public fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
     _attributes.add(name to value)
   }
 

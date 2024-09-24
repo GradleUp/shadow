@@ -46,7 +46,7 @@ import org.gradle.api.tasks.util.PatternSet
 import org.jetbrains.annotations.NotNull
 
 @CacheableTask
-abstract class ShadowJar :
+public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
   private val _transformers = mutableListOf<Transformer>()
@@ -69,21 +69,21 @@ abstract class ShadowJar :
     }
   }
 
-  var transformers: List<Transformer>
+  public var transformers: List<Transformer>
     @Nested get() = _transformers
     set(value) {
       _transformers.clear()
       _transformers.addAll(value)
     }
 
-  var relocators: List<Relocator>
+  public var relocators: List<Relocator>
     @Nested get() = _relocators
     set(value) {
       _relocators.clear()
       _relocators.addAll(value)
     }
 
-  var configurations: List<FileCollection>
+  public var configurations: List<FileCollection>
     @Classpath get() = _configurations
     set(value) {
       _configurations.clear()
@@ -91,19 +91,19 @@ abstract class ShadowJar :
     }
 
   @get:Input
-  var enableRelocation: Boolean = false
+  public var enableRelocation: Boolean = false
 
   @get:Input
-  var relocationPrefix: String = "shadow"
+  public var relocationPrefix: String = "shadow"
 
   @get:Internal
-  var dependencyFilter: DependencyFilter = DefaultDependencyFilter(project)
+  public var dependencyFilter: DependencyFilter = DefaultDependencyFilter(project)
 
   @get:Internal
   override val stats: ShadowStats = ShadowStats()
 
   @get:Internal
-  val internalCompressor: ZipCompressor
+  public val internalCompressor: ZipCompressor
     get() {
       return when (entryCompression) {
         ZipEntryCompression.DEFLATED -> DefaultZipCompressor(isZip64, ZipOutputStream.DEFLATED)
@@ -113,7 +113,7 @@ abstract class ShadowJar :
     }
 
   @get:Classpath
-  val toMinimize: FileCollection
+  public val toMinimize: FileCollection
     get() {
       if (_toMinimize == null) {
         _toMinimize = if (minimizeJar) {
@@ -126,7 +126,7 @@ abstract class ShadowJar :
     }
 
   @get:Classpath
-  val apiJars: FileCollection
+  public val apiJars: FileCollection
     get() {
       if (_apiJars == null) {
         _apiJars = if (minimizeJar) {
@@ -140,7 +140,7 @@ abstract class ShadowJar :
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  val sourceSetsClassesDirs: FileCollection
+  public val sourceSetsClassesDirs: FileCollection
     get() {
       if (_sourceSetsClassesDirs == null) {
         val allClassesDirs = project.objects.fileCollection()
@@ -156,7 +156,7 @@ abstract class ShadowJar :
     }
 
   @get:Classpath
-  val includedDependencies: ConfigurableFileCollection
+  public val includedDependencies: ConfigurableFileCollection
     get() = project.files(
       Callable {
         dependencyFilter.resolve(_configurations)
@@ -164,7 +164,7 @@ abstract class ShadowJar :
     )
 
   @get:Internal
-  val rootPatternSet: PatternSet
+  public val rootPatternSet: PatternSet
     get() {
       return (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
     }

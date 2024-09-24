@@ -13,7 +13,7 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 @CacheableRelocator
-class SimpleRelocator @JvmOverloads constructor(
+public class SimpleRelocator @JvmOverloads constructor(
   patt: String?,
   shadedPattern: String?,
   includes: List<String>?,
@@ -23,27 +23,27 @@ class SimpleRelocator @JvmOverloads constructor(
 
   @Input
   @Optional
-  val pattern: String?
+  public val pattern: String?
 
   @Input
   @Optional
-  val pathPattern: String
+  public val pathPattern: String
 
   @Input
   @Optional
-  val shadedPattern: String?
+  public val shadedPattern: String?
 
   @Input
   @Optional
-  val shadedPathPattern: String
+  public val shadedPathPattern: String
 
   @Input
   @Optional
-  val includes = mutableSetOf<String>()
+  public val includes: MutableSet<String> = mutableSetOf()
 
   @Input
   @Optional
-  val excludes = mutableSetOf<String>()
+  public val excludes: MutableSet<String> = mutableSetOf()
 
   init {
     if (rawString) {
@@ -61,11 +61,11 @@ class SimpleRelocator @JvmOverloads constructor(
     this.excludes += normalizePatterns(excludes)
   }
 
-  fun include(pattern: String): SimpleRelocator = apply {
+  public fun include(pattern: String): SimpleRelocator = apply {
     includes.addAll(normalizePatterns(listOf(pattern)))
   }
 
-  fun exclude(pattern: String): SimpleRelocator = apply {
+  public fun exclude(pattern: String): SimpleRelocator = apply {
     excludes.addAll(normalizePatterns(listOf(pattern)))
   }
 

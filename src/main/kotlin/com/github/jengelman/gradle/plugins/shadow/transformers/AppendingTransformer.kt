@@ -17,11 +17,11 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 @CacheableTransformer
-class AppendingTransformer : Transformer {
+public class AppendingTransformer : Transformer {
 
   @Optional
   @Input
-  var resource: String? = null
+  public var resource: String? = null
 
   /**
    * Defer initialization, see https://github.com/GradleUp/shadow/issues/763

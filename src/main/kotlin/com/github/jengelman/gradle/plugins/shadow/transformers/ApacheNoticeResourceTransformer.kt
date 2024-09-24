@@ -18,49 +18,49 @@ import org.gradle.api.tasks.Optional
  *
  * Modified from `org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.java`.
  */
-class ApacheNoticeResourceTransformer : Transformer {
+public class ApacheNoticeResourceTransformer : Transformer {
 
   private val entries = LinkedHashSet<String>()
   private val organizationEntries = LinkedHashMap<String, MutableSet<String>>()
 
   @Input
-  var projectName: String = ""
+  public var projectName: String = ""
 
   @Input
-  var addHeader: Boolean = true
+  public var addHeader: Boolean = true
 
   @Input
-  var preamble1: String = """
+  public var preamble1: String = """
     // ------------------------------------------------------------------
     // NOTICE file corresponding to the section 4d of The Apache License,
     // Version 2.0, in this case for
   """.trimIndent()
 
   @Input
-  var preamble2: String = "\n// ------------------------------------------------------------------\n"
+  public var preamble2: String = "\n// ------------------------------------------------------------------\n"
 
   @Input
-  var preamble3: String = "This product includes software developed at\n"
+  public var preamble3: String = "This product includes software developed at\n"
 
   @Input
-  var organizationName: String = "The Apache Software Foundation"
+  public var organizationName: String = "The Apache Software Foundation"
 
   @Input
-  var organizationURL: String = "https://www.apache.org/"
+  public var organizationURL: String = "https://www.apache.org/"
 
   @Input
-  var inceptionYear: String = "2006"
+  public var inceptionYear: String = "2006"
 
   @Optional
   @Input
-  var copyright: String? = null
+  public var copyright: String? = null
 
   /**
    * The file encoding of the `NOTICE` file.
    */
   @Optional
   @Input
-  var encoding: Charset = Charsets.UTF_8
+  public var encoding: Charset = Charsets.UTF_8
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
@@ -173,8 +173,8 @@ class ApacheNoticeResourceTransformer : Transformer {
     entries.clear()
   }
 
-  companion object {
-    private const val NOTICE_PATH = "META-INF/NOTICE"
-    private const val NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
+  private companion object {
+    const val NOTICE_PATH = "META-INF/NOTICE"
+    const val NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
   }
 }

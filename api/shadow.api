@@ -49,9 +49,11 @@ public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin :
 	public fun <init> (Lorg/gradle/api/component/SoftwareComponentFactory;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
+	public static final fun configureShadowTask (Lorg/gradle/api/Project;Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {
+	public final fun configureShadowTask (Lorg/gradle/api/Project;Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : org/gradle/api/Plugin {
@@ -159,7 +161,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 }
 
-public final class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask : org/gradle/api/DefaultTask {
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask : org/gradle/api/DefaultTask {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Companion;
 	public static final field DESC Ljava/lang/String;
 	public static final field NAME Ljava/lang/String;
@@ -171,6 +173,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Co
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
+	public static final field CONSTANT_TIME_FOR_ZIP_ENTRIES J
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
@@ -195,7 +198,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$BaseStreamAction : org/gradle/api/internal/file/CopyActionProcessingStreamAction {
-	public fun <init> (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction;)V
+	public fun <init> ()V
 	protected final fun isArchive (Lorg/gradle/api/file/FileCopyDetails;)Z
 	protected final fun isClass (Lorg/gradle/api/file/FileCopyDetails;)Z
 	public fun processFile (Lorg/gradle/api/internal/file/copy/FileCopyDetailsInternal;)V
@@ -204,7 +207,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCop
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion {
-	public final fun getCONSTANT_TIME_FOR_ZIP_ENTRIES ()J
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath : org/gradle/api/file/RelativePath {
@@ -279,7 +281,8 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer$Companion;
+	public static final field LICENSE_PATH Ljava/lang/String;
+	public static final field LICENSE_TXT_PATH Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getName ()Ljava/lang/String;
@@ -288,11 +291,9 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Apach
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer$Companion {
-}
-
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer$Companion;
+	public static final field NOTICE_PATH Ljava/lang/String;
+	public static final field NOTICE_TXT_PATH Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun getAddHeader ()Z
@@ -319,9 +320,6 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Apach
 	public final fun setPreamble3 (Ljava/lang/String;)V
 	public final fun setProjectName (Ljava/lang/String;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer$Companion {
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
@@ -364,16 +362,20 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/DontI
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer$Companion;
+	public static final field EXTENSION_CLASSES_KEY Ljava/lang/String;
+	public static final field GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH Ljava/lang/String;
+	public static final field GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH Ljava/lang/String;
+	public static final field MERGED_MODULE_NAME Ljava/lang/String;
+	public static final field MERGED_MODULE_VERSION Ljava/lang/String;
+	public static final field MODULE_NAME_KEY Ljava/lang/String;
+	public static final field MODULE_VERSION_KEY Ljava/lang/String;
+	public static final field STATIC_EXTENSION_CLASSES_KEY Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getName ()Ljava/lang/String;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer$Companion {
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
@@ -392,16 +394,13 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Inclu
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer$Companion;
+	public static final field PLUGIN_CACHE_FILE Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getName ()Ljava/lang/String;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer$Companion {
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
@@ -439,7 +438,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/NoOpT
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$Companion;
+	public static final field PROPERTIES_SUFFIX Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun getCharset ()Ljava/nio/charset/Charset;
@@ -460,11 +459,9 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Prope
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$Companion {
-}
-
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer, org/gradle/api/tasks/util/PatternFilterable {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer$Companion;
+	public static final field GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN Ljava/lang/String;
+	public static final field SERVICES_PATTERN Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun exclude (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
@@ -484,9 +481,6 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Servi
 	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public final fun setPath (Ljava/lang/String;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer$Companion {
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer$ServiceStream : java/io/ByteArrayOutputStream {
@@ -510,6 +504,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/io/InputStream;
 	public final fun component3 ()Ljava/util/List;
@@ -517,6 +512,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 	public final fun copy (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
 	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
 	public fun equals (Ljava/lang/Object;)Z
+	public static final fun getEntryTimestamp (ZJ)J
 	public final fun getInputStream ()Ljava/io/InputStream;
 	public final fun getPath ()Ljava/lang/String;
 	public final fun getRelocators ()Ljava/util/List;
