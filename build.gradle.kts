@@ -38,8 +38,8 @@ dependencies {
   testImplementation("xmlunit:xmlunit:1.6")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
-  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.0")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.1")
+  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
