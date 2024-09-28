@@ -46,6 +46,7 @@ class SimpleRelocatorTest extends TestCase {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null, null, null)
+        assertEquals(false, relocator.canRelocatePath(""))
         assertEquals(true, relocator.canRelocatePath("org/foo/Class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/Class.class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/bar/Class"))

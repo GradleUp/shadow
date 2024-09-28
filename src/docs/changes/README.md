@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Avoid `StringIndexOutOfBoundsException` when relocating from empty string.
 
 ## [v8.3.2]
 

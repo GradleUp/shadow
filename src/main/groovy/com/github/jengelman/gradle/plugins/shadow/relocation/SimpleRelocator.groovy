@@ -151,6 +151,10 @@ class SimpleRelocator implements Relocator {
 
     @Override
     boolean canRelocatePath(String path) {
+        if (path.isEmpty()) {
+            return false
+        }
+
         if (rawString) {
             return Pattern.compile(pathPattern).matcher(path).find()
         }
