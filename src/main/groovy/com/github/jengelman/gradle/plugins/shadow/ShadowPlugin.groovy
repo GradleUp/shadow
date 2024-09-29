@@ -13,13 +13,18 @@ class ShadowPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.with {
             plugins.apply(ShadowBasePlugin)
-            plugins.apply(LegacyShadowPlugin)
             plugins.withType(JavaPlugin) {
                 plugins.apply(ShadowJavaPlugin)
             }
             plugins.withType(ApplicationPlugin) {
                 plugins.apply(ShadowApplicationPlugin)
             }
+            // Apply the legacy plugin last
+            //   Because we apply the ShadowJavaPlugin/ShadowApplication plugin in a withType callback for the
+            //   respective JavaPlugin/ApplicationPlugin, it may still apply before the shadowJar task is created and
+            //   etc. if the user applies shadow before those plugins. However, this is fine, because this was also
+            //   the behavior with the old plugin when applying in that order.
+            plugins.apply(LegacyShadowPlugin)
 
             // Legacy build scan support for Gradle Enterprise, users should migrate to develocity plugin.
             rootProject.plugins.withId('com.gradle.enterprise') {

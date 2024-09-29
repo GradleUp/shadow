@@ -45,3 +45,39 @@ tasks.withType<Javadoc>().configureEach {
     it.addStringOption("Xdoclint:none", "-quiet")
   }
 }
+
+configurations {
+  sequenceOf(
+    apiElements,
+    runtimeElements,
+    named("javadocElements"),
+    named("sourcesElements"),
+  ).forEach {
+    it.configure {
+      attributes {
+        // We have dependencies that require Java 11 (jdependency)
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 11)
+      }
+
+      outgoing {
+        // Main/current capability
+        capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
+
+        // Historical capabilities
+        capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
+        capability("com.github.johnrengelman:shadow:$version")
+        capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
+        capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
+        capability("com.github.jengelman.gradle.plugins:shadow:$version")
+      }
+    }
+  }
+}
+
+publishing.publications.withType<MavenPublication>().configureEach {
+  // We don't care about capabilities being unmappable to Maven
+  suppressPomMetadataWarningsFor("apiElements")
+  suppressPomMetadataWarningsFor("runtimeElements")
+  suppressPomMetadataWarningsFor("javadocElements")
+  suppressPomMetadataWarningsFor("sourcesElements")
+}
