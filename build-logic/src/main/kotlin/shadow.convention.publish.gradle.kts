@@ -54,11 +54,6 @@ configurations {
     named("sourcesElements"),
   ).forEach {
     it.configure {
-      attributes {
-        // We have dependencies that require Java 11 (jdependency)
-        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 11)
-      }
-
       outgoing {
         // Main/current capability
         capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
