@@ -23,7 +23,7 @@ class ShadowPlugin implements Plugin<Project> {
 
             boolean enableDevelocityIntegration = providers.gradleProperty(
                 "com.gradleup.shadow.enableDevelocityIntegration"
-            ).map { it.toBoolean() }.getOrElse(true)
+            ).map { it.toBoolean() }.getOrElse(false)
             if (enableDevelocityIntegration) {
                 // Legacy build scan support for Gradle Enterprise, users should migrate to develocity plugin.
                 rootProject.plugins.withId('com.gradle.enterprise') {
