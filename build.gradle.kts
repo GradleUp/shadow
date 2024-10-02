@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
   kotlin("jvm") version "2.0.20"
@@ -12,7 +13,11 @@ plugins {
 
 kotlin {
   explicitApi()
-  compilerOptions.jvmTarget = JvmTarget.JVM_11
+  compilerOptions {
+    // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+    apiVersion = KotlinVersion.KOTLIN_1_8
+    jvmTarget = JvmTarget.JVM_11
+  }
 }
 
 spotless {
