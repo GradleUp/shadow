@@ -1,3 +1,5 @@
+
+
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.PrintWriter
@@ -18,163 +20,161 @@ import org.gradle.api.tasks.Optional
  */
 public class ApacheNoticeResourceTransformer : Transformer {
 
-    private val entries = LinkedHashSet<String>()
-    private val organizationEntries = LinkedHashMap<String, MutableSet<String>>()
+  private val entries = LinkedHashSet<String>()
+  private val organizationEntries = LinkedHashMap<String, MutableSet<String>>()
 
-    @Input
-    public var projectName: String = ""
+  @Input
+  public var projectName: String = ""
 
-    @Input
-    public var addHeader: Boolean = true
+  @Input
+  public var addHeader: Boolean = true
 
-    @Input
-    public var preamble1: String = """
+  @Input
+  public var preamble1: String = """
     // ------------------------------------------------------------------
     // NOTICE file corresponding to the section 4d of The Apache License,
     // Version 2.0, in this case for
-    """.trimIndent()
+  """.trimIndent()
 
-    @Input
-    public var preamble2: String = "\n// ------------------------------------------------------------------\n"
+  @Input
+  public var preamble2: String = "\n// ------------------------------------------------------------------\n"
 
-    @Input
-    public var preamble3: String = "This product includes software developed at\n"
+  @Input
+  public var preamble3: String = "This product includes software developed at\n"
 
-    @Input
-    public var organizationName: String = "The Apache Software Foundation"
+  @Input
+  public var organizationName: String = "The Apache Software Foundation"
 
-    @Input
-    public var organizationURL: String = "https://www.apache.org/"
+  @Input
+  public var organizationURL: String = "https://www.apache.org/"
 
-    @Input
-    public var inceptionYear: String = "2006"
+  @Input
+  public var inceptionYear: String = "2006"
 
-    @Optional
-    @Input
-    public var copyright: String? = null
+  @Optional
+  @Input
+  public var copyright: String? = null
 
-    /**
-     * The file encoding of the `NOTICE` file.
-     */
-    @Optional
-    @Input
-    public var encoding: Charset = Charsets.UTF_8
+  /**
+   * The file encoding of the `NOTICE` file.
+   */
+  @Optional
+  @Input
+  public var encoding: Charset = Charsets.UTF_8
 
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        val path = element.relativePath.pathString
-        return NOTICE_PATH.equals(path, ignoreCase = true) || NOTICE_TXT_PATH.equals(path, ignoreCase = true)
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    val path = element.relativePath.pathString
+    return NOTICE_PATH.equals(path, ignoreCase = true) || NOTICE_TXT_PATH.equals(path, ignoreCase = true)
+  }
+
+  override fun transform(context: TransformerContext) {
+    if (entries.isEmpty()) {
+      val year = SimpleDateFormat("yyyy").format(Date())
+      val displayYear = if (inceptionYear != year) "$inceptionYear-$year" else year
+
+      // add headers
+      if (addHeader) {
+        entries.add("$preamble1$projectName$preamble2")
+      } else {
+        entries.add("")
+      }
+      // fake second entry, we'll look for a real one later
+      entries.add("$projectName\nCopyright $displayYear $organizationName\n")
+      entries.add("$preamble3$organizationName ($organizationURL).\n")
     }
 
-    override fun transform(context: TransformerContext) {
-        if (entries.isEmpty()) {
-            val year = SimpleDateFormat("yyyy").format(Date())
-            val displayYear = if (inceptionYear != year) "$inceptionYear-$year" else year
+    val reader = context.inputStream.bufferedReader(encoding)
 
-            // add headers
-            if (addHeader) {
-                entries.add("$preamble1$projectName$preamble2")
-            } else {
-                entries.add("")
+    var line = reader.readLine()
+    val sb = StringBuffer()
+    var currentOrg: MutableSet<String>? = null
+    var lineCount = 0
+    while (line != null) {
+      val trimmedLine = line.trim()
+
+      if (!trimmedLine.startsWith("//")) {
+        if (trimmedLine.isNotEmpty()) {
+          if (trimmedLine.startsWith("- ")) {
+            // resource-bundle 1.3 mode
+            if (lineCount == 1 && sb.toString().contains("This product includes/uses software(s) developed by")) {
+              currentOrg = organizationEntries.getOrPut(sb.toString().trim()) { TreeSet() }
+              sb.setLength(0)
+            } else if (sb.isNotEmpty() && currentOrg != null) {
+              currentOrg.add(sb.toString())
+              sb.setLength(0)
             }
-            // fake second entry, we'll look for a real one later
-            entries.add("$projectName\nCopyright $displayYear $organizationName\n")
-            entries.add("$preamble3$organizationName ($organizationURL).\n")
+          }
+          sb.append(line).append("\n")
+          lineCount++
+        } else {
+          val ent = sb.toString()
+          if (ent.startsWith(projectName) && ent.contains("Copyright ")) {
+            copyright = ent
+          }
+          if (currentOrg == null) {
+            entries.add(ent)
+          } else {
+            currentOrg.add(ent)
+          }
+          sb.setLength(0)
+          lineCount = 0
+          currentOrg = null
         }
+      }
 
-        val reader = context.inputStream.bufferedReader(encoding)
+      line = reader.readLine()
+    }
+    if (sb.isNotEmpty()) {
+      if (currentOrg == null) {
+        entries.add(sb.toString())
+      } else {
+        currentOrg.add(sb.toString())
+      }
+    }
+  }
 
-        var line = reader.readLine()
-        val sb = StringBuffer()
-        var currentOrg: MutableSet<String>? = null
-        var lineCount = 0
-        while (line != null) {
-            val trimmedLine = line.trim()
+  override fun hasTransformedResource(): Boolean = true
 
-            if (!trimmedLine.startsWith("//")) {
-                if (trimmedLine.isNotEmpty()) {
-                    if (trimmedLine.startsWith("- ")) {
-                        // resource-bundle 1.3 mode
-                        if (lineCount == 1 && sb.toString()
-                                .contains("This product includes/uses software(s) developed by")
-                        ) {
-                            currentOrg = organizationEntries.getOrPut(sb.toString().trim()) { TreeSet() }
-                            sb.setLength(0)
-                        } else if (sb.isNotEmpty() && currentOrg != null) {
-                            currentOrg.add(sb.toString())
-                            sb.setLength(0)
-                        }
-                    }
-                    sb.append(line).append("\n")
-                    lineCount++
-                } else {
-                    val ent = sb.toString()
-                    if (ent.startsWith(projectName) && ent.contains("Copyright ")) {
-                        copyright = ent
-                    }
-                    if (currentOrg == null) {
-                        entries.add(ent)
-                    } else {
-                        currentOrg.add(ent)
-                    }
-                    sb.setLength(0)
-                    lineCount = 0
-                    currentOrg = null
-                }
-            }
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    val zipEntry = ZipEntry(NOTICE_PATH)
+    zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)
+    os.putNextEntry(zipEntry)
 
-            line = reader.readLine()
+    val writer = PrintWriter(os.writer(encoding))
+
+    var count = 0
+    for (line in entries) {
+      ++count
+      if (line == copyright && count != 2) {
+        continue
+      }
+
+      if (count == 2 && copyright != null) {
+        writer.print(copyright)
+        writer.print('\n')
+      } else {
+        writer.print(line)
+        writer.print('\n')
+      }
+      if (count == 3) {
+        // do org stuff
+        for ((key, value) in organizationEntries) {
+          writer.print(key)
+          writer.print('\n')
+          for (l in value) {
+            writer.print(l)
+          }
+          writer.print('\n')
         }
-        if (sb.isNotEmpty()) {
-            if (currentOrg == null) {
-                entries.add(sb.toString())
-            } else {
-                currentOrg.add(sb.toString())
-            }
-        }
+      }
     }
 
-    override fun hasTransformedResource(): Boolean = true
+    writer.flush()
+    entries.clear()
+  }
 
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-        val zipEntry = ZipEntry(NOTICE_PATH)
-        zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)
-        os.putNextEntry(zipEntry)
-
-        val writer = PrintWriter(os.writer(encoding))
-
-        var count = 0
-        for (line in entries) {
-            ++count
-            if (line == copyright && count != 2) {
-                continue
-            }
-
-            if (count == 2 && copyright != null) {
-                writer.print(copyright)
-                writer.print('\n')
-            } else {
-                writer.print(line)
-                writer.print('\n')
-            }
-            if (count == 3) {
-                // do org stuff
-                for ((key, value) in organizationEntries) {
-                    writer.print(key)
-                    writer.print('\n')
-                    for (l in value) {
-                        writer.print(l)
-                    }
-                    writer.print('\n')
-                }
-            }
-        }
-
-        writer.flush()
-        entries.clear()
-    }
-
-    private companion object {
-        const val NOTICE_PATH = "META-INF/NOTICE"
-        const val NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
-    }
+  private companion object {
+    const val NOTICE_PATH = "META-INF/NOTICE"
+    const val NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
+  }
 }

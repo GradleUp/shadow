@@ -1,3 +1,5 @@
+
+
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.StringReader
@@ -18,61 +20,61 @@ import org.xml.sax.InputSource
 @CacheableTransformer
 public class XmlAppendingTransformer : Transformer {
 
-    @Input
-    public var ignoreDtd: Boolean = true
+  @Input
+  public var ignoreDtd: Boolean = true
 
-    @Optional
-    @Input
-    public var resource: String? = null
+  @Optional
+  @Input
+  public var resource: String? = null
 
-    private var doc: Document? = null
+  private var doc: Document? = null
 
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        val path = element.relativePath.pathString
-        return resource?.equals(path, ignoreCase = true) == true
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    val path = element.relativePath.pathString
+    return resource?.equals(path, ignoreCase = true) == true
+  }
+
+  override fun transform(context: TransformerContext) {
+    val r: Document
+    try {
+      val builder = SAXBuilder(XMLReaders.NONVALIDATING).apply {
+        expandEntities = false
+        if (ignoreDtd) {
+          entityResolver = EntityResolver { _, _ -> InputSource(StringReader("")) }
+        }
+      }
+      r = builder.build(context.inputStream)
+    } catch (e: JDOMException) {
+      throw RuntimeException("Error processing resource $resource: ${e.message}", e)
     }
 
-    override fun transform(context: TransformerContext) {
-        val r: Document
-        try {
-            val builder = SAXBuilder(XMLReaders.NONVALIDATING).apply {
-                expandEntities = false
-                if (ignoreDtd) {
-                    entityResolver = EntityResolver { _, _ -> InputSource(StringReader("")) }
-                }
-            }
-            r = builder.build(context.inputStream)
-        } catch (e: JDOMException) {
-            throw RuntimeException("Error processing resource $resource: ${e.message}", e)
+    if (doc == null) {
+      doc = r
+    } else {
+      val root = r.rootElement
+
+      root.attributes.forEach { a ->
+        val mergedEl = doc!!.rootElement
+        val mergedAtt = mergedEl.getAttribute(a.name, a.namespace)
+        if (mergedAtt == null) {
+          mergedEl.setAttribute(a)
         }
+      }
 
-        if (doc == null) {
-            doc = r
-        } else {
-            val root = r.rootElement
-
-            root.attributes.forEach { a ->
-                val mergedEl = doc!!.rootElement
-                val mergedAtt = mergedEl.getAttribute(a.name, a.namespace)
-                if (mergedAtt == null) {
-                    mergedEl.setAttribute(a)
-                }
-            }
-
-            root.children.forEach { n ->
-                doc!!.rootElement.addContent(n.clone())
-            }
-        }
+      root.children.forEach { n ->
+        doc!!.rootElement.addContent(n.clone())
+      }
     }
+  }
 
-    override fun hasTransformedResource(): Boolean = doc != null
+  override fun hasTransformedResource(): Boolean = doc != null
 
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-        val entry = ZipEntry(resource).apply {
-            time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, time)
-        }
-        os.putNextEntry(entry)
-        XMLOutputter(Format.getPrettyFormat()).output(doc, os)
-        doc = null
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    val entry = ZipEntry(resource).apply {
+      time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, time)
     }
+    os.putNextEntry(entry)
+    XMLOutputter(Format.getPrettyFormat()).output(doc, os)
+    doc = null
+  }
 }

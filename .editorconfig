@@ -18,9 +18,5 @@ ij_kotlin_packages_to_use_import_on_demand = unset
 ktlint_code_style = intellij_idea
 ktlint_standard_function-expression-body = disabled
 
-# TODO: this overriding will be removed in the next PR.
-[*.kt]
-indent_size = 4
-
 [*.md]
 trim_trailing_whitespace = false

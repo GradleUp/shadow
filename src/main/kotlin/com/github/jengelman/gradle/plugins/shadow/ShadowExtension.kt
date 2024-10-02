@@ -5,13 +5,13 @@ import org.gradle.api.publish.maven.MavenPublication
 
 @Deprecated("This is deprecated since 8.3.2")
 public abstract class ShadowExtension(project: Project) {
-    private val components = project.components
+  private val components = project.components
 
-    @Deprecated(
-        message = "configure publication using component.shadow directly.",
-        replaceWith = ReplaceWith("publication.from(components.getByName(\"shadow\"))"),
-    )
-    public fun component(publication: MavenPublication) {
-        publication.from(components.findByName("shadow"))
-    }
+  @Deprecated(
+    message = "configure publication using component.shadow directly.",
+    replaceWith = ReplaceWith("publication.from(components.getByName(\"shadow\"))"),
+  )
+  public fun component(publication: MavenPublication) {
+    publication.from(components.findByName("shadow"))
+  }
 }
