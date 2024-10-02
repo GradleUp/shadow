@@ -11,6 +11,11 @@ plugins {
   id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.16.3"
 }
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
 kotlin {
   explicitApi()
   compilerOptions {
