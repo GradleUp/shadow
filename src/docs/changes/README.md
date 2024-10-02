@@ -4,6 +4,13 @@
 ## [Unreleased]
 
 
+## [v8.3.3]
+
+**Changed**
+
+- Disable Develocity integration by default. ([#993](https://github.com/GradleUp/shadow/pull/993))
+
+
 ## [v8.3.2]
 
 **Added**
@@ -394,7 +401,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.2...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.3...HEAD
+[v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
 [v8.3.2]: https://github.com/GradleUp/shadow/releases/tag/8.3.2
 [v8.3.1]: https://github.com/GradleUp/shadow/releases/tag/8.3.1
 [v8.3.0]: https://github.com/GradleUp/shadow/releases/tag/8.3.0
