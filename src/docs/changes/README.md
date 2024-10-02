@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- Disable Develocity integration by default. ([#993](https://github.com/GradleUp/shadow/pull/993))
+
 
 ## [v8.3.2]
 
