@@ -8,16 +8,16 @@ import org.gradle.api.plugins.JavaPlugin
 
 public class ShadowPlugin : Plugin<Project> {
 
-  override fun apply(project: Project) {
-    with(project.plugins) {
-      apply(ShadowBasePlugin::class.java)
-      apply(LegacyShadowPlugin::class.java)
-      withType(JavaPlugin::class.java) {
-        apply(ShadowJavaPlugin::class.java)
-      }
-      withType(ApplicationPlugin::class.java) {
-        apply(ShadowApplicationPlugin::class.java)
-      }
+    override fun apply(project: Project) {
+        with(project.plugins) {
+            apply(ShadowBasePlugin::class.java)
+            apply(LegacyShadowPlugin::class.java)
+            withType(JavaPlugin::class.java) {
+                apply(ShadowJavaPlugin::class.java)
+            }
+            withType(ApplicationPlugin::class.java) {
+                apply(ShadowApplicationPlugin::class.java)
+            }
+        }
     }
-  }
 }

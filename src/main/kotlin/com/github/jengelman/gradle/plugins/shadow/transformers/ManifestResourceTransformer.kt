@@ -1,5 +1,3 @@
-
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.IOException
@@ -15,63 +13,63 @@ import org.gradle.api.tasks.Optional
 
 @CacheableTransformer
 public class ManifestResourceTransformer : Transformer {
-  private val logger = LogManager.getLogger(this::class.java)
+    private val logger = LogManager.getLogger(this::class.java)
 
-  @Optional
-  @Input
-  public var mainClass: String? = null
+    @Optional
+    @Input
+    public var mainClass: String? = null
 
-  @Optional
-  @Input
-  public var manifestEntries: MutableMap<String, Attributes>? = null
+    @Optional
+    @Input
+    public var manifestEntries: MutableMap<String, Attributes>? = null
 
-  private var manifestDiscovered = false
-  private var manifest: Manifest? = null
+    private var manifestDiscovered = false
+    private var manifest: Manifest? = null
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
-    return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
-  }
-
-  override fun transform(context: TransformerContext) {
-    if (!manifestDiscovered) {
-      try {
-        manifest = Manifest(context.inputStream)
-        manifestDiscovered = true
-      } catch (e: IOException) {
-        logger.warn("Failed to read MANIFEST.MF", e)
-      }
-    }
-  }
-
-  override fun hasTransformedResource(): Boolean = true
-
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    if (manifest == null) {
-      manifest = Manifest()
+    override fun canTransformResource(element: FileTreeElement): Boolean {
+        val path = element.relativePath.pathString
+        return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
     }
 
-    val attributes = manifest!!.mainAttributes
-
-    mainClass?.let {
-      attributes.put(Attributes.Name.MAIN_CLASS, it)
+    override fun transform(context: TransformerContext) {
+        if (!manifestDiscovered) {
+            try {
+                manifest = Manifest(context.inputStream)
+                manifestDiscovered = true
+            } catch (e: IOException) {
+                logger.warn("Failed to read MANIFEST.MF", e)
+            }
+        }
     }
 
-    manifestEntries?.forEach { (key, value) ->
-      attributes[Attributes.Name(key)] = value
+    override fun hasTransformedResource(): Boolean = true
+
+    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        if (manifest == null) {
+            manifest = Manifest()
+        }
+
+        val attributes = manifest!!.mainAttributes
+
+        mainClass?.let {
+            attributes.put(Attributes.Name.MAIN_CLASS, it)
+        }
+
+        manifestEntries?.forEach { (key, value) ->
+            attributes[Attributes.Name(key)] = value
+        }
+
+        val entry = ZipEntry(JarFile.MANIFEST_NAME).apply {
+            time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, time)
+        }
+        os.putNextEntry(entry)
+        manifest!!.write(os)
     }
 
-    val entry = ZipEntry(JarFile.MANIFEST_NAME).apply {
-      time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, time)
+    public fun attributes(attributes: Map<String, *>): ManifestResourceTransformer = apply {
+        if (manifestEntries == null) {
+            manifestEntries = mutableMapOf()
+        }
+        manifestEntries!!.putAll(attributes.mapValues { Attributes().apply { putValue(it.key, it.value.toString()) } })
     }
-    os.putNextEntry(entry)
-    manifest!!.write(os)
-  }
-
-  public fun attributes(attributes: Map<String, *>): ManifestResourceTransformer = apply {
-    if (manifestEntries == null) {
-      manifestEntries = mutableMapOf()
-    }
-    manifestEntries!!.putAll(attributes.mapValues { Attributes().apply { putValue(it.key, it.value.toString()) } })
-  }
 }

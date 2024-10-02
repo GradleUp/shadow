@@ -1,5 +1,3 @@
-
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.File
@@ -20,22 +18,22 @@ import org.gradle.api.tasks.PathSensitivity
  */
 public class IncludeResourceTransformer : Transformer by NoOpTransformer {
 
-  @InputFile
-  @PathSensitive(PathSensitivity.NONE)
-  public lateinit var file: File
+    @InputFile
+    @PathSensitive(PathSensitivity.NONE)
+    public lateinit var file: File
 
-  @Input
-  public lateinit var resource: String
+    @Input
+    public lateinit var resource: String
 
-  override fun hasTransformedResource(): Boolean {
-    return this::file.isInitialized && file.exists()
-  }
+    override fun hasTransformedResource(): Boolean {
+        return this::file.isInitialized && file.exists()
+    }
 
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(resource)
-    entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        val entry = ZipEntry(resource)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
 
-    file.inputStream().copyTo(os)
-  }
+        file.inputStream().copyTo(os)
+    }
 }

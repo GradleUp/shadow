@@ -1,5 +1,3 @@
-
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
@@ -98,130 +96,131 @@ import org.gradle.api.tasks.Internal
  * </pre>
  */
 public class PropertiesFileTransformer : Transformer {
-  private val propertiesEntries = mutableMapOf<String, CleanProperties>()
+    private val propertiesEntries = mutableMapOf<String, CleanProperties>()
 
-  @Input
-  public var paths: List<String> = listOf()
+    @Input
+    public var paths: List<String> = listOf()
 
-  @Input
-  public var mappings: Map<String, Map<String, String>> = mapOf()
+    @Input
+    public var mappings: Map<String, Map<String, String>> = mapOf()
 
-  /**
-   * latest, append
-   */
-  @Input
-  public var mergeStrategy: String = "first"
+    /**
+     * latest, append
+     */
+    @Input
+    public var mergeStrategy: String = "first"
 
-  @Input
-  public var mergeSeparator: String = ","
+    @Input
+    public var mergeSeparator: String = ","
 
-  @Input
-  public var charset: Charset = Charsets.ISO_8859_1
+    @Input
+    public var charset: Charset = Charsets.ISO_8859_1
 
-  @Internal
-  public var keyTransformer: (String) -> String = defaultKeyTransformer
+    @Internal
+    public var keyTransformer: (String) -> String = defaultKeyTransformer
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
-    if (mappings.containsKey(path)) return true
-    for (key in mappings.keys) {
-      if (path.matches(key.toRegex())) return true
-    }
-
-    if (path in paths) return true
-    for (p in paths) {
-      if (path.matches(p.toRegex())) return true
-    }
-
-    return mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
-  }
-
-  override fun transform(context: TransformerContext) {
-    val props = propertiesEntries[context.path]
-    val incoming = loadAndTransformKeys(context.inputStream)
-    if (props == null) {
-      propertiesEntries[context.path] = incoming
-    } else {
-      incoming.forEach { (key, value) ->
-        if (props.containsKey(key)) {
-          when (mergeStrategyFor(context.path).lowercase()) {
-            "latest" -> props[key] = value
-            "append" -> props[key] = props.getProperty(key.toString()) + mergeSeparatorFor(context.path) + value
-            "first" -> Unit // continue
-            else -> Unit // continue
-          }
-        } else {
-          props[key] = value
+    override fun canTransformResource(element: FileTreeElement): Boolean {
+        val path = element.relativePath.pathString
+        if (mappings.containsKey(path)) return true
+        for (key in mappings.keys) {
+            if (path.matches(key.toRegex())) return true
         }
-      }
-    }
-  }
 
-  private fun loadAndTransformKeys(inputStream: InputStream?): CleanProperties {
-    val props = CleanProperties()
-    inputStream?.let {
-      props.load(it.reader(charset))
-    }
-    return transformKeys(props) as CleanProperties
-  }
+        if (path in paths) return true
+        for (p in paths) {
+            if (path.matches(p.toRegex())) return true
+        }
 
-  private fun transformKeys(properties: Properties): Properties {
-    if (keyTransformer == defaultKeyTransformer) return properties
-    val result = CleanProperties()
-    properties.forEach { (key, value) ->
-      result[keyTransformer(key as String)] = value
+        return mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
     }
-    return result
-  }
 
-  private fun mergeStrategyFor(path: String): String {
-    mappings[path]?.let {
-      return it["mergeStrategy"] ?: mergeStrategy
+    override fun transform(context: TransformerContext) {
+        val props = propertiesEntries[context.path]
+        val incoming = loadAndTransformKeys(context.inputStream)
+        if (props == null) {
+            propertiesEntries[context.path] = incoming
+        } else {
+            incoming.forEach { (key, value) ->
+                if (props.containsKey(key)) {
+                    when (mergeStrategyFor(context.path).lowercase()) {
+                        "latest" -> props[key] = value
+                        "append" -> props[key] =
+                            props.getProperty(key.toString()) + mergeSeparatorFor(context.path) + value
+                        "first" -> Unit // continue
+                        else -> Unit // continue
+                    }
+                } else {
+                    props[key] = value
+                }
+            }
+        }
     }
-    for (key in mappings.keys) {
-      if (path.matches(key.toRegex())) {
-        return mappings[key]?.get("mergeStrategy") ?: mergeStrategy
-      }
-    }
-    return mergeStrategy
-  }
 
-  private fun mergeSeparatorFor(path: String): String {
-    mappings[path]?.let {
-      return it["mergeSeparator"] ?: mergeSeparator
+    private fun loadAndTransformKeys(inputStream: InputStream?): CleanProperties {
+        val props = CleanProperties()
+        inputStream?.let {
+            props.load(it.reader(charset))
+        }
+        return transformKeys(props) as CleanProperties
     }
-    for (key in mappings.keys) {
-      if (path.matches(Regex(key))) {
-        return mappings[key]?.get("mergeSeparator") ?: mergeSeparator
-      }
+
+    private fun transformKeys(properties: Properties): Properties {
+        if (keyTransformer == defaultKeyTransformer) return properties
+        val result = CleanProperties()
+        properties.forEach { (key, value) ->
+            result[keyTransformer(key as String)] = value
+        }
+        return result
     }
-    return mergeSeparator
-  }
 
-  override fun hasTransformedResource(): Boolean = propertiesEntries.isNotEmpty()
-
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val zipWriter = os.writer(charset)
-    propertiesEntries.forEach { (path, props) ->
-      val entry = ZipEntry(path)
-      entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-      os.putNextEntry(entry)
-      readerFor(props, charset).copyTo(zipWriter)
-      zipWriter.flush()
-      os.closeEntry()
+    private fun mergeStrategyFor(path: String): String {
+        mappings[path]?.let {
+            return it["mergeStrategy"] ?: mergeStrategy
+        }
+        for (key in mappings.keys) {
+            if (path.matches(key.toRegex())) {
+                return mappings[key]?.get("mergeStrategy") ?: mergeStrategy
+            }
+        }
+        return mergeStrategy
     }
-  }
 
-  private fun readerFor(props: Properties, charset: Charset): InputStreamReader {
-    val baos = ByteArrayOutputStream()
-    baos.writer(charset).use { writer ->
-      props.store(writer, "")
+    private fun mergeSeparatorFor(path: String): String {
+        mappings[path]?.let {
+            return it["mergeSeparator"] ?: mergeSeparator
+        }
+        for (key in mappings.keys) {
+            if (path.matches(Regex(key))) {
+                return mappings[key]?.get("mergeSeparator") ?: mergeSeparator
+            }
+        }
+        return mergeSeparator
     }
-    return baos.toByteArray().inputStream().reader(charset)
-  }
 
-  private companion object {
-    const val PROPERTIES_SUFFIX = ".properties"
-    val defaultKeyTransformer: (String) -> String = { it }
-  }
+    override fun hasTransformedResource(): Boolean = propertiesEntries.isNotEmpty()
+
+    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        val zipWriter = os.writer(charset)
+        propertiesEntries.forEach { (path, props) ->
+            val entry = ZipEntry(path)
+            entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+            os.putNextEntry(entry)
+            readerFor(props, charset).copyTo(zipWriter)
+            zipWriter.flush()
+            os.closeEntry()
+        }
+    }
+
+    private fun readerFor(props: Properties, charset: Charset): InputStreamReader {
+        val baos = ByteArrayOutputStream()
+        baos.writer(charset).use { writer ->
+            props.store(writer, "")
+        }
+        return baos.toByteArray().inputStream().reader(charset)
+    }
+
+    private companion object {
+        const val PROPERTIES_SUFFIX = ".properties"
+        val defaultKeyTransformer: (String) -> String = { it }
+    }
 }

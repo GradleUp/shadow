@@ -1,5 +1,3 @@
-
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.ByteArrayOutputStream
@@ -19,45 +17,45 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 public class AppendingTransformer : Transformer {
 
-  @Optional
-  @Input
-  public var resource: String? = null
+    @Optional
+    @Input
+    public var resource: String? = null
 
-  /**
-   * Defer initialization, see https://github.com/GradleUp/shadow/issues/763
-   */
-  private var data: ByteArrayOutputStream? = null
+    /**
+     * Defer initialization, see https://github.com/GradleUp/shadow/issues/763
+     */
+    private var data: ByteArrayOutputStream? = null
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
-    return resource?.equals(path, ignoreCase = true) ?: false
-  }
-
-  override fun transform(context: TransformerContext) {
-    if (data == null) {
-      data = ByteArrayOutputStream()
+    override fun canTransformResource(element: FileTreeElement): Boolean {
+        val path = element.relativePath.pathString
+        return resource?.equals(path, ignoreCase = true) ?: false
     }
 
-    context.inputStream.copyTo(data!!)
-    data!!.write('\n'.code)
+    override fun transform(context: TransformerContext) {
+        if (data == null) {
+            data = ByteArrayOutputStream()
+        }
 
-    context.inputStream.close()
-  }
+        context.inputStream.copyTo(data!!)
+        data!!.write('\n'.code)
 
-  override fun hasTransformedResource(): Boolean {
-    return (data?.size() ?: 0) > 0
-  }
-
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    if (data == null) {
-      data = ByteArrayOutputStream()
+        context.inputStream.close()
     }
 
-    val entry = ZipEntry(resource)
-    entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    override fun hasTransformedResource(): Boolean {
+        return (data?.size() ?: 0) > 0
+    }
 
-    data!!.toByteArray().inputStream().copyTo(os)
-    data!!.reset()
-  }
+    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        if (data == null) {
+            data = ByteArrayOutputStream()
+        }
+
+        val entry = ZipEntry(resource)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
+
+        data!!.toByteArray().inputStream().copyTo(os)
+        data!!.reset()
+    }
 }

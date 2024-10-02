@@ -7,13 +7,13 @@ import org.gradle.api.tasks.TaskAction
 
 internal abstract class JavaJarExec : JavaExec() {
 
-  @get:InputFile
-  val jarFile: RegularFileProperty = objectFactory.fileProperty()
+    @get:InputFile
+    val jarFile: RegularFileProperty = objectFactory.fileProperty()
 
-  @TaskAction
-  override fun exec() {
-    val allArgs = listOf(jarFile.get().asFile.path) + args
-    setArgs(allArgs)
-    super.exec()
-  }
+    @TaskAction
+    override fun exec() {
+        val allArgs = listOf(jarFile.get().asFile.path) + args
+        setArgs(allArgs)
+        super.exec()
+    }
 }
