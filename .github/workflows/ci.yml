@@ -42,19 +42,3 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
-
-  test-extract-title:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Extract release notes
-        id: extract-release-notes
-        uses: Goooler/extract-release-notes@405c5f085ebc1c945e03f54b3bea51c011ef0ce2
-        with:
-          changelog_file: src/docs/changes/README.md
-          release_notes_file: RELEASE_NOTES.md
-      - name: Echo release title
-        env:
-          RELEASE_TITLE: ${{ steps.extract-release-notes.outputs.release_title }}
-        run: |
-          echo "Release title: $RELEASE_TITLE"
