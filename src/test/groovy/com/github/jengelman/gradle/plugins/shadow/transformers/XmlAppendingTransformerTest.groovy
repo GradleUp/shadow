@@ -32,9 +32,7 @@ import static org.junit.jupiter.api.Assertions.*
  *
  * Modified from org.apache.maven.plugins.shade.resource.XmlAppendingTransformerTest.java
  */
-class XmlAppendingTransformerTest extends TransformerTestSupport {
-
-    private static XmlAppendingTransformer transformer
+class XmlAppendingTransformerTest extends TransformerTestSupport<XmlAppendingTransformer> {
 
     static {
         /*

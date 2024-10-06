@@ -13,10 +13,8 @@ import static org.junit.jupiter.api.Assertions.*
 /**
  * Test for {@link PropertiesFileTransformer}.
  */
-final class PropertiesFileTransformerTest extends TransformerTestSupport {
-    static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
-
-    private static PropertiesFileTransformer transformer
+final class PropertiesFileTransformerTest extends TransformerTestSupport<PropertiesFileTransformer> {
+    private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
     @BeforeAll
     static void setUp() {

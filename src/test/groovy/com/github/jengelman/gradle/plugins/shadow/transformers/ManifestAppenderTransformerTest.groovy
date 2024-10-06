@@ -33,10 +33,8 @@ import static org.junit.jupiter.api.Assertions.*
 /**
  * Test for {@link ManifestAppenderTransformer}.
  */
-class ManifestAppenderTransformerTest extends TransformerTestSupport {
-    public static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
-
-    private static ManifestAppenderTransformer transformer
+class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestAppenderTransformer> {
+    private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
     @BeforeAll
     static void setUp() {

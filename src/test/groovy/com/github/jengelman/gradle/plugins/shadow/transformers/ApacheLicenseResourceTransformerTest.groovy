@@ -32,9 +32,7 @@ import static org.junit.jupiter.api.Assertions.*
  *
  * Modified from org.apache.maven.plugins.shade.resources.ApacheLicenseResourceTransformerTest.java
  */
-class ApacheLicenseResourceTransformerTest extends TransformerTestSupport {
-
-    private static ApacheLicenseResourceTransformer transformer
+class ApacheLicenseResourceTransformerTest extends TransformerTestSupport<ApacheLicenseResourceTransformer> {
 
     static {
         /*

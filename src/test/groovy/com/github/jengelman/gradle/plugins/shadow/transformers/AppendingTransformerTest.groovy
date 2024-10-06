@@ -30,9 +30,7 @@ import static org.junit.jupiter.api.Assertions.*
  * @author Benjamin Bentmann
  * @version $Id: AppendingTransformerTest.java 673906 2008-07-04 05:03:20Z brett $
  */
-class AppendingTransformerTest extends TransformerTestSupport {
-
-    private static AppendingTransformer transformer
+class AppendingTransformerTest extends TransformerTestSupport<AppendingTransformer> {
 
     static
     {

@@ -32,9 +32,7 @@ import static org.junit.jupiter.api.Assertions.*
  *
  * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerTest.java
  */
-class ApacheNoticeResourceTransformerTest extends TransformerTestSupport {
-
-    private static ApacheNoticeResourceTransformer transformer
+class ApacheNoticeResourceTransformerTest extends TransformerTestSupport<ApacheNoticeResourceTransformer> {
 
     static {
         /*
