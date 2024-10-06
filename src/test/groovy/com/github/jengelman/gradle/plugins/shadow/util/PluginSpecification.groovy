@@ -104,7 +104,7 @@ abstract class PluginSpecification extends Specification {
     }
 
     File file(String path) {
-        File f = dir.root.resolveSibling(path).toFile()
+        File f = dir.resolve(path).toFile()
         if (!f.exists()) {
             f.parentFile.mkdirs()
             if (!f.createNewFile()) {
