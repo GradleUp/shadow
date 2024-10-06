@@ -34,16 +34,19 @@ dependencies {
   testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
     exclude(group = "org.codehaus.groovy")
   }
+  testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
   testImplementation("xmlunit:xmlunit:1.6")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation("junit:junit:4.13.2")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.2")
+  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
 
 tasks.withType<Test>().configureEach {
-  useJUnit()
+  useJUnitPlatform()
 
   maxParallelForks = Runtime.getRuntime().availableProcessors()
 
