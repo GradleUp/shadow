@@ -108,14 +108,14 @@ abstract class PluginSpecification extends Specification {
         if (!f.exists()) {
             f.parentFile.mkdirs()
             if (!f.createNewFile()) {
-                throw new IOException("a file with the name \'" + f.name + "\' already exists in the test folder")
+                throw new IOException("a file with the name \'" + f.name + "\' already exists in the test folder.")
             }
         }
         return f
     }
 
     File getFile(String path) {
-        new File(dir.toFile(), path)
+        return dir.resolve(path).toFile()
     }
 
     AppendableMavenFileRepository repo(String path = 'maven-repo') {
