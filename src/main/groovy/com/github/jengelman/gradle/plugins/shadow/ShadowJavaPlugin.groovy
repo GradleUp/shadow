@@ -24,6 +24,8 @@ class ShadowJavaPlugin implements Plugin<Project> {
     public static final String SHADOW_GROUP = 'Shadow'
     public static final String SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME = 'shadowRuntimeElements'
 
+    public static final String MODULE_INFO_CLASS = 'module-info.class'
+
     private final SoftwareComponentFactory softwareComponentFactory
 
     @Inject
@@ -100,7 +102,18 @@ class ShadowJavaPlugin implements Plugin<Project> {
                     project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME) ?:
                             project.configurations.runtime,
             ]
-            shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
+            /*
+             Remove excludes like this:
+             shadowJar {
+               ...
+               allowModuleInfos()
+             }
+             */
+            def excludes = ['META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA']
+            if (!shadow.isAllowModuleInfos()) {
+                excludes.add(MODULE_INFO_CLASS)
+            }
+            shadow.exclude(excludes)
         }
         project.artifacts.add(shadowConfiguration.name, taskProvider)
         return taskProvider
