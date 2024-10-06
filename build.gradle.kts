@@ -40,7 +40,8 @@ dependencies {
   testImplementation("com.google.guava:guava:33.3.1-jre")
   testImplementation(platform("org.junit:junit-bom:5.11.2"))
   testImplementation("org.junit.jupiter:junit-jupiter-api")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testImplementation("org.junit.platform:junit-platform-suite-engine")
+  testImplementation("org.junit.platform:junit-platform-launcher")
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
