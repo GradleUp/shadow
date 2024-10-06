@@ -39,9 +39,8 @@ dependencies {
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
   testImplementation(platform("org.junit:junit-bom:5.11.2"))
-  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.platform:junit-platform-suite-engine")
-  testImplementation("org.junit.platform:junit-platform-launcher")
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
