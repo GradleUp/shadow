@@ -19,10 +19,10 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 
-import static org.junit.Assert.*
+import static org.junit.jupiter.api.Assertions.*
 
 /**
  * Test for {@link AppendingTransformer}.
@@ -30,9 +30,7 @@ import static org.junit.Assert.*
  * @author Benjamin Bentmann
  * @version $Id: AppendingTransformerTest.java 673906 2008-07-04 05:03:20Z brett $
  */
-class AppendingTransformerTest extends TransformerTestSupport {
-
-    private AppendingTransformer transformer
+class AppendingTransformerTest extends TransformerTestSupport<AppendingTransformer> {
 
     static
     {
@@ -43,18 +41,18 @@ class AppendingTransformerTest extends TransformerTestSupport {
         Locale.setDefault(new Locale("tr"))
     }
 
-    @Before
-    void setUp() {
-        this.transformer = new AppendingTransformer()
+    @BeforeAll
+    static void setUp() {
+        transformer = new AppendingTransformer()
     }
 
     @Test
     void testCanTransformResource() {
-        this.transformer.resource = "abcdefghijklmnopqrstuvwxyz"
+        transformer.resource = "abcdefghijklmnopqrstuvwxyz"
 
-        assertTrue(this.transformer.canTransformResource(getFileElement("abcdefghijklmnopqrstuvwxyz")))
-        assertTrue(this.transformer.canTransformResource(getFileElement("ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
-        assertFalse(this.transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
+        assertTrue(transformer.canTransformResource(getFileElement("abcdefghijklmnopqrstuvwxyz")))
+        assertTrue(transformer.canTransformResource(getFileElement("ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
+        assertFalse(transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
     }
 
 }

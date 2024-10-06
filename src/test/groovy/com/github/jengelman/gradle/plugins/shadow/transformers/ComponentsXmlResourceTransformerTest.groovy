@@ -20,13 +20,14 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import junit.framework.TestCase
 
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLAssert
 import org.custommonkey.xmlunit.XMLUnit
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.codehaus.plexus.util.IOUtil
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * Test for {@link ComponentsXmlResourceTransformer}.
@@ -36,16 +37,17 @@ import org.codehaus.plexus.util.IOUtil
  *
  * Modified from org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformerTest.java
  */
-class ComponentsXmlResourceTransformerTest extends TestCase {
-    private ComponentsXmlResourceTransformer transformer
-    private ShadowStats stats
+class ComponentsXmlResourceTransformerTest {
+    private static ComponentsXmlResourceTransformer transformer
+    private static ShadowStats stats
 
-    @Override
+    @BeforeEach
     void setUp() {
-        this.transformer = new ComponentsXmlResourceTransformer()
+        transformer = new ComponentsXmlResourceTransformer()
         stats = new ShadowStats()
     }
 
+    @Test
     void testConfigurationMerging() {
 
         XMLUnit.setNormalizeWhitespace(true)
