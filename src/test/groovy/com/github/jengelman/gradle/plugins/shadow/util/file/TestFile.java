@@ -37,7 +37,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestFile extends File {
     private boolean useNativeTools;
@@ -297,22 +297,22 @@ public class TestFile extends File {
     }
 
     public TestFile assertExists() {
-        assertTrue(String.format("%s does not exist", this), exists());
+        assertTrue(exists(), String.format("%s does not exist", this));
         return this;
     }
 
     public TestFile assertIsFile() {
-        assertTrue(String.format("%s is not a file", this), isFile());
+        assertTrue(isFile(), String.format("%s is not a file", this));
         return this;
     }
 
     public TestFile assertIsDir() {
-        assertTrue(String.format("%s is not a directory", this), isDirectory());
+        assertTrue(isDirectory(), String.format("%s is not a directory", this));
         return this;
     }
 
     public TestFile assertDoesNotExist() {
-        assertFalse(String.format("%s should not exist", this), exists());
+        assertFalse(exists(), String.format("%s should not exist", this));
         return this;
     }
 
@@ -324,8 +324,8 @@ public class TestFile extends File {
     public TestFile assertIsCopyOf(TestFile other) {
         assertIsFile();
         other.assertIsFile();
-        assertEquals(String.format("%s is not the same length as %s", this, other), other.length(), this.length());
-        assertArrayEquals(String.format("%s does not have the same content as %s", this, other), getHash("MD5"), other.getHash("MD5"));
+        assertEquals(other.length(), this.length(), String.format("%s is not the same length as %s", this, other));
+        assertArrayEquals(getHash("MD5"), other.getHash("MD5"), String.format("%s does not have the same content as %s", this, other));
         return this;
     }
 
@@ -380,7 +380,7 @@ public class TestFile extends File {
         Set<String> missing = new TreeSet<>(expected);
         missing.removeAll(actual);
 
-        assertEquals(String.format("For dir: %s, extra files: %s, missing files: %s, expected: %s", this, extras, missing, expected), expected, actual);
+        assertEquals(expected, actual, String.format("For dir: %s, extra files: %s, missing files: %s, expected: %s", this, extras, missing, expected));
 
         return this;
     }
@@ -513,18 +513,18 @@ public class TestFile extends File {
 
     public void assertContentsHaveChangedSince(Snapshot snapshot) {
         Snapshot now = snapshot();
-        assertFalse(String.format("contents of %s have not changed", this), Arrays.equals(now.hash, snapshot.hash));
+        assertFalse(Arrays.equals(now.hash, snapshot.hash), String.format("contents of %s have not changed", this));
     }
 
     public void assertContentsHaveNotChangedSince(Snapshot snapshot) {
         Snapshot now = snapshot();
-        assertArrayEquals(String.format("contents of %s has changed", this), snapshot.hash, now.hash);
+        assertArrayEquals(snapshot.hash, now.hash, String.format("contents of %s has changed", this));
     }
 
     public void assertHasNotChangedSince(Snapshot snapshot) {
         Snapshot now = snapshot();
-        assertEquals(String.format("last modified time of %s has changed", this), snapshot.modTime, now.modTime);
-        assertArrayEquals(String.format("contents of %s has changed", this), snapshot.hash, now.hash);
+        assertEquals(snapshot.modTime, now.modTime, String.format("last modified time of %s has changed", this));
+        assertArrayEquals(snapshot.hash, now.hash, String.format("contents of %s has changed", this));
     }
 
     public void writeProperties(Map<?, ?> properties) {

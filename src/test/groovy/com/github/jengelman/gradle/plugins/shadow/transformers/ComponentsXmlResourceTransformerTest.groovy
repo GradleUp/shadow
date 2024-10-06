@@ -20,7 +20,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import junit.framework.TestCase
 
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLAssert

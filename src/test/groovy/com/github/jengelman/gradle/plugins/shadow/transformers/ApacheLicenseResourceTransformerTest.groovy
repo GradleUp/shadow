@@ -19,10 +19,10 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 
-import static org.junit.Assert.*
+import static org.junit.jupiter.api.Assertions.*
 
 /**
  * Test for {@link ApacheLicenseResourceTransformer}.
@@ -34,7 +34,7 @@ import static org.junit.Assert.*
  */
 class ApacheLicenseResourceTransformerTest extends TransformerTestSupport {
 
-    private ApacheLicenseResourceTransformer transformer
+    private static ApacheLicenseResourceTransformer transformer
 
     static {
         /*
@@ -44,17 +44,17 @@ class ApacheLicenseResourceTransformerTest extends TransformerTestSupport {
         Locale.setDefault(new Locale("tr"))
     }
 
-    @Before
-    void setUp() {
-        this.transformer = new ApacheLicenseResourceTransformer()
+    @BeforeAll
+    static void setUp() {
+        transformer = new ApacheLicenseResourceTransformer()
     }
 
     @Test
     void testCanTransformResource() {
-        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/LICENSE")))
-        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/LICENSE.TXT")))
-        assertTrue(this.transformer.canTransformResource(getFileElement("META-INF/License.txt")))
-        assertFalse(this.transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/LICENSE")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/LICENSE.TXT")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/License.txt")))
+        assertFalse(transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
     }
 
 }

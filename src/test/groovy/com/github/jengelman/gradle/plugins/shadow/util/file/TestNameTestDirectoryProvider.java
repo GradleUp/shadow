@@ -3,11 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.util.file;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.junit.rules.MethodRule;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;

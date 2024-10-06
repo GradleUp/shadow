@@ -19,8 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import junit.framework.TestCase
-
 /**
  * Modified from org.apache.maven.plugins.shade.relocation.SimpleRelocatorParameterTest.java
  *

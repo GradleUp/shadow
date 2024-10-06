@@ -3,13 +3,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipOutputStream
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 
 import java.util.zip.ZipFile
 
-import static java.util.Arrays.asList
-import static org.junit.Assert.*
+import static org.junit.jupiter.api.Assertions.*
 
 /**
  * Test for {@link PropertiesFileTransformer}.
@@ -17,10 +16,10 @@ import static org.junit.Assert.*
 final class PropertiesFileTransformerTest extends TransformerTestSupport {
     static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
-    private PropertiesFileTransformer transformer
+    private static PropertiesFileTransformer transformer
 
-    @Before
-    void setUp() {
+    @BeforeAll
+    static void setUp() {
         transformer = new PropertiesFileTransformer()
     }
 
