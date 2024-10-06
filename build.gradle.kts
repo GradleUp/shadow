@@ -35,7 +35,7 @@ dependencies {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
-  testImplementation("xmlunit:xmlunit:1.6")
+  testImplementation("org.xmlunit:xmlunit-legacy:2.10.0")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
   testImplementation(platform("org.junit:junit-bom:5.11.2"))
