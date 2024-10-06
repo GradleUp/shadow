@@ -10,7 +10,7 @@ import org.apache.tools.ant.taskdefs.Zip
 
 import java.util.zip.ZipInputStream
 
-import static org.junit.Assert.assertTrue
+import static org.junit.jupiter.api.Assertions.*
 
 class TestFileHelper {
     TestFile file
@@ -27,13 +27,13 @@ class TestFileHelper {
             def entry
             while (entry = zipStr.getNextEntry()) {
                 if (entry.directory) {
-                    assertTrue("Duplicate directory '$entry.name'", dirs.add(entry.name))
+                    assertTrue(dirs.add(entry.name), "Duplicate directory '$entry.name'")
                 }
                 if (!entry.name.contains('/')) {
                     continue
                 }
                 def parent = StringUtils.substringBeforeLast(entry.name, '/') + '/'
-                assertTrue("Missing dir '$parent'", dirs.contains(parent))
+                assertTrue(dirs.contains(parent), "Missing dir '$parent'")
             }
         }
 

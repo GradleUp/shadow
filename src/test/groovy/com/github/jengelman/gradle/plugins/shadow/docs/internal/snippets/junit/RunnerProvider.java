@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.junit;
 
-import org.junit.runner.Runner;
+import org.gradle.internal.impldep.org.junit.runner.Runner;
 
 import java.util.List;
 

@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.execute
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.SnippetFixture
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.rules.TemporaryFolder
 
 import java.util.function.Function
 
@@ -34,19 +33,15 @@ class GradleBuildExecuter implements SnippetExecuter {
     }
 
     @Override
-    void execute(TestCodeSnippet snippet) throws Exception {
-        TemporaryFolder tempDir = new TemporaryFolder()
-        tempDir.create()
-        File dir = tempDir.newFolder()
-
-        addSubProject(dir)
-        File settings = new File(dir, "settings.gradle")
+    void execute(File tempDir, TestCodeSnippet snippet) throws Exception {
+        addSubProject(tempDir)
+        File settings = new File(tempDir, "settings.gradle")
         settings.text = """
 rootProject.name = 'shadowTest'
 include 'api', 'main'
 """
 
-        File mainDir = new File(dir, "main")
+        File mainDir = new File(tempDir, "main")
         mainDir.mkdirs()
         File buildFile = new File(mainDir, buildFile)
 
@@ -59,7 +54,7 @@ include 'api', 'main'
 
         buildFile.text = replaceTokens(fullSnippet)
 
-        GradleRunner runner = GradleRunner.create().withProjectDir(dir).withPluginClasspath().forwardOutput()
+        GradleRunner runner = GradleRunner.create().withProjectDir(tempDir).withPluginClasspath().forwardOutput()
 
         runner.withArguments(":main:build", "-m").build()
 
