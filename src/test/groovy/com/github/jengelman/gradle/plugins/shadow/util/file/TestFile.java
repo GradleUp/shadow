@@ -24,7 +24,6 @@ import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.codehaus.groovy.runtime.ResourceGroovyMethods;
-import org.hamcrest.Matcher;
 
 import java.io.*;
 import java.net.URI;
@@ -36,7 +35,6 @@ import java.util.*;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestFile extends File {
@@ -188,23 +186,6 @@ public class TestFile extends File {
         }
     }
 
-    public List<String> linesThat(Matcher<? super String> matcher) {
-        try {
-            try (BufferedReader reader = new BufferedReader(new FileReader(this))) {
-                List<String> lines = new ArrayList<>();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (matcher.matches(line)) {
-                        lines.add(line);
-                    }
-                }
-                return lines;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void unzipTo(File target) {
         assertIsFile();
         new TestFileHelper(this).unzipTo(target, useNativeTools);
@@ -313,11 +294,6 @@ public class TestFile extends File {
 
     public TestFile assertDoesNotExist() {
         assertFalse(exists(), String.format("%s should not exist", this));
-        return this;
-    }
-
-    public TestFile assertContents(Matcher<String> matcher) {
-        assertThat(getText(), matcher);
         return this;
     }
 

@@ -33,6 +33,7 @@ dependencies {
 
   testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
     exclude(group = "org.codehaus.groovy")
+    exclude(group = "org.hamcrest")
   }
   testImplementation("xmlunit:xmlunit:1.6")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
