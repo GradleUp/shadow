@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.io.TempDir
+import spock.lang.TempDir
 
 import java.nio.file.Path
 
@@ -42,7 +42,7 @@ abstract class AbstractCachingSpec extends PluginSpecification {
         List<String> cacheArguments = [ '--build-cache' ]
         cacheArguments.addAll(arguments)
         // TODO: Use PluginSpecification.run here to reuse flags, but cache tests failed for now, need to investigate.
-        return runner.withProjectDir(alternateDir.root.toFile()).withArguments(cacheArguments).build()
+        return runner.withProjectDir(alternateDir.toFile()).withArguments(cacheArguments).build()
     }
 
     private String escapedPath(File file) {
@@ -60,9 +60,9 @@ abstract class AbstractCachingSpec extends PluginSpecification {
     }
 
     void copyToAlternateDir() {
-        FileUtils.deleteDirectory(alternateDir.root.toFile())
-        FileUtils.forceMkdir(alternateDir.root.toFile())
-        FileUtils.copyDirectory(dir.root.toFile(), alternateDir.root.toFile())
+        FileUtils.deleteDirectory(alternateDir.toFile())
+        FileUtils.forceMkdir(alternateDir.toFile())
+        FileUtils.copyDirectory(dir.toFile(), alternateDir.toFile())
     }
 
     void assertShadowJarIsCachedAndRelocatable() {

@@ -4,8 +4,8 @@ import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.io.TempDir
 import spock.lang.Specification
+import spock.lang.TempDir
 
 import java.nio.file.Path
 import java.util.function.Function
@@ -55,7 +55,7 @@ abstract class PluginSpecification extends Specification {
 
     GradleRunner getRunner() {
         GradleRunner.create()
-                .withProjectDir(dir.root.toFile())
+                .withProjectDir(dir.toFile())
                 .forwardOutput()
                 .withPluginClasspath()
     }
@@ -115,11 +115,11 @@ abstract class PluginSpecification extends Specification {
     }
 
     File getFile(String path) {
-        new File(dir.root.toFile(), path)
+        new File(dir.toFile(), path)
     }
 
     AppendableMavenFileRepository repo(String path = 'maven-repo') {
-        new AppendableMavenFileRepository(new TestFile(dir.root.toFile(), path))
+        new AppendableMavenFileRepository(new TestFile(dir.toFile(), path))
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
