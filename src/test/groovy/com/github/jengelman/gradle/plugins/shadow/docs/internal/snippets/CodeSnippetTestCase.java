@@ -2,8 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets;
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.junit.DelegatingTestRunner;
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.junit.RunnerProvider;
-import org.junit.runner.RunWith;
-import org.junit.runner.Runner;
+import org.gradle.internal.impldep.org.junit.runner.RunWith;
+import org.gradle.internal.impldep.org.junit.runner.Runner;
 
 import java.util.LinkedList;
 import java.util.List;

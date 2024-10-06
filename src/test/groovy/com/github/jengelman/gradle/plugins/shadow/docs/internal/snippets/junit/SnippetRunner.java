@@ -1,12 +1,18 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.junit;
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet;
-import org.junit.runner.Description;
-import org.junit.runner.Runner;
-import org.junit.runner.notification.Failure;
-import org.junit.runner.notification.RunNotifier;
+import org.gradle.internal.impldep.org.junit.runner.Description;
+import org.gradle.internal.impldep.org.junit.runner.Runner;
+import org.gradle.internal.impldep.org.junit.runner.notification.Failure;
+import org.gradle.internal.impldep.org.junit.runner.notification.RunNotifier;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.nio.file.Path;
 
 public class SnippetRunner extends Runner {
+
+  @TempDir
+  private Path tempDir;
 
   private final Description description;
   private final TestCodeSnippet snippet;
@@ -32,7 +38,7 @@ public class SnippetRunner extends Runner {
 
     try {
       notifier.fireTestStarted(description);
-      snippet.getExecuter().execute(snippet);
+      snippet.getExecuter().execute(tempDir.toFile(), snippet);
     } catch (Throwable t) {
       Throwable transform;
       try {

@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.junit;
 
-import org.junit.runner.Runner;
-import org.junit.runners.Suite;
-import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.RunnerScheduler;
+import org.gradle.internal.impldep.org.junit.runner.Runner;
+import org.gradle.internal.impldep.org.junit.runners.Suite;
+import org.gradle.internal.impldep.org.junit.runners.model.InitializationError;
+import org.gradle.internal.impldep.org.junit.runners.model.RunnerScheduler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
