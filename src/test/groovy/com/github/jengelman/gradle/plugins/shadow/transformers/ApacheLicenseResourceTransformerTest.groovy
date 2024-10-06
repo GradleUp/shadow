@@ -19,7 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 import static org.junit.jupiter.api.Assertions.*
@@ -42,8 +42,8 @@ class ApacheLicenseResourceTransformerTest extends TransformerTestSupport<Apache
         Locale.setDefault(new Locale("tr"))
     }
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         transformer = new ApacheLicenseResourceTransformer()
     }
 

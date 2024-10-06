@@ -37,8 +37,7 @@ import org.junit.jupiter.api.Test
  *
  * Modified from org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformerTest.java
  */
-class ComponentsXmlResourceTransformerTest {
-    private static ComponentsXmlResourceTransformer transformer
+class ComponentsXmlResourceTransformerTest extends TransformerTestSupport<ComponentsXmlResourceTransformer> {
     private static ShadowStats stats
 
     @BeforeEach

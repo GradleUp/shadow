@@ -31,15 +31,14 @@ import static org.junit.jupiter.api.Assertions.*
  *
  * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerParameterTests.java
  */
-class ApacheNoticeResourceTransformerParameterTests {
+class ApacheNoticeResourceTransformerParameterTests extends TransformerTestSupport<ApacheNoticeResourceTransformer> {
 
     private static final String NOTICE_RESOURCE = "META-INF/NOTICE"
-    private static ApacheNoticeResourceTransformer subject
     private static ShadowStats stats
 
     @BeforeEach
     void setUp() {
-        subject = new ApacheNoticeResourceTransformer()
+        transformer = new ApacheNoticeResourceTransformer()
         stats = new ShadowStats()
     }
 
@@ -82,7 +81,7 @@ class ApacheNoticeResourceTransformerParameterTests {
         try {
             final ByteArrayInputStream noticeInputStream = new ByteArrayInputStream(noticeText.getBytes())
             final List<Relocator> emptyList = Collections.emptyList()
-            subject.transform(TransformerContext.builder().path(NOTICE_RESOURCE).is(noticeInputStream).relocators(emptyList).stats(stats).build())
+            transformer.transform(TransformerContext.builder().path(NOTICE_RESOURCE).is(noticeInputStream).relocators(emptyList).stats(stats).build())
         }
         catch (NullPointerException ignored) {
             fail("Null pointer should not be thrown when no parameters are set.")

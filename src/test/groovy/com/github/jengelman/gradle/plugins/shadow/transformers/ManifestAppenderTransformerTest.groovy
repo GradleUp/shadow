@@ -22,7 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipOutputStream
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 import java.util.zip.ZipFile
@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.*
 class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestAppenderTransformer> {
     private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         transformer = new ManifestAppenderTransformer()
     }
 
