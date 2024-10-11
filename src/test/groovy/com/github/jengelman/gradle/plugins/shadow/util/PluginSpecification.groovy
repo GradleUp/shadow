@@ -7,16 +7,14 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-import spock.lang.TempDir
 
-import java.nio.file.Path
 import java.util.function.Function
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 abstract class PluginSpecification extends Specification {
 
-    @TempDir Path dir
+    @Rule TemporaryFolder dir
 
     public static final String SHADOW_VERSION = System.getProperty("shadowVersion")
 
@@ -57,7 +55,7 @@ abstract class PluginSpecification extends Specification {
 
     GradleRunner getRunner() {
         GradleRunner.create()
-                .withProjectDir(dir.toFile())
+                .withProjectDir(dir.root)
                 .forwardOutput()
                 .withPluginClasspath()
     }
@@ -106,22 +104,20 @@ abstract class PluginSpecification extends Specification {
     }
 
     File file(String path) {
-        File f = dir.resolve(path).toFile()
+        File f = new File(dir.root, path)
         if (!f.exists()) {
             f.parentFile.mkdirs()
-            if (!f.createNewFile()) {
-                throw new IOException("a file with the name \'" + f.name + "\' already exists in the test folder.")
-            }
+            return dir.newFile(path)
         }
         return f
     }
 
     File getFile(String path) {
-        new File(dir.root.toFile(), path)
+        new File(dir.root, path)
     }
 
     AppendableMavenFileRepository repo(String path = 'maven-repo') {
-        new AppendableMavenFileRepository(new TestFile(dir.toFile(), path))
+        new AppendableMavenFileRepository(new TestFile(dir.root, path))
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
