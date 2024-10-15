@@ -40,7 +40,7 @@ dependencies {
   compileOnly(localGroovy())
 
   implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("org.ow2.asm:asm-commons:9.7")
+  implementation("org.ow2.asm:asm-commons:9.7.1")
   implementation("commons-io:commons-io:2.17.0")
   implementation("org.apache.ant:ant:1.10.15")
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
@@ -55,8 +55,8 @@ dependencies {
   testImplementation("xmlunit:xmlunit:1.6")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.1")
-  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.1")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.2")
+  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.2")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

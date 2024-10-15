@@ -4,6 +4,7 @@ module.exports = {
   ga: "UA-321220-4",
   themeConfig: {
     repo: "GradleUp/shadow",
+    docsBranch: 'main',
     editLinks: true,
     editLinkText: 'Help improve these docs!',
     logo: '/logo+type.svg',

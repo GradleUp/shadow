@@ -12,11 +12,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 task testJar(type: ShadowJar) {
   archiveClassifier.set("tests")
   from sourceSets.test.output
-  configurations = [project.configurations.testImplementation]
+  configurations = [project.configurations.testRuntimeClasspath]
 }
 ```
 
-The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all `runtime`
+The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all `testRuntimeOnly`
 and `testImplementation` dependencies.
 The file is output to `build/libs/<project>-<version>-tests.jar`.
     
