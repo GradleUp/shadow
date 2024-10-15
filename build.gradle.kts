@@ -1,9 +1,14 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
+  kotlin("jvm") version "2.0.20"
   groovy
   `java-gradle-plugin`
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
   id("com.diffplug.spotless") version "7.0.0.BETA2"
+  id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.16.3"
 }
 
 java {
@@ -11,7 +16,19 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
 }
 
+kotlin {
+  explicitApi()
+  compilerOptions {
+    // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+    apiVersion = KotlinVersion.KOTLIN_1_8
+    jvmTarget = JvmTarget.JVM_11
+  }
+}
+
 spotless {
+  kotlin {
+    ktlint()
+  }
   kotlinGradle {
     ktlint()
     target("**/*.kts")

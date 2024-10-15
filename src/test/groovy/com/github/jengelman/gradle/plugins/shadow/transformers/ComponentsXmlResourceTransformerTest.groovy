@@ -53,14 +53,14 @@ class ComponentsXmlResourceTransformerTest extends TestCase {
         transformer.transform(
                 TransformerContext.builder()
                         .path("components-1.xml")
-                        .is(getClass().getResourceAsStream("/components-1.xml"))
+                        .inputStream(getClass().getResourceAsStream("/components-1.xml"))
                         .relocators(Collections.<Relocator> emptyList())
                         .stats(stats)
                         .build())
         transformer.transform(
                 TransformerContext.builder()
                         .path("components-1.xml")
-                        .is(getClass().getResourceAsStream("/components-2.xml"))
+                        .inputStream(getClass().getResourceAsStream("/components-2.xml"))
                         .relocators(Collections.<Relocator> emptyList())
                         .stats(stats)
                         .build())

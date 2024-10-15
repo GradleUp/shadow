@@ -7,9 +7,6 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{groovy,java}]
-indent_size = 4
-
 [*.{kt,kts}]
 ij_kotlin_imports_layout = *
 ij_kotlin_allow_trailing_comma = true
