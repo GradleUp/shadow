@@ -17,7 +17,7 @@ import static org.apache.logging.log4j.core.config.plugins.processor.PluginProce
  * @see <a href="https://github.com/paul-nelson-baker/">GitHub</a>
  * @see <a href="https://www.linkedin.com/in/paul-n-baker/">LinkedIn</a>
  */
-class Log4j2PluginsCacheFileTransformerSpec extends Specification{
+class Log4j2PluginsCacheFileTransformerSpec extends Specification {
 
     Log4j2PluginsCacheFileTransformer transformer
 

@@ -12,7 +12,7 @@ class NoopExecuter implements SnippetExecuter {
     }
 
     @Override
-    void execute(TestCodeSnippet snippet) throws Exception {
-
+    void execute(File tempDir, TestCodeSnippet snippet) throws Exception {
+        // noop
     }
 }
