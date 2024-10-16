@@ -132,6 +132,86 @@ class ShadowPluginSpec extends PluginSpecification {
         assert output.exists()
     }
 
+    def 'warns when a file is masked by a previously shadowed resource'() {
+        given:
+        URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
+        URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
+
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDirectory = buildDir
+            |    archiveBaseName = 'shadow'
+            |    from('${artifact.path}')
+            |    from('${project.path}')
+            |}
+        """.stripMargin()
+
+        when:
+        BuildResult result = run('shadow')
+
+        then:
+        assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar,/
+                                 / size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/
+
+        /* Shouldn't appear, because the default StandardFileTransformer should've merged it,
+           instead of just dropping all following licenses. */
+        assert !result.output.contains('license.txt')
+        // No module listing should appear. module-info.class is excluded by default.
+        assert !result.output.contains('open module org.example')
+    }
+
+    def 'Tests the removal of the default transformer'() {
+        given:
+        URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
+        URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
+
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDirectory = buildDir
+            |    archiveBaseName = 'shadow'
+            |    removeDefaultTransformers()
+            |    from('${artifact.path}')
+            |    from('${project.path}')
+            |}
+        """.stripMargin()
+
+        when:
+        BuildResult result = run('shadow')
+
+        then:
+        assert result.output =~ /\s*IGNORING Weird-File\.StrangeFormat from test-project-1\.0-SNAPSHOT\.jar,/
+                                / size is different \([0-9]{4} vs [0-9]{2}\)\s+--> origin JAR was Weird-File.StrangeFormat/
+                                /\s+IGNORING test\.json from test-project-1\.0-SNAPSHOT.jar, size is different/
+        // Without the StandardFileTransformer there should be a warning about multiple license files with the same name.
+        assert result.output.contains('license.txt')
+        // No module listing should appear. module-info.class is excluded by default.
+        assert !result.output.contains('open module org.example')
+    }
+
+    def 'Tests the info about the module-info.class, if removed from standard excludes'() {
+        given:
+        URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
+        URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
+
+        buildFile << """
+            |task shadow(type: ${ShadowJar.name}) {
+            |    destinationDirectory = buildDir
+            |    archiveBaseName = 'shadow'
+            |    allowModuleInfos()
+            |    from('${artifact.path}')
+            |    from('${project.path}')
+            |}
+        """.stripMargin()
+
+        when:
+        BuildResult result = run('shadow')
+
+        then:
+        assert result.output.contains('module-info.class')
+        // Because allowModuleInfos() is used, the module listing should appear.
+        assert result.output.contains('open module org.example')
+    }
+
     def 'include project sources'() {
         given:
         file('src/main/java/shadow/Passed.java') << '''
@@ -193,7 +273,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
             repositories { maven { url "${repo.uri}" } }
             dependencies { implementation project(':client') }
-
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server-all.jar')
