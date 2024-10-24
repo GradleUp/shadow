@@ -26,12 +26,17 @@ class ShadowPlugin implements Plugin<Project> {
             //   the behavior with the old plugin when applying in that order.
             plugins.apply(LegacyShadowPlugin)
 
-            // Legacy build scan support for Gradle Enterprise, users should migrate to develocity plugin.
-            rootProject.plugins.withId('com.gradle.enterprise') {
-                configureBuildScan(rootProject)
-            }
-            rootProject.plugins.withId('com.gradle.develocity') {
-                configureBuildScan(rootProject)
+            boolean enableDevelocityIntegration = providers.gradleProperty(
+                "com.gradleup.shadow.enableDevelocityIntegration"
+            ).map { it.toBoolean() }.getOrElse(false)
+            if (enableDevelocityIntegration) {
+                // Legacy build scan support for Gradle Enterprise, users should migrate to develocity plugin.
+                rootProject.plugins.withId('com.gradle.enterprise') {
+                    configureBuildScan(rootProject)
+                }
+                rootProject.plugins.withId('com.gradle.develocity') {
+                    configureBuildScan(rootProject)
+                }
             }
         }
     }
