@@ -47,7 +47,7 @@ tasks.withType<Javadoc>().configureEach {
 }
 
 configurations {
-  sequenceOf(
+  listOf(
     apiElements,
     runtimeElements,
     named("javadocElements"),

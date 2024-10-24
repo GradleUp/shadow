@@ -3,7 +3,9 @@
 
 ## [Unreleased]
 
-- Apply legacy plugin last, and declare capabilities for old plugins, fixes [#964](https://github.com/GradleUp/shadow/issues/964) ([#991](https://github.com/GradleUp/shadow/pull/991))
+**Fixed**
+
+- Apply legacy plugin last, and declare capabilities for old plugins, fixes [#964](https://github.com/GradleUp/shadow/issues/964). ([#991](https://github.com/GradleUp/shadow/pull/991))
 
 ## [v8.3.2]
 
