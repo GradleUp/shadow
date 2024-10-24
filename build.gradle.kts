@@ -3,7 +3,7 @@ plugins {
   `java-gradle-plugin`
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
-  id("com.diffplug.spotless") version "7.0.0.BETA3"
+  id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
 java {
