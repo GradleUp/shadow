@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.util.jar.JarFile
 
@@ -11,7 +12,7 @@ class RelocationUtil {
             configuration.files.each { jar ->
                 JarFile jf = new JarFile(jar)
                 jf.entries().each { entry ->
-                    if (entry.name.endsWith(".class") && entry.name != "module-info.class") {
+                    if (entry.name.endsWith(".class") && entry.name != ShadowJavaPlugin.MODULE_INFO_CLASS) {
                         packages << entry.name[0..entry.name.lastIndexOf('/') - 1].replaceAll('/', '.')
                     }
                 }
