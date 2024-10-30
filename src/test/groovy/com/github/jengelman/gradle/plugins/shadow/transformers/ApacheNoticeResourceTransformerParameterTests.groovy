@@ -20,60 +20,68 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import junit.framework.TestCase
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+
+import static org.junit.jupiter.api.Assertions.*
 
 /**
  * Tests {@link ApacheLicenseResourceTransformer} parameters.
  *
  * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerParameterTests.java
  */
-class ApacheNoticeResourceTransformerParameterTests extends TestCase {
+class ApacheNoticeResourceTransformerParameterTests extends TransformerTestSupport<ApacheNoticeResourceTransformer> {
 
     private static final String NOTICE_RESOURCE = "META-INF/NOTICE"
-    private ApacheNoticeResourceTransformer subject
-    private ShadowStats stats
+    private static ShadowStats stats
 
-    @Override
-    protected void setUp() {
-        super.setUp()
-        subject = new ApacheNoticeResourceTransformer()
+    @BeforeEach
+    void setUp() {
+        transformer = new ApacheNoticeResourceTransformer()
         stats = new ShadowStats()
     }
 
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenNoInput() {
         processAndFailOnNullPointer("")
     }
 
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenNoLinesOfInput() {
         processAndFailOnNullPointer("Some notice text")
     }
 
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenOneLineOfInput() {
         processAndFailOnNullPointer("Some notice text\n")
     }
 
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenTwoLinesOfInput() {
         processAndFailOnNullPointer("Some notice text\nSome notice text\n")
     }
 
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenLineStartsWithSlashSlash() {
         processAndFailOnNullPointer("Some notice text\n//Some notice text\n")
     }
 
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenLineIsSlashSlash() {
         processAndFailOnNullPointer("//\n")
     }
 
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenLineIsEmpty() {
         processAndFailOnNullPointer("\n")
     }
 
-    private void processAndFailOnNullPointer(final String noticeText) {
+    private static void processAndFailOnNullPointer(final String noticeText) {
         try {
             final ByteArrayInputStream noticeInputStream = new ByteArrayInputStream(noticeText.getBytes())
             final List<Relocator> emptyList = Collections.emptyList()
-            subject.transform(TransformerContext.builder().path(NOTICE_RESOURCE).is(noticeInputStream).relocators(emptyList).stats(stats).build())
+            transformer.transform(TransformerContext.builder().path(NOTICE_RESOURCE).is(noticeInputStream).relocators(emptyList).stats(stats).build())
         }
         catch (NullPointerException ignored) {
             fail("Null pointer should not be thrown when no parameters are set.")
