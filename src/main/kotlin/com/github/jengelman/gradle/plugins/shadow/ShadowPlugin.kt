@@ -11,13 +11,18 @@ public class ShadowPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     with(project.plugins) {
       apply(ShadowBasePlugin::class.java)
-      apply(LegacyShadowPlugin::class.java)
       withType(JavaPlugin::class.java) {
         apply(ShadowJavaPlugin::class.java)
       }
       withType(ApplicationPlugin::class.java) {
         apply(ShadowApplicationPlugin::class.java)
       }
+      // Apply the legacy plugin last
+      //   Because we apply the ShadowJavaPlugin/ShadowApplication plugin in a withType callback for the
+      //   respective JavaPlugin/ApplicationPlugin, it may still apply before the shadowJar task is created and
+      //   etc. if the user applies shadow before those plugins. However, this is fine, because this was also
+      //   the behavior with the old plugin when applying in that order.
+      apply(LegacyShadowPlugin::class.java)
     }
   }
 }

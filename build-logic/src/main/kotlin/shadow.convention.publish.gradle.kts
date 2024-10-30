@@ -45,8 +45,6 @@ configurations {
   listOf(
     apiElements,
     runtimeElements,
-    named("javadocElements"),
-    named("sourcesElements"),
   ).forEach {
     it.configure {
       outgoing {
