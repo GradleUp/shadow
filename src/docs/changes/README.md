@@ -4,14 +4,20 @@
 ## [Unreleased]
 
 
-## [v8.3.3]
+## [v8.3.4] (2024-10-29)
+
+**Fixed**
+
+- Apply legacy plugin last, and declare capabilities for old plugins, fixes [#964](https://github.com/GradleUp/shadow/issues/964). ([#991](https://github.com/GradleUp/shadow/pull/991))
+
+## [v8.3.3] (2024-10-02)
 
 **Changed**
 
 - Disable Develocity integration by default. ([#993](https://github.com/GradleUp/shadow/pull/993))
 
 
-## [v8.3.2]
+## [v8.3.2] (2024-09-18)
 
 **Added**
 
@@ -27,7 +33,7 @@
 - Stop publishing Shadow self fat jar to Maven repository. ([#967](https://github.com/GradleUp/shadow/pull/967))
 
 
-## [v8.3.1]
+## [v8.3.1] (2024-09-10)
 
 **Added**
 
@@ -41,7 +47,7 @@
 
 
 
-## [v8.3.0]
+## [v8.3.0] (2024-08-08)
 
 **Changed**
 
@@ -401,7 +407,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.3...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.4...HEAD
+[v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
 [v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
 [v8.3.2]: https://github.com/GradleUp/shadow/releases/tag/8.3.2
 [v8.3.1]: https://github.com/GradleUp/shadow/releases/tag/8.3.1

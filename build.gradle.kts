@@ -3,7 +3,7 @@ plugins {
   `java-gradle-plugin`
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
-  id("com.diffplug.spotless") version "7.0.0.BETA2"
+  id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
 java {
@@ -38,7 +38,7 @@ dependencies {
   testImplementation("org.xmlunit:xmlunit-legacy:2.10.0")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation(platform("org.junit:junit-bom:5.11.2"))
+  testImplementation(platform("org.junit:junit-bom:5.11.3"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.platform:junit-platform-suite-engine")
 }
