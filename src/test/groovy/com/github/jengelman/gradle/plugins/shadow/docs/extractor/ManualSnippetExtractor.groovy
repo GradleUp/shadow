@@ -5,11 +5,12 @@ import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.execute
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter
 import groovy.ant.FileNameFinder
 
+import java.nio.file.Path
 import java.util.regex.Pattern
 
 class ManualSnippetExtractor {
 
-    static List<TestCodeSnippet> extract(File root, String cssClass, SnippetExecuter executer) {
+    static List<TestCodeSnippet> extract(Path tempDir, File root, String cssClass, SnippetExecuter executer) {
         List<TestCodeSnippet> snippets = []
 
         def snippetBlockPattern = Pattern.compile(/(?ims)```$cssClass\n(.*?)\n```/)
@@ -17,19 +18,19 @@ class ManualSnippetExtractor {
 
         filenames.each { filename ->
             def file = new File(filename)
-            addSnippets(snippets, file, snippetBlockPattern, executer)
+            addSnippets(tempDir, snippets, file, snippetBlockPattern, executer)
         }
 
         snippets
     }
 
-    private static void addSnippets(List<TestCodeSnippet> snippets, File file, Pattern snippetBlockPattern, SnippetExecuter executer) {
+    private static void addSnippets(Path tempDir, List<TestCodeSnippet> snippets, File file, Pattern snippetBlockPattern, SnippetExecuter executer) {
         def source = file.text
         String testName = file.parentFile.name + "/" +file.name
         Map<Integer, String> snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
 
         snippetsByLine.each { lineNumber, snippet ->
-            snippets << createSnippet(testName, file, lineNumber, snippet, executer)
+            snippets << createSnippet(tempDir, testName, file, lineNumber, snippet, executer)
         }
     }
 
@@ -60,8 +61,8 @@ class ManualSnippetExtractor {
         tag.substring(tag.indexOf("\n") + 1, tag.lastIndexOf("\n"))
     }
 
-    private static TestCodeSnippet createSnippet(String sourceClassName, File sourceFile, int lineNumber, String snippet, SnippetExecuter executer) {
-        new TestCodeSnippet(snippet, sourceClassName, sourceClassName + ":$lineNumber", executer, new ExceptionTransformer(sourceClassName, sourceFile.name, lineNumber))
+    private static TestCodeSnippet createSnippet(Path tempDir, String sourceClassName, File sourceFile, int lineNumber, String snippet, SnippetExecuter executer) {
+        new TestCodeSnippet(tempDir, snippet, sourceClassName + ":$lineNumber", executer, new ExceptionTransformer(sourceClassName, sourceFile.name, lineNumber))
     }
 
 }
