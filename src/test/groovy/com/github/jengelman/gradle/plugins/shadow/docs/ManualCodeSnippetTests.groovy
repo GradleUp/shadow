@@ -15,9 +15,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 
 class ManualCodeSnippetTests {
-    @TempDir
-    private Path tempDir
-
     public static final LinkedHashMap<String, SnippetExecuter> FIXTURES = [
             "groovy": new GradleBuildExecuter("build.gradle", new GroovyDslFixture(), new GroovyDslFixture.ImportsExtractor()),
             "groovy no-plugins": new GradleBuildExecuter("build.gradle", new GroovyScriptFixture(), new GroovyDslFixture.ImportsExtractor()),
@@ -25,7 +22,7 @@ class ManualCodeSnippetTests {
     ]
 
     @TestFactory
-    List<DynamicTest> provideDynamicTests() {
+    List<DynamicTest> provideDynamicTests(@TempDir Path tempDir) {
         File cwd = new File(StandardSystemProperty.USER_DIR.value())
         def content = new File(cwd, "src/docs")
         List<TestCodeSnippet> snippets = []
