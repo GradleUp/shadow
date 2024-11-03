@@ -5,7 +5,7 @@
 
 **Fixed**
 
-- Revert "Bump Java level to 11" ([#1011](https://github.com/GradleUp/shadow/issues/1011)).
+- Revert "Bump Java level to 11" ([#1011](https://github.com/GradleUp/shadow/issues/1011)).  
   Shadow will bump Java level to 11 or above in the next major release, reverts it here for keeping compatibility with 8.x versions.
 
 
