@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v8.3.5] (2024-11-03)
+
 **Fixed**
 
 - Revert "Bump Java level to 11" ([#1011](https://github.com/GradleUp/shadow/issues/1011)).  
@@ -412,7 +415,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.4...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.5...HEAD
+[v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
 [v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
 [v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
 [v8.3.2]: https://github.com/GradleUp/shadow/releases/tag/8.3.2
