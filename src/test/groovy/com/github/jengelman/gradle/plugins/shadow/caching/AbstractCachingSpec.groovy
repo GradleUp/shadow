@@ -4,14 +4,15 @@ import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import spock.lang.TempDir
+
+import java.nio.file.Path
 
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 abstract class AbstractCachingSpec extends PluginSpecification {
-    @Rule TemporaryFolder alternateDir
+    @TempDir Path alternateDir
 
     @Override
     def setup() {
@@ -41,7 +42,7 @@ abstract class AbstractCachingSpec extends PluginSpecification {
         List<String> cacheArguments = [ '--build-cache' ]
         cacheArguments.addAll(arguments)
         // TODO: Use PluginSpecification.run here to reuse flags, but cache tests failed for now, need to investigate.
-        return runner.withProjectDir(alternateDir.root).withArguments(cacheArguments).build()
+        return runner.withProjectDir(alternateDir.toFile()).withArguments(cacheArguments).build()
     }
 
     private String escapedPath(File file) {
@@ -59,9 +60,9 @@ abstract class AbstractCachingSpec extends PluginSpecification {
     }
 
     void copyToAlternateDir() {
-        FileUtils.deleteDirectory(alternateDir.root)
-        FileUtils.forceMkdir(alternateDir.root)
-        FileUtils.copyDirectory(dir.root, alternateDir.root)
+        FileUtils.deleteDirectory(alternateDir.toFile())
+        FileUtils.forceMkdir(alternateDir.toFile())
+        FileUtils.copyDirectory(dir.toFile(), alternateDir.toFile())
     }
 
     void assertShadowJarIsCachedAndRelocatable() {

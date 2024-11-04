@@ -7,7 +7,7 @@ plugins {
   `java-gradle-plugin`
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
-  id("com.diffplug.spotless") version "7.0.0.BETA2"
+  id("com.diffplug.spotless") version "7.0.0.BETA4"
   id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.16.3"
 }
 
@@ -40,7 +40,7 @@ dependencies {
   compileOnly(localGroovy())
 
   implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("org.ow2.asm:asm-commons:9.7")
+  implementation("org.ow2.asm:asm-commons:9.7.1")
   implementation("commons-io:commons-io:2.17.0")
   implementation("org.apache.ant:ant:1.10.15")
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
@@ -50,14 +50,14 @@ dependencies {
 
   testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
     exclude(group = "org.codehaus.groovy")
+    exclude(group = "org.hamcrest")
   }
-  testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
-  testImplementation("xmlunit:xmlunit:1.6")
+  testImplementation("org.xmlunit:xmlunit-legacy:2.10.0")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.1")
-  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.11.1")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testImplementation(platform("org.junit:junit-bom:5.11.3"))
+  testImplementation("org.junit.jupiter:junit-jupiter")
+  testImplementation("org.junit.platform:junit-platform-suite-engine")
 }
 
 val isCI = providers.environmentVariable("CI").isPresent

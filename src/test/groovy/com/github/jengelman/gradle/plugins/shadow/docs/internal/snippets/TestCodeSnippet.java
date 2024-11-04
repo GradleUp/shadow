@@ -2,40 +2,39 @@ package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets;
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.ExceptionTransformer;
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter;
+import org.junit.jupiter.api.function.Executable;
 
-public class TestCodeSnippet {
+import java.nio.file.Path;
 
-  private final String snippet;
-  private final String className;
-  private final String testName;
-  private final SnippetExecuter executer;
-  private final ExceptionTransformer exceptionTransformer;
+public class TestCodeSnippet implements Executable {
 
-  public TestCodeSnippet(String snippet, String className, String testName, SnippetExecuter executer, ExceptionTransformer exceptionTransformer) {
-    this.snippet = snippet;
-    this.className = className;
-    this.testName = testName;
-    this.executer = executer;
-    this.exceptionTransformer = exceptionTransformer;
-  }
+    private final Path tempDir;
+    private final String snippet;
+    private final String testName;
+    private final SnippetExecuter executer;
+    private final ExceptionTransformer exceptionTransformer;
 
-  public String getSnippet() {
-    return snippet;
-  }
+    public TestCodeSnippet(Path tempDir, String snippet, String testName, SnippetExecuter executer, ExceptionTransformer exceptionTransformer) {
+        this.tempDir = tempDir;
+        this.snippet = snippet;
+        this.testName = testName;
+        this.executer = executer;
+        this.exceptionTransformer = exceptionTransformer;
+    }
 
-  public String getClassName() {
-    return className;
-  }
+    public String getSnippet() {
+        return snippet;
+    }
 
-  public String getTestName() {
-    return testName;
-  }
+    public String getTestName() {
+        return testName;
+    }
 
-  public ExceptionTransformer getExceptionTransformer() {
-    return exceptionTransformer;
-  }
-
-  public SnippetExecuter getExecuter() {
-    return executer;
-  }
+    public void execute() throws Throwable {
+        try {
+            executer.execute(tempDir.toFile(), this);
+        } catch (Throwable t) {
+            throw exceptionTransformer.transform(t, executer.getFixture().getOffset());
+        }
+    }
 }

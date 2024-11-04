@@ -1,9 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
-import org.gradle.testkit.runner.BuildResult
-
-import static org.gradle.testkit.runner.TaskOutcome.*
-
 class MinimizationCachingSpec extends AbstractCachingSpec {
     File output
     String shadowJarTask = ":server:shadowJar"
