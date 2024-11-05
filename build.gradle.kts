@@ -1,4 +1,8 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
+  kotlin("jvm") version "2.0.21"
   groovy
   `java-gradle-plugin`
   id("shadow.convention.publish")
@@ -11,7 +15,19 @@ java {
   targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+kotlin {
+  explicitApi()
+  compilerOptions {
+    // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+    apiVersion = KotlinVersion.KOTLIN_1_8
+    jvmTarget = JvmTarget.JVM_1_8
+  }
+}
+
 spotless {
+  kotlin {
+    ktlint()
+  }
   kotlinGradle {
     ktlint()
     target("**/*.kts")
