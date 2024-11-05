@@ -10,12 +10,6 @@ plugins {
   id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
-sourceSets {
-  main {
-    kotlin.setSrcDirs(groovy.srcDirs)
-  }
-}
-
 java {
   sourceCompatibility = JavaVersion.VERSION_1_8
   targetCompatibility = JavaVersion.VERSION_1_8
