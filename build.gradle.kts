@@ -37,6 +37,7 @@ spotless {
 
 dependencies {
   compileOnly(localGroovy())
+  api(projects.api)
 
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("org.ow2.asm:asm-commons:9.7.1")
