@@ -16,25 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 /**
- * Modified from org.apache.maven.plugins.shade.relocation.Relocator.java
+ * Modified from `org.apache.maven.plugins.shade.relocation.Relocator.java`
  *
  * @author Jason van Zyl
  * @author John Engelman
  */
-interface Relocator {
-    String ROLE = Relocator.class.getName()
+public interface Relocator {
+  public fun canRelocatePath(path: String): Boolean
 
-    boolean canRelocatePath(String path)
+  public fun relocatePath(context: RelocatePathContext): String
 
-    String relocatePath(RelocatePathContext context)
+  public fun canRelocateClass(className: String): Boolean
 
-    boolean canRelocateClass(String className)
+  public fun relocateClass(context: RelocateClassContext): String
 
-    String relocateClass(RelocateClassContext context)
+  public fun applyToSourceContent(sourceContent: String): String
 
-    String applyToSourceContent(String sourceContent)
+  public companion object {
+    public val ROLE: String = Relocator::class.java.name
+  }
 }
