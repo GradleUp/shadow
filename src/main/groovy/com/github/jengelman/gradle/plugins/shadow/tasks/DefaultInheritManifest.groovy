@@ -33,7 +33,7 @@ class DefaultInheritManifest implements InheritManifest {
     }
 
     @Override
-    InheritManifest inheritFrom(Object inheritPaths, Closure closure) {
+    InheritManifest inheritFrom(Object[] inheritPaths, Closure closure) {
         DefaultManifestMergeSpec mergeSpec = new DefaultManifestMergeSpec()
         mergeSpec.from(inheritPaths)
         inheritMergeSpecs.add(mergeSpec)
