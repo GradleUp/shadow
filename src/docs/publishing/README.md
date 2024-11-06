@@ -4,8 +4,8 @@
 
 The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle's
 `maven-publish` plugin.
-The plugin provides the `component` method from the `shadow` extension to configure the
-publication with the necessary artifact and dependencies in the POM file.
+The plugin provides the `shadow` component to configure the publication with the necessary
+artifact and dependencies in the POM file.
 
 ```groovy
 // Publishing a Shadow JAR with the Maven-Publish Plugin
@@ -16,7 +16,7 @@ apply plugin: 'com.gradleup.shadow'
 publishing {
   publications {
     shadow(MavenPublication) {
-      components.shadow
+      from(components.shadow) // or components["shadow"] in Kotlin DSL
     }
   }
   repositories {
