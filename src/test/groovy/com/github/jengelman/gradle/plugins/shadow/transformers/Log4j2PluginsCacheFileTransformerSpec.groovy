@@ -27,7 +27,7 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
 
     void "should not transformer"() {
         when:
-        transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), null))
+        transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE)))
 
         then:
         !transformer.hasTransformedResource()
