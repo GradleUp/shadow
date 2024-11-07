@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.apache.tools.zip.ZipOutputStream
@@ -25,24 +24,21 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
 
 /**
- * Modified from org.apache.maven.plugins.shade.resource.ResourceTransformer.java
+ * Modified from `org.apache.maven.plugins.shade.resource.ResourceTransformer.java`
  *
  * @author Jason van Zyl
  * @author Charlie Knudsen
  * @author John Engelman
  */
-trait Transformer implements Named {
+public interface Transformer : Named {
+  public fun canTransformResource(element: FileTreeElement): Boolean
 
-    abstract boolean canTransformResource(FileTreeElement element)
+  public fun transform(context: TransformerContext)
 
-    abstract void transform(TransformerContext context)
+  public fun hasTransformedResource(): Boolean
 
-    abstract boolean hasTransformedResource()
+  public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
 
-    abstract void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps)
-
-    @Internal
-    String getName() {
-        return getClass().simpleName
-    }
+  @Internal
+  override fun getName(): String = this::class.java.simpleName
 }
