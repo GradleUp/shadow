@@ -16,43 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 /**
  * Prevents duplicate copies of the license
- * <p>
- * Modified from org.apache.maven.plugins.shade.resouce.ApacheLicenseResourceTransformer.java
+ *
+ * Modified from `org.apache.maven.plugins.shade.resouce.ApacheLicenseResourceTransformer.java`
  *
  * @author John Engelman
  */
-class ApacheLicenseResourceTransformer implements Transformer {
-
-    private static final String LICENSE_PATH = "META-INF/LICENSE"
-
-    private static final String LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
-
-    @Override
-    boolean canTransformResource(FileTreeElement element) {
-        def path = element.relativePath.pathString
-        return LICENSE_PATH.equalsIgnoreCase(path) ||
-                LICENSE_TXT_PATH.regionMatches(true, 0, path, 0, LICENSE_TXT_PATH.length())
+public class ApacheLicenseResourceTransformer public constructor() : Transformer by NoOpTransformer {
+    override fun canTransformResource(element: FileTreeElement): Boolean {
+        val path = element.relativePath.pathString
+        return LICENSE_PATH.equals(path, ignoreCase = true) ||
+          LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true)
     }
 
-    @Override
-    void transform(TransformerContext context) {
-
-    }
-
-    @Override
-    boolean hasTransformedResource() {
-        return false
-    }
-
-    @Override
-    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+    public companion object {
+        private const val LICENSE_PATH = "META-INF/LICENSE"
+        private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
     }
 }
