@@ -1,10 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import groovy.lang.Closure
+import org.gradle.api.Action
 import org.gradle.api.java.archives.Manifest
 
-public interface InheritManifest : Manifest {
-  public fun inheritFrom(vararg inheritPaths: Any): InheritManifest
+public interface InheritManifest <T : Any> : Manifest {
+  public fun inheritFrom(vararg inheritPaths: Any): InheritManifest<T>
 
-  public fun inheritFrom(vararg inheritPaths: Any, closure: Closure<*>?): InheritManifest
+  public fun inheritFrom(vararg inheritPaths: Any, action: Action<T>?): InheritManifest<T>
 }

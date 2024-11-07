@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 import groovy.lang.Closure
 import java.io.Writer
 import org.gradle.api.Action
-import org.gradle.api.Project
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Attributes
 import org.gradle.api.java.archives.Manifest
@@ -13,23 +12,25 @@ import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
 public class DefaultInheritManifest(
-  @Transient private val project: Project,
   private val fileResolver: FileResolver,
-) : InheritManifest {
+) : InheritManifest<ManifestMergeSpec> {
   private val internalManifest = DefaultManifest(fileResolver)
   private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
 
-  override fun inheritFrom(vararg inheritPaths: Any): InheritManifest {
-    return inheritFrom(inheritPaths, closure = null)
+  override fun inheritFrom(
+    vararg inheritPaths: Any
+  ): InheritManifest<ManifestMergeSpec> {
+    return inheritFrom(inheritPaths = inheritPaths, action = null)
   }
 
-  override fun inheritFrom(vararg inheritPaths: Any, closure: Closure<*>?): InheritManifest = apply {
+  override fun inheritFrom(
+    vararg inheritPaths: Any,
+    action: Action<ManifestMergeSpec>?
+  ): InheritManifest<ManifestMergeSpec> = apply {
     val mergeSpec = DefaultManifestMergeSpec()
     mergeSpec.from(*inheritPaths)
     inheritMergeSpecs.add(mergeSpec)
-    if (closure != null) {
-      project.configure(mergeSpec, closure)
-    }
+    action?.execute(mergeSpec)
   }
 
   override fun getAttributes(): Attributes = internalManifest.attributes
