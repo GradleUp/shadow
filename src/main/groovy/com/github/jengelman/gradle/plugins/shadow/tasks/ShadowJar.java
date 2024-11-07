@@ -151,14 +151,14 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     @Internal
     protected ZipCompressor getInternalCompressor() {
-        return GradleVersionUtil.getInternalCompressor(getEntryCompression(), this);
+        return Utils.getInternalCompressor(getEntryCompression(), this);
     }
 
     @TaskAction
     @Override
     protected void copy() {
         if (enableRelocation) {
-            RelocationUtil.configureRelocation(this, relocationPrefix);
+            Utils.configureRelocation(this, relocationPrefix);
         }
         from(getIncludedDependencies());
         super.copy();
@@ -177,7 +177,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      */
     @Internal
     protected PatternSet getRootPatternSet() {
-        return GradleVersionUtil.getRootPatternSet(getMainSpec());
+        return Utils.getRootPatternSet(getMainSpec());
     }
 
     /**
