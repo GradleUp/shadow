@@ -4,7 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
 
 @Deprecated("This is deprecated since 8.3.2")
-public abstract class ShadowExtension public constructor(project: Project) {
+public abstract class ShadowExtension(project: Project) {
   private val components = project.components
 
   @Deprecated("configure publication using component.shadow directly.")

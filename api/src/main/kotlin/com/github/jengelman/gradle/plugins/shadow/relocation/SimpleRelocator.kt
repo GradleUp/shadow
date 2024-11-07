@@ -32,7 +32,7 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 @CacheableRelocator
-public class SimpleRelocator @JvmOverloads public constructor(
+public class SimpleRelocator @JvmOverloads constructor(
   pattern: String?,
   shadedPattern: String?,
   includes: List<String>?,

@@ -5,7 +5,7 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.file.RegularFileProperty
 
-public abstract class JavaJarExec public constructor() : JavaExec() {
+public abstract class JavaJarExec : JavaExec() {
   @get:InputFile
   public val jarFile: RegularFileProperty = objectFactory.fileProperty()
 
