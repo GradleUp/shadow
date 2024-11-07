@@ -7,8 +7,8 @@ public data class RelocatePathContext(
   val stats: ShadowStats,
 ) {
   public class Builder {
-    private var path: String = ""
-    private var stats: ShadowStats = ShadowStats()
+    private var path = ""
+    private var stats = ShadowStats()
 
     public fun path(path: String): Builder = apply { this.path = path }
     public fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }

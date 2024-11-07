@@ -7,8 +7,8 @@ public data class RelocateClassContext(
   val stats: ShadowStats,
 ) {
   public class Builder {
-    private var className: String = ""
-    private var stats: ShadowStats = ShadowStats()
+    private var className = ""
+    private var stats = ShadowStats()
 
     public fun className(className: String): Builder = apply { this.className = className }
     public fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }
