@@ -61,9 +61,9 @@ class ManifestAppenderTransformer implements Transformer {
     @Override
     void transform(TransformerContext context) {
         if (manifestContents.length == 0) {
-            manifestContents = IOUtil.toByteArray(context.is)
+            manifestContents = IOUtil.toByteArray(context.inputStream)
             try {
-                context.is
+                context.inputStream
             } catch (IOException e) {
                 log.warn("Failed to read MANIFEST.MF", e)
             }

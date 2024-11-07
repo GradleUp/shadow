@@ -12,7 +12,7 @@ import groovy.transform.builder.Builder
 class TransformerContext {
 
     String path
-    InputStream is
+    InputStream inputStream
     List<Relocator> relocators
     ShadowStats stats
 

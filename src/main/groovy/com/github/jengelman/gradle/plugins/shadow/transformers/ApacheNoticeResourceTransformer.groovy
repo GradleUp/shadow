@@ -113,9 +113,9 @@ class ApacheNoticeResourceTransformer implements Transformer {
 
         BufferedReader reader
         if (StringUtils.isNotEmpty(encoding)) {
-            reader = new BufferedReader(new InputStreamReader(context.is, encoding))
+            reader = new BufferedReader(new InputStreamReader(context.inputStream, encoding))
         } else {
-            reader = new BufferedReader(new InputStreamReader(context.is))
+            reader = new BufferedReader(new InputStreamReader(context.inputStream))
         }
 
         String line = reader.readLine()

@@ -61,7 +61,7 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
 
     @Override
     void transform(TransformerContext context) {
-        def inputStream = context.is
+        def inputStream = context.inputStream
         def temporaryFile = File.createTempFile("Log4j2Plugins", ".dat")
         temporaryFile.deleteOnExit()
         temporaryFiles.add(temporaryFile)
