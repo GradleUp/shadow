@@ -20,35 +20,35 @@ public interface DependencyFilter {
   /**
    * Exclude dependencies that match the provided spec.
    */
-  public fun exclude(spec: Spec<in ResolvedDependency>): DependencyFilter
+  public fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter
 
   /**
    * Include dependencies that match the provided spec.
    */
-  public fun include(spec: Spec<in ResolvedDependency>): DependencyFilter
+  public fun include(spec: Spec<ResolvedDependency>): DependencyFilter
 
   /**
    * Create a spec that matches the provided project notation on group, name, and version.
    */
-  public fun project(notation: Map<String, *>): Spec<in ResolvedDependency>
+  public fun project(notation: Map<String, *>): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the default configuration for the provided project path on group, name, and version.
    */
-  public fun project(notation: String): Spec<in ResolvedDependency>
+  public fun project(notation: String): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches dependencies using the provided notation on group, name, and version.
    */
-  public fun dependency(notation: Any): Spec<in ResolvedDependency>
+  public fun dependency(notation: Any): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the provided dependency on group, name, and version.
    */
-  public fun dependency(dependency: Dependency): Spec<in ResolvedDependency>
+  public fun dependency(dependency: Dependency): Spec<ResolvedDependency>
 
   /**
    * Create a spec that matches the provided closure.
    */
-  public fun dependency(spec: Closure<*>): Spec<in ResolvedDependency>
+  public fun dependency(closure: Closure<*>): Spec<ResolvedDependency>
 }
