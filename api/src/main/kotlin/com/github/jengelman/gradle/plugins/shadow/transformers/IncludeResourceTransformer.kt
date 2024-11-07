@@ -16,58 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.codehaus.plexus.util.IOUtil
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import java.io.File
 
 /**
  * A resource processor that allows the addition of an arbitrary file
  * content into the shaded JAR.
- * <p>
- * Modified from org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java
+ *
+ * Modified from `org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java`
  *
  * @author John Engelman
  */
-class IncludeResourceTransformer implements Transformer {
+public class IncludeResourceTransformer : Transformer by NoOpTransformer {
+  @get:InputFile
+  @get:PathSensitive(PathSensitivity.NONE)
+  public var file: File? = null
 
-    @InputFile
-    @PathSensitive(PathSensitivity.NONE)
-    File file
+  @get:Input
+  public var resource: String? = null
 
-    @Input
-    String resource
+  override fun hasTransformedResource(): Boolean = file?.exists() == true
 
-    @Override
-    boolean canTransformResource(FileTreeElement element) {
-        return false
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    check(file != null) { "file must be set" }
+    check(resource != null) { "resource must be set" }
+
+    val entry = ZipEntry(resource)
+    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
+    os.putNextEntry(entry)
+
+    file!!.inputStream().use { inputStream ->
+      inputStream.copyTo(os)
     }
-
-    @Override
-    void transform(TransformerContext context) {
-        // no op
-    }
-
-    @Override
-    boolean hasTransformedResource() {
-        return file != null ? file.exists() : false
-    }
-
-    @Override
-    void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
-        ZipEntry entry = new ZipEntry(resource)
-        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-        os.putNextEntry(entry)
-
-        InputStream is = new FileInputStream(file)
-        IOUtil.copy(is, os)
-        is.close()
-    }
+  }
 }
