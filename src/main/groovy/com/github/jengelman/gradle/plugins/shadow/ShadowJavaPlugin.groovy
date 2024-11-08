@@ -21,7 +21,6 @@ import javax.inject.Inject
 class ShadowJavaPlugin implements Plugin<Project> {
 
     public static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
-    public static final String SHADOW_GROUP = 'Shadow'
     public static final String SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME = 'shadowRuntimeElements'
 
     private final SoftwareComponentFactory softwareComponentFactory
@@ -83,7 +82,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
         def jarTask = project.tasks.named(JavaPlugin.JAR_TASK_NAME, Jar)
         def taskProvider = project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
-            shadow.group = SHADOW_GROUP
+            shadow.group = ShadowBasePlugin.SHADOW_GROUP
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.archiveClassifier.set("all")
             shadow.manifest.inheritFrom(jarTask.get().manifest)
