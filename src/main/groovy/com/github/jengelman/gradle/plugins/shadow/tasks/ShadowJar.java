@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks;
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin;
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats;
 import com.github.jengelman.gradle.plugins.shadow.internal.*;
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator;
@@ -32,7 +33,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private List<FileCollection> configurations;
     private transient DependencyFilter dependencyFilter;
     private boolean enableRelocation;
-    private String relocationPrefix = "shadow";
+    private String relocationPrefix = ShadowBasePlugin.SHADOW;
     private boolean minimizeJar;
     private final transient DependencyFilter dependencyFilterForMinimize;
     private FileCollection toMinimize;

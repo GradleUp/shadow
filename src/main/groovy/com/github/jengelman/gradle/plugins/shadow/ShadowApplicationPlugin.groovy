@@ -33,7 +33,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         this.javaApplication = project.extensions.getByType(JavaApplication)
 
         DistributionContainer distributions = project.extensions.getByName("distributions") as DistributionContainer
-        Distribution distribution = distributions.create("shadow")
+        Distribution distribution = distributions.create(ShadowBasePlugin.DISTRIBUTION_NAME)
 
         addRunTask(project)
         addCreateScriptsTask(project)

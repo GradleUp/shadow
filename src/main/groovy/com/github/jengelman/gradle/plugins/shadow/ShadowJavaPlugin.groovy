@@ -82,7 +82,7 @@ class ShadowJavaPlugin implements Plugin<Project> {
         SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
         def jarTask = project.tasks.named(JavaPlugin.JAR_TASK_NAME, Jar)
         def taskProvider = project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar) { shadow ->
-            shadow.group = ShadowBasePlugin.SHADOW_GROUP
+            shadow.group = ShadowBasePlugin.GROUP_NAME
             shadow.description = 'Create a combined JAR of project and runtime dependencies'
             shadow.archiveClassifier.set("all")
             shadow.manifest.inheritFrom(jarTask.get().manifest)

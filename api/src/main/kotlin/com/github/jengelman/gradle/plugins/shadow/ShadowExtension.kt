@@ -9,6 +9,6 @@ public abstract class ShadowExtension(project: Project) {
 
   @Deprecated("configure publication using component.shadow directly.")
   public fun component(publication: MavenPublication) {
-    publication.from(components.findByName("shadow"))
+    publication.from(components.findByName(ShadowBasePlugin.COMPONENT_NAME))
   }
 }

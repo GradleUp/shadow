@@ -15,15 +15,17 @@ public class ShadowBasePlugin : Plugin<Project> {
     project.extensions.create(EXTENSION_NAME, ShadowExtension::class.java, project)
     project.configurations.create(CONFIGURATION_NAME)
     project.tasks.register(KnowsTask.NAME, KnowsTask::class.java) { knows ->
-      knows.group = SHADOW_GROUP
+      knows.group = GROUP_NAME
       knows.description = KnowsTask.DESC
     }
   }
 
   public companion object {
-    public const val SHADOW_GROUP: String = "Shadow"
-    public const val EXTENSION_NAME: String = "shadow"
-    public const val CONFIGURATION_NAME: String = "shadow"
-    public const val COMPONENT_NAME: String = "shadow"
+    public const val SHADOW: String = "shadow"
+    public const val GROUP_NAME: String = SHADOW
+    public const val EXTENSION_NAME: String = SHADOW
+    public const val CONFIGURATION_NAME: String = SHADOW
+    public const val COMPONENT_NAME: String = SHADOW
+    public const val DISTRIBUTION_NAME: String = SHADOW
   }
 }
