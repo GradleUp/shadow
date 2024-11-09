@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Removed**
+
+- **BREAKING CHANGE:** Remove Develocity integration. ([#1013](https://github.com/GradleUp/shadow/pull/1013))
+
 
 ## [v8.3.5] (2024-11-03)
 
