@@ -24,6 +24,8 @@ kotlin {
 }
 
 dependencies {
+  compileOnly("com.gradleup.shadow:shadow-gradle-plugin:8.3.5")
+
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("org.ow2.asm:asm-commons:9.7.1")
   implementation("commons-io:commons-io:2.17.0")
