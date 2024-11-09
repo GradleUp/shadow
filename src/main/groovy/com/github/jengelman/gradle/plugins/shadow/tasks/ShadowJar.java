@@ -280,9 +280,9 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     @Override
-    public ShadowJar mergeServiceFiles(Action<ServiceFileTransformer> configureClosure) {
+    public ShadowJar mergeServiceFiles(Action<ServiceFileTransformer> action) {
         try {
-            transform(ServiceFileTransformer.class, configureClosure);
+            transform(ServiceFileTransformer.class, action);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
                  InstantiationException ignored) {
         }
@@ -336,13 +336,13 @@ public class ShadowJar extends Jar implements ShadowSpec {
      *
      * @param pattern the source pattern to relocate
      * @param destination the destination package
-     * @param configure the configuration of the relocator
+     * @param action the configuration of the relocator
      * @return this
      */
     @Override
-    public ShadowJar relocate(String pattern, String destination, Action<SimpleRelocator> configure) {
+    public ShadowJar relocate(String pattern, String destination, Action<SimpleRelocator> action) {
         SimpleRelocator relocator = new SimpleRelocator(pattern, destination, new ArrayList<>(), new ArrayList<>());
-        addRelocator(relocator, configure);
+        addRelocator(relocator, action);
         return this;
     }
 
@@ -381,13 +381,13 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * Add a relocator of the provided class and configure.
      *
      * @param relocatorClass the relocator class to add. Must have a no-arg constructor
-     * @param configure the configuration for the relocator
+     * @param action the configuration for the relocator
      * @return this
      */
     @Override
-    public <R extends Relocator> ShadowJar relocate(Class<R> relocatorClass, Action<R> configure) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public <R extends Relocator> ShadowJar relocate(Class<R> relocatorClass, Action<R> action) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         R relocator = relocatorClass.getDeclaredConstructor().newInstance();
-        addRelocator(relocator, configure);
+        addRelocator(relocator, action);
         return this;
     }
 
