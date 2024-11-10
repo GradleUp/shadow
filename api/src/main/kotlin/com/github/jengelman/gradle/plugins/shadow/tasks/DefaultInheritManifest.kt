@@ -1,50 +1,33 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import groovy.lang.Closure
 import java.io.Writer
 import org.gradle.api.Action
 import org.gradle.api.internal.file.FileResolver
-import org.gradle.api.java.archives.Attributes
 import org.gradle.api.java.archives.Manifest
-import org.gradle.api.java.archives.ManifestException
 import org.gradle.api.java.archives.ManifestMergeSpec
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
-public class DefaultInheritManifest(
+public class DefaultInheritManifest @JvmOverloads constructor(
   private val fileResolver: FileResolver,
-) : InheritManifest<ManifestMergeSpec> {
-  private val internalManifest = DefaultManifest(fileResolver)
+  private val internalManifest: DefaultManifest = DefaultManifest(fileResolver),
+) : InheritManifest<ManifestMergeSpec>, Manifest by internalManifest {
   private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
 
   override fun inheritFrom(
-    vararg inheritPaths: Any
+    vararg inheritPaths: Any,
   ): InheritManifest<ManifestMergeSpec> {
     return inheritFrom(inheritPaths = inheritPaths, action = null)
   }
 
   override fun inheritFrom(
     vararg inheritPaths: Any,
-    action: Action<ManifestMergeSpec>?
+    action: Action<ManifestMergeSpec>?,
   ): InheritManifest<ManifestMergeSpec> = apply {
     val mergeSpec = DefaultManifestMergeSpec()
     mergeSpec.from(*inheritPaths)
     inheritMergeSpecs.add(mergeSpec)
     action?.execute(mergeSpec)
-  }
-
-  override fun getAttributes(): Attributes = internalManifest.attributes
-
-  override fun getSections(): MutableMap<String, Attributes> = internalManifest.sections
-
-  @Throws(ManifestException::class)
-  override fun attributes(map: Map<String, *>): Manifest = apply {
-    internalManifest.attributes(map)
-  }
-
-  @Throws(ManifestException::class)
-  override fun attributes(map: Map<String, *>, s: String): Manifest  = apply {
-    internalManifest.attributes(map, s)
   }
 
   override fun getEffectiveManifest(): DefaultManifest {
@@ -62,17 +45,5 @@ public class DefaultInheritManifest(
 
   override fun writeTo(o: Any): Manifest = apply {
     effectiveManifest.writeTo(o)
-  }
-
-  override fun from(vararg objects: Any): Manifest = apply {
-    internalManifest.from(*objects)
-  }
-
-  override fun from(o: Any, closure: Closure<*>?): Manifest = apply {
-    internalManifest.from(o, closure)
-  }
-
-  override fun from(o: Any, action: Action<ManifestMergeSpec>): Manifest = apply {
-    internalManifest.from(o, action)
   }
 }

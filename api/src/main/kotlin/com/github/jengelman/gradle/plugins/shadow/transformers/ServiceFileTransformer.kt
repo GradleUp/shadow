@@ -20,7 +20,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
-import groovy.lang.Closure
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -29,7 +28,6 @@ import java.io.InputStream
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
-import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
@@ -48,15 +46,12 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public class ServiceFileTransformer : Transformer, PatternFilterable {
-  private val serviceEntries = mutableMapOf<String, ServiceStream>()
-  private val patternSet = PatternSet()
+public class ServiceFileTransformer(
+  private val patternSet: PatternSet = PatternSet()
     .include(SERVICES_PATTERN)
-    .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN)
-
-  public fun setPath(path: String) {
-    patternSet.setIncludes(listOf("$path/**"))
-  }
+    .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
+) : Transformer, PatternFilterable by patternSet {
+  private val serviceEntries = mutableMapOf<String, ServiceStream>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element
@@ -111,74 +106,8 @@ public class ServiceFileTransformer : Transformer, PatternFilterable {
   @Input
   override fun getExcludes(): Set<String> = patternSet.excludes
 
-  /**
-   * {@inheritDoc}
-   */
-  override fun include(vararg includes: String): ServiceFileTransformer = apply {
-    patternSet.include(*includes)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun include(includes: Iterable<String>): ServiceFileTransformer = apply {
-    patternSet.include(includes)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun include(includeSpec: Spec<FileTreeElement>): ServiceFileTransformer = apply {
-    patternSet.include(includeSpec)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun include(includeSpec: Closure<*>): ServiceFileTransformer = apply {
-    patternSet.include(includeSpec)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun exclude(vararg excludes: String): ServiceFileTransformer = apply {
-    patternSet.exclude(*excludes)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun exclude(excludes: Iterable<String>): ServiceFileTransformer = apply {
-    patternSet.exclude(excludes)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun exclude(excludeSpec: Spec<FileTreeElement>): ServiceFileTransformer = apply {
-    patternSet.exclude(excludeSpec)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun exclude(excludeSpec: Closure<*>): ServiceFileTransformer = apply {
-    patternSet.exclude(excludeSpec)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun setIncludes(includes: Iterable<String>): ServiceFileTransformer = apply {
-    patternSet.setIncludes(includes)
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  override fun setExcludes(excludes: Iterable<String>): ServiceFileTransformer = apply {
-    patternSet.setExcludes(excludes)
+  public fun setPath(path: String): PatternFilterable = apply {
+    patternSet.setIncludes(listOf("$path/**"))
   }
 
   public class ServiceStream : ByteArrayOutputStream(1024) {
