@@ -4,30 +4,30 @@ import java.io.Writer
 import org.gradle.api.Action
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Manifest
-import org.gradle.api.java.archives.ManifestMergeSpec
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
 public class DefaultInheritManifest @JvmOverloads constructor(
   private val fileResolver: FileResolver,
   private val internalManifest: DefaultManifest = DefaultManifest(fileResolver),
-) : InheritManifest<ManifestMergeSpec>, Manifest by internalManifest {
+) : InheritManifest, Manifest by internalManifest {
   private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
 
   override fun inheritFrom(
     vararg inheritPaths: Any,
-  ): InheritManifest<ManifestMergeSpec> {
+  ): InheritManifest {
     return inheritFrom(inheritPaths = inheritPaths, action = null)
   }
 
   override fun inheritFrom(
     vararg inheritPaths: Any,
-    action: Action<ManifestMergeSpec>?,
-  ): InheritManifest<ManifestMergeSpec> = apply {
+    action: Action<*>?
+  ): InheritManifest = apply {
     val mergeSpec = DefaultManifestMergeSpec()
     mergeSpec.from(*inheritPaths)
     inheritMergeSpecs.add(mergeSpec)
-    action?.execute(mergeSpec)
+    @Suppress("UNCHECKED_CAST")
+    (action as? Action<DefaultManifestMergeSpec>)?.execute(mergeSpec)
   }
 
   override fun getEffectiveManifest(): DefaultManifest {
