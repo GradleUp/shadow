@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.JavaJarExec
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -12,21 +13,16 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
+import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 import org.gradle.jvm.toolchain.JavaToolchainService
 
-class ShadowApplicationPlugin implements Plugin<Project> {
+public class ShadowApplicationPlugin : Plugin<Project> {
+  private lateinit var project: Project
+  private lateinit var javaApplication: JavaApplication
 
-  public static final String SHADOW_RUN_TASK_NAME = "runShadow"
-  public static final String SHADOW_SCRIPTS_TASK_NAME = "startShadowScripts"
-  public static final String SHADOW_INSTALL_TASK_NAME = "installShadowDist"
-
-  private Project project
-  private JavaApplication javaApplication
-
-  @Override
-  void apply(Project project) {
+  override fun apply(project: Project) {
     this.project = project
-    this.javaApplication = project.extensions.getByType(JavaApplication)
+    this.javaApplication = project.extensions.getByType(JavaApplication::class.java)
 
     addRunTask()
     addCreateScriptsTask()
@@ -35,8 +31,8 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     configureInstallTask()
   }
 
-  protected void configureJarMainClass() {
-    def classNameProvider = javaApplication.mainClass
+  private fun configureJarMainClass() {
+    val classNameProvider = javaApplication.mainClass
     shadowJar.configure { jar ->
       jar.inputs.property("mainClassName", classNameProvider)
       jar.doFirst {
@@ -45,9 +41,9 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
   }
 
-  protected void addRunTask() {
-    project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec) {
-      def install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync)
+  private fun addRunTask() {
+    project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec::class.java) {
+      val install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
       it.dependsOn(install)
       it.mainClass.set("-jar")
       it.description = "Runs this project as a JVM application using the shadow jar"
@@ -58,17 +54,19 @@ class ShadowApplicationPlugin implements Plugin<Project> {
           project.file("${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}")
         },
       )
-      def toolchain = project.extensions.getByType(JavaPluginExtension.class).toolchain
-      def defaultLauncher = project.extensions.getByType(JavaToolchainService.class)
+      val toolchain = project.extensions.getByType(JavaPluginExtension::class.java).toolchain
+      val defaultLauncher = project.extensions.getByType(JavaToolchainService::class.java)
         .launcherFor(toolchain)
       it.javaLauncher.set(defaultLauncher)
     }
   }
 
-  protected void addCreateScriptsTask() {
-    project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts) {
-      it.unixStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/unixStartScript.txt").text)
-      it.windowsStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/windowsStartScript.txt").text)
+  private fun addCreateScriptsTask() {
+    project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) {
+      (it.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
+        project.resources.text.fromString(this::class.java.requireResourceAsText("internal/unixStartScript.txt"))
+      (it.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
+        project.resources.text.fromString(this::class.java.requireResourceAsText("internal/windowsStartScript.txt"))
       it.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.classpath = project.files(shadowJar)
@@ -80,16 +78,19 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
   }
 
-  protected void configureInstallTask() {
-    project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync).configure { task ->
+  private fun configureInstallTask() {
+    project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java).configure { task ->
       task.doFirst {
-        if (task.destinationDir.directory &&
-          task.destinationDir.listFiles().size() != 0 &&
-          (!new File(task.destinationDir, "lib").directory || !new File(task.destinationDir, "bin").directory)
+        if (
+          !task.destinationDir.listFiles().isNullOrEmpty() && (
+            !task.destinationDir.resolve("lib").isDirectory ||
+              !task.destinationDir.resolve("bin").isDirectory
+            )
         ) {
-          throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
-            "If you really want to install to this directory, delete it and run the install task again.\n" +
-            "Alternatively, choose a different installation directory."
+          throw GradleException(
+            "The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
+              "If you really want to install to this directory, delete it and run the install task again.\n" +
+              "Alternatively, choose a different installation directory.",
           )
         }
       }
@@ -103,10 +104,10 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     }
   }
 
-  protected void configureDistSpec() {
-    project.extensions.getByType(DistributionContainer)
+  private fun configureDistSpec() {
+    project.extensions.getByType(DistributionContainer::class.java)
       .create(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
-        distributions.contents.with {
+        with(distributions.contents) {
           from(project.file("src/dist"))
           into("lib") {
             from(shadowJar)
@@ -120,7 +121,12 @@ class ShadowApplicationPlugin implements Plugin<Project> {
       }
   }
 
-  private TaskProvider<ShadowJar> getShadowJar() {
-    project.tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar)
+  private val shadowJar: TaskProvider<ShadowJar>
+    get() = project.tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
+
+  public companion object {
+    public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
+    public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"
+    public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
   }
 }
