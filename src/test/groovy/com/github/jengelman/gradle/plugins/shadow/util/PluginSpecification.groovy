@@ -58,6 +58,7 @@ abstract class PluginSpecification extends Specification {
                 .withProjectDir(dir.toFile())
                 .forwardOutput()
                 .withPluginClasspath()
+                .withTestKitDir(testKitDir)
     }
 
     GradleRunner runner(Collection<String> tasks) {
@@ -177,7 +178,7 @@ abstract class PluginSpecification extends Specification {
         return new File(this.class.classLoader.getResource(name).toURI())
     }
 
-    static File getTestKitDir() {
+    protected static File getTestKitDir() {
         def gradleUserHome = System.getenv("GRADLE_USER_HOME")
         if (!gradleUserHome) {
             gradleUserHome = new File(System.getProperty("user.home"), ".gradle").absolutePath

@@ -82,8 +82,6 @@ class ShadowPluginSpec extends PluginSpecification {
         when:
         run(['shadowJar']) {
             it.withGradleVersion(version)
-            it.withDebug(true)
-            it.withTestKitDir(getTestKitDir())
         }
 
         then:
@@ -108,8 +106,6 @@ class ShadowPluginSpec extends PluginSpecification {
         expect:
         runWithFailure(['shadowJar']) {
             it.withGradleVersion('7.0')
-            it.withDebug(true)
-            it.withTestKitDir(getTestKitDir())
         }
     }
 
@@ -387,7 +383,7 @@ class ShadowPluginSpec extends PluginSpecification {
             package client;
             import junit.framework.TestCase;
             public class Client extends TestCase {
-                public static void main(String[] args) {} 
+                public static void main(String[] args) {}
             }
         """.stripIndent()
 
@@ -1029,7 +1025,7 @@ class ShadowPluginSpec extends PluginSpecification {
             version = '1.0'
             repositories { maven { url "${repo.uri}" } }
             dependencies { api project(':api') }
-            
+
             shadowJar.minimize()
         """.stripIndent()
 
