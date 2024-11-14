@@ -2,8 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.InputStream
-import java.util.GregorianCalendar
 
 public data class TransformerContext @JvmOverloads constructor(
   val path: String,
@@ -36,15 +36,12 @@ public data class TransformerContext @JvmOverloads constructor(
   }
 
   public companion object {
-    // TODO: replace it with ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
-    private val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).getTimeInMillis()
-
     @JvmStatic
     public fun builder(): Builder = Builder()
 
     @JvmStatic
     public fun getEntryTimestamp(preserveFileTimestamps: Boolean, entryTime: Long): Long {
-      return if (preserveFileTimestamps) entryTime else CONSTANT_TIME_FOR_ZIP_ENTRIES
+      return if (preserveFileTimestamps) entryTime else ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
     }
   }
 }
