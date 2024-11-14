@@ -5,9 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.distribution.Distribution
 import org.gradle.api.distribution.DistributionContainer
-import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPluginExtension
@@ -18,9 +16,9 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 
 class ShadowApplicationPlugin implements Plugin<Project> {
 
-    public static final String SHADOW_RUN_TASK_NAME = 'runShadow'
-    public static final String SHADOW_SCRIPTS_TASK_NAME = 'startShadowScripts'
-    public static final String SHADOW_INSTALL_TASK_NAME = 'installShadowDist'
+    public static final String SHADOW_RUN_TASK_NAME = "runShadow"
+    public static final String SHADOW_SCRIPTS_TASK_NAME = "startShadowScripts"
+    public static final String SHADOW_INSTALL_TASK_NAME = "installShadowDist"
 
     private Project project
     private JavaApplication javaApplication
@@ -32,9 +30,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
 
         addRunTask()
         addCreateScriptsTask()
-
         configureDistSpec()
-
         configureJarMainClass()
         configureInstallTask()
     }
@@ -42,56 +38,59 @@ class ShadowApplicationPlugin implements Plugin<Project> {
     protected void configureJarMainClass() {
         def classNameProvider = javaApplication.mainClass
         shadowJar.configure { jar ->
-            jar.inputs.property('mainClassName', classNameProvider)
+            jar.inputs.property("mainClassName", classNameProvider)
             jar.doFirst {
-                jar.manifest.attributes 'Main-Class': classNameProvider.get()
+                jar.manifest.attributes["Main-Class"] = classNameProvider.get()
             }
         }
     }
 
     protected void addRunTask() {
-        project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec) { run ->
+        project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec) {
             def install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync)
-            run.dependsOn install
-            run.mainClass.set('-jar')
-            run.description = 'Runs this project as a JVM application using the shadow jar'
-            run.group = ApplicationPlugin.APPLICATION_GROUP
-            run.conventionMapping.jvmArgs = { javaApplication.applicationDefaultJvmArgs }
-            run.jarFile.fileProvider(project.providers.provider {
-                project.file("${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}")
-            })
-            def toolchain = project.getExtensions().getByType(JavaPluginExtension.class).toolchain
-            def defaultLauncher = project.getExtensions().getByType(JavaToolchainService.class)
+            it.dependsOn(install)
+            it.mainClass.set("-jar")
+            it.description = "Runs this project as a JVM application using the shadow jar"
+            it.group = ApplicationPlugin.APPLICATION_GROUP
+            it.conventionMapping.map("jvmArgs") { javaApplication.applicationDefaultJvmArgs }
+            it.jarFile.fileProvider(
+                project.providers.provider {
+                    project.file("${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}")
+                },
+            )
+            def toolchain = project.extensions.getByType(JavaPluginExtension.class).toolchain
+            def defaultLauncher = project.extensions.getByType(JavaToolchainService.class)
                 .launcherFor(toolchain)
-            run.getJavaLauncher().set(defaultLauncher)
+            it.javaLauncher.set(defaultLauncher)
         }
     }
 
     protected void addCreateScriptsTask() {
-        project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts) { task ->
-            task.unixStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/unixStartScript.txt").text)
-            task.windowsStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/windowsStartScript.txt").text)
-            task.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
-            task.group = ApplicationPlugin.APPLICATION_GROUP
-            task.classpath = project.files(shadowJar)
-            task.conventionMapping.mainClassName = { javaApplication.mainClass.get() }
-            task.conventionMapping.applicationName = { javaApplication.applicationName }
-            task.conventionMapping.outputDir = { new File(project.layout.buildDirectory.asFile.get(), 'scriptsShadow') }
-            task.conventionMapping.defaultJvmOpts = { javaApplication.applicationDefaultJvmArgs }
-            task.inputs.files(project.files(shadowJar))
+        project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts) {
+            it.unixStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/unixStartScript.txt").text)
+            it.windowsStartScriptGenerator.template = project.resources.text.fromString(this.class.getResource("internal/windowsStartScript.txt").text)
+            it.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
+            it.group = ApplicationPlugin.APPLICATION_GROUP
+            it.classpath = project.files(shadowJar)
+            it.conventionMapping.map("mainClassName") { javaApplication.mainClass.get() }
+            it.conventionMapping.map("applicationName") { javaApplication.applicationName }
+            it.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
+            it.conventionMapping.map("defaultJvmOpts") { javaApplication.applicationDefaultJvmArgs }
+            it.inputs.files(project.files(shadowJar))
         }
     }
 
     protected void configureInstallTask() {
         project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync).configure { task ->
             task.doFirst {
-                if (task.destinationDir.directory) {
-                    if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
-                        throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
-                            "If you really want to install to this directory, delete it and run the install task again.\n" +
-                            "Alternatively, choose a different installation directory."
-                        )
-                    }
+                if (task.destinationDir.directory &&
+                    task.destinationDir.listFiles().size() != 0 &&
+                    (!new File(task.destinationDir, "lib").directory || !new File(task.destinationDir, "bin").directory)
+                ) {
+                    throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
+                        "If you really want to install to this directory, delete it and run the install task again.\n" +
+                        "Alternatively, choose a different installation directory."
+                    )
                 }
             }
             task.doLast {
@@ -109,7 +108,6 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             .create(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
                 distributions.contents.with {
                     from(project.file("src/dist"))
-
                     into("lib") {
                         from(shadowJar)
                         from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
