@@ -12,22 +12,22 @@ import org.gradle.api.tasks.Internal
  * @author Charlie Knudsen
  * @author John Engelman
  */
-interface Transformer : Named {
-    fun canTransformResource(element: FileTreeElement): Boolean
+public interface Transformer : Named {
+  public fun canTransformResource(element: FileTreeElement): Boolean
 
-    fun transform(context: TransformerContext)
+  public fun transform(context: TransformerContext)
 
-    fun hasTransformedResource(): Boolean
+  public fun hasTransformedResource(): Boolean
 
-    fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
+  public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
 
-    @Internal
-    override fun getName(): String = this::class.java.simpleName
+  @Internal
+  override fun getName(): String = this::class.java.simpleName
 }
 
-object NoOpTransformer : Transformer {
-    override fun canTransformResource(element: FileTreeElement): Boolean = false
-    override fun transform(context: TransformerContext): Unit = Unit
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean): Unit = Unit
-    override fun hasTransformedResource(): Boolean = false
+public object NoOpTransformer : Transformer {
+  public override fun canTransformResource(element: FileTreeElement): Boolean = false
+  public override fun transform(context: TransformerContext): Unit = Unit
+  public override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean): Unit = Unit
+  public override fun hasTransformedResource(): Boolean = false
 }

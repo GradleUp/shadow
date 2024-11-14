@@ -9,15 +9,15 @@ import org.gradle.api.file.FileTreeElement
  *
  * @author John Engelman
  */
-class ApacheLicenseResourceTransformer : Transformer by NoOpTransformer {
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        val path = element.relativePath.pathString
-        return LICENSE_PATH.equals(path, ignoreCase = true) ||
-            LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true)
-    }
+public class ApacheLicenseResourceTransformer : Transformer by NoOpTransformer {
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    val path = element.relativePath.pathString
+    return LICENSE_PATH.equals(path, ignoreCase = true) ||
+      LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true)
+  }
 
-    companion object {
-        private const val LICENSE_PATH = "META-INF/LICENSE"
-        private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
-    }
+  public companion object {
+    private const val LICENSE_PATH = "META-INF/LICENSE"
+    private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
+  }
 }

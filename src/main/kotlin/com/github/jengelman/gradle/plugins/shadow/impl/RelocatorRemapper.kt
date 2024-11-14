@@ -13,61 +13,61 @@ import org.objectweb.asm.commons.Remapper
  *
  * @author John Engelman
  */
-class RelocatorRemapper(
-    private val relocators: List<Relocator>,
-    private val stats: ShadowStats,
+public class RelocatorRemapper(
+  private val relocators: List<Relocator>,
+  private val stats: ShadowStats,
 ) : Remapper() {
 
-    private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
+  private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
-    fun hasRelocators(): Boolean = relocators.isNotEmpty()
+  public fun hasRelocators(): Boolean = relocators.isNotEmpty()
 
-    override fun mapValue(value: Any): Any {
-        return if (value is String) {
-            mapName(value, true)
-        } else {
-            super.mapValue(value)
-        }
+  override fun mapValue(value: Any): Any {
+    return if (value is String) {
+      mapName(value, true)
+    } else {
+      super.mapValue(value)
+    }
+  }
+
+  override fun map(name: String): String {
+    return mapName(name, false)
+  }
+
+  public fun mapPath(path: String): String {
+    return map(path.substring(0, path.indexOf('.')))
+  }
+
+  public fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
+    return mapPath(path.pathString)
+  }
+
+  private fun mapName(name: String, relocateClass: Boolean): String {
+    var newName = name
+    var mappedValue = name
+
+    var prefix = ""
+    var suffix = ""
+
+    val matcher = classPattern.matcher(newName)
+    if (matcher.matches()) {
+      prefix = matcher.group(1) + "L"
+      suffix = ""
+      newName = matcher.group(2)
     }
 
-    override fun map(name: String): String {
-        return mapName(name, false)
+    for (relocator in relocators) {
+      if (relocator.canRelocateClass(newName) && relocateClass) {
+        val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
+        mappedValue = prefix + relocator.relocateClass(classContext) + suffix
+        break
+      } else if (relocator.canRelocatePath(newName)) {
+        val pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
+        mappedValue = prefix + relocator.relocatePath(pathContext) + suffix
+        break
+      }
     }
 
-    fun mapPath(path: String): String {
-        return map(path.substring(0, path.indexOf('.')))
-    }
-
-    fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
-        return mapPath(path.pathString)
-    }
-
-    private fun mapName(name: String, relocateClass: Boolean): String {
-        var newName = name
-        var mappedValue = name
-
-        var prefix = ""
-        var suffix = ""
-
-        val matcher = classPattern.matcher(newName)
-        if (matcher.matches()) {
-            prefix = matcher.group(1) + "L"
-            suffix = ""
-            newName = matcher.group(2)
-        }
-
-        for (relocator in relocators) {
-            if (relocator.canRelocateClass(newName) && relocateClass) {
-                val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
-                mappedValue = prefix + relocator.relocateClass(classContext) + suffix
-                break
-            } else if (relocator.canRelocatePath(newName)) {
-                val pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
-                mappedValue = prefix + relocator.relocatePath(pathContext) + suffix
-                break
-            }
-        }
-
-        return mappedValue
-    }
+    return mappedValue
+  }
 }
