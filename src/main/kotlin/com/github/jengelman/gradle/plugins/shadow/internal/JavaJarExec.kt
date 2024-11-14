@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.file.RegularFileProperty
 
 public abstract class JavaJarExec : JavaExec() {
   @get:InputFile

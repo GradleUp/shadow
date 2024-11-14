@@ -18,14 +18,14 @@
  */
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import java.io.IOException
+import java.nio.charset.StandardCharsets.UTF_8
+import java.util.jar.JarFile.MANIFEST_NAME
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
-import java.io.IOException
-import java.nio.charset.StandardCharsets.UTF_8
-import java.util.jar.JarFile.MANIFEST_NAME
 import org.slf4j.LoggerFactory
 
 /**

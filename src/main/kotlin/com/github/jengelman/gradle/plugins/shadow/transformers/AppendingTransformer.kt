@@ -19,12 +19,12 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import java.io.ByteArrayOutputStream
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
-import java.io.ByteArrayOutputStream
 
 /**
  * A resource processor that appends content for a resource, separated by a newline.

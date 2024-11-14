@@ -15,7 +15,7 @@ import org.vafer.jdependency.ClazzpathUnit
 public class UnusedTracker private constructor(
   classDirs: Iterable<File>,
   classJars: FileCollection,
-  private val _toMinimize: FileCollection
+  private val _toMinimize: FileCollection,
 ) {
   private val projectUnits: List<ClazzpathUnit>
   private val cp = Clazzpath()
@@ -47,7 +47,7 @@ public class UnusedTracker private constructor(
     public fun forProject(
       apiJars: FileCollection,
       sourceSetsClassesDirs: Iterable<File>,
-      toMinimize: FileCollection
+      toMinimize: FileCollection,
     ): UnusedTracker {
       return UnusedTracker(sourceSetsClassesDirs, apiJars, toMinimize)
     }

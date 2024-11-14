@@ -22,17 +22,17 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
+import java.util.Collections
+import java.util.Enumeration
 import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
-import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
-import java.util.Collections
-import java.util.Enumeration
 
 /**
  * Modified from the maven equivalent to work with gradle

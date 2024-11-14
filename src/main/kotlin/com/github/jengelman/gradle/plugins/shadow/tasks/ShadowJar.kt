@@ -42,7 +42,9 @@ import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.util.PatternSet
 
 @CacheableTask
-public abstract class ShadowJar : Jar(), ShadowSpec {
+public abstract class ShadowJar :
+  Jar(),
+  ShadowSpec {
   private val _transformers = mutableListOf<Transformer>()
   private val _relocators = mutableListOf<Relocator>()
   private val _configurations = mutableListOf<FileCollection>()
@@ -50,11 +52,11 @@ public abstract class ShadowJar : Jar(), ShadowSpec {
   private val _includedDependencies = project.files(Callable { _dependencyFilter.resolve(_configurations) })
 
   @Transient
-  private val _dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
+  private var minimizeJar = false
   private var _isEnableRelocation = false
   private var _relocationPrefix = ShadowBasePlugin.SHADOW
-  private var _minimizeJar = false
   private var _toMinimize: FileCollection? = null
   private var _apiJars: FileCollection? = null
   private var _sourceSetsClassesDirs: FileCollection? = null
@@ -66,7 +68,7 @@ public abstract class ShadowJar : Jar(), ShadowSpec {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
-    inputs.property("minimize") { _minimizeJar }
+    inputs.property("minimize") { minimizeJar }
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       _transformers.any { !isCacheableTransform(it::class.java) } ||
         _relocators.any { !isCacheableRelocator(it::class.java) }
@@ -80,8 +82,8 @@ public abstract class ShadowJar : Jar(), ShadowSpec {
   public val toMinimize: FileCollection
     get() {
       if (_toMinimize == null) {
-        _toMinimize = if (_minimizeJar) {
-          _dependencyFilterForMinimize.resolve(_configurations)
+        _toMinimize = if (minimizeJar) {
+          dependencyFilterForMinimize.resolve(_configurations)
             .minus(apiJars)
         } else {
           project.objects.fileCollection()
@@ -94,7 +96,7 @@ public abstract class ShadowJar : Jar(), ShadowSpec {
   public val apiJars: FileCollection
     get() {
       if (_apiJars == null) {
-        _apiJars = if (_minimizeJar) {
+        _apiJars = if (minimizeJar) {
           UnusedTracker.getApiJarsFromProject(project)
         } else {
           project.objects.fileCollection()
@@ -109,7 +111,7 @@ public abstract class ShadowJar : Jar(), ShadowSpec {
     get() {
       if (_sourceSetsClassesDirs == null) {
         val allClassesDirs = project.objects.fileCollection()
-        if (_minimizeJar) {
+        if (minimizeJar) {
           project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
             allClassesDirs.from(sourceSet.output.classesDirs)
           }
@@ -188,17 +190,17 @@ public abstract class ShadowJar : Jar(), ShadowSpec {
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
   override fun minimize(): ShadowJar = apply {
-    _minimizeJar = true
+    minimizeJar = true
   }
 
   override fun minimize(action: Action<DependencyFilter>?): ShadowJar = apply {
     minimize()
-    action?.execute(_dependencyFilterForMinimize)
+    action?.execute(dependencyFilterForMinimize)
   }
 
   override fun createCopyAction(): CopyAction {
     val documentationRegistry = services.get(DocumentationRegistry::class.java)
-    val unusedTracker = if (_minimizeJar) {
+    val unusedTracker = if (minimizeJar) {
       UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
     } else {
       null
@@ -213,7 +215,7 @@ public abstract class ShadowJar : Jar(), ShadowSpec {
       rootPatternSet,
       _stats,
       isPreserveFileTimestamps,
-      _minimizeJar,
+      minimizeJar,
       unusedTracker,
     )
   }

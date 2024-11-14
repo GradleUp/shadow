@@ -10,7 +10,8 @@ import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 public class DefaultInheritManifest @JvmOverloads constructor(
   private val fileResolver: FileResolver,
   private val internalManifest: DefaultManifest = DefaultManifest(fileResolver),
-) : InheritManifest, Manifest by internalManifest {
+) : InheritManifest,
+  Manifest by internalManifest {
   private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
 
   override fun inheritFrom(
@@ -21,7 +22,7 @@ public class DefaultInheritManifest @JvmOverloads constructor(
 
   override fun inheritFrom(
     vararg inheritPaths: Any,
-    action: Action<*>?
+    action: Action<*>?,
   ): InheritManifest = apply {
     val mergeSpec = DefaultManifestMergeSpec()
     mergeSpec.from(*inheritPaths)

@@ -75,7 +75,7 @@ public class ShadowCopyAction(
     val zipOutStream = try {
       compressor.createArchiveOutputStream(zipFile) as ZipOutputStream
     } catch (e: Exception) {
-      throw GradleException("Could not create ZIP '${zipFile}'", e)
+      throw GradleException("Could not create ZIP '$zipFile'", e)
     }
 
     try {
@@ -182,7 +182,7 @@ public class ShadowCopyAction(
           }
           recordVisit(fileDetails.relativePath)
         } catch (e: Exception) {
-          throw GradleException("Could not add $fileDetails to ZIP '${zipFile}'.", e)
+          throw GradleException("Could not add $fileDetails to ZIP '$zipFile'.", e)
         }
       } else {
         processArchive(fileDetails)
@@ -323,7 +323,7 @@ public class ShadowCopyAction(
         zipOutStr.closeEntry()
         recordVisit(dirDetails.relativePath)
       } catch (e: Exception) {
-        throw GradleException("Could not add $dirDetails to ZIP '${zipFile}'.", e)
+        throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
       }
     }
 

@@ -84,7 +84,8 @@ public class ShadowApplicationPlugin : Plugin<Project> {
 
       task.doFirst {
         if (
-          !task.destinationDir.listFiles().isNullOrEmpty() && (
+          !task.destinationDir.listFiles().isNullOrEmpty() &&
+          (
             !task.destinationDir.resolve("lib").isDirectory ||
               !task.destinationDir.resolve("bin").isDirectory
             )

@@ -50,7 +50,8 @@ public class ServiceFileTransformer(
   private val patternSet: PatternSet = PatternSet()
     .include(SERVICES_PATTERN)
     .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
-) : Transformer, PatternFilterable by patternSet {
+) : Transformer,
+  PatternFilterable by patternSet {
   private val serviceEntries = mutableMapOf<String, ServiceStream>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {

@@ -19,9 +19,9 @@
 
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
+import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
-import java.util.regex.Pattern
 import org.gradle.api.tasks.Optional
 
 /**
@@ -71,7 +71,6 @@ public class SimpleRelocator @JvmOverloads constructor(
     _includes += normalizePatterns(includes)
     _excludes += normalizePatterns(excludes)
   }
-
 
   @get:Input
   @get:Optional

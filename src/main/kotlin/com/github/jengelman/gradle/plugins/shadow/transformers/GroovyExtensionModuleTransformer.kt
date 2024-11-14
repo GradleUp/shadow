@@ -19,13 +19,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
-import org.apache.tools.zip.ZipEntry
-import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.util.Properties
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 
 /**
  * Modified from `eu.appsatori.gradle.fatjar.tasks.PrepareFiles.groovy`
