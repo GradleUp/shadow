@@ -108,7 +108,7 @@ public class ShadowApplicationPlugin : Plugin<Project> {
 
   private fun configureDistSpec() {
     project.extensions.getByType(DistributionContainer::class.java)
-      .create(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
+      .register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
         distributions.contents { contents ->
           contents.from(project.file("src/dist"))
           contents.into("lib") { lib ->
