@@ -7,11 +7,11 @@ import org.gradle.api.file.RegularFileProperty
 
 public abstract class JavaJarExec : JavaExec() {
   @get:InputFile
-  public val jarFile: RegularFileProperty = objectFactory.fileProperty()
+  public abstract val jarFile: RegularFileProperty
 
   @TaskAction
   override fun exec() {
-    val allArgs = buildList<String> {
+    val allArgs = buildList {
       add(jarFile.get().asFile.path)
       // Must cast args to List<String> here to avoid type mismatch.
       addAll(args as List<String>)
