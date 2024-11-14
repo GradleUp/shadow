@@ -80,6 +80,8 @@ public class ShadowApplicationPlugin : Plugin<Project> {
 
   private fun configureInstallTask() {
     project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java).configure { task ->
+      val applicationName = project.providers.provider { javaApplication.applicationName }
+
       task.doFirst {
         if (
           !task.destinationDir.listFiles().isNullOrEmpty() && (
@@ -88,7 +90,7 @@ public class ShadowApplicationPlugin : Plugin<Project> {
             )
         ) {
           throw GradleException(
-            "The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
+            "The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
               "If you really want to install to this directory, delete it and run the install task again.\n" +
               "Alternatively, choose a different installation directory.",
           )
@@ -96,7 +98,7 @@ public class ShadowApplicationPlugin : Plugin<Project> {
       }
       task.doLast {
         task.eachFile {
-          if (it.path == "bin/${javaApplication.applicationName}") {
+          if (it.path == "bin/${applicationName.get()}") {
             it.mode = 0x755
           }
         }
@@ -107,15 +109,15 @@ public class ShadowApplicationPlugin : Plugin<Project> {
   private fun configureDistSpec() {
     project.extensions.getByType(DistributionContainer::class.java)
       .create(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
-        with(distributions.contents) {
-          from(project.file("src/dist"))
-          into("lib") {
-            from(shadowJar)
-            from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
+        distributions.contents { contents ->
+          contents.from(project.file("src/dist"))
+          contents.into("lib") { lib ->
+            lib.from(shadowJar)
+            lib.from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
           }
-          into("bin") {
-            from(project.tasks.named(SHADOW_SCRIPTS_TASK_NAME))
-            filePermissions { it.unix(493) }
+          contents.into("bin") { bin ->
+            bin.from(project.tasks.named(SHADOW_SCRIPTS_TASK_NAME))
+            bin.filePermissions { it.unix(493) }
           }
         }
       }
