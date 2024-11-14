@@ -106,19 +106,13 @@ class ShadowCopyAction implements CopyAction {
         try {
             withResource(zipOutStr, new Action<ZipOutputStream>() {
                 void execute(ZipOutputStream outputStream) {
-                    try {
-                        stream.process(new StreamAction(outputStream, encoding, transformers, relocators, patternSet,
-                                unusedClasses, stats))
-                        processTransformers(outputStream)
-                    } catch (Exception e) {
-                        log.error('ex', e)
-                        //TODO this should not be rethrown
-                        throw e
-                    }
+                  stream.process(new StreamAction(outputStream, encoding, transformers, relocators, patternSet,
+                    unusedClasses, stats))
+                  processTransformers(outputStream)
                 }
             })
-        } catch (UncheckedIOException e) {
-            if (e.cause instanceof Zip64RequiredException) {
+        } catch (Exception e) {
+            if (e instanceof Zip64RequiredException || e.cause instanceof Zip64RequiredException) {
                 throw new Zip64RequiredException(
                         String.format("%s\n\nTo build this archive, please enable the zip64 extension.\nSee: %s",
                                 e.cause.message, documentationRegistry.getDslRefForProperty(Zip, "zip64"))
