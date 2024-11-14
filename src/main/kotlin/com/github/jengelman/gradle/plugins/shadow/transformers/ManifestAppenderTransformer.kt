@@ -18,55 +18,55 @@ import org.slf4j.LoggerFactory
  * Modified from [ManifestResourceTransformer].
  * @author Chris Rankin
  */
-public class ManifestAppenderTransformer : Transformer {
-  private var manifestContents = ByteArray(0)
-  private val _attributes = mutableListOf<Pair<String, Comparable<*>>>()
-  private val log = LoggerFactory.getLogger(this::class.java)
+class ManifestAppenderTransformer : Transformer {
+    private var manifestContents = ByteArray(0)
+    private val _attributes = mutableListOf<Pair<String, Comparable<*>>>()
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-  @get:Input
-  public val attributes: List<Pair<String, Comparable<*>>> get() = _attributes
+    @get:Input
+    val attributes: List<Pair<String, Comparable<*>>> get() = _attributes
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
-  }
-
-  override fun transform(context: TransformerContext) {
-    if (manifestContents.isEmpty()) {
-      manifestContents = IOUtil.toByteArray(context.inputStream)
-      try {
-        context.inputStream
-      } catch (e: IOException) {
-        log.warn("Failed to read MANIFEST.MF", e)
-      }
+    override fun canTransformResource(element: FileTreeElement): Boolean {
+        return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
     }
-  }
 
-  override fun hasTransformedResource(): Boolean = _attributes.isNotEmpty()
-
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(MANIFEST_NAME)
-    entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
-    os.write(manifestContents)
-
-    if (_attributes.isNotEmpty()) {
-      for (attribute in _attributes) {
-        os.write(attribute.first.toByteArray(UTF_8))
-        os.write(SEPARATOR)
-        os.write(attribute.second.toString().toByteArray(UTF_8))
-        os.write(EOL)
-      }
-      os.write(EOL)
-      _attributes.clear()
+    override fun transform(context: TransformerContext) {
+        if (manifestContents.isEmpty()) {
+            manifestContents = IOUtil.toByteArray(context.inputStream)
+            try {
+                context.inputStream
+            } catch (e: IOException) {
+                log.warn("Failed to read MANIFEST.MF", e)
+            }
+        }
     }
-  }
 
-  public fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
-    _attributes.add(Pair(name, value))
-  }
+    override fun hasTransformedResource(): Boolean = _attributes.isNotEmpty()
 
-  private companion object {
-    private val EOL = "\r\n".toByteArray(UTF_8)
-    private val SEPARATOR = ": ".toByteArray(UTF_8)
-  }
+    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        val entry = ZipEntry(MANIFEST_NAME)
+        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
+        os.write(manifestContents)
+
+        if (_attributes.isNotEmpty()) {
+            for (attribute in _attributes) {
+                os.write(attribute.first.toByteArray(UTF_8))
+                os.write(SEPARATOR)
+                os.write(attribute.second.toString().toByteArray(UTF_8))
+                os.write(EOL)
+            }
+            os.write(EOL)
+            _attributes.clear()
+        }
+    }
+
+    fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
+        _attributes.add(Pair(name, value))
+    }
+
+    private companion object {
+        private val EOL = "\r\n".toByteArray(UTF_8)
+        private val SEPARATOR = ": ".toByteArray(UTF_8)
+    }
 }

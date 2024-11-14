@@ -7,4 +7,4 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-public annotation class CacheableRelocator
+annotation class CacheableRelocator

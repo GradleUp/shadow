@@ -17,26 +17,26 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
-public class IncludeResourceTransformer : Transformer by NoOpTransformer {
-  @get:InputFile
-  @get:PathSensitive(PathSensitivity.NONE)
-  public var file: File? = null
+class IncludeResourceTransformer : Transformer by NoOpTransformer {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    var file: File? = null
 
-  @get:Input
-  public var resource: String? = null
+    @get:Input
+    var resource: String? = null
 
-  override fun hasTransformedResource(): Boolean = file?.exists() == true
+    override fun hasTransformedResource(): Boolean = file?.exists() == true
 
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    check(file != null) { "file must be set" }
-    check(resource != null) { "resource must be set" }
+    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        check(file != null) { "file must be set" }
+        check(resource != null) { "resource must be set" }
 
-    val entry = ZipEntry(resource)
-    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+        val entry = ZipEntry(resource)
+        entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
 
-    file!!.inputStream().use { inputStream ->
-      inputStream.copyTo(os)
+        file!!.inputStream().use { inputStream ->
+            inputStream.copyTo(os)
+        }
     }
-  }
 }

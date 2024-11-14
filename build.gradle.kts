@@ -16,7 +16,6 @@ java {
 }
 
 kotlin {
-  explicitApi()
   compilerOptions {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_1_8

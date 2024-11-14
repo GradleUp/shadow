@@ -22,68 +22,68 @@ import org.slf4j.LoggerFactory
  * @author Jason van Zyl
  * @author John Engelman
  */
-public class ManifestResourceTransformer : Transformer {
-  private val log = LoggerFactory.getLogger(this::class.java)
+class ManifestResourceTransformer : Transformer {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-  private var manifestDiscovered = false
-  private var manifest: Manifest? = null
+    private var manifestDiscovered = false
+    private var manifest: Manifest? = null
 
-  @get:Optional
-  @get:Input
-  public var mainClass: String? = null
+    @get:Optional
+    @get:Input
+    var mainClass: String? = null
 
-  @get:Optional
-  @get:Input
-  public var manifestEntries: MutableMap<String, Attributes>? = null
+    @get:Optional
+    @get:Input
+    var manifestEntries: MutableMap<String, Attributes>? = null
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
-    return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
-  }
-
-  override fun transform(context: TransformerContext) {
-    // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
-    // now which is situational at best. Right now there is no context passed in with the processing so we cannot
-    // tell what artifact is being processed.
-    if (!manifestDiscovered) {
-      manifest = Manifest(context.inputStream)
-      manifestDiscovered = true
-      try {
-        context.inputStream
-      } catch (e: IOException) {
-        log.warn("Failed to read MANIFEST.MF", e)
-      }
-    }
-  }
-
-  override fun hasTransformedResource(): Boolean = true
-
-  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    // If we didn't find a manifest, then let's create one.
-    if (manifest == null) {
-      manifest = Manifest()
+    override fun canTransformResource(element: FileTreeElement): Boolean {
+        val path = element.relativePath.pathString
+        return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
     }
 
-    val attributes = manifest!!.mainAttributes
-
-    mainClass?.let {
-      attributes[Attributes.Name.MAIN_CLASS] = it
+    override fun transform(context: TransformerContext) {
+        // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
+        // now which is situational at best. Right now there is no context passed in with the processing so we cannot
+        // tell what artifact is being processed.
+        if (!manifestDiscovered) {
+            manifest = Manifest(context.inputStream)
+            manifestDiscovered = true
+            try {
+                context.inputStream
+            } catch (e: IOException) {
+                log.warn("Failed to read MANIFEST.MF", e)
+            }
+        }
     }
 
-    manifestEntries?.forEach { (key, value) ->
-      attributes[Attributes.Name(key)] = value
+    override fun hasTransformedResource(): Boolean = true
+
+    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        // If we didn't find a manifest, then let's create one.
+        if (manifest == null) {
+            manifest = Manifest()
+        }
+
+        val attributes = manifest!!.mainAttributes
+
+        mainClass?.let {
+            attributes[Attributes.Name.MAIN_CLASS] = it
+        }
+
+        manifestEntries?.forEach { (key, value) ->
+            attributes[Attributes.Name(key)] = value
+        }
+
+        val entry = ZipEntry(JarFile.MANIFEST_NAME)
+        entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
+        os.putNextEntry(entry)
+        manifest!!.write(os)
     }
 
-    val entry = ZipEntry(JarFile.MANIFEST_NAME)
-    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
-    manifest!!.write(os)
-  }
-
-  public fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
-    if (manifestEntries == null) {
-      manifestEntries = LinkedHashMap()
+    fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
+        if (manifestEntries == null) {
+            manifestEntries = LinkedHashMap()
+        }
+        manifestEntries!!.putAll(attributes)
     }
-    manifestEntries!!.putAll(attributes)
-  }
 }

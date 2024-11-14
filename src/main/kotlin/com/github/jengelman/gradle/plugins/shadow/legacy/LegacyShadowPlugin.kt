@@ -8,6 +8,6 @@ import org.gradle.api.Project
  *
  * This allows older build logic to keep on working as if that old plugin ID was applied.
  */
-public class LegacyShadowPlugin : Plugin<Project> {
-  override fun apply(project: Project): Unit = Unit
+class LegacyShadowPlugin : Plugin<Project> {
+    override fun apply(project: Project): Unit = Unit
 }
