@@ -13,7 +13,7 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 @CacheableRelocator
-public class SimpleRelocator @JvmOverloads constructor(
+public open class SimpleRelocator @JvmOverloads constructor(
   pattern: String?,
   shadedPattern: String?,
   includes: List<String>?,
@@ -55,32 +55,32 @@ public class SimpleRelocator @JvmOverloads constructor(
 
   @get:Input
   @get:Optional
-  public val pattern: String? get() = _pattern
+  public open val pattern: String? get() = _pattern
 
   @get:Input
-  public val pathPattern: String get() = _pathPattern
+  public open val pathPattern: String get() = _pathPattern
 
   @get:Input
   @get:Optional
-  public val shadedPattern: String? get() = _shadedPattern
+  public open val shadedPattern: String? get() = _shadedPattern
 
   @get:Input
-  public val shadedPathPattern: String get() = _shadedPathPattern
+  public open val shadedPathPattern: String get() = _shadedPathPattern
 
   @get:Input
-  public val isRawString: Boolean get() = _isRawString
+  public open val isRawString: Boolean get() = _isRawString
 
   @get:Input
-  public val includes: Set<String> get() = _includes
+  public open val includes: Set<String> get() = _includes
 
   @get:Input
-  public val excludes: Set<String> get() = _excludes
+  public open val excludes: Set<String> get() = _excludes
 
-  public fun include(pattern: String): SimpleRelocator = apply {
+  public open fun include(pattern: String): SimpleRelocator = apply {
     _includes += normalizePatterns(listOf(pattern))
   }
 
-  public fun exclude(pattern: String): SimpleRelocator = apply {
+  public open fun exclude(pattern: String): SimpleRelocator = apply {
     _excludes += normalizePatterns(listOf(pattern))
   }
 

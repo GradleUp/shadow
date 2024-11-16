@@ -38,7 +38,7 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 import org.slf4j.LoggerFactory
 
-public class ShadowCopyAction internal constructor(
+public open class ShadowCopyAction internal constructor(
   private val zipFile: File,
   private val compressor: ZipCompressor,
   private val documentationRegistry: DocumentationRegistry,
@@ -380,10 +380,10 @@ public class ShadowCopyAction internal constructor(
     }
   }
 
-  public inner class RelativeArchivePath(
-    public val entry: ZipEntry,
+  public open inner class RelativeArchivePath(
+    public open val entry: ZipEntry,
   ) : RelativePath(!entry.isDirectory, *entry.name.split('/').toTypedArray()) {
-    public val isClassFile: Boolean get() = lastName.endsWith(".class")
+    public open val isClassFile: Boolean get() = lastName.endsWith(".class")
 
     @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
     override fun getParent(): RelativeArchivePath? {
@@ -397,10 +397,10 @@ public class ShadowCopyAction internal constructor(
     }
   }
 
-  public class ArchiveFileTreeElement(
+  public open class ArchiveFileTreeElement(
     private val archivePath: RelativeArchivePath,
   ) : FileTreeElement {
-    public val isClassFile: Boolean get() = archivePath.isClassFile
+    public open val isClassFile: Boolean get() = archivePath.isClassFile
 
     override fun getFile(): File = throw UnsupportedOperationException()
 
@@ -427,7 +427,7 @@ public class ShadowCopyAction internal constructor(
 
     override fun getPermissions(): FilePermissions = DefaultFilePermissions(mode)
 
-    public fun asFileTreeElement(): FileTreeElement {
+    public open fun asFileTreeElement(): FileTreeElement {
       @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
       return DefaultFileTreeElement(null, RelativePath(!isDirectory, *archivePath.segments), null, null)
     }

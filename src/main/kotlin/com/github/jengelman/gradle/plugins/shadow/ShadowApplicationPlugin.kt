@@ -31,7 +31,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     configureInstallTask()
   }
 
-  private fun configureJarMainClass() {
+  protected open fun configureJarMainClass() {
     val classNameProvider = javaApplication.mainClass
     shadowJar.configure { jar ->
       jar.inputs.property("mainClassName", classNameProvider)
@@ -41,7 +41,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  private fun addRunTask() {
+  protected open fun addRunTask() {
     project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec::class.java) {
       val install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
       it.dependsOn(install)
@@ -61,7 +61,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  private fun addCreateScriptsTask() {
+  protected open fun addCreateScriptsTask() {
     project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) {
       (it.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
         project.resources.text.fromString(this::class.java.requireResourceAsText("internal/unixStartScript.txt"))
@@ -78,7 +78,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  private fun configureInstallTask() {
+  protected open fun configureInstallTask() {
     project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java).configure { task ->
       val applicationName = project.providers.provider { javaApplication.applicationName }
 
@@ -107,7 +107,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  private fun configureDistSpec() {
+  protected open fun configureDistSpec() {
     project.extensions.getByType(DistributionContainer::class.java)
       .register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
         distributions.contents { contents ->
@@ -124,7 +124,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       }
   }
 
-  private val shadowJar: TaskProvider<ShadowJar>
+  protected val shadowJar: TaskProvider<ShadowJar>
     get() = project.tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
   public companion object {

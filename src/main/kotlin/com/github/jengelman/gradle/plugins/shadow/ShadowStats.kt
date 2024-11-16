@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import org.gradle.api.GradleException
 
-public class ShadowStats {
+public open class ShadowStats {
   public var totalTime: Long = 0
   public var jarStartTime: Long = 0
   public var jarEndTime: Long = 0
