@@ -1,18 +1,18 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import org.gradle.api.file.RegularFileProperty
+import java.io.File
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
 public abstract class JavaJarExec : JavaExec() {
   @get:InputFile
-  public abstract val jarFile: RegularFileProperty
+  public lateinit var jarFile: File
 
   @TaskAction
   override fun exec() {
     val allArgs = buildList {
-      add(jarFile.get().asFile.path)
+      add(jarFile.path)
       // Must cast args to List<String> here to avoid type mismatch.
       addAll(args as List<String>)
     }
