@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.GregorianCalendar
@@ -18,7 +19,6 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
-import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
@@ -93,7 +93,7 @@ public class ShadowCopyAction(
         )
         processTransformers(outputStream)
       }
-    } catch (e: UncheckedIOException) {
+    } catch (e: IOException) {
       throw Zip64RequiredException(
         "${e.cause?.message}\n\nTo build this archive, please enable the zip64 extension.\n" +
           "See: ${documentationRegistry.getDslRefForProperty(Zip::class.java, "zip64")}",
@@ -192,17 +192,17 @@ public class ShadowCopyAction(
     private fun processArchive(fileDetails: FileCopyDetails) {
       stats.startJar()
       ZipFile(fileDetails.file).use { archive ->
-        val archiveElements = archive.entries.toList().map {
-          ArchiveFileTreeElement(RelativeArchivePath(it))
-        }
-        val filteredArchiveElements = archiveElements.filter {
-          patternSet.asSpec.isSatisfiedBy(it.asFileTreeElement())
-        }
-        filteredArchiveElements.forEach { archiveElement ->
-          if (archiveElement.relativePath.isFile) {
-            visitArchiveFile(archiveElement, archive)
+        archive.entries.asSequence()
+          .map {
+            ArchiveFileTreeElement(RelativeArchivePath(it))
           }
-        }
+          .filter {
+            patternSet.asSpec.isSatisfiedBy(it.asFileTreeElement())
+          }.forEach { archiveElement ->
+            if (archiveElement.relativePath.isFile) {
+              visitArchiveFile(archiveElement, archive)
+            }
+          }
       }
       stats.finishJar()
     }
