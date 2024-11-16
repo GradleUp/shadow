@@ -18,21 +18,15 @@ public data class TransformerContext @JvmOverloads constructor(
     private var stats = ShadowStats()
 
     public fun path(path: String): Builder = apply { this.path = path }
-
     public fun inputStream(inputStream: InputStream): Builder = apply { this.inputStream = inputStream }
-
     public fun relocators(relocators: List<Relocator>): Builder = apply { this.relocators = relocators }
-
     public fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }
-
-    public fun build(): TransformerContext {
-      return TransformerContext(
-        path = path,
-        inputStream = inputStream,
-        relocators = relocators,
-        stats = stats,
-      )
-    }
+    public fun build(): TransformerContext = TransformerContext(
+      path = path,
+      inputStream = inputStream,
+      relocators = relocators,
+      stats = stats,
+    )
   }
 
   public companion object {
