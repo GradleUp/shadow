@@ -11,21 +11,21 @@ public data class TransformerContext @JvmOverloads constructor(
   val relocators: List<Relocator> = emptyList(),
   val stats: ShadowStats = ShadowStats(),
 ) {
-  public class Builder {
+  public open class Builder {
     private var path = ""
     private var inputStream: InputStream? = null
     private var relocators = emptyList<Relocator>()
     private var stats = ShadowStats()
 
-    public fun path(path: String): Builder = apply { this.path = path }
+    public open fun path(path: String): Builder = apply { this.path = path }
 
-    public fun inputStream(inputStream: InputStream): Builder = apply { this.inputStream = inputStream }
+    public open fun inputStream(inputStream: InputStream): Builder = apply { this.inputStream = inputStream }
 
-    public fun relocators(relocators: List<Relocator>): Builder = apply { this.relocators = relocators }
+    public open fun relocators(relocators: List<Relocator>): Builder = apply { this.relocators = relocators }
 
-    public fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }
+    public open fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }
 
-    public fun build(): TransformerContext {
+    public open fun build(): TransformerContext {
       return TransformerContext(
         path = path,
         inputStream = inputStream,
@@ -37,10 +37,10 @@ public data class TransformerContext @JvmOverloads constructor(
 
   public companion object {
     @JvmStatic
-    public fun builder(): Builder = Builder()
+    public open fun builder(): Builder = Builder()
 
     @JvmStatic
-    public fun getEntryTimestamp(preserveFileTimestamps: Boolean, entryTime: Long): Long {
+    public open fun getEntryTimestamp(preserveFileTimestamps: Boolean, entryTime: Long): Long {
       return if (preserveFileTimestamps) entryTime else ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
     }
   }

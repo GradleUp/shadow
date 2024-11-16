@@ -18,7 +18,7 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
-public class ApacheNoticeResourceTransformer : Transformer {
+public open class ApacheNoticeResourceTransformer : Transformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
   private val charset get() = if (encoding.isNullOrEmpty()) Charsets.UTF_8 else Charset.forName(encoding)

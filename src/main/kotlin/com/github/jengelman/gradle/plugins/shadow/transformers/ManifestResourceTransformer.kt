@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory
  * @author Jason van Zyl
  * @author John Engelman
  */
-public class ManifestResourceTransformer : Transformer {
+public open class ManifestResourceTransformer : Transformer {
   private val log = LoggerFactory.getLogger(this::class.java)
 
   private var manifestDiscovered = false
@@ -80,7 +80,7 @@ public class ManifestResourceTransformer : Transformer {
     manifest!!.write(os)
   }
 
-  public fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
+  public open fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
     if (manifestEntries == null) {
       manifestEntries = LinkedHashMap()
     }

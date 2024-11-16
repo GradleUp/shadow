@@ -23,7 +23,7 @@ import org.xml.sax.InputSource
  * @author John Engelman
  */
 @CacheableTransformer
-public class XmlAppendingTransformer : Transformer {
+public open class XmlAppendingTransformer : Transformer {
   private var doc: Document? = null
 
   @get:Input

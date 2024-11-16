@@ -90,7 +90,7 @@ import org.gradle.api.tasks.Internal
  * @author Andres Almiray
  * @author Marc Philipp
  */
-public class PropertiesFileTransformer : Transformer {
+public open class PropertiesFileTransformer : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
   private val _charset get() = Charset.forName(charset)
 

@@ -11,7 +11,7 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
-public class DontIncludeResourceTransformer : Transformer by NoOpTransformer {
+public open class DontIncludeResourceTransformer : Transformer by NoOpTransformer {
   @get:Optional
   @get:Input
   public var resource: String? = null

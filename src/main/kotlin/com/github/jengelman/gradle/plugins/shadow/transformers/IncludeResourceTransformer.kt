@@ -17,7 +17,7 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
-public class IncludeResourceTransformer : Transformer by NoOpTransformer {
+public open class IncludeResourceTransformer : Transformer by NoOpTransformer {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
   public var file: File? = null

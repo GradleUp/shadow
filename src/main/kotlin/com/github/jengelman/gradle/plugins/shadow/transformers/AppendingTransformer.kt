@@ -16,7 +16,7 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 @CacheableTransformer
-public class AppendingTransformer : Transformer {
+public open class AppendingTransformer : Transformer {
   /**
    * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
    */

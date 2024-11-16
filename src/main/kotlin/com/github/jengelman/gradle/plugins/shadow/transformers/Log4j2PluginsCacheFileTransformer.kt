@@ -25,7 +25,7 @@ import org.gradle.api.file.FileTreeElement
  * @see [PluginsCacheFileTransformer.java](https://github.com/edwgiz/maven-shaded-log4j-transformer/blob/master/src/main/java/com/github/edwgiz/mavenShadePlugin/log4j2CacheTransformer/PluginsCacheFileTransformer.java)
  */
 @CacheableTransformer
-public class Log4j2PluginsCacheFileTransformer : Transformer {
+public open class Log4j2PluginsCacheFileTransformer : Transformer {
   private val temporaryFiles = mutableListOf<File>()
   private val relocators = mutableListOf<Relocator>()
   private var stats: ShadowStats? = null

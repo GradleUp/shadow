@@ -25,7 +25,7 @@ import org.gradle.api.file.FileTreeElement
  * Note that certain JDK9+ tooling will break when using the legacy location.
  */
 @CacheableTransformer
-public class GroovyExtensionModuleTransformer : Transformer {
+public open class GroovyExtensionModuleTransformer : Transformer {
   private val module = Properties()
 
   /**
