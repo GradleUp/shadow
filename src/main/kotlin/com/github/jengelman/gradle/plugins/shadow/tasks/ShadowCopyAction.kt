@@ -363,11 +363,11 @@ public class ShadowCopyAction(
 
     @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
     override fun getParent(): RelativeArchivePath? {
-      return if (segments.isEmpty() || segments.size == 1) {
+      return if (segments.isEmpty() || segments.size == 1 || pathString == "/") {
         null
       } else {
         // Parent is always a directory so add / to the end of the path
-        val path = segments.dropLast(1).joinToString("/") + "/"
+        val path = segments.dropLast(2).joinToString("/") + "/"
         RelativeArchivePath(setArchiveTimes(ZipEntry(path)))
       }
     }
