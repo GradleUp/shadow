@@ -17,7 +17,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
-public class ShadowJavaPlugin @Inject constructor(
+public abstract class ShadowJavaPlugin @Inject constructor(
   private val softwareComponentFactory: SoftwareComponentFactory,
 ) : Plugin<Project> {
 

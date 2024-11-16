@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-public class KnowsTask : DefaultTask() {
+public abstract class KnowsTask : DefaultTask() {
 
   @TaskAction
   public fun knows() {

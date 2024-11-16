@@ -16,7 +16,7 @@ import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 import org.gradle.jvm.toolchain.JavaToolchainService
 
-public class ShadowApplicationPlugin : Plugin<Project> {
+public abstract class ShadowApplicationPlugin : Plugin<Project> {
   private lateinit var project: Project
   private lateinit var javaApplication: JavaApplication
 

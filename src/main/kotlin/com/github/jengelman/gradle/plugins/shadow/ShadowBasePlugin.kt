@@ -6,7 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.util.GradleVersion
 
-public class ShadowBasePlugin : Plugin<Project> {
+public abstract class ShadowBasePlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
     if (GradleVersion.current() < GradleVersion.version("8.3")) {
