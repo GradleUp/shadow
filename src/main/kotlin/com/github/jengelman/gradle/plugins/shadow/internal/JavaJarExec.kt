@@ -5,9 +5,9 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
-public abstract class JavaJarExec : JavaExec() {
+internal abstract class JavaJarExec : JavaExec() {
   @get:InputFile
-  public abstract val jarFile: RegularFileProperty
+  abstract val jarFile: RegularFileProperty
 
   @TaskAction
   override fun exec() {

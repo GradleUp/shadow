@@ -10,7 +10,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 
-public abstract class AbstractDependencyFilter(
+internal sealed class AbstractDependencyFilter(
   private val project: Project,
 ) : DependencyFilter {
   protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf()

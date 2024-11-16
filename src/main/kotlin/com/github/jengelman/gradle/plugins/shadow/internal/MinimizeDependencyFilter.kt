@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolvedDependency
 
-public class MinimizeDependencyFilter(
+internal class MinimizeDependencyFilter(
   project: Project,
 ) : AbstractDependencyFilter(project) {
   override fun resolve(

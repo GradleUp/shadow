@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
@@ -39,7 +38,7 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 import org.slf4j.LoggerFactory
 
-public class ShadowCopyAction(
+public class ShadowCopyAction internal constructor(
   private val zipFile: File,
   private val compressor: ZipCompressor,
   private val documentationRegistry: DocumentationRegistry,
@@ -53,6 +52,31 @@ public class ShadowCopyAction(
   private val unusedTracker: UnusedTracker?,
 ) : CopyAction {
   private val log = LoggerFactory.getLogger(this::class.java)
+
+  public constructor(
+    zipFile: File,
+    compressor: ZipCompressor,
+    documentationRegistry: DocumentationRegistry,
+    encoding: String?,
+    transformers: List<Transformer>,
+    relocators: List<Relocator>,
+    patternSet: PatternSet,
+    stats: ShadowStats,
+    preserveFileTimestamps: Boolean,
+    minimizeJar: Boolean,
+  ) : this(
+    zipFile,
+    compressor,
+    documentationRegistry,
+    encoding,
+    transformers,
+    relocators,
+    patternSet,
+    stats,
+    preserveFileTimestamps,
+    minimizeJar,
+    null,
+  )
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
     val unusedClasses = if (minimizeJar && unusedTracker != null) {

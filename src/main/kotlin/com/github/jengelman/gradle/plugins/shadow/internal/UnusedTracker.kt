@@ -12,7 +12,7 @@ import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
 
 /** Tracks unused classes in the project classpath. */
-public class UnusedTracker private constructor(
+internal class UnusedTracker private constructor(
   classDirs: Iterable<File>,
   classJars: FileCollection,
   private val _toMinimize: FileCollection,
@@ -25,9 +25,9 @@ public class UnusedTracker private constructor(
   }
 
   @get:InputFiles
-  public val toMinimize: FileCollection get() = _toMinimize
+  val toMinimize: FileCollection get() = _toMinimize
 
-  public fun findUnused(): Set<String> {
+  fun findUnused(): Set<String> {
     val unused = cp.clazzes.toMutableSet()
     for (cpu in projectUnits) {
       unused.removeAll(cpu.clazzes)
@@ -36,15 +36,14 @@ public class UnusedTracker private constructor(
     return unused.map { it.name }.toSet()
   }
 
-  public fun addDependency(jarOrDir: File) {
+  fun addDependency(jarOrDir: File) {
     if (_toMinimize.contains(jarOrDir)) {
       cp.addClazzpathUnit(jarOrDir)
     }
   }
 
-  public companion object {
-    @JvmStatic
-    public fun forProject(
+  companion object {
+    fun forProject(
       apiJars: FileCollection,
       sourceSetsClassesDirs: Iterable<File>,
       toMinimize: FileCollection,
@@ -52,8 +51,7 @@ public class UnusedTracker private constructor(
       return UnusedTracker(sourceSetsClassesDirs, apiJars, toMinimize)
     }
 
-    @JvmStatic
-    public fun getApiJarsFromProject(project: Project): FileCollection {
+    fun getApiJarsFromProject(project: Project): FileCollection {
       val apiDependencies = project.configurations.findByName("api")?.dependencies
         ?: return project.files()
       val runtimeConfiguration = project.configurations.findByName("runtimeClasspath")

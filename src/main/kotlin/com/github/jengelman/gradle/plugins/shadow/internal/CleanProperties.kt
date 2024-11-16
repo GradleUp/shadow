@@ -6,7 +6,7 @@ import java.io.Writer
 import java.util.Date
 import java.util.Properties
 
-public class CleanProperties : Properties() {
+internal class CleanProperties : Properties() {
   @Throws(IOException::class)
   override fun store(writer: Writer, comments: String) {
     super.store(StripCommentsWithTimestampBufferedWriter(writer), comments)
