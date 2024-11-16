@@ -49,7 +49,11 @@ public class ShadowApplicationPlugin : Plugin<Project> {
       it.description = "Runs this project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.conventionMapping.map("jvmArgs") { javaApplication.applicationDefaultJvmArgs }
-      it.conventionMapping.map("jarFile") { project.file("${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}") }
+      it.jarFile.fileProvider(
+        project.providers.provider {
+          project.file("${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}")
+        },
+      )
       val toolchain = project.extensions.getByType(JavaPluginExtension::class.java).toolchain
       val defaultLauncher = project.extensions.getByType(JavaToolchainService::class.java)
         .launcherFor(toolchain)
