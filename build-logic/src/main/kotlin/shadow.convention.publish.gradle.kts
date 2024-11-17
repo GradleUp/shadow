@@ -1,6 +1,7 @@
 plugins {
   id("com.gradle.plugin-publish")
   id("com.vanniktech.maven.publish")
+  id("org.jetbrains.dokka")
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -34,16 +35,6 @@ tasks.publishPlugins {
     }
   }
   notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
-}
-
-tasks.withType<Javadoc>().configureEach {
-  (options as? StandardJavadocDocletOptions)?.let {
-    it.links(
-      "https://docs.oracle.com/en/java/javase/17/docs/api/",
-      "https://docs.groovy-lang.org/2.4.7/html/gapi/",
-    )
-    it.addStringOption("Xdoclint:none", "-quiet")
-  }
 }
 
 configurations {
