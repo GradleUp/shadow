@@ -3,8 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
   kotlin("jvm") version "2.0.21"
-  `java-gradle-plugin`
-  groovy
+  groovy // Required for Spock tests.
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
   id("com.diffplug.spotless") version "7.0.0.BETA4"
