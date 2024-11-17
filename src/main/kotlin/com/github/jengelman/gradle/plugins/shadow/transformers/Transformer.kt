@@ -13,13 +13,13 @@ import org.gradle.api.tasks.Internal
  * @author John Engelman
  */
 public interface Transformer : Named {
-  public open fun canTransformResource(element: FileTreeElement): Boolean
+  public fun canTransformResource(element: FileTreeElement): Boolean
 
-  public open fun transform(context: TransformerContext)
+  public fun transform(context: TransformerContext)
 
-  public open fun hasTransformedResource(): Boolean
+  public fun hasTransformedResource(): Boolean
 
-  public open fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
+  public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
 
   @Internal
   override fun getName(): String = this::class.java.simpleName

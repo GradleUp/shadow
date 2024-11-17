@@ -28,14 +28,11 @@ public open class IncludeResourceTransformer : Transformer by NoOpTransformer {
   override fun hasTransformedResource(): Boolean = file?.exists() == true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    check(file != null) { "file must be set" }
-    check(resource != null) { "resource must be set" }
-
-    val entry = ZipEntry(resource)
+    val entry = ZipEntry(requireNotNull(resource))
     entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
 
-    file!!.inputStream().use { inputStream ->
+    requireNotNull(file).inputStream().use { inputStream ->
       inputStream.copyTo(os)
     }
   }

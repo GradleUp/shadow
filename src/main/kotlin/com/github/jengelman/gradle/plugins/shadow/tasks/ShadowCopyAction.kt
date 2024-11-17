@@ -51,7 +51,6 @@ public open class ShadowCopyAction internal constructor(
   private val minimizeJar: Boolean,
   private val unusedTracker: UnusedTracker?,
 ) : CopyAction {
-  private val log = LoggerFactory.getLogger(this::class.java)
 
   public constructor(
     zipFile: File,
@@ -267,7 +266,7 @@ public open class ShadowCopyAction internal constructor(
       val className = classPathWithoutExtension.replace('/', '.')
       val result = unused.contains(className)
       if (result) {
-        log.debug("Dropping unused class: $className")
+        logger.debug("Dropping unused class: $className")
       }
       return result
     }
@@ -319,7 +318,7 @@ public open class ShadowCopyAction internal constructor(
         }
         zipOutStr.closeEntry()
       } catch (ignored: ZipException) {
-        log.warn("We have a duplicate $mappedName in source project")
+        logger.warn("We have a duplicate $mappedName in source project")
       }
     }
 
@@ -434,6 +433,7 @@ public open class ShadowCopyAction internal constructor(
   }
 
   public companion object {
+    private val logger = LoggerFactory.getLogger(ShadowCopyAction::class.java)
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }
 }

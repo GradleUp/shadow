@@ -4,7 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 import java.util.Properties
 import java.util.function.Function
@@ -73,17 +72,17 @@ import org.gradle.api.tasks.Internal
  * closure that receives the original key and returns the key name to be used.
  *
  * Example:
- * ```java
+ * ```groovy
  * import org.codehaus.griffon.gradle.shadow.transformers.*
  * tasks.named('shadowJar', ShadowJar) {
- *     transform(PropertiesFileTransformer) {
- *         paths = [
- *             'META-INF/editors/java.beans.PropertyEditor'
- *         ]
- *         keyTransformer = { key ->
- *             key.replaceAll('^(orig\.package\..*)$', 'new.prefix.$1')
- *         }
+ *   transform(PropertiesFileTransformer) {
+ *     paths = [
+ *       'META-INF/editors/java.beans.PropertyEditor'
+ *     ]
+ *     keyTransformer = { key ->
+ *       key.replaceAll('^(orig\.package\..*)$', 'new.prefix.$1')
  *     }
+ *   }
  * }
  * ```
  *
@@ -141,9 +140,7 @@ public open class PropertiesFileTransformer : Transformer {
         if (props.containsKey(key)) {
           when (mergeStrategyFor(context.path).lowercase()) {
             "latest" -> props[key] = value
-            "append" -> props[key] =
-              props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
-
+            "append" -> props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
             "first" -> Unit
             else -> Unit
           }
@@ -219,7 +216,7 @@ public open class PropertiesFileTransformer : Transformer {
 
   private fun Properties.toReader(): InputStreamReader {
     val os = ByteArrayOutputStream()
-    OutputStreamWriter(os, charset).use { writer ->
+    os.writer(Charset.forName(charset)).use { writer ->
       store(writer, "")
     }
     return os.toByteArray().inputStream().reader(_charset)

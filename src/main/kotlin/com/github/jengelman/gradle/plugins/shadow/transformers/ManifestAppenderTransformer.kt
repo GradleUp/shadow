@@ -1,11 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.jar.JarFile.MANIFEST_NAME
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.codehaus.plexus.util.IOUtil
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
 import org.slf4j.LoggerFactory
@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory
 public open class ManifestAppenderTransformer : Transformer {
   private var manifestContents = ByteArray(0)
   private val _attributes = mutableListOf<Pair<String, Comparable<*>>>()
-  private val log = LoggerFactory.getLogger(this::class.java)
 
   @get:Input
   public open val attributes: List<Pair<String, Comparable<*>>> get() = _attributes
@@ -32,11 +31,14 @@ public open class ManifestAppenderTransformer : Transformer {
 
   override fun transform(context: TransformerContext) {
     if (manifestContents.isEmpty()) {
-      manifestContents = IOUtil.toByteArray(context.inputStream)
       try {
-        context.inputStream
+        requireNotNull(context.inputStream).use { inputStream ->
+          val outputStream = ByteArrayOutputStream()
+          inputStream.copyTo(outputStream)
+          manifestContents = outputStream.toByteArray()
+        }
       } catch (e: IOException) {
-        log.warn("Failed to read MANIFEST.MF", e)
+        logger.warn("Failed to read MANIFEST.MF", e)
       }
     }
   }
@@ -66,6 +68,7 @@ public open class ManifestAppenderTransformer : Transformer {
   }
 
   private companion object {
+    private val logger = LoggerFactory.getLogger(ManifestAppenderTransformer::class.java)
     private val EOL = "\r\n".toByteArray(UTF_8)
     private val SEPARATOR = ": ".toByteArray(UTF_8)
   }

@@ -52,14 +52,14 @@ internal sealed class AbstractDependencyFilter(
   }
 
   /**
-   * Create a spec that matches the provided project notation on group, name, and version
+   * Create a spec that matches the provided project notation on group, name, and version.
    */
   override fun project(notation: Map<String, *>): Spec<ResolvedDependency> {
     return dependency(dependency = project.dependencies.project(notation))
   }
 
   /**
-   * Create a spec that matches the default configuration for the provided project path on group, name, and version
+   * Create a spec that matches the default configuration for the provided project path on group, name, and version.
    */
   override fun project(notation: String): Spec<ResolvedDependency> {
     return dependency(
@@ -73,14 +73,14 @@ internal sealed class AbstractDependencyFilter(
   }
 
   /**
-   * Create a spec that matches dependencies using the provided notation on group, name, and version
+   * Create a spec that matches dependencies using the provided notation on group, name, and version.
    */
   override fun dependency(notation: Any): Spec<ResolvedDependency> {
     return dependency(dependency = project.dependencies.create(notation))
   }
 
   /**
-   * Create a spec that matches the provided dependency on group, name, and version
+   * Create a spec that matches the provided dependency on group, name, and version.
    */
   override fun dependency(dependency: Dependency): Spec<ResolvedDependency> {
     return Spec<ResolvedDependency> { resolvedDependency ->
@@ -91,7 +91,7 @@ internal sealed class AbstractDependencyFilter(
   }
 
   /**
-   * Create a spec that matches the provided closure
+   * Create a spec that matches the provided closure.
    */
   override fun dependency(closure: Closure<*>): Spec<ResolvedDependency> {
     return Specs.convertClosureToSpec(closure)

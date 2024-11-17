@@ -13,7 +13,7 @@ public interface DependencyFilter {
   public fun resolve(configuration: FileCollection): FileCollection
 
   /**
-   * Resolve all FileCollections against the include/exclude ruels in the filter and combine the results.
+   * Resolve all FileCollections against the include/exclude rules in the filter and combine the results.
    */
   public fun resolve(configurations: MutableCollection<FileCollection>): FileCollection
 

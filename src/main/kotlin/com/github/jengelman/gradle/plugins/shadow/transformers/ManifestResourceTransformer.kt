@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory
  * @author John Engelman
  */
 public open class ManifestResourceTransformer : Transformer {
-  private val log = LoggerFactory.getLogger(this::class.java)
-
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
@@ -51,7 +49,7 @@ public open class ManifestResourceTransformer : Transformer {
       try {
         context.inputStream
       } catch (e: IOException) {
-        log.warn("Failed to read MANIFEST.MF", e)
+        logger.warn("Failed to read MANIFEST.MF", e)
       }
     }
   }
@@ -85,5 +83,9 @@ public open class ManifestResourceTransformer : Transformer {
       manifestEntries = LinkedHashMap()
     }
     manifestEntries!!.putAll(attributes)
+  }
+
+  private companion object {
+    private val logger = LoggerFactory.getLogger(ManifestResourceTransformer::class.java)
   }
 }

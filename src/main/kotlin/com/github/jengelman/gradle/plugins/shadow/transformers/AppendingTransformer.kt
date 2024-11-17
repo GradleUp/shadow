@@ -45,13 +45,11 @@ public open class AppendingTransformer : Transformer {
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    check(resource != null) { "resource must be set" }
-
     if (data == null) {
       data = ByteArrayOutputStream()
     }
 
-    val entry = ZipEntry(resource)
+    val entry = ZipEntry(requireNotNull(resource))
     entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
 

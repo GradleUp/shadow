@@ -8,8 +8,13 @@ public abstract class KnowsTask : DefaultTask() {
 
   @TaskAction
   public fun knows() {
-    logger.info("\nNo, The Shadow Knows....")
-    logger.info(this::class.java.requireResourceAsText("/shadowBanner.txt"))
+    logger.info(
+      """
+      No, The Shadow Knows....
+
+      ${this::class.java.requireResourceAsText("/shadowBanner.txt")}
+      """.trimIndent(),
+    )
   }
 
   public companion object {

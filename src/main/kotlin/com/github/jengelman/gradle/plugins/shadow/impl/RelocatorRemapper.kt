@@ -17,7 +17,6 @@ public open class RelocatorRemapper(
   private val relocators: List<Relocator>,
   private val stats: ShadowStats,
 ) : Remapper() {
-
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
   public open fun hasRelocators(): Boolean = relocators.isNotEmpty()
