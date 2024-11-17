@@ -32,7 +32,7 @@ public open class ManifestAppenderTransformer : Transformer {
   override fun transform(context: TransformerContext) {
     if (manifestContents.isEmpty()) {
       try {
-        requireNotNull(context.inputStream).use { inputStream ->
+        context.inputStream.use { inputStream ->
           val outputStream = ByteArrayOutputStream()
           inputStream.copyTo(outputStream)
           manifestContents = outputStream.toByteArray()

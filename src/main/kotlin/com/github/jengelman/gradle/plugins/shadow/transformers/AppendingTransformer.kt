@@ -34,7 +34,7 @@ public open class AppendingTransformer : Transformer {
     if (data == null) {
       data = ByteArrayOutputStream()
     }
-    context.inputStream?.use {
+    context.inputStream.use {
       it.copyTo(data!!)
       data!!.write('\n'.code)
     }

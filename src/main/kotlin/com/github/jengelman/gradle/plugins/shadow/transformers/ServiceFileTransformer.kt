@@ -42,7 +42,7 @@ public open class ServiceFileTransformer(
   }
 
   override fun transform(context: TransformerContext) {
-    val lines = requireNotNull(context.inputStream).bufferedReader().readLines().toMutableList()
+    val lines = context.inputStream.bufferedReader().readLines().toMutableList()
     var targetPath = context.path
     context.relocators.forEach { rel ->
       if (rel.canRelocateClass(File(targetPath).name)) {

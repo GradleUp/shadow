@@ -7,7 +7,7 @@ import java.io.InputStream
 
 public data class TransformerContext @JvmOverloads constructor(
   val path: String,
-  val inputStream: InputStream? = null,
+  val inputStream: InputStream,
   val relocators: List<Relocator> = emptyList(),
   val stats: ShadowStats = ShadowStats(),
 ) {
@@ -23,7 +23,7 @@ public data class TransformerContext @JvmOverloads constructor(
     public fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }
     public fun build(): TransformerContext = TransformerContext(
       path = path,
-      inputStream = inputStream,
+      inputStream = inputStream ?: error("inputStream is required"),
       relocators = relocators,
       stats = stats,
     )

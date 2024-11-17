@@ -151,12 +151,10 @@ public open class PropertiesFileTransformer : Transformer {
     }
   }
 
-  private fun loadAndTransformKeys(inputStream: InputStream?): CleanProperties {
+  private fun loadAndTransformKeys(inputStream: InputStream): CleanProperties {
     val props = CleanProperties()
     // InputStream closed by caller, so we don't do it here.
-    inputStream?.let {
-      props.load(it.reader(_charset))
-    }
+    props.load(inputStream.reader(_charset))
     return transformKeys(props)
   }
 

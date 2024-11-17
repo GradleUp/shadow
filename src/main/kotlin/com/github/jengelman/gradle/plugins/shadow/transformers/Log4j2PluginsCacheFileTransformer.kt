@@ -45,7 +45,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     temporaryFile.deleteOnExit()
     temporaryFiles.add(temporaryFile)
     val fos = FileOutputStream(temporaryFile)
-    context.inputStream?.use {
+    context.inputStream.use {
       it.copyTo(fos)
     }
 

@@ -30,7 +30,7 @@ public open class ComponentsXmlResourceTransformer : Transformer {
 
   override fun transform(context: TransformerContext) {
     val newDom = try {
-      val bis = object : BufferedInputStream(requireNotNull(context.inputStream)) {
+      val bis = object : BufferedInputStream(context.inputStream) {
         @Throws(IOException::class)
         override fun close() {
           // leave ZIP open

@@ -44,10 +44,9 @@ public open class ManifestResourceTransformer : Transformer {
     // now which is situational at best. Right now there is no context passed in with the processing so we cannot
     // tell what artifact is being processed.
     if (!manifestDiscovered) {
-      manifest = Manifest(context.inputStream)
-      manifestDiscovered = true
       try {
-        context.inputStream
+        manifest = Manifest(context.inputStream)
+        manifestDiscovered = true
       } catch (e: IOException) {
         logger.warn("Failed to read MANIFEST.MF", e)
       }

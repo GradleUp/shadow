@@ -23,7 +23,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
 
     @Test
     void testHasTransformedResource() {
-        transformer.transform(new TransformerContext(MANIFEST_NAME))
+        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME)))
 
         assertTrue(transformer.hasTransformedResource())
     }

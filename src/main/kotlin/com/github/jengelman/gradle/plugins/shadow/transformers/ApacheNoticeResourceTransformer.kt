@@ -86,7 +86,7 @@ public open class ApacheNoticeResourceTransformer : Transformer {
       entries.add("$preamble3$organizationName ($organizationURL).\n")
     }
 
-    val reader = requireNotNull(context.inputStream).bufferedReader(charset)
+    val reader = context.inputStream.bufferedReader(charset)
     var line = reader.readLine()
     val sb = StringBuffer()
     var currentOrg: MutableSet<String>? = null
