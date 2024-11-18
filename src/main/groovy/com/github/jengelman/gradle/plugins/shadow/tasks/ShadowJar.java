@@ -201,7 +201,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     @Override
-    public ShadowJar transform(Class<? extends Transformer> clazz) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public ShadowJar transform(Class<Transformer> clazz) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         return transform(clazz, null);
     }
 
@@ -251,7 +251,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     @Override
     public ShadowJar mergeServiceFiles() {
         try {
-            transform(ServiceFileTransformer.class);
+            transform(ServiceFileTransformer.class, null);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
                  InstantiationException ignored) {
         }
@@ -294,9 +294,9 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     @Override
-    public ShadowJar mergeGroovyExtensionModules() {
+    public ShadowSpec mergeGroovyExtensionModules() {
         try {
-            transform(GroovyExtensionModuleTransformer.class);
+            transform(GroovyExtensionModuleTransformer.class, null);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
                  InstantiationException ignored) {
         }
@@ -364,7 +364,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
      * @return this
      */
     @Override
-    public ShadowJar relocate(Class<? extends Relocator> relocatorClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public ShadowJar relocate(Class<Relocator> relocatorClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         return relocate(relocatorClass, null);
     }
 
