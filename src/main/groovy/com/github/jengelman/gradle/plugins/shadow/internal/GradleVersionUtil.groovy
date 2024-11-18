@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ZipCompressor
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.internal.file.copy.CopySpecInternal
 import org.gradle.api.tasks.bundling.Jar

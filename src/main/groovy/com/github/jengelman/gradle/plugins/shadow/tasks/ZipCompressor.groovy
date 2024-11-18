@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jengelman.gradle.plugins.shadow.internal
+package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import org.gradle.api.internal.file.archive.compression.ArchiveOutputStreamFactory
 

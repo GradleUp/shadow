@@ -15,6 +15,7 @@
  */
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ZipCompressor
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.UncheckedIOException
