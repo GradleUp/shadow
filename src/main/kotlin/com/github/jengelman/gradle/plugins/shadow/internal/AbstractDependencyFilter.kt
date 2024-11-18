@@ -31,7 +31,7 @@ internal sealed class AbstractDependencyFilter(
       project.files(excludedDeps.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
   }
 
-  override fun resolve(configurations: MutableCollection<FileCollection>): FileCollection {
+  override fun resolve(configurations: Collection<FileCollection>): FileCollection {
     return configurations.map { resolve(it) }
       .reduceOrNull { acc, fileCollection -> acc + fileCollection }
       ?: project.files()
