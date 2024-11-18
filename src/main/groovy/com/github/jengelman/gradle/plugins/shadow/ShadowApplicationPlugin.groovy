@@ -63,9 +63,11 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             run.description = 'Runs this project as a JVM application using the shadow jar'
             run.group = ApplicationPlugin.APPLICATION_GROUP
             run.conventionMapping.jvmArgs = { javaApplication.applicationDefaultJvmArgs }
-            run.conventionMapping.jarFile = {
-                project.file("${install.get().destinationDir.path}/lib/${jar.get().archiveFile.get().asFile.name}")
-            }
+            run.jarFile.fileProvider(
+                project.providers.provider {
+                    project.file("${install.get().destinationDir.path}/lib/${jar.get().archiveFile.get().asFile.name}")
+                }
+            )
             configureJavaLauncher(run)
         }
     }
