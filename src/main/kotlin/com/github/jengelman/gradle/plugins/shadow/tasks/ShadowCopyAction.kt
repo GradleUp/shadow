@@ -180,10 +180,6 @@ public open class ShadowCopyAction internal constructor(
       }
     }
 
-    private fun recordVisit(path: RelativePath): Boolean {
-      return visitedFiles.add(path.pathString)
-    }
-
     override fun visitFile(fileDetails: FileCopyDetails) {
       if (!isArchive(fileDetails)) {
         try {
@@ -210,6 +206,10 @@ public open class ShadowCopyAction internal constructor(
       } else {
         processArchive(fileDetails)
       }
+    }
+
+    private fun recordVisit(path: RelativePath): Boolean {
+      return visitedFiles.add(path.pathString)
     }
 
     private fun processArchive(fileDetails: FileCopyDetails) {
@@ -287,6 +287,11 @@ public open class ShadowCopyAction internal constructor(
       }
     }
 
+    /**
+     * Applies remapping to the given class with the specified relocation path. The remapped class is then written
+     * to the zip file. [classInputStream] is closed automatically to prevent future file leaks.
+     * See #364 and #408.
+     */
     private fun remapClass(classInputStream: InputStream, path: String, lastModified: Long) {
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
@@ -384,9 +389,8 @@ public open class ShadowCopyAction internal constructor(
   ) : RelativePath(!entry.isDirectory, *entry.name.split('/').toTypedArray()) {
     public open val isClassFile: Boolean get() = lastName.endsWith(".class")
 
-    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
     override fun getParent(): RelativeArchivePath? {
-      return if (segments.isEmpty() || segments.size == 1 || pathString == "/") {
+      return if (segments.size <= 1 || pathString == "/") {
         null
       } else {
         // Parent is always a directory so add / to the end of the path
@@ -401,19 +405,11 @@ public open class ShadowCopyAction internal constructor(
   ) : FileTreeElement {
     public open val isClassFile: Boolean get() = archivePath.isClassFile
 
-    override fun getFile(): File = throw UnsupportedOperationException()
-
     override fun isDirectory(): Boolean = archivePath.entry.isDirectory
 
     override fun getLastModified(): Long = archivePath.entry.lastModifiedDate.time
 
     override fun getSize(): Long = archivePath.entry.size
-
-    override fun open(): InputStream = throw UnsupportedOperationException()
-
-    override fun copyTo(outputStream: OutputStream) {}
-
-    override fun copyTo(file: File): Boolean = false
 
     override fun getName(): String = archivePath.pathString
 
@@ -427,9 +423,16 @@ public open class ShadowCopyAction internal constructor(
     override fun getPermissions(): FilePermissions = DefaultFilePermissions(mode)
 
     public open fun asFileTreeElement(): FileTreeElement {
-      @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE")
       return DefaultFileTreeElement(null, RelativePath(!isDirectory, *archivePath.segments), null, null)
     }
+
+    override fun getFile(): File = throw UnsupportedOperationException()
+
+    override fun open(): InputStream = throw UnsupportedOperationException()
+
+    override fun copyTo(outputStream: OutputStream): Unit = throw UnsupportedOperationException()
+
+    override fun copyTo(file: File): Boolean = throw UnsupportedOperationException()
   }
 
   public companion object {
