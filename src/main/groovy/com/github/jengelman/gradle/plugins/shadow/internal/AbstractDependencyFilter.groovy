@@ -12,8 +12,8 @@ import org.gradle.api.specs.Specs
 abstract class AbstractDependencyFilter implements DependencyFilter {
     private final Project project
 
-    protected final List<Spec<? super ResolvedDependency>> includeSpecs = []
-    protected final List<Spec<? super ResolvedDependency>> excludeSpecs = []
+    protected final List<Spec<ResolvedDependency>> includeSpecs = []
+    protected final List<Spec<ResolvedDependency>> excludeSpecs = []
 
     AbstractDependencyFilter(Project project) {
         assert project
@@ -35,7 +35,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
     }
 
     @Override
-    FileCollection resolve(Collection<FileCollection> configurations) {
+    FileCollection resolve(Collection<? extends FileCollection> configurations) {
         configurations.collect {
             resolve(it)
         }.sum() as FileCollection ?: project.files()
@@ -48,7 +48,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @return
      */
     @Override
-    DependencyFilter exclude(Spec<? super ResolvedDependency> spec) {
+    DependencyFilter exclude(Spec<ResolvedDependency> spec) {
         excludeSpecs << spec
         return this
     }
@@ -60,7 +60,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @return
      */
     @Override
-    DependencyFilter include(Spec<? super ResolvedDependency> spec) {
+    DependencyFilter include(Spec<ResolvedDependency> spec) {
         includeSpecs << spec
         return this
     }
@@ -71,7 +71,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @return
      */
     @Override
-    Spec<? super ResolvedDependency> project(Map<String, ?> notation) {
+    Spec<ResolvedDependency> project(Map<String, ?> notation) {
         dependency(project.dependencies.project(notation))
     }
 
@@ -82,7 +82,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @return
      */
     @Override
-    Spec<? super ResolvedDependency> project(String notation) {
+    Spec<ResolvedDependency> project(String notation) {
         dependency(project.dependencies.project(path: notation, configuration: 'default'))
     }
 
@@ -92,7 +92,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @return
      */
     @Override
-    Spec<? super ResolvedDependency> dependency(Object notation) {
+    Spec<ResolvedDependency> dependency(Object notation) {
         dependency(project.dependencies.create(notation))
     }
 
@@ -102,7 +102,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @return
      */
     @Override
-    Spec<? super ResolvedDependency> dependency(Dependency dependency) {
+    Spec<ResolvedDependency> dependency(Dependency dependency) {
         this.dependency({ ResolvedDependency it ->
             (!dependency.group || it.moduleGroup.matches(dependency.group)) &&
                     (!dependency.name || it.moduleName.matches(dependency.name)) &&
@@ -116,7 +116,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      * @return
      */
     @Override
-    Spec<? super ResolvedDependency> dependency(Closure spec) {
+    Spec<ResolvedDependency> dependency(Closure spec) {
         return Specs.<ResolvedDependency>convertClosureToSpec(spec)
     }
 
