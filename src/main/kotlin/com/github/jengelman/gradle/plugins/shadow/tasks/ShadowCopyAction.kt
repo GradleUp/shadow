@@ -386,16 +386,21 @@ public open class ShadowCopyAction internal constructor(
 
   public open inner class RelativeArchivePath(
     public open val entry: ZipEntry,
-  ) : RelativePath(!entry.isDirectory, *entry.name.split('/').toTypedArray()) {
+  ) : RelativePath(
+    !entry.isDirectory,
+    // `dir/` will be split into ["dir", ""], we have to trim empty segments here.
+    *entry.name.split('/').filter(CharSequence::isNotEmpty).toTypedArray(),
+  ) {
     public open val isClassFile: Boolean get() = lastName.endsWith(".class")
 
     override fun getParent(): RelativeArchivePath? {
-      return if (segments.size <= 1 || pathString == "/") {
+      return if (segments.size <= 1) {
         null
       } else {
         // Parent is always a directory so add / to the end of the path
-        val path = segments.dropLast(2).joinToString("/") + "/"
-        RelativeArchivePath(setArchiveTimes(ZipEntry(path)))
+        val parentPath = segments.dropLast(1).joinToString("/") + "/"
+        val entry = setArchiveTimes(ZipEntry(parentPath))
+        RelativeArchivePath(entry)
       }
     }
   }
