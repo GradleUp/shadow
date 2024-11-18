@@ -20,6 +20,7 @@ Read the [User Guide](https://gradleup.com/shadow/)!
 [![Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.gradleup.shadow)](https://plugins.gradle.org/plugin/com.gradleup.shadow)
 [![CI](https://github.com/GradleUp/shadow/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/GradleUp/shadow/actions/workflows/ci.yml?query=branch:main+event:push)
 [![License](https://img.shields.io/github/license/GradleUp/shadow.svg)](LICENSE)
+[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20Gradle%20Shadow%20Guru-006BFF)](https://gurubase.io/g/gradle-shadow)
 
 ## Latest Test Compatibility
 
