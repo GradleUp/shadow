@@ -299,7 +299,7 @@ public abstract class ShadowJar :
   @TaskAction
   override fun copy() {
     if (_isEnableRelocation) {
-      configureRelocation(this, _relocationPrefix)
+      configureRelocation()
     }
     from(_includedDependencies)
     super.copy()
@@ -324,9 +324,9 @@ public abstract class ShadowJar :
     return clazz.isAnnotationPresent(CacheableTransformer::class.java)
   }
 
-  private fun configureRelocation(target: ShadowJar, prefix: String) {
+  private fun configureRelocation() {
     val packages = mutableSetOf<String>()
-    target.configurations.forEach { configuration ->
+    configurations.forEach { configuration ->
       configuration.files.forEach { jarFile ->
         JarFile(jarFile).use { jf ->
           jf.entries().asSequence().forEach { entry ->
@@ -338,7 +338,7 @@ public abstract class ShadowJar :
       }
     }
     packages.forEach {
-      target.relocate(it, "$prefix.$it")
+      relocate(it, "$_relocationPrefix.$it")
     }
   }
 }
