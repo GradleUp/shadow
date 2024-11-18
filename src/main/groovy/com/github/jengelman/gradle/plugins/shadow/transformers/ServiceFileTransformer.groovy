@@ -68,7 +68,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     @Override
     void transform(TransformerContext context) {
-        def lines = context.is.readLines()
+        def lines = context.inputStream.readLines()
         def targetPath = context.path
         context.relocators.each {rel ->
             if (rel.canRelocateClass(new File(targetPath).name)) {
