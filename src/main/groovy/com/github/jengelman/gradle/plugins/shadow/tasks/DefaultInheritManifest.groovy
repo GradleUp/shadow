@@ -9,6 +9,8 @@ import org.gradle.api.java.archives.ManifestException
 import org.gradle.api.java.archives.ManifestMergeSpec
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 class DefaultInheritManifest implements InheritManifest {
 
@@ -33,11 +35,11 @@ class DefaultInheritManifest implements InheritManifest {
     }
 
     @Override
-    InheritManifest inheritFrom(Object inheritPaths, Closure closure) {
+    InheritManifest inheritFrom(@NotNull Object[] inheritPaths, @Nullable Action<?> action) {
         DefaultManifestMergeSpec mergeSpec = new DefaultManifestMergeSpec()
         mergeSpec.from(inheritPaths)
         inheritMergeSpecs.add(mergeSpec)
-        project.configure(mergeSpec, closure)
+        action?.execute(mergeSpec)
         return this
     }
 
