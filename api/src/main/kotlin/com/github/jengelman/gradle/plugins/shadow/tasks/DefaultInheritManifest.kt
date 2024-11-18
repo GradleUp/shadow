@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import java.io.Writer
 import org.gradle.api.Action
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Manifest
@@ -40,11 +39,7 @@ open class DefaultInheritManifest @JvmOverloads constructor(
         return base.effectiveManifest
     }
 
-    open fun writeTo(writer: Writer): Manifest = apply {
-        effectiveManifest.writeTo(writer)
-    }
-
-    override fun writeTo(o: Any): Manifest = apply {
-        effectiveManifest.writeTo(o)
+    override fun writeTo(path: Any): Manifest = apply {
+        effectiveManifest.writeTo(path)
     }
 }
