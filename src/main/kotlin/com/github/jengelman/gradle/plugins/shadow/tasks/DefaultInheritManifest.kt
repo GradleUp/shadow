@@ -40,11 +40,7 @@ public open class DefaultInheritManifest @JvmOverloads constructor(
     return base.effectiveManifest
   }
 
-  public open fun writeTo(writer: Writer): Manifest = apply {
-    effectiveManifest.writeTo(writer)
-  }
-
-  override fun writeTo(o: Any): Manifest = apply {
-    effectiveManifest.writeTo(o)
+  override fun writeTo(path: Any): Manifest = apply {
+    effectiveManifest.writeTo(path)
   }
 }
