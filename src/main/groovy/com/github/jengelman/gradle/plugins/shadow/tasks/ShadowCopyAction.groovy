@@ -1,10 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.transformers.StandardFilesMergeTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import groovy.util.logging.Slf4j
@@ -40,6 +42,8 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
+import javax.annotation.Nonnull
+import javax.annotation.Nullable
 import java.util.zip.ZipException
 
 @Slf4j
@@ -57,11 +61,13 @@ class ShadowCopyAction implements CopyAction {
     private final boolean preserveFileTimestamps
     private final boolean minimizeJar
     private final UnusedTracker unusedTracker
+    private final boolean allowModuleInfos
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
-                            String encoding, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats,
-                            boolean preserveFileTimestamps, boolean minimizeJar, UnusedTracker unusedTracker) {
+                     String encoding, List<Transformer> transformers, List<Relocator> relocators,
+                     PatternSet patternSet, ShadowStats stats,
+                     boolean preserveFileTimestamps, boolean minimizeJar, UnusedTracker unusedTracker,
+                     boolean allowModuleInfos) {
 
         this.zipFile = zipFile
         this.compressor = compressor
@@ -74,6 +80,7 @@ class ShadowCopyAction implements CopyAction {
         this.preserveFileTimestamps = preserveFileTimestamps
         this.minimizeJar = minimizeJar
         this.unusedTracker = unusedTracker
+        this.allowModuleInfos = allowModuleInfos
     }
 
     @Override
@@ -150,7 +157,7 @@ class ShadowCopyAction implements CopyAction {
     private static <T extends Closeable> void withResource(T resource, Action<? super T> action) {
         try {
             action.execute(resource)
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             try {
                 resource.close()
             } catch (IOException e) {
@@ -199,11 +206,21 @@ class ShadowCopyAction implements CopyAction {
         private final Set<String> unused
         private final ShadowStats stats
 
-        private Set<String> visitedFiles = new HashSet<String>()
+        private class VisitedFileInfo {
+            long size
+            RelativePath originJar
+
+            VisitedFileInfo(long size, @Nonnull RelativePath originJar) {
+                this.size = size
+                this.originJar = originJar
+            }
+        }
+
+        private Map<String, VisitedFileInfo> visitedFiles = new HashMap<>()
 
         StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
-                            List<Relocator> relocators, PatternSet patternSet, Set<String> unused,
-                            ShadowStats stats) {
+                     List<Relocator> relocators, PatternSet patternSet, Set<String> unused,
+                     ShadowStats stats) {
             this.zipOutStr = zipOutStr
             this.transformers = transformers
             this.relocators = relocators
@@ -211,13 +228,38 @@ class ShadowCopyAction implements CopyAction {
             this.patternSet = patternSet
             this.unused = unused
             this.stats = stats
-            if(encoding != null) {
+            if (encoding != null) {
                 this.zipOutStr.setEncoding(encoding)
             }
         }
 
-        private boolean recordVisit(RelativePath path) {
-            return visitedFiles.add(path.pathString)
+        /**
+         * Record visit and return true if visited for the first time.
+         *
+         * @param path Visited path.
+         * @param size Size.
+         * @param originJar JAR it originated from.
+         * @return True if wasn't visited already.
+         */
+        private boolean recordVisit(String path, long size, @Nullable RelativePath originJar) {
+            if (visitedFiles.containsKey(path)) {
+                return false
+            }
+
+            if (originJar == null) {
+                originJar = new RelativePath(false)
+            }
+
+            visitedFiles.put(path.toString(), new VisitedFileInfo(size, originJar))
+            return true
+        }
+
+        private boolean recordVisit(path) {
+            return recordVisit(path.toString(), 0, null)
+        }
+
+        private boolean recordVisit(FileCopyDetails fileCopyDetails) {
+            return recordVisit(fileCopyDetails.relativePath.toString(), fileCopyDetails.size, null)
         }
 
         @Override
@@ -240,7 +282,7 @@ class ShadowCopyAction implements CopyAction {
                     } else if (isClass && !isUnused(fileDetails.path)) {
                         remapClass(fileDetails)
                     }
-                    recordVisit(fileDetails.relativePath)
+                    recordVisit(fileDetails)
                 } catch (Exception e) {
                     throw new GradleException(String.format("Could not add %s to ZIP '%s'.", fileDetails, zipFile), e)
                 }
@@ -262,7 +304,7 @@ class ShadowCopyAction implements CopyAction {
                 }
                 filteredArchiveElements.each { ArchiveFileTreeElement archiveElement ->
                     if (archiveElement.relativePath.file) {
-                        visitArchiveFile(archiveElement, archive)
+                        visitArchiveFile(archiveElement, archive, fileDetails)
                     }
                 }
             } finally {
@@ -272,24 +314,102 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private void visitArchiveDirectory(RelativeArchivePath archiveDir) {
-            if (recordVisit(archiveDir)) {
+            if (recordVisit(archiveDir.toString())) {
                 zipOutStr.putNextEntry(archiveDir.entry)
                 zipOutStr.closeEntry()
             }
         }
 
-        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive) {
-            def archiveFilePath = archiveFile.relativePath
+        private void visitArchiveFile(ArchiveFileTreeElement archiveFile, ZipFile archive, FileCopyDetails fileDetails) {
+            RelativeArchivePath archiveFilePath = archiveFile.relativePath
+            long archiveFileSize = archiveFile.size
+
             if (archiveFile.classFile || !isTransformable(archiveFile)) {
-                if (recordVisit(archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
+                String path = archiveFilePath.toString()
+
+                listModuleInfoOnDemand(path, archive, archiveFilePath)
+
+                if (recordVisit(path, archiveFileSize, archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
                     if (!remapper.hasRelocators() || !archiveFile.classFile) {
                         copyArchiveEntry(archiveFilePath, archive)
                     } else {
                         remapClass(archiveFilePath, archive)
                     }
+                } else {
+                    def archiveFileInVisitedFiles = visitedFiles.get(path)
+                    if (archiveFileInVisitedFiles && (archiveFileInVisitedFiles.size != fileDetails.size)) {
+                        // Give of only a debug-level warning for this file:
+                        final String lowLevelWarningFile = "META-INF/MANIFEST.MF"
+
+                        final logDebug = (String msg) -> { log.debug(msg) }
+                        final logWarn = (String msg) -> { log.warn(msg) }
+
+                        final Closure logger
+                        if (archiveFilePath.toString() == lowLevelWarningFile) {
+                            logger = logDebug
+                        } else {
+                            logger = logWarn
+                        }
+                        logger("IGNORING ${archiveFilePath} from ${fileDetails.relativePath}," +
+                                " size is different (${fileDetails.size} vs ${archiveFileInVisitedFiles.size})")
+                        if (archiveFileInVisitedFiles.originJar) {
+                            logger("\t--> origin JAR was ${archiveFileInVisitedFiles.originJar}")
+                        } else {
+                            logger("\t--> file originated from project sourcecode")
+                        }
+                        if (new StandardFilesMergeTransformer().canTransformResource(archiveFile)) {
+                            logger("\t--> Recommended transformer is " + StandardFilesMergeTransformer.class.name)
+                        }
+                    }
                 }
             } else {
                 transform(archiveFile, archive)
+            }
+        }
+
+        /**
+         Information about the 'module-info.class' if it isn't excluded. Including can be done with
+         <code>allowModuleInfos()</code>, like this:
+         <pre><code>
+         shadowJar {
+            ...
+            allowModuleInfos()
+         }
+         </code></pre>
+         Based on the discussion in issue 710: <a href="https://github.com/GradleUp/shadow/issues/710">GitHub Issue #710</a>.
+         */
+        private void listModuleInfoOnDemand(String path, ZipFile archive, RelativeArchivePath archiveFilePath) {
+            if (path.endsWith(ShadowJavaPlugin.MODULE_INFO_CLASS) && allowModuleInfos) {
+                log.warn("======== Warning: {}/{} contains module-info - Listing content ========",
+                        RelativePath.parse(true, archive.name).lastName, path)
+
+                def moduleFileName = "module-info"
+                def moduleFileSuffix = ".class"
+                File disassembleModFile = File.createTempFile(moduleFileName, moduleFileSuffix)
+
+                try (InputStream is = archive.getInputStream(archiveFilePath.entry)) {
+                    try (OutputStream os = new FileOutputStream(disassembleModFile)) {
+                        IOUtils.copyLarge(is, os)
+                    }
+                }
+
+                ProcessBuilder processBuilder = new ProcessBuilder("javap", disassembleModFile.absolutePath)
+                processBuilder.redirectErrorStream(true)
+                Process process = processBuilder.start()
+                InputStream inputStream = process.getInputStream()
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))
+
+                String line
+                while ((line = reader.readLine()) != null) {
+                    log.warn(line)
+                }
+
+                int exitCode = process.waitFor()
+                if (exitCode != 0) {
+                    log.warn("Process exited with code " + exitCode)
+                }
+
+                log.warn("======== module-info content listing end ========")
             }
         }
 
@@ -379,6 +499,12 @@ class ShadowCopyAction implements CopyAction {
             }
         }
 
+        /**
+         * Copy archive entry.
+         *
+         * @param archiveFile Source archive entry.
+         * @param archive Source archive.
+         */
         private void copyArchiveEntry(RelativeArchivePath archiveFile, ZipFile archive) {
             String mappedPath = remapper.map(archiveFile.entry.name)
             ZipEntry entry = new ZipEntry(mappedPath)
@@ -412,19 +538,20 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private void transform(ArchiveFileTreeElement element, ZipFile archive) {
-            transformAndClose(element, archive.getInputStream(element.relativePath.entry))
+            transformAndClose(element, archive, archive.getInputStream(element.relativePath.entry))
         }
 
         private void transform(FileCopyDetails details) {
-            transformAndClose(details, details.file.newInputStream())
+            transformAndClose(details, null, details.file.newInputStream())
         }
 
-        private void transformAndClose(FileTreeElement element, InputStream is) {
+        private void transformAndClose(FileTreeElement element, @Nullable ZipFile archive, InputStream is) {
             try {
                 String mappedPath = remapper.map(element.relativePath.pathString)
                 transformers.find { it.canTransformResource(element) }.transform(
                         TransformerContext.builder()
                                 .path(mappedPath)
+                                .origin(archive)
                                 .is(is)
                                 .relocators(relocators)
                                 .stats(stats)
