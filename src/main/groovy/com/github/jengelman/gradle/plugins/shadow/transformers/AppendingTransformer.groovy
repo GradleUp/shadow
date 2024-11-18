@@ -62,10 +62,10 @@ class AppendingTransformer implements Transformer {
             data = new ByteArrayOutputStream()
         }
 
-        IOUtil.copy(context.is, data)
+        IOUtil.copy(context.inputStream, data)
         data.write('\n'.bytes)
 
-        context.is.close()
+        context.inputStream.close()
     }
 
     @Override

@@ -81,7 +81,7 @@ class XmlAppendingTransformer implements Transformer {
                     }
                 })
             }
-            r = builder.build(context.is)
+            r = builder.build(context.inputStream)
         }
         catch (JDOMException e) {
             throw new RuntimeException("Error processing resource " + resource + ": " + e.getMessage(), e)

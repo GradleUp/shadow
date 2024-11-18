@@ -424,7 +424,7 @@ class ShadowCopyAction implements CopyAction {
                 transformers.find { it.canTransformResource(element) }.transform(
                         TransformerContext.builder()
                                 .path(mappedPath)
-                                .is(is)
+                                .inputStream(is)
                                 .relocators(relocators)
                                 .stats(stats)
                                 .build()
