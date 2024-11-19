@@ -38,9 +38,8 @@ public open class XmlAppendingTransformer : Transformer {
   }
 
   override fun transform(context: TransformerContext) {
-    val r: Document
-    try {
-      r = SAXBuilder(XMLReaders.NONVALIDATING).apply {
+    val r = try {
+      SAXBuilder(XMLReaders.NONVALIDATING).apply {
         expandEntities = false
         if (ignoreDtd) {
           entityResolver = EntityResolver { _, _ -> InputSource(StringReader("")) }
