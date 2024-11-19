@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.nio.charset.StandardCharsets.UTF_8
 import java.util.jar.JarFile.MANIFEST_NAME
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -52,10 +51,10 @@ public open class ManifestAppenderTransformer : Transformer {
     os.write(manifestContents)
 
     if (_attributes.isNotEmpty()) {
-      for (attribute in _attributes) {
-        os.write(attribute.first.toByteArray(UTF_8))
+      for ((key, value) in _attributes) {
+        os.write(key.toByteArray())
         os.write(SEPARATOR)
-        os.write(attribute.second.toString().toByteArray(UTF_8))
+        os.write(value.toString().toByteArray())
         os.write(EOL)
       }
       os.write(EOL)
@@ -69,7 +68,7 @@ public open class ManifestAppenderTransformer : Transformer {
 
   private companion object {
     private val logger = LoggerFactory.getLogger(ManifestAppenderTransformer::class.java)
-    private val EOL = "\r\n".toByteArray(UTF_8)
-    private val SEPARATOR = ": ".toByteArray(UTF_8)
+    private val EOL = "\r\n".toByteArray()
+    private val SEPARATOR = ": ".toByteArray()
   }
 }
