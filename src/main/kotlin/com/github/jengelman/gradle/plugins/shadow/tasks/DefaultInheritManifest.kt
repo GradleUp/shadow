@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import java.io.Writer
 import org.gradle.api.Action
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Manifest
