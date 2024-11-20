@@ -11,95 +11,95 @@ import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 
 internal sealed class AbstractDependencyFilter(
-    private val project: Project,
+  private val project: Project,
 ) : DependencyFilter {
-    protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf()
-    protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf()
+  protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf()
+  protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf()
 
-    protected abstract fun resolve(
-        dependencies: Set<ResolvedDependency>,
-        includedDependencies: MutableSet<ResolvedDependency>,
-        excludedDependencies: MutableSet<ResolvedDependency>,
+  protected abstract fun resolve(
+    dependencies: Set<ResolvedDependency>,
+    includedDependencies: MutableSet<ResolvedDependency>,
+    excludedDependencies: MutableSet<ResolvedDependency>,
+  )
+
+  override fun resolve(configuration: FileCollection): FileCollection {
+    val includedDeps = mutableSetOf<ResolvedDependency>()
+    val excludedDeps = mutableSetOf<ResolvedDependency>()
+    configuration as Configuration
+    resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, includedDeps, excludedDeps)
+    return project.files(configuration.files) -
+      project.files(excludedDeps.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
+  }
+
+  override fun resolve(configurations: Collection<FileCollection>): FileCollection {
+    return configurations.map { resolve(it) }
+      .reduceOrNull { acc, fileCollection -> acc + fileCollection }
+      ?: project.files()
+  }
+
+  /**
+   * Exclude dependencies that match the provided spec.
+   */
+  override fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
+    excludeSpecs.add(spec)
+  }
+
+  /**
+   * Include dependencies that match the provided spec.
+   */
+  override fun include(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
+    includeSpecs.add(spec)
+  }
+
+  /**
+   * Create a spec that matches the provided project notation on group, name, and version.
+   */
+  override fun project(notation: Map<String, *>): Spec<ResolvedDependency> {
+    return dependency(dependency = project.dependencies.project(notation))
+  }
+
+  /**
+   * Create a spec that matches the default configuration for the provided project path on group, name, and version.
+   */
+  override fun project(notation: String): Spec<ResolvedDependency> {
+    return dependency(
+      dependency = project.dependencies.project(
+        mapOf(
+          "path" to notation,
+          "configuration" to "default",
+        ),
+      ),
     )
+  }
 
-    override fun resolve(configuration: FileCollection): FileCollection {
-        val includedDeps = mutableSetOf<ResolvedDependency>()
-        val excludedDeps = mutableSetOf<ResolvedDependency>()
-        configuration as Configuration
-        resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, includedDeps, excludedDeps)
-        return project.files(configuration.files) -
-            project.files(excludedDeps.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
-    }
+  /**
+   * Create a spec that matches dependencies using the provided notation on group, name, and version.
+   */
+  override fun dependency(notation: Any): Spec<ResolvedDependency> {
+    return dependency(dependency = project.dependencies.create(notation))
+  }
 
-    override fun resolve(configurations: Collection<FileCollection>): FileCollection {
-        return configurations.map { resolve(it) }
-            .reduceOrNull { acc, fileCollection -> acc + fileCollection }
-            ?: project.files()
+  /**
+   * Create a spec that matches the provided dependency on group, name, and version.
+   */
+  override fun dependency(dependency: Dependency): Spec<ResolvedDependency> {
+    return Spec<ResolvedDependency> { resolvedDependency ->
+      (dependency.group == null || resolvedDependency.moduleGroup.matches(dependency.group!!.toRegex())) &&
+        resolvedDependency.moduleName.matches(dependency.name.toRegex()) &&
+        (dependency.version == null || resolvedDependency.moduleVersion.matches(dependency.version!!.toRegex()))
     }
+  }
 
-    /**
-     * Exclude dependencies that match the provided spec.
-     */
-    override fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
-        excludeSpecs.add(spec)
-    }
+  /**
+   * Create a spec that matches the provided closure.
+   */
+  override fun dependency(closure: Closure<*>): Spec<ResolvedDependency> {
+    return Specs.convertClosureToSpec(closure)
+  }
 
-    /**
-     * Include dependencies that match the provided spec.
-     */
-    override fun include(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
-        includeSpecs.add(spec)
-    }
-
-    /**
-     * Create a spec that matches the provided project notation on group, name, and version.
-     */
-    override fun project(notation: Map<String, *>): Spec<ResolvedDependency> {
-        return dependency(dependency = project.dependencies.project(notation))
-    }
-
-    /**
-     * Create a spec that matches the default configuration for the provided project path on group, name, and version.
-     */
-    override fun project(notation: String): Spec<ResolvedDependency> {
-        return dependency(
-            dependency = project.dependencies.project(
-                mapOf(
-                    "path" to notation,
-                    "configuration" to "default",
-                ),
-            ),
-        )
-    }
-
-    /**
-     * Create a spec that matches dependencies using the provided notation on group, name, and version.
-     */
-    override fun dependency(notation: Any): Spec<ResolvedDependency> {
-        return dependency(dependency = project.dependencies.create(notation))
-    }
-
-    /**
-     * Create a spec that matches the provided dependency on group, name, and version.
-     */
-    override fun dependency(dependency: Dependency): Spec<ResolvedDependency> {
-        return Spec<ResolvedDependency> { resolvedDependency ->
-            (dependency.group == null || resolvedDependency.moduleGroup.matches(dependency.group!!.toRegex())) &&
-                resolvedDependency.moduleName.matches(dependency.name.toRegex()) &&
-                (dependency.version == null || resolvedDependency.moduleVersion.matches(dependency.version!!.toRegex()))
-        }
-    }
-
-    /**
-     * Create a spec that matches the provided closure.
-     */
-    override fun dependency(closure: Closure<*>): Spec<ResolvedDependency> {
-        return Specs.convertClosureToSpec(closure)
-    }
-
-    protected fun ResolvedDependency.isIncluded(): Boolean {
-        val include = includeSpecs.isEmpty() || includeSpecs.any { it.isSatisfiedBy(this) }
-        val exclude = excludeSpecs.isNotEmpty() && excludeSpecs.any { it.isSatisfiedBy(this) }
-        return include && !exclude
-    }
+  protected fun ResolvedDependency.isIncluded(): Boolean {
+    val include = includeSpecs.isEmpty() || includeSpecs.any { it.isSatisfiedBy(this) }
+    val exclude = excludeSpecs.isNotEmpty() && excludeSpecs.any { it.isSatisfiedBy(this) }
+    return include && !exclude
+  }
 }

@@ -29,88 +29,88 @@ import org.gradle.api.tasks.util.PatternSet
  */
 @CacheableTransformer
 open class ServiceFileTransformer(
-    private val patternSet: PatternSet = PatternSet()
-        .include(SERVICES_PATTERN)
-        .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
+  private val patternSet: PatternSet = PatternSet()
+    .include(SERVICES_PATTERN)
+    .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
 ) : Transformer,
-    PatternFilterable by patternSet {
-    private val serviceEntries = mutableMapOf<String, ServiceStream>()
+  PatternFilterable by patternSet {
+  private val serviceEntries = mutableMapOf<String, ServiceStream>()
 
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element
-        return patternSet.asSpec.isSatisfiedBy(target)
-    }
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element
+    return patternSet.asSpec.isSatisfiedBy(target)
+  }
 
-    override fun transform(context: TransformerContext) {
-        val lines = context.inputStream.bufferedReader().readLines().toMutableList()
-        var targetPath = context.path
-        context.relocators.forEach { rel ->
-            if (rel.canRelocateClass(File(targetPath).name)) {
-                val classContext = RelocateClassContext.builder().className(targetPath).stats(context.stats).build()
-                targetPath = rel.relocateClass(classContext)
-            }
-            lines.forEachIndexed { i, line ->
-                if (rel.canRelocateClass(line)) {
-                    val lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
-                    lines[i] = rel.relocateClass(lineContext)
-                }
-            }
+  override fun transform(context: TransformerContext) {
+    val lines = context.inputStream.bufferedReader().readLines().toMutableList()
+    var targetPath = context.path
+    context.relocators.forEach { rel ->
+      if (rel.canRelocateClass(File(targetPath).name)) {
+        val classContext = RelocateClassContext.builder().className(targetPath).stats(context.stats).build()
+        targetPath = rel.relocateClass(classContext)
+      }
+      lines.forEachIndexed { i, line ->
+        if (rel.canRelocateClass(line)) {
+          val lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
+          lines[i] = rel.relocateClass(lineContext)
         }
-        lines.forEach { line ->
-            serviceEntries[targetPath] = serviceEntries.getOrDefault(targetPath, ServiceStream()).apply {
-                append(ByteArrayInputStream(line.toByteArray()))
-            }
-        }
+      }
+    }
+    lines.forEach { line ->
+      serviceEntries[targetPath] = serviceEntries.getOrDefault(targetPath, ServiceStream()).apply {
+        append(ByteArrayInputStream(line.toByteArray()))
+      }
+    }
+  }
+
+  override fun hasTransformedResource(): Boolean = serviceEntries.isNotEmpty()
+
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    serviceEntries.forEach { (path, stream) ->
+      val entry = ZipEntry(path)
+      entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+      os.putNextEntry(entry)
+      stream.toInputStream().use {
+        it.copyTo(os)
+      }
+      os.closeEntry()
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Input
+  override fun getIncludes(): Set<String> = patternSet.includes
+
+  /**
+   * {@inheritDoc}
+   */
+  @Input
+  override fun getExcludes(): Set<String> = patternSet.excludes
+
+  open fun setPath(path: String): PatternFilterable = apply {
+    patternSet.setIncludes(listOf("$path/**"))
+  }
+
+  open class ServiceStream : ByteArrayOutputStream(1024) {
+    @Throws(IOException::class)
+    open fun append(inputStream: InputStream) {
+      if (count > 0 && buf[count - 1] != '\n'.code.toByte() && buf[count - 1] != '\r'.code.toByte()) {
+        val newline = "\n".toByteArray()
+        write(newline, 0, newline.size)
+      }
+      inputStream.use {
+        it.copyTo(this)
+      }
     }
 
-    override fun hasTransformedResource(): Boolean = serviceEntries.isNotEmpty()
+    open fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
+  }
 
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-        serviceEntries.forEach { (path, stream) ->
-            val entry = ZipEntry(path)
-            entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-            os.putNextEntry(entry)
-            stream.toInputStream().use {
-                it.copyTo(os)
-            }
-            os.closeEntry()
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Input
-    override fun getIncludes(): Set<String> = patternSet.includes
-
-    /**
-     * {@inheritDoc}
-     */
-    @Input
-    override fun getExcludes(): Set<String> = patternSet.excludes
-
-    open fun setPath(path: String): PatternFilterable = apply {
-        patternSet.setIncludes(listOf("$path/**"))
-    }
-
-    open class ServiceStream : ByteArrayOutputStream(1024) {
-        @Throws(IOException::class)
-        open fun append(inputStream: InputStream) {
-            if (count > 0 && buf[count - 1] != '\n'.code.toByte() && buf[count - 1] != '\r'.code.toByte()) {
-                val newline = "\n".toByteArray()
-                write(newline, 0, newline.size)
-            }
-            inputStream.use {
-                it.copyTo(this)
-            }
-        }
-
-        open fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
-    }
-
-    private companion object {
-        private const val SERVICES_PATTERN = "META-INF/services/**"
-        private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
-            "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-    }
+  private companion object {
+    private const val SERVICES_PATTERN = "META-INF/services/**"
+    private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
+      "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+  }
 }

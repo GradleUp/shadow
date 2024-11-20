@@ -13,79 +13,79 @@ import org.vafer.jdependency.ClazzpathUnit
 
 /** Tracks unused classes in the project classpath. */
 internal class UnusedTracker private constructor(
-    classDirs: Iterable<File>,
-    classJars: FileCollection,
-    private val _toMinimize: FileCollection,
+  classDirs: Iterable<File>,
+  classJars: FileCollection,
+  private val _toMinimize: FileCollection,
 ) {
-    private val projectUnits: List<ClazzpathUnit>
-    private val cp = Clazzpath()
+  private val projectUnits: List<ClazzpathUnit>
+  private val cp = Clazzpath()
 
-    init {
-        projectUnits = classDirs.map { cp.addClazzpathUnit(it) } + classJars.map { cp.addClazzpathUnit(it) }
+  init {
+    projectUnits = classDirs.map { cp.addClazzpathUnit(it) } + classJars.map { cp.addClazzpathUnit(it) }
+  }
+
+  @get:InputFiles
+  val toMinimize: FileCollection get() = _toMinimize
+
+  fun findUnused(): Set<String> {
+    val unused = cp.clazzes.toMutableSet()
+    for (cpu in projectUnits) {
+      unused.removeAll(cpu.clazzes)
+      unused.removeAll(cpu.transitiveDependencies)
+    }
+    return unused.map { it.name }.toSet()
+  }
+
+  fun addDependency(jarOrDir: File) {
+    if (_toMinimize.contains(jarOrDir)) {
+      cp.addClazzpathUnit(jarOrDir)
+    }
+  }
+
+  companion object {
+    @JvmStatic
+    fun forProject(
+      apiJars: FileCollection,
+      sourceSetsClassesDirs: Iterable<File>,
+      toMinimize: FileCollection,
+    ): UnusedTracker {
+      return UnusedTracker(sourceSetsClassesDirs, apiJars, toMinimize)
     }
 
-    @get:InputFiles
-    val toMinimize: FileCollection get() = _toMinimize
-
-    fun findUnused(): Set<String> {
-        val unused = cp.clazzes.toMutableSet()
-        for (cpu in projectUnits) {
-            unused.removeAll(cpu.clazzes)
-            unused.removeAll(cpu.transitiveDependencies)
+    @JvmStatic
+    fun getApiJarsFromProject(project: Project): FileCollection {
+      val apiDependencies = project.configurations.findByName("api")?.dependencies
+        ?: return project.files()
+      val runtimeConfiguration = project.configurations.findByName("runtimeClasspath")
+        ?: project.configurations.getByName("runtime")
+      val apiJars = mutableListOf<File>()
+      apiDependencies.forEach { dep ->
+        when (dep) {
+          is ProjectDependency -> {
+            apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
+            addJar(runtimeConfiguration, dep, apiJars)
+          }
+          is SelfResolvingDependency -> {
+            apiJars.addAll(dep.resolve())
+          }
+          else -> {
+            addJar(runtimeConfiguration, dep, apiJars)
+            apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
+          }
         }
-        return unused.map { it.name }.toSet()
+      }
+      return project.files(apiJars)
     }
 
-    fun addDependency(jarOrDir: File) {
-        if (_toMinimize.contains(jarOrDir)) {
-            cp.addClazzpathUnit(jarOrDir)
-        }
+    private fun addJar(config: Configuration, dep: Dependency, result: MutableList<File>) {
+      config.find { isProjectDependencyFile(it, dep) }?.let { result.add(it) }
     }
 
-    companion object {
-        @JvmStatic
-        fun forProject(
-            apiJars: FileCollection,
-            sourceSetsClassesDirs: Iterable<File>,
-            toMinimize: FileCollection,
-        ): UnusedTracker {
-            return UnusedTracker(sourceSetsClassesDirs, apiJars, toMinimize)
-        }
-
-        @JvmStatic
-        fun getApiJarsFromProject(project: Project): FileCollection {
-            val apiDependencies = project.configurations.findByName("api")?.dependencies
-                ?: return project.files()
-            val runtimeConfiguration = project.configurations.findByName("runtimeClasspath")
-                ?: project.configurations.getByName("runtime")
-            val apiJars = mutableListOf<File>()
-            apiDependencies.forEach { dep ->
-                when (dep) {
-                    is ProjectDependency -> {
-                        apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
-                        addJar(runtimeConfiguration, dep, apiJars)
-                    }
-                    is SelfResolvingDependency -> {
-                        apiJars.addAll(dep.resolve())
-                    }
-                    else -> {
-                        addJar(runtimeConfiguration, dep, apiJars)
-                        apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
-                    }
-                }
-            }
-            return project.files(apiJars)
-        }
-
-        private fun addJar(config: Configuration, dep: Dependency, result: MutableList<File>) {
-            config.find { isProjectDependencyFile(it, dep) }?.let { result.add(it) }
-        }
-
-        private fun isProjectDependencyFile(file: File, dep: Dependency): Boolean {
-            val fileName = file.name
-            val dependencyName = dep.name
-            return fileName == "$dependencyName.jar" ||
-                (fileName.startsWith("$dependencyName-") && fileName.endsWith(".jar"))
-        }
+    private fun isProjectDependencyFile(file: File, dep: Dependency): Boolean {
+      val fileName = file.name
+      val dependencyName = dep.name
+      return fileName == "$dependencyName.jar" ||
+        (fileName.startsWith("$dependencyName-") && fileName.endsWith(".jar"))
     }
+  }
 }

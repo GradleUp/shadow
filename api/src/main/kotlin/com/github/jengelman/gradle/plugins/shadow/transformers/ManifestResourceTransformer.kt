@@ -23,66 +23,66 @@ import org.slf4j.LoggerFactory
  * @author John Engelman
  */
 open class ManifestResourceTransformer : Transformer {
-    private var manifestDiscovered = false
-    private var manifest: Manifest? = null
+  private var manifestDiscovered = false
+  private var manifest: Manifest? = null
 
-    @get:Optional
-    @get:Input
-    var mainClass: String? = null
+  @get:Optional
+  @get:Input
+  var mainClass: String? = null
 
-    @get:Optional
-    @get:Input
-    var manifestEntries: MutableMap<String, Attributes>? = null
+  @get:Optional
+  @get:Input
+  var manifestEntries: MutableMap<String, Attributes>? = null
 
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        val path = element.relativePath.pathString
-        return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    val path = element.relativePath.pathString
+    return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
+  }
+
+  override fun transform(context: TransformerContext) {
+    // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
+    // now which is situational at best. Right now there is no context passed in with the processing so we cannot
+    // tell what artifact is being processed.
+    if (!manifestDiscovered) {
+      try {
+        manifest = Manifest(context.inputStream)
+        manifestDiscovered = true
+      } catch (e: IOException) {
+        logger.warn("Failed to read MANIFEST.MF", e)
+      }
+    }
+  }
+
+  override fun hasTransformedResource(): Boolean = true
+
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    // If we didn't find a manifest, then let's create one.
+    if (manifest == null) {
+      manifest = Manifest()
     }
 
-    override fun transform(context: TransformerContext) {
-        // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
-        // now which is situational at best. Right now there is no context passed in with the processing so we cannot
-        // tell what artifact is being processed.
-        if (!manifestDiscovered) {
-            try {
-                manifest = Manifest(context.inputStream)
-                manifestDiscovered = true
-            } catch (e: IOException) {
-                logger.warn("Failed to read MANIFEST.MF", e)
-            }
-        }
+    val attributes = manifest!!.mainAttributes
+    mainClass?.let {
+      attributes[Attributes.Name.MAIN_CLASS] = it
+    }
+    manifestEntries?.forEach { (key, value) ->
+      attributes[Attributes.Name(key)] = value
     }
 
-    override fun hasTransformedResource(): Boolean = true
+    val entry = ZipEntry(JarFile.MANIFEST_NAME)
+    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
+    os.putNextEntry(entry)
+    manifest!!.write(os)
+  }
 
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-        // If we didn't find a manifest, then let's create one.
-        if (manifest == null) {
-            manifest = Manifest()
-        }
-
-        val attributes = manifest!!.mainAttributes
-        mainClass?.let {
-            attributes[Attributes.Name.MAIN_CLASS] = it
-        }
-        manifestEntries?.forEach { (key, value) ->
-            attributes[Attributes.Name(key)] = value
-        }
-
-        val entry = ZipEntry(JarFile.MANIFEST_NAME)
-        entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-        os.putNextEntry(entry)
-        manifest!!.write(os)
+  open fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
+    if (manifestEntries == null) {
+      manifestEntries = LinkedHashMap()
     }
+    manifestEntries!!.putAll(attributes)
+  }
 
-    open fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
-        if (manifestEntries == null) {
-            manifestEntries = LinkedHashMap()
-        }
-        manifestEntries!!.putAll(attributes)
-    }
-
-    private companion object {
-        private val logger = LoggerFactory.getLogger(ManifestResourceTransformer::class.java)
-    }
+  private companion object {
+    private val logger = LoggerFactory.getLogger(ManifestResourceTransformer::class.java)
+  }
 }

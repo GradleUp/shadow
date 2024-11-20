@@ -14,51 +14,51 @@ import org.objectweb.asm.commons.Remapper
  * @author John Engelman
  */
 open class RelocatorRemapper(
-    private val relocators: List<Relocator>,
-    private val stats: ShadowStats,
+  private val relocators: List<Relocator>,
+  private val stats: ShadowStats,
 ) : Remapper() {
-    private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
+  private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
-    open fun hasRelocators(): Boolean = relocators.isNotEmpty()
+  open fun hasRelocators(): Boolean = relocators.isNotEmpty()
 
-    override fun mapValue(value: Any): Any {
-        return if (value is String) {
-            map(value)
-        } else {
-            super.mapValue(value)
-        }
+  override fun mapValue(value: Any): Any {
+    return if (value is String) {
+      map(value)
+    } else {
+      super.mapValue(value)
+    }
+  }
+
+  override fun map(name: String): String {
+    var newName = name
+    var prefix = ""
+    var suffix = ""
+
+    val matcher = classPattern.matcher(newName)
+    if (matcher.matches()) {
+      prefix = matcher.group(1) + "L"
+      suffix = ""
+      newName = matcher.group(2)
     }
 
-    override fun map(name: String): String {
-        var newName = name
-        var prefix = ""
-        var suffix = ""
-
-        val matcher = classPattern.matcher(newName)
-        if (matcher.matches()) {
-            prefix = matcher.group(1) + "L"
-            suffix = ""
-            newName = matcher.group(2)
-        }
-
-        for (relocator in relocators) {
-            if (relocator.canRelocateClass(newName)) {
-                val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
-                return prefix + relocator.relocateClass(classContext) + suffix
-            } else if (relocator.canRelocatePath(newName)) {
-                val pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
-                return prefix + relocator.relocatePath(pathContext) + suffix
-            }
-        }
-
-        return name
+    for (relocator in relocators) {
+      if (relocator.canRelocateClass(newName)) {
+        val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
+        return prefix + relocator.relocateClass(classContext) + suffix
+      } else if (relocator.canRelocatePath(newName)) {
+        val pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
+        return prefix + relocator.relocatePath(pathContext) + suffix
+      }
     }
 
-    open fun mapPath(path: String): String {
-        return map(path.substring(0, path.indexOf('.')))
-    }
+    return name
+  }
 
-    open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
-        return mapPath(path.pathString)
-    }
+  open fun mapPath(path: String): String {
+    return map(path.substring(0, path.indexOf('.')))
+  }
+
+  open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
+    return mapPath(path.pathString)
+  }
 }

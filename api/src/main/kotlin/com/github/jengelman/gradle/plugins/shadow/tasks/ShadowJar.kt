@@ -42,303 +42,303 @@ import org.gradle.api.tasks.util.PatternSet
 
 @CacheableTask
 abstract class ShadowJar :
-    Jar(),
-    ShadowSpec {
-    private val _transformers = mutableListOf<Transformer>()
-    private val _relocators = mutableListOf<Relocator>()
-    private val _configurations = mutableListOf<FileCollection>()
-    private val _stats = ShadowStats()
-    private val _includedDependencies = project.files(Callable { _dependencyFilter.resolve(_configurations) })
+  Jar(),
+  ShadowSpec {
+  private val _transformers = mutableListOf<Transformer>()
+  private val _relocators = mutableListOf<Relocator>()
+  private val _configurations = mutableListOf<FileCollection>()
+  private val _stats = ShadowStats()
+  private val _includedDependencies = project.files(Callable { _dependencyFilter.resolve(_configurations) })
 
-    @Transient
-    private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  @Transient
+  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
-    private var minimizeJar = false
-    private var _isEnableRelocation = false
-    private var _relocationPrefix = ShadowBasePlugin.SHADOW
-    private var _toMinimize: FileCollection? = null
-    private var _apiJars: FileCollection? = null
-    private var _sourceSetsClassesDirs: FileCollection? = null
+  private var minimizeJar = false
+  private var _isEnableRelocation = false
+  private var _relocationPrefix = ShadowBasePlugin.SHADOW
+  private var _toMinimize: FileCollection? = null
+  private var _apiJars: FileCollection? = null
+  private var _sourceSetsClassesDirs: FileCollection? = null
 
-    @Transient
-    private var _dependencyFilter: DependencyFilter = DefaultDependencyFilter(project)
+  @Transient
+  private var _dependencyFilter: DependencyFilter = DefaultDependencyFilter(project)
 
-    init {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
+  init {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
-        inputs.property("minimize") { minimizeJar }
-        outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
-            _transformers.any { !isCacheableTransform(it::class.java) } ||
-                _relocators.any { !isCacheableRelocator(it::class.java) }
-        }
+    inputs.property("minimize") { minimizeJar }
+    outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
+      _transformers.any { !isCacheableTransform(it::class.java) } ||
+        _relocators.any { !isCacheableRelocator(it::class.java) }
     }
+  }
 
-    @get:Internal
-    override val stats: ShadowStats get() = _stats
+  @get:Internal
+  override val stats: ShadowStats get() = _stats
 
-    @get:Classpath
-    val toMinimize: FileCollection
-        get() {
-            if (_toMinimize == null) {
-                _toMinimize = if (minimizeJar) {
-                    dependencyFilterForMinimize.resolve(_configurations)
-                        .minus(apiJars)
-                } else {
-                    project.objects.fileCollection()
-                }
-            }
-            return _toMinimize!!
-        }
-
-    @get:Classpath
-    val apiJars: FileCollection
-        get() {
-            if (_apiJars == null) {
-                _apiJars = if (minimizeJar) {
-                    UnusedTracker.getApiJarsFromProject(project)
-                } else {
-                    project.objects.fileCollection()
-                }
-            }
-            return _apiJars!!
-        }
-
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    val sourceSetsClassesDirs: FileCollection
-        get() {
-            if (_sourceSetsClassesDirs == null) {
-                val allClassesDirs = project.objects.fileCollection()
-                if (minimizeJar) {
-                    project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
-                        allClassesDirs.from(sourceSet.output.classesDirs)
-                    }
-                }
-                _sourceSetsClassesDirs = allClassesDirs.filter { it.isDirectory }
-            }
-            return _sourceSetsClassesDirs!!
-        }
-
-    @get:Classpath
-    val includedDependencies: FileCollection get() = _includedDependencies
-
-    @get:Internal
-    val rootPatternSet: PatternSet
-        get() {
-            return (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
-        }
-
-    @get:Internal
-    val internalCompressor: ZipCompressor
-        get() {
-            return when (entryCompression) {
-                ZipEntryCompression.DEFLATED -> DefaultZipCompressor(isZip64, ZipOutputStream.DEFLATED)
-                ZipEntryCompression.STORED -> DefaultZipCompressor(isZip64, ZipOutputStream.STORED)
-                else -> throw IllegalArgumentException("Unknown Compression type $entryCompression")
-            }
-        }
-
-    @get:Nested
-    var transformers: List<Transformer>
-        get() = _transformers
-        set(value) {
-            _transformers.clear()
-            _transformers.addAll(value)
-        }
-
-    @get:Nested
-    var relocators: List<Relocator>
-        get() = _relocators
-        set(value) {
-            _relocators.clear()
-            _relocators.addAll(value)
-        }
-
-    @get:Classpath
-    @get:Optional
-    var configurations: List<FileCollection>
-        get() = _configurations
-        set(value) {
-            _configurations.clear()
-            _configurations.addAll(value)
-        }
-
-    @get:Internal
-    var dependencyFilter: DependencyFilter
-        get() = _dependencyFilter
-        set(value) {
-            _dependencyFilter = value
-        }
-
-    @get:Input
-    var isEnableRelocation: Boolean
-        get() = _isEnableRelocation
-        set(value) {
-            _isEnableRelocation = value
-        }
-
-    @get:Input
-    var relocationPrefix: String
-        get() = _relocationPrefix
-        set(value) {
-            _relocationPrefix = value
-        }
-
-    @Internal
-    override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
-
-    override fun minimize(): ShadowJar = apply {
-        minimizeJar = true
-    }
-
-    override fun minimize(action: Action<DependencyFilter>?): ShadowJar = apply {
-        minimize()
-        action?.execute(dependencyFilterForMinimize)
-    }
-
-    override fun createCopyAction(): CopyAction {
-        val documentationRegistry = services.get(DocumentationRegistry::class.java)
-        val unusedTracker = if (minimizeJar) {
-            UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+  @get:Classpath
+  val toMinimize: FileCollection
+    get() {
+      if (_toMinimize == null) {
+        _toMinimize = if (minimizeJar) {
+          dependencyFilterForMinimize.resolve(_configurations)
+            .minus(apiJars)
         } else {
-            null
+          project.objects.fileCollection()
         }
-        return ShadowCopyAction(
-            archiveFile.get().asFile,
-            internalCompressor,
-            documentationRegistry,
-            metadataCharset,
-            _transformers,
-            _relocators,
-            rootPatternSet,
-            _stats,
-            isPreserveFileTimestamps,
-            minimizeJar,
-            unusedTracker,
-        )
+      }
+      return _toMinimize!!
     }
 
-    override fun dependencies(action: Action<DependencyFilter>?): ShadowJar = apply {
-        action?.execute(_dependencyFilter)
+  @get:Classpath
+  val apiJars: FileCollection
+    get() {
+      if (_apiJars == null) {
+        _apiJars = if (minimizeJar) {
+          UnusedTracker.getApiJarsFromProject(project)
+        } else {
+          project.objects.fileCollection()
+        }
+      }
+      return _apiJars!!
     }
 
-    override fun transform(clazz: Class<Transformer>): ShadowJar {
-        return transform(clazz, null)
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  val sourceSetsClassesDirs: FileCollection
+    get() {
+      if (_sourceSetsClassesDirs == null) {
+        val allClassesDirs = project.objects.fileCollection()
+        if (minimizeJar) {
+          project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
+            allClassesDirs.from(sourceSet.output.classesDirs)
+          }
+        }
+        _sourceSetsClassesDirs = allClassesDirs.filter { it.isDirectory }
+      }
+      return _sourceSetsClassesDirs!!
     }
 
-    override fun <T : Transformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
-        val transformer = clazz.getDeclaredConstructor().newInstance()
-        addTransform(transformer, action)
+  @get:Classpath
+  val includedDependencies: FileCollection get() = _includedDependencies
+
+  @get:Internal
+  val rootPatternSet: PatternSet
+    get() {
+      return (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
     }
 
-    override fun transform(transformer: Transformer): ShadowJar = apply {
-        addTransform(transformer, null)
+  @get:Internal
+  val internalCompressor: ZipCompressor
+    get() {
+      return when (entryCompression) {
+        ZipEntryCompression.DEFLATED -> DefaultZipCompressor(isZip64, ZipOutputStream.DEFLATED)
+        ZipEntryCompression.STORED -> DefaultZipCompressor(isZip64, ZipOutputStream.STORED)
+        else -> throw IllegalArgumentException("Unknown Compression type $entryCompression")
+      }
     }
 
-    override fun mergeServiceFiles(): ShadowJar {
-        return runCatching {
-            transform(ServiceFileTransformer::class.java, null)
-        }.getOrDefault(this)
+  @get:Nested
+  var transformers: List<Transformer>
+    get() = _transformers
+    set(value) {
+      _transformers.clear()
+      _transformers.addAll(value)
     }
 
-    override fun mergeServiceFiles(rootPath: String): ShadowJar {
-        return runCatching {
-            transform(ServiceFileTransformer::class.java) {
-                it.setPath(rootPath)
+  @get:Nested
+  var relocators: List<Relocator>
+    get() = _relocators
+    set(value) {
+      _relocators.clear()
+      _relocators.addAll(value)
+    }
+
+  @get:Classpath
+  @get:Optional
+  var configurations: List<FileCollection>
+    get() = _configurations
+    set(value) {
+      _configurations.clear()
+      _configurations.addAll(value)
+    }
+
+  @get:Internal
+  var dependencyFilter: DependencyFilter
+    get() = _dependencyFilter
+    set(value) {
+      _dependencyFilter = value
+    }
+
+  @get:Input
+  var isEnableRelocation: Boolean
+    get() = _isEnableRelocation
+    set(value) {
+      _isEnableRelocation = value
+    }
+
+  @get:Input
+  var relocationPrefix: String
+    get() = _relocationPrefix
+    set(value) {
+      _relocationPrefix = value
+    }
+
+  @Internal
+  override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
+
+  override fun minimize(): ShadowJar = apply {
+    minimizeJar = true
+  }
+
+  override fun minimize(action: Action<DependencyFilter>?): ShadowJar = apply {
+    minimize()
+    action?.execute(dependencyFilterForMinimize)
+  }
+
+  override fun createCopyAction(): CopyAction {
+    val documentationRegistry = services.get(DocumentationRegistry::class.java)
+    val unusedTracker = if (minimizeJar) {
+      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+    } else {
+      null
+    }
+    return ShadowCopyAction(
+      archiveFile.get().asFile,
+      internalCompressor,
+      documentationRegistry,
+      metadataCharset,
+      _transformers,
+      _relocators,
+      rootPatternSet,
+      _stats,
+      isPreserveFileTimestamps,
+      minimizeJar,
+      unusedTracker,
+    )
+  }
+
+  override fun dependencies(action: Action<DependencyFilter>?): ShadowJar = apply {
+    action?.execute(_dependencyFilter)
+  }
+
+  override fun transform(clazz: Class<Transformer>): ShadowJar {
+    return transform(clazz, null)
+  }
+
+  override fun <T : Transformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
+    val transformer = clazz.getDeclaredConstructor().newInstance()
+    addTransform(transformer, action)
+  }
+
+  override fun transform(transformer: Transformer): ShadowJar = apply {
+    addTransform(transformer, null)
+  }
+
+  override fun mergeServiceFiles(): ShadowJar {
+    return runCatching {
+      transform(ServiceFileTransformer::class.java, null)
+    }.getOrDefault(this)
+  }
+
+  override fun mergeServiceFiles(rootPath: String): ShadowJar {
+    return runCatching {
+      transform(ServiceFileTransformer::class.java) {
+        it.setPath(rootPath)
+      }
+    }.getOrDefault(this)
+  }
+
+  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?): ShadowJar {
+    return runCatching {
+      transform(ServiceFileTransformer::class.java, action)
+    }.getOrDefault(this)
+  }
+
+  override fun mergeGroovyExtensionModules(): ShadowJar {
+    return runCatching {
+      transform(GroovyExtensionModuleTransformer::class.java, null)
+    }.getOrDefault(this)
+  }
+
+  override fun append(resourcePath: String): ShadowJar {
+    return runCatching {
+      transform(AppendingTransformer::class.java) {
+        it.resource = resourcePath
+      }
+    }.getOrDefault(this)
+  }
+
+  override fun relocate(pattern: String, destination: String): ShadowJar {
+    return relocate(pattern, destination, null)
+  }
+
+  override fun relocate(
+    pattern: String,
+    destination: String,
+    action: Action<SimpleRelocator>?,
+  ): ShadowJar = apply {
+    val relocator = SimpleRelocator(pattern, destination, mutableListOf(), mutableListOf())
+    addRelocator(relocator, action)
+  }
+
+  override fun relocate(relocator: Relocator): ShadowJar = apply {
+    addRelocator(relocator, null)
+  }
+
+  override fun relocate(clazz: Class<Relocator>): ShadowJar {
+    return relocate(clazz, null)
+  }
+
+  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowJar = apply {
+    val relocator = clazz.getDeclaredConstructor().newInstance()
+    addRelocator(relocator, action)
+  }
+
+  @TaskAction
+  override fun copy() {
+    if (_isEnableRelocation) {
+      configureRelocation()
+    }
+    from(_includedDependencies)
+    super.copy()
+    logger.info(_stats.toString())
+  }
+
+  private fun <R : Relocator> addRelocator(relocator: R, configure: Action<R>?) {
+    configure?.execute(relocator)
+    _relocators.add(relocator)
+  }
+
+  private fun <T : Transformer> addTransform(transformer: T, action: Action<T>?) {
+    action?.execute(transformer)
+    _transformers.add(transformer)
+  }
+
+  private fun isCacheableRelocator(clazz: Class<out Relocator>): Boolean {
+    return clazz.isAnnotationPresent(CacheableRelocator::class.java)
+  }
+
+  private fun isCacheableTransform(clazz: Class<out Transformer>): Boolean {
+    return clazz.isAnnotationPresent(CacheableTransformer::class.java)
+  }
+
+  private fun configureRelocation() {
+    val packages = mutableSetOf<String>()
+    configurations.forEach { configuration ->
+      configuration.files.forEach { jarFile ->
+        JarFile(jarFile).use { jf ->
+          jf.entries().asSequence().forEach { entry ->
+            if (entry.name.endsWith(".class") && entry.name != "module-info.class") {
+              packages.add(entry.name.substringBeforeLast('/').replace('/', '.'))
             }
-        }.getOrDefault(this)
-    }
-
-    override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?): ShadowJar {
-        return runCatching {
-            transform(ServiceFileTransformer::class.java, action)
-        }.getOrDefault(this)
-    }
-
-    override fun mergeGroovyExtensionModules(): ShadowJar {
-        return runCatching {
-            transform(GroovyExtensionModuleTransformer::class.java, null)
-        }.getOrDefault(this)
-    }
-
-    override fun append(resourcePath: String): ShadowJar {
-        return runCatching {
-            transform(AppendingTransformer::class.java) {
-                it.resource = resourcePath
-            }
-        }.getOrDefault(this)
-    }
-
-    override fun relocate(pattern: String, destination: String): ShadowJar {
-        return relocate(pattern, destination, null)
-    }
-
-    override fun relocate(
-        pattern: String,
-        destination: String,
-        action: Action<SimpleRelocator>?,
-    ): ShadowJar = apply {
-        val relocator = SimpleRelocator(pattern, destination, mutableListOf(), mutableListOf())
-        addRelocator(relocator, action)
-    }
-
-    override fun relocate(relocator: Relocator): ShadowJar = apply {
-        addRelocator(relocator, null)
-    }
-
-    override fun relocate(clazz: Class<Relocator>): ShadowJar {
-        return relocate(clazz, null)
-    }
-
-    override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowJar = apply {
-        val relocator = clazz.getDeclaredConstructor().newInstance()
-        addRelocator(relocator, action)
-    }
-
-    @TaskAction
-    override fun copy() {
-        if (_isEnableRelocation) {
-            configureRelocation()
+          }
         }
-        from(_includedDependencies)
-        super.copy()
-        logger.info(_stats.toString())
+      }
     }
-
-    private fun <R : Relocator> addRelocator(relocator: R, configure: Action<R>?) {
-        configure?.execute(relocator)
-        _relocators.add(relocator)
+    packages.forEach {
+      relocate(it, "$_relocationPrefix.$it")
     }
-
-    private fun <T : Transformer> addTransform(transformer: T, action: Action<T>?) {
-        action?.execute(transformer)
-        _transformers.add(transformer)
-    }
-
-    private fun isCacheableRelocator(clazz: Class<out Relocator>): Boolean {
-        return clazz.isAnnotationPresent(CacheableRelocator::class.java)
-    }
-
-    private fun isCacheableTransform(clazz: Class<out Transformer>): Boolean {
-        return clazz.isAnnotationPresent(CacheableTransformer::class.java)
-    }
-
-    private fun configureRelocation() {
-        val packages = mutableSetOf<String>()
-        configurations.forEach { configuration ->
-            configuration.files.forEach { jarFile ->
-                JarFile(jarFile).use { jf ->
-                    jf.entries().asSequence().forEach { entry ->
-                        if (entry.name.endsWith(".class") && entry.name != "module-info.class") {
-                            packages.add(entry.name.substringBeforeLast('/').replace('/', '.'))
-                        }
-                    }
-                }
-            }
-        }
-        packages.forEach {
-            relocate(it, "$_relocationPrefix.$it")
-        }
-    }
+  }
 }

@@ -7,17 +7,17 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
  * @author John Engelman
  */
 interface Relocator {
-    fun canRelocatePath(path: String): Boolean
+  fun canRelocatePath(path: String): Boolean
 
-    fun relocatePath(context: RelocatePathContext): String
+  fun relocatePath(context: RelocatePathContext): String
 
-    fun canRelocateClass(className: String): Boolean
+  fun canRelocateClass(className: String): Boolean
 
-    fun relocateClass(context: RelocateClassContext): String
+  fun relocateClass(context: RelocateClassContext): String
 
-    fun applyToSourceContent(sourceContent: String): String
+  fun applyToSourceContent(sourceContent: String): String
 
-    companion object {
-        val ROLE: String = Relocator::class.java.name
-    }
+  companion object {
+    val ROLE: String = Relocator::class.java.name
+  }
 }

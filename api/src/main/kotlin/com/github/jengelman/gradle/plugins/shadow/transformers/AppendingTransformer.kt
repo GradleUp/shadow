@@ -18,37 +18,37 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 @Suppress("ktlint:standard:backing-property-naming")
 open class AppendingTransformer : Transformer {
-    /**
-     * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
-     */
-    private var _data: ByteArrayOutputStream? = null
-    private inline val data get() = if (_data == null) ByteArrayOutputStream().also { _data = it } else _data!!
+  /**
+   * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
+   */
+  private var _data: ByteArrayOutputStream? = null
+  private inline val data get() = if (_data == null) ByteArrayOutputStream().also { _data = it } else _data!!
 
-    @get:Optional
-    @get:Input
-    var resource: String? = null
+  @get:Optional
+  @get:Input
+  var resource: String? = null
 
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        return resource.equals(element.relativePath.pathString, ignoreCase = true)
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return resource.equals(element.relativePath.pathString, ignoreCase = true)
+  }
+
+  override fun transform(context: TransformerContext) {
+    context.inputStream.use {
+      it.copyTo(data)
+      data.write('\n'.code)
     }
+  }
 
-    override fun transform(context: TransformerContext) {
-        context.inputStream.use {
-            it.copyTo(data)
-            data.write('\n'.code)
-        }
-    }
+  override fun hasTransformedResource(): Boolean {
+    return data.size() > 0
+  }
 
-    override fun hasTransformedResource(): Boolean {
-        return data.size() > 0
-    }
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    val entry = ZipEntry(requireNotNull(resource))
+    entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+    os.putNextEntry(entry)
 
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-        val entry = ZipEntry(requireNotNull(resource))
-        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-        os.putNextEntry(entry)
-
-        data.toByteArray().inputStream().copyTo(os)
-        data.reset()
-    }
+    data.toByteArray().inputStream().copyTo(os)
+    data.reset()
+  }
 }
