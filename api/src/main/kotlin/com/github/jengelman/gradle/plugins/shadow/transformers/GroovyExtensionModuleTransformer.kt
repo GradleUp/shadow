@@ -54,9 +54,10 @@ public open class GroovyExtensionModuleTransformer : Transformer {
         MODULE_VERSION_KEY -> handle(key, value as String) {
           module.setProperty(key, MERGED_MODULE_VERSION)
         }
-        EXTENSION_CLASSES_KEY, STATIC_EXTENSION_CLASSES_KEY -> handle(key, value as String) { existingValue ->
-          val newValue = "$existingValue,$value"
-          module.setProperty(key, newValue)
+        EXTENSION_CLASSES_KEY,
+        STATIC_EXTENSION_CLASSES_KEY,
+        -> handle(key, value as String) { existingValue ->
+          module.setProperty(key, "$existingValue,$value")
         }
       }
     }
@@ -86,9 +87,9 @@ public open class GroovyExtensionModuleTransformer : Transformer {
 
   private companion object {
     private fun Properties.inputStream(): InputStream {
-      val baos = ByteArrayOutputStream()
-      store(baos, null)
-      return ByteArrayInputStream(baos.toByteArray())
+      val os = ByteArrayOutputStream()
+      store(os, null)
+      return ByteArrayInputStream(os.toByteArray())
     }
 
     private const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =

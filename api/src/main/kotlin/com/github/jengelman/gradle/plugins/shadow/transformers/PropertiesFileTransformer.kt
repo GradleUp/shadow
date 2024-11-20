@@ -94,10 +94,10 @@ public open class PropertiesFileTransformer : Transformer {
   private val _charset get() = Charset.forName(charset)
 
   @get:Input
-  public var paths: List<String> = mutableListOf()
+  public var paths: List<String> = listOf()
 
   @get:Input
-  public var mappings: Map<String, Map<String, String>> = mutableMapOf()
+  public var mappings: Map<String, Map<String, String>> = mapOf()
 
   /**
    * Optional values: first, latest, append.

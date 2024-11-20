@@ -62,11 +62,9 @@ public open class ManifestResourceTransformer : Transformer {
     }
 
     val attributes = manifest!!.mainAttributes
-
     mainClass?.let {
       attributes[Attributes.Name.MAIN_CLASS] = it
     }
-
     manifestEntries?.forEach { (key, value) ->
       attributes[Attributes.Name(key)] = value
     }
