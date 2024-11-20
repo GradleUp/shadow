@@ -57,13 +57,10 @@ open class ComponentsXmlResourceTransformer : Transformer {
             setValue(component, "implementation", impl)
 
             val key = "$role:$roleHint"
-            if (components.containsKey(key)) {
-                // TODO: use the tools in Plexus to merge these properly. For now, I just need an all-or-nothing
-                // configuration carry over
-                val dom = requireNotNull(components[key])
-                if (dom.getChild("configuration") != null) {
-                    component.addChild(dom.getChild("configuration"))
-                }
+            // TODO: use the tools in Plexus to merge these properly. For now, I just need an all-or-nothing
+            // configuration carry over
+            components[key]?.getChild("configuration")?.let {
+                component.addChild(it)
             }
 
             val requirements = component.getChild("requirements")
