@@ -6,19 +6,19 @@ import org.gradle.api.tasks.TaskAction
 
 abstract class KnowsTask : DefaultTask() {
 
-    @TaskAction
-    fun knows() {
-        logger.info(
-            """
+  @TaskAction
+  fun knows() {
+    logger.info(
+      """
               No, The Shadow Knows....
 
               ${this::class.java.requireResourceAsText("/shadowBanner.txt")}
-            """.trimIndent(),
-        )
-    }
+      """.trimIndent(),
+    )
+  }
 
-    companion object {
-        const val NAME: String = "knows"
-        const val DESC: String = "Do you know who knows?"
-    }
+  companion object {
+    const val NAME: String = "knows"
+    const val DESC: String = "Do you know who knows?"
+  }
 }

@@ -26,81 +26,81 @@ import org.gradle.api.file.FileTreeElement
  */
 @CacheableTransformer
 open class GroovyExtensionModuleTransformer : Transformer {
-    private val module = Properties()
+  private val module = Properties()
 
-    /**
-     * default to Groovy 2.4 or earlier
-     */
-    private var legacy = true
+  /**
+   * default to Groovy 2.4 or earlier
+   */
+  private var legacy = true
 
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        val path = element.relativePath.pathString
-        if (path == GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH) {
-            // Groovy 2.5+
-            legacy = false
-            return true
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    val path = element.relativePath.pathString
+    if (path == GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH) {
+      // Groovy 2.5+
+      legacy = false
+      return true
+    }
+    return path == GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH
+  }
+
+  override fun transform(context: TransformerContext) {
+    val props = Properties()
+    props.load(context.inputStream)
+    props.forEach { key, value ->
+      when (key as String) {
+        MODULE_NAME_KEY -> handle(key, value as String) {
+          module.setProperty(key, MERGED_MODULE_NAME)
         }
-        return path == GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH
+        MODULE_VERSION_KEY -> handle(key, value as String) {
+          module.setProperty(key, MERGED_MODULE_VERSION)
+        }
+        EXTENSION_CLASSES_KEY,
+        STATIC_EXTENSION_CLASSES_KEY,
+        -> handle(key, value as String) { existingValue ->
+          module.setProperty(key, "$existingValue,$value")
+        }
+      }
+    }
+  }
+
+  private fun handle(key: String, value: String, mergeValue: (String) -> Unit) {
+    val existingValue = module.getProperty(key)
+    if (existingValue != null) {
+      mergeValue(existingValue)
+    } else {
+      module.setProperty(key, value)
+    }
+  }
+
+  override fun hasTransformedResource(): Boolean = module.isNotEmpty()
+
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    val name = if (legacy) GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH else GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH
+    val entry = ZipEntry(name)
+    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
+    os.putNextEntry(entry)
+    module.inputStream().use {
+      it.copyTo(os)
+    }
+    os.closeEntry()
+  }
+
+  private companion object {
+    private fun Properties.inputStream(): InputStream {
+      val os = ByteArrayOutputStream()
+      store(os, null)
+      return ByteArrayInputStream(os.toByteArray())
     }
 
-    override fun transform(context: TransformerContext) {
-        val props = Properties()
-        props.load(context.inputStream)
-        props.forEach { key, value ->
-            when (key as String) {
-                MODULE_NAME_KEY -> handle(key, value as String) {
-                    module.setProperty(key, MERGED_MODULE_NAME)
-                }
-                MODULE_VERSION_KEY -> handle(key, value as String) {
-                    module.setProperty(key, MERGED_MODULE_VERSION)
-                }
-                EXTENSION_CLASSES_KEY,
-                STATIC_EXTENSION_CLASSES_KEY,
-                -> handle(key, value as String) { existingValue ->
-                    module.setProperty(key, "$existingValue,$value")
-                }
-            }
-        }
-    }
-
-    private fun handle(key: String, value: String, mergeValue: (String) -> Unit) {
-        val existingValue = module.getProperty(key)
-        if (existingValue != null) {
-            mergeValue(existingValue)
-        } else {
-            module.setProperty(key, value)
-        }
-    }
-
-    override fun hasTransformedResource(): Boolean = module.isNotEmpty()
-
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-        val name = if (legacy) GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH else GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH
-        val entry = ZipEntry(name)
-        entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-        os.putNextEntry(entry)
-        module.inputStream().use {
-            it.copyTo(os)
-        }
-        os.closeEntry()
-    }
-
-    private companion object {
-        private fun Properties.inputStream(): InputStream {
-            val os = ByteArrayOutputStream()
-            store(os, null)
-            return ByteArrayInputStream(os.toByteArray())
-        }
-
-        private const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =
-            "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-        private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
-            "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
-        private const val MODULE_NAME_KEY = "moduleName"
-        private const val MODULE_VERSION_KEY = "moduleVersion"
-        private const val EXTENSION_CLASSES_KEY = "extensionClasses"
-        private const val STATIC_EXTENSION_CLASSES_KEY = "staticExtensionClasses"
-        private const val MERGED_MODULE_NAME = "MergedByShadowJar"
-        private const val MERGED_MODULE_VERSION = "1.0.0"
-    }
+    private const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+      "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+    private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+      "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
+    private const val MODULE_NAME_KEY = "moduleName"
+    private const val MODULE_VERSION_KEY = "moduleVersion"
+    private const val EXTENSION_CLASSES_KEY = "extensionClasses"
+    private const val STATIC_EXTENSION_CLASSES_KEY = "staticExtensionClasses"
+    private const val MERGED_MODULE_NAME = "MergedByShadowJar"
+    private const val MERGED_MODULE_VERSION = "1.0.0"
+  }
 }

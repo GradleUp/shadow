@@ -22,113 +22,113 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 open class ComponentsXmlResourceTransformer : Transformer {
-    private val components = mutableMapOf<String, Xpp3Dom>()
+  private val components = mutableMapOf<String, Xpp3Dom>()
 
-    override fun canTransformResource(element: FileTreeElement): Boolean {
-        return COMPONENTS_XML_PATH == element.relativePath.pathString
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return COMPONENTS_XML_PATH == element.relativePath.pathString
+  }
+
+  override fun transform(context: TransformerContext) {
+    val newDom = try {
+      val bis = object : BufferedInputStream(context.inputStream) {
+        @Throws(IOException::class)
+        override fun close() {
+          // leave ZIP open
+        }
+      }
+      Xpp3DomBuilder.build(XmlStreamReader(bis))
+    } catch (e: Exception) {
+      throw IOException("Error parsing components.xml in ${context.inputStream}", e)
     }
 
-    override fun transform(context: TransformerContext) {
-        val newDom = try {
-            val bis = object : BufferedInputStream(context.inputStream) {
-                @Throws(IOException::class)
-                override fun close() {
-                    // leave ZIP open
-                }
-            }
-            Xpp3DomBuilder.build(XmlStreamReader(bis))
-        } catch (e: Exception) {
-            throw IOException("Error parsing components.xml in ${context.inputStream}", e)
+    // Only try to merge in components if there are some elements in the component-set
+    if (newDom.getChild("components") == null) return
+
+    val children = newDom.getChild("components").getChildren("component")
+    for (component in children) {
+      var role: String? = getValue(component, "role")
+      role = getRelocatedClass(role, context)
+      setValue(component, "role", role)
+
+      val roleHint = getValue(component, "role-hint")
+
+      var impl: String? = getValue(component, "implementation")
+      impl = getRelocatedClass(impl, context)
+      setValue(component, "implementation", impl)
+
+      val key = "$role:$roleHint"
+      // TODO: use the tools in Plexus to merge these properly. For now, I just need an all-or-nothing
+      // configuration carry over
+      components[key]?.getChild("configuration")?.let {
+        component.addChild(it)
+      }
+
+      val requirements = component.getChild("requirements")
+      if (requirements != null && requirements.childCount > 0) {
+        for (r in requirements.childCount - 1 downTo 0) {
+          val requirement = requirements.getChild(r)
+          var requiredRole: String? = getValue(requirement, "role")
+          requiredRole = getRelocatedClass(requiredRole, context)
+          setValue(requirement, "role", requiredRole)
         }
+      }
+      components[key] = component
+    }
+  }
 
-        // Only try to merge in components if there are some elements in the component-set
-        if (newDom.getChild("components") == null) return
+  override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    val entry = ZipEntry(COMPONENTS_XML_PATH)
+    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
+    os.putNextEntry(entry)
 
-        val children = newDom.getChild("components").getChildren("component")
-        for (component in children) {
-            var role: String? = getValue(component, "role")
-            role = getRelocatedClass(role, context)
-            setValue(component, "role", role)
+    transformedResource.inputStream().use {
+      it.copyTo(os)
+    }
+    components.clear()
+  }
 
-            val roleHint = getValue(component, "role-hint")
+  override fun hasTransformedResource(): Boolean = components.isNotEmpty()
 
-            var impl: String? = getValue(component, "implementation")
-            impl = getRelocatedClass(impl, context)
-            setValue(component, "implementation", impl)
-
-            val key = "$role:$roleHint"
-            // TODO: use the tools in Plexus to merge these properly. For now, I just need an all-or-nothing
-            // configuration carry over
-            components[key]?.getChild("configuration")?.let {
-                component.addChild(it)
-            }
-
-            val requirements = component.getChild("requirements")
-            if (requirements != null && requirements.childCount > 0) {
-                for (r in requirements.childCount - 1 downTo 0) {
-                    val requirement = requirements.getChild(r)
-                    var requiredRole: String? = getValue(requirement, "role")
-                    requiredRole = getRelocatedClass(requiredRole, context)
-                    setValue(requirement, "role", requiredRole)
-                }
-            }
-            components[key] = component
+  @get:Throws(IOException::class)
+  private val transformedResource: ByteArray
+    get() {
+      val os = ByteArrayOutputStream(1024 * 4)
+      XmlStreamWriter(os).use { writer ->
+        val dom = Xpp3Dom("component-set")
+        val componentDom = Xpp3Dom("components")
+        dom.addChild(componentDom)
+        for (component in components.values) {
+          componentDom.addChild(component)
         }
+        Xpp3DomWriter.write(writer, dom)
+      }
+      return os.toByteArray()
     }
 
-    override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-        val entry = ZipEntry(COMPONENTS_XML_PATH)
-        entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-        os.putNextEntry(entry)
+  companion object {
+    const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
 
-        transformedResource.inputStream().use {
-            it.copyTo(os)
+    private fun getRelocatedClass(className: String?, context: TransformerContext): String? {
+      val stats = context.stats
+      if (!className.isNullOrEmpty()) {
+        for (relocator in context.relocators) {
+          if (relocator.canRelocateClass(className)) {
+            val relocateClassContext = RelocateClassContext(className, stats)
+            return relocator.relocateClass(relocateClassContext)
+          }
         }
-        components.clear()
+      }
+      return className
     }
 
-    override fun hasTransformedResource(): Boolean = components.isNotEmpty()
-
-    @get:Throws(IOException::class)
-    private val transformedResource: ByteArray
-        get() {
-            val os = ByteArrayOutputStream(1024 * 4)
-            XmlStreamWriter(os).use { writer ->
-                val dom = Xpp3Dom("component-set")
-                val componentDom = Xpp3Dom("components")
-                dom.addChild(componentDom)
-                for (component in components.values) {
-                    componentDom.addChild(component)
-                }
-                Xpp3DomWriter.write(writer, dom)
-            }
-            return os.toByteArray()
-        }
-
-    companion object {
-        const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
-
-        private fun getRelocatedClass(className: String?, context: TransformerContext): String? {
-            val stats = context.stats
-            if (!className.isNullOrEmpty()) {
-                for (relocator in context.relocators) {
-                    if (relocator.canRelocateClass(className)) {
-                        val relocateClassContext = RelocateClassContext(className, stats)
-                        return relocator.relocateClass(relocateClassContext)
-                    }
-                }
-            }
-            return className
-        }
-
-        private fun getValue(dom: Xpp3Dom, element: String): String {
-            return dom.getChild(element).value.orEmpty()
-        }
-
-        private fun setValue(dom: Xpp3Dom, element: String, value: String?) {
-            val child = dom.getChild(element)
-            if (child == null || value.isNullOrEmpty()) return
-            child.value = value
-        }
+    private fun getValue(dom: Xpp3Dom, element: String): String {
+      return dom.getChild(element).value.orEmpty()
     }
+
+    private fun setValue(dom: Xpp3Dom, element: String, value: String?) {
+      val child = dom.getChild(element)
+      if (child == null || value.isNullOrEmpty()) return
+      child.value = value
+    }
+  }
 }

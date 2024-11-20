@@ -27,7 +27,7 @@ spotless {
   kotlin {
     ktlint().editorConfigOverride(
       mapOf(
-        "indent_size" to "4",
+        "indent_size" to "2",
       ),
     )
   }
