@@ -89,33 +89,33 @@ import org.gradle.api.tasks.Internal
  * @author Andres Almiray
  * @author Marc Philipp
  */
-open class PropertiesFileTransformer : Transformer {
+public open class PropertiesFileTransformer : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
   private val _charset get() = Charset.forName(charset)
 
   @get:Input
-  var paths: List<String> = listOf()
+  public var paths: List<String> = listOf()
 
   @get:Input
-  var mappings: Map<String, Map<String, String>> = mapOf()
+  public var mappings: Map<String, Map<String, String>> = mapOf()
 
   /**
    * Optional values: first, latest, append.
    */
   @get:Input
-  var mergeStrategy: String = "first"
+  public var mergeStrategy: String = "first"
 
   @get:Input
-  var mergeSeparator: String = ","
+  public var mergeSeparator: String = ","
 
   @get:Input
-  var charset: String = "ISO_8859_1"
+  public var charset: String = "ISO_8859_1"
 
   /**
    * Use [java.util.function.Function] here for compatibility with Groovy and Java.
    */
   @get:Internal
-  var keyTransformer: Function<String, String> = IDENTITY
+  public var keyTransformer: Function<String, String> = IDENTITY
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString

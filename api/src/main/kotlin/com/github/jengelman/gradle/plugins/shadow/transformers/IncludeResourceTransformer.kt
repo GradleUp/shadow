@@ -17,13 +17,13 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
-open class IncludeResourceTransformer : Transformer by NoOpTransformer {
+public open class IncludeResourceTransformer : Transformer by NoOpTransformer {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
-  var file: File? = null
+  public var file: File? = null
 
   @get:Input
-  var resource: String? = null
+  public var resource: String? = null
 
   override fun hasTransformedResource(): Boolean = file?.exists() == true
 

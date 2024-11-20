@@ -18,7 +18,7 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
-open class ApacheNoticeResourceTransformer : Transformer {
+public open class ApacheNoticeResourceTransformer : Transformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
   private val charset get() = if (encoding.isNullOrEmpty()) Charsets.UTF_8 else Charset.forName(encoding)
@@ -27,43 +27,43 @@ open class ApacheNoticeResourceTransformer : Transformer {
    * MSHADE-101 :: NullPointerException when projectName is missing
    */
   @get:Input
-  var projectName: String = ""
+  public var projectName: String = ""
 
   @get:Input
-  var addHeader: Boolean = true
+  public var addHeader: Boolean = true
 
   @get:Input
-  var preamble1: String = """
+  public var preamble1: String = """
    // ------------------------------------------------------------------
    // NOTICE file corresponding to the section 4d of The Apache License,
    // Version 2.0, in this case for
   """.trimIndent()
 
   @get:Input
-  var preamble2: String = "\n// ------------------------------------------------------------------\n"
+  public var preamble2: String = "\n// ------------------------------------------------------------------\n"
 
   @get:Input
-  var preamble3: String = "This product includes software developed at\n"
+  public var preamble3: String = "This product includes software developed at\n"
 
   @get:Input
-  var organizationName: String = "The Apache Software Foundation"
+  public var organizationName: String = "The Apache Software Foundation"
 
   @get:Input
-  var organizationURL: String = "http://www.apache.org/"
+  public var organizationURL: String = "http://www.apache.org/"
 
   @get:Input
-  var inceptionYear: String = "2006"
+  public var inceptionYear: String = "2006"
 
   @get:Optional
   @get:Input
-  var copyright: String? = null
+  public var copyright: String? = null
 
   /**
    * The file encoding of the `NOTICE` file.
    */
   @get:Optional
   @get:Input
-  var encoding: String? = null
+  public var encoding: String? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString

@@ -17,12 +17,12 @@ import org.slf4j.LoggerFactory
  * Modified from [ManifestResourceTransformer].
  * @author Chris Rankin
  */
-open class ManifestAppenderTransformer : Transformer {
+public open class ManifestAppenderTransformer : Transformer {
   private var manifestContents = ByteArray(0)
   private val _attributes = mutableListOf<Pair<String, Comparable<*>>>()
 
   @get:Input
-  open val attributes: List<Pair<String, Comparable<*>>> get() = _attributes
+  public open val attributes: List<Pair<String, Comparable<*>>> get() = _attributes
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
@@ -62,7 +62,7 @@ open class ManifestAppenderTransformer : Transformer {
     }
   }
 
-  open fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
+  public open fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
     _attributes.add(Pair(name, value))
   }
 

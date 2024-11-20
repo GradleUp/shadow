@@ -22,17 +22,17 @@ import org.slf4j.LoggerFactory
  * @author Jason van Zyl
  * @author John Engelman
  */
-open class ManifestResourceTransformer : Transformer {
+public open class ManifestResourceTransformer : Transformer {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
   @get:Optional
   @get:Input
-  var mainClass: String? = null
+  public var mainClass: String? = null
 
   @get:Optional
   @get:Input
-  var manifestEntries: MutableMap<String, Attributes>? = null
+  public var manifestEntries: MutableMap<String, Attributes>? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
@@ -75,7 +75,7 @@ open class ManifestResourceTransformer : Transformer {
     manifest!!.write(os)
   }
 
-  open fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
+  public open fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
     if (manifestEntries == null) {
       manifestEntries = LinkedHashMap()
     }

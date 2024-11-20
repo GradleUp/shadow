@@ -17,7 +17,7 @@ import org.gradle.api.tasks.Optional
  */
 @CacheableTransformer
 @Suppress("ktlint:standard:backing-property-naming")
-open class AppendingTransformer : Transformer {
+public open class AppendingTransformer : Transformer {
   /**
    * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
    */
@@ -26,7 +26,7 @@ open class AppendingTransformer : Transformer {
 
   @get:Optional
   @get:Input
-  var resource: String? = null
+  public var resource: String? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.equals(element.relativePath.pathString, ignoreCase = true)

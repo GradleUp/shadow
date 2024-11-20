@@ -2,21 +2,21 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 
-data class RelocatePathContext(
+public data class RelocatePathContext(
   val path: String,
   val stats: ShadowStats,
 ) {
-  class Builder {
+  public class Builder {
     private var path = ""
     private var stats = ShadowStats()
 
-    fun path(path: String): Builder = apply { this.path = path }
-    fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }
-    fun build(): RelocatePathContext = RelocatePathContext(path, stats)
+    public fun path(path: String): Builder = apply { this.path = path }
+    public fun stats(stats: ShadowStats): Builder = apply { this.stats = stats }
+    public fun build(): RelocatePathContext = RelocatePathContext(path, stats)
   }
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun builder(): Builder = Builder()
+    public fun builder(): Builder = Builder()
   }
 }

@@ -41,7 +41,7 @@ import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.util.PatternSet
 
 @CacheableTask
-abstract class ShadowJar :
+public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
   private val _transformers = mutableListOf<Transformer>()
@@ -78,7 +78,7 @@ abstract class ShadowJar :
   override val stats: ShadowStats get() = _stats
 
   @get:Classpath
-  val toMinimize: FileCollection
+  public val toMinimize: FileCollection
     get() {
       if (_toMinimize == null) {
         _toMinimize = if (minimizeJar) {
@@ -92,7 +92,7 @@ abstract class ShadowJar :
     }
 
   @get:Classpath
-  val apiJars: FileCollection
+  public val apiJars: FileCollection
     get() {
       if (_apiJars == null) {
         _apiJars = if (minimizeJar) {
@@ -106,7 +106,7 @@ abstract class ShadowJar :
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  val sourceSetsClassesDirs: FileCollection
+  public val sourceSetsClassesDirs: FileCollection
     get() {
       if (_sourceSetsClassesDirs == null) {
         val allClassesDirs = project.objects.fileCollection()
@@ -121,16 +121,16 @@ abstract class ShadowJar :
     }
 
   @get:Classpath
-  val includedDependencies: FileCollection get() = _includedDependencies
+  public val includedDependencies: FileCollection get() = _includedDependencies
 
   @get:Internal
-  val rootPatternSet: PatternSet
+  public val rootPatternSet: PatternSet
     get() {
       return (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
     }
 
   @get:Internal
-  val internalCompressor: ZipCompressor
+  public val internalCompressor: ZipCompressor
     get() {
       return when (entryCompression) {
         ZipEntryCompression.DEFLATED -> DefaultZipCompressor(isZip64, ZipOutputStream.DEFLATED)
@@ -140,7 +140,7 @@ abstract class ShadowJar :
     }
 
   @get:Nested
-  var transformers: List<Transformer>
+  public var transformers: List<Transformer>
     get() = _transformers
     set(value) {
       _transformers.clear()
@@ -148,7 +148,7 @@ abstract class ShadowJar :
     }
 
   @get:Nested
-  var relocators: List<Relocator>
+  public var relocators: List<Relocator>
     get() = _relocators
     set(value) {
       _relocators.clear()
@@ -157,7 +157,7 @@ abstract class ShadowJar :
 
   @get:Classpath
   @get:Optional
-  var configurations: List<FileCollection>
+  public var configurations: List<FileCollection>
     get() = _configurations
     set(value) {
       _configurations.clear()
@@ -165,21 +165,21 @@ abstract class ShadowJar :
     }
 
   @get:Internal
-  var dependencyFilter: DependencyFilter
+  public var dependencyFilter: DependencyFilter
     get() = _dependencyFilter
     set(value) {
       _dependencyFilter = value
     }
 
   @get:Input
-  var isEnableRelocation: Boolean
+  public var isEnableRelocation: Boolean
     get() = _isEnableRelocation
     set(value) {
       _isEnableRelocation = value
     }
 
   @get:Input
-  var relocationPrefix: String
+  public var relocationPrefix: String
     get() = _relocationPrefix
     set(value) {
       _relocationPrefix = value

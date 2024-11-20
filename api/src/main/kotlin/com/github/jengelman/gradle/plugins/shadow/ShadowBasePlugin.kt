@@ -6,7 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.util.GradleVersion
 
-abstract class ShadowBasePlugin : Plugin<Project> {
+public abstract class ShadowBasePlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
     if (GradleVersion.current() < GradleVersion.version("8.3")) {
@@ -20,12 +20,12 @@ abstract class ShadowBasePlugin : Plugin<Project> {
     }
   }
 
-  companion object {
-    const val SHADOW: String = "shadow"
-    const val GROUP_NAME: String = SHADOW
-    const val EXTENSION_NAME: String = SHADOW
-    const val CONFIGURATION_NAME: String = SHADOW
-    const val COMPONENT_NAME: String = SHADOW
-    const val DISTRIBUTION_NAME: String = SHADOW
+  public companion object {
+    public const val SHADOW: String = "shadow"
+    public const val GROUP_NAME: String = SHADOW
+    public const val EXTENSION_NAME: String = SHADOW
+    public const val CONFIGURATION_NAME: String = SHADOW
+    public const val COMPONENT_NAME: String = SHADOW
+    public const val DISTRIBUTION_NAME: String = SHADOW
   }
 }
