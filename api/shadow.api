@@ -1,0 +1,610 @@
+public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin : org/gradle/api/Plugin {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion;
+	public static final field SHADOW_INSTALL_TASK_NAME Ljava/lang/String;
+	public static final field SHADOW_RUN_TASK_NAME Ljava/lang/String;
+	public static final field SHADOW_SCRIPTS_TASK_NAME Ljava/lang/String;
+	public fun <init> ()V
+	protected fun addCreateScriptsTask ()V
+	protected fun addRunTask ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+	protected fun configureDistSpec ()V
+	protected fun configureInstallTask ()V
+	protected fun configureJarMainClass ()V
+	protected final fun getShadowJar ()Lorg/gradle/api/tasks/TaskProvider;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion {
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin : org/gradle/api/Plugin {
+	public static final field COMPONENT_NAME Ljava/lang/String;
+	public static final field CONFIGURATION_NAME Ljava/lang/String;
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion;
+	public static final field DISTRIBUTION_NAME Ljava/lang/String;
+	public static final field EXTENSION_NAME Ljava/lang/String;
+	public static final field GROUP_NAME Ljava/lang/String;
+	public static final field SHADOW Ljava/lang/String;
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion {
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
+	public fun <init> (Lorg/gradle/api/Project;)V
+	public final fun component (Lorg/gradle/api/publish/maven/MavenPublication;)V
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin : org/gradle/api/Plugin {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion;
+	public static final field SHADOW_JAR_TASK_NAME Ljava/lang/String;
+	public static final field SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME Ljava/lang/String;
+	public fun <init> (Lorg/gradle/api/component/SoftwareComponentFactory;)V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : org/gradle/api/Plugin {
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/ShadowStats {
+	public fun <init> ()V
+	public fun finishJar ()V
+	public fun getAverageTimePerJar ()D
+	public fun getAverageTimeSecsPerJar ()D
+	public fun getBuildScanData ()Ljava/util/Map;
+	public fun getJarCount ()I
+	public fun getJarEndTime ()J
+	public fun getJarStartTime ()J
+	public fun getJarTiming ()J
+	public fun getProcessingJar ()Z
+	public fun getRelocationString ()Ljava/lang/String;
+	public fun getRelocations ()Ljava/util/Map;
+	public fun getTotalTime ()J
+	public fun getTotalTimeSecs ()D
+	public fun printStats ()V
+	public fun relocate (Ljava/lang/String;Ljava/lang/String;)V
+	public fun setJarCount (I)V
+	public fun setJarEndTime (J)V
+	public fun setJarStartTime (J)V
+	public fun setProcessingJar (Z)V
+	public fun setTotalTime (J)V
+	public fun startJar ()V
+	public fun toString ()Ljava/lang/String;
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper : org/objectweb/asm/commons/Remapper {
+	public fun <init> (Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public fun hasRelocators ()Z
+	public fun map (Ljava/lang/String;)Ljava/lang/String;
+	public fun mapPath (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;)Ljava/lang/String;
+	public fun mapPath (Ljava/lang/String;)Ljava/lang/String;
+	public fun mapValue (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter {
+	public abstract fun dependency (Lgroovy/lang/Closure;)Lorg/gradle/api/specs/Spec;
+	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
+	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
+	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
+	public abstract fun include (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
+	public abstract fun project (Ljava/lang/String;)Lorg/gradle/api/specs/Spec;
+	public abstract fun project (Ljava/util/Map;)Lorg/gradle/api/specs/Spec;
+	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
+	public abstract fun resolve (Lorg/gradle/api/file/FileCollection;)Lorg/gradle/api/file/FileCollection;
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/legacy/LegacyShadowPlugin : org/gradle/api/Plugin {
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/relocation/CacheableRelocator : java/lang/annotation/Annotation {
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Companion;
+	public fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public final fun copy (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getClassName ()Ljava/lang/String;
+	public final fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
+	public final fun className (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
+	public final fun stats (Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Companion {
+	public final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Companion;
+	public fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public final fun copy (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
+	public final fun path (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
+	public final fun stats (Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Companion {
+	public final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator$Companion;
+	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
+	public abstract fun canRelocateClass (Ljava/lang/String;)Z
+	public abstract fun canRelocatePath (Ljava/lang/String;)Z
+	public abstract fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
+	public abstract fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator$Companion {
+	public final fun getROLE ()Ljava/lang/String;
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator : com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
+	public fun canRelocateClass (Ljava/lang/String;)Z
+	public fun canRelocatePath (Ljava/lang/String;)Z
+	public fun exclude (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
+	public fun getExcludes ()Ljava/util/Set;
+	public fun getIncludes ()Ljava/util/Set;
+	public fun getPathPattern ()Ljava/lang/String;
+	public fun getPattern ()Ljava/lang/String;
+	public fun getShadedPathPattern ()Ljava/lang/String;
+	public fun getShadedPattern ()Ljava/lang/String;
+	public fun include (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
+	public fun isRawString ()Z
+	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
+	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest : com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest, org/gradle/api/java/archives/Manifest {
+	public fun <init> (Lorg/gradle/api/internal/file/FileResolver;)V
+	public fun <init> (Lorg/gradle/api/internal/file/FileResolver;Lorg/gradle/api/java/archives/internal/DefaultManifest;)V
+	public synthetic fun <init> (Lorg/gradle/api/internal/file/FileResolver;Lorg/gradle/api/java/archives/internal/DefaultManifest;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun attributes (Ljava/util/Map;)Lorg/gradle/api/java/archives/Manifest;
+	public fun attributes (Ljava/util/Map;Ljava/lang/String;)Lorg/gradle/api/java/archives/Manifest;
+	public fun from (Ljava/lang/Object;Lgroovy/lang/Closure;)Lorg/gradle/api/java/archives/Manifest;
+	public fun from (Ljava/lang/Object;Lorg/gradle/api/Action;)Lorg/gradle/api/java/archives/Manifest;
+	public fun from ([Ljava/lang/Object;)Lorg/gradle/api/java/archives/Manifest;
+	public fun getAttributes ()Lorg/gradle/api/java/archives/Attributes;
+	public synthetic fun getEffectiveManifest ()Lorg/gradle/api/java/archives/Manifest;
+	public fun getEffectiveManifest ()Lorg/gradle/api/java/archives/internal/DefaultManifest;
+	public fun getSections ()Ljava/util/Map;
+	public fun inheritFrom ([Ljava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
+	public fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
+	public fun writeTo (Ljava/lang/Object;)Lorg/gradle/api/java/archives/Manifest;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest : org/gradle/api/java/archives/Manifest {
+	public abstract fun inheritFrom ([Ljava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
+	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask : org/gradle/api/DefaultTask {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Companion;
+	public static final field DESC Ljava/lang/String;
+	public static final field NAME Ljava/lang/String;
+	public fun <init> ()V
+	public final fun knows ()V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Companion {
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
+	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/tasks/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZZ)V
+	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$ArchiveFileTreeElement : org/gradle/api/file/FileTreeElement {
+	public fun <init> (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;)V
+	public fun asFileTreeElement ()Lorg/gradle/api/file/FileTreeElement;
+	public fun copyTo (Ljava/io/File;)Z
+	public fun copyTo (Ljava/io/OutputStream;)V
+	public fun getFile ()Ljava/io/File;
+	public fun getLastModified ()J
+	public fun getMode ()I
+	public fun getName ()Ljava/lang/String;
+	public fun getPath ()Ljava/lang/String;
+	public fun getPermissions ()Lorg/gradle/api/file/FilePermissions;
+	public fun getRelativePath ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;
+	public synthetic fun getRelativePath ()Lorg/gradle/api/file/RelativePath;
+	public fun getSize ()J
+	public fun isClassFile ()Z
+	public fun isDirectory ()Z
+	public fun open ()Ljava/io/InputStream;
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$BaseStreamAction : org/gradle/api/internal/file/CopyActionProcessingStreamAction {
+	public fun <init> ()V
+	protected final fun isArchive (Lorg/gradle/api/file/FileCopyDetails;)Z
+	protected final fun isClass (Lorg/gradle/api/file/FileCopyDetails;)Z
+	public fun processFile (Lorg/gradle/api/internal/file/copy/FileCopyDetailsInternal;)V
+	protected fun visitDir (Lorg/gradle/api/file/FileCopyDetails;)V
+	protected abstract fun visitFile (Lorg/gradle/api/file/FileCopyDetails;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion {
+	public final fun getCONSTANT_TIME_FOR_ZIP_ENTRIES ()J
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath : org/gradle/api/file/RelativePath {
+	public fun <init> (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction;Lorg/apache/tools/zip/ZipEntry;)V
+	public final fun charAt (I)C
+	public fun get (I)C
+	public fun getEntry ()Lorg/apache/tools/zip/ZipEntry;
+	public fun getLength ()I
+	public fun getParent ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;
+	public synthetic fun getParent ()Lorg/gradle/api/file/RelativePath;
+	public fun isClassFile ()Z
+	public final fun length ()I
+}
+
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar, com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec {
+	public fun <init> ()V
+	public fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	protected fun copy ()V
+	protected fun createCopyAction ()Lorg/gradle/api/internal/file/copy/CopyAction;
+	public fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public final fun getApiJars ()Lorg/gradle/api/file/FileCollection;
+	public final fun getConfigurations ()Ljava/util/List;
+	public final fun getDependencyFilter ()Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
+	public final fun getIncludedDependencies ()Lorg/gradle/api/file/FileCollection;
+	public final fun getInternalCompressor ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ZipCompressor;
+	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
+	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
+	public final fun getRelocationPrefix ()Ljava/lang/String;
+	public final fun getRelocators ()Ljava/util/List;
+	public final fun getRootPatternSet ()Lorg/gradle/api/tasks/util/PatternSet;
+	public final fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/FileCollection;
+	public fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public final fun getToMinimize ()Lorg/gradle/api/file/FileCollection;
+	public final fun getTransformers ()Ljava/util/List;
+	public final fun isEnableRelocation ()Z
+	public fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun mergeServiceFiles (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun mergeServiceFiles (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun mergeServiceFiles (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun mergeServiceFiles (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun minimize ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun minimize ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun minimize (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun minimize (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun relocate (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public final fun setConfigurations (Ljava/util/List;)V
+	public final fun setDependencyFilter (Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;)V
+	public final fun setEnableRelocation (Z)V
+	public final fun setRelocationPrefix (Ljava/lang/String;)V
+	public final fun setRelocators (Ljava/util/List;)V
+	public final fun setTransformers (Ljava/util/List;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun transform (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun transform (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun transform (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun transform (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec : org/gradle/api/file/CopySpec {
+	public abstract fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public abstract fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun mergeServiceFiles (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun mergeServiceFiles (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun minimize ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun minimize (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun relocate (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun transform (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun transform (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/ZipCompressor : org/gradle/api/internal/file/archive/compression/ArchiveOutputStreamFactory {
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun getName ()Ljava/lang/String;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getAddHeader ()Z
+	public final fun getCopyright ()Ljava/lang/String;
+	public final fun getEncoding ()Ljava/lang/String;
+	public final fun getInceptionYear ()Ljava/lang/String;
+	public final fun getOrganizationName ()Ljava/lang/String;
+	public final fun getOrganizationURL ()Ljava/lang/String;
+	public final fun getPreamble1 ()Ljava/lang/String;
+	public final fun getPreamble2 ()Ljava/lang/String;
+	public final fun getPreamble3 ()Ljava/lang/String;
+	public final fun getProjectName ()Ljava/lang/String;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public final fun setAddHeader (Z)V
+	public final fun setCopyright (Ljava/lang/String;)V
+	public final fun setEncoding (Ljava/lang/String;)V
+	public final fun setInceptionYear (Ljava/lang/String;)V
+	public final fun setOrganizationName (Ljava/lang/String;)V
+	public final fun setOrganizationURL (Ljava/lang/String;)V
+	public final fun setPreamble1 (Ljava/lang/String;)V
+	public final fun setPreamble2 (Ljava/lang/String;)V
+	public final fun setPreamble3 (Ljava/lang/String;)V
+	public final fun setProjectName (Ljava/lang/String;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getResource ()Ljava/lang/String;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public final fun setResource (Ljava/lang/String;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/transformers/CacheableTransformer : java/lang/annotation/Annotation {
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public static final field COMPONENTS_XML_PATH Ljava/lang/String;
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion;
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion {
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/DontIncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun getName ()Ljava/lang/String;
+	public final fun getResource ()Ljava/lang/String;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public final fun setResource (Ljava/lang/String;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getFile ()Ljava/io/File;
+	public fun getName ()Ljava/lang/String;
+	public final fun getResource ()Ljava/lang/String;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public final fun setFile (Ljava/io/File;)V
+	public final fun setResource (Ljava/lang/String;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer;
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun getAttributes ()Ljava/util/List;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun attributes (Ljava/util/Map;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer;
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getMainClass ()Ljava/lang/String;
+	public final fun getManifestEntries ()Ljava/util/Map;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public final fun setMainClass (Ljava/lang/String;)V
+	public final fun setManifestEntries (Ljava/util/Map;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/NoOpTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public static final field INSTANCE Lcom/github/jengelman/gradle/plugins/shadow/transformers/NoOpTransformer;
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getCharset ()Ljava/lang/String;
+	public final fun getKeyTransformer ()Ljava/util/function/Function;
+	public final fun getMappings ()Ljava/util/Map;
+	public final fun getMergeSeparator ()Ljava/lang/String;
+	public final fun getMergeStrategy ()Ljava/lang/String;
+	public final fun getPaths ()Ljava/util/List;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public final fun setCharset (Ljava/lang/String;)V
+	public final fun setKeyTransformer (Ljava/util/function/Function;)V
+	public final fun setMappings (Ljava/util/Map;)V
+	public final fun setMergeSeparator (Ljava/lang/String;)V
+	public final fun setMergeStrategy (Ljava/lang/String;)V
+	public final fun setPaths (Ljava/util/List;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer, org/gradle/api/tasks/util/PatternFilterable {
+	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
+	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun exclude (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun getExcludes ()Ljava/util/Set;
+	public fun getIncludes ()Ljava/util/Set;
+	public fun hasTransformedResource ()Z
+	public fun include (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setPath (Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer$ServiceStream : java/io/ByteArrayOutputStream {
+	public fun <init> ()V
+	public fun append (Ljava/io/InputStream;)V
+	public fun toInputStream ()Ljava/io/InputStream;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer : org/gradle/api/Named {
+	public abstract fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun getName ()Ljava/lang/String;
+	public abstract fun hasTransformedResource ()Z
+	public abstract fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;)V
+	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;)V
+	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/io/InputStream;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public final fun copy (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
+	public fun equals (Ljava/lang/Object;)Z
+	public static final fun getEntryTimestamp (ZJ)J
+	public final fun getInputStream ()Ljava/io/InputStream;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getRelocators ()Ljava/util/List;
+	public final fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
+	public final fun inputStream (Ljava/io/InputStream;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
+	public final fun path (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
+	public final fun relocators (Ljava/util/List;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
+	public final fun stats (Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion {
+	public final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
+	public final fun getEntryTimestamp (ZJ)J
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer$Companion;
+	public static final field XSI_NS Ljava/lang/String;
+	public fun <init> ()V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getIgnoreDtd ()Z
+	public final fun getResource ()Ljava/lang/String;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public final fun setIgnoreDtd (Z)V
+	public final fun setResource (Ljava/lang/String;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer$Companion {
+}
+

@@ -6,6 +6,7 @@ plugins {
   groovy // Required for Spock tests.
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
+  id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.16.3"
   id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
