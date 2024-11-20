@@ -11,7 +11,7 @@ gitPublish {
   contents {
     from("build/site")
     into("api") {
-      from(tasks.named("groovydoc"))
+      from(tasks.named("dokkaHtml"))
     }
     filter<ReplaceTokens>(
       "tokens" to mapOf(
@@ -33,5 +33,5 @@ val yarnBuild = tasks.named("yarn_build") {
 }
 
 tasks.gitPublishCopy {
-  dependsOn(yarnBuild, tasks.named("groovydoc"))
+  dependsOn(yarnBuild, tasks.named("dokkaHtml"))
 }

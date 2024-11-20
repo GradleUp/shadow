@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- **BREAKING CHANGE:** Rewrite this plugin in Kotlin. ([#1012](https://github.com/GradleUp/shadow/pull/1012))
+
 **Removed**
 
 - **BREAKING CHANGE:** Remove Develocity integration. ([#1013](https://github.com/GradleUp/shadow/pull/1013))

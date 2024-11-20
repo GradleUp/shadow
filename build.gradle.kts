@@ -3,8 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
   kotlin("jvm") version "2.0.21"
-  groovy
-  `java-gradle-plugin`
+  groovy // Required for Spock tests.
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
   id("com.diffplug.spotless") version "7.0.0.BETA4"
@@ -16,6 +15,7 @@ java {
 }
 
 kotlin {
+  explicitApi()
   compilerOptions {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_1_8
@@ -27,6 +27,9 @@ kotlin {
 }
 
 spotless {
+  kotlin {
+    ktlint()
+  }
   kotlinGradle {
     ktlint()
     target("**/*.kts")
@@ -35,9 +38,6 @@ spotless {
 }
 
 dependencies {
-  compileOnly(localGroovy())
-  implementation(projects.api)
-
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("org.ow2.asm:asm-commons:9.7.1")
   implementation("commons-io:commons-io:2.18.0")
