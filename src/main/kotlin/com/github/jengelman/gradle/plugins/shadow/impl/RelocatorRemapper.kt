@@ -23,28 +23,14 @@ public open class RelocatorRemapper(
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
-      mapName(value, true)
+      map(value)
     } else {
       super.mapValue(value)
     }
   }
 
   override fun map(name: String): String {
-    return mapName(name, false)
-  }
-
-  public open fun mapPath(path: String): String {
-    return map(path.substring(0, path.indexOf('.')))
-  }
-
-  public open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
-    return mapPath(path.pathString)
-  }
-
-  private fun mapName(name: String, relocateClass: Boolean): String {
     var newName = name
-    var mappedValue = name
-
     var prefix = ""
     var suffix = ""
 
@@ -56,17 +42,23 @@ public open class RelocatorRemapper(
     }
 
     for (relocator in relocators) {
-      if (relocator.canRelocateClass(newName) && relocateClass) {
+      if (relocator.canRelocateClass(newName)) {
         val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
-        mappedValue = prefix + relocator.relocateClass(classContext) + suffix
-        break
+        return prefix + relocator.relocateClass(classContext) + suffix
       } else if (relocator.canRelocatePath(newName)) {
         val pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
-        mappedValue = prefix + relocator.relocatePath(pathContext) + suffix
-        break
+        return prefix + relocator.relocatePath(pathContext) + suffix
       }
     }
 
-    return mappedValue
+    return name
+  }
+
+  public open fun mapPath(path: String): String {
+    return map(path.substring(0, path.indexOf('.')))
+  }
+
+  public open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
+    return mapPath(path.pathString)
   }
 }

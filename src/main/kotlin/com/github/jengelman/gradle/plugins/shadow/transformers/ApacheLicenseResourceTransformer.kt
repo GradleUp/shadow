@@ -16,7 +16,7 @@ public open class ApacheLicenseResourceTransformer : Transformer by NoOpTransfor
       LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true)
   }
 
-  public companion object {
+  private companion object {
     private const val LICENSE_PATH = "META-INF/LICENSE"
     private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
   }

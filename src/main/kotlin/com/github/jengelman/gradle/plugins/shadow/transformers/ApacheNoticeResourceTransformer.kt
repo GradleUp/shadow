@@ -77,7 +77,7 @@ public open class ApacheNoticeResourceTransformer : Transformer {
       }
       // add headers
       if (addHeader) {
-        entries.add(preamble1 + projectName + preamble2)
+        entries.add("$preamble1$projectName$preamble2")
       } else {
         entries.add("")
       }
@@ -108,14 +108,14 @@ public open class ApacheNoticeResourceTransformer : Transformer {
           sb.append(line).append("\n")
           lineCount++
         } else {
-          val ent = sb.toString()
-          if (ent.startsWith(projectName) && ent.contains("Copyright ")) {
-            copyright = ent
+          val entry = sb.toString()
+          if (entry.startsWith(projectName) && entry.contains("Copyright ")) {
+            copyright = entry
           }
           if (currentOrg == null) {
-            entries.add(ent)
+            entries.add(entry)
           } else {
-            currentOrg.add(ent)
+            currentOrg.add(entry)
           }
           sb.setLength(0)
           lineCount = 0
@@ -146,10 +146,7 @@ public open class ApacheNoticeResourceTransformer : Transformer {
     var count = 0
     for (line in entries) {
       count++
-      if (line == copyright && count != 2) {
-        continue
-      }
-
+      if (line == copyright && count != 2) continue
       if (count == 2 && copyright != null) {
         writer.print(copyright)
         writer.print('\n')
