@@ -7,4 +7,4 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class CacheableTransformer
+public annotation class CacheableTransformer

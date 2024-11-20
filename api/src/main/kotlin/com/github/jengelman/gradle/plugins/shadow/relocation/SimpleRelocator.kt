@@ -13,7 +13,7 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 @CacheableRelocator
-open class SimpleRelocator @JvmOverloads constructor(
+public open class SimpleRelocator @JvmOverloads constructor(
   pattern: String?,
   shadedPattern: String?,
   includes: List<String>?,
@@ -55,50 +55,62 @@ open class SimpleRelocator @JvmOverloads constructor(
 
   @get:Input
   @get:Optional
-  open val pattern: String? get() = _pattern
+  public open val pattern: String? get() = _pattern
 
   @get:Input
-  open val pathPattern: String get() = _pathPattern
+  public open val pathPattern: String get() = _pathPattern
 
   @get:Input
   @get:Optional
-  open val shadedPattern: String? get() = _shadedPattern
+  public open val shadedPattern: String? get() = _shadedPattern
 
   @get:Input
-  open val shadedPathPattern: String get() = _shadedPathPattern
+  public open val shadedPathPattern: String get() = _shadedPathPattern
 
   @get:Input
-  open val isRawString: Boolean get() = _isRawString
+  public open val isRawString: Boolean get() = _isRawString
 
   @get:Input
-  open val includes: Set<String> get() = _includes
+  public open val includes: Set<String> get() = _includes
 
   @get:Input
-  open val excludes: Set<String> get() = _excludes
+  public open val excludes: Set<String> get() = _excludes
 
-  open fun include(pattern: String): SimpleRelocator = apply {
+  public open fun include(pattern: String): SimpleRelocator = apply {
     _includes += normalizePatterns(listOf(pattern))
   }
 
-  open fun exclude(pattern: String): SimpleRelocator = apply {
+  public open fun exclude(pattern: String): SimpleRelocator = apply {
     _excludes += normalizePatterns(listOf(pattern))
   }
 
   override fun canRelocatePath(path: String): Boolean {
-    if (_isRawString) return Pattern.compile(_pathPattern).matcher(path).find()
-    // If string is too short - no need to perform expensive string operations
-    if (path.length < _pathPattern.length) return false
-    val adjustedPath = if (path.endsWith(".class")) {
-      // Safeguard against strings containing only ".class"
-      if (path.length == 6) return false
-      path.dropLast(6)
-    } else {
-      path
+    var adjustPath = path
+    if (_isRawString) {
+      return Pattern.compile(_pathPattern).matcher(adjustPath).find()
     }
+
+    // If string is too short - no need to perform expensive string operations
+    if (adjustPath.length < _pathPattern.length) {
+      return false
+    }
+
+    if (adjustPath.endsWith(".class")) {
+      // Safeguard against strings containing only ".class"
+      if (adjustPath.length == 6) {
+        return false
+      }
+      adjustPath = adjustPath.substring(0, adjustPath.length - 6)
+    }
+
     // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
-    val startIndex = if (adjustedPath.startsWith("/")) 1 else 0
-    val pathStartsWithPattern = adjustedPath.startsWith(_pathPattern, startIndex)
-    return pathStartsWithPattern && isIncluded(adjustedPath) && !isExcluded(adjustedPath)
+    val pathStartsWithPattern = if (adjustPath.startsWith("/")) {
+      adjustPath.startsWith(_pathPattern, 1)
+    } else {
+      adjustPath.startsWith(_pathPattern)
+    }
+
+    return if (pathStartsWithPattern) isIncluded(adjustPath) && !isExcluded(adjustPath) else false
   }
 
   override fun canRelocateClass(className: String): Boolean {
@@ -116,8 +128,9 @@ open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun relocateClass(context: RelocateClassContext): String {
+    val clazz = context.className
     context.stats.relocate(_pathPattern, _shadedPathPattern)
-    return context.className.replaceFirst(_pattern.orEmpty(), _shadedPattern.orEmpty())
+    return clazz.replaceFirst(_pattern.orEmpty(), _shadedPattern.orEmpty())
   }
 
   override fun applyToSourceContent(sourceContent: String): String {

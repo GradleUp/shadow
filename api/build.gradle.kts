@@ -16,6 +16,7 @@ kotlin {
   compilerOptions {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_1_8
+    explicitApi()
     jvmTarget = JvmTarget.JVM_1_8
     freeCompilerArgs.addAll(
       "-Xjvm-default=all",

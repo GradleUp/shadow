@@ -21,7 +21,7 @@ import org.gradle.api.file.FileTreeElement
  *
  * @author John Engelman
  */
-open class ComponentsXmlResourceTransformer : Transformer {
+public open class ComponentsXmlResourceTransformer : Transformer {
   private val components = mutableMapOf<String, Xpp3Dom>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
@@ -105,8 +105,8 @@ open class ComponentsXmlResourceTransformer : Transformer {
       return os.toByteArray()
     }
 
-  companion object {
-    const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
+  public companion object {
+    public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
 
     private fun getRelocatedClass(className: String?, context: TransformerContext): String? {
       val stats = context.stats

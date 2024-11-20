@@ -11,10 +11,10 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
-open class DontIncludeResourceTransformer : Transformer by NoOpTransformer {
+public open class DontIncludeResourceTransformer : Transformer by NoOpTransformer {
   @get:Optional
   @get:Input
-  var resource: String? = null
+  public var resource: String? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString

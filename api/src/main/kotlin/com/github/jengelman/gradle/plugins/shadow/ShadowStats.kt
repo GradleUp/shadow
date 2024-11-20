@@ -2,50 +2,50 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import org.gradle.api.GradleException
 
-open class ShadowStats {
-  open var totalTime: Long = 0
-  open var jarStartTime: Long = 0
-  open var jarEndTime: Long = 0
-  open var jarCount: Int = 1
-  open var processingJar: Boolean = false
-  open val relocations: MutableMap<String, String> = mutableMapOf()
+public open class ShadowStats {
+  public open var totalTime: Long = 0
+  public open var jarStartTime: Long = 0
+  public open var jarEndTime: Long = 0
+  public open var jarCount: Int = 1
+  public open var processingJar: Boolean = false
+  public open val relocations: MutableMap<String, String> = mutableMapOf()
 
-  open val relocationString: String
+  public open val relocationString: String
     get() {
       return relocations.map { (k, v) -> "$k → $v" }
         .sorted()
         .joinToString("\n")
     }
 
-  open val jarTiming: Long
+  public open val jarTiming: Long
     get() = jarEndTime - jarStartTime
 
-  open val totalTimeSecs: Double
+  public open val totalTimeSecs: Double
     get() = totalTime / 1000.0
 
-  open val averageTimePerJar: Double
+  public open val averageTimePerJar: Double
     get() = totalTime / jarCount.toDouble()
 
-  open val averageTimeSecsPerJar: Double
+  public open val averageTimeSecsPerJar: Double
     get() = averageTimePerJar / 1000.0
 
-  open val buildScanData: Map<String, String>
+  public open val buildScanData: Map<String, String>
     get() = mapOf(
       "dependencies" to jarCount.toString(),
       "relocations" to relocationString,
     )
 
-  open fun relocate(src: String, dst: String) {
+  public open fun relocate(src: String, dst: String) {
     relocations[src] = dst
   }
 
-  open fun startJar() {
+  public open fun startJar() {
     if (processingJar) throw GradleException("Can only time one entry at a time")
     processingJar = true
     jarStartTime = System.currentTimeMillis()
   }
 
-  open fun finishJar() {
+  public open fun finishJar() {
     if (processingJar) {
       jarEndTime = System.currentTimeMillis()
       jarCount++
@@ -54,7 +54,7 @@ open class ShadowStats {
     }
   }
 
-  open fun printStats() {
+  public open fun printStats() {
     println(this)
   }
 

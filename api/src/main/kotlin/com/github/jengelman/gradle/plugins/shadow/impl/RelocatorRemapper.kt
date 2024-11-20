@@ -13,24 +13,38 @@ import org.objectweb.asm.commons.Remapper
  *
  * @author John Engelman
  */
-open class RelocatorRemapper(
+public open class RelocatorRemapper(
   private val relocators: List<Relocator>,
   private val stats: ShadowStats,
 ) : Remapper() {
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
-  open fun hasRelocators(): Boolean = relocators.isNotEmpty()
+  public open fun hasRelocators(): Boolean = relocators.isNotEmpty()
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
-      map(value)
+      mapName(value, true)
     } else {
       super.mapValue(value)
     }
   }
 
   override fun map(name: String): String {
+    return mapName(name, false)
+  }
+
+  public open fun mapPath(path: String): String {
+    return map(path.substring(0, path.indexOf('.')))
+  }
+
+  public open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
+    return mapPath(path.pathString)
+  }
+
+  private fun mapName(name: String, relocateClass: Boolean): String {
     var newName = name
+    var mappedValue = name
+
     var prefix = ""
     var suffix = ""
 
@@ -42,23 +56,17 @@ open class RelocatorRemapper(
     }
 
     for (relocator in relocators) {
-      if (relocator.canRelocateClass(newName)) {
+      if (relocator.canRelocateClass(newName) && relocateClass) {
         val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
-        return prefix + relocator.relocateClass(classContext) + suffix
+        mappedValue = prefix + relocator.relocateClass(classContext) + suffix
+        break
       } else if (relocator.canRelocatePath(newName)) {
         val pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
-        return prefix + relocator.relocatePath(pathContext) + suffix
+        mappedValue = prefix + relocator.relocatePath(pathContext) + suffix
+        break
       }
     }
 
-    return name
-  }
-
-  open fun mapPath(path: String): String {
-    return map(path.substring(0, path.indexOf('.')))
-  }
-
-  open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
-    return mapPath(path.pathString)
+    return mappedValue
   }
 }

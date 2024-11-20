@@ -28,7 +28,7 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-open class ServiceFileTransformer(
+public open class ServiceFileTransformer(
   private val patternSet: PatternSet = PatternSet()
     .include(SERVICES_PATTERN)
     .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
@@ -89,13 +89,13 @@ open class ServiceFileTransformer(
   @Input
   override fun getExcludes(): Set<String> = patternSet.excludes
 
-  open fun setPath(path: String): PatternFilterable = apply {
+  public open fun setPath(path: String): PatternFilterable = apply {
     patternSet.setIncludes(listOf("$path/**"))
   }
 
-  open class ServiceStream : ByteArrayOutputStream(1024) {
+  public open class ServiceStream : ByteArrayOutputStream(1024) {
     @Throws(IOException::class)
-    open fun append(inputStream: InputStream) {
+    public open fun append(inputStream: InputStream) {
       if (count > 0 && buf[count - 1] != '\n'.code.toByte() && buf[count - 1] != '\r'.code.toByte()) {
         val newline = "\n".toByteArray()
         write(newline, 0, newline.size)
@@ -105,7 +105,7 @@ open class ServiceFileTransformer(
       }
     }
 
-    open fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
+    public open fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
   }
 
   private companion object {

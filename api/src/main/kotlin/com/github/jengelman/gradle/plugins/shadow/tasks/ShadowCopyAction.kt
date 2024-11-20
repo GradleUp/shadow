@@ -38,7 +38,7 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 import org.slf4j.LoggerFactory
 
-open class ShadowCopyAction internal constructor(
+public open class ShadowCopyAction internal constructor(
   private val zipFile: File,
   private val compressor: ZipCompressor,
   private val documentationRegistry: DocumentationRegistry,
@@ -52,7 +52,7 @@ open class ShadowCopyAction internal constructor(
   private val unusedTracker: UnusedTracker?,
 ) : CopyAction {
 
-  constructor(
+  public constructor(
     zipFile: File,
     compressor: ZipCompressor,
     documentationRegistry: DocumentationRegistry,
@@ -144,7 +144,7 @@ open class ShadowCopyAction internal constructor(
     return zipEntry
   }
 
-  abstract class BaseStreamAction : CopyActionProcessingStreamAction {
+  public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
     protected fun isArchive(fileDetails: FileCopyDetails): Boolean {
       return fileDetails.relativePath.pathString.endsWith(".jar")
     }
@@ -384,14 +384,14 @@ open class ShadowCopyAction internal constructor(
     }
   }
 
-  open inner class RelativeArchivePath(
-    open val entry: ZipEntry,
+  public open inner class RelativeArchivePath(
+    public open val entry: ZipEntry,
   ) : RelativePath(
     !entry.isDirectory,
     // `dir/` will be split into ["dir", ""], we have to trim empty segments here.
     *entry.name.split('/').filter(CharSequence::isNotEmpty).toTypedArray(),
   ) {
-    open val isClassFile: Boolean get() = lastName.endsWith(".class")
+    public open val isClassFile: Boolean get() = lastName.endsWith(".class")
 
     override fun getParent(): RelativeArchivePath? {
       return if (segments.size <= 1) {
@@ -405,10 +405,10 @@ open class ShadowCopyAction internal constructor(
     }
   }
 
-  open class ArchiveFileTreeElement(
+  public open class ArchiveFileTreeElement(
     private val archivePath: RelativeArchivePath,
   ) : FileTreeElement {
-    open val isClassFile: Boolean get() = archivePath.isClassFile
+    public open val isClassFile: Boolean get() = archivePath.isClassFile
 
     override fun isDirectory(): Boolean = archivePath.entry.isDirectory
 
@@ -427,7 +427,7 @@ open class ShadowCopyAction internal constructor(
 
     override fun getPermissions(): FilePermissions = DefaultFilePermissions(mode)
 
-    open fun asFileTreeElement(): FileTreeElement {
+    public open fun asFileTreeElement(): FileTreeElement {
       return DefaultFileTreeElement(null, RelativePath(!isDirectory, *archivePath.segments), null, null)
     }
 
@@ -440,8 +440,8 @@ open class ShadowCopyAction internal constructor(
     override fun copyTo(file: File): Boolean = throw UnsupportedOperationException()
   }
 
-  companion object {
+  public companion object {
     private val logger = LoggerFactory.getLogger(ShadowCopyAction::class.java)
-    val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }
 }

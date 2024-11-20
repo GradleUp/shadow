@@ -17,7 +17,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
-abstract class ShadowJavaPlugin @Inject constructor(
+public abstract class ShadowJavaPlugin @Inject constructor(
   private val softwareComponentFactory: SoftwareComponentFactory,
 ) : Plugin<Project> {
 
@@ -104,8 +104,8 @@ abstract class ShadowJavaPlugin @Inject constructor(
     return taskProvider
   }
 
-  companion object {
-    const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
-    const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
+  public companion object {
+    public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
+    public const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
   }
 }

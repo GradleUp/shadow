@@ -23,15 +23,15 @@ import org.xml.sax.InputSource
  * @author John Engelman
  */
 @CacheableTransformer
-open class XmlAppendingTransformer : Transformer {
+public open class XmlAppendingTransformer : Transformer {
   private var doc: Document? = null
 
   @get:Input
-  var ignoreDtd: Boolean = true
+  public var ignoreDtd: Boolean = true
 
   @get:Optional
   @get:Input
-  var resource: String? = null
+  public var resource: String? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource?.equals(element.relativePath.pathString, ignoreCase = true) == true
@@ -76,7 +76,7 @@ open class XmlAppendingTransformer : Transformer {
     doc = null
   }
 
-  companion object {
-    const val XSI_NS: String = "http://www.w3.org/2001/XMLSchema-instance"
+  public companion object {
+    public const val XSI_NS: String = "http://www.w3.org/2001/XMLSchema-instance"
   }
 }

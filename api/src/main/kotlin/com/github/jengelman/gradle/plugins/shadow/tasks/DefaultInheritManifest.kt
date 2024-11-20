@@ -6,7 +6,7 @@ import org.gradle.api.java.archives.Manifest
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
-open class DefaultInheritManifest @JvmOverloads constructor(
+public open class DefaultInheritManifest @JvmOverloads constructor(
   private val fileResolver: FileResolver,
   private val internalManifest: DefaultManifest = DefaultManifest(fileResolver),
 ) : InheritManifest,

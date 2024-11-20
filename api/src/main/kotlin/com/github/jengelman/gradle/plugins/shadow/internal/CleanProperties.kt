@@ -17,11 +17,11 @@ internal class CleanProperties : Properties() {
 
     @Throws(IOException::class)
     override fun write(str: String) {
-      if (str.couldBeCommentWithTimestamp) return
+      if (str.couldBeCommentWithTimestamp()) return
       super.write(str)
     }
 
-    private val String?.couldBeCommentWithTimestamp: Boolean get() {
+    private fun String?.couldBeCommentWithTimestamp(): Boolean {
       return this != null && startsWith("#") && length == lengthOfExpectedTimestamp
     }
   }

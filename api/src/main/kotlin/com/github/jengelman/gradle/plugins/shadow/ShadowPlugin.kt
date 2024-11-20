@@ -6,7 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 
-abstract class ShadowPlugin : Plugin<Project> {
+public abstract class ShadowPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
     project.run {
