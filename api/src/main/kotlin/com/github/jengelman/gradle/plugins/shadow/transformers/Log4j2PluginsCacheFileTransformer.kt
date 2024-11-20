@@ -70,18 +70,13 @@ open class Log4j2PluginsCacheFileTransformer : Transformer {
     }
 
     private fun relocatePlugins(pluginCache: PluginCache) {
-        for (currentMap in pluginCache.allCategories.values) {
-            for (currentPluginEntry in currentMap.values) {
+        pluginCache.allCategories.values.forEach { currentMap ->
+            currentMap.values.forEach { currentPluginEntry ->
                 val className = currentPluginEntry.className
                 val relocateClassContext = RelocateClassContext(className, requireNotNull(stats))
-                for (currentRelocator in relocators) {
-                    // If we have a relocator that can relocate our current entry...
-                    if (currentRelocator.canRelocateClass(className)) {
-                        // Then we perform that relocation and update the plugin entry to reflect the new value.
-                        val relocatedClassName = currentRelocator.relocateClass(relocateClassContext)
-                        currentPluginEntry.className = relocatedClassName
-                        break
-                    }
+                relocators.firstOrNull { it.canRelocateClass(className) }?.let { relocator ->
+                    // Then we perform that relocation and update the plugin entry to reflect the new value.
+                    currentPluginEntry.className = relocator.relocateClass(relocateClassContext)
                 }
             }
         }
