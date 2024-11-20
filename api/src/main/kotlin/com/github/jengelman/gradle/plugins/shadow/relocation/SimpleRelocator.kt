@@ -85,32 +85,20 @@ open class SimpleRelocator @JvmOverloads constructor(
     }
 
     override fun canRelocatePath(path: String): Boolean {
-        var adjustPath = path
-        if (_isRawString) {
-            return Pattern.compile(_pathPattern).matcher(adjustPath).find()
-        }
-
+        if (_isRawString) return Pattern.compile(_pathPattern).matcher(path).find()
         // If string is too short - no need to perform expensive string operations
-        if (adjustPath.length < _pathPattern.length) {
-            return false
-        }
-
-        if (adjustPath.endsWith(".class")) {
+        if (path.length < _pathPattern.length) return false
+        val adjustedPath = if (path.endsWith(".class")) {
             // Safeguard against strings containing only ".class"
-            if (adjustPath.length == 6) {
-                return false
-            }
-            adjustPath = adjustPath.substring(0, adjustPath.length - 6)
-        }
-
-        // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
-        val pathStartsWithPattern = if (adjustPath.startsWith("/")) {
-            adjustPath.startsWith(_pathPattern, 1)
+            if (path.length == 6) return false
+            path.dropLast(6)
         } else {
-            adjustPath.startsWith(_pathPattern)
+            path
         }
-
-        return if (pathStartsWithPattern) isIncluded(adjustPath) && !isExcluded(adjustPath) else false
+        // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
+        val startIndex = if (adjustedPath.startsWith("/")) 1 else 0
+        val pathStartsWithPattern = adjustedPath.startsWith(_pathPattern, startIndex)
+        return pathStartsWithPattern && isIncluded(adjustedPath) && !isExcluded(adjustedPath)
     }
 
     override fun canRelocateClass(className: String): Boolean {
@@ -128,9 +116,8 @@ open class SimpleRelocator @JvmOverloads constructor(
     }
 
     override fun relocateClass(context: RelocateClassContext): String {
-        val clazz = context.className
         context.stats.relocate(_pathPattern, _shadedPathPattern)
-        return clazz.replaceFirst(_pattern.orEmpty(), _shadedPattern.orEmpty())
+        return context.className.replaceFirst(_pattern.orEmpty(), _shadedPattern.orEmpty())
     }
 
     override fun applyToSourceContent(sourceContent: String): String {
