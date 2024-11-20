@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.7.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.2)" variant="all" version="8.7.2">
+
+    <issue
+        id="SimpleDateFormat"
+        message="To get local formatting use `getDateInstance()`, `getDateTimeInstance()`, or `getTimeInstance()`, or use `new SimpleDateFormat(String template, Locale locale)` with for example `Locale.US` for ASCII dates."
+        errorLine1="      val year = SimpleDateFormat(&quot;yyyy&quot;).format(Date()).let {"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer.kt"
+            line="75"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="EagerGradleConfiguration"
+        message="Avoid using method get"
+        errorLine1="          project.file(&quot;${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}&quot;)"
+        errorLine2="                                  ~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="54"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="EagerGradleConfiguration"
+        message="Avoid using method get"
+        errorLine1="          project.file(&quot;${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}&quot;)"
+        errorLine2="                                                                             ~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="54"
+            column="78"/>
+    </issue>
+
+    <issue
+        id="EagerGradleConfiguration"
+        message="Avoid using method get"
+        errorLine1="      shadow.manifest.inheritFrom(jarTask.get().manifest)"
+        errorLine2="                                          ~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="81"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.FileResolver"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest.kt"
+            line="4"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.java.archives.internal.DefaultManifest"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest.kt"
+            line="6"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest.kt"
+            line="7"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.DocumentationRegistry"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
+            line="25"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.CopyActionProcessingStreamAction"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
+            line="26"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.DefaultFilePermissions"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
+            line="27"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.DefaultFileTreeElement"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
+            line="28"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.copy.CopyAction"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
+            line="29"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.copy.CopyActionProcessingStream"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
+            line="30"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.copy.FileCopyDetailsInternal"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
+            line="31"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.DocumentationRegistry"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="24"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.FileResolver"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="25"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.copy.CopyAction"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="26"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.copy.DefaultCopySpec"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="27"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.archive.compression.ArchiveOutputStreamFactory"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ZipCompressor.kt"
+            line="3"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="WithTypeWithoutConfigureEach"
+        message="Avoid passing a closure to withType, use withType().configureEach instead"
+        errorLine1="      plugins.withType(JavaPlugin::class.java) {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowPlugin.kt"
+            line="14"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="WithTypeWithoutConfigureEach"
+        message="Avoid passing a closure to withType, use withType().configureEach instead"
+        errorLine1="      plugins.withType(ApplicationPlugin::class.java) {"
+        errorLine2="              ~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowPlugin.kt"
+            line="17"
+            column="15"/>
+    </issue>
+
+</issues>
