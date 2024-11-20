@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContex
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
 import java.io.File
-import java.io.FileOutputStream
 import java.net.URL
 import java.util.Collections
 import java.util.Enumeration
@@ -30,12 +29,6 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
   private val relocators = mutableListOf<Relocator>()
   private var stats: ShadowStats? = null
 
-  private val urlEnumeration: Enumeration<URL>
-    get() {
-      val urls = temporaryFiles.map { it.toURI().toURL() }
-      return Collections.enumeration(urls)
-    }
-
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return PluginProcessor.PLUGIN_CACHE_FILE == element.name
   }
@@ -44,7 +37,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     val temporaryFile = File.createTempFile("Log4j2Plugins", ".dat")
     temporaryFile.deleteOnExit()
     temporaryFiles.add(temporaryFile)
-    val fos = FileOutputStream(temporaryFile)
+    val fos = temporaryFile.outputStream()
     context.inputStream.use {
       it.copyTo(fos)
     }
@@ -62,8 +55,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     // if anything has been performed.
     val hasTransformedMultipleFiles = temporaryFiles.size > 1
     val hasAtLeastOneFileAndRelocator = temporaryFiles.isNotEmpty() && relocators.isNotEmpty()
-    val hasTransformedResources = hasTransformedMultipleFiles || hasAtLeastOneFileAndRelocator
-    return (hasTransformedResources)
+    return hasTransformedMultipleFiles || hasAtLeastOneFileAndRelocator
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
@@ -78,20 +70,21 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
   }
 
   private fun relocatePlugins(pluginCache: PluginCache) {
-    for (currentMap in pluginCache.allCategories.values) {
-      for (currentPluginEntry in currentMap.values) {
+    pluginCache.allCategories.values.forEach { currentMap ->
+      currentMap.values.forEach { currentPluginEntry ->
         val className = currentPluginEntry.className
         val relocateClassContext = RelocateClassContext(className, requireNotNull(stats))
-        for (currentRelocator in relocators) {
-          // If we have a relocator that can relocate our current entry...
-          if (currentRelocator.canRelocateClass(className)) {
-            // Then we perform that relocation and update the plugin entry to reflect the new value.
-            val relocatedClassName = currentRelocator.relocateClass(relocateClassContext)
-            currentPluginEntry.className = relocatedClassName
-            break
-          }
+        relocators.firstOrNull { it.canRelocateClass(className) }?.let { relocator ->
+          // Then we perform that relocation and update the plugin entry to reflect the new value.
+          currentPluginEntry.className = relocator.relocateClass(relocateClassContext)
         }
       }
     }
   }
+
+  private val urlEnumeration: Enumeration<URL>
+    get() {
+      val urls = temporaryFiles.map { it.toURI().toURL() }
+      return Collections.enumeration(urls)
+    }
 }
