@@ -177,26 +177,4 @@
             column="1"/>
     </issue>
 
-    <issue
-        id="WithTypeWithoutConfigureEach"
-        message="Avoid passing a closure to withType, use withType().configureEach instead"
-        errorLine1="      plugins.withType(JavaPlugin::class.java) {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowPlugin.kt"
-            line="14"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="WithTypeWithoutConfigureEach"
-        message="Avoid passing a closure to withType, use withType().configureEach instead"
-        errorLine1="      plugins.withType(ApplicationPlugin::class.java) {"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowPlugin.kt"
-            line="17"
-            column="15"/>
-    </issue>
-
 </issues>
