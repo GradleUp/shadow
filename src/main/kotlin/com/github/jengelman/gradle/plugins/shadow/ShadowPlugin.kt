@@ -11,10 +11,12 @@ public abstract class ShadowPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     project.run {
       plugins.apply(ShadowBasePlugin::class.java)
-      plugins.withType(JavaPlugin::class.java).configureEach {
+      @Suppress("WithTypeWithoutConfigureEach")
+      plugins.withType(JavaPlugin::class.java) {
         plugins.apply(ShadowJavaPlugin::class.java)
       }
-      plugins.withType(ApplicationPlugin::class.java).configureEach {
+      @Suppress("WithTypeWithoutConfigureEach")
+      plugins.withType(ApplicationPlugin::class.java) {
         plugins.apply(ShadowApplicationPlugin::class.java)
       }
       // Apply the legacy plugin last
