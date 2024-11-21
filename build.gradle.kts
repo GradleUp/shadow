@@ -7,6 +7,7 @@ plugins {
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
   id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.16.3"
+  id("com.android.lint") version "8.7.2"
   id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
@@ -25,6 +26,10 @@ kotlin {
       "-Xjvm-default=all",
     )
   }
+}
+
+lint {
+  baseline = file("lint-baseline.xml")
 }
 
 spotless {
@@ -58,6 +63,8 @@ dependencies {
   testImplementation(platform("org.junit:junit-bom:5.11.3"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.platform:junit-platform-suite-engine")
+
+  lintChecks("androidx.lint:lint-gradle:1.0.0-alpha02")
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
