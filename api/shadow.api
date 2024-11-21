@@ -295,19 +295,20 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public final fun getApiJars ()Lorg/gradle/api/file/FileCollection;
-	public final fun getConfigurations ()Ljava/util/List;
-	public final fun getDependencyFilter ()Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
-	public final fun getIncludedDependencies ()Lorg/gradle/api/file/FileCollection;
+	public abstract fun getConfigurations ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
+	public abstract fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
-	public final fun getRelocationPrefix ()Ljava/lang/String;
-	public final fun getRelocators ()Ljava/util/List;
+	public abstract fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
+	public abstract fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
+	public abstract fun getRelocators ()Lorg/gradle/api/provider/ListProperty;
 	public final fun getRootPatternSet ()Lorg/gradle/api/tasks/util/PatternSet;
 	public final fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/FileCollection;
 	public fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public final fun getToMinimize ()Lorg/gradle/api/file/FileCollection;
-	public final fun getTransformers ()Ljava/util/List;
-	public final fun isEnableRelocation ()Z
+	public abstract fun getTransformers ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun isEnableRelocation ()Lorg/gradle/api/provider/Property;
 	public fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
@@ -330,12 +331,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public final fun setConfigurations (Ljava/util/List;)V
-	public final fun setDependencyFilter (Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;)V
-	public final fun setEnableRelocation (Z)V
-	public final fun setRelocationPrefix (Ljava/lang/String;)V
-	public final fun setRelocators (Ljava/util/List;)V
-	public final fun setTransformers (Ljava/util/List;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun transform (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
