@@ -2,17 +2,6 @@
 <issues format="6" by="lint 8.7.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.2)" variant="all" version="8.7.2">
 
     <issue
-        id="SimpleDateFormat"
-        message="To get local formatting use `getDateInstance()`, `getDateTimeInstance()`, or `getTimeInstance()`, or use `new SimpleDateFormat(String template, Locale locale)` with for example `Locale.US` for ASCII dates."
-        errorLine1="      val year = SimpleDateFormat(&quot;yyyy&quot;).format(Date()).let {"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer.kt"
-            line="75"
-            column="18"/>
-    </issue>
-
-    <issue
         id="EagerGradleConfiguration"
         message="Avoid using method get"
         errorLine1="      shadow.manifest.inheritFrom(jarTask.get().manifest)"
