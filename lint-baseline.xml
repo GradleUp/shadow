@@ -15,28 +15,6 @@
     <issue
         id="EagerGradleConfiguration"
         message="Avoid using method get"
-        errorLine1="          project.file(&quot;${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}&quot;)"
-        errorLine2="                                  ~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="54"
-            column="35"/>
-    </issue>
-
-    <issue
-        id="EagerGradleConfiguration"
-        message="Avoid using method get"
-        errorLine1="          project.file(&quot;${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}&quot;)"
-        errorLine2="                                                                             ~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="54"
-            column="78"/>
-    </issue>
-
-    <issue
-        id="EagerGradleConfiguration"
-        message="Avoid using method get"
         errorLine1="      shadow.manifest.inheritFrom(jarTask.get().manifest)"
         errorLine2="                                          ~~~">
         <location
