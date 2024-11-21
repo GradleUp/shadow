@@ -103,6 +103,9 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/inter
 	public abstract fun resolve (Lorg/gradle/api/file/FileCollection;)Lorg/gradle/api/file/FileCollection;
 }
 
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor : org/gradle/api/internal/file/archive/compression/ArchiveOutputStreamFactory {
+}
+
 public abstract class com/github/jengelman/gradle/plugins/shadow/legacy/LegacyShadowPlugin : org/gradle/api/Plugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -233,7 +236,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Co
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
-	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/tasks/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZZ)V
+	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZZ)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 
@@ -293,7 +296,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public final fun getConfigurations ()Ljava/util/List;
 	public final fun getDependencyFilter ()Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
 	public final fun getIncludedDependencies ()Lorg/gradle/api/file/FileCollection;
-	public final fun getInternalCompressor ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ZipCompressor;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
 	public final fun getRelocationPrefix ()Ljava/lang/String;
@@ -358,9 +360,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun transform (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun transform (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-}
-
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/ZipCompressor : org/gradle/api/internal/file/archive/compression/ArchiveOutputStreamFactory {
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
