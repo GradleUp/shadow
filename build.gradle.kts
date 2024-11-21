@@ -96,11 +96,6 @@ tasks.withType<Test>().configureEach {
   )
 }
 
-tasks.lint {
-  // TODO: this check could be removed after we migrated to Java 17 or above.
-  enabled = JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)
-}
-
 tasks.register("release") {
   dependsOn(
     tasks.publish,
