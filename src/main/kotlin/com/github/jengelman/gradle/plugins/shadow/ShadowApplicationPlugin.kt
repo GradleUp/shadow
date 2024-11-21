@@ -70,7 +70,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       it.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.classpath = project.files(shadowJar)
-      it.conventionMapping.map("mainClassName") { javaApplication.mainClass.get() }
+      it.mainClass.set(javaApplication.mainClass)
       it.conventionMapping.map("applicationName") { javaApplication.applicationName }
       it.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
       it.conventionMapping.map("defaultJvmOpts") { javaApplication.applicationDefaultJvmArgs }
