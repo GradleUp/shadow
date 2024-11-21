@@ -84,7 +84,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       val files = project.objects.fileCollection().from(shadowConfiguration)
       shadow.doFirst {
         if (!files.isEmpty) {
-          val attrs = listOf(attrProvider.getOrElse("")) + files.map { it.name }
+          val attrs = listOf(attrProvider) + files.map { it.name }
           shadow.manifest.attributes["Class-Path"] = attrs.joinToString(" ").trim()
         }
       }
