@@ -78,7 +78,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       shadow.group = ShadowBasePlugin.GROUP_NAME
       shadow.description = "Create a combined JAR of project and runtime dependencies"
       shadow.archiveClassifier.set("all")
-      shadow.manifest.inheritFrom(jarTask.get().manifest)
+      shadow.manifest.inheritFrom(jarTask.map { it.manifest })
       val attrProvider = jarTask.map { it.manifest.attributes["Class-Path"]?.toString().orEmpty() }
       val files = project.objects.fileCollection().from(shadowConfiguration)
       shadow.doFirst {

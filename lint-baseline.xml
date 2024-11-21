@@ -2,17 +2,6 @@
 <issues format="6" by="lint 8.7.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.2)" variant="all" version="8.7.2">
 
     <issue
-        id="EagerGradleConfiguration"
-        message="Avoid using method get"
-        errorLine1="      shadow.manifest.inheritFrom(jarTask.get().manifest)"
-        errorLine2="                                          ~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
-            line="81"
-            column="43"/>
-    </issue>
-
-    <issue
         id="InternalGradleApiUsage"
         message="Avoid using internal Gradle APIs"
         errorLine1="import org.gradle.api.internal.file.FileResolver"
