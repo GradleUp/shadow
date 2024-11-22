@@ -50,7 +50,7 @@ dependencies {
   implementation("org.apache.ant:ant:1.10.15")
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
   implementation("org.codehaus.plexus:plexus-xml:4.0.4")
-  implementation("org.apache.logging.log4j:log4j-core:2.24.1")
+  implementation("org.apache.logging.log4j:log4j-core:2.24.2")
   implementation("org.vafer:jdependency:2.11")
 
   testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
