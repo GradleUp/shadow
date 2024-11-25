@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*
  * @author Benjamin Bentmann
  * @version $Id: ApacheLicenseResourceTransformerTest.java 673906 2008-07-04 05:03:20Z brett $
  *
- * Modified from org.apache.maven.plugins.shade.resources.ApacheLicenseResourceTransformerTest.java
+ * Modified from org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformerTest.java
  */
 class ApacheLicenseResourceTransformerTest extends TransformerTestSupport<ApacheLicenseResourceTransformer> {
 

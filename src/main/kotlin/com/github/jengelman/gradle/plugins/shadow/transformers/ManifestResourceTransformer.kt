@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
  * the first MANIFEST.MF that is found in the set of JARs being processed, or
  * to a newly created manifest for the shaded JAR.
  *
- * Modified from `org.apache.maven.plugins.shade.resource.ManifestResourceTransformer`
+ * Modified from [org.apache.maven.plugins.shade.resource.ManifestResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ManifestResourceTransformer.java).
  *
  * @author Jason van Zyl
  * @author John Engelman

@@ -18,10 +18,10 @@ import org.gradle.api.file.FileTreeElement
 /**
  * Modified from the maven equivalent to work with gradle
  *
+ * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java).
+ *
  * @author Paul Nelson Baker
- * @see [LinkedIn](https://www.linkedin.com/in/paul-n-baker/)
- * @see [GitHub](https://github.com/paul-nelson-baker/)
- * @see [PluginsCacheFileTransformer.java](https://github.com/edwgiz/maven-shaded-log4j-transformer/blob/master/src/main/java/com/github/edwgiz/mavenShadePlugin/log4j2CacheTransformer/PluginsCacheFileTransformer.java)
+ * @author John Engelman
  */
 @CacheableTransformer
 public open class Log4j2PluginsCacheFileTransformer : Transformer {

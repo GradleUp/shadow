@@ -17,7 +17,7 @@ import org.gradle.api.file.FileTreeElement
 /**
  * A resource processor that aggregates plexus `components.xml` files.
  *
- * Modified from `org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer.java`
+ * Modified from [org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ComponentsXmlResourceTransformer.java).
  *
  * @author John Engelman
  */

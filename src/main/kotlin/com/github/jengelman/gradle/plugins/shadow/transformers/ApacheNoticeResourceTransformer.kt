@@ -14,7 +14,7 @@ import org.gradle.api.tasks.Optional
 /**
  * Merges `META-INF/NOTICE.TXT` files.
  *
- * Modified from `org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.java`
+ * Modified from [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformer.java).
  *
  * @author John Engelman
  */
