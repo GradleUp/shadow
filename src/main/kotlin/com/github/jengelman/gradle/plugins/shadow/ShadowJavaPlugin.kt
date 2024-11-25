@@ -93,10 +93,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       shadow.enableRelocation.convention(false)
       shadow.relocationPrefix.convention(ShadowBasePlugin.SHADOW)
       shadow.minimizeJar.convention(false)
-      shadow.transformers.convention(emptyList())
-      shadow.relocators.convention(emptyList())
       shadow.dependencyFilter.convention(DefaultDependencyFilter(project))
-      shadow.configurations.convention(emptyList())
       shadow.includedDependencies.setFrom(shadow.dependencyFilter.map { it.resolve(shadow.configurations.get()) })
       shadow.configurations.convention(
         listOf(
