@@ -53,9 +53,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     // This functionality matches the original plugin, however, I'm not clear what
     // the exact logic is. From what I can tell temporaryFiles should be never be empty
     // if anything has been performed.
-    val hasTransformedMultipleFiles = temporaryFiles.size > 1
-    val hasAtLeastOneFileAndRelocator = temporaryFiles.isNotEmpty() && relocators.isNotEmpty()
-    return hasTransformedMultipleFiles || hasAtLeastOneFileAndRelocator
+    return temporaryFiles.isNotEmpty() || relocators.isNotEmpty()
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
