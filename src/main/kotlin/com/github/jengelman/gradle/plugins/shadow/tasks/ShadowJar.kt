@@ -121,8 +121,7 @@ public abstract class ShadowJar :
 
   // TODO: we have to modify relocators in execution phase, can't migrate this to a lazy property now.
   @get:Nested
-  public open var relocators: List<Relocator>
-    get() = _relocators
+  public open var relocators: List<Relocator> = _relocators
     set(value) {
       _relocators.clear()
       _relocators.addAll(value)
@@ -290,8 +289,9 @@ public abstract class ShadowJar :
         }
       }
     }
+    val prefix = relocationPrefix.get()
     packages.forEach {
-      relocate(it, "${relocationPrefix.get()}.$it")
+      relocate(it, "$prefix.$it")
     }
   }
 }
