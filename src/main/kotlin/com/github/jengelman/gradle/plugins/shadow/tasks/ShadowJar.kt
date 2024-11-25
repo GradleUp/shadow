@@ -280,7 +280,7 @@ public abstract class ShadowJar :
     destination: String,
     action: Action<SimpleRelocator>?,
   ): ShadowJar = apply {
-    val relocator = SimpleRelocator(pattern, destination, mutableListOf(), mutableListOf())
+    val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
   }
 

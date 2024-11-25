@@ -16,8 +16,8 @@ import org.gradle.api.tasks.Optional
 public open class SimpleRelocator @JvmOverloads constructor(
   pattern: String?,
   shadedPattern: String?,
-  includes: List<String>?,
-  excludes: List<String>?,
+  includes: List<String>? = null,
+  excludes: List<String>? = null,
   private val _isRawString: Boolean = false,
 ) : Relocator {
   private val _pattern: String?
