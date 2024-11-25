@@ -307,8 +307,8 @@ public abstract class ShadowJar :
     logger.info(_stats.toString())
   }
 
-  private fun <R : Relocator> addRelocator(relocator: R, configure: Action<R>?) {
-    configure?.execute(relocator)
+  private fun <R : Relocator> addRelocator(relocator: R, action: Action<R>?) {
+    action?.execute(relocator)
     _relocators.add(relocator)
   }
 
