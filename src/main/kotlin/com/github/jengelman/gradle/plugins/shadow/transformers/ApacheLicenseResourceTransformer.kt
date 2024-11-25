@@ -13,11 +13,13 @@ public open class ApacheLicenseResourceTransformer : Transformer by NoOpTransfor
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
     return LICENSE_PATH.equals(path, ignoreCase = true) ||
-      LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true)
+      LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true) ||
+      LICENSE_MD_PATH.regionMatches(0, path, 0, LICENSE_MD_PATH.length, ignoreCase = true)
   }
 
   private companion object {
     private const val LICENSE_PATH = "META-INF/LICENSE"
     private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
+    private const val LICENSE_MD_PATH = "META-INF/LICENSE.md"
   }
 }

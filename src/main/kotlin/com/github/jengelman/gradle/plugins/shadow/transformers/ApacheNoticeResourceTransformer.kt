@@ -67,7 +67,9 @@ public open class ApacheNoticeResourceTransformer : Transformer {
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
-    return NOTICE_PATH.equals(path, ignoreCase = true) || NOTICE_TXT_PATH.equals(path, ignoreCase = true)
+    return NOTICE_PATH.equals(path, ignoreCase = true) ||
+      NOTICE_TXT_PATH.equals(path, ignoreCase = true) ||
+      NOTICE_MD_PATH.equals(path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
@@ -174,5 +176,6 @@ public open class ApacheNoticeResourceTransformer : Transformer {
   private companion object {
     private const val NOTICE_PATH = "META-INF/NOTICE"
     private const val NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
+    private const val NOTICE_MD_PATH = "META-INF/NOTICE.md"
   }
 }
