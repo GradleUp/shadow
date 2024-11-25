@@ -52,6 +52,8 @@ class ApacheLicenseResourceTransformerTest extends TransformerTestSupport<Apache
         assertTrue(transformer.canTransformResource(getFileElement("META-INF/LICENSE")))
         assertTrue(transformer.canTransformResource(getFileElement("META-INF/LICENSE.TXT")))
         assertTrue(transformer.canTransformResource(getFileElement("META-INF/License.txt")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/LICENSE.md")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/License.md")))
         assertFalse(transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF")))
     }
 
