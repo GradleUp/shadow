@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
+import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -49,9 +50,6 @@ public abstract class ShadowJar :
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
   private val _relocators = mutableListOf<Relocator>()
-  private var _toMinimize: FileCollection? = null
-  private var _apiJars: FileCollection? = null
-  private var _sourceSetsClassesDirs: FileCollection? = null
 
   init {
     // shadow filters out files later. This was the default behavior in  Gradle < 6.x
@@ -68,53 +66,38 @@ public abstract class ShadowJar :
   override val stats: ShadowStats = ShadowStats()
 
   @get:Classpath
-  public val toMinimize: FileCollection
-    get() {
-      if (_toMinimize == null) {
-        _toMinimize = if (minimizeJar.get()) {
-          dependencyFilterForMinimize.resolve(configurations.get())
-            .minus(apiJars)
-        } else {
-          project.objects.fileCollection()
-        }
-      }
-      return _toMinimize!!
+  public val toMinimize: FileCollection by unsafeLazy {
+    if (minimizeJar.get()) {
+      dependencyFilterForMinimize.resolve(configurations.get()).minus(apiJars)
+    } else {
+      project.objects.fileCollection()
     }
+  }
 
   @get:Classpath
-  public val apiJars: FileCollection
-    get() {
-      if (_apiJars == null) {
-        _apiJars = if (minimizeJar.get()) {
-          UnusedTracker.getApiJarsFromProject(project)
-        } else {
-          project.objects.fileCollection()
-        }
-      }
-      return _apiJars!!
+  public val apiJars: FileCollection by unsafeLazy {
+    if (minimizeJar.get()) {
+      UnusedTracker.getApiJarsFromProject(project)
+    } else {
+      project.objects.fileCollection()
     }
+  }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public val sourceSetsClassesDirs: FileCollection
-    get() {
-      if (_sourceSetsClassesDirs == null) {
-        val allClassesDirs = project.objects.fileCollection()
-        if (minimizeJar.get()) {
-          project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
-            allClassesDirs.from(sourceSet.output.classesDirs)
-          }
-        }
-        _sourceSetsClassesDirs = allClassesDirs.filter { it.isDirectory }
+  public val sourceSetsClassesDirs: FileCollection by unsafeLazy {
+    val allClassesDirs = project.objects.fileCollection()
+    if (minimizeJar.get()) {
+      project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
+        allClassesDirs.from(sourceSet.output.classesDirs)
       }
-      return _sourceSetsClassesDirs!!
     }
+    allClassesDirs.filter { it.isDirectory }
+  }
 
   @get:Internal
   public val rootPatternSet: PatternSet
-    get() {
-      return (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
-    }
+    get() = (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
 
   @get:Internal
   internal val internalCompressor: ZipCompressor
