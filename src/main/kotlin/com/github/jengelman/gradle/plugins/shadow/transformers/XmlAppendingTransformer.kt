@@ -18,7 +18,7 @@ import org.xml.sax.InputSource
 /**
  * Appends multiple occurrences of some XML file.
  *
- * Modified from [org.apache.maven.plugins.shade.resouce.XmlAppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/XmlAppendingTransformer.java).
+ * Modified from [org.apache.maven.plugins.shade.resource.XmlAppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/XmlAppendingTransformer.java).
  *
  * @author John Engelman
  */

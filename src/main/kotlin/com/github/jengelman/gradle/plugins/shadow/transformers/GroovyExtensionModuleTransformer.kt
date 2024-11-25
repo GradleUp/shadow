@@ -24,7 +24,8 @@ import org.gradle.api.file.FileTreeElement
  * files came from the legacy location, otherwise it will be written into the now standard location (META-INF/groovy).
  * Note that certain JDK9+ tooling will break when using the legacy location.
  *
- * Modified from [org.apache.maven.plugins.shade.resouce.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
+ * Modified from [eu.appsatori.gradle.fatjar.tasks.PrepareFiles.groovy](https://github.com/musketyr/gradle-fatjar-plugin/blob/master/src/main/groovy/eu/appsatori/gradle/fatjar/tasks/PrepareFiles.groovy).
+ * Related to [org.apache.maven.plugins.shade.resource.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
  */
 @CacheableTransformer
 public open class GroovyExtensionModuleTransformer : Transformer {

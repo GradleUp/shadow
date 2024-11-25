@@ -85,7 +85,8 @@ import org.gradle.api.tasks.Internal
  *   }
  * }
  * ```
- * Related to [org.apache.maven.plugins.shade.resouce.PropertiesTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/properties/PropertiesTransformer.java).
+ *
+ * Related to [org.apache.maven.plugins.shade.resource.properties.PropertiesTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/properties/PropertiesTransformer.java).
  *
  * @author Andres Almiray
  * @author Marc Philipp

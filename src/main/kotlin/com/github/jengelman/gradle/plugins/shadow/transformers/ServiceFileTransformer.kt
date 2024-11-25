@@ -21,7 +21,7 @@ import org.gradle.api.tasks.util.PatternSet
  * `META-INF/services/org.apache.maven.project.ProjectBuilder` resource packaged into the resultant JAR produced
  * by the shading process.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.ServiceFileTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ServiceResourceTransformerTest.java).
+ * Modified from [org.apache.maven.plugins.shade.resource.ServicesResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ServicesResourceTransformer.java).
  *
  * @author jvanzyl
  * @author Charlie Knudsen

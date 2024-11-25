@@ -7,7 +7,7 @@ import org.gradle.api.tasks.Optional
 /**
  * A resource processor that prevents the inclusion of an arbitrary resource into the shaded JAR.
  *
- * Modified from [org.apache.maven.plugins.shade.resouce.DontIncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/DontIncludeResourceTransformer.java).
+ * Modified from [org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/DontIncludeResourceTransformer.java).
  *
  * @author John Engelman
  */

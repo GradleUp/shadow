@@ -10,7 +10,7 @@ import org.gradle.api.tasks.Optional
 /**
  * A resource processor that appends content for a resource, separated by a newline.
  *
- * Modified from [org.apache.maven.plugins.shade.resouce.AppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/AppendingTransformer.java).
+ * Modified from [org.apache.maven.plugins.shade.resource.AppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/AppendingTransformer.java).
  *
  * @author John Engelman
  */
