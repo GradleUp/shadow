@@ -240,7 +240,7 @@ public abstract class ShadowJar :
       documentationRegistry,
       metadataCharset,
       transformers.get(),
-      allRelocators,
+      relocators.get() + packageRelocators,
       rootPatternSet,
       stats,
       isPreserveFileTimestamps,
@@ -267,26 +267,20 @@ public abstract class ShadowJar :
     return clazz.isAnnotationPresent(CacheableTransformer::class.java)
   }
 
-  private val allRelocators get() = buildList {
-    addAll(relocators.get())
-    if (!enableRelocation.get()) return@buildList
+  private val packageRelocators: List<SimpleRelocator>
+    get() {
+      if (!enableRelocation.get()) return emptyList()
 
-    val prefix = relocationPrefix.get()
-    val packages = mutableSetOf<String>()
-    configurations.get().forEach { configuration ->
-      configuration.files.forEach { jarFile ->
-        JarFile(jarFile).use { jf ->
-          jf.entries().asSequence().forEach { entry ->
-            if (entry.name.endsWith(".class") && entry.name != "module-info.class") {
-              packages.add(entry.name.substringBeforeLast('/').replace('/', '.'))
-            }
+      val prefix = relocationPrefix.get()
+      return configurations.get().flatMap { configuration ->
+        configuration.files.flatMap { file ->
+          JarFile(file).use { jarFile ->
+            jarFile.entries().toList()
+              .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
+              .map { it.name.substringBeforeLast('/').replace('/', '.') }
+              .map { SimpleRelocator(it, "$prefix.$it") }
           }
         }
       }
     }
-    val packageRelocators = packages.map {
-      SimpleRelocator(it, "$prefix.$it")
-    }
-    addAll(packageRelocators)
-  }
 }
