@@ -48,6 +48,7 @@ public abstract class ShadowJar :
   @Transient
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
+  private val _relocators = mutableListOf<Relocator>()
   private var _toMinimize: FileCollection? = null
   private var _apiJars: FileCollection? = null
   private var _sourceSetsClassesDirs: FileCollection? = null
@@ -59,7 +60,7 @@ public abstract class ShadowJar :
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       transformers.get().any { !isCacheableTransform(it::class.java) } ||
-        relocators.get().any { !isCacheableRelocator(it::class.java) }
+        _relocators.any { !isCacheableRelocator(it::class.java) }
     }
   }
 
@@ -137,8 +138,14 @@ public abstract class ShadowJar :
   @get:Nested
   public abstract val transformers: ListProperty<Transformer>
 
+  // TODO: we have to modify relocators in execution phase, can't migrate this to a lazy property now.
   @get:Nested
-  public abstract val relocators: ListProperty<Relocator>
+  public open var relocators: List<Relocator>
+    get() = _relocators
+    set(value) {
+      _relocators.clear()
+      _relocators.addAll(value)
+    }
 
   @get:Classpath
   @get:Optional
@@ -160,28 +167,6 @@ public abstract class ShadowJar :
   override fun minimize(action: Action<DependencyFilter>?): ShadowJar = apply {
     minimize()
     action?.execute(dependencyFilterForMinimize)
-  }
-
-  override fun createCopyAction(): CopyAction {
-    val documentationRegistry = services.get(DocumentationRegistry::class.java)
-    val unusedTracker = if (minimizeJar.get()) {
-      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
-    } else {
-      null
-    }
-    return ShadowCopyAction(
-      archiveFile.get().asFile,
-      internalCompressor,
-      documentationRegistry,
-      metadataCharset,
-      transformers.get(),
-      relocators.get(),
-      rootPatternSet,
-      stats,
-      isPreserveFileTimestamps,
-      minimizeJar.get(),
-      unusedTracker,
-    )
   }
 
   override fun dependencies(action: Action<DependencyFilter>?): ShadowJar = apply {
@@ -244,7 +229,7 @@ public abstract class ShadowJar :
     destination: String,
     action: Action<SimpleRelocator>?,
   ): ShadowJar = apply {
-    val relocator = SimpleRelocator(pattern, destination, mutableListOf(), mutableListOf())
+    val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
   }
 
@@ -271,9 +256,31 @@ public abstract class ShadowJar :
     logger.info(stats.toString())
   }
 
-  private fun <R : Relocator> addRelocator(relocator: R, configure: Action<R>?) {
-    configure?.execute(relocator)
-    relocators.add(relocator)
+  override fun createCopyAction(): CopyAction {
+    val documentationRegistry = services.get(DocumentationRegistry::class.java)
+    val unusedTracker = if (minimizeJar.get()) {
+      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+    } else {
+      null
+    }
+    return ShadowCopyAction(
+      archiveFile.get().asFile,
+      internalCompressor,
+      documentationRegistry,
+      metadataCharset,
+      transformers.get(),
+      _relocators,
+      rootPatternSet,
+      stats,
+      isPreserveFileTimestamps,
+      minimizeJar.get(),
+      unusedTracker,
+    )
+  }
+
+  private fun <R : Relocator> addRelocator(relocator: R, action: Action<R>?) {
+    action?.execute(relocator)
+    _relocators.add(relocator)
   }
 
   private fun <T : Transformer> addTransform(transformer: T, action: Action<T>?) {
