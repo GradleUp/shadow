@@ -46,7 +46,6 @@ import org.gradle.api.tasks.util.PatternSet
 public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
-  private val _relocators = mutableListOf<Relocator>()
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
   init {
@@ -56,7 +55,7 @@ public abstract class ShadowJar :
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       transformers.get().any { !isCacheableTransform(it::class.java) } ||
-        _relocators.any { !isCacheableRelocator(it::class.java) }
+        relocators.get().any { !isCacheableRelocator(it::class.java) }
     }
   }
 
@@ -119,13 +118,8 @@ public abstract class ShadowJar :
   @get:Nested
   public abstract val transformers: ListProperty<Transformer>
 
-  // TODO: we have to modify relocators in execution phase, can't migrate this to a lazy property now.
   @get:Nested
-  public open var relocators: List<Relocator> = _relocators
-    set(value) {
-      _relocators.clear()
-      _relocators.addAll(value)
-    }
+  public abstract val relocators: ListProperty<Relocator>
 
   @get:Classpath
   @get:Optional
@@ -228,9 +222,6 @@ public abstract class ShadowJar :
 
   @TaskAction
   override fun copy() {
-    if (enableRelocation.get()) {
-      configureRelocation()
-    }
     from(includedDependencies)
     super.copy()
     logger.info(stats.toString())
@@ -249,7 +240,7 @@ public abstract class ShadowJar :
       documentationRegistry,
       metadataCharset,
       transformers.get(),
-      _relocators,
+      allRelocators,
       rootPatternSet,
       stats,
       isPreserveFileTimestamps,
@@ -260,7 +251,7 @@ public abstract class ShadowJar :
 
   private fun <R : Relocator> addRelocator(relocator: R, action: Action<R>?) {
     action?.execute(relocator)
-    _relocators.add(relocator)
+    relocators.add(relocator)
   }
 
   private fun <T : Transformer> addTransform(transformer: T, action: Action<T>?) {
@@ -276,7 +267,11 @@ public abstract class ShadowJar :
     return clazz.isAnnotationPresent(CacheableTransformer::class.java)
   }
 
-  private fun configureRelocation() {
+  private val allRelocators get() = buildList {
+    addAll(relocators.get())
+    if (!enableRelocation.get()) return@buildList
+
+    val prefix = relocationPrefix.get()
     val packages = mutableSetOf<String>()
     configurations.get().forEach { configuration ->
       configuration.files.forEach { jarFile ->
@@ -289,9 +284,9 @@ public abstract class ShadowJar :
         }
       }
     }
-    val prefix = relocationPrefix.get()
-    packages.forEach {
-      relocate(it, "$prefix.$it")
+    val packageRelocators = packages.map {
+      SimpleRelocator(it, "$prefix.$it")
     }
+    addAll(packageRelocators)
   }
 }
