@@ -64,33 +64,33 @@ public abstract class ShadowJar :
   override val stats: ShadowStats = ShadowStats()
 
   @get:Classpath
-  public val toMinimize: FileCollection by unsafeLazy {
-    if (minimizeJar.get()) {
-      dependencyFilterForMinimize.resolve(configurations.get()).minus(apiJars)
-    } else {
-      project.objects.fileCollection()
+  public val toMinimize: ConfigurableFileCollection by unsafeLazy {
+    project.objects.fileCollection().apply {
+      if (minimizeJar.get()) {
+        setFrom(dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
+      }
     }
   }
 
   @get:Classpath
-  public val apiJars: FileCollection by unsafeLazy {
-    if (minimizeJar.get()) {
-      UnusedTracker.getApiJarsFromProject(project)
-    } else {
-      project.objects.fileCollection()
+  public val apiJars: ConfigurableFileCollection by unsafeLazy {
+    project.objects.fileCollection().apply {
+      if (minimizeJar.get()) {
+        setFrom(UnusedTracker.getApiJarsFromProject(project))
+      }
     }
   }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public val sourceSetsClassesDirs: FileCollection by unsafeLazy {
-    val allClassesDirs = project.objects.fileCollection()
-    if (minimizeJar.get()) {
-      project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
-        allClassesDirs.from(sourceSet.output.classesDirs)
+  public val sourceSetsClassesDirs: ConfigurableFileCollection by unsafeLazy {
+    project.objects.fileCollection().apply {
+      if (minimizeJar.get()) {
+        project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
+          from(sourceSet.output.classesDirs.filter { it.isDirectory })
+        }
       }
     }
-    allClassesDirs.filter { it.isDirectory }
   }
 
   @get:Internal
