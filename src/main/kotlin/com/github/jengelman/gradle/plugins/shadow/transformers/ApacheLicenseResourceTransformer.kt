@@ -3,9 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import org.gradle.api.file.FileTreeElement
 
 /**
- * Prevents duplicate copies of the license
+ * Prevents duplicate copies of the license.
  *
- * Modified from `org.apache.maven.plugins.shade.resouce.ApacheLicenseResourceTransformer.java`
+ * Modified from [org.apache.maven.plugins.shade.resouce.ApacheLicenseResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ApacheLicenseResourceTransformer.java).
  *
  * @author John Engelman
  */
