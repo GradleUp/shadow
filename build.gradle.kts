@@ -80,6 +80,8 @@ tasks.withType<Test>().configureEach {
     maxHeapSize = "1g"
   }
 
+  // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
+  inputs.dir(file("src/docs"))
   systemProperty("shadowVersion", version)
 
   // Required to test configuration cache in tests when using withDebug()
