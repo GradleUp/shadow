@@ -6,7 +6,7 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
 
 /**
- * Modified from `org.apache.maven.plugins.shade.resource.ResourceTransformer.java`
+ * Modified from [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java).
  *
  * @author Jason van Zyl
  * @author Charlie Knudsen
