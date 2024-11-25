@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Add .md support to the Apache License and Notice transformers. ([#1041](https://github.com/GradleUp/shadow/pull/1041))
+
 **Changed**
 
 - **BREAKING CHANGE:** Rewrite this plugin in Kotlin. ([#1012](https://github.com/GradleUp/shadow/pull/1012))

@@ -43,6 +43,15 @@ class ApacheNoticeResourceTransformerParameterTests extends TransformerTestSuppo
     }
 
     @Test
+    void testCanTransformResource() {
+      assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE")))
+      assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE.TXT")))
+      assertTrue(transformer.canTransformResource(getFileElement("META-INF/Notice.txt")))
+      assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE.md")))
+      assertTrue(transformer.canTransformResource(getFileElement("META-INF/Notice.md")))
+    }
+
+    @Test
     void testNoParametersShouldNotThrowNullPointerWhenNoInput() {
         processAndFailOnNullPointer("")
     }
