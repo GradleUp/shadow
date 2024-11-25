@@ -46,10 +46,8 @@ import org.gradle.api.tasks.util.PatternSet
 public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
-  @Transient
-  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-
   private val _relocators = mutableListOf<Relocator>()
+  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
   init {
     // shadow filters out files later. This was the default behavior in  Gradle < 6.x
