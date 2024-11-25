@@ -10,10 +10,9 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
 /**
- * A resource processor that allows the addition of an arbitrary file
- * content into the shaded JAR.
+ * A resource processor that allows the addition of an arbitrary file content into the shaded JAR.
  *
- * Modified from `org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java`
+ * Modified from [org.apache.maven.plugins.shade.resouce.IncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/IncludeResourceTransformer.java).
  *
  * @author John Engelman
  */
