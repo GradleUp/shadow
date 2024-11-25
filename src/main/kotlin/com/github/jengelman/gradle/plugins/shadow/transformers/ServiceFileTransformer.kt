@@ -15,13 +15,13 @@ import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 
 /**
- * Modified from `org.apache.maven.plugins.shade.resource.ServiceResourceTransformer.java`
- *
  * Resources transformer that appends entries in `META-INF/services` resources into
  * a single resource. For example, if there are several `META-INF/services/org.apache.maven.project.ProjectBuilder`
  * resources spread across many JARs the individual entries will all be concatenated into a single
  * `META-INF/services/org.apache.maven.project.ProjectBuilder` resource packaged into the resultant JAR produced
  * by the shading process.
+ *
+ * Modified from [org.apache.maven.plugins.shade.resource.ServiceFileTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ServiceResourceTransformerTest.java).
  *
  * @author jvanzyl
  * @author Charlie Knudsen
