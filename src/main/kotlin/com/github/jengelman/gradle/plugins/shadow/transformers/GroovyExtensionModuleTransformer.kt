@@ -10,7 +10,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 /**
- * Modified from `eu.appsatori.gradle.fatjar.tasks.PrepareFiles.groovy`
+ * Aggregate Apache Groovy extension modules descriptors.
  *
  * Resource transformer that merges Groovy extension module descriptor files into a single file.
  * Groovy extension module descriptor files have the name org.codehaus.groovy.runtime.ExtensionModule
@@ -23,6 +23,8 @@ import org.gradle.api.file.FileTreeElement
  * It will live in the legacy directory (META-INF/services) if all the processed descriptor
  * files came from the legacy location, otherwise it will be written into the now standard location (META-INF/groovy).
  * Note that certain JDK9+ tooling will break when using the legacy location.
+ *
+ * Modified from [org.apache.maven.plugins.shade.resouce.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
  */
 @CacheableTransformer
 public open class GroovyExtensionModuleTransformer : Transformer {
