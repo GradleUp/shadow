@@ -11,6 +11,10 @@
 
 - **BREAKING CHANGE:** Remove Develocity integration. ([#1013](https://github.com/GradleUp/shadow/pull/1013))
 
+**Fixed**
+
+- Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039)).  
+
 
 ## [v8.3.5] (2024-11-03)
 

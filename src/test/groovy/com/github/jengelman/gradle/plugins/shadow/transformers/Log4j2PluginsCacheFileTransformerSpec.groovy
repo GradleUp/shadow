@@ -25,12 +25,12 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
         transformer = new Log4j2PluginsCacheFileTransformer()
     }
 
-    void "should not transformer"() {
+    void "should transform for a single file"() {
         when:
         transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE)))
 
         then:
-        !transformer.hasTransformedResource()
+        transformer.hasTransformedResource()
     }
 
     void "should transform"() {
