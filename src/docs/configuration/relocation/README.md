@@ -74,7 +74,7 @@ To configure automatic dependency relocation, set `enableRelocation true` and op
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    isEnableRelocation = true
+    enableRelocation = true
     relocationPrefix = "myapp"
 }
 ```

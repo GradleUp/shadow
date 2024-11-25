@@ -126,7 +126,7 @@ public abstract class ShadowJar :
     }
 
   @get:Input
-  public abstract val isEnableRelocation: Property<Boolean>
+  public abstract val enableRelocation: Property<Boolean>
 
   @get:Input
   public abstract val relocationPrefix: Property<String>
@@ -263,7 +263,7 @@ public abstract class ShadowJar :
 
   @TaskAction
   override fun copy() {
-    if (isEnableRelocation.get()) {
+    if (enableRelocation.get()) {
       configureRelocation()
     }
     from(includedDependencies)

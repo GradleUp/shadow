@@ -297,6 +297,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public final fun getApiJars ()Lorg/gradle/api/file/FileCollection;
 	public abstract fun getConfigurations ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
+	public abstract fun getEnableRelocation ()Lorg/gradle/api/provider/Property;
 	public abstract fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
@@ -308,7 +309,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public final fun getToMinimize ()Lorg/gradle/api/file/FileCollection;
 	public abstract fun getTransformers ()Lorg/gradle/api/provider/ListProperty;
-	public abstract fun isEnableRelocation ()Lorg/gradle/api/provider/Property;
 	public fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;

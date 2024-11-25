@@ -90,7 +90,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         }
       }
       shadow.from(sourceSets.getByName("main").output)
-      shadow.isEnableRelocation.convention(false)
+      shadow.enableRelocation.convention(false)
       shadow.relocationPrefix.convention(ShadowBasePlugin.SHADOW)
       shadow.minimizeJar.convention(false)
       shadow.transformers.convention(emptyList())
