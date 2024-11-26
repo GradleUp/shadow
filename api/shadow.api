@@ -181,23 +181,23 @@ public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocat
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator : com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
+	public synthetic fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public fun canRelocateClass (Ljava/lang/String;)Z
 	public fun canRelocatePath (Ljava/lang/String;)Z
 	public fun exclude (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
-	public fun getExcludes ()Ljava/util/Set;
-	public fun getIncludes ()Ljava/util/Set;
-	public fun getPathPattern ()Ljava/lang/String;
-	public fun getPattern ()Ljava/lang/String;
-	public fun getShadedPathPattern ()Ljava/lang/String;
-	public fun getShadedPattern ()Ljava/lang/String;
+	public fun getExcludes ()Lorg/gradle/api/provider/SetProperty;
+	public fun getIncludes ()Lorg/gradle/api/provider/SetProperty;
+	public fun getPathPattern ()Lorg/gradle/api/provider/Property;
+	public fun getPattern ()Lorg/gradle/api/provider/Property;
+	public fun getShadedPathPattern ()Lorg/gradle/api/provider/Property;
+	public fun getShadedPattern ()Lorg/gradle/api/provider/Property;
 	public fun include (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
-	public fun isRawString ()Z
+	public fun isRawString ()Lorg/gradle/api/provider/Property;
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }

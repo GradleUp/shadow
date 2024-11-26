@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
 import static java.util.Collections.singletonList
@@ -17,6 +18,7 @@ import static org.apache.logging.log4j.core.config.plugins.processor.PluginProce
  * @see <a href="https://www.linkedin.com/in/paul-n-baker/">LinkedIn</a>
  */
 class Log4j2PluginsCacheFileTransformerSpec extends Specification {
+    private static final def objectFactory = ProjectBuilder.builder().build().objects
 
     Log4j2PluginsCacheFileTransformer transformer
 
@@ -35,7 +37,7 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
     void "should transform"() {
         given:
         List<Relocator> relocators = new ArrayList<>()
-        relocators.add(new SimpleRelocator(null, null))
+        relocators.add(new SimpleRelocator(objectFactory, null, null))
 
         when:
         transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), relocators))
@@ -49,7 +51,7 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
         String pattern = "org.apache.logging"
         String destination = "new.location.org.apache.logging"
 
-        List<Relocator> relocators = singletonList((Relocator) new SimpleRelocator(pattern, destination))
+        List<Relocator> relocators = singletonList((Relocator) new SimpleRelocator(objectFactory, pattern, destination))
 
         when:
         transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), relocators, new ShadowStats()))
