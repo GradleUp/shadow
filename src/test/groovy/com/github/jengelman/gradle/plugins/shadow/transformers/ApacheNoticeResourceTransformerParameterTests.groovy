@@ -24,7 +24,8 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.*
+import static org.junit.jupiter.api.Assertions.assertTrue
+import static org.junit.jupiter.api.Assertions.fail
 
 /**
  * Tests {@link ApacheLicenseResourceTransformer} parameters.
@@ -44,11 +45,11 @@ class ApacheNoticeResourceTransformerParameterTests extends TransformerTestSuppo
 
     @Test
     void testCanTransformResource() {
-      assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE")))
-      assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE.TXT")))
-      assertTrue(transformer.canTransformResource(getFileElement("META-INF/Notice.txt")))
-      assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE.md")))
-      assertTrue(transformer.canTransformResource(getFileElement("META-INF/Notice.md")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE.TXT")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/Notice.txt")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/NOTICE.md")))
+        assertTrue(transformer.canTransformResource(getFileElement("META-INF/Notice.md")))
     }
 
     @Test

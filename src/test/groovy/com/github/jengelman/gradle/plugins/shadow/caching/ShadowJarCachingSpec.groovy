@@ -84,7 +84,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         given:
         buildFile << """
             dependencies { implementation 'junit:junit:3.8.2' }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 exclude 'junit/*'
             }
@@ -112,8 +112,8 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'server/Util.class'
+            'server/Server.class',
+            'server/Util.class'
         ])
 
         when:
@@ -130,13 +130,13 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         and:
         doesNotContain(output, [
-                'server/Util.class',
-                'junit/framework/Test.class'
+            'server/Util.class',
+            'junit/framework/Test.class'
         ])
 
         when:
@@ -145,13 +145,13 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         and:
         doesNotContain(output, [
-                'server/Util.class',
-                'junit/framework/Test.class'
+            'server/Util.class',
+            'junit/framework/Test.class'
         ])
     }
 
@@ -178,8 +178,8 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'junit/framework/Test.class'
+            'server/Server.class',
+            'junit/framework/Test.class'
         ])
 
         when:
@@ -197,12 +197,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         and:
         doesNotContain(output, [
-                'junit/framework/Test.class'
+            'junit/framework/Test.class'
         ])
 
         when:
@@ -211,12 +211,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         and:
         doesNotContain(output, [
-                'junit/framework/Test.class'
+            'junit/framework/Test.class'
         ])
     }
 }

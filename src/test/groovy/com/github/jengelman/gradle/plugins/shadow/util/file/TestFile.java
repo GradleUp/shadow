@@ -203,7 +203,7 @@ public class TestFile extends File {
                 FileUtils.copyDirectory(this, target);
             } catch (IOException e) {
                 throw new RuntimeException(String.format("Could not copy test directory '%s' to '%s'", this,
-                        target), e);
+                    target), e);
             }
         } else {
             try {
@@ -394,7 +394,7 @@ public class TestFile extends File {
             return this;
         }
         throw new AssertionError("Problems creating dir: " + this
-                + ". Diagnostics: exists=" + this.exists() + ", isFile=" + this.isFile() + ", isDirectory=" + this.isDirectory());
+            + ". Diagnostics: exists=" + this.exists() + ", isFile=" + this.isFile() + ", isDirectory=" + this.isDirectory());
     }
 
     public TestFile createDir(Object path) {
@@ -408,6 +408,7 @@ public class TestFile extends File {
 
     /**
      * Attempts to delete this directory, ignoring failures to do so.
+     *
      * @return this
      */
     public TestFile maybeDeleteDir() {
@@ -444,7 +445,7 @@ public class TestFile extends File {
         return zipFile;
     }
 
-    public TestFile zipTo(TestFile zipFile){
+    public TestFile zipTo(TestFile zipFile) {
         new TestFileHelper(this).zipTo(zipFile, useNativeTools);
         return this;
     }

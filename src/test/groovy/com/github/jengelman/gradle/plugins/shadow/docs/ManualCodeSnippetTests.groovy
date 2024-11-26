@@ -16,9 +16,9 @@ import java.nio.file.Path
 
 class ManualCodeSnippetTests {
     public static final LinkedHashMap<String, SnippetExecuter> FIXTURES = [
-            "groovy": new GradleBuildExecuter("build.gradle", new GroovyDslFixture(), new GroovyDslFixture.ImportsExtractor()),
-            "groovy no-plugins": new GradleBuildExecuter("build.gradle", new GroovyScriptFixture(), new GroovyDslFixture.ImportsExtractor()),
-            "groovy no-run": new NoopExecuter()
+        "groovy"           : new GradleBuildExecuter("build.gradle", new GroovyDslFixture(), new GroovyDslFixture.ImportsExtractor()),
+        "groovy no-plugins": new GradleBuildExecuter("build.gradle", new GroovyScriptFixture(), new GroovyDslFixture.ImportsExtractor()),
+        "groovy no-run"    : new NoopExecuter()
     ]
 
     @TestFactory

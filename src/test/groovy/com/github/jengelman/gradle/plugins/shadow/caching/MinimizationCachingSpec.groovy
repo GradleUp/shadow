@@ -45,9 +45,9 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'junit/framework/Test.class',
-                'client/Client.class'
+            'server/Server.class',
+            'junit/framework/Test.class',
+            'client/Client.class'
         ])
 
         when:
@@ -69,8 +69,8 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'junit/framework/Test.class'
+            'server/Server.class',
+            'junit/framework/Test.class'
         ])
         doesNotContain(output, ['client/Client.class'])
 
@@ -80,8 +80,8 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'junit/framework/Test.class'
+            'server/Server.class',
+            'junit/framework/Test.class'
         ])
         doesNotContain(output, ['client/Client.class'])
     }

@@ -7,12 +7,12 @@ class ConfigurationCacheSpec extends PluginSpecification {
     @Override
     def setup() {
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
         repo.module('shadow', 'b', '1.0')
-                .insertFile('b.properties', 'b')
-                .publish()
+            .insertFile('b.properties', 'b')
+            .publish()
 
         buildFile << """
             dependencies {
@@ -39,11 +39,11 @@ class ConfigurationCacheSpec extends PluginSpecification {
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                implementation 'shadow:a:1.0'
             }
-            
+
             runShadow {
                args 'foo'
             }
@@ -127,8 +127,8 @@ class ConfigurationCacheSpec extends PluginSpecification {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'junit/framework/Test.class'
+            'server/Server.class',
+            'junit/framework/Test.class'
         ])
         doesNotContain(output, ['client/Client.class'])
 

@@ -24,8 +24,8 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'junit/framework/Test.class'
+            'server/Server.class',
+            'junit/framework/Test.class'
         ])
 
         when:
@@ -41,13 +41,13 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/junit/framework/Test.class'
+            'server/Server.class',
+            'foo/junit/framework/Test.class'
         ])
 
         and:
         doesNotContain(output, [
-                'junit/framework/Test.class'
+            'junit/framework/Test.class'
         ])
 
         when:
@@ -56,13 +56,13 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/junit/framework/Test.class'
+            'server/Server.class',
+            'foo/junit/framework/Test.class'
         ])
 
         and:
         doesNotContain(output, [
-                'junit/framework/Test.class'
+            'junit/framework/Test.class'
         ])
     }
 }

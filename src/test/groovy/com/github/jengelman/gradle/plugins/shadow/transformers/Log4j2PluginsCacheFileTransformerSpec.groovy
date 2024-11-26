@@ -7,7 +7,6 @@ import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.tools.zip.ZipOutputStream
 import spock.lang.Specification
 
-
 import static java.util.Collections.singletonList
 import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 

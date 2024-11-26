@@ -14,7 +14,8 @@ import java.util.jar.JarFile
 
 abstract class PluginSpecification extends Specification {
 
-    @TempDir Path dir
+    @TempDir
+    Path dir
 
     public static final String SHADOW_VERSION = System.getProperty("shadowVersion")
 
@@ -55,10 +56,10 @@ abstract class PluginSpecification extends Specification {
 
     GradleRunner getRunner() {
         GradleRunner.create()
-                .withProjectDir(dir.toFile())
-                .forwardOutput()
-                .withPluginClasspath()
-                .withTestKitDir(testKitDir)
+            .withProjectDir(dir.toFile())
+            .forwardOutput()
+            .withPluginClasspath()
+            .withTestKitDir(testKitDir)
     }
 
     GradleRunner runner(Collection<String> tasks) {
@@ -93,7 +94,7 @@ abstract class PluginSpecification extends Specification {
 
     static boolean containsDeprecationWarning(String output) {
         output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
-                output.contains("has been deprecated. This is scheduled to be removed in Gradle")
+            output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
 
     File getBuildFile() {

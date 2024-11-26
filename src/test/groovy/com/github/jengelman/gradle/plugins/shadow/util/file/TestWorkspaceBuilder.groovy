@@ -31,8 +31,7 @@ class TestWorkspaceBuilder {
     def methodMissing(String name, Object args) {
         if (args.length == 1 && args[0] instanceof Closure) {
             baseDir.file(name).create(args[0])
-        }
-        else {
+        } else {
             throw new MissingMethodException(name, getClass(), args)
         }
     }

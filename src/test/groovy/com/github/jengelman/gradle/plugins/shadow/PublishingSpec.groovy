@@ -20,12 +20,12 @@ class PublishingSpec extends PluginSpecification {
     def "publish shadow jar with maven-publish plugin"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
         repo.module('shadow', 'b', '1.0')
-                .insertFile('b.properties', 'b')
-                .publish()
+            .insertFile('b.properties', 'b')
+            .publish()
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
@@ -35,12 +35,12 @@ class PublishingSpec extends PluginSpecification {
                implementation 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                archiveClassifier = ''
                archiveBaseName = 'maven-all'
             }
-            
+
             publishing {
                publications {
                    shadow(MavenPublication) {
@@ -81,18 +81,18 @@ class PublishingSpec extends PluginSpecification {
     }
 
     @Issue([
-            "https://github.com/GradleUp/shadow/issues/860",
-            "https://github.com/GradleUp/shadow/issues/945",
+        "https://github.com/GradleUp/shadow/issues/860",
+        "https://github.com/GradleUp/shadow/issues/945",
     ])
     def "publish shadow jar with maven-publish plugin using custom classifier and extension"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
         repo.module('shadow', 'b', '1.0')
-                .insertFile('b.properties', 'b')
-                .publish()
+            .insertFile('b.properties', 'b')
+            .publish()
 
         settingsFile << "rootProject.name = 'maven'"
         buildFile << """
@@ -102,7 +102,7 @@ class PublishingSpec extends PluginSpecification {
                implementation 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
             }
-            
+
             publishing {
                publications {
                    shadow(MavenPublication) { publication ->
@@ -116,7 +116,7 @@ class PublishingSpec extends PluginSpecification {
                    }
                }
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                archiveClassifier = 'my-classifier'
                archiveExtension = 'my-ext'
@@ -149,7 +149,7 @@ class PublishingSpec extends PluginSpecification {
 
                 version = "1.0"
                 group = 'shadow'
-    
+
                 repositories { maven { url "${repo.uri}" } }
                 publishing {
                    repositories {
@@ -184,7 +184,7 @@ class PublishingSpec extends PluginSpecification {
             plugins {
                 id 'com.gradleup.shadow'
             }
-            
+
             dependencies {
                 implementation project(':a')
                 shadow project(':b')
@@ -194,7 +194,7 @@ class PublishingSpec extends PluginSpecification {
                archiveClassifier = ''
                archiveBaseName = 'maven-all'
             }
-            
+
             publishing {
                publications {
                    shadow(MavenPublication) {
@@ -232,12 +232,12 @@ class PublishingSpec extends PluginSpecification {
     def "publish shadow jar with maven-publish plugin and Gradle metadata"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
         repo.module('shadow', 'b', '1.0')
-                .insertFile('b.properties', 'b')
-                .publish()
+            .insertFile('b.properties', 'b')
+            .publish()
 
         settingsFile << """
             rootProject.name = 'maven'

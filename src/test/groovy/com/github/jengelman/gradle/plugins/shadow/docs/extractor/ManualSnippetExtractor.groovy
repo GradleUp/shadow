@@ -26,7 +26,7 @@ class ManualSnippetExtractor {
 
     private static void addSnippets(Path tempDir, List<TestCodeSnippet> snippets, File file, Pattern snippetBlockPattern, SnippetExecuter executer) {
         def source = file.text
-        String testName = file.parentFile.name + "/" +file.name
+        String testName = file.parentFile.name + "/" + file.name
         Map<Integer, String> snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
 
         snippetsByLine.each { lineNumber, snippet ->
