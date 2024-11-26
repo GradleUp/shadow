@@ -15,7 +15,7 @@ internal inline val Project.runtimeConfiguration: Configuration get() {
     ?: configurations.getByName("runtime")
 }
 
-internal inline fun <reified T : Any?> ObjectFactory.property(defaultValue: T? = null): Property<T> {
+internal inline fun <reified T : Any> ObjectFactory.property(defaultValue: T? = null): Property<T> {
   return property(T::class.java).apply {
     if (defaultValue != null) convention(defaultValue)
   }

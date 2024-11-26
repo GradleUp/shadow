@@ -23,25 +23,25 @@ public open class SimpleRelocator @JvmOverloads constructor(
   shadedPattern: String?,
   includes: List<String>? = null,
   excludes: List<String>? = null,
-  isRawString: Boolean = false,
+  rawString: Boolean = false,
 ) : Relocator {
 
   @get:Input
   @get:Optional
-  public open val pattern: Property<String?> = objectFactory.property()
+  public open val pattern: Property<String> = objectFactory.property()
 
   @get:Input
   public open val pathPattern: Property<String> = objectFactory.property()
 
   @get:Input
   @get:Optional
-  public open val shadedPattern: Property<String?> = objectFactory.property()
+  public open val shadedPattern: Property<String> = objectFactory.property()
 
   @get:Input
   public open val shadedPathPattern: Property<String> = objectFactory.property()
 
   @get:Input
-  public open val rawString: Property<Boolean> = objectFactory.property(isRawString)
+  public open val rawString: Property<Boolean> = objectFactory.property(rawString)
 
   @get:Input
   public open val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
@@ -50,11 +50,11 @@ public open class SimpleRelocator @JvmOverloads constructor(
   public open val excludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
 
   init {
-    if (isRawString) {
+    if (rawString) {
       pathPattern.set(pattern.orEmpty())
       shadedPathPattern.set(shadedPattern.orEmpty())
       this.pattern.set(null as String?) // not used for raw string relocator
-      this.shadedPathPattern.set(null as String?) // not used for raw string relocator
+      this.shadedPattern.set(null as String?) // not used for raw string relocator
     } else {
       if (pattern == null) {
         this.pattern.set("")
@@ -64,8 +64,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
         this.pathPattern.set(pattern.replace('.', '/'))
       }
       if (shadedPattern == null) {
-        this.shadedPattern.set("hidden.$pattern")
-        this.shadedPathPattern.set("hidden/$pathPattern")
+        this.shadedPattern.set(this.pattern.map { "hidden.$it" })
+        this.shadedPathPattern.set(this.pathPattern.map { "hidden/$it" })
       } else {
         this.shadedPattern.set(shadedPattern.replace('/', '.'))
         this.shadedPathPattern.set(shadedPattern.replace('.', '/'))
@@ -116,14 +116,14 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun relocateClass(context: RelocateClassContext): String {
     context.stats.relocate(pathPattern.get(), shadedPathPattern.get())
-    return context.className.replaceFirst(pattern.get().orEmpty(), shadedPattern.get().orEmpty())
+    return context.className.replaceFirst(pattern.orNull.orEmpty(), shadedPattern.orNull.orEmpty())
   }
 
   override fun applyToSourceContent(sourceContent: String): String {
     return if (rawString.get()) {
       sourceContent
     } else {
-      sourceContent.replace("\\b$pattern.get()".toRegex(), shadedPattern.get().orEmpty())
+      sourceContent.replace("\\b${pattern.orNull}".toRegex(), shadedPattern.orNull.orEmpty())
     }
   }
 
