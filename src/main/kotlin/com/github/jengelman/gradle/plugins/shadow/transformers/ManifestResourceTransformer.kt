@@ -35,11 +35,11 @@ public open class ManifestResourceTransformer @Inject constructor(
 
   @get:Optional
   @get:Input
-  public val mainClass: Property<String> = objectFactory.property()
+  public open val mainClass: Property<String> = objectFactory.property()
 
   @get:Optional
   @get:Input
-  public val manifestEntries: MapProperty<String, Attributes> =
+  public open val manifestEntries: MapProperty<String, Attributes> =
     objectFactory.mapProperty(String::class.java, Attributes::class.java)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {

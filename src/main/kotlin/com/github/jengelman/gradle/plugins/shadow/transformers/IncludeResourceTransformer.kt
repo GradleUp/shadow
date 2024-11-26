@@ -25,10 +25,10 @@ public open class IncludeResourceTransformer @Inject constructor(
 ) : Transformer by NoOpTransformer {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
-  public val file: RegularFileProperty = objectFactory.fileProperty()
+  public open val file: RegularFileProperty = objectFactory.fileProperty()
 
   @get:Input
-  public val resource: Property<String> = objectFactory.property()
+  public open val resource: Property<String> = objectFactory.property()
 
   override fun hasTransformedResource(): Boolean = file.orNull?.asFile?.exists() == true
 

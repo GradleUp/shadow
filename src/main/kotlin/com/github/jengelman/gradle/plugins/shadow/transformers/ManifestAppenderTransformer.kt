@@ -27,7 +27,7 @@ public open class ManifestAppenderTransformer @Inject constructor(
 
   @Suppress("UNCHECKED_CAST")
   @get:Input
-  public val attributes: ListProperty<Pair<String, Comparable<*>>> =
+  public open val attributes: ListProperty<Pair<String, Comparable<*>>> =
     objectFactory.listProperty(Pair::class.java) as ListProperty<Pair<String, Comparable<*>>>
 
   override fun canTransformResource(element: FileTreeElement): Boolean {

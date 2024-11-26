@@ -32,13 +32,13 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
     get() = if (encoding.orNull.isNullOrEmpty()) Charsets.UTF_8 else Charset.forName(encoding.get())
 
   @get:Input
-  public val projectName: Property<String> = objectFactory.property("")
+  public open val projectName: Property<String> = objectFactory.property("")
 
   @get:Input
-  public val addHeader: Property<Boolean> = objectFactory.property(true)
+  public open val addHeader: Property<Boolean> = objectFactory.property(true)
 
   @get:Input
-  public val preamble1: Property<String> = objectFactory.property(
+  public open val preamble1: Property<String> = objectFactory.property(
     """
       // ------------------------------------------------------------------
       // NOTICE file corresponding to the section 4d of The Apache License,
@@ -47,32 +47,32 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   )
 
   @get:Input
-  public val preamble2: Property<String> = objectFactory.property(
+  public open val preamble2: Property<String> = objectFactory.property(
     "\n// ------------------------------------------------------------------\n",
   )
 
   @get:Input
-  public val preamble3: Property<String> = objectFactory.property("This product includes software developed at\n")
+  public open val preamble3: Property<String> = objectFactory.property("This product includes software developed at\n")
 
   @get:Input
-  public val organizationName: Property<String> = objectFactory.property("The Apache Software Foundation")
+  public open val organizationName: Property<String> = objectFactory.property("The Apache Software Foundation")
 
   @get:Input
-  public val organizationURL: Property<String> = objectFactory.property("http://www.apache.org/")
+  public open val organizationURL: Property<String> = objectFactory.property("http://www.apache.org/")
 
   @get:Input
-  public val inceptionYear: Property<String> = objectFactory.property("2006")
+  public open val inceptionYear: Property<String> = objectFactory.property("2006")
 
   @get:Optional
   @get:Input
-  public val copyright: Property<String> = objectFactory.property()
+  public open val copyright: Property<String> = objectFactory.property()
 
   /**
    * The file encoding of the `NOTICE` file.
    */
   @get:Optional
   @get:Input
-  public val encoding: Property<String> = objectFactory.property()
+  public open val encoding: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString

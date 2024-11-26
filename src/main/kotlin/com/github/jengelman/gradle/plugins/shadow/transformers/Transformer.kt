@@ -24,7 +24,7 @@ public interface Transformer : Named {
   public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
 
   @get:Internal
-  public val objectFactory: ObjectFactory
+  public open val objectFactory: ObjectFactory
     get() = throw NotImplementedError("You have to make sure this has been implemented or injected.")
 
   @Internal

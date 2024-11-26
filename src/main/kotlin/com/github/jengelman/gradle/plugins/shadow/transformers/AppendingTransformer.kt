@@ -31,7 +31,7 @@ public open class AppendingTransformer @Inject constructor(
 
   @get:Optional
   @get:Input
-  public val resource: Property<String> = objectFactory.property()
+  public open val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.orNull.equals(element.relativePath.pathString, ignoreCase = true)

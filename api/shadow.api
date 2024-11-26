@@ -372,17 +372,17 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicen
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getAddHeader ()Lorg/gradle/api/provider/Property;
-	public final fun getCopyright ()Lorg/gradle/api/provider/Property;
-	public final fun getEncoding ()Lorg/gradle/api/provider/Property;
-	public final fun getInceptionYear ()Lorg/gradle/api/provider/Property;
+	public fun getAddHeader ()Lorg/gradle/api/provider/Property;
+	public fun getCopyright ()Lorg/gradle/api/provider/Property;
+	public fun getEncoding ()Lorg/gradle/api/provider/Property;
+	public fun getInceptionYear ()Lorg/gradle/api/provider/Property;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public final fun getOrganizationName ()Lorg/gradle/api/provider/Property;
-	public final fun getOrganizationURL ()Lorg/gradle/api/provider/Property;
-	public final fun getPreamble1 ()Lorg/gradle/api/provider/Property;
-	public final fun getPreamble2 ()Lorg/gradle/api/provider/Property;
-	public final fun getPreamble3 ()Lorg/gradle/api/provider/Property;
-	public final fun getProjectName ()Lorg/gradle/api/provider/Property;
+	public fun getOrganizationName ()Lorg/gradle/api/provider/Property;
+	public fun getOrganizationURL ()Lorg/gradle/api/provider/Property;
+	public fun getPreamble1 ()Lorg/gradle/api/provider/Property;
+	public fun getPreamble2 ()Lorg/gradle/api/provider/Property;
+	public fun getPreamble3 ()Lorg/gradle/api/provider/Property;
+	public fun getProjectName ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -392,7 +392,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTr
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public final fun getResource ()Lorg/gradle/api/provider/Property;
+	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -419,7 +419,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/DontInclude
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public final fun getResource ()Lorg/gradle/api/provider/Property;
+	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -436,10 +436,10 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExten
 public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public fun getFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public final fun getResource ()Lorg/gradle/api/provider/Property;
+	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -457,7 +457,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer;
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getAttributes ()Lorg/gradle/api/provider/ListProperty;
+	public fun getAttributes ()Lorg/gradle/api/provider/ListProperty;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
@@ -468,8 +468,8 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun attributes (Ljava/util/Map;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer;
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getMainClass ()Lorg/gradle/api/provider/Property;
-	public final fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
+	public fun getMainClass ()Lorg/gradle/api/provider/Property;
+	public fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
@@ -487,13 +487,13 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/NoOpT
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getCharset ()Lorg/gradle/api/provider/Property;
-	public final fun getKeyTransformer ()Lorg/gradle/api/provider/Property;
-	public final fun getMappings ()Lorg/gradle/api/provider/MapProperty;
-	public final fun getMergeSeparator ()Lorg/gradle/api/provider/Property;
-	public final fun getMergeStrategy ()Lorg/gradle/api/provider/Property;
+	public fun getCharset ()Lorg/gradle/api/provider/Property;
+	public fun getKeyTransformer ()Lorg/gradle/api/provider/Property;
+	public fun getMappings ()Lorg/gradle/api/provider/MapProperty;
+	public fun getMergeSeparator ()Lorg/gradle/api/provider/Property;
+	public fun getMergeStrategy ()Lorg/gradle/api/provider/Property;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public final fun getPaths ()Lorg/gradle/api/provider/ListProperty;
+	public fun getPaths ()Lorg/gradle/api/provider/ListProperty;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -584,9 +584,9 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendin
 	public static final field XSI_NS Ljava/lang/String;
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getIgnoreDtd ()Lorg/gradle/api/provider/Property;
+	public fun getIgnoreDtd ()Lorg/gradle/api/provider/Property;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public final fun getResource ()Lorg/gradle/api/provider/Property;
+	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V

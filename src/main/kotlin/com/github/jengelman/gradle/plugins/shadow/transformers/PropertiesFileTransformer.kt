@@ -105,31 +105,31 @@ public open class PropertiesFileTransformer @Inject constructor(
   private val _charset get() = Charset.forName(charset.get())
 
   @get:Input
-  public val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
+  public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
 
   @Suppress("UNCHECKED_CAST")
   @get:Input
-  public val mappings: MapProperty<String, Map<String, String>> =
+  public open val mappings: MapProperty<String, Map<String, String>> =
     objectFactory.mapProperty(String::class.java, Map::class.java) as MapProperty<String, Map<String, String>>
 
   /**
    * Optional values: first, latest, append.
    */
   @get:Input
-  public val mergeStrategy: Property<String> = objectFactory.property("first")
+  public open val mergeStrategy: Property<String> = objectFactory.property("first")
 
   @get:Input
-  public val mergeSeparator: Property<String> = objectFactory.property(",")
+  public open val mergeSeparator: Property<String> = objectFactory.property(",")
 
   @get:Input
-  public val charset: Property<String> = objectFactory.property("ISO_8859_1")
+  public open val charset: Property<String> = objectFactory.property("ISO_8859_1")
 
   /**
    * Use [java.util.function.Function] here for compatibility with Groovy and Java.
    */
   @Suppress("UNCHECKED_CAST")
   @get:Internal
-  public val keyTransformer: Property<Closure<String>> =
+  public open val keyTransformer: Property<Closure<String>> =
     objectFactory.property(IDENTITY) as Property<Closure<String>>
 
   override fun canTransformResource(element: FileTreeElement): Boolean {

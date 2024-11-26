@@ -20,7 +20,7 @@ public open class DontIncludeResourceTransformer @Inject constructor(
 ) : Transformer by NoOpTransformer {
   @get:Optional
   @get:Input
-  public val resource: Property<String> = objectFactory.property()
+  public open val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString

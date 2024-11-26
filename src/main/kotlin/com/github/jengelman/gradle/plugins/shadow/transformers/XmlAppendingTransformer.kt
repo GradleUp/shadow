@@ -33,11 +33,11 @@ public open class XmlAppendingTransformer @Inject constructor(
   private var doc: Document? = null
 
   @get:Input
-  public val ignoreDtd: Property<Boolean> = objectFactory.property(true)
+  public open val ignoreDtd: Property<Boolean> = objectFactory.property(true)
 
   @get:Optional
   @get:Input
-  public val resource: Property<String> = objectFactory.property()
+  public open val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.orNull?.equals(element.relativePath.pathString, ignoreCase = true) == true
