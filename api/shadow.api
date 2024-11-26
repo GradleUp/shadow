@@ -465,15 +465,14 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun attributes (Ljava/util/Map;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer;
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getMainClass ()Ljava/lang/String;
-	public final fun getManifestEntries ()Ljava/util/Map;
+	public final fun getMainClass ()Lorg/gradle/api/provider/Property;
+	public final fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public final fun setMainClass (Ljava/lang/String;)V
-	public final fun setManifestEntries (Ljava/util/Map;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
