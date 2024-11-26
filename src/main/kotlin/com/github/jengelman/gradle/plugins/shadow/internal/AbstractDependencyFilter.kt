@@ -22,16 +22,15 @@ internal sealed class AbstractDependencyFilter(
     excludedDependencies: MutableSet<ResolvedDependency>,
   )
 
-  override fun resolve(configuration: FileCollection): FileCollection {
+  override fun resolve(configuration: Configuration): FileCollection {
     val includedDeps = mutableSetOf<ResolvedDependency>()
     val excludedDeps = mutableSetOf<ResolvedDependency>()
-    configuration as Configuration
     resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, includedDeps, excludedDeps)
     return project.files(configuration.files) -
       project.files(excludedDeps.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
   }
 
-  override fun resolve(configurations: Collection<FileCollection>): FileCollection {
+  override fun resolve(configurations: Collection<Configuration>): FileCollection {
     return configurations.map { resolve(it) }
       .reduceOrNull { acc, fileCollection -> acc + fileCollection }
       ?: project.files()

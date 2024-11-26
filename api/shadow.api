@@ -100,7 +100,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/inter
 	public abstract fun project (Ljava/lang/String;)Lorg/gradle/api/specs/Spec;
 	public abstract fun project (Ljava/util/Map;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
-	public abstract fun resolve (Lorg/gradle/api/file/FileCollection;)Lorg/gradle/api/file/FileCollection;
+	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor : org/gradle/api/internal/file/archive/compression/ArchiveOutputStreamFactory {

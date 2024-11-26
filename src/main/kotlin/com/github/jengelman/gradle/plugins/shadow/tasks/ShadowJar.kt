@@ -18,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import java.util.jar.JarFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
@@ -117,7 +118,7 @@ public abstract class ShadowJar :
 
   @get:Classpath
   @get:Optional
-  public abstract val configurations: ListProperty<FileCollection>
+  public abstract val configurations: ListProperty<Configuration>
 
   @get:Internal
   public abstract val dependencyFilter: Property<DependencyFilter>
@@ -272,7 +273,8 @@ public abstract class ShadowJar :
       if (!enableRelocation.get()) return emptyList()
 
       val prefix = relocationPrefix.get()
-      return configurations.get().flatMap { configuration ->
+      // Must cast configurations to List<FileCollection> to fix type mismatch in runtime.
+      return (configurations.get() as List<FileCollection>).flatMap { configuration ->
         configuration.files.flatMap { file ->
           JarFile(file).use { jarFile ->
             jarFile.entries().toList()
