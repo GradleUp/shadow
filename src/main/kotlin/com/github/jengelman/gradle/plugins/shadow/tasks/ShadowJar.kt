@@ -92,6 +92,9 @@ public abstract class ShadowJar :
     }
   }
 
+  @get:Classpath
+  public abstract val includedDependencies: ConfigurableFileCollection
+
   @get:Internal
   public val rootPatternSet: PatternSet
     get() = (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
@@ -106,15 +109,6 @@ public abstract class ShadowJar :
       }
     }
 
-  @get:Input
-  public abstract val enableRelocation: Property<Boolean>
-
-  @get:Input
-  public abstract val relocationPrefix: Property<String>
-
-  @get:Input
-  public abstract val minimizeJar: Property<Boolean>
-
   @get:Nested
   public abstract val transformers: ListProperty<Transformer>
 
@@ -128,8 +122,14 @@ public abstract class ShadowJar :
   @get:Internal
   public abstract val dependencyFilter: Property<DependencyFilter>
 
-  @get:Classpath
-  public abstract val includedDependencies: ConfigurableFileCollection
+  @get:Input
+  public abstract val enableRelocation: Property<Boolean>
+
+  @get:Input
+  public abstract val relocationPrefix: Property<String>
+
+  @get:Input
+  public abstract val minimizeJar: Property<Boolean>
 
   @Internal
   override fun getManifest(): InheritManifest = super.manifest as InheritManifest

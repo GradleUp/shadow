@@ -95,12 +95,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       shadow.minimizeJar.convention(false)
       shadow.relocationPrefix.convention(ShadowBasePlugin.SHADOW)
       shadow.dependencyFilter.convention(DefaultDependencyFilter(project))
+      shadow.configurations.convention(listOf(project.runtimeConfiguration))
       shadow.includedDependencies.setFrom(shadow.dependencyFilter.map { it.resolve(shadow.configurations.get()) })
-      shadow.configurations.convention(
-        listOf(
-          project.runtimeConfiguration,
-        ),
-      )
       shadow.exclude(
         "META-INF/INDEX.LIST",
         "META-INF/*.SF",
