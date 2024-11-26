@@ -328,7 +328,8 @@ public abstract class ShadowJar :
 
   private fun configureRelocation() {
     val packages = mutableSetOf<String>()
-    configurations.forEach { configuration ->
+    // Must cast configurations to List<FileCollection> to fix type mismatch in runtime.
+    (configurations as List<FileCollection>).forEach { configuration ->
       configuration.files.forEach { jarFile ->
         JarFile(jarFile).use { jf ->
           jf.entries().asSequence().forEach { entry ->
