@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import com.github.jengelman.gradle.plugins.shadow.util.repo.AbstractModule
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlParser
+
 import java.text.SimpleDateFormat
 
 abstract class AbstractMavenModule extends AbstractModule implements MavenModule {
@@ -166,7 +167,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         for (name in artifactNames) {
             assert actual.remove(name)
 
-            if(publishesHashFiles()) {
+            if (publishesHashFiles()) {
                 assert actual.remove("${name}.md5" as String)
                 assert actual.remove("${name}.sha1" as String)
             }
@@ -299,7 +300,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
                         }
                     } else {
                         versions {
-                            allVersions.each {currVersion ->
+                            allVersions.each { currVersion ->
                                 version(currVersion)
                             }
                         }
@@ -339,5 +340,6 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     }
 
     protected abstract boolean publishesMetaDataFile()
+
     protected abstract boolean publishesHashFiles()
 }

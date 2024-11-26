@@ -8,33 +8,33 @@ import java.nio.file.Path;
 
 public class TestCodeSnippet implements Executable {
 
-    private final Path tempDir;
-    private final String snippet;
-    private final String testName;
-    private final SnippetExecuter executer;
-    private final ExceptionTransformer exceptionTransformer;
+  private final Path tempDir;
+  private final String snippet;
+  private final String testName;
+  private final SnippetExecuter executer;
+  private final ExceptionTransformer exceptionTransformer;
 
-    public TestCodeSnippet(Path tempDir, String snippet, String testName, SnippetExecuter executer, ExceptionTransformer exceptionTransformer) {
-        this.tempDir = tempDir;
-        this.snippet = snippet;
-        this.testName = testName;
-        this.executer = executer;
-        this.exceptionTransformer = exceptionTransformer;
-    }
+  public TestCodeSnippet(Path tempDir, String snippet, String testName, SnippetExecuter executer, ExceptionTransformer exceptionTransformer) {
+    this.tempDir = tempDir;
+    this.snippet = snippet;
+    this.testName = testName;
+    this.executer = executer;
+    this.exceptionTransformer = exceptionTransformer;
+  }
 
-    public String getSnippet() {
-        return snippet;
-    }
+  public String getSnippet() {
+    return snippet;
+  }
 
-    public String getTestName() {
-        return testName;
-    }
+  public String getTestName() {
+    return testName;
+  }
 
-    public void execute() throws Throwable {
-        try {
-            executer.execute(tempDir.toFile(), this);
-        } catch (Throwable t) {
-            throw exceptionTransformer.transform(t, executer.getFixture().getOffset());
-        }
+  public void execute() throws Throwable {
+    try {
+      executer.execute(tempDir.toFile(), this);
+    } catch (Throwable t) {
+      throw exceptionTransformer.transform(t, executer.getFixture().getOffset());
     }
+  }
 }

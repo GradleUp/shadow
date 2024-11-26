@@ -11,12 +11,12 @@ class FilteringSpec extends PluginSpecification {
     @Override
     def setup() {
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
         repo.module('shadow', 'b', '1.0')
-                .insertFile('b.properties', 'b')
-                .publish()
+            .insertFile('b.properties', 'b')
+            .publish()
 
         buildFile << """
             dependencies {
@@ -58,19 +58,19 @@ class FilteringSpec extends PluginSpecification {
     def "exclude dependency"() {
         given:
         repo.module('shadow', 'c', '1.0')
-                .insertFile('c.properties', 'c')
-                .publish()
+            .insertFile('c.properties', 'c')
+            .publish()
         repo.module('shadow', 'd', '1.0')
-                .insertFile('d.properties', 'd')
-                .dependsOn('c')
-                .publish()
+            .insertFile('d.properties', 'd')
+            .dependsOn('c')
+            .publish()
 
         buildFile << '''
             // tag::excludeDep[]
             dependencies {
                implementation 'shadow:d:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
@@ -93,19 +93,19 @@ class FilteringSpec extends PluginSpecification {
     def "exclude dependency using wildcard syntax"() {
         given:
         repo.module('shadow', 'c', '1.0')
-                .insertFile('c.properties', 'c')
-                .publish()
+            .insertFile('c.properties', 'c')
+            .publish()
         repo.module('shadow', 'd', '1.0')
-                .insertFile('d.properties', 'd')
-                .dependsOn('c')
-                .publish()
+            .insertFile('d.properties', 'd')
+            .dependsOn('c')
+            .publish()
 
         buildFile << '''
             // tag::excludeDepWildcard[]
             dependencies {
                implementation 'shadow:d:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:.*'))
@@ -129,18 +129,18 @@ class FilteringSpec extends PluginSpecification {
     def "dependency exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
-                .insertFile('c.properties', 'c')
-                .publish()
+            .insertFile('c.properties', 'c')
+            .publish()
         repo.module('shadow', 'd', '1.0')
-                .insertFile('d.properties', 'd')
-                .dependsOn('c')
-                .publish()
+            .insertFile('d.properties', 'd')
+            .dependsOn('c')
+            .publish()
 
         buildFile << '''
             dependencies {
                implementation 'shadow:d:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
@@ -159,7 +159,7 @@ class FilteringSpec extends PluginSpecification {
 
         when: 'Update build file shadowJar dependency exclusion'
         buildFile.text = buildFile.text.replace('exclude(dependency(\'shadow:d:1.0\'))',
-                                                'exclude(dependency(\'shadow:c:1.0\'))')
+            'exclude(dependency(\'shadow:c:1.0\'))')
 
         BuildResult result = run('shadowJar')
 
@@ -178,18 +178,18 @@ class FilteringSpec extends PluginSpecification {
     def "project exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
-                .insertFile('c.properties', 'c')
-                .publish()
+            .insertFile('c.properties', 'c')
+            .publish()
         repo.module('shadow', 'd', '1.0')
-                .insertFile('d.properties', 'd')
-                .dependsOn('c')
-                .publish()
+            .insertFile('d.properties', 'd')
+            .dependsOn('c')
+            .publish()
 
         buildFile << '''
             dependencies {
                implementation 'shadow:d:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
@@ -228,12 +228,12 @@ class FilteringSpec extends PluginSpecification {
     def "include dependency, excluding all others"() {
         given:
         repo.module('shadow', 'c', '1.0')
-                .insertFile('c.properties', 'c')
-                .publish()
+            .insertFile('c.properties', 'c')
+            .publish()
         repo.module('shadow', 'd', '1.0')
-                .insertFile('d.properties', 'd')
-                .dependsOn('c')
-                .publish()
+            .insertFile('d.properties', 'd')
+            .dependsOn('c')
+            .publish()
 
         file('src/main/java/shadow/Passed.java') << '''
             package shadow;
@@ -244,7 +244,7 @@ class FilteringSpec extends PluginSpecification {
             dependencies {
                implementation 'shadow:d:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                    include(dependency('shadow:d:1.0'))
@@ -293,7 +293,7 @@ class FilteringSpec extends PluginSpecification {
             dependencies {
               implementation project(':client')
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                    exclude(project(':client'))
@@ -310,7 +310,7 @@ class FilteringSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         doesNotContain(serverOutput, [
-                'client/Client.class',
+            'client/Client.class',
         ])
 
         and:
@@ -364,13 +364,13 @@ class FilteringSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         doesNotContain(serverOutput, [
-                'junit/framework/Test.class'
+            'junit/framework/Test.class'
         ])
 
         and:
         contains(serverOutput, [
-                'client/Client.class',
-                'server/Server.class'])
+            'client/Client.class',
+            'server/Server.class'])
     }
 
     //http://mail-archives.apache.org/mod_mbox/ant-user/200506.mbox/%3C001d01c57756$6dc35da0$dc00a8c0@CTEGDOMAIN.COM%3E
@@ -400,19 +400,19 @@ class FilteringSpec extends PluginSpecification {
     def "handle exclude with circular dependency"() {
         given:
         repo.module('shadow', 'c', '1.0')
-                .insertFile('c.properties', 'c')
-                .dependsOn('d')
-                .publish()
+            .insertFile('c.properties', 'c')
+            .dependsOn('d')
+            .publish()
         repo.module('shadow', 'd', '1.0')
-                .insertFile('d.properties', 'd')
-                .dependsOn('c')
-                .publish()
+            .insertFile('d.properties', 'd')
+            .dependsOn('c')
+            .publish()
 
         buildFile << '''
             dependencies {
                implementation 'shadow:d:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
