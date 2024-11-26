@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Named
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 
 /**
@@ -21,6 +22,10 @@ public interface Transformer : Named {
   public fun hasTransformedResource(): Boolean
 
   public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
+
+  @get:Internal
+  public val objectFactory: ObjectFactory
+    get() = throw NotImplementedError("You have to make sure this has been implemented or injected.")
 
   @Internal
   override fun getName(): String = this::class.java.simpleName
