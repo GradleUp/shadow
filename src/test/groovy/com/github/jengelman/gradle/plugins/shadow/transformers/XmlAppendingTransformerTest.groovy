@@ -45,12 +45,12 @@ class XmlAppendingTransformerTest extends TransformerTestSupport<XmlAppendingTra
 
     @BeforeEach
     void setUp() {
-        transformer = new XmlAppendingTransformer()
+        transformer = new XmlAppendingTransformer(objectFactory)
     }
 
     @Test
     void testCanTransformResource() {
-        transformer.resource = "abcdefghijklmnopqrstuvwxyz"
+        transformer.resource.set("abcdefghijklmnopqrstuvwxyz")
 
         assertTrue(transformer.canTransformResource(getFileElement("abcdefghijklmnopqrstuvwxyz")))
         assertTrue(transformer.canTransformResource(getFileElement("ABCDEFGHIJKLMNOPQRSTUVWXYZ")))

@@ -587,14 +587,13 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 public class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer$Companion;
 	public static final field XSI_NS Ljava/lang/String;
-	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getIgnoreDtd ()Z
-	public final fun getResource ()Ljava/lang/String;
+	public final fun getIgnoreDtd ()Lorg/gradle/api/provider/Property;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public final fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public final fun setIgnoreDtd (Z)V
-	public final fun setResource (Ljava/lang/String;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
