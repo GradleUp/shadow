@@ -20,6 +20,7 @@ import java.util.concurrent.Callable
 import java.util.jar.JarFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.DocumentationRegistry
@@ -47,7 +48,7 @@ public abstract class ShadowJar :
   ShadowSpec {
   private val _transformers = mutableListOf<Transformer>()
   private val _relocators = mutableListOf<Relocator>()
-  private val _configurations = mutableListOf<FileCollection>()
+  private val _configurations = mutableListOf<Configuration>()
   private val _stats = ShadowStats()
   private val _includedDependencies = project.files(Callable { _dependencyFilter.resolve(_configurations) })
 
@@ -158,7 +159,7 @@ public abstract class ShadowJar :
 
   @get:Classpath
   @get:Optional
-  public var configurations: List<FileCollection>
+  public var configurations: List<Configuration>
     get() = _configurations
     set(value) {
       _configurations.clear()
@@ -327,7 +328,8 @@ public abstract class ShadowJar :
 
   private fun configureRelocation() {
     val packages = mutableSetOf<String>()
-    configurations.forEach { configuration ->
+    // Must cast configurations to List<FileCollection> to fix type mismatch in runtime.
+    (configurations as List<FileCollection>).forEach { configuration ->
       configuration.files.forEach { jarFile ->
         JarFile(jarFile).use { jf ->
           jf.entries().asSequence().forEach { entry ->
