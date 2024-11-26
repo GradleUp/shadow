@@ -434,16 +434,14 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExten
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getFile ()Ljava/io/File;
+	public final fun getFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public final fun getResource ()Ljava/lang/String;
+	public final fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public final fun setFile (Ljava/io/File;)V
-	public final fun setResource (Ljava/lang/String;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
