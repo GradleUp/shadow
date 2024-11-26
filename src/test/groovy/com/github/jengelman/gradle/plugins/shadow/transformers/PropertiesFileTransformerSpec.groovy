@@ -19,9 +19,9 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import spock.lang.Unroll
 
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import java.nio.charset.Charset
 
 import static groovy.lang.Closure.IDENTITY
