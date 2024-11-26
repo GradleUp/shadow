@@ -177,7 +177,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   private fun transformKeys(properties: Properties): CleanProperties {
-    if (keyTransformer === IDENTITY) {
+    if (keyTransformer == IDENTITY) {
       return properties as CleanProperties
     }
     val result = CleanProperties()
