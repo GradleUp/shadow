@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy.values
 import groovy.lang.Closure
 import groovy.lang.Closure.IDENTITY
 import java.io.ByteArrayOutputStream
@@ -112,11 +113,8 @@ public open class PropertiesFileTransformer @Inject constructor(
   public open val mappings: MapProperty<String, Map<String, String>> =
     objectFactory.mapProperty(String::class.java, Map::class.java) as MapProperty<String, Map<String, String>>
 
-  /**
-   * Optional values: first, latest, append.
-   */
   @get:Input
-  public open val mergeStrategy: Property<String> = objectFactory.property("first")
+  public open val mergeStrategy: Property<MergeStrategy> = objectFactory.property(MergeStrategy.First)
 
   @get:Input
   public open val mergeSeparator: Property<String> = objectFactory.property(",")
@@ -156,11 +154,10 @@ public open class PropertiesFileTransformer @Inject constructor(
     } else {
       for ((key, value) in incoming) {
         if (props.containsKey(key)) {
-          when (mergeStrategyFor(context.path).lowercase()) {
-            "latest" -> props[key] = value
-            "append" -> props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
-            "first" -> Unit
-            else -> Unit
+          when (MergeStrategy.from(mergeStrategyFor(context.path))) {
+            MergeStrategy.Latest -> props[key] = value
+            MergeStrategy.Append -> props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
+            MergeStrategy.First -> Unit
           }
         } else {
           props[key] = value
@@ -189,7 +186,7 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   private fun mergeStrategyFor(path: String): String {
     val mappings = mappings.get()
-    val mergeStrategy = mergeStrategy.get()
+    val mergeStrategy = mergeStrategy.get().name
 
     mappings[path]?.let {
       return it["mergeStrategy"] ?: mergeStrategy
@@ -242,6 +239,21 @@ public open class PropertiesFileTransformer @Inject constructor(
       store(writer, "")
     }
     return os.toByteArray().inputStream().reader(_charset)
+  }
+
+  public enum class MergeStrategy {
+    First,
+    Latest,
+    Append,
+    ;
+
+    public companion object {
+      @JvmStatic
+      public fun from(value: String): MergeStrategy {
+        return values().find { it.name.equals(value, ignoreCase = true) }
+          ?: throw IllegalArgumentException("Unknown merge strategy: $value")
+      }
+    }
   }
 
   private companion object {

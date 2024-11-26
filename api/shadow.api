@@ -499,6 +499,21 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesF
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy : java/lang/Enum {
+	public static final field Append Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy$Companion;
+	public static final field First Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+	public static final field Latest Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+	public static final fun from (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+	public static fun values ()[Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy$Companion {
+	public final fun from (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer, org/gradle/api/tasks/util/PatternFilterable {
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V

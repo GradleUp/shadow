@@ -21,6 +21,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import spock.lang.Unroll
 
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+
 import static groovy.lang.Closure.IDENTITY
 
 @Unroll
@@ -49,7 +51,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         given:
         def element = getFileElement(path)
         Transformer transformer = new PropertiesFileTransformer(objectFactory)
-        transformer.mergeStrategy.set(mergeStrategy)
+        transformer.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
         transformer.mergeSeparator.set(mergeSeparator)
 
         when:
@@ -74,7 +76,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         def element = getFileElement(path)
         Transformer transformer = new PropertiesFileTransformer(objectFactory)
         transformer.paths.set(paths)
-        transformer.mergeStrategy.set('first')
+        transformer.mergeStrategy.set(MergeStrategy.from('first'))
 
         when:
         if (transformer.canTransformResource(element)) {
@@ -98,7 +100,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         def element = getFileElement(path)
         Transformer transformer = new PropertiesFileTransformer(objectFactory)
         transformer.mappings.set(mappings)
-        transformer.mergeStrategy.set('latest')
+        transformer.mergeStrategy.set(MergeStrategy.from('latest'))
 
         when:
         if (transformer.canTransformResource(element)) {
@@ -124,7 +126,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         def element = getFileElement(path)
         Transformer transformer = new PropertiesFileTransformer(objectFactory)
         transformer.keyTransformer.set(keyTransformer)
-        transformer.mergeStrategy.set('append')
+        transformer.mergeStrategy.set(MergeStrategy.from('append'))
 
         when:
         if (transformer.canTransformResource(element)) {
