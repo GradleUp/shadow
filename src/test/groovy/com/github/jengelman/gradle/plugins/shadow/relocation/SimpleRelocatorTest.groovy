@@ -63,8 +63,8 @@ class SimpleRelocatorTest {
         assertEquals(false, relocator.canRelocatePath("/org/Foo/Class"))
         assertEquals(false, relocator.canRelocatePath("/org/Foo/Class.class"))
 
-        relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
-            ["org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"] as String[]))
+        relocator = new SimpleRelocator("org.foo", null, null,
+            List.of("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"))
         assertEquals(true, relocator.canRelocatePath("org/foo/Class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/Class.class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/excluded"))
@@ -126,7 +126,7 @@ class SimpleRelocatorTest {
 
         // Include with Regex and normal pattern
         relocator = new SimpleRelocator("org.foo", null,
-            Arrays.asList("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"), null)
+            List.of("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"))
         assertEquals(true, relocator.canRelocatePath("org/foo/Factory1.class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/public/Bar.class"))
         assertEquals(false, relocator.canRelocatePath("org/foo/Factory.class"))
@@ -143,8 +143,8 @@ class SimpleRelocatorTest {
         assertEquals(false, relocator.canRelocateClass("com.foo.bar.Class"))
         assertEquals(false, relocator.canRelocateClass("org.Foo.Class"))
 
-        relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
-            ["org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"] as String[]))
+        relocator = new SimpleRelocator("org.foo", null, null,
+            List.of("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"))
         assertEquals(true, relocator.canRelocateClass("org.foo.Class"))
         assertEquals(true, relocator.canRelocateClass("org.foo.excluded"))
         assertEquals(false, relocator.canRelocateClass("org.foo.Excluded"))
