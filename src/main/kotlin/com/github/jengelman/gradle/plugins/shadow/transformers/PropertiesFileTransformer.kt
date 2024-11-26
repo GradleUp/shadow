@@ -103,7 +103,6 @@ public open class PropertiesFileTransformer @Inject constructor(
   override val objectFactory: ObjectFactory,
 ) : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
-  private val _charset get() = Charset.forName(charset.get())
 
   @get:Input
   public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
@@ -120,7 +119,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   public open val mergeSeparator: Property<String> = objectFactory.property(",")
 
   @get:Input
-  public open val charset: Property<String> = objectFactory.property("ISO_8859_1")
+  public open val charset: Property<Charset> = objectFactory.property(Charsets.ISO_8859_1)
 
   /**
    * Use [java.util.function.Function] here for compatibility with Groovy and Java.
@@ -169,7 +168,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   private fun loadAndTransformKeys(inputStream: InputStream): CleanProperties {
     val props = CleanProperties()
     // InputStream closed by caller, so we don't do it here.
-    props.load(inputStream.reader(_charset))
+    props.load(inputStream.reader(charset.get()))
     return transformKeys(props)
   }
 
@@ -220,7 +219,7 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     // cannot close the writer as the OutputStream needs to remain open
-    val zipWriter = os.writer(_charset)
+    val zipWriter = os.writer(charset.get())
     propertiesEntries.forEach { (path, props) ->
       val entry = ZipEntry(path)
       entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
@@ -235,10 +234,10 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   private fun Properties.toReader(): InputStreamReader {
     val os = ByteArrayOutputStream()
-    os.writer(_charset).use { writer ->
+    os.writer(charset.get()).use { writer ->
       store(writer, "")
     }
-    return os.toByteArray().inputStream().reader(_charset)
+    return os.toByteArray().inputStream().reader(charset.get())
   }
 
   public enum class MergeStrategy {

@@ -373,8 +373,8 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNotic
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAddHeader ()Lorg/gradle/api/provider/Property;
+	public fun getCharset ()Lorg/gradle/api/provider/Property;
 	public fun getCopyright ()Lorg/gradle/api/provider/Property;
-	public fun getEncoding ()Lorg/gradle/api/provider/Property;
 	public fun getInceptionYear ()Lorg/gradle/api/provider/Property;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getOrganizationName ()Lorg/gradle/api/provider/Property;
