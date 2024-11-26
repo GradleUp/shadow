@@ -109,18 +109,6 @@ public abstract class ShadowJar :
   @get:Input
   public abstract val enableRelocation: Property<Boolean>
 
-  @Deprecated(
-    level = DeprecationLevel.WARNING,
-    message = "Use enableRelocation instead, this will be deleted in 9.0",
-    replaceWith = ReplaceWith("enableRelocation"),
-  )
-  @get:Input
-  public var isEnableRelocation: Boolean
-    get() = enableRelocation.get()
-    set(value) {
-      enableRelocation.set(value)
-    }
-
   @get:Input
   public abstract val relocationPrefix: Property<String>
 
