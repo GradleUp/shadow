@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.property
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
@@ -30,7 +31,7 @@ public open class AppendingTransformer @Inject constructor(
 
   @get:Optional
   @get:Input
-  public val resource: Property<String> = objectFactory.property(String::class.java)
+  public val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.orNull.equals(element.relativePath.pathString, ignoreCase = true)
