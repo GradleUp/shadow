@@ -555,6 +555,10 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/trans
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$DefaultImpls {
+	public static fun getName (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Ljava/lang/String;
+}
+
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;)V
