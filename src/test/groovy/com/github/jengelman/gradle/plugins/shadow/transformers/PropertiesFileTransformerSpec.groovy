@@ -22,8 +22,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import spock.lang.Unroll
 
-import java.nio.charset.Charset
-
 import static groovy.lang.Closure.IDENTITY
 
 @Unroll
@@ -150,7 +148,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         given:
         def element = getFileElement(path)
         def transformer = new PropertiesFileTransformer(objectFactory)
-        transformer.charset.set(Charset.forName(charset))
+        transformer.encoding.set(charset)
 
         when:
         if (transformer.canTransformResource(element)) {

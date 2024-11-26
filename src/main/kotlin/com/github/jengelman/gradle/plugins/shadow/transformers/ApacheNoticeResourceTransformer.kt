@@ -28,6 +28,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
 ) : Transformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
+  private val charset get() = Charset.forName(encoding.get())
 
   @get:Input
   public open val projectName: Property<String> = objectFactory.property("")
@@ -69,7 +70,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
    * The file encoding of the `NOTICE` file.
    */
   @get:Input
-  public open val charset: Property<Charset> = objectFactory.property(Charsets.UTF_8)
+  public open val encoding: Property<String> = objectFactory.property(Charsets.UTF_8.name())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
@@ -95,7 +96,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
       entries.add("${preamble3.get()}${organizationName.get()} (${organizationURL.get()}).\n")
     }
 
-    val reader = context.inputStream.bufferedReader(charset.get())
+    val reader = context.inputStream.bufferedReader(charset)
     var line = reader.readLine()
     val sb = StringBuffer()
     var currentOrg: MutableSet<String>? = null
@@ -150,7 +151,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
     zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)
     os.putNextEntry(zipEntry)
 
-    val writer = PrintWriter(os.writer(charset.get()))
+    val writer = PrintWriter(os.writer(charset))
 
     var count = 0
     for (line in entries) {
