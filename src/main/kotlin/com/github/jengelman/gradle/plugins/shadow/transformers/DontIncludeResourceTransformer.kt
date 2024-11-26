@@ -1,6 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.property
+import javax.inject.Inject
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
@@ -11,13 +15,15 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
-public open class DontIncludeResourceTransformer : Transformer by NoOpTransformer {
+public open class DontIncludeResourceTransformer @Inject constructor(
+  override val objectFactory: ObjectFactory,
+) : Transformer by NoOpTransformer {
   @get:Optional
   @get:Input
-  public var resource: String? = null
+  public val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
-    return !resource.isNullOrEmpty() && path.endsWith(resource!!)
+    return !resource.orNull.isNullOrEmpty() && path.endsWith(resource.get())
   }
 }
