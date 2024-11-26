@@ -39,7 +39,7 @@ class ApacheNoticeResourceTransformerParameterTests extends TransformerTestSuppo
 
     @BeforeEach
     void setUp() {
-        transformer = new ApacheNoticeResourceTransformer()
+        transformer = new ApacheNoticeResourceTransformer(objectFactory)
         stats = new ShadowStats()
     }
 

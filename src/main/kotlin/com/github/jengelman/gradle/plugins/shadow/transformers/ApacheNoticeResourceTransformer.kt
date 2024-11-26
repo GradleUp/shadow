@@ -1,14 +1,18 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.property
 import java.io.PrintWriter
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TreeSet
+import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
@@ -19,52 +23,56 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
-public open class ApacheNoticeResourceTransformer : Transformer {
+public open class ApacheNoticeResourceTransformer @Inject constructor(
+  override val objectFactory: ObjectFactory,
+) : Transformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
-  private val charset get() = if (encoding.isNullOrEmpty()) Charsets.UTF_8 else Charset.forName(encoding)
-
-  /**
-   * MSHADE-101 :: NullPointerException when projectName is missing
-   */
-  @get:Input
-  public var projectName: String = ""
+  private val charset
+    get() = if (encoding.orNull.isNullOrEmpty()) Charsets.UTF_8 else Charset.forName(encoding.get())
 
   @get:Input
-  public var addHeader: Boolean = true
+  public val projectName: Property<String> = objectFactory.property("")
 
   @get:Input
-  public var preamble1: String = """
-   // ------------------------------------------------------------------
-   // NOTICE file corresponding to the section 4d of The Apache License,
-   // Version 2.0, in this case for
-  """.trimIndent()
+  public val addHeader: Property<Boolean> = objectFactory.property(true)
 
   @get:Input
-  public var preamble2: String = "\n// ------------------------------------------------------------------\n"
+  public val preamble1: Property<String> = objectFactory.property(
+    """
+      // ------------------------------------------------------------------
+      // NOTICE file corresponding to the section 4d of The Apache License,
+      // Version 2.0, in this case for
+    """.trimIndent(),
+  )
 
   @get:Input
-  public var preamble3: String = "This product includes software developed at\n"
+  public val preamble2: Property<String> = objectFactory.property(
+    "\n// ------------------------------------------------------------------\n",
+  )
 
   @get:Input
-  public var organizationName: String = "The Apache Software Foundation"
+  public val preamble3: Property<String> = objectFactory.property("This product includes software developed at\n")
 
   @get:Input
-  public var organizationURL: String = "http://www.apache.org/"
+  public val organizationName: Property<String> = objectFactory.property("The Apache Software Foundation")
 
   @get:Input
-  public var inceptionYear: String = "2006"
+  public val organizationURL: Property<String> = objectFactory.property("http://www.apache.org/")
+
+  @get:Input
+  public val inceptionYear: Property<String> = objectFactory.property("2006")
 
   @get:Optional
   @get:Input
-  public var copyright: String? = null
+  public val copyright: Property<String> = objectFactory.property()
 
   /**
    * The file encoding of the `NOTICE` file.
    */
   @get:Optional
   @get:Input
-  public var encoding: String? = null
+  public val encoding: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
@@ -76,17 +84,18 @@ public open class ApacheNoticeResourceTransformer : Transformer {
   override fun transform(context: TransformerContext) {
     if (entries.isEmpty()) {
       val year = SimpleDateFormat("yyyy", Locale.US).format(Date()).let {
-        if (inceptionYear != it) "$inceptionYear-$it" else it
+        val iy = inceptionYear.get()
+        if (iy != it) "$iy-$it" else it
       }
       // add headers
-      if (addHeader) {
-        entries.add("$preamble1$projectName$preamble2")
+      if (addHeader.get()) {
+        entries.add("${preamble1.get()}${projectName.get()}${preamble2.get()}")
       } else {
         entries.add("")
       }
       // fake second entry, we'll look for a real one later
-      entries.add("$projectName\nCopyright $year $organizationName\n")
-      entries.add("$preamble3$organizationName ($organizationURL).\n")
+      entries.add("${projectName.get()}\nCopyright $year ${organizationName.get()}\n")
+      entries.add("${preamble3.get()}${organizationName.get()} (${organizationURL.get()}).\n")
     }
 
     val reader = context.inputStream.bufferedReader(charset)
@@ -112,8 +121,8 @@ public open class ApacheNoticeResourceTransformer : Transformer {
           lineCount++
         } else {
           val entry = sb.toString()
-          if (entry.startsWith(projectName) && entry.contains("Copyright ")) {
-            copyright = entry
+          if (entry.startsWith(projectName.get()) && entry.contains("Copyright ")) {
+            copyright.set(entry)
           }
           if (currentOrg == null) {
             entries.add(entry)
@@ -149,8 +158,8 @@ public open class ApacheNoticeResourceTransformer : Transformer {
     var count = 0
     for (line in entries) {
       count++
-      if (line == copyright && count != 2) continue
-      if (count == 2 && copyright != null) {
+      if (line == copyright.orNull && count != 2) continue
+      if (count == 2 && copyright.orNull != null) {
         writer.print(copyright)
         writer.print('\n')
       } else {

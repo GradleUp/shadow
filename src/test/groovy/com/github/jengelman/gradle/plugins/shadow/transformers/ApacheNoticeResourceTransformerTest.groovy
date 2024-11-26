@@ -45,7 +45,7 @@ class ApacheNoticeResourceTransformerTest extends TransformerTestSupport<ApacheN
 
     @BeforeEach
     void setUp() {
-        transformer = new ApacheNoticeResourceTransformer()
+        transformer = new ApacheNoticeResourceTransformer(objectFactory)
     }
 
     @Test

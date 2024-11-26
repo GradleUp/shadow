@@ -370,30 +370,21 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicen
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getAddHeader ()Z
-	public final fun getCopyright ()Ljava/lang/String;
-	public final fun getEncoding ()Ljava/lang/String;
-	public final fun getInceptionYear ()Ljava/lang/String;
-	public final fun getOrganizationName ()Ljava/lang/String;
-	public final fun getOrganizationURL ()Ljava/lang/String;
-	public final fun getPreamble1 ()Ljava/lang/String;
-	public final fun getPreamble2 ()Ljava/lang/String;
-	public final fun getPreamble3 ()Ljava/lang/String;
-	public final fun getProjectName ()Ljava/lang/String;
+	public final fun getAddHeader ()Lorg/gradle/api/provider/Property;
+	public final fun getCopyright ()Lorg/gradle/api/provider/Property;
+	public final fun getEncoding ()Lorg/gradle/api/provider/Property;
+	public final fun getInceptionYear ()Lorg/gradle/api/provider/Property;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public final fun getOrganizationName ()Lorg/gradle/api/provider/Property;
+	public final fun getOrganizationURL ()Lorg/gradle/api/provider/Property;
+	public final fun getPreamble1 ()Lorg/gradle/api/provider/Property;
+	public final fun getPreamble2 ()Lorg/gradle/api/provider/Property;
+	public final fun getPreamble3 ()Lorg/gradle/api/provider/Property;
+	public final fun getProjectName ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public final fun setAddHeader (Z)V
-	public final fun setCopyright (Ljava/lang/String;)V
-	public final fun setEncoding (Ljava/lang/String;)V
-	public final fun setInceptionYear (Ljava/lang/String;)V
-	public final fun setOrganizationName (Ljava/lang/String;)V
-	public final fun setOrganizationURL (Ljava/lang/String;)V
-	public final fun setPreamble1 (Ljava/lang/String;)V
-	public final fun setPreamble2 (Ljava/lang/String;)V
-	public final fun setPreamble3 (Ljava/lang/String;)V
-	public final fun setProjectName (Ljava/lang/String;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
