@@ -199,7 +199,7 @@ public abstract class ShadowJar :
   override fun append(resourcePath: String): ShadowJar {
     return runCatching {
       transform(AppendingTransformer::class.java) {
-        it.resource = resourcePath
+        it.resource.set(resourcePath)
       }
     }.getOrDefault(this)
   }

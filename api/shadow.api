@@ -363,6 +363,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicen
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getName ()Ljava/lang/String;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -397,12 +398,12 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNotic
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getResource ()Ljava/lang/String;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public final fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public final fun setResource (Ljava/lang/String;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -426,6 +427,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/DontInclude
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getName ()Ljava/lang/String;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public final fun getResource ()Ljava/lang/String;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
@@ -446,6 +448,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeReso
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun getFile ()Ljava/io/File;
 	public fun getName ()Ljava/lang/String;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public final fun getResource ()Ljava/lang/String;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
@@ -545,6 +548,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer : org/gradle/api/Named {
 	public abstract fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getName ()Ljava/lang/String;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public abstract fun hasTransformedResource ()Z
 	public abstract fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -552,6 +556,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/trans
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$DefaultImpls {
 	public static fun getName (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Ljava/lang/String;
+	public static fun getObjectFactory (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lorg/gradle/api/model/ObjectFactory;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext {

@@ -44,12 +44,12 @@ class AppendingTransformerTest extends TransformerTestSupport<AppendingTransform
 
     @BeforeEach
     void setUp() {
-        transformer = new AppendingTransformer()
+        transformer = new AppendingTransformer(objectFactory)
     }
 
     @Test
     void testCanTransformResource() {
-        transformer.resource = "abcdefghijklmnopqrstuvwxyz"
+        transformer.resource.set("abcdefghijklmnopqrstuvwxyz")
 
         assertTrue(transformer.canTransformResource(getFileElement("abcdefghijklmnopqrstuvwxyz")))
         assertTrue(transformer.canTransformResource(getFileElement("ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
