@@ -198,28 +198,6 @@ public abstract class ShadowJar :
     action?.execute(dependencyFilterForMinimize)
   }
 
-  override fun createCopyAction(): CopyAction {
-    val documentationRegistry = services.get(DocumentationRegistry::class.java)
-    val unusedTracker = if (minimizeJar) {
-      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
-    } else {
-      null
-    }
-    return ShadowCopyAction(
-      archiveFile.get().asFile,
-      internalCompressor,
-      documentationRegistry,
-      metadataCharset,
-      _transformers,
-      _relocators,
-      rootPatternSet,
-      _stats,
-      isPreserveFileTimestamps,
-      minimizeJar,
-      unusedTracker,
-    )
-  }
-
   override fun dependencies(action: Action<DependencyFilter>?): ShadowJar = apply {
     action?.execute(_dependencyFilter)
   }
@@ -280,7 +258,7 @@ public abstract class ShadowJar :
     destination: String,
     action: Action<SimpleRelocator>?,
   ): ShadowJar = apply {
-    val relocator = SimpleRelocator(pattern, destination, mutableListOf(), mutableListOf())
+    val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
   }
 
@@ -307,8 +285,30 @@ public abstract class ShadowJar :
     logger.info(_stats.toString())
   }
 
-  private fun <R : Relocator> addRelocator(relocator: R, configure: Action<R>?) {
-    configure?.execute(relocator)
+  override fun createCopyAction(): CopyAction {
+    val documentationRegistry = services.get(DocumentationRegistry::class.java)
+    val unusedTracker = if (minimizeJar) {
+      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+    } else {
+      null
+    }
+    return ShadowCopyAction(
+      archiveFile.get().asFile,
+      internalCompressor,
+      documentationRegistry,
+      metadataCharset,
+      _transformers,
+      _relocators,
+      rootPatternSet,
+      _stats,
+      isPreserveFileTimestamps,
+      minimizeJar,
+      unusedTracker,
+    )
+  }
+
+  private fun <R : Relocator> addRelocator(relocator: R, action: Action<R>?) {
+    action?.execute(relocator)
     _relocators.add(relocator)
   }
 

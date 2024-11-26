@@ -12,6 +12,7 @@ import org.gradle.api.tasks.Internal
  * @author Charlie Knudsen
  * @author John Engelman
  */
+@JvmDefaultWithCompatibility
 public interface Transformer : Named {
   public fun canTransformResource(element: FileTreeElement): Boolean
 

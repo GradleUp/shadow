@@ -15,7 +15,7 @@ import org.vafer.jdependency.ClazzpathUnit
 internal class UnusedTracker private constructor(
   classDirs: Iterable<File>,
   classJars: FileCollection,
-  private val _toMinimize: FileCollection,
+  @get:InputFiles val toMinimize: FileCollection,
 ) {
   private val projectUnits: List<ClazzpathUnit>
   private val cp = Clazzpath()
@@ -23,9 +23,6 @@ internal class UnusedTracker private constructor(
   init {
     projectUnits = classDirs.map { cp.addClazzpathUnit(it) } + classJars.map { cp.addClazzpathUnit(it) }
   }
-
-  @get:InputFiles
-  val toMinimize: FileCollection get() = _toMinimize
 
   fun findUnused(): Set<String> {
     val unused = cp.clazzes.toMutableSet()
@@ -37,7 +34,7 @@ internal class UnusedTracker private constructor(
   }
 
   fun addDependency(jarOrDir: File) {
-    if (_toMinimize.contains(jarOrDir)) {
+    if (toMinimize.contains(jarOrDir)) {
       cp.addClazzpathUnit(jarOrDir)
     }
   }

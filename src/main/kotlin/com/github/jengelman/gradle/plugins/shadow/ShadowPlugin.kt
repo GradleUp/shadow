@@ -11,9 +11,11 @@ public abstract class ShadowPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     project.run {
       plugins.apply(ShadowBasePlugin::class.java)
+      @Suppress("WithTypeWithoutConfigureEach")
       plugins.withType(JavaPlugin::class.java) {
         plugins.apply(ShadowJavaPlugin::class.java)
       }
+      @Suppress("WithTypeWithoutConfigureEach")
       plugins.withType(ApplicationPlugin::class.java) {
         plugins.apply(ShadowApplicationPlugin::class.java)
       }

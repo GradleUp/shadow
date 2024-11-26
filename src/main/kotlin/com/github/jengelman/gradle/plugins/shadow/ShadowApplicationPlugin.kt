@@ -50,8 +50,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.conventionMapping.map("jvmArgs") { javaApplication.applicationDefaultJvmArgs }
       it.jarFile.fileProvider(
-        project.providers.provider {
-          project.file("${install.get().destinationDir.path}/lib/${shadowJar.get().archiveFile.get().asFile.name}")
+        install.zip(shadowJar) { i, s ->
+          project.file("${i.destinationDir.path}/lib/${s.archiveFile.get().asFile.name}")
         },
       )
       val toolchain = project.extensions.getByType(JavaPluginExtension::class.java).toolchain
@@ -70,7 +70,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       it.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.classpath = project.files(shadowJar)
-      it.conventionMapping.map("mainClassName") { javaApplication.mainClass.get() }
+      it.mainClass.set(javaApplication.mainClass)
       it.conventionMapping.map("applicationName") { javaApplication.applicationName }
       it.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
       it.conventionMapping.map("defaultJvmOpts") { javaApplication.applicationDefaultJvmArgs }
@@ -100,7 +100,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.doLast {
         task.eachFile {
           if (it.path == "bin/${applicationName.get()}") {
-            it.mode = 0x755
+            it.permissions { permissions -> permissions.unix(755) }
           }
         }
       }

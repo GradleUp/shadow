@@ -181,6 +181,8 @@ public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocat
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator : com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -551,6 +553,10 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/trans
 	public abstract fun hasTransformedResource ()Z
 	public abstract fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$DefaultImpls {
+	public static fun getName (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Ljava/lang/String;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext {

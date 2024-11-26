@@ -4,6 +4,7 @@ import java.io.PrintWriter
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.TreeSet
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -74,7 +75,7 @@ public open class ApacheNoticeResourceTransformer : Transformer {
 
   override fun transform(context: TransformerContext) {
     if (entries.isEmpty()) {
-      val year = SimpleDateFormat("yyyy").format(Date()).let {
+      val year = SimpleDateFormat("yyyy", Locale.US).format(Date()).let {
         if (inceptionYear != it) "$inceptionYear-$it" else it
       }
       // add headers
