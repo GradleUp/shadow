@@ -98,11 +98,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         }
       }
       task.doLast {
-        task.eachFile { details ->
-          if (details.path == "bin/${applicationName.get()}") {
-            details.permissions {
-              it.unix(755)
-            }
+        task.eachFile {
+          if (it.path == "bin/${applicationName.get()}") {
+            it.permissions { permissions -> permissions.unix(755) }
           }
         }
       }
