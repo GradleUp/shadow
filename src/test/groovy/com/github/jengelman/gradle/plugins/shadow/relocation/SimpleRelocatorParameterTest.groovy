@@ -44,7 +44,7 @@ class SimpleRelocatorParameterTest {
 
     private static void constructThenFailOnNullPointerException(String pattern, String shadedPattern) {
         try {
-            new SimpleRelocator(pattern, shadedPattern, Collections.<String> emptyList(), Collections.<String> emptyList())
+            new SimpleRelocator(pattern, shadedPattern)
         }
         catch (NullPointerException ignored) {
             fail("Constructor should not throw null pointer exceptions")

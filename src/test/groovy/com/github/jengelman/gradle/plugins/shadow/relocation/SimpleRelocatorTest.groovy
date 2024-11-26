@@ -49,7 +49,7 @@ class SimpleRelocatorTest {
     void testCanRelocatePath() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("org.foo", null, null, null)
+        relocator = new SimpleRelocator("org.foo", null)
         assertEquals(true, relocator.canRelocatePath("org/foo/Class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/Class.class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/bar/Class"))
@@ -90,7 +90,7 @@ class SimpleRelocatorTest {
         assertEquals(false, relocator.canRelocatePath("org/foo/recurse/sub/Class.class"))
 
         // Verify edge cases
-        relocator = new SimpleRelocator("org.f", null, null, null)
+        relocator = new SimpleRelocator("org.f", null)
         assertEquals(false, relocator.canRelocatePath(""))       // Empty path
         assertEquals(false, relocator.canRelocatePath(".class")) // only .class
         assertEquals(false, relocator.canRelocatePath("te"))     // shorter than path pattern
@@ -115,7 +115,7 @@ class SimpleRelocatorTest {
         assertEquals(false, relocator.canRelocatePath("org/R\$string.class"))
 
         // Exclude with Regex
-        relocator = new SimpleRelocator("org.foo", null, null, null)
+        relocator = new SimpleRelocator("org.foo", null)
         relocator.exclude("%regex[org/foo/.*Factory[0-9].*]")
         assertEquals(true, relocator.canRelocatePath("org/foo/Factory.class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/FooFactoryMain.class"))
@@ -137,7 +137,7 @@ class SimpleRelocatorTest {
     void testCanRelocateClass() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("org.foo", null, null, null)
+        relocator = new SimpleRelocator("org.foo", null)
         assertEquals(true, relocator.canRelocateClass("org.foo.Class"))
         assertEquals(true, relocator.canRelocateClass("org.foo.bar.Class"))
         assertEquals(false, relocator.canRelocateClass("com.foo.bar.Class"))
@@ -176,7 +176,7 @@ class SimpleRelocatorTest {
     //MSHADE-119, make sure that the easy part of this works.
     @Test
     void testCanRelocateAbsClassPath() {
-        SimpleRelocator relocator = new SimpleRelocator("org.apache.velocity", "org.apache.momentum", null, null)
+        SimpleRelocator relocator = new SimpleRelocator("org.apache.velocity", "org.apache.momentum")
         assertEquals("/org/apache/momentum/mass.properties", relocator.relocatePath(pathContext("/org/apache/velocity/mass.properties")))
 
     }
@@ -185,10 +185,10 @@ class SimpleRelocatorTest {
     void testRelocatePath() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("org.foo", null, null, null)
+        relocator = new SimpleRelocator("org.foo", null)
         assertEquals("hidden/org/foo/bar/Class.class", relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
 
-        relocator = new SimpleRelocator("org.foo", "private.stuff", null, null)
+        relocator = new SimpleRelocator("org.foo", "private.stuff")
         assertEquals("private/stuff/bar/Class.class", relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
     }
 
@@ -196,10 +196,10 @@ class SimpleRelocatorTest {
     void testRelocateClass() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("org.foo", null, null, null)
+        relocator = new SimpleRelocator("org.foo", null)
         assertEquals("hidden.org.foo.bar.Class", relocator.relocateClass(classContext("org.foo.bar.Class")))
 
-        relocator = new SimpleRelocator("org.foo", "private.stuff", null, null)
+        relocator = new SimpleRelocator("org.foo", "private.stuff")
         assertEquals("private.stuff.bar.Class", relocator.relocateClass(classContext("org.foo.bar.Class")))
     }
 
