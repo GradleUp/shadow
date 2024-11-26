@@ -11,10 +11,10 @@ import org.gradle.api.specs.Spec
 import org.gradle.api.specs.Specs
 
 internal sealed class AbstractDependencyFilter(
-  private val project: Project,
+  @Transient private val project: Project,
+  @Transient protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
+  @Transient protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
 ) : DependencyFilter {
-  protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf()
-  protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf()
 
   protected abstract fun resolve(
     dependencies: Set<ResolvedDependency>,

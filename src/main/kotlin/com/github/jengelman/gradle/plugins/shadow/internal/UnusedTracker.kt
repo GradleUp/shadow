@@ -51,8 +51,7 @@ internal class UnusedTracker private constructor(
     fun getApiJarsFromProject(project: Project): FileCollection {
       val apiDependencies = project.configurations.findByName("api")?.dependencies
         ?: return project.files()
-      val runtimeConfiguration = project.configurations.findByName("runtimeClasspath")
-        ?: project.configurations.getByName("runtime")
+      val runtimeConfiguration = project.runtimeConfiguration
       val apiJars = mutableListOf<File>()
       apiDependencies.forEach { dep ->
         when (dep) {

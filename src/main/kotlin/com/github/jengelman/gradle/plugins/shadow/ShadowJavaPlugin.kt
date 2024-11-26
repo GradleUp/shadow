@@ -1,5 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.inject.Inject
 import org.gradle.api.Plugin
@@ -88,11 +90,13 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           shadow.manifest.attributes["Class-Path"] = attrs.joinToString(" ").trim()
         }
       }
-      shadow.from(sourceSets.getByName("main").output)
-      shadow.configurations = listOf(
-        project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
-          ?: project.configurations.getByName("runtime"),
-      )
+      shadow.from(sourceSets.named("main").map { it.output })
+      shadow.enableRelocation.convention(false)
+      shadow.minimizeJar.convention(false)
+      shadow.relocationPrefix.convention(ShadowBasePlugin.SHADOW)
+      shadow.dependencyFilter.convention(DefaultDependencyFilter(project))
+      shadow.configurations.convention(listOf(project.runtimeConfiguration))
+      shadow.includedDependencies.setFrom(shadow.dependencyFilter.map { it.resolve(shadow.configurations.get()) })
       shadow.exclude(
         "META-INF/INDEX.LIST",
         "META-INF/*.SF",

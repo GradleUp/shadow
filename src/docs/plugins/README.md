@@ -31,7 +31,7 @@ dependencies {
 }
 
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    enableRelocation true
+    enableRelocation = true
 }
 ```
 
