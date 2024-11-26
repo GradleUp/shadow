@@ -41,7 +41,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   public open val shadedPathPattern: Property<String> = objectFactory.property()
 
   @get:Input
-  public open val isRawString: Property<Boolean> = objectFactory.property(isRawString)
+  public open val rawString: Property<Boolean> = objectFactory.property(isRawString)
 
   @get:Input
   public open val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
@@ -84,7 +84,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun canRelocatePath(path: String): Boolean {
-    if (isRawString.get()) return Pattern.compile(pathPattern.get()).matcher(path).find()
+    if (rawString.get()) return Pattern.compile(pathPattern.get()).matcher(path).find()
     // If string is too short - no need to perform expensive string operations
     if (path.length < pathPattern.get().length) return false
     val adjustedPath = if (path.endsWith(".class")) {
@@ -101,13 +101,13 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun canRelocateClass(className: String): Boolean {
-    return !isRawString.get() && !className.contains('/') && canRelocatePath(className.replace('.', '/'))
+    return !rawString.get() && !className.contains('/') && canRelocatePath(className.replace('.', '/'))
   }
 
   override fun relocatePath(context: RelocatePathContext): String {
     val path = context.path
     context.stats.relocate(pathPattern.get(), shadedPathPattern.get())
-    return if (isRawString.get()) {
+    return if (rawString.get()) {
       path.replace(pathPattern.get().toRegex(), shadedPathPattern.get())
     } else {
       path.replaceFirst(pathPattern.get(), shadedPathPattern.get())
@@ -120,7 +120,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun applyToSourceContent(sourceContent: String): String {
-    return if (isRawString.get()) {
+    return if (rawString.get()) {
       sourceContent
     } else {
       sourceContent.replace("\\b$pattern.get()".toRegex(), shadedPattern.get().orEmpty())

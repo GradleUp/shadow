@@ -194,10 +194,10 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun getIncludes ()Lorg/gradle/api/provider/SetProperty;
 	public fun getPathPattern ()Lorg/gradle/api/provider/Property;
 	public fun getPattern ()Lorg/gradle/api/provider/Property;
+	public fun getRawString ()Lorg/gradle/api/provider/Property;
 	public fun getShadedPathPattern ()Lorg/gradle/api/provider/Property;
 	public fun getShadedPattern ()Lorg/gradle/api/provider/Property;
 	public fun include (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
-	public fun isRawString ()Lorg/gradle/api/provider/Property;
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
