@@ -38,7 +38,7 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestApp
 
     @BeforeEach
     void setUp() {
-        transformer = new ManifestAppenderTransformer()
+        transformer = new ManifestAppenderTransformer(objectFactory)
     }
 
     @Test

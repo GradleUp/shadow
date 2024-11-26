@@ -454,10 +454,11 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2Plugi
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer;
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public fun getAttributes ()Ljava/util/List;
+	public final fun getAttributes ()Lorg/gradle/api/provider/ListProperty;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
