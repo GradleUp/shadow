@@ -7,7 +7,7 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.groovy]
+[*.{groovy,java}]
 indent_size = 4
 
 [*.{kt,kts}]
