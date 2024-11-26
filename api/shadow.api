@@ -485,22 +485,17 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/NoOpT
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public final fun getCharset ()Ljava/lang/String;
-	public final fun getKeyTransformer ()Ljava/util/function/Function;
-	public final fun getMappings ()Ljava/util/Map;
-	public final fun getMergeSeparator ()Ljava/lang/String;
-	public final fun getMergeStrategy ()Ljava/lang/String;
-	public final fun getPaths ()Ljava/util/List;
+	public final fun getCharset ()Lorg/gradle/api/provider/Property;
+	public final fun getKeyTransformer ()Lorg/gradle/api/provider/Property;
+	public final fun getMappings ()Lorg/gradle/api/provider/MapProperty;
+	public final fun getMergeSeparator ()Lorg/gradle/api/provider/Property;
+	public final fun getMergeStrategy ()Lorg/gradle/api/provider/Property;
+	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public final fun getPaths ()Lorg/gradle/api/provider/ListProperty;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public final fun setCharset (Ljava/lang/String;)V
-	public final fun setKeyTransformer (Ljava/util/function/Function;)V
-	public final fun setMappings (Ljava/util/Map;)V
-	public final fun setMergeSeparator (Ljava/lang/String;)V
-	public final fun setMergeStrategy (Ljava/lang/String;)V
-	public final fun setPaths (Ljava/util/List;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 

@@ -1,15 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.property
+import groovy.lang.Closure
+import groovy.lang.Closure.IDENTITY
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.util.Properties
-import java.util.function.Function
+import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 
@@ -91,35 +98,44 @@ import org.gradle.api.tasks.Internal
  * @author Andres Almiray
  * @author Marc Philipp
  */
-public open class PropertiesFileTransformer : Transformer {
+public open class PropertiesFileTransformer @Inject constructor(
+  override val objectFactory: ObjectFactory,
+) : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
-  private val _charset get() = Charset.forName(charset)
+  private val _charset get() = Charset.forName(charset.get())
 
   @get:Input
-  public var paths: List<String> = listOf()
+  public val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
 
+  @Suppress("UNCHECKED_CAST")
   @get:Input
-  public var mappings: Map<String, Map<String, String>> = mapOf()
+  public val mappings: MapProperty<String, Map<String, String>> =
+    objectFactory.mapProperty(String::class.java, Map::class.java) as MapProperty<String, Map<String, String>>
 
   /**
    * Optional values: first, latest, append.
    */
   @get:Input
-  public var mergeStrategy: String = "first"
+  public val mergeStrategy: Property<String> = objectFactory.property("first")
 
   @get:Input
-  public var mergeSeparator: String = ","
+  public val mergeSeparator: Property<String> = objectFactory.property(",")
 
   @get:Input
-  public var charset: String = "ISO_8859_1"
+  public val charset: Property<String> = objectFactory.property("ISO_8859_1")
 
   /**
    * Use [java.util.function.Function] here for compatibility with Groovy and Java.
    */
+  @Suppress("UNCHECKED_CAST")
   @get:Internal
-  public var keyTransformer: Function<String, String> = IDENTITY
+  public val keyTransformer: Property<Closure<String>> =
+    objectFactory.property(IDENTITY) as Property<Closure<String>>
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
+    val mappings = mappings.get()
+    val paths = paths.get()
+
     val path = element.relativePath.pathString
     if (path in mappings) return true
     for (key in mappings.keys) {
@@ -166,12 +182,15 @@ public open class PropertiesFileTransformer : Transformer {
     }
     val result = CleanProperties()
     properties.forEach { (key, value) ->
-      result[keyTransformer.apply(key as String)] = value
+      result[keyTransformer.get().call(key as String)] = value
     }
     return result
   }
 
   private fun mergeStrategyFor(path: String): String {
+    val mappings = mappings.get()
+    val mergeStrategy = mergeStrategy.get()
+
     mappings[path]?.let {
       return it["mergeStrategy"] ?: mergeStrategy
     }
@@ -184,6 +203,9 @@ public open class PropertiesFileTransformer : Transformer {
   }
 
   private fun mergeSeparatorFor(path: String): String {
+    val mappings = mappings.get()
+    val mergeSeparator = mergeSeparator.get()
+
     mappings[path]?.let {
       return it["mergeSeparator"] ?: mergeSeparator
     }
@@ -216,7 +238,7 @@ public open class PropertiesFileTransformer : Transformer {
 
   private fun Properties.toReader(): InputStreamReader {
     val os = ByteArrayOutputStream()
-    os.writer(Charset.forName(charset)).use { writer ->
+    os.writer(_charset).use { writer ->
       store(writer, "")
     }
     return os.toByteArray().inputStream().reader(_charset)
@@ -224,6 +246,5 @@ public open class PropertiesFileTransformer : Transformer {
 
   private companion object {
     private const val PROPERTIES_SUFFIX = ".properties"
-    private val IDENTITY = Function<String, String> { it }
   }
 }

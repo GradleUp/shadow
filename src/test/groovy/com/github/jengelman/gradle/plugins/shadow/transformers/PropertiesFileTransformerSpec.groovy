@@ -28,7 +28,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
 
     void "Path #path #transform transformed"() {
         given:
-        Transformer transformer = new PropertiesFileTransformer()
+        Transformer transformer = new PropertiesFileTransformer(objectFactory)
 
         when:
         boolean actual = transformer.canTransformResource(getFileElement(path))
@@ -48,9 +48,9 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void exerciseAllTransformConfigurations() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer()
-        transformer.mergeStrategy = mergeStrategy
-        transformer.mergeSeparator = mergeSeparator
+        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        transformer.mergeStrategy.set(mergeStrategy)
+        transformer.mergeSeparator.set(mergeSeparator)
 
         when:
         if (transformer.canTransformResource(element)) {
@@ -72,9 +72,9 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void exerciseAllTransformConfigurationsWithPaths() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer()
-        transformer.paths = paths
-        transformer.mergeStrategy = 'first'
+        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        transformer.paths.set(paths)
+        transformer.mergeStrategy.set('first')
 
         when:
         if (transformer.canTransformResource(element)) {
@@ -96,9 +96,9 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void exerciseAllTransformConfigurationsWithMappings() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer()
-        transformer.mappings = mappings
-        transformer.mergeStrategy = 'latest'
+        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        transformer.mappings.set(mappings)
+        transformer.mergeStrategy.set('latest')
 
         when:
         if (transformer.canTransformResource(element)) {
@@ -122,9 +122,9 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void appliesKeyTransformer() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer()
-        transformer.keyTransformer = keyTransformer
-        transformer.mergeStrategy = 'append'
+        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        transformer.keyTransformer.set(keyTransformer)
+        transformer.mergeStrategy.set('append')
 
         when:
         if (transformer.canTransformResource(element)) {
@@ -146,8 +146,8 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void appliesCharset() {
         given:
         def element = getFileElement(path)
-        def transformer = new PropertiesFileTransformer()
-        transformer.charset = charset
+        def transformer = new PropertiesFileTransformer(objectFactory)
+        transformer.charset.set(charset)
 
         when:
         if (transformer.canTransformResource(element)) {
