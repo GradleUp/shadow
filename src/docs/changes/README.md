@@ -10,6 +10,7 @@
 **Changed**
 
 - **BREAKING CHANGE:** Rewrite this plugin in Kotlin. ([#1012](https://github.com/GradleUp/shadow/pull/1012))
+- **BREAKING CHANGE:** Migrate `Transformer`s to using lazy properties. ([#1036](https://github.com/GradleUp/shadow/pull/1036))  
 - **BREAKING CHANGE:** Migrate `ShadowJar` to using lazy properties. ([#1044](https://github.com/GradleUp/shadow/pull/1044))  
   `isEnableRelocation` is deprecated, use `enableRelocation` instead.
 - **BREAKING CHANGE:** Resolve `Configuration` directly in `DependencyFilter`. ([#1045](https://github.com/GradleUp/shadow/pull/1045))
