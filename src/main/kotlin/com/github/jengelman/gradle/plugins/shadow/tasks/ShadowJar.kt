@@ -198,28 +198,6 @@ public abstract class ShadowJar :
     action?.execute(dependencyFilterForMinimize)
   }
 
-  override fun createCopyAction(): CopyAction {
-    val documentationRegistry = services.get(DocumentationRegistry::class.java)
-    val unusedTracker = if (minimizeJar) {
-      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
-    } else {
-      null
-    }
-    return ShadowCopyAction(
-      archiveFile.get().asFile,
-      internalCompressor,
-      documentationRegistry,
-      metadataCharset,
-      _transformers,
-      _relocators,
-      rootPatternSet,
-      _stats,
-      isPreserveFileTimestamps,
-      minimizeJar,
-      unusedTracker,
-    )
-  }
-
   override fun dependencies(action: Action<DependencyFilter>?): ShadowJar = apply {
     action?.execute(_dependencyFilter)
   }
@@ -305,6 +283,28 @@ public abstract class ShadowJar :
     from(_includedDependencies)
     super.copy()
     logger.info(_stats.toString())
+  }
+
+  override fun createCopyAction(): CopyAction {
+    val documentationRegistry = services.get(DocumentationRegistry::class.java)
+    val unusedTracker = if (minimizeJar) {
+      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+    } else {
+      null
+    }
+    return ShadowCopyAction(
+      archiveFile.get().asFile,
+      internalCompressor,
+      documentationRegistry,
+      metadataCharset,
+      _transformers,
+      _relocators,
+      rootPatternSet,
+      _stats,
+      isPreserveFileTimestamps,
+      minimizeJar,
+      unusedTracker,
+    )
   }
 
   private fun <R : Relocator> addRelocator(relocator: R, action: Action<R>?) {
