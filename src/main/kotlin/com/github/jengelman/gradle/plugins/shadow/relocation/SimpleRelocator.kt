@@ -32,8 +32,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
     if (rawString) {
       pathPattern.set(pattern.orEmpty())
       shadedPathPattern.set(shadedPattern.orEmpty())
-      this.pattern.set(null as String?) // not used for raw string relocator
-      this.shadedPattern.set(null as String?) // not used for raw string relocator
+      // Don't need to assign pattern and shadedPattern for raw string relocator
     } else {
       if (pattern == null) {
         this.pattern.set("")
