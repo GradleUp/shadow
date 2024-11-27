@@ -103,7 +103,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
-  private inline val charset get() = Charset.forName(encoding.get())
+  private inline val charset get() = Charset.forName(charsetName.get())
 
   @get:Input
   public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
@@ -120,7 +120,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   public open val mergeSeparator: Property<String> = objectFactory.property(",")
 
   @get:Input
-  public open val encoding: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
+  public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
   /**
    * Use [java.util.function.Function] here for compatibility with Groovy and Java.

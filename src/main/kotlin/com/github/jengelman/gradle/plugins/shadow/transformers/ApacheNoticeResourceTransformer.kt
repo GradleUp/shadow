@@ -28,7 +28,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
 ) : Transformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
-  private inline val charset get() = Charset.forName(encoding.get())
+  private inline val charset get() = Charset.forName(charsetName.get())
 
   @get:Input
   public open val projectName: Property<String> = objectFactory.property("")
@@ -70,7 +70,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
    * The file encoding of the `NOTICE` file.
    */
   @get:Input
-  public open val encoding: Property<String> = objectFactory.property(Charsets.UTF_8.name())
+  public open val charsetName: Property<String> = objectFactory.property(Charsets.UTF_8.name())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString

@@ -148,7 +148,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         given:
         def element = getFileElement(path)
         def transformer = new PropertiesFileTransformer(objectFactory)
-        transformer.encoding.set(charset)
+        transformer.charsetName.set(charset)
 
         when:
         if (transformer.canTransformResource(element)) {

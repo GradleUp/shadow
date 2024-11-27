@@ -373,8 +373,8 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNotic
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAddHeader ()Lorg/gradle/api/provider/Property;
+	public fun getCharsetName ()Lorg/gradle/api/provider/Property;
 	public fun getCopyright ()Lorg/gradle/api/provider/Property;
-	public fun getEncoding ()Lorg/gradle/api/provider/Property;
 	public fun getInceptionYear ()Lorg/gradle/api/provider/Property;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getOrganizationName ()Lorg/gradle/api/provider/Property;
@@ -487,7 +487,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/NoOpT
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public fun getEncoding ()Lorg/gradle/api/provider/Property;
+	public fun getCharsetName ()Lorg/gradle/api/provider/Property;
 	public fun getKeyTransformer ()Lorg/gradle/api/provider/Property;
 	public fun getMappings ()Lorg/gradle/api/provider/MapProperty;
 	public fun getMergeSeparator ()Lorg/gradle/api/provider/Property;
