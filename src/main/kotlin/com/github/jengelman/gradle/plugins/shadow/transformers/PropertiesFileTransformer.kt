@@ -121,9 +121,6 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
-  /**
-   * Use [java.util.function.Function] here for compatibility with Groovy and Java.
-   */
   @Suppress("UNCHECKED_CAST")
   @get:Internal
   public open val keyTransformer: Property<Closure<String>> =
