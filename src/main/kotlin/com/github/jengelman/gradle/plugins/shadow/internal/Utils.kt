@@ -3,7 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import java.io.InputStream
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.provider.Property
 
 /**
  * Return `runtimeClasspath` or `runtime` configuration.
@@ -11,6 +13,12 @@ import org.gradle.api.plugins.JavaPlugin
 internal inline val Project.runtimeConfiguration: Configuration get() {
   return configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
     ?: configurations.getByName("runtime")
+}
+
+internal inline fun <reified T : Any> ObjectFactory.property(defaultValue: T? = null): Property<T> {
+  return property(T::class.java).apply {
+    if (defaultValue != null) convention(defaultValue)
+  }
 }
 
 @Suppress("NOTHING_TO_INLINE")

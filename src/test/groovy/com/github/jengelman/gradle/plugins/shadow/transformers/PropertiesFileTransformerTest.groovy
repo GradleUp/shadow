@@ -18,7 +18,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
 
     @BeforeEach
     void setUp() {
-        transformer = new PropertiesFileTransformer()
+        transformer = new PropertiesFileTransformer(objectFactory)
     }
 
     @Test

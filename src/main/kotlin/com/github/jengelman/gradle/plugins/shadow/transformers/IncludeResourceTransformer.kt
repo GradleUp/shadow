@@ -1,9 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
-import java.io.File
+import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.PathSensitive
@@ -16,22 +20,24 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
-public open class IncludeResourceTransformer : Transformer by NoOpTransformer {
+public open class IncludeResourceTransformer @Inject constructor(
+  final override val objectFactory: ObjectFactory,
+) : Transformer by NoOpTransformer {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
-  public var file: File? = null
+  public open val file: RegularFileProperty = objectFactory.fileProperty()
 
   @get:Input
-  public var resource: String? = null
+  public open val resource: Property<String> = objectFactory.property()
 
-  override fun hasTransformedResource(): Boolean = file?.exists() == true
+  override fun hasTransformedResource(): Boolean = file.get().asFile.exists()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(requireNotNull(resource))
+    val entry = ZipEntry(resource.get())
     entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
 
-    requireNotNull(file).inputStream().use { inputStream ->
+    file.get().asFile.inputStream().use { inputStream ->
       inputStream.copyTo(os)
     }
   }

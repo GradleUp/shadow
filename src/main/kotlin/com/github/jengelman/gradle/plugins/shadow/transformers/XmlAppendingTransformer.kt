@@ -1,9 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.property
 import java.io.StringReader
+import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.jdom2.Document
@@ -23,25 +27,27 @@ import org.xml.sax.InputSource
  * @author John Engelman
  */
 @CacheableTransformer
-public open class XmlAppendingTransformer : Transformer {
+public open class XmlAppendingTransformer @Inject constructor(
+  final override val objectFactory: ObjectFactory,
+) : Transformer {
   private var doc: Document? = null
 
   @get:Input
-  public var ignoreDtd: Boolean = true
+  public open val ignoreDtd: Property<Boolean> = objectFactory.property(true)
 
   @get:Optional
   @get:Input
-  public var resource: String? = null
+  public open val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource?.equals(element.relativePath.pathString, ignoreCase = true) == true
+    return resource.orNull?.equals(element.relativePath.pathString, ignoreCase = true) == true
   }
 
   override fun transform(context: TransformerContext) {
     val r = try {
       SAXBuilder(XMLReaders.NONVALIDATING).apply {
         expandEntities = false
-        if (ignoreDtd) {
+        if (ignoreDtd.get()) {
           entityResolver = EntityResolver { _, _ -> InputSource(StringReader("")) }
         }
       }.build(context.inputStream)
@@ -69,7 +75,7 @@ public open class XmlAppendingTransformer : Transformer {
   override fun hasTransformedResource(): Boolean = doc != null
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(resource)
+    val entry = ZipEntry(resource.get())
     entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
     XMLOutputter(Format.getPrettyFormat()).output(doc, os)

@@ -758,7 +758,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         'ComponentsXmlResourceTransformer'  | ''
         'DontIncludeResourceTransformer'    | ''
         'GroovyExtensionModuleTransformer'  | ''
-        'IncludeResourceTransformer'        | '{ resource = "test.file"; file = file("test/some.file") }'
+        'IncludeResourceTransformer'        | '{ resource.set("test.file"); file.fileValue(file("test/some.file")) }'
         'Log4j2PluginsCacheFileTransformer' | ''
         'ManifestAppenderTransformer'       | ''
         'ManifestResourceTransformer'       | ''

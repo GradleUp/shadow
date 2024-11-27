@@ -3,9 +3,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
+import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.slf4j.LoggerFactory
 
@@ -17,12 +20,15 @@ import org.slf4j.LoggerFactory
  * Modified from [ManifestResourceTransformer].
  * @author Chris Rankin
  */
-public open class ManifestAppenderTransformer : Transformer {
+public open class ManifestAppenderTransformer @Inject constructor(
+  final override val objectFactory: ObjectFactory,
+) : Transformer {
   private var manifestContents = ByteArray(0)
-  private val _attributes = mutableListOf<Pair<String, Comparable<*>>>()
 
+  @Suppress("UNCHECKED_CAST")
   @get:Input
-  public open val attributes: List<Pair<String, Comparable<*>>> get() = _attributes
+  public open val attributes: ListProperty<Pair<String, Comparable<*>>> =
+    objectFactory.listProperty(Pair::class.java) as ListProperty<Pair<String, Comparable<*>>>
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
@@ -42,7 +48,7 @@ public open class ManifestAppenderTransformer : Transformer {
     }
   }
 
-  override fun hasTransformedResource(): Boolean = _attributes.isNotEmpty()
+  override fun hasTransformedResource(): Boolean = attributes.get().isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val entry = ZipEntry(MANIFEST_NAME)
@@ -50,20 +56,20 @@ public open class ManifestAppenderTransformer : Transformer {
     os.putNextEntry(entry)
     os.write(manifestContents)
 
-    if (_attributes.isNotEmpty()) {
-      for ((key, value) in _attributes) {
+    if (attributes.get().isNotEmpty()) {
+      for ((key, value) in attributes.get()) {
         os.write(key.toByteArray())
         os.write(SEPARATOR)
         os.write(value.toString().toByteArray())
         os.write(EOL)
       }
       os.write(EOL)
-      _attributes.clear()
+      attributes.empty()
     }
   }
 
   public open fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
-    _attributes.add(Pair(name, value))
+    attributes.add(Pair(name, value))
   }
 
   private companion object {

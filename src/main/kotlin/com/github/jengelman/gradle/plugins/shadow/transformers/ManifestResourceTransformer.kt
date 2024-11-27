@@ -1,13 +1,18 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
 import java.io.IOException
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.jar.Manifest
+import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.slf4j.LoggerFactory
@@ -22,17 +27,20 @@ import org.slf4j.LoggerFactory
  * @author Jason van Zyl
  * @author John Engelman
  */
-public open class ManifestResourceTransformer : Transformer {
+public open class ManifestResourceTransformer @Inject constructor(
+  final override val objectFactory: ObjectFactory,
+) : Transformer {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
   @get:Optional
   @get:Input
-  public var mainClass: String? = null
+  public open val mainClass: Property<String> = objectFactory.property()
 
   @get:Optional
   @get:Input
-  public var manifestEntries: MutableMap<String, Attributes>? = null
+  public open val manifestEntries: MapProperty<String, Attributes> =
+    objectFactory.mapProperty(String::class.java, Attributes::class.java)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
@@ -62,10 +70,10 @@ public open class ManifestResourceTransformer : Transformer {
     }
 
     val attributes = manifest!!.mainAttributes
-    mainClass?.let {
+    mainClass.orNull?.let {
       attributes[Attributes.Name.MAIN_CLASS] = it
     }
-    manifestEntries?.forEach { (key, value) ->
+    manifestEntries.get().forEach { (key, value) ->
       attributes[Attributes.Name(key)] = value
     }
 
@@ -76,10 +84,7 @@ public open class ManifestResourceTransformer : Transformer {
   }
 
   public open fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
-    if (manifestEntries == null) {
-      manifestEntries = LinkedHashMap()
-    }
-    manifestEntries!!.putAll(attributes)
+    manifestEntries.putAll(attributes)
   }
 
   private companion object {
