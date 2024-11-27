@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
-  kotlin("jvm") version "2.0.21"
+  kotlin("jvm") version "2.1.0"
   groovy // Required for Spock tests.
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
