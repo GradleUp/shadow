@@ -66,7 +66,7 @@ public abstract class ShadowJar :
 
   @get:Classpath
   public val toMinimize: ConfigurableFileCollection by unsafeLazy {
-    project.objects.fileCollection().apply {
+    objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
         setFrom(dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
       }
@@ -75,7 +75,7 @@ public abstract class ShadowJar :
 
   @get:Classpath
   public val apiJars: ConfigurableFileCollection by unsafeLazy {
-    project.objects.fileCollection().apply {
+    objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
         setFrom(UnusedTracker.getApiJarsFromProject(project))
       }
@@ -85,7 +85,7 @@ public abstract class ShadowJar :
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public val sourceSetsClassesDirs: ConfigurableFileCollection by unsafeLazy {
-    project.objects.fileCollection().apply {
+    objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
         project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
           from(sourceSet.output.classesDirs.filter { it.isDirectory })
