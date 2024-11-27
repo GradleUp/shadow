@@ -108,10 +108,9 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
 
-  @Suppress("UNCHECKED_CAST")
   @get:Input
-  public open val mappings: MapProperty<String, Map<String, String>> =
-    objectFactory.mapProperty(String::class.java, Map::class.java) as MapProperty<String, Map<String, String>>
+  public open val mappings: MapProperty<String, Properties> =
+    objectFactory.mapProperty(String::class.java, Properties::class.java)
 
   @get:Input
   public open val mergeStrategy: Property<MergeStrategy> = objectFactory.property(MergeStrategy.First)
@@ -189,11 +188,11 @@ public open class PropertiesFileTransformer @Inject constructor(
     val mergeStrategy = mergeStrategy.get().name
 
     mappings[path]?.let {
-      return it["mergeStrategy"] ?: mergeStrategy
+      return it.getProperty("mergeStrategy") ?: mergeStrategy
     }
     for (key in mappings.keys) {
       if (key.toRegex().containsMatchIn(path)) {
-        return mappings[key]?.get("mergeStrategy") ?: mergeStrategy
+        return mappings[key]?.getProperty("mergeStrategy") ?: mergeStrategy
       }
     }
     return mergeStrategy
@@ -204,11 +203,11 @@ public open class PropertiesFileTransformer @Inject constructor(
     val mergeSeparator = mergeSeparator.get()
 
     mappings[path]?.let {
-      return it["mergeSeparator"] ?: mergeSeparator
+      return it.getProperty("mergeSeparator") ?: mergeSeparator
     }
     for (key in mappings.keys) {
       if (key.toRegex().containsMatchIn(path)) {
-        return mappings[key]?.get("mergeSeparator") ?: mergeSeparator
+        return mappings[key]?.getProperty("mergeSeparator") ?: mergeSeparator
       }
     }
     return mergeSeparator
