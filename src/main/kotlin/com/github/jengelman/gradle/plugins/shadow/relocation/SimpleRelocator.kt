@@ -41,7 +41,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   public open val shadedPathPattern: Property<String> = objectFactory.property()
 
   @get:Input
-  public open val rawString: Property<Boolean> = objectFactory.property(rawString)
+  public open val rawString: Property<Boolean> = objectFactory.property()
 
   @get:Input
   public open val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
@@ -50,6 +50,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   public open val excludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
 
   init {
+    this.rawString.set(rawString)
     if (rawString) {
       pathPattern.set(pattern.orEmpty())
       shadedPathPattern.set(shadedPattern.orEmpty())
