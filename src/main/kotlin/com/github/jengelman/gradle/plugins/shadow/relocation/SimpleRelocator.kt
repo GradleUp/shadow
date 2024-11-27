@@ -10,7 +10,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
 /**
- * Modified from `org.apache.maven.plugins.shade.relocation.SimpleRelocator.java`
+ * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/SimpleRelocator.java).
  *
  * @author Jason van Zyl
  * @author Mauro Talevi
