@@ -30,7 +30,7 @@ public open class IncludeResourceTransformer @Inject constructor(
   @get:Input
   public open val resource: Property<String> = objectFactory.property()
 
-  override fun hasTransformedResource(): Boolean = file.orNull?.asFile?.exists() == true
+  override fun hasTransformedResource(): Boolean = file.get().asFile.exists()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val entry = ZipEntry(resource.get())
