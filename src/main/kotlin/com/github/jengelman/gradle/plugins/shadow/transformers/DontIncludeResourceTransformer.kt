@@ -16,7 +16,7 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 public open class DontIncludeResourceTransformer @Inject constructor(
-  override val objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
 ) : Transformer by NoOpTransformer {
   @get:Optional
   @get:Input

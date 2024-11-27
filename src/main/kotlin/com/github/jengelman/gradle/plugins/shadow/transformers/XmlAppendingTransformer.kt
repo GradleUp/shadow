@@ -28,7 +28,7 @@ import org.xml.sax.InputSource
  */
 @CacheableTransformer
 public open class XmlAppendingTransformer @Inject constructor(
-  override val objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
 ) : Transformer {
   private var doc: Document? = null
 

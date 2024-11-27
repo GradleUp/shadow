@@ -21,7 +21,7 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 @Suppress("ktlint:standard:backing-property-naming")
 public open class AppendingTransformer @Inject constructor(
-  override val objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
 ) : Transformer {
   /**
    * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).

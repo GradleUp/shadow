@@ -100,7 +100,7 @@ import org.gradle.api.tasks.Internal
  * @author Marc Philipp
  */
 public open class PropertiesFileTransformer @Inject constructor(
-  override val objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
 ) : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
   private val charset get() = Charset.forName(encoding.get())

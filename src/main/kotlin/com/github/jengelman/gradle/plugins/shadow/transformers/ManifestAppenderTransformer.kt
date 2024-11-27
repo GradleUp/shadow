@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory
  * @author Chris Rankin
  */
 public open class ManifestAppenderTransformer @Inject constructor(
-  override val objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
 ) : Transformer {
   private var manifestContents = ByteArray(0)
 

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory
  * @author John Engelman
  */
 public open class ManifestResourceTransformer @Inject constructor(
-  override val objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
 ) : Transformer {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null

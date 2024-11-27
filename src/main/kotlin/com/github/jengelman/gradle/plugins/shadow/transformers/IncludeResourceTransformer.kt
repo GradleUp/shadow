@@ -21,7 +21,7 @@ import org.gradle.api.tasks.PathSensitivity
  * @author John Engelman
  */
 public open class IncludeResourceTransformer @Inject constructor(
-  override val objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
 ) : Transformer by NoOpTransformer {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
