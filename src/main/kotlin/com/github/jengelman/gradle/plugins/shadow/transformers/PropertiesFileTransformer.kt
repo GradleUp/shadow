@@ -103,7 +103,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer {
   private val propertiesEntries = mutableMapOf<String, CleanProperties>()
-  private val charset get() = Charset.forName(encoding.get())
+  private inline val charset get() = Charset.forName(encoding.get())
 
   @get:Input
   public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)

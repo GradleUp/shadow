@@ -28,7 +28,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
 ) : Transformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
-  private val charset get() = Charset.forName(encoding.get())
+  private inline val charset get() = Charset.forName(encoding.get())
 
   @get:Input
   public open val projectName: Property<String> = objectFactory.property("")
