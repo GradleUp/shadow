@@ -152,8 +152,12 @@ public open class PropertiesFileTransformer @Inject constructor(
       for ((key, value) in incoming) {
         if (props.containsKey(key)) {
           when (MergeStrategy.from(mergeStrategyFor(context.path))) {
-            MergeStrategy.Latest -> props[key] = value
-            MergeStrategy.Append -> props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
+            MergeStrategy.Latest -> {
+              props[key] = value
+            }
+            MergeStrategy.Append -> {
+              props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
+            }
             MergeStrategy.First -> Unit
           }
         } else {
