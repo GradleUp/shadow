@@ -16,6 +16,7 @@ import org.gradle.api.tasks.Optional
  * @author Mauro Talevi
  * @author John Engelman
  */
+@Suppress("LeakingThis")
 @CacheableRelocator
 public open class SimpleRelocator @JvmOverloads constructor(
   objectFactory: ObjectFactory,
