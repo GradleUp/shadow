@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy.values
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import groovy.lang.Closure
 import groovy.lang.Closure.IDENTITY
 import java.io.ByteArrayOutputStream
@@ -25,12 +25,12 @@ import org.gradle.api.tasks.Internal
  * Resources transformer that merges Properties files.
  *
  * The default merge strategy discards duplicate values coming from additional
- * resources. This behavior can be changed by setting a value for the `mergeStrategy`
- * property, such as 'first' (default), 'latest' or 'append'. If the merge strategy is
- * 'latest' then the last value of a matching property entry will be used. If the
- * merge strategy is 'append' then the property values will be combined, using a
+ * resources. This behavior can be changed by setting a value for the [mergeStrategy] property,
+ * such as [MergeStrategy.First] (default), [MergeStrategy.Latest] or [MergeStrategy.Append]. If the merge strategy is
+ * [MergeStrategy.Latest] then the last value of a matching property entry will be used. If the
+ * merge strategy is [MergeStrategy.Append] then the property values will be combined, using a
  * merge separator (default value is ','). The merge separator can be changed by
- * setting a value for the `mergeSeparator` property.
+ * setting a value for the [mergeSeparator] property.
  *
  * Say there are two properties files A and B with the
  * following entries:
@@ -43,40 +43,40 @@ import org.gradle.api.tasks.Internal
  * - key2 = balue2
  * - key3 = value3
  *
- * With `mergeStrategy = first` you get
+ * With `mergeStrategy = MergeStrategy.First` you get
  *
  * **C**
  * - key1 = value1
  * - key2 = value2
  * - key3 = value3
  *
- * With `mergeStrategy = latest` you get
+ * With `mergeStrategy = MergeStrategy.Latest` you get
  *
  * **C**
  * - key1 = value1
  * - key2 = balue2
  * - key3 = value3
  *
- * With `mergeStrategy = append` and `mergeSeparator = ;` you get
+ * With `mergeStrategy = MergeStrategy.Append` and `mergeSeparator = ;` you get
  *
  * **C**
  * - key1 = value1
  * - key2 = value2;balue2
  * - key3 = value3
  *
- * There are three additional properties that can be set: `paths`, `mappings`,
- * and `keyTransformer`.
+ * There are three additional properties that can be set: [paths], [mappings],
+ * and [keyTransformer].
  * The first contains a list of strings or regexes that will be used to determine if
  * a path should be transformed or not. The merge strategy and merge separator are
  * taken from the global settings.
  *
- * The `mappings` property allows you to define merge strategy and separator per
- * path. If either `paths` or `mappings` is defined then no other path
- * entries will be merged. `mappings` has precedence over `paths` if both
+ * The [mappings] property allows you to define merge strategy and separator per
+ * path. If either [paths] or [mappings] is defined then no other path
+ * entries will be merged. [mappings] has precedence over [paths] if both
  * are defined.
  *
  * If you need to transform keys in properties files, e.g. because they contain class
- * names about to be relocated, you can set the `keyTransformer` property to a
+ * names about to be relocated, you can set the [keyTransformer] property to a
  * closure that receives the original key and returns the key name to be used.
  *
  * Example:
