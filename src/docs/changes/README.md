@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v9.0.0-beta1] (2024-11-27)
+
 **Added**
 
 - Add .md support to the Apache License and Notice transformers. ([#1041](https://github.com/GradleUp/shadow/pull/1041))
