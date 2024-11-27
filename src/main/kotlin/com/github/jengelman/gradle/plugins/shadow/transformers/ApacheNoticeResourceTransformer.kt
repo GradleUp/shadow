@@ -80,20 +80,28 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
+    val projectName = projectName.get()
+    val addHeader = addHeader.get()
+    val preamble1 = preamble1.get()
+    val preamble2 = preamble2.get()
+    val preamble3 = preamble3.get()
+    val organizationName = organizationName.get()
+    val organizationURL = organizationURL.get()
+    val inceptionYear = inceptionYear.get()
+
     if (entries.isEmpty()) {
       val year = SimpleDateFormat("yyyy", Locale.US).format(Date()).let {
-        val iy = inceptionYear.get()
-        if (iy != it) "$iy-$it" else it
+        if (inceptionYear != it) "$inceptionYear-$it" else it
       }
       // add headers
-      if (addHeader.get()) {
-        entries.add("${preamble1.get()}${projectName.get()}${preamble2.get()}")
+      if (addHeader) {
+        entries.add("$preamble1$projectName$preamble2")
       } else {
         entries.add("")
       }
       // fake second entry, we'll look for a real one later
-      entries.add("${projectName.get()}\nCopyright $year ${organizationName.get()}\n")
-      entries.add("${preamble3.get()}${organizationName.get()} (${organizationURL.get()}).\n")
+      entries.add("$projectName\nCopyright $year $organizationName\n")
+      entries.add("$preamble3$organizationName ($organizationURL).\n")
     }
 
     val reader = context.inputStream.bufferedReader(charset)
@@ -119,7 +127,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
           lineCount++
         } else {
           val entry = sb.toString()
-          if (entry.startsWith(projectName.get()) && entry.contains("Copyright ")) {
+          if (entry.startsWith(projectName) && entry.contains("Copyright ")) {
             copyright.set(entry)
           }
           if (currentOrg == null) {
@@ -147,6 +155,8 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   override fun hasTransformedResource(): Boolean = true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    val copyright = copyright.orNull
+
     val zipEntry = ZipEntry(NOTICE_PATH)
     zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)
     os.putNextEntry(zipEntry)
@@ -156,8 +166,8 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
     var count = 0
     for (line in entries) {
       count++
-      if (line == copyright.orNull && count != 2) continue
-      if (count == 2 && copyright.orNull != null) {
+      if (line == copyright && count != 2) continue
+      if (count == 2 && copyright != null) {
         writer.print(copyright)
         writer.print('\n')
       } else {
