@@ -18,38 +18,17 @@ import org.gradle.api.tasks.Optional
  */
 @CacheableRelocator
 public open class SimpleRelocator @JvmOverloads constructor(
-  objectFactory: ObjectFactory,
+  override val objectFactory: ObjectFactory,
   pattern: String?,
   shadedPattern: String?,
   includes: List<String>? = null,
   excludes: List<String>? = null,
   rawString: Boolean = false,
-) : Relocator {
-
-  @get:Input
-  @get:Optional
-  public open val pattern: Property<String> = objectFactory.property()
-
-  @get:Input
-  public open val pathPattern: Property<String> = objectFactory.property()
-
-  @get:Input
-  @get:Optional
-  public open val shadedPattern: Property<String> = objectFactory.property()
-
-  @get:Input
-  public open val shadedPathPattern: Property<String> = objectFactory.property()
-
-  @get:Input
-  public open val rawString: Property<Boolean> = objectFactory.property(rawString)
-
-  @get:Input
-  public open val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
-
-  @get:Input
-  public open val excludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
+) : SimpleRelocatorParent(),
+  Relocator {
 
   init {
+    this.rawString.set(rawString)
     if (rawString) {
       pathPattern.set(pattern.orEmpty())
       shadedPathPattern.set(shadedPattern.orEmpty())
@@ -152,4 +131,31 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private fun isExcluded(path: String): Boolean {
     return excludes.get().any { SelectorUtils.matchPath(it, path, "/", true) }
   }
+}
+
+public abstract class SimpleRelocatorParent {
+  protected abstract val objectFactory: ObjectFactory
+
+  @get:Input
+  @get:Optional
+  public open val pattern: Property<String> = objectFactory.property()
+
+  @get:Input
+  public open val pathPattern: Property<String> = objectFactory.property()
+
+  @get:Input
+  @get:Optional
+  public open val shadedPattern: Property<String> = objectFactory.property()
+
+  @get:Input
+  public open val shadedPathPattern: Property<String> = objectFactory.property()
+
+  @get:Input
+  public open val rawString: Property<Boolean> = objectFactory.property()
+
+  @get:Input
+  public open val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
+
+  @get:Input
+  public open val excludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
 }
