@@ -128,29 +128,32 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
   }
 
-  private fun normalizePatterns(patterns: Collection<String>?) = buildSet {
-    for (pattern in patterns.orEmpty()) {
-      // Regex patterns don't need to be normalized and stay as is
-      if (pattern.startsWith(SelectorUtils.REGEX_HANDLER_PREFIX)) {
-        add(pattern)
-        continue
-      }
-
-      val classPattern = pattern.replace('.', '/')
-      add(classPattern)
-
-      if (classPattern.endsWith("/*")) {
-        val packagePattern = classPattern.substring(0, classPattern.lastIndexOf('/'))
-        add(packagePattern)
-      }
-    }
-  }
-
   private fun isIncluded(path: String): Boolean {
     return _includes.isEmpty() || _includes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
   private fun isExcluded(path: String): Boolean {
     return _excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
+  }
+
+  private companion object {
+    fun normalizePatterns(patterns: Collection<String>?) = buildSet {
+      patterns ?: return@buildSet
+      for (pattern in patterns) {
+        // Regex patterns don't need to be normalized and stay as is
+        if (pattern.startsWith(SelectorUtils.REGEX_HANDLER_PREFIX)) {
+          add(pattern)
+          continue
+        }
+
+        val classPattern = pattern.replace('.', '/')
+        add(classPattern)
+
+        if (classPattern.endsWith("/*")) {
+          val packagePattern = classPattern.substring(0, classPattern.lastIndexOf('/'))
+          add(packagePattern)
+        }
+      }
+    }
   }
 }
