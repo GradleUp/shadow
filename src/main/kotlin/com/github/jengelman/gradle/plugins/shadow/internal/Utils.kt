@@ -22,8 +22,9 @@ internal inline fun <reified T : Any> ObjectFactory.property(defaultValue: T? = 
 }
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun <T> unsafeLazy(noinline initializer: () -> T): Lazy<T> =
-  lazy(LazyThreadSafetyMode.NONE, initializer)
+internal inline fun <T> unsafeLazy(noinline initializer: () -> T): Lazy<T> {
+  return lazy(LazyThreadSafetyMode.NONE, initializer)
+}
 
 internal fun Class<*>.requireResourceAsText(name: String): String {
   return requireResourceAsStream(name).bufferedReader().readText()

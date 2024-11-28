@@ -34,10 +34,10 @@ lint {
 
 spotless {
   kotlin {
-    ktlint()
+    ktlint(libs.ktlint.get().version)
   }
   kotlinGradle {
-    ktlint()
+    ktlint(libs.ktlint.get().version)
     target("**/*.kts")
     targetExclude("build-logic/build/**")
   }
