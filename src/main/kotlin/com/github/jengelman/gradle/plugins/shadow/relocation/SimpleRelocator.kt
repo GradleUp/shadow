@@ -18,7 +18,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   shadedPattern: String?,
   includes: List<String>? = null,
   excludes: List<String>? = null,
-  private val _isRawString: Boolean = false,
+  private val _rawString: Boolean = false,
 ) : Relocator {
   private val _pattern: String?
   private val _pathPattern: String
@@ -28,7 +28,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val _excludes = mutableSetOf<String>()
 
   init {
-    if (_isRawString) {
+    if (_rawString) {
       _pathPattern = pattern.orEmpty()
       _shadedPathPattern = shadedPattern.orEmpty()
       _pattern = null // not used for raw string relocator
@@ -68,7 +68,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   public open val shadedPathPattern: String get() = _shadedPathPattern
 
   @get:Input
-  public open val isRawString: Boolean get() = _isRawString
+  public open val rawString: Boolean get() = _rawString
 
   @get:Input
   public open val includes: Set<String> get() = _includes
@@ -85,7 +85,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun canRelocatePath(path: String): Boolean {
-    if (_isRawString) return Pattern.compile(_pathPattern).matcher(path).find()
+    if (_rawString) return Pattern.compile(_pathPattern).matcher(path).find()
     // If string is too short - no need to perform expensive string operations
     if (path.length < _pathPattern.length) return false
     val adjustedPath = if (path.endsWith(".class")) {
@@ -102,13 +102,13 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun canRelocateClass(className: String): Boolean {
-    return !_isRawString && !className.contains('/') && canRelocatePath(className.replace('.', '/'))
+    return !_rawString && !className.contains('/') && canRelocatePath(className.replace('.', '/'))
   }
 
   override fun relocatePath(context: RelocatePathContext): String {
     val path = context.path
     context.stats.relocate(_pathPattern, _shadedPathPattern)
-    return if (_isRawString) {
+    return if (_rawString) {
       path.replace(_pathPattern.toRegex(), _shadedPathPattern)
     } else {
       path.replaceFirst(_pathPattern, _shadedPathPattern)
@@ -121,7 +121,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun applyToSourceContent(sourceContent: String): String {
-    return if (_isRawString) {
+    return if (_rawString) {
       sourceContent
     } else {
       sourceContent.replace("\\b$_pattern".toRegex(), _shadedPattern.orEmpty())
