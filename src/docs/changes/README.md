@@ -439,7 +439,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.5...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta1...HEAD
+[v9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
 [v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
 [v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
 [v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
