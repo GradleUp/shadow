@@ -3,6 +3,11 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Revert "Migrate SimpleRelocator to using lazy properties" ([#1052](https://github.com/GradleUp/shadow/pull/1052))  
+  This fixes the relocation not working in `v9.0.0-beta1`.
+
 
 ## [v9.0.0-beta1] (2024-11-27)
 
