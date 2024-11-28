@@ -29,7 +29,7 @@
 
 **Removed**
 
-- **BREAKING CHANGE:** Remove Develocity integration. ([#1013](https://github.com/GradleUp/shadow/pull/1013))
+- **BREAKING CHANGE:** Remove Develocity integration. ([#1014](https://github.com/GradleUp/shadow/pull/1014))
 
 **Fixed**
 
