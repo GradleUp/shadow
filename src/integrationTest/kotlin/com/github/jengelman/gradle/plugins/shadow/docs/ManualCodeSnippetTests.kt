@@ -6,7 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCod
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.GradleBuildExecutor
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.NoopExecutor
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.GroovyScriptFixture
-import com.google.common.base.StandardSystemProperty
 import java.io.File
 import java.nio.file.Path
 import org.junit.jupiter.api.DynamicTest
@@ -17,7 +16,7 @@ class ManualCodeSnippetTests {
 
   @TestFactory
   fun provideDynamicTests(@TempDir tempDir: Path): List<DynamicTest> {
-    val cwd = File(requireNotNull(StandardSystemProperty.USER_DIR.value()))
+    val cwd = File(System.getProperty("user.dir"))
     val content = File(cwd, "src/docs")
     val snippets = mutableListOf<TestCodeSnippet>()
 

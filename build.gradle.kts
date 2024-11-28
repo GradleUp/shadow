@@ -43,7 +43,6 @@ spotless {
   }
 }
 
-
 val integrationTest: SourceSet by sourceSets.creating
 val integrationTestImplementation: Configuration by configurations.getting
 val integrationTestRuntimeOnly: Configuration by configurations.getting
@@ -64,16 +63,15 @@ dependencies {
   }
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
-  testImplementation(libs.junit.platformSuite)
   testImplementation(libs.xmlunit)
   testImplementation(libs.apache.commonsLang)
-  testImplementation(libs.guava)
 
-  integrationTestImplementation("com.google.guava:guava:33.3.1-jre")
-  integrationTestImplementation(platform("org.junit:junit-bom:5.11.3"))
-  integrationTestImplementation("org.junit.jupiter:junit-jupiter")
-  integrationTestImplementation("org.junit.platform:junit-platform-suite-engine")
-  integrationTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  integrationTestImplementation(gradleApi())
+  integrationTestImplementation(gradleTestKit())
+  integrationTestImplementation(platform(libs.junit.bom))
+  integrationTestImplementation(libs.junit.jupiter)
+  integrationTestImplementation(libs.junit.platformSuite)
+  integrationTestRuntimeOnly(libs.junit.platformLauncher)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }
