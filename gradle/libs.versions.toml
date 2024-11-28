@@ -1,0 +1,25 @@
+[libraries]
+apache-ant = "org.apache.ant:ant:1.10.15"
+apache-commonsIo = "commons-io:commons-io:2.18.0"
+apache-commonsLang = "org.apache.commons:commons-lang3:3.17.0"
+apache-log4j = "org.apache.logging.log4j:log4j-core:2.24.2"
+asm = "org.ow2.asm:asm-commons:9.7.1"
+guava = "com.google.guava:guava:33.3.1-jre"
+jdependency = "org.vafer:jdependency:2.11"
+jdom2 = "org.jdom:jdom2:2.0.6.1"
+plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.2"
+plexus-xml = "org.codehaus.plexus:plexus-xml:4.0.4"
+xmlunit = "org.xmlunit:xmlunit-legacy:2.10.0"
+
+androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha02"
+
+spock = "org.spockframework:spock-core:2.3-groovy-3.0"
+junit-bom = "org.junit:junit-bom:5.11.3"
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platformSuite = { module = "org.junit.platform:junit-platform-suite-engine" }
+
+[plugins]
+kotlin = "org.jetbrains.kotlin.jvm:2.1.0"
+android-lint = "com.android.lint:8.7.2"
+jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.16.3"
+spotless = "com.diffplug.spotless:7.0.0.BETA4"
