@@ -2,13 +2,13 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
-  kotlin("jvm") version "2.1.0"
+  alias(libs.plugins.jetbrains.bcv)
+  alias(libs.plugins.kotlin)
+  alias(libs.plugins.android.lint)
+  alias(libs.plugins.spotless)
   groovy // Required for Spock tests.
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
-  id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.16.3"
-  id("com.android.lint") version "8.7.2"
-  id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
 java {
@@ -44,27 +44,27 @@ spotless {
 }
 
 dependencies {
-  implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("org.ow2.asm:asm-commons:9.7.1")
-  implementation("commons-io:commons-io:2.18.0")
-  implementation("org.apache.ant:ant:1.10.15")
-  implementation("org.codehaus.plexus:plexus-utils:4.0.2")
-  implementation("org.codehaus.plexus:plexus-xml:4.0.4")
-  implementation("org.apache.logging.log4j:log4j-core:2.24.2")
-  implementation("org.vafer:jdependency:2.11")
+  implementation(libs.apache.ant)
+  implementation(libs.apache.commonsIo)
+  implementation(libs.apache.log4j)
+  implementation(libs.asm)
+  implementation(libs.jdependency)
+  implementation(libs.jdom2)
+  implementation(libs.plexus.utils)
+  implementation(libs.plexus.xml)
 
-  testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
+  testImplementation(libs.spock) {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
-  testImplementation("org.xmlunit:xmlunit-legacy:2.10.0")
-  testImplementation("org.apache.commons:commons-lang3:3.17.0")
-  testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation(platform("org.junit:junit-bom:5.11.3"))
-  testImplementation("org.junit.jupiter:junit-jupiter")
-  testImplementation("org.junit.platform:junit-platform-suite-engine")
+  testImplementation(platform(libs.junit.bom))
+  testImplementation(libs.junit.jupiter)
+  testImplementation(libs.junit.platformSuite)
+  testImplementation(libs.xmlunit)
+  testImplementation(libs.apache.commonsLang)
+  testImplementation(libs.guava)
 
-  lintChecks("androidx.lint:lint-gradle:1.0.0-alpha02")
+  lintChecks(libs.androidx.gradlePluginLints)
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
