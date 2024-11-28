@@ -10,3 +10,8 @@ interface SnippetExecutor {
   @Throws(Exception::class)
   fun execute(tempDir: File, snippet: TestCodeSnippet)
 }
+
+object NoopExecutor : SnippetExecutor {
+  override val fixture: SnippetFixture? = null
+  override fun execute(tempDir: File, snippet: TestCodeSnippet) = Unit
+}
