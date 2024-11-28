@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
-  alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.kotlin)
   alias(libs.plugins.android.lint)
+  alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.spotless)
   groovy // Required for Spock tests.
   id("shadow.convention.publish")
