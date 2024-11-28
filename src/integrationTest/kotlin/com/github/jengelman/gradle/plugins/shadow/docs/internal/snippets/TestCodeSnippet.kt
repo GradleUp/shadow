@@ -14,7 +14,7 @@ class TestCodeSnippet(
 ) : Executable {
   override fun execute() {
     try {
-      executor.execute(tempDir.toFile(), this)
+      executor.execute(tempDir, this)
     } catch (t: Throwable) {
       throw exceptionTransformer.transform(t, requireNotNull(executor.fixture).offset)
     }

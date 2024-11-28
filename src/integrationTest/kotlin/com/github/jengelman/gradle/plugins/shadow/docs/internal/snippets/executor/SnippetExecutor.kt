@@ -2,16 +2,15 @@ package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.execut
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.SnippetFixture
-import java.io.File
+import java.nio.file.Path
 
 interface SnippetExecutor {
-  val fixture: SnippetFixture?
+  val fixture: SnippetFixture
 
-  @Throws(Exception::class)
-  fun execute(tempDir: File, snippet: TestCodeSnippet)
+  fun execute(tempDir: Path, snippet: TestCodeSnippet)
 }
 
 object NoopExecutor : SnippetExecutor {
-  override val fixture: SnippetFixture? = null
-  override fun execute(tempDir: File, snippet: TestCodeSnippet) = Unit
+  override val fixture: SnippetFixture get() = error("NoopExecutor does not have a fixture.")
+  override fun execute(tempDir: Path, snippet: TestCodeSnippet) = Unit
 }

@@ -3,50 +3,52 @@ package com.github.jengelman.gradle.plugins.shadow.docs.extractor
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.ExceptionTransformer
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.SnippetExecutor
-import java.io.File
 import java.nio.file.Path
 import java.util.regex.Pattern
-import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.name
+import kotlin.io.path.readText
+import kotlin.io.path.walk
 
 object ManualSnippetExtractor {
-  @JvmStatic
   fun extract(
     tempDir: Path,
-    root: File,
+    docRoot: Path,
     cssClass: String,
     executor: SnippetExecutor,
   ): List<TestCodeSnippet> {
     val snippets = mutableListOf<TestCodeSnippet>()
     val snippetBlockPattern = Pattern.compile("(?ims)```$cssClass\n(.*?)\n```")
-    root.toPath().listDirectoryEntries("**/*.md").forEach {
-      addSnippets(tempDir, snippets, it.toFile(), snippetBlockPattern, executor)
-    }
+    @OptIn(ExperimentalPathApi::class)
+    docRoot.walk()
+      .filter { it.name.endsWith(".md", ignoreCase = true) }
+      .forEach {
+        addSnippets(tempDir, snippets, it, snippetBlockPattern, executor)
+      }
     return snippets
   }
 
   private fun addSnippets(
     tempDir: Path,
     snippets: MutableList<TestCodeSnippet>,
-    file: File,
+    path: Path,
     snippetBlockPattern: Pattern,
     executor: SnippetExecutor,
   ) {
-    val source = file.readText()
-    val testName = "${file.parentFile.name}/${file.name}"
+    val source = path.readText()
+    val testName = "${path.parent.name}/${path.name}"
     val snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
 
     snippetsByLine.forEach { (lineNumber, snippet) ->
-      snippets.add(createSnippet(tempDir, testName, file, lineNumber, snippet, executor))
+      snippets.add(createSnippet(tempDir, testName, path, lineNumber, snippet, executor))
     }
   }
 
-  private fun findSnippetBlocks(code: String, snippetTagPattern: Pattern): List<String> {
-    val tags = mutableListOf<String>()
+  private fun findSnippetBlocks(code: String, snippetTagPattern: Pattern) = buildList {
     val matcher = snippetTagPattern.matcher(code)
     while (matcher.find()) {
-      tags.add(matcher.group(0))
+      add(matcher.group(0))
     }
-    return tags
   }
 
   private fun findSnippetsByLine(source: String, snippetTagPattern: Pattern): Map<Int, String> {
@@ -71,7 +73,7 @@ object ManualSnippetExtractor {
   private fun createSnippet(
     tempDir: Path,
     sourceClassName: String,
-    sourceFile: File,
+    sourcePath: Path,
     lineNumber: Int,
     snippet: String,
     executor: SnippetExecutor,
@@ -81,7 +83,7 @@ object ManualSnippetExtractor {
       snippet,
       "$sourceClassName:$lineNumber",
       executor,
-      ExceptionTransformer(sourceClassName, sourceFile.name, lineNumber),
+      ExceptionTransformer(sourceClassName, sourcePath.name, lineNumber),
     )
   }
 }

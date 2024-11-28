@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.fixture
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.GroovyScriptFixture
-import java.util.function.Function
 
 class GroovyDslFixture : GroovyScriptFixture() {
 
@@ -23,8 +22,8 @@ class GroovyDslFixture : GroovyScriptFixture() {
     """.trimIndent()
   }
 
-  class ImportsExtractor : Function<String, List<String>> {
-    override fun apply(snippet: String): List<String> {
+  companion object {
+    val importsExtractor: (String) -> List<String> = { snippet ->
       val imports = StringBuilder()
       val scriptMinusImports = StringBuilder()
 
@@ -33,7 +32,10 @@ class GroovyDslFixture : GroovyScriptFixture() {
         target.append(line).append("\n")
       }
 
-      return listOf(imports.toString(), scriptMinusImports.toString())
+      listOf(
+        imports.toString(),
+        scriptMinusImports.toString(),
+      )
     }
   }
 }
