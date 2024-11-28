@@ -20,9 +20,9 @@ public open class SimpleRelocator @JvmOverloads constructor(
   excludes: List<String>? = null,
   private val _rawString: Boolean = false,
 ) : Relocator {
-  private val _pattern: String?
+  private val _pattern: String
   private val _pathPattern: String
-  private val _shadedPattern: String?
+  private val _shadedPattern: String
   private val _shadedPathPattern: String
   private val _includes = mutableSetOf<String>()
   private val _excludes = mutableSetOf<String>()
@@ -31,8 +31,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
     if (_rawString) {
       _pathPattern = pattern.orEmpty()
       _shadedPathPattern = shadedPattern.orEmpty()
-      _pattern = null // not used for raw string relocator
-      _shadedPattern = null // not used for raw string relocator
+      _pattern = "" // not used for raw string relocator
+      _shadedPattern = "" // not used for raw string relocator
     } else {
       if (pattern == null) {
         _pattern = ""
@@ -55,14 +55,14 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   @get:Input
   @get:Optional
-  public open val pattern: String? get() = _pattern
+  public open val pattern: String get() = _pattern
 
   @get:Input
   public open val pathPattern: String get() = _pathPattern
 
   @get:Input
   @get:Optional
-  public open val shadedPattern: String? get() = _shadedPattern
+  public open val shadedPattern: String get() = _shadedPattern
 
   @get:Input
   public open val shadedPathPattern: String get() = _shadedPathPattern
@@ -117,14 +117,14 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun relocateClass(context: RelocateClassContext): String {
     context.stats.relocate(_pathPattern, _shadedPathPattern)
-    return context.className.replaceFirst(_pattern.orEmpty(), _shadedPattern.orEmpty())
+    return context.className.replaceFirst(_pattern, _shadedPattern)
   }
 
   override fun applyToSourceContent(sourceContent: String): String {
     return if (_rawString) {
       sourceContent
     } else {
-      sourceContent.replace("\\b$_pattern".toRegex(), _shadedPattern.orEmpty())
+      sourceContent.replace("\\b$_pattern".toRegex(), _shadedPattern)
     }
   }
 
