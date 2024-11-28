@@ -43,6 +43,11 @@ spotless {
   }
 }
 
+
+val integrationTest: SourceSet by sourceSets.creating
+val integrationTestImplementation: Configuration by configurations.getting
+val integrationTestRuntimeOnly: Configuration by configurations.getting
+
 dependencies {
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
@@ -64,7 +69,25 @@ dependencies {
   testImplementation(libs.apache.commonsLang)
   testImplementation(libs.guava)
 
+  integrationTestImplementation("com.google.guava:guava:33.3.1-jre")
+  integrationTestImplementation(platform("org.junit:junit-bom:5.11.3"))
+  integrationTestImplementation("org.junit.jupiter:junit-jupiter")
+  integrationTestImplementation("org.junit.platform:junit-platform-suite-engine")
+  integrationTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
   lintChecks(libs.androidx.gradlePluginLints)
+}
+
+val integrationTestTask = tasks.register<Test>("integrationTest") {
+  description = "Runs the integration tests."
+  group = LifecycleBasePlugin.VERIFICATION_GROUP
+  testClassesDirs = integrationTest.output.classesDirs
+  classpath = integrationTest.runtimeClasspath
+  mustRunAfter(tasks.test)
+}
+
+tasks.check {
+  dependsOn(integrationTestTask)
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
