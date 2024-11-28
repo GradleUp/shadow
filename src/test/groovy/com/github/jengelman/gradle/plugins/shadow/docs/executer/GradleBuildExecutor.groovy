@@ -1,14 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.executer
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecutor
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.SnippetFixture
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.runner.GradleRunner
 
 import java.util.function.Function
 
-class GradleBuildExecuter implements SnippetExecuter {
+class GradleBuildExecutor implements SnippetExecutor {
 
     private final SnippetFixture fixture
     private final String buildFile
@@ -16,13 +16,13 @@ class GradleBuildExecuter implements SnippetExecuter {
 
     private List<String> arguments = ["build", "-m"]
 
-    GradleBuildExecuter(String buildFile, SnippetFixture fixture, Function<String, List<String>> importExtractor) {
+    GradleBuildExecutor(String buildFile, SnippetFixture fixture, Function<String, List<String>> importExtractor) {
         this.buildFile = buildFile
         this.fixture = fixture
         this.importExtractor = importExtractor
     }
 
-    GradleBuildExecuter(String buildFile, List<String> arguments, SnippetFixture fixture, Function<String, List<String>> importExtractor) {
+    GradleBuildExecutor(String buildFile, List<String> arguments, SnippetFixture fixture, Function<String, List<String>> importExtractor) {
         this(buildFile, fixture, importExtractor)
         this.arguments = arguments
     }

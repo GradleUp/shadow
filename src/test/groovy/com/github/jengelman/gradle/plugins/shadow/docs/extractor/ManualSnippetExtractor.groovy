@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.docs.extractor
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.ExceptionTransformer
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecutor
 import groovy.ant.FileNameFinder
 
 import java.nio.file.Path
@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 
 class ManualSnippetExtractor {
 
-    static List<TestCodeSnippet> extract(Path tempDir, File root, String cssClass, SnippetExecuter executer) {
+    static List<TestCodeSnippet> extract(Path tempDir, File root, String cssClass, SnippetExecutor executer) {
         List<TestCodeSnippet> snippets = []
 
         def snippetBlockPattern = Pattern.compile(/(?ims)```$cssClass\n(.*?)\n```/)
@@ -24,7 +24,7 @@ class ManualSnippetExtractor {
         snippets
     }
 
-    private static void addSnippets(Path tempDir, List<TestCodeSnippet> snippets, File file, Pattern snippetBlockPattern, SnippetExecuter executer) {
+    private static void addSnippets(Path tempDir, List<TestCodeSnippet> snippets, File file, Pattern snippetBlockPattern, SnippetExecutor executer) {
         def source = file.text
         String testName = file.parentFile.name + "/" + file.name
         Map<Integer, String> snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
@@ -61,7 +61,7 @@ class ManualSnippetExtractor {
         tag.substring(tag.indexOf("\n") + 1, tag.lastIndexOf("\n"))
     }
 
-    private static TestCodeSnippet createSnippet(Path tempDir, String sourceClassName, File sourceFile, int lineNumber, String snippet, SnippetExecuter executer) {
+    private static TestCodeSnippet createSnippet(Path tempDir, String sourceClassName, File sourceFile, int lineNumber, String snippet, SnippetExecutor executer) {
         new TestCodeSnippet(tempDir, snippet, sourceClassName + ":$lineNumber", executer, new ExceptionTransformer(sourceClassName, sourceFile.name, lineNumber))
     }
 

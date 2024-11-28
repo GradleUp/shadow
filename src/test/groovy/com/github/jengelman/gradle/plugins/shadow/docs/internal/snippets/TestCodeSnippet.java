@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets;
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.ExceptionTransformer;
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecuter;
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecutor;
 import org.junit.jupiter.api.function.Executable;
 
 import java.nio.file.Path;
@@ -11,10 +11,10 @@ public class TestCodeSnippet implements Executable {
     private final Path tempDir;
     private final String snippet;
     private final String testName;
-    private final SnippetExecuter executer;
+    private final SnippetExecutor executer;
     private final ExceptionTransformer exceptionTransformer;
 
-    public TestCodeSnippet(Path tempDir, String snippet, String testName, SnippetExecuter executer, ExceptionTransformer exceptionTransformer) {
+    public TestCodeSnippet(Path tempDir, String snippet, String testName, SnippetExecutor executer, ExceptionTransformer exceptionTransformer) {
         this.tempDir = tempDir;
         this.snippet = snippet;
         this.testName = testName;
