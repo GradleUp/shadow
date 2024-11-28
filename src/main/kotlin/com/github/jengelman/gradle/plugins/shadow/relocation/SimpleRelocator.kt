@@ -55,26 +55,26 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   @get:Input
   @get:Optional
-  public open val pattern: String = _pattern
+  public open val pattern: String get() = _pattern
 
   @get:Input
-  public open val pathPattern: String = _pathPattern
+  public open val pathPattern: String get() = _pathPattern
 
   @get:Input
   @get:Optional
-  public open val shadedPattern: String = _shadedPattern
+  public open val shadedPattern: String get() = _shadedPattern
 
   @get:Input
-  public open val shadedPathPattern: String = _shadedPathPattern
+  public open val shadedPathPattern: String get() = _shadedPathPattern
 
   @get:Input
-  public open val rawString: Boolean = _rawString
+  public open val rawString: Boolean get() = _rawString
 
   @get:Input
-  public open val includes: Set<String> = _includes
+  public open val includes: Set<String> get() = _includes
 
   @get:Input
-  public open val excludes: Set<String> = _excludes
+  public open val excludes: Set<String> get() = _excludes
 
   public open fun include(pattern: String): SimpleRelocator = apply {
     _includes += normalizePatterns(listOf(pattern))
