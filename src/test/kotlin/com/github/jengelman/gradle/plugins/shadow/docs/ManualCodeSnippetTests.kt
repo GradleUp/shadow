@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.docs
 import com.github.jengelman.gradle.plugins.shadow.docs.extractor.ManualSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.docs.fixture.GroovyDslFixture
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.GradleBuildExecutor
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.NoopExecutor
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.GradleBuildExecutor
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.NoopExecutor
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.GroovyScriptFixture
 import com.google.common.base.StandardSystemProperty
 import java.io.File

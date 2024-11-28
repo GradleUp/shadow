@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets
 
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.ExceptionTransformer
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecutor
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.ExceptionTransformer
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.SnippetExecutor
 import java.nio.file.Path
 import org.junit.jupiter.api.function.Executable
 

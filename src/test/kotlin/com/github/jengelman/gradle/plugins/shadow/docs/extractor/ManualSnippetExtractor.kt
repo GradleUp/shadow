@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.docs.extractor
 
 import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.ExceptionTransformer
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer.SnippetExecutor
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.ExceptionTransformer
+import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.SnippetExecutor
 import java.io.File
 import java.nio.file.Path
 import java.util.regex.Pattern

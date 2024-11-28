@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executer
+package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor
 
 class CompileException(
   cause: Throwable?,
