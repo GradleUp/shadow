@@ -19,7 +19,6 @@
 
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 
 import static org.junit.jupiter.api.Assertions.fail
@@ -32,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.fail
  * @author John Engelman
  */
 class SimpleRelocatorParameterTest {
-    private static final def objectFactory = ProjectBuilder.builder().build().objects
 
     @Test
     void testThatNullPatternInConstructorShouldNotThrowNullPointerException() {
@@ -46,7 +44,7 @@ class SimpleRelocatorParameterTest {
 
     private static void constructThenFailOnNullPointerException(String pattern, String shadedPattern) {
         try {
-            new SimpleRelocator(objectFactory, pattern, shadedPattern)
+            new SimpleRelocator(pattern, shadedPattern)
         }
         catch (NullPointerException ignored) {
             fail("Constructor should not throw null pointer exceptions")
