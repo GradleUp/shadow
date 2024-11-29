@@ -17,10 +17,8 @@ class GroovyBuildExecutor(
     tempDir.resolve("settings.gradle").writeText(settingsBuildText)
     tempDir.addSubProject("api", projectBuildText)
 
-    val importsAndSnippet = importExtractor(snippet)
-    val imports = importsAndSnippet.first()
-    val snippetMinusImports = fixture.transform(importsAndSnippet[1])
-    val fullSnippet = imports + fixture.pre + '\n' + snippetMinusImports + '\n' + fixture.post
+    val (imports, snippetWithoutImports) = importExtractor(snippet)
+    val fullSnippet = imports + fixture.pre + '\n' + snippetWithoutImports + '\n' + fixture.post
 
     tempDir.addSubProject("main", fullSnippet)
 

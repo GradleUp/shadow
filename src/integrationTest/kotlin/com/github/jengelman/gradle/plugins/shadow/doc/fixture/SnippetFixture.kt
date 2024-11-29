@@ -4,6 +4,4 @@ interface SnippetFixture {
   val pre: String
 
   val post: String
-
-  fun transform(text: String): String = text
 }
