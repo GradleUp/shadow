@@ -1,6 +1,6 @@
 # Getting Started
 
-```groovy no-plugins
+```groovy no-run
 plugins {
   id 'com.gradleup.shadow' version '@version@'
   id 'java'
