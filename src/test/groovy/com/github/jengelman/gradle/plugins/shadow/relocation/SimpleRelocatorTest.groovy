@@ -226,9 +226,9 @@ class SimpleRelocatorTest {
     void testCanRelocateSourceFile() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("org.foo", null, null, null)
-        relocator.excludeSource "org/apache/iceberg/spark/parquet/**"
-        relocator.excludeSource "org/apache/spark/sql/execution/datasources/parquet/**"
+        relocator = new SimpleRelocator("org.foo", null)
+        relocator.excludeSources "org/apache/iceberg/spark/parquet/**"
+        relocator.excludeSources "org/apache/spark/sql/execution/datasources/parquet/**"
 
         assertEquals(false, relocator.canRelocateSourceFile("org/apache/iceberg/spark/parquet/SparkNativeParquet.class"))
         assertEquals(false, relocator.canRelocateSourceFile("org/apache/iceberg/spark/parquet/SparkNativeParquet\$.class"))
@@ -240,9 +240,9 @@ class SimpleRelocatorTest {
     void testCanRelocateSourceFileWithRegex() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("org.foo", null, null, null)
-        relocator.excludeSource "%regex[org/apache/iceberg/.*]"
-        relocator.excludeSource "%regex[org/apache/spark/.*]"
+        relocator = new SimpleRelocator("org.foo", null)
+        relocator.excludeSources "%regex[org/apache/iceberg/.*]"
+        relocator.excludeSources "%regex[org/apache/spark/.*]"
 
         assertEquals(false, relocator.canRelocateSourceFile("org/apache/iceberg/spark/parquet/SparkNativeParquet.class"))
         assertEquals(false, relocator.canRelocateSourceFile("org/apache/iceberg/spark/parquet/SparkNativeParquet\$.class"))
