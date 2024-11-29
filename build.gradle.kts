@@ -44,8 +44,12 @@ spotless {
 }
 
 val integrationTestSourceSet: SourceSet = sourceSets.create("integrationTest")
-val integrationTestImplementation: Configuration by configurations.getting
-val integrationTestRuntimeOnly: Configuration by configurations.getting
+val integrationTestImplementation: Configuration by configurations.getting {
+  extendsFrom(configurations.testImplementation.get())
+}
+val integrationTestRuntimeOnly: Configuration by configurations.getting {
+  extendsFrom(configurations.testRuntimeOnly.get())
+}
 
 gradlePlugin {
   testSourceSets.add(integrationTestSourceSet)
@@ -69,13 +73,7 @@ dependencies {
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.xmlunit)
   testImplementation(libs.apache.commonsLang)
-
-  integrationTestImplementation(gradleApi())
-  integrationTestImplementation(gradleTestKit())
-  integrationTestImplementation(platform(libs.junit.bom))
-  integrationTestImplementation(libs.junit.jupiter)
-  integrationTestImplementation(libs.junit.platformSuite)
-  integrationTestRuntimeOnly(libs.junit.platformLauncher)
+  testRuntimeOnly(libs.junit.platformLauncher)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }
