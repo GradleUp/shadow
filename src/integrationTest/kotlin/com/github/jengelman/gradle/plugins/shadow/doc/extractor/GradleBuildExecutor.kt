@@ -1,7 +1,7 @@
-package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor
+package com.github.jengelman.gradle.plugins.shadow.doc.extractor
 
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.SnippetFixture
+import com.github.jengelman.gradle.plugins.shadow.doc.executable.TestCodeExecutable
+import com.github.jengelman.gradle.plugins.shadow.doc.fixture.SnippetFixture
 import java.nio.file.Path
 import kotlin.io.path.createDirectory
 import kotlin.io.path.writeText
@@ -14,7 +14,7 @@ class GradleBuildExecutor(
   private val arguments: List<String> = listOf("build", "-m"),
 ) : SnippetExecutor {
 
-  override fun execute(tempDir: Path, snippet: TestCodeSnippet) {
+  override fun execute(tempDir: Path, snippet: TestCodeExecutable) {
     addSubProject(tempDir)
     tempDir.resolve("settings.gradle").writeText(
       """

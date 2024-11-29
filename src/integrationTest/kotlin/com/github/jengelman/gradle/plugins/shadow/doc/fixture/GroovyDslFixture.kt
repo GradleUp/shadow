@@ -1,6 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.docs.fixture
-
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixture.GroovyScriptFixture
+package com.github.jengelman.gradle.plugins.shadow.doc.fixture
 
 class GroovyDslFixture : GroovyScriptFixture() {
 

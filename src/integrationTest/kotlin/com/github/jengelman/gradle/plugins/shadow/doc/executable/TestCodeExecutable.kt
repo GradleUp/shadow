@@ -1,11 +1,11 @@
-package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets
+package com.github.jengelman.gradle.plugins.shadow.doc.executable
 
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.ExceptionTransformer
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.SnippetExecutor
+import com.github.jengelman.gradle.plugins.shadow.doc.exception.ExceptionTransformer
+import com.github.jengelman.gradle.plugins.shadow.doc.extractor.SnippetExecutor
 import java.nio.file.Path
 import org.junit.jupiter.api.function.Executable
 
-class TestCodeSnippet(
+class TestCodeExecutable(
   private val tempDir: Path,
   val snippet: String,
   val testName: String,
@@ -16,7 +16,7 @@ class TestCodeSnippet(
     try {
       executor.execute(tempDir, this)
     } catch (t: Throwable) {
-      throw exceptionTransformer.transform(t, requireNotNull(executor.fixture).offset)
+      throw exceptionTransformer.transform(t, executor.fixture.offset)
     }
   }
 }

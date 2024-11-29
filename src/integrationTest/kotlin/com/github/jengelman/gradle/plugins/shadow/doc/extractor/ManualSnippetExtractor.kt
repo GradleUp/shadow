@@ -1,8 +1,7 @@
-package com.github.jengelman.gradle.plugins.shadow.docs.extractor
+package com.github.jengelman.gradle.plugins.shadow.doc.extractor
 
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.TestCodeSnippet
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.ExceptionTransformer
-import com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.executor.SnippetExecutor
+import com.github.jengelman.gradle.plugins.shadow.doc.exception.ExceptionTransformer
+import com.github.jengelman.gradle.plugins.shadow.doc.executable.TestCodeExecutable
 import java.nio.file.Path
 import java.util.regex.Pattern
 import kotlin.io.path.ExperimentalPathApi
@@ -16,8 +15,8 @@ object ManualSnippetExtractor {
     docRoot: Path,
     cssClass: String,
     executor: SnippetExecutor,
-  ): List<TestCodeSnippet> {
-    val snippets = mutableListOf<TestCodeSnippet>()
+  ): List<TestCodeExecutable> {
+    val snippets = mutableListOf<TestCodeExecutable>()
     val snippetBlockPattern = Pattern.compile("(?ims)```$cssClass\n(.*?)\n```")
     @OptIn(ExperimentalPathApi::class)
     docRoot.walk()
@@ -30,7 +29,7 @@ object ManualSnippetExtractor {
 
   private fun addSnippets(
     tempDir: Path,
-    snippets: MutableList<TestCodeSnippet>,
+    snippets: MutableList<TestCodeExecutable>,
     path: Path,
     snippetBlockPattern: Pattern,
     executor: SnippetExecutor,
@@ -77,8 +76,8 @@ object ManualSnippetExtractor {
     lineNumber: Int,
     snippet: String,
     executor: SnippetExecutor,
-  ): TestCodeSnippet {
-    return TestCodeSnippet(
+  ): TestCodeExecutable {
+    return TestCodeExecutable(
       tempDir,
       snippet,
       "$sourceClassName:$lineNumber",
