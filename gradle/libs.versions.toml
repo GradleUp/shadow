@@ -17,7 +17,6 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.4.1"
 spock = "org.spockframework:spock-core:2.3-groovy-3.0"
 junit-bom = "org.junit:junit-bom:5.11.3"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-junit-platformSuite = { module = "org.junit.platform:junit-platform-suite-engine" }
 junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 
 [plugins]
