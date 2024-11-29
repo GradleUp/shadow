@@ -149,16 +149,15 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun canRelocateSourceFile(sourceFilePath: String): Boolean {
-    var tempPath = sourceFilePath
-    if (tempPath.endsWith(CLASS_SUFFIX)) {
+    val adjustedPath = if (sourceFilePath.endsWith(CLASS_SUFFIX)) {
       // Safeguard against strings containing only ".class"
-      if (tempPath.length == CLASS_SUFFIX_LENGTH) {
-        return false
-      }
-      tempPath = tempPath.substring(0, tempPath.length - CLASS_SUFFIX_LENGTH)
+      if (sourceFilePath.length == CLASS_SUFFIX_LENGTH) return false
+      sourceFilePath.dropLast(CLASS_SUFFIX_LENGTH)
+    } else {
+      sourceFilePath
     }
 
-    return this.isSourceIncluded(tempPath) && !this.isSourceExcluded(tempPath)
+    return this.isSourceIncluded(adjustedPath) && !this.isSourceExcluded(adjustedPath)
   }
 
   private fun isIncluded(path: String): Boolean {
