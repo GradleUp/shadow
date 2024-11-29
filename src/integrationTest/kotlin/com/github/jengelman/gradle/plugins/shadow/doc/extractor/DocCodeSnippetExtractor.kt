@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.doc.extractor
 
-import com.github.jengelman.gradle.plugins.shadow.doc.DocCodeSnippetTests
+import com.github.jengelman.gradle.plugins.shadow.doc.DocCodeSnippetTest
 import com.github.jengelman.gradle.plugins.shadow.doc.exception.ExceptionTransformer
-import com.github.jengelman.gradle.plugins.shadow.doc.executable.TestCodeExecutable
+import com.github.jengelman.gradle.plugins.shadow.doc.executable.DocCodeExecutable
 import java.nio.file.Path
 import java.util.regex.Pattern
 import kotlin.io.path.ExperimentalPathApi
@@ -12,14 +12,14 @@ import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
-object ManualSnippetExtractor {
+object DocCodeSnippetExtractor {
   fun extract(
     tempDir: Path,
     docRoot: Path,
     cssClass: String,
     executor: SnippetExecutor,
-  ): List<TestCodeExecutable> {
-    val snippets = mutableListOf<TestCodeExecutable>()
+  ): List<DocCodeExecutable> {
+    val snippets = mutableListOf<DocCodeExecutable>()
     val snippetBlockPattern = Pattern.compile("(?ims)```$cssClass\n(.*?)\n```")
     @OptIn(ExperimentalPathApi::class)
     docRoot.walk()
@@ -32,13 +32,13 @@ object ManualSnippetExtractor {
 
   private fun addSnippets(
     tempDir: Path,
-    snippets: MutableList<TestCodeExecutable>,
+    snippets: MutableList<DocCodeExecutable>,
     path: Path,
     snippetBlockPattern: Pattern,
     executor: SnippetExecutor,
   ) {
     val source = path.readText()
-    val relativeDocPath = path.relativeTo(DocCodeSnippetTests.docsDir).pathString
+    val relativeDocPath = path.relativeTo(DocCodeSnippetTest.docsDir).pathString
     val snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
 
     snippetsByLine.forEach { (lineNumber, snippet) ->
@@ -79,8 +79,8 @@ object ManualSnippetExtractor {
     lineNumber: Int,
     snippet: String,
     executor: SnippetExecutor,
-  ): TestCodeExecutable {
-    return TestCodeExecutable(
+  ): DocCodeExecutable {
+    return DocCodeExecutable(
       tempDir,
       snippet,
       "$sourceClassName:$lineNumber",

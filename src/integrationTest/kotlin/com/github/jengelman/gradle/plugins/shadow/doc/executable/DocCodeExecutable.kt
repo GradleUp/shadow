@@ -6,7 +6,7 @@ import java.nio.file.Path
 import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.function.Executable
 
-class TestCodeExecutable(
+class DocCodeExecutable(
   private val tempDir: Path,
   private val snippet: String,
   val testName: String,
