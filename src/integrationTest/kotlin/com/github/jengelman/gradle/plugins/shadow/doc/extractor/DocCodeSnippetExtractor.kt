@@ -59,7 +59,7 @@ object DocCodeSnippetExtractor {
     var codeIndex = 0
     snippetBlocks.forEach { block ->
       codeIndex = source.indexOf(block, codeIndex)
-      val lineNumber = source.substring(0, codeIndex).lines().size + 2
+      val lineNumber = source.substring(0, codeIndex).lines().size + 1
       snippetBlocksByLine[lineNumber] = extractSnippetFromBlock(block)
       codeIndex += block.length
     }
@@ -84,10 +84,9 @@ object DocCodeSnippetExtractor {
       snippet,
       "$sourceClassName:$lineNumber",
       executor,
-      exceptionTransformer = {
-        val message = "The error line in the doc at ${sourcePath.toUri()}:$lineNumber"
-        RuntimeException(message, it)
-      },
-    )
+    ) {
+      val message = "The error line in the doc is near ${sourcePath.toUri()}:$lineNumber"
+      RuntimeException(message, it)
+    }
   }
 }
