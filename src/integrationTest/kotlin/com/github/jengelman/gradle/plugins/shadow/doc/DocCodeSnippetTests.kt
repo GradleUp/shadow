@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.io.TempDir
 
-class ManualCodeSnippetTests {
+class DocCodeSnippetTests {
 
   @TestFactory
   fun provideDynamicTests(@TempDir tempDir: Path): List<DynamicTest> {
