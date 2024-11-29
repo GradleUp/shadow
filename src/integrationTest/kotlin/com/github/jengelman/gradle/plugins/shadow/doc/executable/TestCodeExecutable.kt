@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.doc.executable
 import com.github.jengelman.gradle.plugins.shadow.doc.exception.ExceptionTransformer
 import com.github.jengelman.gradle.plugins.shadow.doc.extractor.SnippetExecutor
 import java.nio.file.Path
-import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.function.Executable
 
 class TestCodeExecutable(
@@ -15,7 +15,8 @@ class TestCodeExecutable(
 ) : Executable {
   override fun execute() {
     try {
-      executor.execute(tempDir.resolve(testName).createDirectories(), this)
+      // TODO: any way to createTempDirectory with `@TempDir` for each `Executable`?
+      executor.execute(createTempDirectory(tempDir, "doc-"), this)
     } catch (t: Throwable) {
       throw exceptionTransformer.transform(t, executor.fixture.offset)
     }
