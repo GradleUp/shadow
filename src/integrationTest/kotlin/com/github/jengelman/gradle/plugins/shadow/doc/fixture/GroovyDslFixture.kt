@@ -1,26 +1,29 @@
 package com.github.jengelman.gradle.plugins.shadow.doc.fixture
 
-class GroovyDslFixture : GroovyScriptFixture() {
+import org.intellij.lang.annotations.Language
 
-  override fun pre(): String {
-    return """
+class GroovyDslFixture : SnippetFixture {
+
+  override val pre: String = projectBuildText
+
+  override val post: String = "\n;0;"
+
+  companion object {
+    @Language("Groovy")
+    private val projectBuildText = """
       plugins {
         id("java")
         id("com.gradleup.shadow")
         id("application")
       }
-
-      version = "1.0"
-      group = "shadow"
-
       repositories {
         mavenLocal()
         mavenCentral()
       }
+      version = "1.0"
+      group = "shadow"
     """.trimIndent()
-  }
 
-  companion object {
     val importsExtractor: (String) -> List<String> = { snippet ->
       val imports = StringBuilder()
       val scriptMinusImports = StringBuilder()
