@@ -166,10 +166,10 @@ class SimpleRelocatorTest {
     void testCanRelocateRawString() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("org/foo", null, null, null, true)
+        relocator = new SimpleRelocator("org/foo", null, null, null, null, null, true)
         assertEquals(true, relocator.canRelocatePath("(I)org/foo/bar/Class"))
 
-        relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", null, null, null, true)
+        relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", null, null, null, null, null, true)
         assertEquals(true, relocator.canRelocatePath("META-INF/org.foo.xml"))
     }
 
@@ -207,10 +207,10 @@ class SimpleRelocatorTest {
     void testRelocateRawString() {
         SimpleRelocator relocator
 
-        relocator = new SimpleRelocator("Lorg/foo", "Lhidden/org/foo", null, null, true)
+        relocator = new SimpleRelocator("Lorg/foo", "Lhidden/org/foo", null, null, null, null, true)
         assertEquals("(I)Lhidden/org/foo/bar/Class", relocator.relocatePath(pathContext("(I)Lorg/foo/bar/Class")))
 
-        relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", null, null, true)
+        relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", null, null, null, null, true)
         assertEquals("META-INF/hidden.org.foo.xml", relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
     }
 
@@ -223,7 +223,7 @@ class SimpleRelocatorTest {
     }
 
     @Test
-    void testCanRelocateSourceFile() {
+    void testCanRelocateExcludedSourceFile() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null)
@@ -237,7 +237,7 @@ class SimpleRelocatorTest {
     }
 
     @Test
-    void testCanRelocateSourceFileWithRegex() {
+    void testCanRelocateExcludedSourceFileWithRegex() {
         SimpleRelocator relocator
 
         relocator = new SimpleRelocator("org.foo", null)
