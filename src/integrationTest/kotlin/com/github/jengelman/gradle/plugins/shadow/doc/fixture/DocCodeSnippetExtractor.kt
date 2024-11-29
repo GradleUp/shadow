@@ -1,7 +1,8 @@
-package com.github.jengelman.gradle.plugins.shadow.doc.extractor
+package com.github.jengelman.gradle.plugins.shadow.doc.fixture
 
 import com.github.jengelman.gradle.plugins.shadow.doc.DocCodeSnippetTest
 import com.github.jengelman.gradle.plugins.shadow.doc.executable.DocCodeExecutable
+import com.github.jengelman.gradle.plugins.shadow.doc.executor.SnippetExecutor
 import java.nio.file.Path
 import java.util.regex.Pattern
 import kotlin.io.path.ExperimentalPathApi

@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.doc
 
-import com.github.jengelman.gradle.plugins.shadow.doc.extractor.DocCodeSnippetExtractor
-import com.github.jengelman.gradle.plugins.shadow.doc.extractor.GroovyBuildExecutor
-import com.github.jengelman.gradle.plugins.shadow.doc.extractor.NoopExecutor
+import com.github.jengelman.gradle.plugins.shadow.doc.executor.GroovyBuildExecutor
+import com.github.jengelman.gradle.plugins.shadow.doc.executor.NoopExecutor
+import com.github.jengelman.gradle.plugins.shadow.doc.fixture.DocCodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.doc.fixture.GroovyDslFixture
 import java.nio.file.Path
 import kotlin.io.path.Path
