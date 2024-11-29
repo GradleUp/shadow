@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.doc.extractor
 
 import com.github.jengelman.gradle.plugins.shadow.doc.DocCodeSnippetTest
-import com.github.jengelman.gradle.plugins.shadow.doc.exception.ExceptionTransformer
 import com.github.jengelman.gradle.plugins.shadow.doc.executable.DocCodeExecutable
 import java.nio.file.Path
 import java.util.regex.Pattern
@@ -85,12 +84,10 @@ object DocCodeSnippetExtractor {
       snippet,
       "$sourceClassName:$lineNumber",
       executor,
-      ExceptionTransformer(
-        className = sourceClassName,
-        methodName = "",
-        sourcePath = sourcePath.pathString,
-        lineNumber = lineNumber,
-      ),
+      exceptionTransformer = {
+        val message = "The error line in the doc at ${sourcePath.toUri()}:$lineNumber"
+        RuntimeException(message, it)
+      },
     )
   }
 }
