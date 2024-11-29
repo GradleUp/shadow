@@ -5,7 +5,5 @@ interface SnippetFixture {
 
   val post: String
 
-  val offset: Int get() = pre.lines().dropLastWhile { it.isEmpty() }.size
-
   fun transform(text: String): String = text
 }

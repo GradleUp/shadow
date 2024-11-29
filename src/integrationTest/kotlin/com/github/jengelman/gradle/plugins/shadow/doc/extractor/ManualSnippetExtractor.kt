@@ -85,7 +85,12 @@ object ManualSnippetExtractor {
       snippet,
       "$sourceClassName:$lineNumber",
       executor,
-      ExceptionTransformer(sourceClassName, sourcePath.name, lineNumber),
+      ExceptionTransformer(
+        className = sourceClassName,
+        methodName = "",
+        sourcePath = sourcePath.pathString,
+        lineNumber = lineNumber,
+      ),
     )
   }
 }

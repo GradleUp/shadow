@@ -18,7 +18,7 @@ class TestCodeExecutable(
       // TODO: any way to createTempDirectory with `@TempDir` for each `Executable`?
       executor.execute(createTempDirectory(tempDir, "doc-"), this)
     } catch (t: Throwable) {
-      throw exceptionTransformer.transform(t, executor.fixture.offset)
+      throw exceptionTransformer.transform(t)
     }
   }
 }
