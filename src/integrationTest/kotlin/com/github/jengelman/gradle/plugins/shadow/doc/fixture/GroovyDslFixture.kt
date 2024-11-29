@@ -6,7 +6,7 @@ class GroovyDslFixture : SnippetFixture {
 
   override val pre: String = projectBuildText
 
-  override val post: String = "\n;0;"
+  override val post: String = ""
 
   companion object {
     @Language("Groovy")

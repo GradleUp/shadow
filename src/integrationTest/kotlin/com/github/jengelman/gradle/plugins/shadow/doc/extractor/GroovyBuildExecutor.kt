@@ -21,16 +21,20 @@ class GroovyBuildExecutor(
     val importsAndSnippet = importExtractor(snippet.snippet)
     val imports = importsAndSnippet.first()
     val snippetMinusImports = fixture.transform(importsAndSnippet[1])
-    val fullSnippet = imports + fixture.pre + snippetMinusImports + fixture.post
+    val fullSnippet = imports + fixture.pre + '\n' + snippetMinusImports + '\n' + fixture.post
 
     tempDir.addSubProject("main", fullSnippet)
 
-    GradleRunner.create()
-      .withProjectDir(tempDir.toFile())
-      .withPluginClasspath()
-      .forwardOutput()
-      .withArguments(*arguments)
-      .build()
+    try {
+      GradleRunner.create()
+        .withProjectDir(tempDir.toFile())
+        .withPluginClasspath()
+        .forwardOutput()
+        .withArguments(*arguments)
+        .build()
+    } catch (t: Throwable) {
+      throw RuntimeException("Failed to execute snippet:\n\n$fullSnippet", t)
+    }
   }
 
   private fun Path.addSubProject(project: String, buildScriptText: String) {
