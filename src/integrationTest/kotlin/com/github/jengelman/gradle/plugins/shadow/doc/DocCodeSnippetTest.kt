@@ -24,7 +24,7 @@ class DocCodeSnippetTest {
   companion object {
     private val fixtures = mapOf(
       "groovy" to GroovyBuildExecutor(
-        GroovyDslFixture(),
+        GroovyDslFixture,
         GroovyDslFixture.importsExtractor,
       ),
       "groovy no-run" to NoopExecutor,
