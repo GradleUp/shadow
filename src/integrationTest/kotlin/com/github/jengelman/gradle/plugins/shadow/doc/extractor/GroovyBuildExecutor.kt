@@ -11,7 +11,7 @@ import org.intellij.lang.annotations.Language
 class GroovyBuildExecutor(
   override val fixture: SnippetFixture,
   private val importExtractor: (String) -> List<String>,
-  private val arguments: List<String> = listOf("build", "-m"),
+  private val arguments: Array<String> = arrayOf("build", "-m"),
 ) : SnippetExecutor {
 
   override fun execute(tempDir: Path, snippet: TestCodeExecutable) {
@@ -29,7 +29,7 @@ class GroovyBuildExecutor(
       .withProjectDir(tempDir.toFile())
       .withPluginClasspath()
       .forwardOutput()
-      .withArguments(":main:build", "-m")
+      .withArguments(*arguments)
       .build()
   }
 
