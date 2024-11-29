@@ -8,7 +8,7 @@ import org.junit.jupiter.api.function.Executable
 
 class TestCodeExecutable(
   private val tempDir: Path,
-  val snippet: String,
+  private val snippet: String,
   val testName: String,
   private val executor: SnippetExecutor,
   private val exceptionTransformer: ExceptionTransformer,
@@ -16,7 +16,7 @@ class TestCodeExecutable(
   override fun execute() {
     try {
       // TODO: any way to createTempDirectory with `@TempDir` for each `Executable`?
-      executor.execute(createTempDirectory(tempDir, "doc-"), this)
+      executor.execute(createTempDirectory(tempDir, "doc-"), snippet)
     } catch (t: Throwable) {
       throw exceptionTransformer.transform(t)
     }

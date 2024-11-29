@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.doc.extractor
 
-import com.github.jengelman.gradle.plugins.shadow.doc.executable.TestCodeExecutable
 import com.github.jengelman.gradle.plugins.shadow.doc.fixture.SnippetFixture
 import java.nio.file.Path
 import kotlin.io.path.createDirectory
@@ -14,11 +13,11 @@ class GroovyBuildExecutor(
   private val arguments: Array<String> = arrayOf("build", "-m"),
 ) : SnippetExecutor {
 
-  override fun execute(tempDir: Path, snippet: TestCodeExecutable) {
+  override fun execute(tempDir: Path, snippet: String) {
     tempDir.resolve("settings.gradle").writeText(settingsBuildText)
     tempDir.addSubProject("api", projectBuildText)
 
-    val importsAndSnippet = importExtractor(snippet.snippet)
+    val importsAndSnippet = importExtractor(snippet)
     val imports = importsAndSnippet.first()
     val snippetMinusImports = fixture.transform(importsAndSnippet[1])
     val fullSnippet = imports + fixture.pre + '\n' + snippetMinusImports + '\n' + fixture.post
