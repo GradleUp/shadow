@@ -18,6 +18,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
   shadedPattern: String?,
   includes: List<String>? = null,
   excludes: List<String>? = null,
+  includeSources: List<String>? = null,
+  excludeSources: List<String>? = null,
   private val _rawString: Boolean = false,
 ) : Relocator {
   private val _pattern: String
@@ -26,6 +28,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val _shadedPathPattern: String
   private val _includes = mutableSetOf<String>()
   private val _excludes = mutableSetOf<String>()
+  private val _includeSources = mutableSetOf<String>()
+  private val _excludeSources = mutableSetOf<String>()
 
   init {
     if (_rawString) {
@@ -51,6 +55,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
     _includes += normalizePatterns(includes)
     _excludes += normalizePatterns(excludes)
+    _includeSources += normalizePatterns(includeSources)
+    _excludeSources += normalizePatterns(excludeSources)
   }
 
   @get:Input
@@ -76,6 +82,12 @@ public open class SimpleRelocator @JvmOverloads constructor(
   @get:Input
   public open val excludes: Set<String> get() = _excludes
 
+  @get:Input
+  public open val includeSources: Set<String> get() = _includeSources
+
+  @get:Input
+  public open val excludeSources: Set<String> get() = _excludeSources
+
   public open fun include(pattern: String): SimpleRelocator = apply {
     _includes += normalizePatterns(listOf(pattern))
   }
@@ -84,14 +96,22 @@ public open class SimpleRelocator @JvmOverloads constructor(
     _excludes += normalizePatterns(listOf(pattern))
   }
 
+  public open fun includeSources(pattern: String): SimpleRelocator = apply {
+    _includeSources += normalizePatterns(listOf(pattern))
+  }
+
+  public open fun excludeSources(pattern: String): SimpleRelocator = apply {
+    _excludeSources += normalizePatterns(listOf(pattern))
+  }
+
   override fun canRelocatePath(path: String): Boolean {
     if (_rawString) return Pattern.compile(_pathPattern).matcher(path).find()
     // If string is too short - no need to perform expensive string operations
     if (path.length < _pathPattern.length) return false
-    val adjustedPath = if (path.endsWith(".class")) {
+    val adjustedPath = if (path.endsWith(CLASS_SUFFIX)) {
       // Safeguard against strings containing only ".class"
-      if (path.length == 6) return false
-      path.dropLast(6)
+      if (path.length == CLASS_SUFFIX_LENGTH) return false
+      path.dropLast(CLASS_SUFFIX_LENGTH)
     } else {
       path
     }
@@ -128,6 +148,19 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
   }
 
+  override fun canRelocateSourceFile(sourceFilePath: String): Boolean {
+    var tempPath = sourceFilePath
+    if (tempPath.endsWith(CLASS_SUFFIX)) {
+      // Safeguard against strings containing only ".class"
+      if (tempPath.length == CLASS_SUFFIX_LENGTH) {
+        return false
+      }
+      tempPath = tempPath.substring(0, tempPath.length - CLASS_SUFFIX_LENGTH)
+    }
+
+    return this.isSourceIncluded(tempPath) && !this.isSourceExcluded(tempPath)
+  }
+
   private fun isIncluded(path: String): Boolean {
     return _includes.isEmpty() || _includes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
@@ -136,7 +169,18 @@ public open class SimpleRelocator @JvmOverloads constructor(
     return _excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
+  private fun isSourceIncluded(path: String): Boolean {
+    return _includeSources.isEmpty() || _includeSources.any { SelectorUtils.matchPath(it, path, "/", true) }
+  }
+
+  private fun isSourceExcluded(path: String): Boolean {
+    return _excludeSources.any { SelectorUtils.matchPath(it, path, "/", true) }
+  }
+
   private companion object {
+    private const val CLASS_SUFFIX = ".class"
+    private const val CLASS_SUFFIX_LENGTH = CLASS_SUFFIX.length
+
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {

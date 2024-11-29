@@ -304,9 +304,12 @@ public open class ShadowCopyAction internal constructor(
       val cv = ClassRemapper(cw, remapper)
 
       try {
+        remapper.currentFilePath = path
         cr.accept(cv, ClassReader.EXPAND_FRAMES)
       } catch (t: Throwable) {
         throw GradleException("Error in ASM processing class $path", t)
+      } finally {
+          remapper.currentFilePath = null
       }
 
       val renamedClass = cw.toByteArray()
