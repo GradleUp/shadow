@@ -309,7 +309,7 @@ public open class ShadowCopyAction internal constructor(
       } catch (t: Throwable) {
         throw GradleException("Error in ASM processing class $path", t)
       } finally {
-          remapper.currentFilePath = null
+        remapper.currentFilePath = null
       }
 
       val renamedClass = cw.toByteArray()
