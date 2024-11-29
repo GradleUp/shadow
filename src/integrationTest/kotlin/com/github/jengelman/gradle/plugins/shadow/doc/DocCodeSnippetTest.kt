@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.doc
 
+import com.github.jengelman.gradle.plugins.shadow.doc.executable.CodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.doc.executor.GroovyBuildExecutor
 import com.github.jengelman.gradle.plugins.shadow.doc.executor.NoopExecutor
-import com.github.jengelman.gradle.plugins.shadow.doc.fixture.DocCodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.doc.fixture.GroovyDslFixture
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -15,7 +15,7 @@ class DocCodeSnippetTest {
   @TestFactory
   fun provideDynamicTests(@TempDir tempDir: Path): List<DynamicTest> {
     return fixtures.flatMap { (selector, executor) ->
-      DocCodeSnippetExtractor.extract(tempDir, docsDir, selector, executor)
+      CodeSnippetExtractor.extract(tempDir, docsDir, selector, executor)
     }.map {
       DynamicTest.dynamicTest(it.testName, it)
     }

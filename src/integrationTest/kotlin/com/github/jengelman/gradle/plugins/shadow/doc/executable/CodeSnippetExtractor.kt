@@ -1,7 +1,6 @@
-package com.github.jengelman.gradle.plugins.shadow.doc.fixture
+package com.github.jengelman.gradle.plugins.shadow.doc.executable
 
 import com.github.jengelman.gradle.plugins.shadow.doc.DocCodeSnippetTest
-import com.github.jengelman.gradle.plugins.shadow.doc.executable.DocCodeExecutable
 import com.github.jengelman.gradle.plugins.shadow.doc.executor.SnippetExecutor
 import java.nio.file.Path
 import java.util.regex.Pattern
@@ -12,14 +11,14 @@ import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
-object DocCodeSnippetExtractor {
+object CodeSnippetExtractor {
   fun extract(
     tempDir: Path,
     docRoot: Path,
     cssClass: String,
     executor: SnippetExecutor,
-  ): List<DocCodeExecutable> {
-    val snippets = mutableListOf<DocCodeExecutable>()
+  ): List<CodeSnippetExecutable> {
+    val snippets = mutableListOf<CodeSnippetExecutable>()
     val snippetBlockPattern = Pattern.compile("(?ims)```$cssClass\n(.*?)\n```")
     @OptIn(ExperimentalPathApi::class)
     docRoot.walk()
@@ -32,7 +31,7 @@ object DocCodeSnippetExtractor {
 
   private fun addSnippets(
     tempDir: Path,
-    snippets: MutableList<DocCodeExecutable>,
+    snippets: MutableList<CodeSnippetExecutable>,
     path: Path,
     snippetBlockPattern: Pattern,
     executor: SnippetExecutor,
@@ -79,8 +78,8 @@ object DocCodeSnippetExtractor {
     lineNumber: Int,
     snippet: String,
     executor: SnippetExecutor,
-  ): DocCodeExecutable {
-    return DocCodeExecutable(
+  ): CodeSnippetExecutable {
+    return CodeSnippetExecutable(
       tempDir,
       snippet,
       "$sourceClassName:$lineNumber",
