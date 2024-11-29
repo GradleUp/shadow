@@ -1,12 +1,15 @@
 package com.github.jengelman.gradle.plugins.shadow.doc.extractor
 
+import com.github.jengelman.gradle.plugins.shadow.doc.DocCodeSnippetTests
 import com.github.jengelman.gradle.plugins.shadow.doc.exception.ExceptionTransformer
 import com.github.jengelman.gradle.plugins.shadow.doc.executable.TestCodeExecutable
 import java.nio.file.Path
 import java.util.regex.Pattern
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.name
+import kotlin.io.path.pathString
 import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
 object ManualSnippetExtractor {
@@ -35,11 +38,11 @@ object ManualSnippetExtractor {
     executor: SnippetExecutor,
   ) {
     val source = path.readText()
-    val testName = "${path.parent.name}/${path.name}"
+    val relativeDocPath = path.relativeTo(DocCodeSnippetTests.docsDir).pathString
     val snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
 
     snippetsByLine.forEach { (lineNumber, snippet) ->
-      snippets.add(createSnippet(tempDir, testName, path, lineNumber, snippet, executor))
+      snippets.add(createSnippet(tempDir, relativeDocPath, path, lineNumber, snippet, executor))
     }
   }
 

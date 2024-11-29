@@ -15,15 +15,13 @@ class DocCodeSnippetTests {
   @TestFactory
   fun provideDynamicTests(@TempDir tempDir: Path): List<DynamicTest> {
     return fixtures.flatMap { (selector, executor) ->
-      ManualSnippetExtractor.extract(tempDir, Path(docsDir), selector, executor)
+      ManualSnippetExtractor.extract(tempDir, docsDir, selector, executor)
     }.map {
       DynamicTest.dynamicTest(it.testName, it)
     }
   }
 
-  private companion object {
-    private val docsDir = System.getProperty("DOCS_DIR")
-
+  companion object {
     private val fixtures = mapOf(
       "groovy" to GroovyBuildExecutor(
         GroovyDslFixture(),
@@ -31,5 +29,7 @@ class DocCodeSnippetTests {
       ),
       "groovy no-run" to NoopExecutor,
     )
+
+    val docsDir: Path = Path(System.getProperty("DOCS_DIR"))
   }
 }
