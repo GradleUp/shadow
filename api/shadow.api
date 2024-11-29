@@ -84,13 +84,11 @@ public class com/github/jengelman/gradle/plugins/shadow/ShadowStats {
 
 public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper : org/objectweb/asm/commons/Remapper {
 	public fun <init> (Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
-	public final fun getCurrentFilePath ()Ljava/lang/String;
 	public fun hasRelocators ()Z
 	public fun map (Ljava/lang/String;)Ljava/lang/String;
 	public fun mapPath (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;)Ljava/lang/String;
 	public fun mapPath (Ljava/lang/String;)Ljava/lang/String;
 	public fun mapValue (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun setCurrentFilePath (Ljava/lang/String;)V
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter {
@@ -174,7 +172,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/reloc
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun canRelocateClass (Ljava/lang/String;)Z
 	public abstract fun canRelocatePath (Ljava/lang/String;)Z
-	public abstract fun canRelocateSourceFile (Ljava/lang/String;)Z
 	public abstract fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public abstract fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
@@ -187,19 +184,13 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Z)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public fun canRelocateClass (Ljava/lang/String;)Z
 	public fun canRelocatePath (Ljava/lang/String;)Z
-	public fun canRelocateSourceFile (Ljava/lang/String;)Z
 	public fun exclude (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
-	public fun excludeSources (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
-	public fun getExcludeSources ()Ljava/util/Set;
 	public fun getExcludes ()Ljava/util/Set;
-	public fun getIncludeSources ()Ljava/util/Set;
 	public fun getIncludes ()Ljava/util/Set;
 	public fun getPathPattern ()Ljava/lang/String;
 	public fun getPattern ()Ljava/lang/String;
@@ -207,7 +198,6 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun getShadedPathPattern ()Ljava/lang/String;
 	public fun getShadedPattern ()Ljava/lang/String;
 	public fun include (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
-	public fun includeSources (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
