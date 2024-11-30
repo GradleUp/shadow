@@ -15,7 +15,7 @@ abstract class TransformerTestSupport<T extends Transformer> {
 
     /**
      * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
-     * choice to test for improper case-less string comparisions.
+     * choice to test for improper case-less string comparisons.
      */
     protected static setupTurkishLocale() {
         Locale.setDefault(new Locale("tr"))
