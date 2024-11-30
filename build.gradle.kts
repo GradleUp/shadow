@@ -109,7 +109,7 @@ val functionalTest by tasks.registering(Test::class) {
 }
 
 tasks.check {
-  dependsOn(integrationTest)
+  dependsOn(integrationTest, functionalTest)
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
