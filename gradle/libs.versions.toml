@@ -4,7 +4,6 @@ apache-commonsIo = "commons-io:commons-io:2.18.0"
 apache-commonsLang = "org.apache.commons:commons-lang3:3.17.0"
 apache-log4j = "org.apache.logging.log4j:log4j-core:2.24.2"
 asm = "org.ow2.asm:asm-commons:9.7.1"
-guava = "com.google.guava:guava:33.3.1-jre"
 jdependency = "org.vafer:jdependency:2.11"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
 plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.2"
@@ -18,7 +17,7 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.4.1"
 spock = "org.spockframework:spock-core:2.3-groovy-3.0"
 junit-bom = "org.junit:junit-bom:5.11.3"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-junit-platformSuite = { module = "org.junit.platform:junit-platform-suite-engine" }
+junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 
 [plugins]
 kotlin = "org.jetbrains.kotlin.jvm:2.1.0"

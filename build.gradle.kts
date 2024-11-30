@@ -43,6 +43,18 @@ spotless {
   }
 }
 
+val integrationTestSourceSet: SourceSet = sourceSets.create("integrationTest")
+val integrationTestImplementation: Configuration by configurations.getting {
+  extendsFrom(configurations.testImplementation.get())
+}
+val integrationTestRuntimeOnly: Configuration by configurations.getting {
+  extendsFrom(configurations.testRuntimeOnly.get())
+}
+
+gradlePlugin {
+  testSourceSets.add(integrationTestSourceSet)
+}
+
 dependencies {
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
@@ -59,12 +71,27 @@ dependencies {
   }
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
-  testImplementation(libs.junit.platformSuite)
   testImplementation(libs.xmlunit)
   testImplementation(libs.apache.commonsLang)
-  testImplementation(libs.guava)
+  testRuntimeOnly(libs.junit.platformLauncher)
 
   lintChecks(libs.androidx.gradlePluginLints)
+}
+
+val integrationTest by tasks.registering(Test::class) {
+  description = "Runs the integration tests."
+  group = LifecycleBasePlugin.VERIFICATION_GROUP
+  testClassesDirs = integrationTestSourceSet.output.classesDirs
+  classpath = integrationTestSourceSet.runtimeClasspath
+
+  val docsDir = file("src/docs")
+  // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
+  inputs.dir(docsDir)
+  systemProperty("DOCS_DIR", docsDir.absolutePath)
+}
+
+tasks.check {
+  dependsOn(integrationTest)
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
@@ -80,8 +107,6 @@ tasks.withType<Test>().configureEach {
     maxHeapSize = "1g"
   }
 
-  // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
-  inputs.dir(file("src/docs"))
   systemProperty("shadowVersion", version)
 
   // Required to test configuration cache in tests when using withDebug()
