@@ -32,11 +32,10 @@ class ComponentsXmlResourceTransformerTest : TransformerTestSupport<ComponentsXm
         .inputStream(requireResourceAsStream("components-2.xml"))
         .build(),
     )
-
-    val expectedXml = requireResourceAsStream("components-expected.xml").bufferedReader().readText()
-    val actualXml = transformer.transformedResource.decodeToString()
-    val diff = XMLUnit.compareXML(expectedXml, actualXml)
-
+    val diff = XMLUnit.compareXML(
+      requireResourceAsStream("components-expected.xml").bufferedReader().readText(),
+      transformer.transformedResource.decodeToString(),
+    )
     assertThat(diff.identical()).isTrue()
   }
 }

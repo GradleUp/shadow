@@ -20,7 +20,7 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
 
   @Test
   fun testHasTransformedResource() {
-    transformer.transform(TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
+    transformer.transform(manifestTransformerContext)
 
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
@@ -32,7 +32,7 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
 
   @Test
   fun testTransformation() {
-    transformer.transform(TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
+    transformer.transform(manifestTransformerContext)
 
     val testableZipFile = doTransformAndGetTransformedFile(transformer, false)
     val targetLines = readFrom(testableZipFile, MANIFEST_NAME)
@@ -43,7 +43,7 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
 
   @Test
   fun testTransformationPropertiesAreReproducible() {
-    transformer.transform(TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
+    transformer.transform(manifestTransformerContext)
 
     val firstRunTransformedFile = doTransformAndGetTransformedFile(transformer, true)
     val firstRunTargetLines = readFrom(firstRunTransformedFile, MANIFEST_NAME)

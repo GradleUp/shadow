@@ -12,13 +12,16 @@ import org.gradle.testfixtures.ProjectBuilder
 abstract class TransformerTestSupport<T : Transformer> {
   protected lateinit var transformer: T
 
+  protected val manifestTransformerContext: TransformerContext
+    get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
+
   protected fun requireResourceAsStream(name: String): InputStream {
     return this::class.java.classLoader.getResourceAsStream(name) ?: error("Resource $name not found.")
   }
 
   protected companion object {
+    const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
     val objectFactory = ProjectBuilder.builder().build().objects
-    val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
 
     fun getFileElement(path: String): FileTreeElement {
       return DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)

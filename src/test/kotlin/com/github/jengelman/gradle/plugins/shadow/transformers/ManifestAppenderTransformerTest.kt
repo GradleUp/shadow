@@ -27,7 +27,7 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
     }
 
     assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME.toLowerCase()))).isTrue()
+    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME.lowercase()))).isTrue()
   }
 
   @Test
@@ -50,7 +50,7 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
       append("Name", "com/example/")
       append("Sealed", false)
 
-      transform(TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
+      transform(manifestTransformerContext)
     }
 
     val testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
@@ -80,7 +80,7 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
   @Test
   fun testNoTransformation() {
     val sourceLines = requireResourceAsStream(MANIFEST_NAME).bufferedReader().readLines()
-    transformer.transform(TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
+    transformer.transform(manifestTransformerContext)
     val testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
     ZipOutputStream(testableZipFile.outputStream().buffered()).use { zipOutputStream ->
       transformer.modifyOutputStream(zipOutputStream, true)
