@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
 import java.io.InputStream
 import java.nio.file.Path
 import java.util.Locale
@@ -9,7 +10,6 @@ import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
-import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.testfixtures.ProjectBuilder
 
 abstract class TransformerTestSupport<T : Transformer> {
@@ -27,7 +27,7 @@ abstract class TransformerTestSupport<T : Transformer> {
     val objectFactory = ProjectBuilder.builder().build().objects
 
     fun getFileElement(path: String): FileTreeElement {
-      return DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
+      return createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))
     }
 
     fun readFrom(jarPath: Path, resourceName: String = MANIFEST_NAME): List<String> {
