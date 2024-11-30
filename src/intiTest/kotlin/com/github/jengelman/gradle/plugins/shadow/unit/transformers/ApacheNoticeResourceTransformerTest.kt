@@ -15,6 +15,10 @@ import org.junit.jupiter.api.Test
  */
 class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeResourceTransformer>() {
 
+  init {
+    setupTurkishLocale()
+  }
+
   @BeforeEach
   fun setUp() {
     transformer = ApacheNoticeResourceTransformer(objectFactory)

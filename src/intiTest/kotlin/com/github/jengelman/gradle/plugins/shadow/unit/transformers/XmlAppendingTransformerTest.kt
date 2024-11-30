@@ -4,18 +4,13 @@ import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-import java.util.Locale
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class XmlAppendingTransformerTest : TransformerTestSupport<XmlAppendingTransformer>() {
 
   init {
-    /*
-     * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
-     * choice to test for improper case-less string comparisions.
-     */
-    Locale.setDefault(Locale("tr"))
+    setupTurkishLocale()
   }
 
   @BeforeEach
