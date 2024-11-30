@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isTrue
-import org.codehaus.plexus.util.IOUtil
 import org.custommonkey.xmlunit.XMLUnit
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,8 +30,8 @@ class ComponentsXmlResourceTransformerTest : TransformerTestSupport<ComponentsXm
         .build(),
     )
 
-    val expectedXml = IOUtil.toString(requireResourceAsStream("components-expected.xml"), "UTF-8")
-    val actualXml = IOUtil.toString(transformer.transformedResource, "UTF-8")
+    val expectedXml = requireResourceAsStream("components-expected.xml").bufferedReader().readText()
+    val actualXml = transformer.transformedResource.decodeToString()
     val diff = XMLUnit.compareXML(expectedXml, actualXml)
 
     assertThat(diff.identical()).isTrue()
