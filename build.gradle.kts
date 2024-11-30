@@ -81,9 +81,6 @@ dependencies {
   testImplementation(libs.apache.commonsLang)
   testRuntimeOnly(libs.junit.platformLauncher)
 
-  // TODO: this will be removed once we split unit tests from integration tests.
-  intiTestImplementation(sourceSets.main.get().output)
-
   funcTestImplementation(libs.spock) {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
