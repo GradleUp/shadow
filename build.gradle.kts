@@ -71,11 +71,13 @@ dependencies {
   }
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
+  testImplementation(libs.assertk)
   testImplementation(libs.xmlunit)
   testImplementation(libs.apache.commonsLang)
   testRuntimeOnly(libs.junit.platformLauncher)
 
   lintChecks(libs.androidx.gradlePluginLints)
+  lintChecks(libs.assertk.lint)
 }
 
 val integrationTest by tasks.registering(Test::class) {
