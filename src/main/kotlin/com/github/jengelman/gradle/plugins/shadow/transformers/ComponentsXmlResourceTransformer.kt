@@ -13,6 +13,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.Internal
 
 /**
  * A resource processor that aggregates plexus `components.xml` files.
@@ -89,8 +90,8 @@ public open class ComponentsXmlResourceTransformer : Transformer {
 
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()
 
-  @get:Throws(IOException::class)
-  private val transformedResource: ByteArray
+  @get:Internal
+  internal val transformedResource: ByteArray
     get() {
       val os = ByteArrayOutputStream(1024 * 4)
       XmlStreamWriter(os).use { writer ->
