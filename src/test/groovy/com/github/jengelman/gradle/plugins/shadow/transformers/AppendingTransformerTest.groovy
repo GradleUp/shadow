@@ -33,13 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue
  */
 class AppendingTransformerTest extends TransformerTestSupport<AppendingTransformer> {
 
-    static
-    {
-        /*
-         * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
-         * choice to test for improper case-less string comparisions.
-         */
-        Locale.setDefault(new Locale("tr"))
+    static {
+        setupTurkishLocale()
     }
 
     @BeforeEach
