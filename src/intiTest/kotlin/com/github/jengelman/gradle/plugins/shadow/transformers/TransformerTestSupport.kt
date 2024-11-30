@@ -1,7 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import java.io.File
 import java.io.InputStream
 import java.util.Locale
+import java.util.zip.ZipFile
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.DefaultFileTreeElement
@@ -20,6 +22,13 @@ abstract class TransformerTestSupport<T : Transformer> {
 
     fun getFileElement(path: String): FileTreeElement {
       return DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
+    }
+
+    fun readFrom(jarFile: File, resourceName: String = MANIFEST_NAME): List<String> {
+      return ZipFile(jarFile).use { zip ->
+        val entry = zip.getEntry(resourceName) ?: return emptyList()
+        zip.getInputStream(entry).bufferedReader().readLines()
+      }
     }
 
     /**

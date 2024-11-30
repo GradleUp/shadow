@@ -9,7 +9,6 @@ import assertk.assertions.isTrue
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.util.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -89,12 +88,5 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
     val targetLines = readFrom(testableZipFile)
 
     assertThat(targetLines).isEqualTo(sourceLines)
-  }
-
-  private fun readFrom(jarFile: File, resourceName: String = MANIFEST_NAME): List<String> {
-    return ZipFile(jarFile).use { zip ->
-      val entry = zip.getEntry(resourceName) ?: return emptyList()
-      zip.getInputStream(entry).bufferedReader().readLines()
-    }
   }
 }
