@@ -90,7 +90,7 @@ public open class ComponentsXmlResourceTransformer : Transformer {
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()
 
   @get:Throws(IOException::class)
-  private val transformedResource: ByteArray
+  internal val transformedResource: ByteArray
     get() {
       val os = ByteArrayOutputStream(1024 * 4)
       XmlStreamWriter(os).use { writer ->
