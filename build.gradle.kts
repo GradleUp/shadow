@@ -43,16 +43,25 @@ spotless {
   }
 }
 
-val integrationTestSourceSet: SourceSet = sourceSets.create("integrationTest")
-val integrationTestImplementation: Configuration by configurations.getting {
+val intiTest: SourceSet by sourceSets.creating
+val intiTestImplementation: Configuration by configurations.getting {
   extendsFrom(configurations.testImplementation.get())
 }
-val integrationTestRuntimeOnly: Configuration by configurations.getting {
+val intiTestRuntimeOnly: Configuration by configurations.getting {
+  extendsFrom(configurations.testRuntimeOnly.get())
+}
+
+val funcTest: SourceSet by sourceSets.creating
+val funcTestImplementation: Configuration by configurations.getting {
+  extendsFrom(configurations.testImplementation.get())
+}
+val funcTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
 }
 
 gradlePlugin {
-  testSourceSets.add(integrationTestSourceSet)
+  testSourceSets.add(intiTest)
+  testSourceSets.add(funcTest)
 }
 
 dependencies {
@@ -65,10 +74,6 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
-  testImplementation(libs.spock) {
-    exclude(group = "org.codehaus.groovy")
-    exclude(group = "org.hamcrest")
-  }
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.assertk)
@@ -79,6 +84,12 @@ dependencies {
   // TODO: this will be removed once we split unit tests from integration tests.
   integrationTestImplementation(sourceSets.main.get().output)
 
+  funcTestImplementation(libs.spock) {
+    exclude(group = "org.codehaus.groovy")
+    exclude(group = "org.hamcrest")
+  }
+  funcTestImplementation(sourceSets.main.get().output)
+
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)
 }
@@ -86,8 +97,8 @@ dependencies {
 val integrationTest by tasks.registering(Test::class) {
   description = "Runs the integration tests."
   group = LifecycleBasePlugin.VERIFICATION_GROUP
-  testClassesDirs = integrationTestSourceSet.output.classesDirs
-  classpath = integrationTestSourceSet.runtimeClasspath
+  testClassesDirs = intiTest.output.classesDirs
+  classpath = intiTest.runtimeClasspath
 
   val docsDir = file("src/docs")
   // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
@@ -95,24 +106,20 @@ val integrationTest by tasks.registering(Test::class) {
   systemProperty("DOCS_DIR", docsDir.absolutePath)
 }
 
-tasks.check {
-  dependsOn(integrationTest)
+val functionalTest by tasks.registering(Test::class) {
+  description = "Runs the functional tests."
+  group = LifecycleBasePlugin.VERIFICATION_GROUP
+  testClassesDirs = funcTest.output.classesDirs
+  classpath = funcTest.runtimeClasspath
 }
 
-val isCI = providers.environmentVariable("CI").isPresent
+tasks.check {
+  dependsOn(integrationTest, functionalTest)
+}
 
 tasks.withType<Test>().configureEach {
   useJUnitPlatform()
-
   maxParallelForks = Runtime.getRuntime().availableProcessors()
-
-  if (isCI) {
-    testLogging.showStandardStreams = true
-    minHeapSize = "1g"
-    maxHeapSize = "1g"
-  }
-
-  systemProperty("shadowVersion", version)
 
   // Required to test configuration cache in tests when using withDebug()
   // https://github.com/gradle/gradle/issues/22765#issuecomment-1339427241
