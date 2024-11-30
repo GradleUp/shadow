@@ -6,7 +6,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.createTempFile
+import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,8 +36,8 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
   fun testTransformation() {
     transformer.transform(manifestTransformerContext)
 
-    val testableZipFile = doTransformAndGetTransformedFile(transformer, false)
-    val targetLines = readFrom(testableZipFile, MANIFEST_NAME)
+    val testableZipPath = doTransformAndGetTransformedFile(transformer, false)
+    val targetLines = readFrom(testableZipPath, MANIFEST_NAME)
 
     assertThat(targetLines).isNotEmpty()
     assertThat(targetLines).contains("Manifest-Version=1.0")
@@ -45,13 +47,13 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
   fun testTransformationPropertiesAreReproducible() {
     transformer.transform(manifestTransformerContext)
 
-    val firstRunTransformedFile = doTransformAndGetTransformedFile(transformer, true)
-    val firstRunTargetLines = readFrom(firstRunTransformedFile, MANIFEST_NAME)
+    val firstRunTransformedPath = doTransformAndGetTransformedFile(transformer, true)
+    val firstRunTargetLines = readFrom(firstRunTransformedPath, MANIFEST_NAME)
 
     Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
 
-    val secondRunTransformedFile = doTransformAndGetTransformedFile(transformer, true)
-    val secondRunTargetLines = readFrom(secondRunTransformedFile, MANIFEST_NAME)
+    val secondRunTransformedPath = doTransformAndGetTransformedFile(transformer, true)
+    val secondRunTargetLines = readFrom(secondRunTransformedPath, MANIFEST_NAME)
 
     assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
   }
@@ -59,11 +61,11 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
   private fun doTransformAndGetTransformedFile(
     transformer: PropertiesFileTransformer,
     preserveFileTimestamps: Boolean,
-  ): File {
-    val testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
-    ZipOutputStream(testableZipFile.outputStream().buffered()).use { zipOutputStream ->
+  ): Path {
+    val testableZipPath = createTempFile("testable-zip-file-", ".jar")
+    ZipOutputStream(testableZipPath.outputStream().buffered()).use { zipOutputStream ->
       transformer.modifyOutputStream(zipOutputStream, preserveFileTimestamps)
     }
-    return testableZipFile
+    return testableZipPath
   }
 }

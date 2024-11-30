@@ -6,9 +6,8 @@ import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
+import kotlin.io.path.createTempFile
+import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -53,15 +52,12 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
       transform(manifestTransformerContext)
     }
 
-    val testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
-    val fileOutputStream = FileOutputStream(testableZipFile)
-    val bufferedOutputStream = BufferedOutputStream(fileOutputStream)
-
-    ZipOutputStream(bufferedOutputStream).use { zipOutputStream ->
+    val testableZipPath = createTempFile("testable-zip-file-", ".jar")
+    ZipOutputStream(testableZipPath.outputStream().buffered()).use { zipOutputStream ->
       transformer.modifyOutputStream(zipOutputStream, true)
     }
 
-    val targetLines = readFrom(testableZipFile)
+    val targetLines = readFrom(testableZipPath)
     assertThat(targetLines).isNotEmpty()
     assertThat(targetLines.size).isGreaterThan(4)
 
@@ -81,11 +77,11 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
   fun testNoTransformation() {
     val sourceLines = requireResourceAsStream(MANIFEST_NAME).bufferedReader().readLines()
     transformer.transform(manifestTransformerContext)
-    val testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
-    ZipOutputStream(testableZipFile.outputStream().buffered()).use { zipOutputStream ->
+    val testableZipPath = createTempFile("testable-zip-file-", ".jar")
+    ZipOutputStream(testableZipPath.outputStream().buffered()).use { zipOutputStream ->
       transformer.modifyOutputStream(zipOutputStream, true)
     }
-    val targetLines = readFrom(testableZipFile)
+    val targetLines = readFrom(testableZipPath)
 
     assertThat(targetLines).isEqualTo(sourceLines)
   }
