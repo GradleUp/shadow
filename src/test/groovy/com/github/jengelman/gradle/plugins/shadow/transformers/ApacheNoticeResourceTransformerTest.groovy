@@ -37,6 +37,14 @@ class ApacheNoticeResourceTransformerTest extends TransformerTestSupport<ApacheN
     private static final String NOTICE_RESOURCE = "META-INF/NOTICE"
     private static ShadowStats stats
 
+    static {
+        /*
+         * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
+         * choice to test for improper case-less string comparisions.
+         */
+        Locale.setDefault(new Locale("tr"))
+    }
+
     @BeforeEach
     void setUp() {
         transformer = new ApacheNoticeResourceTransformer(objectFactory)
