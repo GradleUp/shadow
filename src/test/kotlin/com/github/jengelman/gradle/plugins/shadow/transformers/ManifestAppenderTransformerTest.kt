@@ -6,9 +6,6 @@ import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
-import kotlin.io.path.createTempFile
-import kotlin.io.path.outputStream
-import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -52,10 +49,7 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
       transform(manifestTransformerContext)
     }
 
-    val testableZipPath = createTempFile("testable-zip-file-", ".jar")
-    ZipOutputStream(testableZipPath.outputStream().buffered()).use { zipOutputStream ->
-      transformer.modifyOutputStream(zipOutputStream, true)
-    }
+    val testableZipPath = doTransformAndGetTransformedPath(transformer, true)
 
     val targetLines = readFrom(testableZipPath)
     assertThat(targetLines).isNotEmpty()
@@ -77,10 +71,7 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
   fun testNoTransformation() {
     val sourceLines = requireResourceAsStream(MANIFEST_NAME).bufferedReader().readLines()
     transformer.transform(manifestTransformerContext)
-    val testableZipPath = createTempFile("testable-zip-file-", ".jar")
-    ZipOutputStream(testableZipPath.outputStream().buffered()).use { zipOutputStream ->
-      transformer.modifyOutputStream(zipOutputStream, true)
-    }
+    val testableZipPath = doTransformAndGetTransformedPath(transformer, true)
     val targetLines = readFrom(testableZipPath)
 
     assertThat(targetLines).isEqualTo(sourceLines)

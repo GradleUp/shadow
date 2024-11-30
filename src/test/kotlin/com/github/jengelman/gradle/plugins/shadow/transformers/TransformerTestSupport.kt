@@ -4,6 +4,9 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.util.Locale
 import java.util.zip.ZipFile
+import kotlin.io.path.createTempFile
+import kotlin.io.path.outputStream
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.DefaultFileTreeElement
@@ -32,6 +35,17 @@ abstract class TransformerTestSupport<T : Transformer> {
         val entry = zip.getEntry(resourceName) ?: return emptyList()
         zip.getInputStream(entry).bufferedReader().readLines()
       }
+    }
+
+    fun doTransformAndGetTransformedPath(
+      transformer: Transformer,
+      preserveFileTimestamps: Boolean,
+    ): Path {
+      val testableZipPath = createTempFile("testable-zip-file-", ".jar")
+      ZipOutputStream(testableZipPath.outputStream().buffered()).use { zipOutputStream ->
+        transformer.modifyOutputStream(zipOutputStream, preserveFileTimestamps)
+      }
+      return testableZipPath
     }
 
     /**
