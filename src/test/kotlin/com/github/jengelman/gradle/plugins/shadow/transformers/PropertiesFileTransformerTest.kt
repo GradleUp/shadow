@@ -33,7 +33,7 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
     transformer.transform(manifestTransformerContext)
 
     val testableZipPath = doTransformAndGetTransformedPath(transformer, false)
-    val targetLines = readFrom(testableZipPath, MANIFEST_NAME)
+    val targetLines = readFrom(testableZipPath)
 
     assertThat(targetLines).isNotEmpty()
     assertThat(targetLines).contains("Manifest-Version=1.0")
@@ -44,12 +44,12 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
     transformer.transform(manifestTransformerContext)
 
     val firstRunTransformedPath = doTransformAndGetTransformedPath(transformer, true)
-    val firstRunTargetLines = readFrom(firstRunTransformedPath, MANIFEST_NAME)
+    val firstRunTargetLines = readFrom(firstRunTransformedPath)
 
     Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
 
     val secondRunTransformedPath = doTransformAndGetTransformedPath(transformer, true)
-    val secondRunTargetLines = readFrom(secondRunTransformedPath, MANIFEST_NAME)
+    val secondRunTargetLines = readFrom(secondRunTransformedPath)
 
     assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
   }
