@@ -6,18 +6,18 @@ import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.testfixtures.ProjectBuilder
 
 abstract class TransformerTestSupport<T extends Transformer> {
-    protected static T transformer
-    protected static final def objectFactory = ProjectBuilder.builder().build().objects
+  protected static T transformer
+  protected static final def objectFactory = ProjectBuilder.builder().build().objects
 
-    protected static FileTreeElement getFileElement(String path) {
-        return new DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
-    }
+  protected static FileTreeElement getFileElement(String path) {
+    return new DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
+  }
 
-    /**
-     * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
-     * choice to test for improper case-less string comparisons.
-     */
-    protected static setupTurkishLocale() {
-        Locale.setDefault(new Locale("tr"))
-    }
+  /**
+   * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
+   * choice to test for improper case-less string comparisons.
+   */
+  protected static setupTurkishLocale() {
+    Locale.setDefault(new Locale("tr"))
+  }
 }
