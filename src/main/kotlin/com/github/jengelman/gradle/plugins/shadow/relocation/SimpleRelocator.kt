@@ -14,8 +14,8 @@ import org.gradle.api.tasks.Optional
  */
 @CacheableRelocator
 public open class SimpleRelocator @JvmOverloads constructor(
-  pattern: String?,
-  shadedPattern: String?,
+  pattern: String? = null,
+  shadedPattern: String? = null,
   includes: List<String>? = null,
   excludes: List<String>? = null,
   private val _rawString: Boolean = false,
