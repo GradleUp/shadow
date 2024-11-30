@@ -76,6 +76,9 @@ dependencies {
   testImplementation(libs.apache.commonsLang)
   testRuntimeOnly(libs.junit.platformLauncher)
 
+  // TODO: this will be removed once we split unit tests from integration tests.
+  integrationTestImplementation(sourceSets.main.get().output)
+
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)
 }
