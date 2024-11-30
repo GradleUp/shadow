@@ -74,16 +74,16 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
-  testImplementation(libs.spock) {
-    exclude(group = "org.codehaus.groovy")
-    exclude(group = "org.hamcrest")
-  }
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.xmlunit)
   testImplementation(libs.apache.commonsLang)
   testRuntimeOnly(libs.junit.platformLauncher)
 
+  funcTestImplementation(libs.spock) {
+    exclude(group = "org.codehaus.groovy")
+    exclude(group = "org.hamcrest")
+  }
   funcTestImplementation(sourceSets.main.get().output)
 
   lintChecks(libs.androidx.gradlePluginLints)
