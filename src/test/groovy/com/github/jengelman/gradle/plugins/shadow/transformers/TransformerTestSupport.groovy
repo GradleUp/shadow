@@ -12,4 +12,12 @@ abstract class TransformerTestSupport<T extends Transformer> {
   protected static FileTreeElement getFileElement(String path) {
     return new DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
   }
+
+  /**
+   * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
+   * choice to test for improper case-less string comparisons.
+   */
+  protected static setupTurkishLocale() {
+    Locale.setDefault(new Locale("tr"))
+  }
 }
