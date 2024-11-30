@@ -41,7 +41,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
-            line="26"
+            line="27"
             column="1"/>
     </issue>
 
@@ -52,17 +52,6 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
-            line="27"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.api.internal.file.DefaultFilePermissions"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
             line="28"
             column="1"/>
     </issue>
@@ -70,7 +59,7 @@
     <issue
         id="InternalGradleApiUsage"
         message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.api.internal.file.DefaultFileTreeElement"
+        errorLine1="import org.gradle.api.internal.file.DefaultFilePermissions"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
@@ -118,7 +107,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="24"
+            line="25"
             column="1"/>
     </issue>
 
@@ -129,7 +118,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="25"
+            line="26"
             column="1"/>
     </issue>
 
@@ -140,7 +129,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="26"
+            line="27"
             column="1"/>
     </issue>
 
@@ -151,7 +140,51 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="27"
+            line="28"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.file.DefaultFileTreeElement"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/Utils.kt"
+            line="8"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.internal.file.Chmod"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/Utils.kt"
+            line="12"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.internal.file.FileMetadata"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/Utils.kt"
+            line="13"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.internal.file.Stat"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/Utils.kt"
+            line="14"
             column="1"/>
     </issue>
 
