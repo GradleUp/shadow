@@ -51,8 +51,17 @@ val intiTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
 }
 
+val funcTest: SourceSet by sourceSets.creating
+val funcTestImplementation: Configuration by configurations.getting {
+  extendsFrom(configurations.testImplementation.get())
+}
+val funcTestRuntimeOnly: Configuration by configurations.getting {
+  extendsFrom(configurations.testRuntimeOnly.get())
+}
+
 gradlePlugin {
   testSourceSets.add(intiTest)
+  testSourceSets.add(funcTest)
 }
 
 dependencies {
@@ -88,6 +97,13 @@ val integrationTest by tasks.registering(Test::class) {
   // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
   inputs.dir(docsDir)
   systemProperty("DOCS_DIR", docsDir.absolutePath)
+}
+
+val functionalTest by tasks.registering(Test::class) {
+  description = "Runs the functional tests."
+  group = LifecycleBasePlugin.VERIFICATION_GROUP
+  testClassesDirs = funcTest.output.classesDirs
+  classpath = funcTest.runtimeClasspath
 }
 
 tasks.check {
