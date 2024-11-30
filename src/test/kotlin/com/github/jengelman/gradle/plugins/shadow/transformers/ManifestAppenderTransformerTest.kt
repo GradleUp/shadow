@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderTransformer>() {
   @BeforeEach
-  fun setUp() {
+  fun setup() {
     transformer = ManifestAppenderTransformer(objectFactory)
   }
 

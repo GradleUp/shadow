@@ -13,7 +13,7 @@ class XmlAppendingTransformerTest : TransformerTestSupport<XmlAppendingTransform
   }
 
   @BeforeEach
-  fun setUp() {
+  fun setup() {
     transformer = XmlAppendingTransformer(objectFactory)
   }
 

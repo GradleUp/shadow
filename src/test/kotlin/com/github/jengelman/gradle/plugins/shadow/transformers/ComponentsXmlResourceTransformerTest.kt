@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 class ComponentsXmlResourceTransformerTest : TransformerTestSupport<ComponentsXmlResourceTransformer>() {
 
   @BeforeEach
-  fun setUp() {
+  fun setup() {
     transformer = ComponentsXmlResourceTransformer()
   }
 

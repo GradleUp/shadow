@@ -17,7 +17,7 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
   }
 
   @BeforeEach
-  fun setUp() {
+  fun setup() {
     transformer = ApacheNoticeResourceTransformer(objectFactory)
   }
 

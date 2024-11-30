@@ -16,7 +16,7 @@ class ApacheLicenseResourceTransformerTest : TransformerTestSupport<ApacheLicens
   }
 
   @BeforeEach
-  fun setUp() {
+  fun setup() {
     transformer = ApacheLicenseResourceTransformer()
   }
 

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTransformer>() {
 
   @BeforeEach
-  fun setUp() {
+  fun setup() {
     transformer = PropertiesFileTransformer(objectFactory)
   }
 

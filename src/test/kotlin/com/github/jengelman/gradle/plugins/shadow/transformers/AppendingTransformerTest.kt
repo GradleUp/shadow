@@ -16,7 +16,7 @@ class AppendingTransformerTest : TransformerTestSupport<AppendingTransformer>() 
   }
 
   @BeforeEach
-  fun setUp() {
+  fun setup() {
     transformer = AppendingTransformer(objectFactory)
   }
 
