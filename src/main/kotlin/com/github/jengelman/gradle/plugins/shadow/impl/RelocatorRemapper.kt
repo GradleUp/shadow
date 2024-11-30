@@ -70,6 +70,6 @@ public open class RelocatorRemapper(
 
   private fun canRelocateSourceFile(relocator: Relocator): Boolean {
     val currentFilePath: String? = this.currentFilePath
-    return currentFilePath != null && relocator.canRelocateSourceFile(currentFilePath)
+    return currentFilePath == null || relocator.canRelocateSourceFile(currentFilePath)
   }
 }
