@@ -90,7 +90,6 @@ public open class ComponentsXmlResourceTransformer : Transformer {
 
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()
 
-  @get:Throws(IOException::class)
   @get:Internal
   internal val transformedResource: ByteArray
     get() {
