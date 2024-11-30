@@ -84,6 +84,8 @@ dependencies {
   testImplementation(libs.apache.commonsLang)
   testRuntimeOnly(libs.junit.platformLauncher)
 
+  funcTestImplementation(sourceSets.main.get().output)
+
   lintChecks(libs.androidx.gradlePluginLints)
 }
 
