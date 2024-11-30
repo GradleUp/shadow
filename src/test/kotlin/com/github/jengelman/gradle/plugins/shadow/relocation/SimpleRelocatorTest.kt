@@ -24,14 +24,14 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("com/foo/bar/Class.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/Foo/Class")).isFalse()
     assertThat(relocator.canRelocatePath("org/Foo/Class.class")).isFalse()
+
+    // Verify paths starting with '/'
     assertThat(relocator.canRelocatePath("/org/Foo/Class")).isFalse()
     assertThat(relocator.canRelocatePath("/org/Foo/Class.class")).isFalse()
 
     relocator = SimpleRelocator(
       "org.foo",
-      null,
-      null,
-      listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
+      excludes = listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
     )
     assertThat(relocator.canRelocatePath("org/foo/Class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
@@ -57,18 +57,20 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("org/foo/recurse/sub/Class")).isFalse()
     assertThat(relocator.canRelocatePath("org/foo/recurse/sub/Class.class")).isFalse()
 
+    // Verify edge cases
     relocator = SimpleRelocator("org.f")
-    assertThat(relocator.canRelocatePath("")).isFalse()
-    assertThat(relocator.canRelocatePath(".class")).isFalse()
-    assertThat(relocator.canRelocatePath("te")).isFalse()
-    assertThat(relocator.canRelocatePath("test")).isFalse()
-    assertThat(relocator.canRelocatePath("org/f")).isTrue()
-    assertThat(relocator.canRelocatePath("/org/f")).isTrue()
+    assertThat(relocator.canRelocatePath("")).isFalse() // Empty path
+    assertThat(relocator.canRelocatePath(".class")).isFalse() // only .class
+    assertThat(relocator.canRelocatePath("te")).isFalse() // shorter than path pattern
+    assertThat(relocator.canRelocatePath("test")).isFalse() // shorter than path pattern with /
+    assertThat(relocator.canRelocatePath("org/f")).isTrue() // equal to path pattern
+    assertThat(relocator.canRelocatePath("/org/f")).isTrue() // equal to path pattern with /
   }
 
   @Test
   fun testCanRelocatePathWithRegex() {
-    var relocator = SimpleRelocator("org.foo", null, listOf("%regex[org/foo/R(\\\$.*)?\$]"))
+    // Include with Regex
+    var relocator = SimpleRelocator("org.foo", includes = listOf("%regex[org/foo/R(\\\$.*)?\$]"))
     assertThat(relocator.canRelocatePath("org/foo/R.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/R\$string.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/R\$layout.class")).isTrue()
@@ -78,6 +80,7 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("org/R.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/R\$string.class")).isFalse()
 
+    // Exclude with Regex
     relocator = SimpleRelocator("org.foo")
     relocator.exclude("%regex[org/foo/.*Factory[0-9].*]")
     assertThat(relocator.canRelocatePath("org/foo/Factory.class")).isTrue()
@@ -87,10 +90,10 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("org/foo/FooFactory1Main.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/foo/BarFactory2.class")).isFalse()
 
+    // Include with Regex and normal pattern
     relocator = SimpleRelocator(
       "org.foo",
-      null,
-      listOf("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"),
+      includes = listOf("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"),
     )
     assertThat(relocator.canRelocatePath("org/foo/Factory1.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/public/Bar.class")).isTrue()
@@ -108,9 +111,7 @@ class SimpleRelocatorTest {
 
     relocator = SimpleRelocator(
       "org.foo",
-      null,
-      null,
-      listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
+      excludes = listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
     )
     assertThat(relocator.canRelocateClass("org.foo.Class")).isTrue()
     assertThat(relocator.canRelocateClass("org.foo.excluded")).isTrue()
@@ -131,10 +132,10 @@ class SimpleRelocatorTest {
 
   @Test
   fun testCanRelocateRawString() {
-    var relocator = SimpleRelocator("org/foo", null, null, null, true)
+    var relocator = SimpleRelocator("org/foo", _rawString = true)
     assertThat(relocator.canRelocatePath("(I)org/foo/bar/Class")).isTrue()
 
-    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", null, null, null, true)
+    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", _rawString = true)
     assertThat(relocator.canRelocatePath("META-INF/org.foo.xml")).isTrue()
   }
 
@@ -169,11 +170,11 @@ class SimpleRelocatorTest {
 
   @Test
   fun testRelocateRawString() {
-    var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", null, null, true)
+    var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", _rawString = true)
     assertThat(relocator.relocatePath(pathContext("(I)Lorg/foo/bar/Class")))
       .isEqualTo("(I)Lhidden/org/foo/bar/Class")
 
-    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", null, null, true)
+    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", _rawString = true)
     assertThat(relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
       .isEqualTo("META-INF/hidden.org.foo.xml")
   }
