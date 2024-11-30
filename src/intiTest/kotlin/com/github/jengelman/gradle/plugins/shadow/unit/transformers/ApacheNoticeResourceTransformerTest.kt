@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import assertk.fail
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +21,6 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
   @BeforeEach
   fun setUp() {
     transformer = ApacheNoticeResourceTransformer(objectFactory)
-    stats = ShadowStats()
   }
 
   @Test
@@ -76,7 +74,6 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
         TransformerContext.builder()
           .path(NOTICE_RESOURCE)
           .inputStream(noticeText.toByteArray().inputStream())
-          .stats(stats)
           .build(),
       )
     } catch (ignored: NullPointerException) {
@@ -86,6 +83,5 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
 
   companion object {
     private const val NOTICE_RESOURCE = "META-INF/NOTICE"
-    private lateinit var stats: ShadowStats
   }
 }

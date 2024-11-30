@@ -4,11 +4,9 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 /**
@@ -17,16 +15,10 @@ import org.junit.jupiter.api.Test
  * @author John Engelman
  */
 class SimpleRelocatorTest {
-  private lateinit var stats: ShadowStats
-
-  @BeforeEach
-  fun setUp() {
-    stats = ShadowStats()
-  }
 
   @Test
   fun testCanRelocatePath() {
-    var relocator = SimpleRelocator("org.foo", null)
+    var relocator = SimpleRelocator("org.foo")
     assertThat(relocator.canRelocatePath("org/foo/Class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/bar/Class")).isTrue()
@@ -68,7 +60,7 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("org/foo/recurse/sub/Class")).isFalse()
     assertThat(relocator.canRelocatePath("org/foo/recurse/sub/Class.class")).isFalse()
 
-    relocator = SimpleRelocator("org.f", null)
+    relocator = SimpleRelocator("org.f")
     assertThat(relocator.canRelocatePath("")).isFalse()
     assertThat(relocator.canRelocatePath(".class")).isFalse()
     assertThat(relocator.canRelocatePath("te")).isFalse()
@@ -79,7 +71,7 @@ class SimpleRelocatorTest {
 
   @Test
   fun testCanRelocatePathWithRegex() {
-    var relocator = SimpleRelocator("org.foo", null, listOf("%regex[org/foo/R(\\\$.*)?\$]"), null)
+    var relocator = SimpleRelocator("org.foo", null, listOf("%regex[org/foo/R(\\\$.*)?\$]"))
     assertThat(relocator.canRelocatePath("org/foo/R.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/R\$string.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/R\$layout.class")).isTrue()
@@ -89,7 +81,7 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("org/R.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/R\$string.class")).isFalse()
 
-    relocator = SimpleRelocator("org.foo", null)
+    relocator = SimpleRelocator("org.foo")
     relocator.exclude("%regex[org/foo/.*Factory[0-9].*]")
     assertThat(relocator.canRelocatePath("org/foo/Factory.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/FooFactoryMain.class")).isTrue()
@@ -111,7 +103,7 @@ class SimpleRelocatorTest {
 
   @Test
   fun testCanRelocateClass() {
-    var relocator = SimpleRelocator("org.foo", null)
+    var relocator = SimpleRelocator("org.foo")
     assertThat(relocator.canRelocateClass("org.foo.Class")).isTrue()
     assertThat(relocator.canRelocateClass("org.foo.bar.Class")).isTrue()
     assertThat(relocator.canRelocateClass("com.foo.bar.Class")).isFalse()
@@ -158,7 +150,7 @@ class SimpleRelocatorTest {
 
   @Test
   fun testRelocatePath() {
-    var relocator = SimpleRelocator("org.foo", null)
+    var relocator = SimpleRelocator("org.foo")
     assertThat(relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
       .isEqualTo("hidden/org/foo/bar/Class.class")
 
@@ -169,7 +161,7 @@ class SimpleRelocatorTest {
 
   @Test
   fun testRelocateClass() {
-    var relocator = SimpleRelocator("org.foo", null)
+    var relocator = SimpleRelocator("org.foo")
     assertThat(relocator.relocateClass(classContext()))
       .isEqualTo("hidden.org.foo.bar.Class")
 
@@ -190,10 +182,10 @@ class SimpleRelocatorTest {
   }
 
   private fun pathContext(path: String): RelocatePathContext {
-    return RelocatePathContext.builder().path(path).stats(stats).build()
+    return RelocatePathContext.builder().path(path).build()
   }
 
   private fun classContext(className: String = "org.foo.bar.Class"): RelocateClassContext {
-    return RelocateClassContext.builder().className(className).stats(stats).build()
+    return RelocateClassContext.builder().className(className).build()
   }
 }
