@@ -1,13 +1,15 @@
-package com.github.jengelman.gradle.plugins.shadow.unit.transformers
+package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class XmlAppendingTransformerTest : TransformerTestSupport<XmlAppendingTransformer>() {
+/**
+ * Modified from [org.apache.maven.plugins.shade.resource.AppendingTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/AppendingTransformerTest.java).
+ */
+class AppendingTransformerTest : TransformerTestSupport<AppendingTransformer>() {
 
   init {
     setupTurkishLocale()
@@ -15,7 +17,7 @@ class XmlAppendingTransformerTest : TransformerTestSupport<XmlAppendingTransform
 
   @BeforeEach
   fun setUp() {
-    transformer = XmlAppendingTransformer(objectFactory)
+    transformer = AppendingTransformer(objectFactory)
   }
 
   @Test

@@ -1,12 +1,9 @@
-package com.github.jengelman.gradle.plugins.shadow.unit.relocation
+package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
-import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import org.junit.jupiter.api.Test
 
 /**

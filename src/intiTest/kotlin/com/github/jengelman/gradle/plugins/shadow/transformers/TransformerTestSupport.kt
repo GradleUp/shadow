@@ -1,6 +1,5 @@
-package com.github.jengelman.gradle.plugins.shadow.unit.transformers
+package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import java.io.InputStream
 import java.util.Locale
 import org.gradle.api.file.FileTreeElement

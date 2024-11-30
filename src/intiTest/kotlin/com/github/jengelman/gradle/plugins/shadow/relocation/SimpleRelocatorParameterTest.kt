@@ -1,7 +1,6 @@
-package com.github.jengelman.gradle.plugins.shadow.unit.relocation
+package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import assertk.fail
-import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import org.junit.jupiter.api.Test
 
 /**
