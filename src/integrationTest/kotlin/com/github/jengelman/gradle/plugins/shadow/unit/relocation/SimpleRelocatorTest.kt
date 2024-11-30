@@ -1,0 +1,199 @@
+package com.github.jengelman.gradle.plugins.shadow.unit.relocation
+
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.ShadowStats
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+
+/**
+ * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocatorTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/relocation/SimpleRelocatorTest.java).
+ *
+ * @author John Engelman
+ */
+class SimpleRelocatorTest {
+  private lateinit var stats: ShadowStats
+
+  @BeforeEach
+  fun setUp() {
+    stats = ShadowStats()
+  }
+
+  @Test
+  fun testCanRelocatePath() {
+    var relocator = SimpleRelocator("org.foo", null)
+    assertThat(relocator.canRelocatePath("org/foo/Class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/bar/Class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/bar/Class.class")).isTrue()
+    assertThat(relocator.canRelocatePath("com/foo/bar/Class")).isFalse()
+    assertThat(relocator.canRelocatePath("com/foo/bar/Class.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/Foo/Class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/Foo/Class.class")).isFalse()
+    assertThat(relocator.canRelocatePath("/org/Foo/Class")).isFalse()
+    assertThat(relocator.canRelocatePath("/org/Foo/Class.class")).isFalse()
+
+    relocator = SimpleRelocator(
+      "org.foo",
+      null,
+      null,
+      listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
+    )
+    assertThat(relocator.canRelocatePath("org/foo/Class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/excluded")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/Excluded")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/Excluded.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/public")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/public/Class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/public/Class.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/public/sub")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/public/sub/Class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/publicRELOC/Class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/PrivateStuff")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/PrivateStuff.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/PublicStuff")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/PublicStuff.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/PublicUtilStuff")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/PublicUtilStuff.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/recurse")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/recurse/Class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/recurse/Class.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/recurse/sub")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/recurse/sub/Class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/recurse/sub/Class.class")).isFalse()
+
+    relocator = SimpleRelocator("org.f", null)
+    assertThat(relocator.canRelocatePath("")).isFalse()
+    assertThat(relocator.canRelocatePath(".class")).isFalse()
+    assertThat(relocator.canRelocatePath("te")).isFalse()
+    assertThat(relocator.canRelocatePath("test")).isFalse()
+    assertThat(relocator.canRelocatePath("org/f")).isTrue()
+    assertThat(relocator.canRelocatePath("/org/f")).isTrue()
+  }
+
+  @Test
+  fun testCanRelocatePathWithRegex() {
+    var relocator = SimpleRelocator("org.foo", null, listOf("%regex[org/foo/R(\\\$.*)?\$]"), null)
+    assertThat(relocator.canRelocatePath("org/foo/R.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/R\$string.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/R\$layout.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/Recording/R.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/Recording.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/bar/R\$string.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/R.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/R\$string.class")).isFalse()
+
+    relocator = SimpleRelocator("org.foo", null)
+    relocator.exclude("%regex[org/foo/.*Factory[0-9].*]")
+    assertThat(relocator.canRelocatePath("org/foo/Factory.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/FooFactoryMain.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/BarFactory.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/Factory0.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/FooFactory1Main.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/BarFactory2.class")).isFalse()
+
+    relocator = SimpleRelocator(
+      "org.foo",
+      null,
+      listOf("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"),
+    )
+    assertThat(relocator.canRelocatePath("org/foo/Factory1.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/public/Bar.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/foo/Factory.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/foo/R.class")).isFalse()
+  }
+
+  @Test
+  fun testCanRelocateClass() {
+    var relocator = SimpleRelocator("org.foo", null)
+    assertThat(relocator.canRelocateClass("org.foo.Class")).isTrue()
+    assertThat(relocator.canRelocateClass("org.foo.bar.Class")).isTrue()
+    assertThat(relocator.canRelocateClass("com.foo.bar.Class")).isFalse()
+    assertThat(relocator.canRelocateClass("org.Foo.Class")).isFalse()
+
+    relocator = SimpleRelocator(
+      "org.foo",
+      null,
+      null,
+      listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
+    )
+    assertThat(relocator.canRelocateClass("org.foo.Class")).isTrue()
+    assertThat(relocator.canRelocateClass("org.foo.excluded")).isTrue()
+    assertThat(relocator.canRelocateClass("org.foo.Excluded")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.public")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.public.Class")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.public.sub")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.public.sub.Class")).isTrue()
+    assertThat(relocator.canRelocateClass("org.foo.publicRELOC.Class")).isTrue()
+    assertThat(relocator.canRelocateClass("org.foo.PrivateStuff")).isTrue()
+    assertThat(relocator.canRelocateClass("org.foo.PublicStuff")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.PublicUtilStuff")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.recurse")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.recurse.Class")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.recurse.sub")).isFalse()
+    assertThat(relocator.canRelocateClass("org.foo.recurse.sub.Class")).isFalse()
+  }
+
+  @Test
+  fun testCanRelocateRawString() {
+    var relocator = SimpleRelocator("org/foo", null, null, null, true)
+    assertThat(relocator.canRelocatePath("(I)org/foo/bar/Class")).isTrue()
+
+    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", null, null, null, true)
+    assertThat(relocator.canRelocatePath("META-INF/org.foo.xml")).isTrue()
+  }
+
+  @Test
+  fun testCanRelocateAbsClassPath() {
+    val relocator = SimpleRelocator("org.apache.velocity", "org.apache.momentum")
+    assertThat(relocator.relocatePath(pathContext("/org/apache/velocity/mass.properties")))
+      .isEqualTo("/org/apache/momentum/mass.properties")
+  }
+
+  @Test
+  fun testRelocatePath() {
+    var relocator = SimpleRelocator("org.foo", null)
+    assertThat(relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
+      .isEqualTo("hidden/org/foo/bar/Class.class")
+
+    relocator = SimpleRelocator("org.foo", "private.stuff")
+    assertThat(relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
+      .isEqualTo("private/stuff/bar/Class.class")
+  }
+
+  @Test
+  fun testRelocateClass() {
+    var relocator = SimpleRelocator("org.foo", null)
+    assertThat(relocator.relocateClass(classContext()))
+      .isEqualTo("hidden.org.foo.bar.Class")
+
+    relocator = SimpleRelocator("org.foo", "private.stuff")
+    assertThat(relocator.relocateClass(classContext()))
+      .isEqualTo("private.stuff.bar.Class")
+  }
+
+  @Test
+  fun testRelocateRawString() {
+    var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", null, null, true)
+    assertThat(relocator.relocatePath(pathContext("(I)Lorg/foo/bar/Class")))
+      .isEqualTo("(I)Lhidden/org/foo/bar/Class")
+
+    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", null, null, true)
+    assertThat(relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
+      .isEqualTo("META-INF/hidden.org.foo.xml")
+  }
+
+  private fun pathContext(path: String): RelocatePathContext {
+    return RelocatePathContext.builder().path(path).stats(stats).build()
+  }
+
+  private fun classContext(className: String = "org.foo.bar.Class"): RelocateClassContext {
+    return RelocateClassContext.builder().className(className).stats(stats).build()
+  }
+}

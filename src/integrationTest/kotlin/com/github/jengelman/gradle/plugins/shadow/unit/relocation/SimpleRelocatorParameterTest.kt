@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.unit
+package com.github.jengelman.gradle.plugins.shadow.unit.relocation
 
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
