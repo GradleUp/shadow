@@ -94,18 +94,9 @@ tasks.check {
   dependsOn(integrationTest)
 }
 
-val isCI = providers.environmentVariable("CI").isPresent
-
 tasks.withType<Test>().configureEach {
   useJUnitPlatform()
-
   maxParallelForks = Runtime.getRuntime().availableProcessors()
-
-  if (isCI) {
-    testLogging.showStandardStreams = true
-    minHeapSize = "1g"
-    maxHeapSize = "1g"
-  }
 
   // Required to test configuration cache in tests when using withDebug()
   // https://github.com/gradle/gradle/issues/22765#issuecomment-1339427241
