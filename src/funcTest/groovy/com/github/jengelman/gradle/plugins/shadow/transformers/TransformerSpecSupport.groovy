@@ -20,6 +20,7 @@ class TransformerSpecSupport extends Specification {
     }
 
     protected static FileTreeElement getFileElement(String path) {
+        // TODO: this should be replace with `createDefaultFileTreeElement` once this test gets migrated to Kotlin.
         return new DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
     }
 
