@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*
  * Test for {@link ManifestAppenderTransformer}.
  */
 class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestAppenderTransformer> {
-  private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
   @BeforeEach
   void setUp() {
@@ -53,7 +52,7 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestApp
       append('Name', 'com/example/')
       append('Sealed', false)
 
-      transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
+      transform(new TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
     }
 
     def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
@@ -83,9 +82,9 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestApp
 
   @Test
   void testNoTransformation() {
-    def sourceLines = getResourceStream(MANIFEST_NAME).readLines()
+    def sourceLines = requireResourceAsStream(MANIFEST_NAME).readLines()
 
-    transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
+    transformer.transform(new TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
 
     def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
     def fileOutputStream = new FileOutputStream(testableZipFile)
@@ -113,9 +112,5 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestApp
     } finally {
       zip.close()
     }
-  }
-
-  InputStream getResourceStream(String resource) {
-    this.class.classLoader.getResourceAsStream(resource)
   }
 }

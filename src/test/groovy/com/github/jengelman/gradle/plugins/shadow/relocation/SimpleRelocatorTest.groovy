@@ -11,18 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals
  */
 class SimpleRelocatorTest {
 
-  private static ShadowStats stats
-
-  @BeforeEach
-  void setUp() {
-    stats = new ShadowStats()
-  }
-
   @Test
   void testCanRelocatePath() {
     SimpleRelocator relocator
 
-    relocator = new SimpleRelocator("org.foo", null)
+    relocator = new SimpleRelocator("org.foo")
     assertEquals(true, relocator.canRelocatePath("org/foo/Class"))
     assertEquals(true, relocator.canRelocatePath("org/foo/Class.class"))
     assertEquals(true, relocator.canRelocatePath("org/foo/bar/Class"))
@@ -63,7 +56,7 @@ class SimpleRelocatorTest {
     assertEquals(false, relocator.canRelocatePath("org/foo/recurse/sub/Class.class"))
 
     // Verify edge cases
-    relocator = new SimpleRelocator("org.f", null)
+    relocator = new SimpleRelocator("org.f")
     assertEquals(false, relocator.canRelocatePath(""))       // Empty path
     assertEquals(false, relocator.canRelocatePath(".class")) // only .class
     assertEquals(false, relocator.canRelocatePath("te"))     // shorter than path pattern
@@ -88,7 +81,7 @@ class SimpleRelocatorTest {
     assertEquals(false, relocator.canRelocatePath("org/R\$string.class"))
 
     // Exclude with Regex
-    relocator = new SimpleRelocator("org.foo", null)
+    relocator = new SimpleRelocator("org.foo")
     relocator.exclude("%regex[org/foo/.*Factory[0-9].*]")
     assertEquals(true, relocator.canRelocatePath("org/foo/Factory.class"))
     assertEquals(true, relocator.canRelocatePath("org/foo/FooFactoryMain.class"))
@@ -110,7 +103,7 @@ class SimpleRelocatorTest {
   void testCanRelocateClass() {
     SimpleRelocator relocator
 
-    relocator = new SimpleRelocator("org.foo", null)
+    relocator = new SimpleRelocator("org.foo")
     assertEquals(true, relocator.canRelocateClass("org.foo.Class"))
     assertEquals(true, relocator.canRelocateClass("org.foo.bar.Class"))
     assertEquals(false, relocator.canRelocateClass("com.foo.bar.Class"))
@@ -158,7 +151,7 @@ class SimpleRelocatorTest {
   void testRelocatePath() {
     SimpleRelocator relocator
 
-    relocator = new SimpleRelocator("org.foo", null)
+    relocator = new SimpleRelocator("org.foo")
     assertEquals("hidden/org/foo/bar/Class.class", relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
 
     relocator = new SimpleRelocator("org.foo", "private.stuff")
@@ -169,7 +162,7 @@ class SimpleRelocatorTest {
   void testRelocateClass() {
     SimpleRelocator relocator
 
-    relocator = new SimpleRelocator("org.foo", null)
+    relocator = new SimpleRelocator("org.foo")
     assertEquals("hidden.org.foo.bar.Class", relocator.relocateClass(classContext("org.foo.bar.Class")))
 
     relocator = new SimpleRelocator("org.foo", "private.stuff")
@@ -188,10 +181,10 @@ class SimpleRelocatorTest {
   }
 
   protected static RelocatePathContext pathContext(String path) {
-    return RelocatePathContext.builder().path(path).stats(stats).build()
+    return RelocatePathContext.builder().path(path).build()
   }
 
   protected static RelocateClassContext classContext(String className) {
-    return RelocateClassContext.builder().className(className).stats(stats).build()
+    return RelocateClassContext.builder().className(className).build()
   }
 }

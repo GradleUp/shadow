@@ -34,8 +34,7 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
 
     void "should transform"() {
         given:
-        List<Relocator> relocators = new ArrayList<>()
-        relocators.add(new SimpleRelocator(null, null))
+        def relocators = singletonList(new SimpleRelocator())
 
         when:
         transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), relocators))
@@ -49,10 +48,10 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
         String pattern = "org.apache.logging"
         String destination = "new.location.org.apache.logging"
 
-        List<Relocator> relocators = singletonList((Relocator) new SimpleRelocator(pattern, destination))
+        List<Relocator> relocators = singletonList(new SimpleRelocator(pattern, destination))
 
         when:
-        transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), relocators, new ShadowStats()))
+        transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), relocators))
 
         then:
         transformer.hasTransformedResource()

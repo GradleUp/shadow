@@ -50,11 +50,11 @@ class TransformerSpecSupport extends Specification {
     }
 
     protected TransformerContext context(String path, Map input, String charset = 'ISO_8859_1') {
-        TransformerContext.builder().path(path).inputStream(toInputStream(toProperties(input), charset)).relocators([]).stats(stats).build()
+        TransformerContext.builder().path(path).inputStream(toInputStream(toProperties(input), charset)).stats(stats).build()
     }
 
     protected TransformerContext context(String path, String input) {
-        TransformerContext.builder().path(path).inputStream(toInputStream(input)).relocators([]).stats(stats).build()
+        TransformerContext.builder().path(path).inputStream(toInputStream(input)).stats(stats).build()
     }
 
 }
