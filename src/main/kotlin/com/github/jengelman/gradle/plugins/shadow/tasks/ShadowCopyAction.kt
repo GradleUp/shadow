@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.impl.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
+import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
@@ -26,7 +27,6 @@ import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.DefaultFilePermissions
-import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
@@ -429,7 +429,7 @@ public open class ShadowCopyAction internal constructor(
     override fun getPermissions(): FilePermissions = DefaultFilePermissions(mode)
 
     public open fun asFileTreeElement(): FileTreeElement {
-      return DefaultFileTreeElement(null, RelativePath(!isDirectory, *archivePath.segments), null, null)
+      return createDefaultFileTreeElement(relativePath = RelativePath(!isDirectory, *archivePath.segments))
     }
 
     override fun getFile(): File = throw UnsupportedOperationException()

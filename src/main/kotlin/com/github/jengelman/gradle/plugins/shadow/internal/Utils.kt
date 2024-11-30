@@ -1,11 +1,16 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import java.io.File
 import java.io.InputStream
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.RelativePath
+import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.provider.Property
+import org.gradle.internal.file.Chmod
+import org.gradle.internal.file.Stat
 
 /**
  * Return `runtimeClasspath` or `runtime` configuration.
@@ -19,6 +24,15 @@ internal inline fun <reified T : Any> ObjectFactory.property(defaultValue: T? = 
   return property(T::class.java).apply {
     if (defaultValue != null) convention(defaultValue)
   }
+}
+
+internal fun createDefaultFileTreeElement(
+  file: File? = null,
+  relativePath: RelativePath,
+  chmod: Chmod? = null,
+  stat: Stat? = null,
+): DefaultFileTreeElement {
+  return DefaultFileTreeElement(file, relativePath, chmod, stat)
 }
 
 @Suppress("NOTHING_TO_INLINE")
