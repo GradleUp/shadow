@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*
 class ApacheNoticeResourceTransformerTest extends TransformerTestSupport<ApacheNoticeResourceTransformer> {
 
   private static final String NOTICE_RESOURCE = "META-INF/NOTICE"
-  private static ShadowStats stats
 
   static {
     setupTurkishLocale()
@@ -22,7 +21,6 @@ class ApacheNoticeResourceTransformerTest extends TransformerTestSupport<ApacheN
   @BeforeEach
   void setUp() {
     transformer = new ApacheNoticeResourceTransformer(objectFactory)
-    stats = new ShadowStats()
   }
 
   @Test
@@ -73,8 +71,11 @@ class ApacheNoticeResourceTransformerTest extends TransformerTestSupport<ApacheN
   private static void processAndFailOnNullPointer(final String noticeText) {
     try {
       final ByteArrayInputStream noticeInputStream = new ByteArrayInputStream(noticeText.getBytes())
-      final List<Relocator> emptyList = Collections.emptyList()
-      transformer.transform(TransformerContext.builder().path(NOTICE_RESOURCE).inputStream(noticeInputStream).relocators(emptyList).stats(stats).build())
+      def transformerContext = TransformerContext.builder()
+        .path(NOTICE_RESOURCE)
+        .inputStream(noticeInputStream)
+        .build()
+      transformer.transform(transformerContext)
     }
     catch (NullPointerException ignored) {
       fail("Null pointer should not be thrown when no parameters are set.")

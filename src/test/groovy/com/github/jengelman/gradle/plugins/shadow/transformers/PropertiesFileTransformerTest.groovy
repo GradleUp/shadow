@@ -1,7 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.*
  * Test for {@link PropertiesFileTransformer}.
  */
 final class PropertiesFileTransformerTest extends TransformerTestSupport<PropertiesFileTransformer> {
-  private static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
   @BeforeEach
   void setUp() {
@@ -23,7 +20,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
 
   @Test
   void testHasTransformedResource() {
-    transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME)))
+    transformer.transform(new TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
 
     assertTrue(transformer.hasTransformedResource())
   }
@@ -35,7 +32,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
 
   @Test
   void testTransformation() {
-    transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
+    transformer.transform(new TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
 
     def testableZipFile = doTransformAndGetTransformedFile(transformer, false)
     def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
@@ -47,7 +44,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
 
   @Test
   void testTransformationPropertiesAreReproducible() {
-    transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
+    transformer.transform(new TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME)))
 
     def firstRunTransformedFile = doTransformAndGetTransformedFile(transformer, true)
     def firstRunTargetLines = readFrom(firstRunTransformedFile, MANIFEST_NAME)
@@ -86,9 +83,5 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
     } finally {
       zip.close()
     }
-  }
-
-  InputStream getResourceStream(String resource) {
-    this.class.classLoader.getResourceAsStream(resource)
   }
 }

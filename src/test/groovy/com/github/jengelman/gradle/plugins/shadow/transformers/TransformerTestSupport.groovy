@@ -8,6 +8,7 @@ import org.gradle.testfixtures.ProjectBuilder
 abstract class TransformerTestSupport<T extends Transformer> {
   protected static T transformer
   protected static final def objectFactory = ProjectBuilder.builder().build().objects
+  protected static final String MANIFEST_NAME = "META-INF/MANIFEST.MF"
 
   protected static FileTreeElement getFileElement(String path) {
     return new DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
@@ -19,5 +20,9 @@ abstract class TransformerTestSupport<T extends Transformer> {
    */
   protected static setupTurkishLocale() {
     Locale.setDefault(new Locale("tr"))
+  }
+
+  protected InputStream requireResourceAsStream(String resource) {
+    this.class.classLoader.getResourceAsStream(resource)
   }
 }
