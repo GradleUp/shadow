@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.fail
  *
  * Modified from org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerParameterTests.java
  */
-class ApacheNoticeResourceTransformerParameterTests extends TransformerTestSupport<ApacheNoticeResourceTransformer> {
+class ApacheNoticeResourceTransformerTest extends TransformerTestSupport<ApacheNoticeResourceTransformer> {
 
     private static final String NOTICE_RESOURCE = "META-INF/NOTICE"
     private static ShadowStats stats
