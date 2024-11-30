@@ -43,16 +43,16 @@ spotless {
   }
 }
 
-val integrationTestSourceSet: SourceSet = sourceSets.create("integrationTest")
-val integrationTestImplementation: Configuration by configurations.getting {
+val intiTest: SourceSet by sourceSets.creating
+val intiTestImplementation: Configuration by configurations.getting {
   extendsFrom(configurations.testImplementation.get())
 }
-val integrationTestRuntimeOnly: Configuration by configurations.getting {
+val intiTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
 }
 
 gradlePlugin {
-  testSourceSets.add(integrationTestSourceSet)
+  testSourceSets.add(intiTest)
 }
 
 dependencies {
@@ -81,8 +81,8 @@ dependencies {
 val integrationTest by tasks.registering(Test::class) {
   description = "Runs the integration tests."
   group = LifecycleBasePlugin.VERIFICATION_GROUP
-  testClassesDirs = integrationTestSourceSet.output.classesDirs
-  classpath = integrationTestSourceSet.runtimeClasspath
+  testClassesDirs = intiTest.output.classesDirs
+  classpath = intiTest.runtimeClasspath
 
   val docsDir = file("src/docs")
   // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
