@@ -3,11 +3,10 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
+import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Shared
 import spock.lang.Specification
-
-import static com.github.jengelman.gradle.plugins.shadow.internal.UtilsKt.createDefaultFileTreeElement
 
 class TransformerSpecSupport extends Specification {
 
@@ -21,7 +20,8 @@ class TransformerSpecSupport extends Specification {
     }
 
     protected static FileTreeElement getFileElement(String path) {
-        return createDefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
+        // TODO: this should be replace with `createDefaultFileTreeElement` once this test gets migrated to Kotlin.
+        return new DefaultFileTreeElement(null, RelativePath.parse(true, path), null, null)
     }
 
     protected static InputStream toInputStream(String str) {
