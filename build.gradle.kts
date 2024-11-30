@@ -107,8 +107,6 @@ tasks.withType<Test>().configureEach {
     maxHeapSize = "1g"
   }
 
-  systemProperty("shadowVersion", version)
-
   // Required to test configuration cache in tests when using withDebug()
   // https://github.com/gradle/gradle/issues/22765#issuecomment-1339427241
   jvmArgs(
