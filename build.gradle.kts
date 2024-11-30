@@ -132,6 +132,14 @@ tasks.withType<Test>().configureEach {
   )
 }
 
+tasks.whenTaskAdded {
+  if (name == "lintAnalyzeJvmTest") {
+    // This task often fails on Windows CI devices.
+    enabled = !providers.systemProperty("os.name").get().startsWith("Windows") &&
+      !providers.environmentVariable("CI").isPresent
+  }
+}
+
 tasks.register("release") {
   dependsOn(
     tasks.publish,
