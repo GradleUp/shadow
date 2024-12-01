@@ -237,6 +237,12 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 }
 
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/JavaJarExec : org/gradle/api/tasks/JavaExec {
+	public fun <init> ()V
+	public fun exec ()V
+	public abstract fun getJarFile ()Lorg/gradle/api/file/RegularFileProperty;
+}
+
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask : org/gradle/api/DefaultTask {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Companion;
 	public static final field DESC Ljava/lang/String;
