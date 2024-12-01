@@ -5,7 +5,7 @@
 
 **Fixed**
 
-- Mark `enableRelocation`, `relocationPrefix`, and `minimizeJar` optional. ([#1073](https://github.com/GradleUp/shadow/pull/1073))  
+- Mark `enableRelocation`, `relocationPrefix`, and `minimizeJar` optional. ([#1074](https://github.com/GradleUp/shadow/pull/1074))  
   This fix the regression for registering custom `ShadowJar` tasks.
 
 
