@@ -142,48 +142,48 @@ class SimpleRelocatorTest {
   @Test
   fun testCanRelocateAbsClassPath() {
     val relocator = SimpleRelocator("org.apache.velocity", "org.apache.momentum")
-    assertThat(relocator.relocatePath(pathContext("/org/apache/velocity/mass.properties")))
+    assertThat(relocator.relocatePath("/org/apache/velocity/mass.properties"))
       .isEqualTo("/org/apache/momentum/mass.properties")
   }
 
   @Test
   fun testRelocatePath() {
     var relocator = SimpleRelocator("org.foo")
-    assertThat(relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
+    assertThat(relocator.relocatePath("org/foo/bar/Class.class"))
       .isEqualTo("hidden/org/foo/bar/Class.class")
 
     relocator = SimpleRelocator("org.foo", "private.stuff")
-    assertThat(relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
+    assertThat(relocator.relocatePath("org/foo/bar/Class.class"))
       .isEqualTo("private/stuff/bar/Class.class")
   }
 
   @Test
   fun testRelocateClass() {
     var relocator = SimpleRelocator("org.foo")
-    assertThat(relocator.relocateClass(classContext()))
+    assertThat(relocator.relocateClass("org.foo.bar.Class"))
       .isEqualTo("hidden.org.foo.bar.Class")
 
     relocator = SimpleRelocator("org.foo", "private.stuff")
-    assertThat(relocator.relocateClass(classContext()))
+    assertThat(relocator.relocateClass("org.foo.bar.Class"))
       .isEqualTo("private.stuff.bar.Class")
   }
 
   @Test
   fun testRelocateRawString() {
     var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", _rawString = true)
-    assertThat(relocator.relocatePath(pathContext("(I)Lorg/foo/bar/Class")))
+    assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class"))
       .isEqualTo("(I)Lhidden/org/foo/bar/Class")
 
     relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", _rawString = true)
-    assertThat(relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
+    assertThat(relocator.relocatePath("META-INF/org.foo.xml"))
       .isEqualTo("META-INF/hidden.org.foo.xml")
   }
 
-  private fun pathContext(path: String): RelocatePathContext {
-    return RelocatePathContext.builder().path(path).build()
+  private fun SimpleRelocator.relocatePath(path: String): String {
+    return relocatePath(RelocatePathContext(path))
   }
 
-  private fun classContext(className: String = "org.foo.bar.Class"): RelocateClassContext {
-    return RelocateClassContext.builder().className(className).build()
+  private fun SimpleRelocator.relocateClass(className: String): String {
+    return relocateClass(RelocateClassContext(className))
   }
 }
