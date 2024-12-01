@@ -14,7 +14,7 @@ apply plugin: 'application'
 apply plugin: 'com.gradleup.shadow'
 
 application {
-    mainClass = 'myapp.Main'
+  mainClass = 'myapp.Main'
 }
 ```
 

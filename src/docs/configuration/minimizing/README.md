@@ -29,9 +29,9 @@ Similar to dependencies, projects can also be excluded.
 
 ```groovy
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    minimize {
-        exclude(project(":api"))
-    }
+  minimize {
+    exclude(project(":api"))
+  }
 }
 ```
 

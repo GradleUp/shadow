@@ -17,4 +17,3 @@ tasks.register('testJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shado
 The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all `testRuntimeOnly`
 and `testImplementation` dependencies.
 The file is output to `build/libs/<project>-<version>-tests.jar`.
-    

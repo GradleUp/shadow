@@ -13,7 +13,7 @@ Any non-class files that are stored within a package structure are also relocate
 ```groovy
 // Relocating a Package
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-   relocate 'junit.framework', 'shadow.junit'
+  relocate 'junit.framework', 'shadow.junit'
 }
 ```
 
@@ -39,12 +39,12 @@ syntax to specify matching path for your files and directories.
 ```groovy
 // Configuring Filtering for Relocation
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-   relocate('junit.textui', 'a') {
-       exclude 'junit.textui.TestRunner'
-   }
-   relocate('junit.framework', 'b') {
-       include 'junit.framework.Test*'
-   }
+  relocate('junit.textui', 'a') {
+    exclude 'junit.textui.TestRunner'
+  }
+  relocate('junit.framework', 'b') {
+    include 'junit.framework.Test*'
+  }
 }
 ```
 
@@ -54,9 +54,9 @@ passing it to `include`/`exclude`.
 ```groovy
 // Configuring Filtering for Relocation with Regex
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-   relocate('org.foo', 'a') {
-       include '%regex[org/foo/.*Factory[0-9].*]'
-   }
+  relocate('org.foo', 'a') {
+    include '%regex[org/foo/.*Factory[0-9].*]'
+  }
 }
 ```
 
@@ -72,8 +72,8 @@ To configure automatic dependency relocation, set `enableRelocation = true` and 
 ```groovy
 // Configure Auto Relocation
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    enableRelocation = true
-    relocationPrefix = "myapp"
+  enableRelocation = true
+  relocationPrefix = "myapp"
 }
 ```
 

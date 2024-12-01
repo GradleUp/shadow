@@ -25,9 +25,9 @@ As with all `Jar` tasks in Gradle, these values can be overridden:
 ```groovy
 // Output to build/libs/shadow.jar
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-   archiveBaseName = 'shadow'
-   archiveClassifier = ''
-   archiveVersion = ''
+  archiveBaseName = 'shadow'
+  archiveClassifier = ''
+  archiveVersion = ''
 }
 ```
 
@@ -73,9 +73,9 @@ This means that any configuration performed on the `jar` task will propagate to 
 
 ```groovy
 tasks.named('jar', Jar) {
-   manifest {
-       attributes 'Class-Path': '/libs/a.jar'
-   }
+  manifest {
+    attributes 'Class-Path': '/libs/a.jar'
+  }
 }
 ```
 
