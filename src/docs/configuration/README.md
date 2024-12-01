@@ -25,9 +25,9 @@ As with all `Jar` tasks in Gradle, these values can be overridden:
 ```groovy
 // Output to build/libs/shadow.jar
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-   archiveBaseName.set('shadow')
-   archiveClassifier.set('')
-   archiveVersion.set('')
+   archiveBaseName = 'shadow'
+   archiveClassifier = ''
+   archiveVersion = ''
 }
 ```
 
@@ -72,7 +72,7 @@ First, the manifest for the `shadowJar` task is configured to __inherit__ from t
 This means that any configuration performed on the `jar` task will propagate to the `shadowJar` tasks.
 
 ```groovy
-jar {
+tasks.named('jar', Jar) {
    manifest {
        attributes 'Class-Path': '/libs/a.jar'
    }
@@ -89,7 +89,7 @@ If it is desired to inherit a manifest from a JAR task other than the standard `
 on the `shadowJar.manifest` object can be used to configure the upstream.
 
 ```groovy
-task testJar(type: Jar) {
+tasks.register('testJar', Jar) {
   manifest {
     attributes 'Description': 'This is an application JAR'
   }

@@ -7,8 +7,8 @@ dependencies to merge into the output.
 
 ```groovy
 // Shadowing Test Sources and Dependencies
-task testJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  archiveClassifier.set("tests")
+tasks.register('testJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+  archiveClassifier = "tests"
   from sourceSets.test.output
   configurations = [project.configurations.testRuntimeClasspath]
 }

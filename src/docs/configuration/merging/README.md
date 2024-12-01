@@ -186,10 +186,8 @@ It must be added using the [`transform`](https://gradleup.com/shadow/api/com/git
 
 ```groovy
 // Appending a XML File
-import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  transform(XmlAppendingTransformer.class) {
+  transform(com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer.class) {
     resource = 'properties.xml'
   }
 }
