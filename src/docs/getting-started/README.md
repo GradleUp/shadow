@@ -31,9 +31,7 @@ apply plugin: 'java'
 buildscript {
   repositories {
     mavenCentral()
-    maven {
-      url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
     classpath 'com.gradleup.shadow:shadow-gradle-plugin:@snapshot-version@'
