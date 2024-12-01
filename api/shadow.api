@@ -119,7 +119,9 @@ public abstract interface annotation class com/github/jengelman/gradle/plugins/s
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Companion;
+	public fun <init> (Ljava/lang/String;)V
 	public fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public synthetic fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
@@ -145,7 +147,9 @@ public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocat
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Companion;
+	public fun <init> (Ljava/lang/String;)V
 	public fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public synthetic fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;

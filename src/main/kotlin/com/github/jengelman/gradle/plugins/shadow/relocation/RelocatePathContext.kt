@@ -2,9 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 
-public data class RelocatePathContext(
+public data class RelocatePathContext @JvmOverloads constructor(
   val path: String,
-  val stats: ShadowStats,
+  val stats: ShadowStats = ShadowStats(),
 ) {
   public class Builder {
     private var path = ""
