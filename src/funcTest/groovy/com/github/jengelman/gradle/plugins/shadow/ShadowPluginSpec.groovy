@@ -8,6 +8,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Issue
@@ -1242,6 +1243,35 @@ class ShadowPluginSpec extends PluginSpecification {
         and:
         JarFile jar = new JarFile(output)
         assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
+    }
+
+    @Issue("https://github.com/GradleUp/shadow/issues/1070")
+    def 'can register a custom shadow jar task'() {
+        buildFile << """
+            dependencies {
+              testImplementation 'junit:junit:3.8.2'
+            }
+
+            def testShadowJar = tasks.register('testShadowJar', ${ShadowJar.name}) {
+              group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+              description = "Create a combined JAR of project and test dependencies"
+
+              archiveClassifier = "tests"
+              from sourceSets.test.output
+              configurations = [project.configurations.testRuntimeClasspath]
+              includedDependencies.setFrom(configurations)
+            }
+        """.stripIndent()
+
+        when:
+        def result = run('testShadowJar')
+
+        then:
+        assert result.task(":testShadowJar").outcome == TaskOutcome.SUCCESS
+
+        and:
+        def jarFile = new JarFile(output("shadow-1.0-tests.jar"))
+        assert jarFile.getEntry('junit') != null
     }
 
     private String escapedPath(File file) {
