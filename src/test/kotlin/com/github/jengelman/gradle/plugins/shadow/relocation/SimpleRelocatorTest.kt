@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator.Companion.relocateClass
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator.Companion.relocatePath
 import org.junit.jupiter.api.Test
 
 /**
@@ -177,13 +179,5 @@ class SimpleRelocatorTest {
     relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", _rawString = true)
     assertThat(relocator.relocatePath("META-INF/org.foo.xml"))
       .isEqualTo("META-INF/hidden.org.foo.xml")
-  }
-
-  private fun SimpleRelocator.relocatePath(path: String): String {
-    return relocatePath(RelocatePathContext(path))
-  }
-
-  private fun SimpleRelocator.relocateClass(className: String): String {
-    return relocateClass(RelocateClassContext(className))
   }
 }
