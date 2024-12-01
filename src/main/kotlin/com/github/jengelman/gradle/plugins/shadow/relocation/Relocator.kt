@@ -19,15 +19,5 @@ public interface Relocator {
 
   public companion object {
     public val ROLE: String = Relocator::class.java.name
-
-    @JvmStatic
-    public fun Relocator.relocatePath(path: String): String {
-      return relocatePath(RelocatePathContext(path))
-    }
-
-    @JvmStatic
-    public fun Relocator.relocateClass(className: String): String {
-      return relocateClass(RelocateClassContext(className))
-    }
   }
 }
