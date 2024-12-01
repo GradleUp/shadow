@@ -1259,6 +1259,7 @@ class ShadowPluginSpec extends PluginSpecification {
               archiveClassifier = "tests"
               from sourceSets.test.output
               configurations = [project.configurations.testRuntimeClasspath]
+              includedDependencies.setFrom(configurations)
             }
         """.stripIndent()
 
@@ -1267,6 +1268,10 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         assert result.task(":testShadowJar").outcome == TaskOutcome.SUCCESS
+
+        and:
+        def jarFile = new JarFile(output("shadow-1.0-tests.jar"))
+        assert jarFile.getEntry('junit') != null
     }
 
     private String escapedPath(File file) {
