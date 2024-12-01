@@ -10,26 +10,24 @@ and `relocationPrefix` settings on any `ShadowJar` task.
 
 A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the `shadowJar` task for relocation.
 
-```groovy no-run
-plugins {
-  id 'com.gradleup.shadow' version '@version@'
-  id 'java'
-}
+```groovy
+apply plugin: 'java'
+apply plugin: 'com.gradleup.shadow'
 
 dependencies {
-    shadow localGroovy()
-    shadow gradleApi()
+  shadow localGroovy()
+  shadow gradleApi()
 
-    implementation 'org.jdom:jdom2:2.0.6'
-    implementation 'org.ow2.asm:asm:6.0'
-    implementation 'org.ow2.asm:asm-commons:6.0'
-    implementation 'commons-io:commons-io:2.4'
-    implementation 'org.apache.ant:ant:1.9.4'
-    implementation 'org.codehaus.plexus:plexus-utils:2.0.6'
+  implementation 'org.jdom:jdom2:2.0.6'
+  implementation 'org.ow2.asm:asm:6.0'
+  implementation 'org.ow2.asm:asm-commons:6.0'
+  implementation 'commons-io:commons-io:2.4'
+  implementation 'org.apache.ant:ant:1.9.4'
+  implementation 'org.codehaus.plexus:plexus-utils:2.0.6'
 }
 
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    enableRelocation = true
+  enableRelocation = true
 }
 ```
 

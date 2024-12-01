@@ -21,7 +21,7 @@ publishing {
   }
   repositories {
     maven {
-      url "http://repo.myorg.com"
+      url "https://repo.myorg.com"
     }
   }
 }

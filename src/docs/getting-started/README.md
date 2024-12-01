@@ -11,12 +11,12 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 
 ```groovy no-run
 buildscript {
-    repositories {
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath 'com.gradleup.shadow:shadow-gradle-plugin:@version@'
-    }
+  repositories {
+    gradlePluginPortal()
+  }
+  dependencies {
+    classpath 'com.gradleup.shadow:shadow-gradle-plugin:@version@'
+  }
 }
 
 apply plugin: 'com.gradleup.shadow'
@@ -29,15 +29,13 @@ apply plugin: 'java'
 
 ```groovy no-run
 buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url 'https://oss.sonatype.org/content/repositories/snapshots/'
-        }
-    }
-    dependencies {
-        classpath 'com.gradleup.shadow:shadow-gradle-plugin:@snapshot-version@'
-    }
+  repositories {
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  }
+  dependencies {
+    classpath 'com.gradleup.shadow:shadow-gradle-plugin:@snapshot-version@'
+  }
 }
 
 apply plugin: 'com.gradleup.shadow'
