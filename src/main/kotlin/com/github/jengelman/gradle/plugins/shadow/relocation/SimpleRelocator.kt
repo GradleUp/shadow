@@ -2,6 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.tasks.Input
 
 /**
  * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/SimpleRelocator.java).
@@ -12,6 +15,7 @@ import org.codehaus.plexus.util.SelectorUtils
  */
 @CacheableRelocator
 public open class SimpleRelocator @JvmOverloads constructor(
+  objectFactory: ObjectFactory,
   pattern: String? = null,
   shadedPattern: String? = null,
   includes: List<String>? = null,
@@ -22,8 +26,12 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val pathPattern: String
   private val shadedPattern: String
   private val shadedPathPattern: String
-  private val includes = mutableSetOf<String>()
-  private val excludes = mutableSetOf<String>()
+
+  @get:Input
+  public val includes: ListProperty<String> = objectFactory.listProperty(String::class.java)
+
+  @get:Input
+  public val excludes: ListProperty<String> = objectFactory.listProperty(String::class.java)
 
   init {
     if (rawString) {
@@ -47,16 +55,16 @@ public open class SimpleRelocator @JvmOverloads constructor(
         this.shadedPathPattern = shadedPattern.replace('.', '/')
       }
     }
-    this.includes += normalizePatterns(includes)
-    this.excludes += normalizePatterns(excludes)
+    this.includes.addAll(normalizePatterns(includes))
+    this.excludes.addAll(normalizePatterns(excludes))
   }
 
   public open fun include(pattern: String): SimpleRelocator = apply {
-    includes += normalizePatterns(listOf(pattern))
+    includes.addAll(normalizePatterns(listOf(pattern)))
   }
 
   public open fun exclude(pattern: String): SimpleRelocator = apply {
-    excludes += normalizePatterns(listOf(pattern))
+    excludes.addAll(normalizePatterns(listOf(pattern)))
   }
 
   override fun canRelocatePath(path: String): Boolean {
@@ -104,11 +112,11 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   private fun isIncluded(path: String): Boolean {
-    return includes.isEmpty() || includes.any { SelectorUtils.matchPath(it, path, "/", true) }
+    return includes.get().isEmpty() || includes.get().any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
   private fun isExcluded(path: String): Boolean {
-    return excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
+    return excludes.get().any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
   private companion object {
