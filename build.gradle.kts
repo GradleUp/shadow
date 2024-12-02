@@ -65,6 +65,10 @@ gradlePlugin {
 }
 
 dependencies {
+  implementation(libs.apache.shade) {
+    // Exclude all transitive dependencies from maven-shade-plugin, we just need its APIs.
+    isTransitive = false
+  }
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
