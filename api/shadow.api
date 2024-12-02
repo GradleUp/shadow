@@ -171,17 +171,24 @@ public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocat
 	public final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
 }
 
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator : org/apache/maven/plugins/shade/relocation/Relocator {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator$Companion;
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun canRelocateClass (Ljava/lang/String;)Z
 	public abstract fun canRelocatePath (Ljava/lang/String;)Z
 	public abstract fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
+	public fun relocateClass (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
+	public fun relocatePath (Ljava/lang/String;)Ljava/lang/String;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator$Companion {
 	public final fun getROLE ()Ljava/lang/String;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator$DefaultImpls {
+	public static fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Ljava/lang/String;)Ljava/lang/String;
+	public static fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Ljava/lang/String;)Ljava/lang/String;
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator : com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
