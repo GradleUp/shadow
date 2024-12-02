@@ -23,6 +23,6 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
 kotlin = "org.jetbrains.kotlin.jvm:2.1.0"
-android-lint = "com.android.lint:8.7.2"
+android-lint = "com.android.lint:8.7.3"
 jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.16.3"
 spotless = "com.diffplug.spotless:7.0.0.BETA4"
