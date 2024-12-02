@@ -26,10 +26,10 @@ import org.codehaus.plexus.util.SelectorUtils
  * @author Mauro Talevi
  */
 internal class SimpleRelocatorNew @JvmOverloads constructor(
-  patt: String?,
-  shadedPattern: String?,
-  includes: List<String>?,
-  excludes: List<String>?,
+  patt: String? = null,
+  shadedPattern: String? = null,
+  includes: List<String>? = null,
+  excludes: List<String>? = null,
   private val rawString: Boolean = false,
 ) : Relocator {
   private var pattern: String? = null
