@@ -196,13 +196,6 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun canRelocateClass (Ljava/lang/String;)Z
 	public fun canRelocatePath (Ljava/lang/String;)Z
 	public fun exclude (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
-	public fun getExcludes ()Ljava/util/Set;
-	public fun getIncludes ()Ljava/util/Set;
-	public fun getPathPattern ()Ljava/lang/String;
-	public fun getPattern ()Ljava/lang/String;
-	public fun getRawString ()Z
-	public fun getShadedPathPattern ()Ljava/lang/String;
-	public fun getShadedPattern ()Ljava/lang/String;
 	public fun include (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;

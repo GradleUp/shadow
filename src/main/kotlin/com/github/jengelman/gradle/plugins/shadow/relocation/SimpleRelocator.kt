@@ -2,8 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 
 /**
  * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/SimpleRelocator.java).
@@ -18,76 +16,53 @@ public open class SimpleRelocator @JvmOverloads constructor(
   shadedPattern: String? = null,
   includes: List<String>? = null,
   excludes: List<String>? = null,
-  private val _rawString: Boolean = false,
+  private val rawString: Boolean = false,
 ) : Relocator {
-  private val _pattern: String
-  private val _pathPattern: String
-  private val _shadedPattern: String
-  private val _shadedPathPattern: String
-  private val _includes = mutableSetOf<String>()
-  private val _excludes = mutableSetOf<String>()
+  private val pattern: String
+  private val pathPattern: String
+  private val shadedPattern: String
+  private val shadedPathPattern: String
+  private val includes = mutableSetOf<String>()
+  private val excludes = mutableSetOf<String>()
 
   init {
-    if (_rawString) {
-      _pathPattern = pattern.orEmpty()
-      _shadedPathPattern = shadedPattern.orEmpty()
-      _pattern = "" // not used for raw string relocator
-      _shadedPattern = "" // not used for raw string relocator
+    if (rawString) {
+      this.pathPattern = pattern.orEmpty()
+      this.shadedPathPattern = shadedPattern.orEmpty()
+      this.pattern = "" // not used for raw string relocator
+      this.shadedPattern = "" // not used for raw string relocator
     } else {
       if (pattern == null) {
-        _pattern = ""
-        _pathPattern = ""
+        this.pattern = ""
+        this.pathPattern = ""
       } else {
-        _pattern = pattern.replace('/', '.')
-        _pathPattern = pattern.replace('.', '/')
+        this.pattern = pattern.replace('/', '.')
+        this.pathPattern = pattern.replace('.', '/')
       }
       if (shadedPattern == null) {
-        _shadedPattern = "hidden.${_pattern}"
-        _shadedPathPattern = "hidden/$_pathPattern"
+        this.shadedPattern = "hidden.${this.pattern}"
+        this.shadedPathPattern = "hidden/${this.pathPattern}"
       } else {
-        _shadedPattern = shadedPattern.replace('/', '.')
-        _shadedPathPattern = shadedPattern.replace('.', '/')
+        this.shadedPattern = shadedPattern.replace('/', '.')
+        this.shadedPathPattern = shadedPattern.replace('.', '/')
       }
     }
-    _includes += normalizePatterns(includes)
-    _excludes += normalizePatterns(excludes)
+    this.includes += normalizePatterns(includes)
+    this.excludes += normalizePatterns(excludes)
   }
 
-  @get:Input
-  @get:Optional
-  public open val pattern: String get() = _pattern
-
-  @get:Input
-  public open val pathPattern: String get() = _pathPattern
-
-  @get:Input
-  @get:Optional
-  public open val shadedPattern: String get() = _shadedPattern
-
-  @get:Input
-  public open val shadedPathPattern: String get() = _shadedPathPattern
-
-  @get:Input
-  public open val rawString: Boolean get() = _rawString
-
-  @get:Input
-  public open val includes: Set<String> get() = _includes
-
-  @get:Input
-  public open val excludes: Set<String> get() = _excludes
-
   public open fun include(pattern: String): SimpleRelocator = apply {
-    _includes += normalizePatterns(listOf(pattern))
+    includes += normalizePatterns(listOf(pattern))
   }
 
   public open fun exclude(pattern: String): SimpleRelocator = apply {
-    _excludes += normalizePatterns(listOf(pattern))
+    excludes += normalizePatterns(listOf(pattern))
   }
 
   override fun canRelocatePath(path: String): Boolean {
-    if (_rawString) return Pattern.compile(_pathPattern).matcher(path).find()
+    if (rawString) return Pattern.compile(pathPattern).matcher(path).find()
     // If string is too short - no need to perform expensive string operations
-    if (path.length < _pathPattern.length) return false
+    if (path.length < pathPattern.length) return false
     val adjustedPath = if (path.endsWith(".class")) {
       // Safeguard against strings containing only ".class"
       if (path.length == 6) return false
@@ -97,43 +72,43 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
     // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
     val startIndex = if (adjustedPath.startsWith("/")) 1 else 0
-    val pathStartsWithPattern = adjustedPath.startsWith(_pathPattern, startIndex)
+    val pathStartsWithPattern = adjustedPath.startsWith(pathPattern, startIndex)
     return pathStartsWithPattern && isIncluded(adjustedPath) && !isExcluded(adjustedPath)
   }
 
   override fun canRelocateClass(className: String): Boolean {
-    return !_rawString && !className.contains('/') && canRelocatePath(className.replace('.', '/'))
+    return !rawString && !className.contains('/') && canRelocatePath(className.replace('.', '/'))
   }
 
   override fun relocatePath(context: RelocatePathContext): String {
     val path = context.path
-    context.stats.relocate(_pathPattern, _shadedPathPattern)
-    return if (_rawString) {
-      path.replace(_pathPattern.toRegex(), _shadedPathPattern)
+    context.stats.relocate(pathPattern, shadedPathPattern)
+    return if (rawString) {
+      path.replace(pathPattern.toRegex(), shadedPathPattern)
     } else {
-      path.replaceFirst(_pathPattern, _shadedPathPattern)
+      path.replaceFirst(pathPattern, shadedPathPattern)
     }
   }
 
   override fun relocateClass(context: RelocateClassContext): String {
-    context.stats.relocate(_pathPattern, _shadedPathPattern)
-    return context.className.replaceFirst(_pattern, _shadedPattern)
+    context.stats.relocate(pathPattern, shadedPathPattern)
+    return context.className.replaceFirst(pattern, shadedPattern)
   }
 
   override fun applyToSourceContent(sourceContent: String): String {
-    return if (_rawString) {
+    return if (rawString) {
       sourceContent
     } else {
-      sourceContent.replace("\\b$_pattern".toRegex(), _shadedPattern)
+      sourceContent.replace("\\b$pattern".toRegex(), shadedPattern)
     }
   }
 
   private fun isIncluded(path: String): Boolean {
-    return _includes.isEmpty() || _includes.any { SelectorUtils.matchPath(it, path, "/", true) }
+    return includes.isEmpty() || includes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
   private fun isExcluded(path: String): Boolean {
-    return _excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
+    return excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
   private companion object {
