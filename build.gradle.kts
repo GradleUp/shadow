@@ -72,7 +72,10 @@ dependencies {
   implementation(libs.jdependency)
   implementation(libs.jdom2)
   implementation(libs.plexus.utils)
-  implementation(libs.plexus.xml)
+  implementation(libs.plexus.xml) {
+    // We don't need com.apache.maven things from plexus-xml.
+    isTransitive = false
+  }
 
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
