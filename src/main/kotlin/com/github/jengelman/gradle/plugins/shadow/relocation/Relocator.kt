@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 /**
- * Modified from `org.apache.maven.plugins.shade.relocation.Relocator.java`
+ * Modified from [org.apache.maven.plugins.shade.relocation.Relocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/Relocator.java).
  *
  * @author Jason van Zyl
  * @author John Engelman
