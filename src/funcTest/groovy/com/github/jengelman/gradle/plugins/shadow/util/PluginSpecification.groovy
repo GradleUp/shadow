@@ -121,7 +121,7 @@ abstract class PluginSpecification extends Specification {
     }
 
     AppendableMavenPathRepository repo(String path = 'maven-repo') {
-        new AppendableMavenPathRepository(dir.resolve(path))
+        new AppendableMavenPathRepository(dir.resolve(path).toFile())
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
