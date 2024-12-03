@@ -1,14 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 
 /**
  * A fixture for dealing with file Maven repositories.
  */
 class MavenFileRepository implements MavenRepository {
-    final TestFile rootDir
+    final File rootDir
 
-    MavenFileRepository(TestFile rootDir) {
+    MavenFileRepository(File rootDir) {
         this.rootDir = rootDir
     }
 
