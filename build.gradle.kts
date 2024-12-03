@@ -59,6 +59,10 @@ val funcTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
 }
 
+val testFixtures: SourceSet by sourceSets.creating
+val testFixturesImplementation: Configuration by configurations.getting
+val testFixturesRuntimeOnly: Configuration by configurations.getting
+
 gradlePlugin {
   testSourceSets.add(intiTest)
   testSourceSets.add(funcTest)
@@ -74,6 +78,9 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
+  testFixturesImplementation(gradleTestKit())
+
+  testImplementation(testFixtures.output)
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.assertk)

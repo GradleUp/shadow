@@ -22,6 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import spock.lang.Unroll
 
+import static com.github.jengelman.gradle.plugins.shadow.testkit.util.Utils.testObjectFactory
 import static groovy.lang.Closure.IDENTITY
 
 @Unroll
@@ -29,7 +30,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
 
     void "Path #path #transform transformed"() {
         given:
-        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        Transformer transformer = new PropertiesFileTransformer(testObjectFactory)
 
         when:
         boolean actual = transformer.canTransformResource(getFileElement(path))
@@ -49,7 +50,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void exerciseAllTransformConfigurations() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        Transformer transformer = new PropertiesFileTransformer(testObjectFactory)
         transformer.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
         transformer.mergeSeparator.set(mergeSeparator)
 
@@ -73,7 +74,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void exerciseAllTransformConfigurationsWithPaths() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        Transformer transformer = new PropertiesFileTransformer(testObjectFactory)
         transformer.paths.set(paths)
         transformer.mergeStrategy.set(MergeStrategy.from('first'))
 
@@ -97,7 +98,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void exerciseAllTransformConfigurationsWithMappings() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        Transformer transformer = new PropertiesFileTransformer(testObjectFactory)
         transformer.mappings.set(mappings)
         transformer.mergeStrategy.set(MergeStrategy.from('latest'))
 
@@ -123,7 +124,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void appliesKeyTransformer() {
         given:
         def element = getFileElement(path)
-        Transformer transformer = new PropertiesFileTransformer(objectFactory)
+        Transformer transformer = new PropertiesFileTransformer(testObjectFactory)
         transformer.keyTransformer.set(keyTransformer)
         transformer.mergeStrategy.set(MergeStrategy.from('append'))
 
@@ -147,7 +148,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
     void appliesCharset() {
         given:
         def element = getFileElement(path)
-        def transformer = new PropertiesFileTransformer(objectFactory)
+        def transformer = new PropertiesFileTransformer(testObjectFactory)
         transformer.charsetName.set(charset)
 
         when:
