@@ -1,19 +1,21 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
+import java.nio.file.Path
+
 
 /**
  * A fixture for dealing with file Maven repositories.
  */
 class MavenPathRepository implements MavenRepository {
-    final File rootDir
+    final Path rootDir
 
-    MavenPathRepository(File rootDir) {
+    MavenPathRepository(Path rootDir) {
         this.rootDir = rootDir
     }
 
     @Override
     URI getUri() {
-        return rootDir.toURI()
+        return rootDir.toFile().toURI()
     }
 
     @Override
