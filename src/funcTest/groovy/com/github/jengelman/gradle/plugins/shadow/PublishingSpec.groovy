@@ -60,14 +60,14 @@ class PublishingSpec extends PluginSpecification {
         run('publish')
 
         then:
-        File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
+        File publishedFile = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
         assert publishedFile.exists()
 
         and:
         contains(publishedFile, ['a.properties', 'a2.properties'])
 
         and:
-        File pom = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.pom').canonicalFile
+        File pom = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.pom').canonicalFile
         assert pom.exists()
 
         def contents = new XmlSlurper().parse(pom)
@@ -128,7 +128,7 @@ class PublishingSpec extends PluginSpecification {
         run('publish')
 
         then:
-        File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext').canonicalFile
+        File publishedFile = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext').canonicalFile
         assert publishedFile.exists()
     }
 
@@ -209,14 +209,14 @@ class PublishingSpec extends PluginSpecification {
         run('publish')
 
         then:
-        File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
+        File publishedFile = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
         assert publishedFile.exists()
 
         and:
         contains(publishedFile, ['a.properties', 'a2.properties'])
 
         and:
-        File pom = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.pom').canonicalFile
+        File pom = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.pom').canonicalFile
         assert pom.exists()
 
         def contents = new XmlSlurper().parse(pom)
@@ -273,8 +273,8 @@ class PublishingSpec extends PluginSpecification {
         run('publish')
 
         then:
-        File mainJar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.jar').canonicalFile
-        File shadowJar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0-all.jar').canonicalFile
+        File mainJar = publishingRepo.rootDir.resolve('com/acme/maven/1.0/maven-1.0.jar').canonicalFile
+        File shadowJar = publishingRepo.rootDir.resolve('com/acme/maven/1.0/maven-1.0-all.jar').canonicalFile
         assert mainJar.exists()
         assert shadowJar.exists()
 
@@ -282,8 +282,8 @@ class PublishingSpec extends PluginSpecification {
         contains(shadowJar, ['a.properties', 'a2.properties'])
 
         and: "publishes both a POM file and a Gradle metadata file"
-        File pom = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.pom').canonicalFile
-        File gmm = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.module').canonicalFile
+        File pom = publishingRepo.rootDir.resolve('com/acme/maven/1.0/maven-1.0.pom').canonicalFile
+        File gmm = publishingRepo.rootDir.resolve('com/acme/maven/1.0/maven-1.0.module').canonicalFile
         pom.exists()
         gmm.exists()
 
@@ -328,13 +328,13 @@ class PublishingSpec extends PluginSpecification {
 
         and: "verify shadow publication"
         assertions {
-            shadowJar = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0-all.jar').canonicalFile
+            shadowJar = publishingRepo.rootDir.resolve('com/acme/maven-all/1.0/maven-all-1.0-all.jar').canonicalFile
             assert shadowJar.exists()
             contains(shadowJar, ['a.properties', 'a2.properties'])
         }
 
         assertions {
-            pom = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.pom').canonicalFile
+            pom = publishingRepo.rootDir.resolve('com/acme/maven-all/1.0/maven-all-1.0.pom').canonicalFile
             assert pom.exists()
             pomContents = new XmlSlurper().parse(pom)
             assert pomContents.dependencies[0].dependency.size() == 1
@@ -351,7 +351,7 @@ class PublishingSpec extends PluginSpecification {
         }
 
         assertions {
-            gmm = publishingRepo.rootDir.file('com/acme/maven-all/1.0/maven-all-1.0.module').canonicalFile
+            gmm = publishingRepo.rootDir.resolve('com/acme/maven-all/1.0/maven-all-1.0.module').canonicalFile
             assert gmm.exists()
             gmmContents = new JsonSlurper().parse(gmm)
             assert gmmContents.variants.size() == 1

@@ -44,7 +44,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     File getArtifactFile(Map options = [:]) {
         if (version.endsWith("-SNAPSHOT") && !metaDataFile.exists() && uniqueSnapshots) {
             def artifact = toArtifact(options)
-            return moduleDir.file("${artifactId}-${version}${artifact.classifier ? "-${artifact.classifier}" : ""}.${artifact.type}")
+            return moduleDir.resolve("${artifactId}-${version}${artifact.classifier ? "-${artifact.classifier}" : ""}.${artifact.type}")
         }
         return artifactFile(options)
     }
@@ -188,16 +188,16 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
     @Override
     File getPomFile() {
-        return moduleDir.file("$artifactId-${publishArtifactVersion}.pom")
+        return moduleDir.resolve("$artifactId-${publishArtifactVersion}.pom")
     }
 
     @Override
     File getMetaDataFile() {
-        moduleDir.file(MAVEN_METADATA_FILE)
+        moduleDir.resolve(MAVEN_METADATA_FILE)
     }
 
     File getRootMetaDataFile() {
-        moduleDir.parentFile.file(MAVEN_METADATA_FILE)
+        moduleDir.parentFile.resolve(MAVEN_METADATA_FILE)
     }
 
     File artifactFile(Map<String, ?> options) {
@@ -206,7 +206,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         if (artifact.classifier) {
             fileName = "$artifactId-$publishArtifactVersion-${artifact.classifier}.${artifact.type}"
         }
-        return moduleDir.file(fileName)
+        return moduleDir.resolve(fileName)
     }
 
     @Override

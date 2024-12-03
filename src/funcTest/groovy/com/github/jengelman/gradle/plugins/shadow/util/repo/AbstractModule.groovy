@@ -9,7 +9,7 @@ abstract class AbstractModule {
      */
     protected void publish(File file, Closure cl) {
         def hashBefore = file.exists() ? getHash(file, "sha1") : null
-        def tmpFile = file.parentFile.file("${file.name}.tmp")
+        def tmpFile = file.parentFile.resolve("${file.name}.tmp")
 
         tmpFile.withWriter("utf-8") {
             cl.call(it)
@@ -28,7 +28,7 @@ abstract class AbstractModule {
 
     protected void publishWithStream(File file, Closure cl) {
         def hashBefore = file.exists() ? getHash(file, "sha1") : null
-        def tmpFile = file.parentFile.file("${file.name}.tmp")
+        def tmpFile = file.parentFile.resolve("${file.name}.tmp")
 
         tmpFile.withOutputStream {
             cl.call(it)
@@ -71,7 +71,7 @@ abstract class AbstractModule {
     }
 
     private static File getHashFile(File file, String algorithm) {
-        file.parentFile.file("${file.name}.${algorithm}")
+        file.parentFile.resolve("${file.name}.${algorithm}")
     }
 
     private static BigInteger getHash(File file, String algorithm) {

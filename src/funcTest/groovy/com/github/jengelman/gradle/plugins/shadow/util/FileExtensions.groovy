@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 final class FileExtensions {
-    static File file(File file, String relativePath) {
+    static File resolve(File file, String relativePath) {
         try {
             return new File(file, relativePath)
         } catch (RuntimeException e) {
