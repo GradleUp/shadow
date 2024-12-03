@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.util.repo.maven.MavenFileModule
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarBuilder
 import groovy.transform.InheritConstructors
 import org.apache.commons.io.IOUtils
 
