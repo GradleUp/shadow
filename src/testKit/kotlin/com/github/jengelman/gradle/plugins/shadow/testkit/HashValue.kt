@@ -1,7 +1,6 @@
-package com.github.jengelman.gradle.plugins.shadow.testkit.util
+package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import java.math.BigInteger
-import java.util.*
 
 class HashValue(digest: ByteArray) {
   private val digest = BigInteger(1, digest)

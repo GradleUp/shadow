@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.testkit.util
+package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import java.io.File
 import java.io.FileInputStream

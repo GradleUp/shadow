@@ -22,7 +22,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import spock.lang.Unroll
 
-import static com.github.jengelman.gradle.plugins.shadow.testkit.util.Utils.testObjectFactory
+import static com.github.jengelman.gradle.plugins.shadow.testkit.Utils.testObjectFactory
 import static groovy.lang.Closure.IDENTITY
 
 @Unroll

@@ -1,6 +1,6 @@
 @file:JvmName("Utils")
 
-package com.github.jengelman.gradle.plugins.shadow.testkit.util
+package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.testfixtures.ProjectBuilder
