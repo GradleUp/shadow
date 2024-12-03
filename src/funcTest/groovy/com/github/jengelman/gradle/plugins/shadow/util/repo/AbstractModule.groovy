@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo
 
-import com.github.jengelman.gradle.plugins.shadow.util.HashUtil
+import com.github.jengelman.gradle.plugins.shadow.testkit.util.HashUtil
 
 abstract class AbstractModule {
     /**
