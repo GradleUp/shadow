@@ -43,6 +43,9 @@ spotless {
   }
 }
 
+val testKit: SourceSet by sourceSets.creating
+val testKitImplementation: Configuration by configurations.getting
+
 val intiTest: SourceSet by sourceSets.creating
 val intiTestImplementation: Configuration by configurations.getting {
   extendsFrom(configurations.testImplementation.get())
@@ -59,10 +62,6 @@ val funcTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
 }
 
-val testFixtures: SourceSet by sourceSets.creating
-val testFixturesImplementation: Configuration by configurations.getting
-val testFixturesRuntimeOnly: Configuration by configurations.getting
-
 gradlePlugin {
   testSourceSets.add(intiTest)
   testSourceSets.add(funcTest)
@@ -78,9 +77,9 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
-  testFixturesImplementation(gradleTestKit())
+  testKitImplementation(gradleTestKit())
 
-  testImplementation(testFixtures.output)
+  testImplementation(testKit.output)
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.assertk)
