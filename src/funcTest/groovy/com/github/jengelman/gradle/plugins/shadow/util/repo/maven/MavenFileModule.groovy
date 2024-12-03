@@ -1,11 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 
 class MavenFileModule extends AbstractMavenModule {
     private boolean uniqueSnapshots = true
 
-    MavenFileModule(TestFile moduleDir, String groupId, String artifactId, String version) {
+    MavenFileModule(File moduleDir, String groupId, String artifactId, String version) {
         super(moduleDir, groupId, artifactId, version)
     }
 
@@ -40,7 +39,7 @@ class MavenFileModule extends AbstractMavenModule {
     }
 
     @Override
-    protected onPublish(TestFile file) {
+    protected onPublish(File file) {
         sha1File(file)
         md5File(file)
     }

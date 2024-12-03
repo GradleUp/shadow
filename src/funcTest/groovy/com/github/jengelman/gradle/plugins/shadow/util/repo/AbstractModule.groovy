@@ -1,15 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo
 
 import com.github.jengelman.gradle.plugins.shadow.util.HashUtil
-import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 
 abstract class AbstractModule {
     /**
      * @param cl A closure that is passed a writer to use to generate the content.
      */
-    protected void publish(TestFile file, Closure cl) {
+    protected void publish(File file, Closure cl) {
         def hashBefore = file.exists() ? getHash(file, "sha1") : null
-        def tmpFile = file.parentFile.file("${file.name}.tmp")
+        def tmpFile = file.parentFile.resolve("${file.name}.tmp")
 
         tmpFile.withWriter("utf-8") {
             cl.call(it)
@@ -26,9 +25,9 @@ abstract class AbstractModule {
         onPublish(file)
     }
 
-    protected void publishWithStream(TestFile file, Closure cl) {
+    protected void publishWithStream(File file, Closure cl) {
         def hashBefore = file.exists() ? getHash(file, "sha1") : null
-        def tmpFile = file.parentFile.file("${file.name}.tmp")
+        def tmpFile = file.parentFile.resolve("${file.name}.tmp")
 
         tmpFile.withOutputStream {
             cl.call(it)
@@ -45,36 +44,36 @@ abstract class AbstractModule {
         onPublish(file)
     }
 
-    protected abstract onPublish(TestFile file)
+    protected abstract onPublish(File file)
 
-    static TestFile getSha1File(TestFile file) {
+    static File getSha1File(File file) {
         getHashFile(file, "sha1")
     }
 
-    static TestFile sha1File(TestFile file) {
+    static File sha1File(File file) {
         hashFile(file, "sha1", 40)
     }
 
-    static TestFile getMd5File(TestFile file) {
+    static File getMd5File(File file) {
         getHashFile(file, "md5")
     }
 
-    static TestFile md5File(TestFile file) {
+    static File md5File(File file) {
         hashFile(file, "md5", 32)
     }
 
-    private static TestFile hashFile(TestFile file, String algorithm, int len) {
+    private static File hashFile(File file, String algorithm, int len) {
         def hashFile = getHashFile(file, algorithm)
         def hash = getHash(file, algorithm)
         hashFile.text = String.format("%0${len}x", hash)
         return hashFile
     }
 
-    private static TestFile getHashFile(TestFile file, String algorithm) {
-        file.parentFile.file("${file.name}.${algorithm}")
+    private static File getHashFile(File file, String algorithm) {
+        file.parentFile.resolve("${file.name}.${algorithm}")
     }
 
-    private static BigInteger getHash(TestFile file, String algorithm) {
+    private static BigInteger getHash(File file, String algorithm) {
         HashUtil.createHash(file, algorithm.toUpperCase()).asBigInteger()
     }
 }

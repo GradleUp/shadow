@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import com.github.jengelman.gradle.plugins.shadow.util.repo.AbstractModule
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlParser
@@ -9,7 +8,7 @@ import java.text.SimpleDateFormat
 
 abstract class AbstractMavenModule extends AbstractModule implements MavenModule {
     protected static final String MAVEN_METADATA_FILE = "maven-metadata.xml"
-    final TestFile moduleDir
+    final File moduleDir
     final String groupId
     final String artifactId
     final String version
@@ -22,7 +21,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     final updateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
     final timestampFormat = new SimpleDateFormat("yyyyMMdd.HHmmss")
 
-    AbstractMavenModule(TestFile moduleDir, String groupId, String artifactId, String version) {
+    AbstractMavenModule(File moduleDir, String groupId, String artifactId, String version) {
         this.moduleDir = moduleDir
         this.groupId = groupId
         this.artifactId = artifactId
@@ -42,10 +41,10 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     }
 
     @Override
-    TestFile getArtifactFile(Map options = [:]) {
+    File getArtifactFile(Map options = [:]) {
         if (version.endsWith("-SNAPSHOT") && !metaDataFile.exists() && uniqueSnapshots) {
             def artifact = toArtifact(options)
-            return moduleDir.file("${artifactId}-${version}${artifact.classifier ? "-${artifact.classifier}" : ""}.${artifact.type}")
+            return moduleDir.resolve("${artifactId}-${version}${artifact.classifier ? "-${artifact.classifier}" : ""}.${artifact.type}")
         }
         return artifactFile(options)
     }
@@ -188,26 +187,26 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     }
 
     @Override
-    TestFile getPomFile() {
-        return moduleDir.file("$artifactId-${publishArtifactVersion}.pom")
+    File getPomFile() {
+        return moduleDir.resolve("$artifactId-${publishArtifactVersion}.pom")
     }
 
     @Override
-    TestFile getMetaDataFile() {
-        moduleDir.file(MAVEN_METADATA_FILE)
+    File getMetaDataFile() {
+        moduleDir.resolve(MAVEN_METADATA_FILE)
     }
 
-    TestFile getRootMetaDataFile() {
-        moduleDir.parentFile.file(MAVEN_METADATA_FILE)
+    File getRootMetaDataFile() {
+        moduleDir.parentFile.resolve(MAVEN_METADATA_FILE)
     }
 
-    TestFile artifactFile(Map<String, ?> options) {
+    File artifactFile(Map<String, ?> options) {
         def artifact = toArtifact(options)
         def fileName = "$artifactId-${publishArtifactVersion}.${artifact.type}"
         if (artifact.classifier) {
             fileName = "$artifactId-$publishArtifactVersion-${artifact.classifier}.${artifact.type}"
         }
-        return moduleDir.file(fileName)
+        return moduleDir.resolve(fileName)
     }
 
     @Override
@@ -282,7 +281,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         return this
     }
 
-    private void updateRootMavenMetaData(TestFile rootMavenMetaData) {
+    private void updateRootMavenMetaData(File rootMavenMetaData) {
         def allVersions = rootMavenMetaData.exists() ? new XmlParser().parseText(rootMavenMetaData.text).versioning.versions.version*.value().flatten() : []
         allVersions << version
         publish(rootMavenMetaData) { Writer writer ->

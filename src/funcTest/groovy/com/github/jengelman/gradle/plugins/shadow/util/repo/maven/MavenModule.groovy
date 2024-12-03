@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 
 interface MavenModule {
     /**
@@ -33,11 +32,11 @@ interface MavenModule {
      */
     MavenModule hasType(String type)
 
-    TestFile getPomFile()
+    File getPomFile()
 
-    TestFile getArtifactFile()
+    File getArtifactFile()
 
-    TestFile getMetaDataFile()
+    File getMetaDataFile()
 
     MavenPom getParsedPom()
 
