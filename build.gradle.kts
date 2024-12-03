@@ -77,6 +77,8 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
+  val mainOutput = sourceSets.main.map { it.output }
+  testKitImplementation(mainOutput)
   testKitImplementation(gradleTestKit())
 
   testImplementation(testKit.output)
@@ -91,7 +93,7 @@ dependencies {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
-  funcTestImplementation(sourceSets.main.get().output)
+  funcTestImplementation(mainOutput)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)
