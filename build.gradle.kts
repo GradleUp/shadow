@@ -80,6 +80,7 @@ dependencies {
   val mainOutput = sourceSets.main.map { it.output }
   testKitImplementation(mainOutput)
   testKitImplementation(gradleTestKit())
+  testKitImplementation(libs.assertk)
 
   testImplementation(testKit.output)
   testImplementation(platform(libs.junit.bom))
