@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenPathRepository
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import groovy.json.JsonSlurper
 import groovy.xml.XmlSlurper
@@ -10,7 +10,7 @@ import spock.lang.Issue
 
 class PublishingSpec extends PluginSpecification {
 
-    AppendableMavenFileRepository publishingRepo
+    AppendableMavenPathRepository publishingRepo
 
     @Override
     def setup() {

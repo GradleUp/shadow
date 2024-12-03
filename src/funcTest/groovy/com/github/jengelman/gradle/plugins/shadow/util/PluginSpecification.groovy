@@ -19,7 +19,7 @@ abstract class PluginSpecification extends Specification {
 
     public static final String SHADOW_VERSION = System.getProperty("shadowVersion")
 
-    AppendableMavenFileRepository repo
+    AppendableMavenPathRepository repo
 
     def setup() {
         repo = repo()
@@ -120,8 +120,8 @@ abstract class PluginSpecification extends Specification {
         return dir.resolve(path).toFile()
     }
 
-    AppendableMavenFileRepository repo(String path = 'maven-repo') {
-        new AppendableMavenFileRepository(dir.resolve(path).toFile())
+    AppendableMavenPathRepository repo(String path = 'maven-repo') {
+        new AppendableMavenPathRepository(dir.resolve(path).toFile())
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
