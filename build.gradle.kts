@@ -48,7 +48,7 @@ val testKitImplementation: Configuration by configurations.getting
 
 val intiTest: SourceSet by sourceSets.creating
 val intiTestImplementation: Configuration by configurations.getting {
-  extendsFrom(configurations.testImplementation.get())
+  extendsFrom(testKitImplementation, configurations.testImplementation.get())
 }
 val intiTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
@@ -56,7 +56,7 @@ val intiTestRuntimeOnly: Configuration by configurations.getting {
 
 val funcTest: SourceSet by sourceSets.creating
 val funcTestImplementation: Configuration by configurations.getting {
-  extendsFrom(configurations.testImplementation.get())
+  extendsFrom(testKitImplementation, configurations.testImplementation.get())
 }
 val funcTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
@@ -80,6 +80,7 @@ dependencies {
   val mainOutput = sourceSets.main.map { it.output }
   testKitImplementation(mainOutput)
   testKitImplementation(gradleTestKit())
+  testKitImplementation(libs.apache.maven)
   testKitImplementation(libs.assertk)
 
   testImplementation(testKit.output)
