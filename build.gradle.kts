@@ -43,9 +43,6 @@ spotless {
   }
 }
 
-val testKit: SourceSet by sourceSets.creating
-val testKitImplementation: Configuration by configurations.getting
-
 val intiTest: SourceSet by sourceSets.creating
 val intiTestImplementation: Configuration by configurations.getting {
   extendsFrom(configurations.testImplementation.get())
@@ -77,11 +74,6 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
-  val mainOutput = sourceSets.main.map { it.output }
-  testKitImplementation(mainOutput)
-  testKitImplementation(gradleTestKit())
-
-  testImplementation(testKit.output)
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.assertk)
@@ -93,7 +85,7 @@ dependencies {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
-  funcTestImplementation(mainOutput)
+  funcTestImplementation(sourceSets.main.get().output)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)

@@ -4,10 +4,13 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.DefaultFileTreeElement
+import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Shared
 import spock.lang.Specification
 
 class TransformerSpecSupport extends Specification {
+
+    protected static final def testObjectFactory = ProjectBuilder.builder().build().objects
 
     @Shared
     ShadowStats stats
