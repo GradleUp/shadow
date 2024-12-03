@@ -141,6 +141,9 @@ tasks.whenTaskAdded {
 }
 
 tasks.register("release") {
+  description = "Publishes the plugin to maven repos and deploys website."
+  group = LifecycleBasePlugin.VERIFICATION_GROUP
+
   dependsOn(
     tasks.publish,
     tasks.publishPlugins,
