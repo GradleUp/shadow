@@ -10,7 +10,6 @@ import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
-import org.gradle.testfixtures.ProjectBuilder
 
 abstract class TransformerTestSupport<T : Transformer> {
   protected lateinit var transformer: T
@@ -24,7 +23,6 @@ abstract class TransformerTestSupport<T : Transformer> {
 
   protected companion object {
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
-    val objectFactory = ProjectBuilder.builder().build().objects
 
     fun getFileElement(path: String): FileTreeElement {
       return createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))

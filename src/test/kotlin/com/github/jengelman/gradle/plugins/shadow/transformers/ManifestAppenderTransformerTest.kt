@@ -6,13 +6,14 @@ import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.util.testObjectFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderTransformer>() {
   @BeforeEach
   fun setup() {
-    transformer = ManifestAppenderTransformer(objectFactory)
+    transformer = ManifestAppenderTransformer(testObjectFactory)
   }
 
   @Test
