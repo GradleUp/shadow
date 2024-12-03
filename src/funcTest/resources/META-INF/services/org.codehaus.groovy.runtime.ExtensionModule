@@ -1,3 +1,3 @@
 moduleName = groovy-extensions
 moduleVersion = ${moduleVersion}
-extensionClasses =com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification.FileExtensions
+extensionClasses =com.github.jengelman.gradle.plugins.shadow.util.FileExtensions
