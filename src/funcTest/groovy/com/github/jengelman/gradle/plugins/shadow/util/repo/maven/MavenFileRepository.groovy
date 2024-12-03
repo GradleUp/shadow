@@ -4,10 +4,10 @@ package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 /**
  * A fixture for dealing with file Maven repositories.
  */
-class MavenPathRepository implements MavenRepository {
+class MavenFileRepository implements MavenRepository {
     final File rootDir
 
-    MavenPathRepository(File rootDir) {
+    MavenFileRepository(File rootDir) {
         this.rootDir = rootDir
     }
 

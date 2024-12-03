@@ -1,10 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-import com.github.jengelman.gradle.plugins.shadow.util.repo.maven.MavenPathRepository
+import com.github.jengelman.gradle.plugins.shadow.util.repo.maven.MavenFileRepository
 import groovy.transform.InheritConstructors
 
 @InheritConstructors
-class AppendableMavenPathRepository extends MavenPathRepository {
+class AppendableMavenFileRepository extends MavenFileRepository {
 
     @Override
     AppendableMavenFileModule module(String groupId, String artifactId, Object version = '1.0') {
