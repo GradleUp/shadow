@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -17,7 +18,7 @@ class AppendingTransformerTest : TransformerTestSupport<AppendingTransformer>() 
 
   @BeforeEach
   fun setup() {
-    transformer = AppendingTransformer(objectFactory)
+    transformer = AppendingTransformer(testObjectFactory)
   }
 
   @Test

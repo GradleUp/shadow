@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -13,7 +14,7 @@ class PropertiesFileTransformerTest : TransformerTestSupport<PropertiesFileTrans
 
   @BeforeEach
   fun setup() {
-    transformer = PropertiesFileTransformer(objectFactory)
+    transformer = PropertiesFileTransformer(testObjectFactory)
   }
 
   @Test
