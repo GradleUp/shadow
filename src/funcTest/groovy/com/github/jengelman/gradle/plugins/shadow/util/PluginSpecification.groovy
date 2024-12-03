@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner

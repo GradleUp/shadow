@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.util.repo
 
 import com.github.jengelman.gradle.plugins.shadow.util.HashUtil
 
-
 abstract class AbstractModule {
     /**
      * @param cl A closure that is passed a writer to use to generate the content.
