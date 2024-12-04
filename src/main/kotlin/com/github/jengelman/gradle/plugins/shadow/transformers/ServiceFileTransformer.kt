@@ -11,6 +11,7 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 
@@ -34,7 +35,8 @@ public open class ServiceFileTransformer(
     .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
 ) : Transformer,
   PatternFilterable by patternSet {
-  private val serviceEntries = mutableMapOf<String, ServiceStream>()
+  @get:Internal
+  internal val serviceEntries = mutableMapOf<String, ServiceStream>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 /**
  * Modified from [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerParameterTests.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformerParameterTests.java).
  */
-class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeResourceTransformer>() {
+class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeResourceTransformer>() {
 
   init {
     setupTurkishLocale()
@@ -17,12 +17,12 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
 
   @Test
   fun testCanTransformResource() {
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/NOTICE"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/NOTICE.TXT"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/Notice.txt"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/NOTICE.md"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/Notice.md"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF"))).isFalse()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.TXT")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/Notice.txt")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.md")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/Notice.md")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
   }
 
   @Test
@@ -65,7 +65,7 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
       transformer.transform(
         TransformerContext.builder()
           .path(NOTICE_RESOURCE)
-          .inputStream(noticeText.toByteArray().inputStream())
+          .inputStream(noticeText.byteInputStream())
           .build(),
       )
     } catch (ignored: NullPointerException) {

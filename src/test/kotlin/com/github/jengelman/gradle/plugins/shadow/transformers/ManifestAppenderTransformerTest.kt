@@ -8,7 +8,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
 
-class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderTransformer>() {
+class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   @Test
   fun testCanTransformResource() {
     with(transformer) {
@@ -16,8 +16,8 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
       append("Sealed", true)
     }
 
-    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME.lowercase()))).isTrue()
+    assertThat(transformer.canTransformResource(MANIFEST_NAME)).isTrue()
+    assertThat(transformer.canTransformResource(MANIFEST_NAME.lowercase())).isTrue()
   }
 
   @Test

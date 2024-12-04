@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 /**
  * Modified from [org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheLicenseResourceTransformerTest.java).
  */
-class ApacheLicenseResourceTransformerTest : TransformerTestSupport<ApacheLicenseResourceTransformer>() {
+class ApacheLicenseResourceTransformerTest : BaseTransformerTest<ApacheLicenseResourceTransformer>() {
 
   init {
     setupTurkishLocale()
@@ -16,11 +16,11 @@ class ApacheLicenseResourceTransformerTest : TransformerTestSupport<ApacheLicens
 
   @Test
   fun testCanTransformResource() {
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/LICENSE"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/LICENSE.TXT"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/License.txt"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/LICENSE.md"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/License.md"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF"))).isFalse()
+    assertThat(transformer.canTransformResource("META-INF/LICENSE")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/LICENSE.TXT")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/License.txt")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/LICENSE.md")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/License.md")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
   }
 }
