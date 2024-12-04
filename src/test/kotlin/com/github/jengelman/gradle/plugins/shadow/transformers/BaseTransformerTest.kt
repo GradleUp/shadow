@@ -4,8 +4,11 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import java.io.FileNotFoundException
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
+import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.InputStream
 import java.nio.charset.Charset
+import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
 import java.util.Locale
 import java.util.Properties
@@ -15,15 +18,24 @@ import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
+import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseTransformerTest<T : Transformer> {
   protected lateinit var transformer: T
+    private set
 
   protected val manifestTransformerContext: TransformerContext
     get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
 
   protected fun requireResourceAsStream(name: String): InputStream {
     return this::class.java.classLoader.getResourceAsStream(name) ?: throw FileNotFoundException("Resource $name not found.")
+  }
+
+  @BeforeEach
+  fun setup() {
+    @Suppress("UNCHECKED_CAST")
+    val clazz = (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.first() as Class<T>
+    transformer = clazz.create(testObjectFactory)
   }
 
   protected companion object {

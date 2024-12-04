@@ -16,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransfor
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import java.util.jar.JarFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
@@ -27,7 +28,6 @@ import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.DefaultCopySpec
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
@@ -173,16 +173,7 @@ public abstract class ShadowJar :
   }
 
   override fun <T : Transformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
-    // If the constructor takes a single ObjectFactory, inject it in.
-    val constructor = clazz.constructors.find {
-      it.parameterTypes.singleOrNull() == ObjectFactory::class.java
-    }
-    val transformer = if (constructor != null) {
-      objectFactory.newInstance(clazz)
-    } else {
-      clazz.getDeclaredConstructor().newInstance()
-    }
-    addTransform(transformer, action)
+    addTransform(clazz.create(objectFactory), action)
   }
 
   override fun transform(transformer: Transformer): ShadowJar = apply {

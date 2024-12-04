@@ -7,7 +7,6 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
-import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import groovy.lang.Closure
 import java.nio.charset.Charset
 import org.junit.jupiter.api.BeforeEach
@@ -17,12 +16,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransformer>() {
-
-  @BeforeEach
-  fun setup() {
-    transformer = PropertiesFileTransformer(testObjectFactory)
-  }
-
   @Test
   fun testHasTransformedResource() {
     transformer.transform(manifestTransformerContext)
