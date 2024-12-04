@@ -66,6 +66,6 @@ abstract class AbstractModule {
     }
 
     private static BigInteger getHash(File file, String algorithm) {
-        HashUtil.createHash(file, algorithm.toUpperCase()).asBigInteger()
+        HashUtil.createHash(file, algorithm.toUpperCase()).getDigest()
     }
 }
