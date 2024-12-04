@@ -50,7 +50,7 @@ internal inline fun <T> unsafeLazy(noinline initializer: () -> T): Lazy<T> {
 }
 
 internal fun Properties.inputStream(
-  charset: Charset = Charsets.UTF_8,
+  charset: Charset = Charsets.ISO_8859_1,
   comments: String = "",
 ): ByteArrayInputStream {
   val os = ByteArrayOutputStream()

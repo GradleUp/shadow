@@ -5,8 +5,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.InputStream
 import java.net.URL
 import java.util.Collections
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
@@ -23,14 +21,14 @@ class Log4j2PluginsCacheFileTransformerTest : TransformerTestSupport<Log4j2Plugi
 
   @Test
   fun `should transform for a single file`() {
-    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, getResourceStream()))
+    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE)))
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
   @Test
   fun `should transform`() {
     val relocators = listOf(SimpleRelocator())
-    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(), relocators))
+    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocators))
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
@@ -40,7 +38,7 @@ class Log4j2PluginsCacheFileTransformerTest : TransformerTestSupport<Log4j2Plugi
     val destination = "new.location.org.apache.logging"
     val relocators = listOf(SimpleRelocator(pattern, destination))
 
-    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(), relocators))
+    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocators))
     assertThat(transformer.hasTransformedResource()).isTrue()
 
     // Write out to a fake jar file
@@ -58,11 +56,7 @@ class Log4j2PluginsCacheFileTransformerTest : TransformerTestSupport<Log4j2Plugi
       .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
   }
 
-  private fun getResourceStream(resource: String = PLUGIN_CACHE_FILE): InputStream {
-    return this::class.java.classLoader.getResourceAsStream(resource) ?: throw FileNotFoundException("Resource not found: $resource")
-  }
-
-  companion object {
-    private const val PLUGIN_CACHE_FILE = "META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat"
+  private companion object {
+    const val PLUGIN_CACHE_FILE = "META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat"
   }
 }
