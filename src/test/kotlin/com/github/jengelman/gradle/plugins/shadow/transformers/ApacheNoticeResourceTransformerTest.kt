@@ -72,7 +72,7 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
       transformer.transform(
         TransformerContext.builder()
           .path(NOTICE_RESOURCE)
-          .inputStream(noticeText.toByteArray().inputStream())
+          .inputStream(noticeText.byteInputStream())
           .build(),
       )
     } catch (ignored: NullPointerException) {
