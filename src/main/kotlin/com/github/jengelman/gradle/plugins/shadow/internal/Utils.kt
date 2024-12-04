@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
@@ -65,7 +66,7 @@ internal fun Class<*>.requireResourceAsText(name: String): String {
 }
 
 private fun Class<*>.requireResourceAsStream(name: String): InputStream {
-  return getResourceAsStream(name) ?: error("Resource $name not found.")
+  return getResourceAsStream(name) ?: throw FileNotFoundException("Resource $name not found.")
 }
 
 private val DummyFile = File("dummy")
