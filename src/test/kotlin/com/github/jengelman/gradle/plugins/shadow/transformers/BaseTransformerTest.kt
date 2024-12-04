@@ -65,7 +65,7 @@ abstract class BaseTransformerTest<T : Transformer> {
     }
 
     /**
-     * NOTE: The Turkish locale has an usual case transformation for the letters "I" and "i", making it a prime
+     * NOTE: The Turkish locale has a usual case transformation for the letters "I" and "i", making it a prime
      * choice to test for improper case-less string comparisons.
      */
     fun setupTurkishLocale() {
