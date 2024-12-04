@@ -566,12 +566,18 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer : org/gradle/api/Named {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer$Companion;
 	public abstract fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public static fun create (Ljava/lang/Class;Lorg/gradle/api/model/ObjectFactory;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public abstract fun hasTransformedResource ()Z
 	public abstract fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$Companion {
+	public final fun create (Ljava/lang/Class;Lorg/gradle/api/model/ObjectFactory;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$DefaultImpls {

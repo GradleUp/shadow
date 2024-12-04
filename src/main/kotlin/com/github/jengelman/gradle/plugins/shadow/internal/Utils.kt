@@ -1,7 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.InputStream
+import java.nio.charset.Charset
+import java.util.Properties
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.RelativePath
@@ -45,12 +50,23 @@ internal inline fun <T> unsafeLazy(noinline initializer: () -> T): Lazy<T> {
   return lazy(LazyThreadSafetyMode.NONE, initializer)
 }
 
+internal fun Properties.inputStream(
+  charset: Charset = Charsets.ISO_8859_1,
+  comments: String = "",
+): ByteArrayInputStream {
+  val os = ByteArrayOutputStream()
+  os.writer(charset).use { writer ->
+    store(writer, comments)
+  }
+  return os.toByteArray().inputStream()
+}
+
 internal fun Class<*>.requireResourceAsText(name: String): String {
   return requireResourceAsStream(name).bufferedReader().readText()
 }
 
 private fun Class<*>.requireResourceAsStream(name: String): InputStream {
-  return getResourceAsStream(name) ?: error("Resource $name not found.")
+  return getResourceAsStream(name) ?: throw FileNotFoundException("Resource $name not found.")
 }
 
 private val DummyFile = File("dummy")

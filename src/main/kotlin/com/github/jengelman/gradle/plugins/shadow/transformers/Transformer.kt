@@ -34,6 +34,21 @@ public interface Transformer : Named {
   @get:Internal
   public val objectFactory: ObjectFactory
     get() = throw NotImplementedError("You have to make sure this has been implemented or injected.")
+
+  public companion object {
+    @JvmStatic
+    public fun <T : Transformer> Class<T>.create(objectFactory: ObjectFactory): T {
+      // If the constructor takes a single ObjectFactory, inject it in.
+      val constructor = constructors.find {
+        it.parameterTypes.singleOrNull() == ObjectFactory::class.java
+      }
+      return if (constructor != null) {
+        objectFactory.newInstance(this@create)
+      } else {
+        getDeclaredConstructor().newInstance()
+      }
+    }
+  }
 }
 
 public object NoOpTransformer : Transformer {

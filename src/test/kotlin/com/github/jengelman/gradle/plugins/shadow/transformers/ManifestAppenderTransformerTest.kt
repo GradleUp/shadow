@@ -6,16 +6,9 @@ import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.testkit.util.testObjectFactory
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderTransformer>() {
-  @BeforeEach
-  fun setup() {
-    transformer = ManifestAppenderTransformer(testObjectFactory)
-  }
-
+class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   @Test
   fun testCanTransformResource() {
     with(transformer) {
@@ -23,8 +16,8 @@ class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderT
       append("Sealed", true)
     }
 
-    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME.lowercase()))).isTrue()
+    assertThat(transformer.canTransformResource(MANIFEST_NAME)).isTrue()
+    assertThat(transformer.canTransformResource(MANIFEST_NAME.lowercase())).isTrue()
   }
 
   @Test
