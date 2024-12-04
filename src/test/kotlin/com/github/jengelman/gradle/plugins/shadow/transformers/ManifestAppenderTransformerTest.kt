@@ -16,8 +16,8 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       append("Sealed", true)
     }
 
-    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement(MANIFEST_NAME.lowercase()))).isTrue()
+    assertThat(transformer.canTransformResource(MANIFEST_NAME)).isTrue()
+    assertThat(transformer.canTransformResource(MANIFEST_NAME.lowercase())).isTrue()
   }
 
   @Test

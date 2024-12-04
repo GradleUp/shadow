@@ -16,13 +16,13 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     if (exclude) {
       transformer.exclude(path)
     }
-    assertThat(transformer.canTransformResource(getFileElement(path))).isEqualTo(expected)
+    assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
   @ParameterizedTest(name = "{index} => path={0}")
   @MethodSource("transformsServiceFileData")
   fun `test transforms service file`(path: String, input1: String, input2: String, output: String) {
-    if (transformer.canTransformResource(getFileElement(path))) {
+    if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -34,7 +34,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
   @Test
   fun `test excludes Groovy extension module descriptor files by default`() {
-    val element = getFileElement("META-INF/services/org.codehaus.groovy.runtime.ExtensionModule")
+    val element = "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
     assertThat(transformer.canTransformResource(element)).isFalse()
   }
 

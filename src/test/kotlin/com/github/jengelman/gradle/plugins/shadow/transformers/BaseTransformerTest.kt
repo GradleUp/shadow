@@ -16,7 +16,6 @@ import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
 
@@ -42,8 +41,9 @@ abstract class BaseTransformerTest<T : Transformer> {
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
     val sharedStats = ShadowStats()
 
-    fun getFileElement(path: String): FileTreeElement {
-      return createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))
+    fun Transformer.canTransformResource(path: String): Boolean {
+      val element = createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))
+      return canTransformResource(element)
     }
 
     fun readFrom(jarPath: Path, resourceName: String = MANIFEST_NAME): List<String> {

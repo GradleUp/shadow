@@ -17,12 +17,12 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
 
   @Test
   fun testCanTransformResource() {
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/NOTICE"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/NOTICE.TXT"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/Notice.txt"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/NOTICE.md"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/Notice.md"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF"))).isFalse()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.TXT")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/Notice.txt")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.md")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/Notice.md")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
   }
 
   @Test

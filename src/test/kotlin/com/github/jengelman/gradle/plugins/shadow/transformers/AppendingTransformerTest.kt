@@ -18,8 +18,8 @@ class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
   fun testCanTransformResource() {
     transformer.resource.set("abcdefghijklmnopqrstuvwxyz")
 
-    assertThat(transformer.canTransformResource(getFileElement("abcdefghijklmnopqrstuvwxyz"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))).isTrue()
-    assertThat(transformer.canTransformResource(getFileElement("META-INF/MANIFEST.MF"))).isFalse()
+    assertThat(transformer.canTransformResource("abcdefghijklmnopqrstuvwxyz")).isTrue()
+    assertThat(transformer.canTransformResource("ABCDEFGHIJKLMNOPQRSTUVWXYZ")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
   }
 }

@@ -56,7 +56,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   @ParameterizedTest(name = "Path {0} {2} transformed")
   @MethodSource("pathProvider")
   fun `test canTransformResource with paths`(path: String, expected: Boolean, transform: String) {
-    assertThat(transformer.canTransformResource(getFileElement(path))).isEqualTo(expected)
+    assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
   @ParameterizedTest(name = "mergeStrategy={1}, mergeSeparator='{2}'")
@@ -72,7 +72,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     transformer.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
     transformer.mergeSeparator.set(mergeSeparator)
 
-    if (transformer.canTransformResource(getFileElement(path))) {
+    if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -92,7 +92,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     transformer.paths.set(paths)
     transformer.mergeStrategy.set(MergeStrategy.First)
 
-    if (transformer.canTransformResource(getFileElement(path))) {
+    if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -112,7 +112,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     transformer.mappings.set(mappings)
     transformer.mergeStrategy.set(MergeStrategy.Latest)
 
-    if (transformer.canTransformResource(getFileElement(path))) {
+    if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -136,7 +136,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       }
     })
 
-    if (transformer.canTransformResource(getFileElement(path))) {
+    if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -154,7 +154,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   ) {
     transformer.charsetName.set(charset)
 
-    if (transformer.canTransformResource(getFileElement(path))) {
+    if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input, Charset.forName(charset)))
     }
 
