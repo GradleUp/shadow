@@ -101,8 +101,10 @@ import org.gradle.api.tasks.Internal
 public open class PropertiesFileTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer {
-  private val propertiesEntries = mutableMapOf<String, CleanProperties>()
   private inline val charset get() = Charset.forName(charsetName.get())
+
+  @get:Internal
+  internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
 
   @get:Input
   public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
