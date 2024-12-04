@@ -3,12 +3,10 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
-import groovy.lang.Closure
-import groovy.lang.Closure.IDENTITY
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
+import java.util.function.Function as JavaFunction
 import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -123,10 +121,9 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
-  @Suppress("UNCHECKED_CAST")
-  @get:Internal
-  public open val keyTransformer: Property<Closure<String>> =
-    objectFactory.property(IDENTITY) as Property<Closure<String>>
+  @get:Input
+  public open val keyTransformer: Property<JavaFunction<String, String>> =
+    objectFactory.property(JavaFunction<String, String> { it })
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
@@ -176,12 +173,10 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   private fun transformKeys(properties: Properties): CleanProperties {
-    if (keyTransformer == IDENTITY) {
-      return properties as CleanProperties
-    }
     val result = CleanProperties()
+    val transformer = keyTransformer.get()
     properties.forEach { (key, value) ->
-      result[keyTransformer.get().call(key as String)] = value
+      result[transformer.apply(key as String)] = value
     }
     return result
   }
