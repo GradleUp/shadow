@@ -2,18 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
-  @BeforeEach
-  fun setup() {
-    transformer = ServiceFileTransformer()
-  }
-
   @ParameterizedTest(name = "{index} => path={0}, exclude={1}, expected={2}")
   @MethodSource("canTransformResourceData")
   fun `test canTransformResource`(path: String, exclude: Boolean, expected: Boolean) {

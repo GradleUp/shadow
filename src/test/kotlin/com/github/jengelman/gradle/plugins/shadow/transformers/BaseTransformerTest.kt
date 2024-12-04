@@ -3,12 +3,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
-import java.io.FileNotFoundException
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
+import java.io.FileNotFoundException
 import java.io.InputStream
-import java.nio.charset.Charset
 import java.lang.reflect.ParameterizedType
+import java.nio.charset.Charset
 import java.nio.file.Path
 import java.util.Locale
 import java.util.Properties

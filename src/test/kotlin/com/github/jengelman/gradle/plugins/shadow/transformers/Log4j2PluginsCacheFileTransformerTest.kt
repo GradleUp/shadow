@@ -9,16 +9,9 @@ import java.net.URL
 import java.util.Collections
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.tools.zip.ZipOutputStream
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
-
-  @BeforeEach
-  fun setup() {
-    transformer = Log4j2PluginsCacheFileTransformer()
-  }
-
   @Test
   fun `should transform for a single file`() {
     transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE)))
