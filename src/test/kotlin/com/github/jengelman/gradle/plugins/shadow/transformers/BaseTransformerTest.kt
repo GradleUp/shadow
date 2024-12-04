@@ -2,16 +2,13 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
-import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.lang.reflect.ParameterizedType
-import java.nio.charset.Charset
 import java.nio.file.Path
 import java.util.Locale
-import java.util.Properties
 import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
@@ -38,8 +35,8 @@ abstract class BaseTransformerTest<T : Transformer> {
   }
 
   protected companion object {
-    private val sharedStats = ShadowStats()
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
+    val sharedStats = ShadowStats()
 
     fun Transformer.canTransformResource(path: String): Boolean {
       val element = createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))
@@ -70,15 +67,6 @@ abstract class BaseTransformerTest<T : Transformer> {
      */
     fun setupTurkishLocale() {
       Locale.setDefault(Locale("tr"))
-    }
-
-    fun context(path: String, input: Map<String, String>, charset: Charset = Charsets.ISO_8859_1): TransformerContext {
-      val properties = Properties().apply { putAll(input) }
-      return TransformerContext(path, properties.inputStream(charset), stats = sharedStats)
-    }
-
-    fun context(path: String, input: String): TransformerContext {
-      return TransformerContext(path, input.byteInputStream(), stats = sharedStats)
     }
   }
 }

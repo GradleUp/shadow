@@ -39,6 +39,10 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   }
 
   private companion object {
+    fun context(path: String, input: String): TransformerContext {
+      return TransformerContext(path, input.byteInputStream(), stats = sharedStats)
+    }
+
     @JvmStatic
     fun canTransformResourceData() = listOf(
       // path, exclude, expected

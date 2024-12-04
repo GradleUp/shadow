@@ -6,9 +6,11 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import groovy.lang.Closure
 import java.nio.charset.Charset
+import java.util.Properties
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -162,6 +164,11 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   private companion object {
+    fun context(path: String, input: Map<String, String>, charset: Charset = Charsets.ISO_8859_1): TransformerContext {
+      val properties = Properties().apply { putAll(input) }
+      return TransformerContext(path, properties.inputStream(charset), stats = sharedStats)
+    }
+
     @JvmStatic
     fun pathProvider() = listOf(
       Arguments.of("foo.properties", true, "can be"),
