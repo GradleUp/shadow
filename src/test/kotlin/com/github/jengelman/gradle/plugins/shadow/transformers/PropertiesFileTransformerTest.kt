@@ -57,13 +57,13 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
   @ParameterizedTest(name = "Path {0} {2} transformed")
   @MethodSource("pathProvider")
-  fun `test canTransformResource with paths`(path: String, expected: Boolean, transform: String) {
+  fun `canTransformResource with paths`(path: String, expected: Boolean, transform: String) {
     assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
   @ParameterizedTest(name = "mergeStrategy={1}, mergeSeparator='{2}'")
   @MethodSource("transformConfigurationsProvider")
-  fun `test exerciseAllTransformConfigurations`(
+  fun exerciseAllTransformConfigurations(
     path: String,
     mergeStrategy: String,
     mergeSeparator: String,
@@ -84,7 +84,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
   @ParameterizedTest(name = "Paths={1}")
   @MethodSource("transformConfigurationsWithPathsProvider")
-  fun `test exerciseAllTransformConfigurationsWithPaths`(
+  fun exerciseAllTransformConfigurationsWithPaths(
     path: String,
     paths: List<String>,
     input1: Map<String, String>,
@@ -104,7 +104,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
   @ParameterizedTest(name = "Mappings={1}")
   @MethodSource("transformConfigurationsWithMappingsProvider")
-  fun `test exerciseAllTransformConfigurationsWithMappings`(
+  fun exerciseAllTransformConfigurationsWithMappings(
     path: String,
     mappings: Map<String, Map<String, String>>,
     input1: Map<String, String>,
@@ -124,7 +124,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
   @ParameterizedTest(name = "KeyTransformer: {1}")
   @MethodSource("appliesKeyTransformerProvider")
-  fun `test appliesKeyTransformer`(
+  fun appliesKeyTransformer(
     path: String,
     keyTransformer: (String) -> String,
     input1: Map<String, String>,
@@ -148,7 +148,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
   @ParameterizedTest(name = "Charset: {1}")
   @MethodSource("appliesCharsetProvider")
-  fun `test appliesCharset`(
+  fun appliesCharset(
     path: String,
     charset: String,
     input: Map<String, String>,
