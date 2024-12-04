@@ -4,8 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import assertk.fail
-import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 /**
@@ -15,11 +13,6 @@ class ApacheNoticeResourceTransformerTest : TransformerTestSupport<ApacheNoticeR
 
   init {
     setupTurkishLocale()
-  }
-
-  @BeforeEach
-  fun setup() {
-    transformer = ApacheNoticeResourceTransformer(testObjectFactory)
   }
 
   @Test
