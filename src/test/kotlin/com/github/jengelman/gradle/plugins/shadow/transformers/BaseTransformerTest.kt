@@ -72,16 +72,9 @@ abstract class BaseTransformerTest<T : Transformer> {
       Locale.setDefault(Locale("tr"))
     }
 
-    fun Map<String, String>.toProperties(): Properties {
-      return Properties().also { it.putAll(this) }
-    }
-
-    fun Properties.toMap(): Map<String, String> {
-      return entries.associate { it.key.toString() to it.value.toString() }
-    }
-
     fun context(path: String, input: Map<String, String>, charset: Charset = Charsets.ISO_8859_1): TransformerContext {
-      return TransformerContext(path, input.toProperties().inputStream(charset), stats = sharedStats)
+      val properties = Properties().apply { putAll(input) }
+      return TransformerContext(path, properties.inputStream(charset), stats = sharedStats)
     }
 
     fun context(path: String, input: String): TransformerContext {
