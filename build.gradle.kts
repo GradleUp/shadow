@@ -86,6 +86,7 @@ dependencies {
     exclude(group = "org.hamcrest")
   }
   funcTestImplementation(sourceSets.main.get().output)
+  funcTestImplementation(intiTest.output)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)
