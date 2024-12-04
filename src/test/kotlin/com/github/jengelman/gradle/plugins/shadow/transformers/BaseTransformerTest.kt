@@ -38,8 +38,8 @@ abstract class BaseTransformerTest<T : Transformer> {
   }
 
   protected companion object {
+    private val sharedStats = ShadowStats()
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
-    val sharedStats = ShadowStats()
 
     fun Transformer.canTransformResource(path: String): Boolean {
       val element = createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))
