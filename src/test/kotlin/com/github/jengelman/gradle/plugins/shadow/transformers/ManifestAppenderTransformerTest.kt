@@ -6,7 +6,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.testkit.util.testObjectFactory
+import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
