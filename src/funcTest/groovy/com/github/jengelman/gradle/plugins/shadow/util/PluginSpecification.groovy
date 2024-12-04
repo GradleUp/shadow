@@ -16,8 +16,6 @@ abstract class PluginSpecification extends Specification {
     @TempDir
     Path dir
 
-    public static final String SHADOW_VERSION = System.getProperty("shadowVersion")
-
     AppendableMavenFileRepository repo
 
     def setup() {

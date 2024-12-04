@@ -179,11 +179,13 @@ class SimpleRelocatorTest {
       .isEqualTo("META-INF/hidden.org.foo.xml")
   }
 
-  private fun SimpleRelocator.relocatePath(path: String): String {
-    return relocatePath(RelocatePathContext(path))
-  }
+  private companion object {
+    fun SimpleRelocator.relocatePath(path: String): String {
+      return relocatePath(RelocatePathContext(path))
+    }
 
-  private fun SimpleRelocator.relocateClass(className: String): String {
-    return relocateClass(RelocateClassContext(className))
+    fun SimpleRelocator.relocateClass(className: String): String {
+      return relocateClass(RelocateClassContext(className))
+    }
   }
 }
