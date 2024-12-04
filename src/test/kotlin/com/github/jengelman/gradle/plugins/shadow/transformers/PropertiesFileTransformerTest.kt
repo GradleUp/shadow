@@ -69,11 +69,10 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
   ) {
-    val element = getFileElement(path)
     transformer.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
     transformer.mergeSeparator.set(mergeSeparator)
 
-    if (transformer.canTransformResource(element)) {
+    if (transformer.canTransformResource(getFileElement(path))) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -90,11 +89,10 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
   ) {
-    val element = getFileElement(path)
     transformer.paths.set(paths)
-    transformer.mergeStrategy.set(MergeStrategy.from("first"))
+    transformer.mergeStrategy.set(MergeStrategy.First)
 
-    if (transformer.canTransformResource(element)) {
+    if (transformer.canTransformResource(getFileElement(path))) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -111,11 +109,10 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
   ) {
-    val element = getFileElement(path)
     transformer.mappings.set(mappings)
-    transformer.mergeStrategy.set(MergeStrategy.from("latest"))
+    transformer.mergeStrategy.set(MergeStrategy.Latest)
 
-    if (transformer.canTransformResource(element)) {
+    if (transformer.canTransformResource(getFileElement(path))) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -132,15 +129,14 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
   ) {
-    val element = getFileElement(path)
+    transformer.mergeStrategy.set(MergeStrategy.Append)
     transformer.keyTransformer.set(object : Closure<String>(null) {
       override fun call(vararg arguments: Any?): String {
         return keyTransformer.invoke(arguments.first() as String)
       }
     })
-    transformer.mergeStrategy.set(MergeStrategy.from("append"))
 
-    if (transformer.canTransformResource(element)) {
+    if (transformer.canTransformResource(getFileElement(path))) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
@@ -156,10 +152,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input: Map<String, String>,
     expectedOutput: Map<String, String>,
   ) {
-    val element = getFileElement(path)
     transformer.charsetName.set(charset)
 
-    if (transformer.canTransformResource(element)) {
+    if (transformer.canTransformResource(getFileElement(path))) {
       transformer.transform(context(path, input, Charset.forName(charset)))
     }
 
