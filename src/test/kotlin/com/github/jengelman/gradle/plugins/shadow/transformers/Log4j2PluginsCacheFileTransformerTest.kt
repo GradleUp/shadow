@@ -43,9 +43,9 @@ class Log4j2PluginsCacheFileTransformerTest : TransformerTestSupport<Log4j2Plugi
 
     // Write out to a fake jar file
     val testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
-    val zipOutputStream = ZipOutputStream(testableZipFile.outputStream().buffered())
-    transformer.modifyOutputStream(zipOutputStream, true)
-    zipOutputStream.close()
+    ZipOutputStream(testableZipFile.outputStream().buffered()).use { zipOutputStream ->
+      transformer.modifyOutputStream(zipOutputStream, true)
+    }
 
     // Pull the data back out and make sure it was transformed
     val cache = PluginCache()
