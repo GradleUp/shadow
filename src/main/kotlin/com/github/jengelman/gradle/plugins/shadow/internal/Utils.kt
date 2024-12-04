@@ -1,7 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
+import java.nio.charset.Charset
+import java.util.Properties
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.RelativePath
@@ -43,6 +47,17 @@ internal fun createDefaultFileTreeElement(
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun <T> unsafeLazy(noinline initializer: () -> T): Lazy<T> {
   return lazy(LazyThreadSafetyMode.NONE, initializer)
+}
+
+internal fun Properties.inputStream(
+  charset: Charset = Charsets.UTF_8,
+  comments: String = "",
+): ByteArrayInputStream {
+  val os = ByteArrayOutputStream()
+  os.writer(charset).use { writer ->
+    store(writer, comments)
+  }
+  return os.toByteArray().inputStream()
 }
 
 internal fun Class<*>.requireResourceAsText(name: String): String {

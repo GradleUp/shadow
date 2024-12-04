@@ -1,13 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import groovy.lang.Closure
 import groovy.lang.Closure.IDENTITY
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
@@ -226,20 +225,12 @@ public open class PropertiesFileTransformer @Inject constructor(
       val entry = ZipEntry(path)
       entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
-      props.toReader().use {
+      props.inputStream(charset).reader(charset).use {
         it.copyTo(zipWriter)
       }
       zipWriter.flush()
       os.closeEntry()
     }
-  }
-
-  private fun Properties.toReader(): InputStreamReader {
-    val os = ByteArrayOutputStream()
-    os.writer(charset).use { writer ->
-      store(writer, "")
-    }
-    return os.toByteArray().inputStream().reader(charset)
   }
 
   public enum class MergeStrategy {
