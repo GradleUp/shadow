@@ -2,6 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -10,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
   @ParameterizedTest(name = "{index} => path={0}, exclude={1}, expected={2}")
   @MethodSource("canTransformResourceData")
-  fun `test canTransformResource`(path: String, exclude: Boolean, expected: Boolean) {
+  fun testCanTransformResource(path: String, exclude: Boolean, expected: Boolean) {
     if (exclude) {
       transformer.exclude(path)
     }
@@ -20,25 +22,20 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   @ParameterizedTest(name = "{index} => path={0}")
   @MethodSource("transformsServiceFileData")
   fun `test transforms service file`(path: String, input1: String, input2: String, output: String) {
-    val element = getFileElement(path)
-    val transformer = ServiceFileTransformer()
-
-    if (transformer.canTransformResource(element)) {
+    if (transformer.canTransformResource(getFileElement(path))) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
     }
 
-    assertThat(transformer.hasTransformedResource()).isEqualTo(true)
-    val transformedText = transformer.serviceEntries.getValue(path).toInputStream().bufferedReader().readText()
-    assertThat(transformedText).isEqualTo(output)
+    assertThat(transformer.hasTransformedResource()).isTrue()
+    assertThat(transformer.serviceEntries.getValue(path).toInputStream().bufferedReader().readText())
+      .isEqualTo(output)
   }
 
   @Test
   fun `test excludes Groovy extension module descriptor files by default`() {
-    val transformer = ServiceFileTransformer()
     val element = getFileElement("META-INF/services/org.codehaus.groovy.runtime.ExtensionModule")
-
-    assertThat(transformer.canTransformResource(element)).isEqualTo(false)
+    assertThat(transformer.canTransformResource(element)).isFalse()
   }
 
   private companion object {
