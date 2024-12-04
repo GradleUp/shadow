@@ -7,7 +7,7 @@ import org.apache.commons.io.IOUtils
 @InheritConstructors
 class AppendableMavenFileModule extends MavenFileModule {
 
-    Map<String, Map<String, String>> contents = [:].withDefault { [:] }
+    Map<String, Map<String, String>> contents = [:].withDefault { [:] } as Map<String, Map<String, String>>
     Map<String, File> files = [:]
 
     AppendableMavenFileModule use(File file) {
@@ -57,15 +57,4 @@ class AppendableMavenFileModule extends MavenFileModule {
             builder.build()
         }
     }
-
-    /**
-     * Adds an additional artifact to this module.
-     * @param options Can specify any of: type or classifier
-     */
-    @Override
-    AppendableMavenFileModule artifact(Map<String, ?> options) {
-        artifacts << options
-        return this
-    }
-
 }

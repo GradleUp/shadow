@@ -28,27 +28,6 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         this.version = version
     }
 
-    @Override
-    MavenModule parent(String group, String artifactId, String version) {
-        parentPomSection = """
-<parent>
-  <groupId>${group}</groupId>
-  <artifactId>${artifactId}</artifactId>
-  <version>${version}</version>
-</parent>
-"""
-        return this
-    }
-
-    @Override
-    File getArtifactFile(Map options = [:]) {
-        if (version.endsWith("-SNAPSHOT") && !metaDataFile.exists() && uniqueSnapshots) {
-            def artifact = toArtifact(options)
-            return moduleDir.resolve("${artifactId}-${version}${artifact.classifier ? "-${artifact.classifier}" : ""}.${artifact.type}")
-        }
-        return artifactFile(options)
-    }
-
     abstract boolean getUniqueSnapshots()
 
     String getPublishArtifactVersion() {
@@ -61,7 +40,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     private String getUniqueSnapshotVersion() {
         assert uniqueSnapshots && version.endsWith('-SNAPSHOT')
         if (metaDataFile.isFile()) {
-            def metaData = new XmlParser().parse(metaDataFile.assertIsFile())
+            def metaData = new XmlParser().parse(metaDataFile)
             def timestamp = metaData.versioning.snapshot.timestamp[0].text().trim()
             def build = metaData.versioning.snapshot.buildNumber[0].text().trim()
             return "${timestamp}-${build}"
@@ -77,32 +56,8 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     }
 
     @Override
-    MavenModule dependsOn(String group, String artifactId, String version, String type = null) {
+    MavenModule dependsOn(String group, String artifactId, String version) {
         this.dependencies << [groupId: group, artifactId: artifactId, version: version, type: type]
-        return this
-    }
-
-    @Override
-    MavenModule hasPackaging(String packaging) {
-        this.packaging = packaging
-        return this
-    }
-
-    /**
-     * Specifies the type of the main artifact.
-     */
-    @Override
-    MavenModule hasType(String type) {
-        this.type = type
-        return this
-    }
-
-    /**
-     * Adds an additional artifact to this module.
-     * @param options Can specify any of: type or classifier
-     */
-    MavenModule artifact(Map<String, ?> options) {
-        artifacts << options
         return this
     }
 
@@ -112,78 +67,6 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
     List getDependencies() {
         return dependencies
-    }
-
-    List getArtifacts() {
-        return artifacts
-    }
-
-    void assertNotPublished() {
-        pomFile.assertDoesNotExist()
-    }
-
-    void assertPublished() {
-        assert pomFile.assertExists()
-        assert parsedPom.groupId == groupId
-        assert parsedPom.artifactId == artifactId
-        assert parsedPom.version == version
-    }
-
-    void assertPublishedAsPomModule() {
-        assertPublished()
-        assertArtifactsPublished("${artifactId}-${publishArtifactVersion}.pom")
-        assert parsedPom.packaging == "pom"
-    }
-
-    void assertPublishedAsJavaModule() {
-        assertPublished()
-        assertArtifactsPublished("${artifactId}-${publishArtifactVersion}.jar", "${artifactId}-${publishArtifactVersion}.pom")
-        assert parsedPom.packaging == null
-    }
-
-    void assertPublishedAsWebModule() {
-        assertPublished()
-        assertArtifactsPublished("${artifactId}-${publishArtifactVersion}.war", "${artifactId}-${publishArtifactVersion}.pom")
-        assert parsedPom.packaging == 'war'
-    }
-
-    void assertPublishedAsEarModule() {
-        assertPublished()
-        assertArtifactsPublished("${artifactId}-${publishArtifactVersion}.ear", "${artifactId}-${publishArtifactVersion}.pom")
-        assert parsedPom.packaging == 'ear'
-    }
-
-    /**
-     * Asserts that exactly the given artifacts have been deployed, along with their checksum files
-     */
-    void assertArtifactsPublished(String... names) {
-        def artifactNames = names as Set
-        if (publishesMetaDataFile()) {
-            artifactNames.add(MAVEN_METADATA_FILE)
-        }
-        assert moduleDir.isDirectory()
-        Set actual = moduleDir.list() as Set
-        for (name in artifactNames) {
-            assert actual.remove(name)
-
-            if (publishesHashFiles()) {
-                assert actual.remove("${name}.md5" as String)
-                assert actual.remove("${name}.sha1" as String)
-            }
-        }
-        assert actual.isEmpty()
-    }
-
-    //abstract String getPublishArtifactVersion()
-
-    @Override
-    MavenPom getParsedPom() {
-        return new MavenPom(pomFile)
-    }
-
-    @Override
-    DefaultMavenMetaData getRootMetaData() {
-        new DefaultMavenMetaData(rootMetaDataFile)
     }
 
     @Override
@@ -207,12 +90,6 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
             fileName = "$artifactId-$publishArtifactVersion-${artifact.classifier}.${artifact.type}"
         }
         return moduleDir.resolve(fileName)
-    }
-
-    @Override
-    MavenModule publishWithChangedContent() {
-        publishCount++
-        return publish()
     }
 
     protected Map<String, Object> toArtifact(Map<String, ?> options) {
@@ -242,38 +119,37 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         publish(pomFile) { Writer writer ->
             def pomPackaging = packaging ?: type
             writer << """
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <!-- ${getArtifactContent()} -->
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>$groupId</groupId>
-  <artifactId>$artifactId</artifactId>
-  <packaging>$pomPackaging</packaging>
-  <version>$version</version>
-  <description>Published on $publishTimestamp</description>"""
+            <project xmlns="http://maven.apache.org/POM/4.0.0">
+              <!-- ${getArtifactContent()} -->
+              <modelVersion>4.0.0</modelVersion>
+              <groupId>$groupId</groupId>
+              <artifactId>$artifactId</artifactId>
+              <packaging>$pomPackaging</packaging>
+              <version>$version</version>
+              <description>Published on $publishTimestamp</description>
+            """.stripIndent()
 
             if (parentPomSection) {
                 writer << "\n$parentPomSection\n"
             }
 
             if (!dependencies.empty) {
-                writer << """
-  <dependencies>"""
+                writer << "<dependencies>"
             }
 
             dependencies.each { dependency ->
                 def typeAttribute = dependency['type'] == null ? "" : "<type>$dependency.type</type>"
                 writer << """
-    <dependency>
-      <groupId>$dependency.groupId</groupId>
-      <artifactId>$dependency.artifactId</artifactId>
-      <version>$dependency.version</version>
-      $typeAttribute
-    </dependency>"""
+                <dependency>
+                  <groupId>$dependency.groupId</groupId>
+                  <artifactId>$dependency.artifactId</artifactId>
+                  <version>$dependency.version</version>
+                  $typeAttribute
+                </dependency>""".stripIndent()
             }
 
             if (!dependencies.empty) {
-                writer << """
-  </dependencies>"""
+                writer << "</dependencies>"
             }
 
             writer << "\n</project>"
@@ -316,7 +192,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
         publishPom()
         artifacts.each { artifact ->
-            publishArtifact(artifact)
+            publishArtifact(artifact as Map<String, ?>)
         }
         publishArtifact([:])
         return this
@@ -339,6 +215,4 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     }
 
     protected abstract boolean publishesMetaDataFile()
-
-    protected abstract boolean publishesHashFiles()
 }

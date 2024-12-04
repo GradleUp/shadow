@@ -11,5 +11,4 @@ class AppendableMavenFileRepository extends MavenFileRepository {
         def artifactDir = rootDir.resolve("${groupId.replace('.', '/')}/$artifactId/$version")
         return new AppendableMavenFileModule(artifactDir, groupId, artifactId, version as String)
     }
-
 }
