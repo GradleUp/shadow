@@ -29,7 +29,7 @@ abstract class TransformerTestSupport<T : Transformer> {
   @BeforeEach
   fun setup() {
     @Suppress("UNCHECKED_CAST")
-    val clazz = (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>
+    val clazz = (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.first() as Class<T>
     transformer = clazz.create(testObjectFactory)
   }
 
