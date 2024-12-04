@@ -16,7 +16,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 
-abstract class TransformerTestSupport<T : Transformer> {
+abstract class BaseTransformerTest<T : Transformer> {
   protected lateinit var transformer: T
 
   protected val manifestTransformerContext: TransformerContext

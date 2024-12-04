@@ -7,7 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class XmlAppendingTransformerTest : TransformerTestSupport<XmlAppendingTransformer>() {
+class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>() {
 
   init {
     setupTurkishLocale()

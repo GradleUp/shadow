@@ -10,7 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class ManifestAppenderTransformerTest : TransformerTestSupport<ManifestAppenderTransformer>() {
+class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   @BeforeEach
   fun setup() {
     transformer = ManifestAppenderTransformer(testObjectFactory)

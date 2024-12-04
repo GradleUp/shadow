@@ -12,7 +12,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class Log4j2PluginsCacheFileTransformerTest : TransformerTestSupport<Log4j2PluginsCacheFileTransformer>() {
+class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
 
   @BeforeEach
   fun setup() {

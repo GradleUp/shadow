@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 /**
  * Modified from [org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ComponentsXmlResourceTransformerTest.java).
  */
-class ComponentsXmlResourceTransformerTest : TransformerTestSupport<ComponentsXmlResourceTransformer>() {
+class ComponentsXmlResourceTransformerTest : BaseTransformerTest<ComponentsXmlResourceTransformer>() {
 
   @BeforeEach
   fun setup() {
