@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-
 class MavenFileModule extends AbstractMavenModule {
     private boolean uniqueSnapshots = true
 
@@ -14,28 +13,22 @@ class MavenFileModule extends AbstractMavenModule {
     }
 
     @Override
-    MavenModule withNonUniqueSnapshots() {
-        uniqueSnapshots = false
-        return this
-    }
-
-    @Override
     String getMetaDataFileContent() {
         """
-<metadata>
-  <!-- ${getArtifactContent()} -->
-  <groupId>$groupId</groupId>
-  <artifactId>$artifactId</artifactId>
-  <version>$version</version>
-  <versioning>
-    <snapshot>
-      <timestamp>${timestampFormat.format(publishTimestamp)}</timestamp>
-      <buildNumber>$publishCount</buildNumber>
-    </snapshot>
-    <lastUpdated>${updateFormat.format(publishTimestamp)}</lastUpdated>
-  </versioning>
-</metadata>
-"""
+            <metadata>
+              <!-- ${getArtifactContent()} -->
+              <groupId>$groupId</groupId>
+              <artifactId>$artifactId</artifactId>
+              <version>$version</version>
+              <versioning>
+                <snapshot>
+                  <timestamp>${timestampFormat.format(publishTimestamp)}</timestamp>
+                  <buildNumber>$publishCount</buildNumber>
+                </snapshot>
+                <lastUpdated>${updateFormat.format(publishTimestamp)}</lastUpdated>
+              </versioning>
+            </metadata>
+        """.stripIndent()
     }
 
     @Override
@@ -47,10 +40,5 @@ class MavenFileModule extends AbstractMavenModule {
     @Override
     protected boolean publishesMetaDataFile() {
         uniqueSnapshots && version.endsWith("-SNAPSHOT")
-    }
-
-    @Override
-    protected boolean publishesHashFiles() {
-        true
     }
 }

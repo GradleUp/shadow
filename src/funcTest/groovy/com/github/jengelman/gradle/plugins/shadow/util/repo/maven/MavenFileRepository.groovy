@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-
 /**
  * A fixture for dealing with file Maven repositories.
  */
