@@ -13,25 +13,21 @@ import org.junit.jupiter.api.Test
 
 class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
   @Test
-  fun `should transform for a single file`() {
-    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE)))
+  fun `should transform`() {
+    transformer.transform(context(SimpleRelocator()))
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
   @Test
-  fun `should transform`() {
-    val relocators = listOf(SimpleRelocator())
-    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocators))
+  fun `should transform for a single file`() {
+    transformer.transform(context())
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
   @Test
   fun `relocate classes inside DAT file`() {
-    val pattern = "org.apache.logging"
-    val destination = "new.location.org.apache.logging"
-    val relocators = listOf(SimpleRelocator(pattern, destination))
-
-    transformer.transform(TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocators))
+    val relocator = SimpleRelocator("org.apache.logging", "new.location.org.apache.logging")
+    transformer.transform(context(relocator))
     assertThat(transformer.hasTransformedResource()).isTrue()
 
     // Write out to a fake jar file
@@ -47,6 +43,10 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
 
     assertThat(cache.getCategory("lookup")["date"]?.className)
       .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
+  }
+
+  private fun context(vararg relocator: SimpleRelocator): TransformerContext {
+    return TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocator.toList())
   }
 
   private companion object {
