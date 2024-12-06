@@ -68,7 +68,7 @@ public abstract class ShadowJar :
   override val stats: ShadowStats = ShadowStats()
 
   @get:Classpath
-  public val toMinimize: ConfigurableFileCollection by unsafeLazy {
+  public open val toMinimize: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
         setFrom(dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
@@ -77,7 +77,7 @@ public abstract class ShadowJar :
   }
 
   @get:Classpath
-  public val apiJars: ConfigurableFileCollection by unsafeLazy {
+  public open val apiJars: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
         setFrom(UnusedTracker.getApiJarsFromProject(project))
@@ -87,7 +87,7 @@ public abstract class ShadowJar :
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public val sourceSetsClassesDirs: ConfigurableFileCollection by unsafeLazy {
+  public open val sourceSetsClassesDirs: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
         project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
@@ -112,21 +112,21 @@ public abstract class ShadowJar :
     }
 
   @get:Nested
-  public val transformers: ListProperty<Transformer> = objectFactory.listProperty(Transformer::class.java)
+  public open val transformers: ListProperty<Transformer> = objectFactory.listProperty(Transformer::class.java)
 
   @get:Nested
-  public val relocators: ListProperty<Relocator> = objectFactory.listProperty(Relocator::class.java)
+  public open val relocators: ListProperty<Relocator> = objectFactory.listProperty(Relocator::class.java)
 
   @get:Classpath
   @get:Optional
-  public val configurations: ListProperty<Configuration> = objectFactory.listProperty(Configuration::class.java)
+  public open val configurations: ListProperty<Configuration> = objectFactory.listProperty(Configuration::class.java)
 
   @get:Internal
-  public val dependencyFilter: Property<DependencyFilter> = objectFactory.property(DependencyFilter::class.java)
+  public open val dependencyFilter: Property<DependencyFilter> = objectFactory.property(DependencyFilter::class.java)
     .convention(DefaultDependencyFilter(project))
 
   @get:Classpath
-  public val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
+  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
     .apply { setFrom(dependencyFilter.map { it.resolve(configurations.get()) }) }
 
   /**
@@ -135,7 +135,7 @@ public abstract class ShadowJar :
    * Defaults to `false`.
    */
   @get:Input
-  public val enableRelocation: Property<Boolean> = objectFactory.property(false)
+  public open val enableRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
    * Prefix to use for relocated packages.
@@ -143,7 +143,7 @@ public abstract class ShadowJar :
    * Defaults to [ShadowBasePlugin.SHADOW].
    */
   @get:Input
-  public val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
+  public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
    * Minimize the jar by removing unused classes.
@@ -151,7 +151,7 @@ public abstract class ShadowJar :
    * Defaults to `false`.
    */
   @get:Input
-  public val minimizeJar: Property<Boolean> = objectFactory.property(false)
+  public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @Internal
   override fun getManifest(): InheritManifest = super.manifest as InheritManifest
