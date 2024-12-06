@@ -9,7 +9,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -121,7 +120,6 @@ public abstract class ShadowJar :
   @get:Classpath
   @get:Optional
   public val configurations: ListProperty<Configuration> = objectFactory.listProperty(Configuration::class.java)
-    .convention(listOf(project.runtimeConfiguration))
 
   @get:Internal
   public val dependencyFilter: Property<DependencyFilter> = objectFactory.property(DependencyFilter::class.java)
@@ -134,10 +132,9 @@ public abstract class ShadowJar :
   /**
    * Enable relocation of packages in the jar.
    *
-   * Defaults to false.
+   * Defaults to `false`.
    */
   @get:Input
-  @get:Optional
   public val enableRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
@@ -146,16 +143,14 @@ public abstract class ShadowJar :
    * Defaults to [ShadowBasePlugin.SHADOW].
    */
   @get:Input
-  @get:Optional
   public val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
    * Minimize the jar by removing unused classes.
    *
-   * Defaults to false.
+   * Defaults to `false`.
    */
   @get:Input
-  @get:Optional
   public val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @Internal
