@@ -17,4 +17,4 @@ src/docs/.vuepress/dist/
 jd-gui.cfg
 bin/
 .vscode/
-.kotlin
+.kotlin/

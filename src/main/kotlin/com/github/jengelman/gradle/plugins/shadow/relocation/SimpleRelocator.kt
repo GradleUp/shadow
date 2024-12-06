@@ -18,6 +18,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
   shadedPattern: String? = null,
   includes: List<String>? = null,
   excludes: List<String>? = null,
+  includeSources: List<String>? = null,
+  excludeSources: List<String>? = null,
   private val _rawString: Boolean = false,
 ) : Relocator {
   private val _pattern: String
@@ -26,6 +28,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val _shadedPathPattern: String
   private val _includes = mutableSetOf<String>()
   private val _excludes = mutableSetOf<String>()
+  private val _includeSources = mutableSetOf<String>()
+  private val _excludeSources = mutableSetOf<String>()
 
   init {
     if (_rawString) {
@@ -51,6 +55,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
     _includes += normalizePatterns(includes)
     _excludes += normalizePatterns(excludes)
+    _includeSources += normalizePatterns(includeSources)
+    _excludeSources += normalizePatterns(excludeSources)
   }
 
   @get:Input
@@ -76,6 +82,12 @@ public open class SimpleRelocator @JvmOverloads constructor(
   @get:Input
   public open val excludes: Set<String> get() = _excludes
 
+  @get:Input
+  public open val includeSources: Set<String> get() = _includeSources
+
+  @get:Input
+  public open val excludeSources: Set<String> get() = _excludeSources
+
   public open fun include(pattern: String): SimpleRelocator = apply {
     _includes += normalizePatterns(listOf(pattern))
   }
@@ -84,21 +96,16 @@ public open class SimpleRelocator @JvmOverloads constructor(
     _excludes += normalizePatterns(listOf(pattern))
   }
 
+  public open fun includeSources(pattern: String): SimpleRelocator = apply {
+    _includeSources += normalizePatterns(listOf(pattern))
+  }
+
+  public open fun excludeSources(pattern: String): SimpleRelocator = apply {
+    _excludeSources += normalizePatterns(listOf(pattern))
+  }
+
   override fun canRelocatePath(path: String): Boolean {
-    if (_rawString) return Pattern.compile(_pathPattern).matcher(path).find()
-    // If string is too short - no need to perform expensive string operations
-    if (path.length < _pathPattern.length) return false
-    val adjustedPath = if (path.endsWith(".class")) {
-      // Safeguard against strings containing only ".class"
-      if (path.length == 6) return false
-      path.dropLast(6)
-    } else {
-      path
-    }
-    // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
-    val startIndex = if (adjustedPath.startsWith("/")) 1 else 0
-    val pathStartsWithPattern = adjustedPath.startsWith(_pathPattern, startIndex)
-    return pathStartsWithPattern && isIncluded(adjustedPath) && !isExcluded(adjustedPath)
+    return this.canRelocatePath(path, false, _includes, _excludes)
   }
 
   override fun canRelocateClass(className: String): Boolean {
@@ -128,15 +135,47 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
   }
 
-  private fun isIncluded(path: String): Boolean {
-    return _includes.isEmpty() || _includes.any { SelectorUtils.matchPath(it, path, "/", true) }
+  override fun canRelocateSourceFile(sourceFilePath: String): Boolean {
+    return this.canRelocatePath(sourceFilePath, true, _includeSources, _excludeSources)
   }
 
-  private fun isExcluded(path: String): Boolean {
-    return _excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
+  private fun canRelocatePath(
+    path: String,
+    sourceFile: Boolean,
+    includes: Collection<String>,
+    excludes: Collection<String>,
+  ): Boolean {
+    if (_rawString) {
+      return Pattern.compile(_pathPattern).matcher(path).find()
+    }
+    // If string is too short - no need to perform expensive string operations
+    if (path.length < _pathPattern.length) {
+      return false
+    }
+    val adjustedPath = if (path.endsWith(CLASS_SUFFIX)) {
+      // Safeguard against strings containing only ".class"
+      if (path.length == CLASS_SUFFIX_LENGTH) {
+        return false
+      }
+      path.dropLast(CLASS_SUFFIX_LENGTH)
+    } else {
+      path
+    }
+    if (!sourceFile) {
+      // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
+      val startIndex = if (adjustedPath.startsWith("/")) 1 else 0
+      val pathStartsWithPattern = adjustedPath.startsWith(_pathPattern, startIndex)
+      if (!pathStartsWithPattern) {
+        return false
+      }
+    }
+    return isPathIncluded(includes, adjustedPath) && !isPathExcluded(excludes, adjustedPath)
   }
 
   private companion object {
+    private const val CLASS_SUFFIX = ".class"
+    private const val CLASS_SUFFIX_LENGTH = CLASS_SUFFIX.length
+
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {
@@ -154,6 +193,14 @@ public open class SimpleRelocator @JvmOverloads constructor(
           add(packagePattern)
         }
       }
+    }
+
+    private fun isPathIncluded(includes: Collection<String>, path: String): Boolean {
+      return includes.isEmpty() || includes.any { SelectorUtils.matchPath(it, path, "/", true) }
+    }
+
+    private fun isPathExcluded(excludes: Collection<String>, path: String): Boolean {
+      return excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
     }
   }
 }

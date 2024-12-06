@@ -20,6 +20,8 @@ public open class RelocatorRemapper(
 ) : Remapper() {
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
+  public var currentFilePath: String? = null
+
   public open fun hasRelocators(): Boolean = relocators.isNotEmpty()
 
   override fun mapValue(value: Any): Any {
@@ -43,6 +45,10 @@ public open class RelocatorRemapper(
     }
 
     for (relocator in relocators) {
+      if (!this.canRelocateSourceFile(relocator)) {
+        continue
+      }
+
       if (relocator.canRelocateClass(newName)) {
         val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
         return prefix + relocator.relocateClass(classContext) + suffix
@@ -61,5 +67,10 @@ public open class RelocatorRemapper(
 
   public open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
     return mapPath(path.pathString)
+  }
+
+  private fun canRelocateSourceFile(relocator: Relocator): Boolean {
+    val currentFilePath: String? = this.currentFilePath
+    return currentFilePath == null || relocator.canRelocateSourceFile(currentFilePath)
   }
 }

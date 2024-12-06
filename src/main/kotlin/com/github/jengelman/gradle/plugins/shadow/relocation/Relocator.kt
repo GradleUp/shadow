@@ -17,6 +17,8 @@ public interface Relocator {
 
   public fun applyToSourceContent(sourceContent: String): String
 
+  public fun canRelocateSourceFile(sourceFilePath: String): Boolean
+
   public companion object {
     public val ROLE: String = Relocator::class.java.name
   }
