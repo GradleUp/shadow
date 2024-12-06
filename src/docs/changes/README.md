@@ -4,7 +4,7 @@
 ## [Unreleased]
 
 
-## [v9.0.0-beta] (2024-12-06)
+## [v9.0.0-beta4] (2024-12-06)
 
 **Changed**
 
@@ -459,7 +459,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta3...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta4...HEAD
+[v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
 [v9.0.0-beta3]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta3
 [v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
 [v9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
