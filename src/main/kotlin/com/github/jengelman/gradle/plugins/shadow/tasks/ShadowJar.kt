@@ -122,8 +122,8 @@ public abstract class ShadowJar :
   public open val configurations: ListProperty<Configuration> = objectFactory.listProperty(Configuration::class.java)
 
   @get:Internal
-  public open val dependencyFilter: Property<DependencyFilter> = objectFactory.property(DependencyFilter::class.java)
-    .convention(DefaultDependencyFilter(project))
+  public open val dependencyFilter: Property<DependencyFilter> =
+    objectFactory.property(DefaultDependencyFilter(project))
 
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
