@@ -26,18 +26,14 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val pathPattern: String
   private val shadedPattern: String
   private val shadedPathPattern: String
+  private val sourcePackageExcludes = mutableSetOf<String>()
+  private val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input
   public val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
 
   @get:Input
   public val excludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
-
-  @get:Input
-  public val sourcePackageExcludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
-
-  @get:Input
-  public val sourcePathExcludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
 
   init {
     if (rawString) {
@@ -136,10 +132,13 @@ public open class SimpleRelocator @JvmOverloads constructor(
     return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
   }
 
+  /**
+   * We don't call this function now, so we don't have to expose [sourcePackageExcludes] and [sourcePathExcludes] as inputs.
+   */
   override fun applyToSourceContent(sourceContent: String): String {
     if (rawString) return sourceContent
-    val content = shadeSourceWithExcludes(sourceContent, pattern, shadedPattern, sourcePackageExcludes.get())
-    return shadeSourceWithExcludes(content, pathPattern, shadedPathPattern, sourcePathExcludes.get())
+    val content = shadeSourceWithExcludes(sourceContent, pattern, shadedPattern, sourcePackageExcludes)
+    return shadeSourceWithExcludes(content, pathPattern, shadedPathPattern, sourcePathExcludes)
   }
 
   private fun isIncluded(path: String): Boolean {
