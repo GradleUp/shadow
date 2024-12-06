@@ -6,7 +6,7 @@
 **Fixed**
 
 - Adjust property initializations and modifiers in `ShadowJar`. ([#1090](https://github.com/GradleUp/shadow/pull/1090))  
-  This fix the regression for registering custom `ShadowJar` tasks.
+  This fixes the regression for registering custom `ShadowJar` tasks.
 
 
 ## [v9.0.0-beta2] (2024-11-28)
