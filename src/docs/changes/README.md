@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- **BREAKING CHANGE:** Some public getters are removed from `SimpleRelocator`, `includes` and `excludes` are exposed as `ListProperty`s. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
+
 **Fixed**
 
 - Adjust property initializations and modifiers in `ShadowJar`. ([#1090](https://github.com/GradleUp/shadow/pull/1090))  

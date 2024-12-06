@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
 import java.io.File
 import java.net.URL
 import java.util.Collections

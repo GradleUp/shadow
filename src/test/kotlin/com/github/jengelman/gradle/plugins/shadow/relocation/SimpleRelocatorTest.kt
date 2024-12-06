@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
 import org.junit.jupiter.api.Test
 
 /**
@@ -132,10 +133,10 @@ class SimpleRelocatorTest {
 
   @Test
   fun testCanRelocateRawString() {
-    var relocator = SimpleRelocator("org/foo", _rawString = true)
+    var relocator = SimpleRelocator("org/foo", rawString = true)
     assertThat(relocator.canRelocatePath("(I)org/foo/bar/Class")).isTrue()
 
-    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", _rawString = true)
+    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", rawString = true)
     assertThat(relocator.canRelocatePath("META-INF/org.foo.xml")).isTrue()
   }
 
@@ -170,11 +171,11 @@ class SimpleRelocatorTest {
 
   @Test
   fun testRelocateRawString() {
-    var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", _rawString = true)
+    var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", rawString = true)
     assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class"))
       .isEqualTo("(I)Lhidden/org/foo/bar/Class")
 
-    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", _rawString = true)
+    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", rawString = true)
     assertThat(relocator.relocatePath("META-INF/org.foo.xml"))
       .isEqualTo("META-INF/hidden.org.foo.xml")
   }
