@@ -14,9 +14,6 @@ def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.
   archiveClassifier = "tests"
   from sourceSets.test.output
   configurations = [project.configurations.testRuntimeClasspath]
-  includedDependencies.setFrom(configurations)
-
-  // May have to configure more properties here, you can ref https://github.com/GradleUp/shadow/blob/8ddb7c5334d15ef054f37aa9999e7680a55c5b2a/src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt#L94-L99 for more details.
 }
 
 // Optionally, make the `assemble` task depend on the new task
