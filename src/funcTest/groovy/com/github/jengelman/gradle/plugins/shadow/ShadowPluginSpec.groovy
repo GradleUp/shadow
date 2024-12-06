@@ -1259,7 +1259,6 @@ class ShadowPluginSpec extends PluginSpecification {
               archiveClassifier = "tests"
               from sourceSets.test.output
               configurations = [project.configurations.testRuntimeClasspath]
-              includedDependencies.setFrom(configurations)
             }
         """.stripIndent()
 
