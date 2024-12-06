@@ -2,11 +2,14 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
+import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -68,7 +71,7 @@ public abstract class ShadowJar :
   @get:Classpath
   public val toMinimize: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
-      if (minimizeJar.getOrElse(false)) {
+      if (minimizeJar.get()) {
         setFrom(dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
       }
     }
@@ -77,7 +80,7 @@ public abstract class ShadowJar :
   @get:Classpath
   public val apiJars: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
-      if (minimizeJar.getOrElse(false)) {
+      if (minimizeJar.get()) {
         setFrom(UnusedTracker.getApiJarsFromProject(project))
       }
     }
@@ -87,16 +90,13 @@ public abstract class ShadowJar :
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public val sourceSetsClassesDirs: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
-      if (minimizeJar.getOrElse(false)) {
+      if (minimizeJar.get()) {
         project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
           from(sourceSet.output.classesDirs.filter { it.isDirectory })
         }
       }
     }
   }
-
-  @get:Classpath
-  public abstract val includedDependencies: ConfigurableFileCollection
 
   @get:Internal
   public val rootPatternSet: PatternSet
@@ -113,17 +113,23 @@ public abstract class ShadowJar :
     }
 
   @get:Nested
-  public abstract val transformers: ListProperty<Transformer>
+  public val transformers: ListProperty<Transformer> = objectFactory.listProperty(Transformer::class.java)
 
   @get:Nested
-  public abstract val relocators: ListProperty<Relocator>
+  public val relocators: ListProperty<Relocator> = objectFactory.listProperty(Relocator::class.java)
 
   @get:Classpath
   @get:Optional
-  public abstract val configurations: ListProperty<Configuration>
+  public val configurations: ListProperty<Configuration> = objectFactory.listProperty(Configuration::class.java)
+    .convention(listOf(project.runtimeConfiguration))
 
   @get:Internal
-  public abstract val dependencyFilter: Property<DependencyFilter>
+  public val dependencyFilter: Property<DependencyFilter> = objectFactory.property(DependencyFilter::class.java)
+    .convention(DefaultDependencyFilter(project))
+
+  @get:Classpath
+  public val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
+    .apply { setFrom(dependencyFilter.map { it.resolve(configurations.get()) }) }
 
   /**
    * Enable relocation of packages in the jar.
@@ -132,7 +138,7 @@ public abstract class ShadowJar :
    */
   @get:Input
   @get:Optional
-  public abstract val enableRelocation: Property<Boolean>
+  public val enableRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
    * Prefix to use for relocated packages.
@@ -141,7 +147,7 @@ public abstract class ShadowJar :
    */
   @get:Input
   @get:Optional
-  public abstract val relocationPrefix: Property<String>
+  public val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
    * Minimize the jar by removing unused classes.
@@ -150,7 +156,7 @@ public abstract class ShadowJar :
    */
   @get:Input
   @get:Optional
-  public abstract val minimizeJar: Property<Boolean>
+  public val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @Internal
   override fun getManifest(): InheritManifest = super.manifest as InheritManifest
@@ -249,7 +255,7 @@ public abstract class ShadowJar :
 
   override fun createCopyAction(): CopyAction {
     val documentationRegistry = services.get(DocumentationRegistry::class.java)
-    val unusedTracker = if (minimizeJar.getOrElse(false)) {
+    val unusedTracker = if (minimizeJar.get()) {
       UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
     } else {
       null
@@ -264,7 +270,7 @@ public abstract class ShadowJar :
       rootPatternSet,
       stats,
       isPreserveFileTimestamps,
-      minimizeJar.getOrElse(false),
+      minimizeJar.get(),
       unusedTracker,
     )
   }
@@ -289,9 +295,9 @@ public abstract class ShadowJar :
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
-      if (!enableRelocation.getOrElse(false)) return emptyList()
+      if (!enableRelocation.get()) return emptyList()
 
-      val prefix = relocationPrefix.getOrElse(ShadowBasePlugin.SHADOW)
+      val prefix = relocationPrefix.get()
       // Must cast configurations to List<FileCollection> to fix type mismatch in runtime.
       return (configurations.get() as List<FileCollection>).flatMap { configuration ->
         configuration.files.flatMap { file ->
