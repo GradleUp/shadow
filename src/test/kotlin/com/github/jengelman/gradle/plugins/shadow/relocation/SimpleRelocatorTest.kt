@@ -257,7 +257,7 @@ class SimpleRelocatorTest {
     ).isEqualTo(relocatedFile)
   }
 
-  companion object {
+  private companion object {
     val sourceFile = """
       package org.apache.maven.hello;
       package org.objectweb.asm;

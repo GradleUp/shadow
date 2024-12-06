@@ -26,6 +26,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val pathPattern: String
   private val shadedPattern: String
   private val shadedPathPattern: String
+  private val sourcePackageExcludes = mutableSetOf<String>()
+  private val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input
   public val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
@@ -57,6 +59,32 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
     this.includes.addAll(normalizePatterns(includes))
     this.excludes.addAll(normalizePatterns(excludes))
+
+    // Don't replace all dots to slashes, otherwise /META-INF/maven/${groupId} can't be matched.
+    if (!includes.isNullOrEmpty()) {
+      this.includes.addAll(includes)
+    }
+    if (!excludes.isNullOrEmpty()) {
+      this.excludes.addAll(excludes)
+    }
+
+    if (!rawString) {
+      // Create exclude pattern sets for sources
+      for (exclude in this.excludes.get()) {
+        // Excludes should be subpackages of the global pattern
+        if (exclude.startsWith(this.pattern)) {
+          sourcePackageExcludes.add(
+            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), ""),
+          )
+        }
+        // Excludes should be subpackages of the global pattern
+        if (exclude.startsWith(pathPattern)) {
+          sourcePathExcludes.add(
+            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), ""),
+          )
+        }
+      }
+    }
   }
 
   public open fun include(pattern: String): SimpleRelocator = apply {
@@ -100,15 +128,14 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun relocateClass(context: RelocateClassContext): String {
     context.stats.relocate(pathPattern, shadedPathPattern)
-    return context.className.replaceFirst(pattern, shadedPattern)
+    val clazz = context.className
+    return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
   }
 
   override fun applyToSourceContent(sourceContent: String): String {
-    return if (rawString) {
-      sourceContent
-    } else {
-      sourceContent.replace("\\b$pattern".toRegex(), shadedPattern)
-    }
+    if (rawString) return sourceContent
+    val content = shadeSourceWithExcludes(sourceContent, pattern, shadedPattern, sourcePackageExcludes)
+    return shadeSourceWithExcludes(content, pathPattern, shadedPathPattern, sourcePathExcludes)
   }
 
   private fun isIncluded(path: String): Boolean {
@@ -120,6 +147,28 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   private companion object {
+    /**
+     * Match dot, slash or space at end of string
+     */
+    val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
+
+    /**
+     * Match
+     *  - certain Java keywords + space
+     *  - beginning of Javadoc link + optional line breaks and continuations with '*'
+     *  - (opening curly brace / opening parenthesis / comma / equals / semicolon) + space
+     *  - (closing curly brace / closing multi-line comment) + space
+     *
+     * at end of string
+     */
+    val RX_ENDS_WITH_JAVA_KEYWORD: Pattern = Pattern.compile(
+      "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
+        "|" +
+        "\\{@link( \\*)* $" +
+        "|" +
+        "([{}(=;,]|\\*/) $",
+    )
+
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {
@@ -137,6 +186,47 @@ public open class SimpleRelocator @JvmOverloads constructor(
           add(packagePattern)
         }
       }
+    }
+
+    fun shadeSourceWithExcludes(
+      sourceContent: String,
+      patternFrom: String,
+      patternTo: String,
+      excludedPatterns: Set<String>,
+    ): String {
+      // Usually shading makes package names a bit longer, so make buffer 10% bigger than original source
+      val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
+      var isFirstSnippet = true
+      // Make sure that search pattern starts at word boundary and that we look for literal ".", not regex jokers
+      val snippets = sourceContent.split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
+        .dropLastWhile { it.isEmpty() }.toTypedArray()
+      var i = 0
+      val snippetsLength = snippets.size
+      while (i < snippetsLength) {
+        val snippet = snippets[i]
+        val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
+        var doExclude = false
+        for (excludedPattern in excludedPatterns) {
+          if (snippet.startsWith(excludedPattern)) {
+            doExclude = true
+            break
+          }
+        }
+        if (isFirstSnippet) {
+          shadedSourceContent.append(snippet)
+          isFirstSnippet = false
+        } else {
+          val previousSnippetOneLine = previousSnippet.replace("\\s+".toRegex(), " ")
+          val afterDotSlashSpace = RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
+          val afterJavaKeyWord = RX_ENDS_WITH_JAVA_KEYWORD.matcher(previousSnippetOneLine).find()
+          val shouldExclude = doExclude || afterDotSlashSpace && !afterJavaKeyWord
+          shadedSourceContent
+            .append(if (shouldExclude) patternFrom else patternTo)
+            .append(snippet)
+        }
+        i++
+      }
+      return shadedSourceContent.toString()
     }
   }
 }
