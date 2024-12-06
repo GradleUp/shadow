@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 
 /**
@@ -28,10 +28,10 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val shadedPathPattern: String
 
   @get:Input
-  public val includes: ListProperty<String> = objectFactory.listProperty(String::class.java)
+  public val includes: SetProperty<String> = objectFactory.setProperty(String::class.java)
 
   @get:Input
-  public val excludes: ListProperty<String> = objectFactory.listProperty(String::class.java)
+  public val excludes: SetProperty<String> = objectFactory.setProperty(String::class.java)
 
   init {
     if (rawString) {
