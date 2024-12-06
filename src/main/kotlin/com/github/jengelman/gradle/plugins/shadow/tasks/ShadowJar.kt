@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
+import com.github.jengelman.gradle.plugins.shadow.internal.conventionCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
@@ -71,7 +72,7 @@ public abstract class ShadowJar :
   public open val toMinimize: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
-        setFrom(dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
+        conventionCompat(dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
       }
     }
   }
@@ -80,7 +81,7 @@ public abstract class ShadowJar :
   public open val apiJars: ConfigurableFileCollection by unsafeLazy {
     objectFactory.fileCollection().apply {
       if (minimizeJar.get()) {
-        setFrom(UnusedTracker.getApiJarsFromProject(project))
+        conventionCompat(UnusedTracker.getApiJarsFromProject(project))
       }
     }
   }
@@ -127,7 +128,7 @@ public abstract class ShadowJar :
 
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
-    .apply { setFrom(dependencyFilter.map { it.resolve(configurations.get()) }) }
+    .conventionCompat(dependencyFilter.map { it.resolve(configurations.get()) })
 
   /**
    * Enable relocation of packages in the jar.
