@@ -4,11 +4,11 @@
 ## [Unreleased]
 
 
-## [v9.0.0-beta3] (2024-12-06)
+## [v9.0.0-beta] (2024-12-06)
 
 **Changed**
 
-- **BREAKING CHANGE:** Some public getters are removed from `SimpleRelocator`, `includes` and `excludes` are exposed as `ListProperty`s. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
+- **BREAKING CHANGE:** Some public getters are removed from `SimpleRelocator`, `includes` and `excludes` are exposed as `SetProperty`s. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
 
 **Fixed**
 
