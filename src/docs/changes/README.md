@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v9.0.0-beta3] (2024-12-06)
+
 **Changed**
 
 - **BREAKING CHANGE:** Some public getters are removed from `SimpleRelocator`, `includes` and `excludes` are exposed as `ListProperty`s. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
@@ -456,7 +459,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta2...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta3...HEAD
+[v9.0.0-beta3]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta3
 [v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
 [v9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
 [v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
