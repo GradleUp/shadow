@@ -98,11 +98,11 @@ public abstract class ShadowJar :
   }
 
   @get:Internal
-  protected val rootPatternSet: PatternSet
+  protected open val rootPatternSet: PatternSet
     get() = (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
 
   @get:Internal
-  protected val internalCompressor: ZipCompressor
+  protected open val internalCompressor: ZipCompressor
     get() {
       return when (entryCompression) {
         ZipEntryCompression.DEFLATED -> DefaultZipCompressor(isZip64, ZipOutputStream.DEFLATED)
