@@ -198,6 +198,8 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun exclude (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
 	public final fun getExcludes ()Lorg/gradle/api/provider/SetProperty;
 	public final fun getIncludes ()Lorg/gradle/api/provider/SetProperty;
+	public final fun getSourcePackageExcludes ()Lorg/gradle/api/provider/SetProperty;
+	public final fun getSourcePathExcludes ()Lorg/gradle/api/provider/SetProperty;
 	public fun include (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
