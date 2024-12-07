@@ -20,7 +20,6 @@ junit-bom = "org.junit:junit-bom:5.11.3"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
-jetbrains-annotations = "org.jetbrains:annotations:26.0.1"
 
 [plugins]
 kotlin = "org.jetbrains.kotlin.jvm:2.1.0"
