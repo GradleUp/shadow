@@ -47,12 +47,12 @@ public open class SimpleRelocator @JvmOverloads constructor(
         this.pattern = pattern.replace('/', '.')
         this.pathPattern = pattern.replace('.', '/')
       }
-      if (shadedPattern == null) {
-        this.shadedPattern = "hidden.${this.pattern}"
-        this.shadedPathPattern = "hidden/${this.pathPattern}"
-      } else {
+      if (shadedPattern != null) {
         this.shadedPattern = shadedPattern.replace('/', '.')
         this.shadedPathPattern = shadedPattern.replace('.', '/')
+      } else {
+        this.shadedPattern = "hidden.${this.pattern}"
+        this.shadedPathPattern = "hidden/${this.pathPattern}"
       }
     }
     this.includes.addAll(normalizePatterns(includes))
@@ -78,10 +78,10 @@ public open class SimpleRelocator @JvmOverloads constructor(
     } else {
       path
     }
-    // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
+    // Allow for annoying option of an extra / on the front of a path. See MSHADE-119;
+    // comes from getClass().getResource("/a/b/c.properties").
     val startIndex = if (adjustedPath.startsWith("/")) 1 else 0
-    val pathStartsWithPattern = adjustedPath.startsWith(pathPattern, startIndex)
-    return pathStartsWithPattern && isIncluded(adjustedPath) && !isExcluded(adjustedPath)
+    return isIncluded(adjustedPath) && !isExcluded(adjustedPath) && adjustedPath.startsWith(pathPattern, startIndex)
   }
 
   override fun canRelocateClass(className: String): Boolean {
@@ -94,7 +94,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
     return if (rawString) {
       path.replace(pathPattern.toRegex(), shadedPathPattern)
     } else {
-      path.replaceFirst(pathPattern, shadedPathPattern)
+      path.replaceFirst(pathPattern.toRegex(), shadedPathPattern)
     }
   }
 
