@@ -15,7 +15,6 @@ yarn-error.log
 src/docs/.vuepress/dist/
 .DS_Store
 jd-gui.cfg
-lib/
 bin/
 .vscode/
 .kotlin
