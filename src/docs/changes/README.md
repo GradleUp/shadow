@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Sync `SimpleRelocator` changes from maven-shade-plugin. ([#1076](https://github.com/GradleUp/shadow/pull/1076))
+
 
 ## [v9.0.0-beta4] (2024-12-06)
 

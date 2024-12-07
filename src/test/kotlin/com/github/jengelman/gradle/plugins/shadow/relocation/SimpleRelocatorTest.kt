@@ -134,7 +134,7 @@ class SimpleRelocatorTest {
   @Test
   fun testCanRelocateRawString() {
     var relocator = SimpleRelocator("org/foo", rawString = true)
-    assertThat(relocator.canRelocatePath("(I)org/foo/bar/Class")).isTrue()
+    assertThat(relocator.canRelocatePath("(I)org/foo/bar/Class;")).isTrue()
 
     relocator = SimpleRelocator("^META-INF/org.foo.xml\$", rawString = true)
     assertThat(relocator.canRelocatePath("META-INF/org.foo.xml")).isTrue()
@@ -145,6 +145,32 @@ class SimpleRelocatorTest {
     val relocator = SimpleRelocator("org.apache.velocity", "org.apache.momentum")
     assertThat(relocator.relocatePath("/org/apache/velocity/mass.properties"))
       .isEqualTo("/org/apache/momentum/mass.properties")
+  }
+
+  @Test
+  fun testCanRelocateAbsClassPathWithExcludes() {
+    val relocator = SimpleRelocator(
+      "org/apache/velocity",
+      "org/apache/momentum",
+      excludes = listOf("org/apache/velocity/excluded/*"),
+    )
+    assertThat(relocator.canRelocatePath("/org/apache/velocity/mass.properties")).isTrue()
+    assertThat(relocator.canRelocatePath("org/apache/velocity/mass.properties")).isTrue()
+    assertThat(relocator.canRelocatePath("/org/apache/velocity/excluded/mass.properties")).isFalse()
+    assertThat(relocator.canRelocatePath("org/apache/velocity/excluded/mass.properties")).isFalse()
+  }
+
+  @Test
+  fun testCanRelocateAbsClassPathWithIncludes() {
+    val relocator = SimpleRelocator(
+      "org/apache/velocity",
+      "org/apache/momentum",
+      includes = listOf("org/apache/velocity/included/*"),
+    )
+    assertThat(relocator.canRelocatePath("/org/apache/velocity/mass.properties")).isFalse()
+    assertThat(relocator.canRelocatePath("org/apache/velocity/mass.properties")).isFalse()
+    assertThat(relocator.canRelocatePath("/org/apache/velocity/included/mass.properties")).isTrue()
+    assertThat(relocator.canRelocatePath("org/apache/velocity/included/mass.properties")).isTrue()
   }
 
   @Test
@@ -172,15 +198,138 @@ class SimpleRelocatorTest {
   @Test
   fun testRelocateRawString() {
     var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", rawString = true)
-    assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class"))
-      .isEqualTo("(I)Lhidden/org/foo/bar/Class")
+    assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class;"))
+      .isEqualTo("(I)Lhidden/org/foo/bar/Class;")
 
     relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", rawString = true)
     assertThat(relocator.relocatePath("META-INF/org.foo.xml"))
       .isEqualTo("META-INF/hidden.org.foo.xml")
   }
 
+  @Test
+  fun testRelocateMavenFiles() {
+    val relocator = SimpleRelocator(
+      "META-INF/maven",
+      "META-INF/shade/maven",
+      excludes = listOf("META-INF/maven/com.foo.bar/artifactId/pom.*"),
+    )
+    assertThat(relocator.canRelocatePath("META-INF/maven/com.foo.bar/artifactId/pom.properties")).isFalse()
+    assertThat(relocator.canRelocatePath("META-INF/maven/com.foo.bar/artifactId/pom.xml")).isFalse()
+    assertThat(relocator.canRelocatePath("META-INF/maven/com/foo/bar/artifactId/pom.properties")).isTrue()
+    assertThat(relocator.canRelocatePath("META-INF/maven/com/foo/bar/artifactId/pom.xml")).isTrue()
+    assertThat(relocator.canRelocatePath("META-INF/maven/com-foo-bar/artifactId/pom.properties")).isTrue()
+    assertThat(relocator.canRelocatePath("META-INF/maven/com-foo-bar/artifactId/pom.xml")).isTrue()
+  }
+
+  @Test
+  fun testRelocateSourceWithExcludesRaw() {
+    val relocator = SimpleRelocator(
+      "org.apache.maven",
+      "com.acme.maven",
+      listOf("foo.bar", "zot.baz"),
+      listOf("irrelevant.exclude", "org.apache.maven.exclude1", "org.apache.maven.sub.exclude2"),
+      true,
+    )
+    assertThat(relocator.applyToSourceContent(sourceFile)).isEqualTo(sourceFile)
+  }
+
+  @Test
+  fun testRelocateSourceWithExcludes() {
+    // Main relocator with in-/excludes
+    val relocator = SimpleRelocator(
+      "org.apache.maven",
+      "com.acme.maven",
+      listOf("foo.bar", "zot.baz"),
+      listOf("irrelevant.exclude", "org.apache.maven.exclude1", "org.apache.maven.sub.exclude2"),
+    )
+    // Make sure not to replace variables 'io' and 'ioInput', package 'java.io'
+    val ioRelocator = SimpleRelocator("io", "shaded.io")
+    // Check corner case which was not working in PR #100
+    val asmRelocator = SimpleRelocator("org.objectweb.asm", "aj.org.objectweb.asm")
+    // Make sure not to replace 'foo' package by path-like 'shaded/foo'
+    val fooRelocator = SimpleRelocator("foo", "shaded.foo", excludes = listOf("foo.bar"))
+    assertThat(
+      fooRelocator.applyToSourceContent(
+        asmRelocator.applyToSourceContent(
+          ioRelocator.applyToSourceContent(relocator.applyToSourceContent(sourceFile)),
+        ),
+      ),
+    ).isEqualTo(relocatedFile)
+  }
+
   private companion object {
+    val sourceFile = """
+      package org.apache.maven.hello;
+      package org.objectweb.asm;
+
+      import foo.bar.Bar;
+      import zot.baz.Baz;
+      import org.apache.maven.exclude1.Ex1;
+      import org.apache.maven.exclude1.a.b.Ex1AB;
+      import org.apache.maven.sub.exclude2.Ex2;
+      import org.apache.maven.sub.exclude2.c.d.Ex2CD;
+      import org.apache.maven.In;
+      import org.apache.maven.e.InE;
+      import org.apache.maven.f.g.InFG;
+      import java.io.IOException;
+
+      /**
+       * Also check out {@link org.apache.maven.hello.OtherClass} and {@link
+       * org.apache.maven.hello.YetAnotherClass}
+       */
+      public class MyClass {
+        private org.apache.maven.exclude1.x.X myX;
+        private org.apache.maven.h.H h;
+        private String ioInput;
+
+        /** Javadoc, followed by default visibility method with fully qualified return type */
+        org.apache.maven.MyReturnType doSomething( org.apache.maven.Bar bar, org.objectweb.asm.sub.Something something) {
+          org.apache.maven.Bar bar;
+          org.objectweb.asm.sub.Something something;
+          String io, val;
+          String noRelocation = "NoWordBoundaryXXXorg.apache.maven.In";
+          String relocationPackage = "org.apache.maven.In";
+          String relocationPath = "org/apache/maven/In";
+        }
+      }
+    """.trimIndent()
+
+    val relocatedFile = """
+      package com.acme.maven.hello;
+      package aj.org.objectweb.asm;
+
+      import foo.bar.Bar;
+      import zot.baz.Baz;
+      import org.apache.maven.exclude1.Ex1;
+      import org.apache.maven.exclude1.a.b.Ex1AB;
+      import org.apache.maven.sub.exclude2.Ex2;
+      import org.apache.maven.sub.exclude2.c.d.Ex2CD;
+      import com.acme.maven.In;
+      import com.acme.maven.e.InE;
+      import com.acme.maven.f.g.InFG;
+      import java.io.IOException;
+
+      /**
+       * Also check out {@link com.acme.maven.hello.OtherClass} and {@link
+       * com.acme.maven.hello.YetAnotherClass}
+       */
+      public class MyClass {
+        private org.apache.maven.exclude1.x.X myX;
+        private com.acme.maven.h.H h;
+        private String ioInput;
+
+        /** Javadoc, followed by default visibility method with fully qualified return type */
+        com.acme.maven.MyReturnType doSomething( com.acme.maven.Bar bar, aj.org.objectweb.asm.sub.Something something) {
+          com.acme.maven.Bar bar;
+          aj.org.objectweb.asm.sub.Something something;
+          String io, val;
+          String noRelocation = "NoWordBoundaryXXXorg.apache.maven.In";
+          String relocationPackage = "com.acme.maven.In";
+          String relocationPath = "com/acme/maven/In";
+        }
+      }
+    """.trimIndent()
+
     fun SimpleRelocator.relocatePath(path: String): String {
       return relocatePath(RelocatePathContext(path))
     }

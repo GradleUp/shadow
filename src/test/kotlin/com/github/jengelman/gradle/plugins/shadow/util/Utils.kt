@@ -10,8 +10,8 @@ val testObjectFactory: ObjectFactory = ProjectBuilder.builder().build().objects
 fun SimpleRelocator(
   pattern: String? = null,
   shadedPattern: String? = null,
-  includes: List<String>? = null,
-  excludes: List<String>? = null,
+  includes: List<String> = emptyList(),
+  excludes: List<String> = emptyList(),
   rawString: Boolean = false,
 ): SimpleRelocator = SimpleRelocator(
   objectFactory = testObjectFactory,
