@@ -79,6 +79,7 @@ dependencies {
   testImplementation(libs.assertk)
   testImplementation(libs.xmlunit)
   testImplementation(libs.apache.commonsLang)
+  testImplementation(libs.jetbrains.annotations)
   testRuntimeOnly(libs.junit.platformLauncher)
 
   funcTestImplementation(libs.spock) {
