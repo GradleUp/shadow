@@ -183,8 +183,9 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
         val classPattern = pattern.replace('.', '/')
         add(classPattern)
-
-        if (classPattern.endsWith("/*")) {
+        // Actually, class patterns should just use 'foo.bar.*' ending with a single asterisk, but some users
+        // mistake them for path patterns like 'my/path/**', so let us be a bit more lenient here.
+        if (classPattern.endsWith("/*") || classPattern.endsWith("/**")) {
           val packagePattern = classPattern.substring(0, classPattern.lastIndexOf('/'))
           add(packagePattern)
         }
