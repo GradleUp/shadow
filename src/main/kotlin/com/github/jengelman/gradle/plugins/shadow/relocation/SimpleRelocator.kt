@@ -99,7 +99,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
     if (rawString) return Pattern.compile(pathPattern).matcher(path).find()
     // If string is too short - no need to perform expensive string operations
     if (path.length < pathPattern.length) return false
-    val adjustedPath = if (path.endsWith(".class")) {
+    var adjustedPath = if (path.endsWith(".class")) {
       // Safeguard against strings containing only ".class"
       if (path.length == 6) return false
       path.dropLast(6)
@@ -108,8 +108,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
     // Allow for annoying option of an extra / on the front of a path. See MSHADE-119;
     // comes from getClass().getResource("/a/b/c.properties").
-    val startIndex = if (adjustedPath.startsWith("/")) 1 else 0
-    return isIncluded(adjustedPath) && !isExcluded(adjustedPath) && adjustedPath.startsWith(pathPattern, startIndex)
+    adjustedPath = adjustedPath.removePrefix("/")
+    return isIncluded(adjustedPath) && !isExcluded(adjustedPath) && adjustedPath.startsWith(pathPattern)
   }
 
   override fun canRelocateClass(className: String): Boolean {
