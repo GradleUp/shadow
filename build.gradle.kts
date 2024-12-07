@@ -65,6 +65,7 @@ gradlePlugin {
 }
 
 dependencies {
+  compileOnly(libs.kotlin.stdlib)
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
@@ -74,6 +75,7 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
+  testImplementation(libs.kotlin.stdlib)
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.assertk)
