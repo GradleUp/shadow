@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-
 interface MavenModule {
     /**
      * Publishes the pom.xml plus main artifact, plus any additional artifacts for this module. Publishes only those artifacts whose content has
@@ -13,32 +12,9 @@ interface MavenModule {
      */
     MavenModule publishPom()
 
-    /**
-     * Publishes the pom.xml plus main artifact, plus any additional artifacts for this module, with different content (and size) to any
-     * previous publication.
-     */
-    MavenModule publishWithChangedContent()
-
-    MavenModule withNonUniqueSnapshots()
-
-    MavenModule parent(String group, String artifactId, String version)
-
     MavenModule dependsOn(String group, String artifactId, String version)
-
-    MavenModule hasPackaging(String packaging)
-
-    /**
-     * Sets the type of the main artifact for this module.
-     */
-    MavenModule hasType(String type)
 
     File getPomFile()
 
-    File getArtifactFile()
-
     File getMetaDataFile()
-
-    MavenPom getParsedPom()
-
-    MavenMetaData getRootMetaData()
 }

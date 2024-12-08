@@ -46,16 +46,8 @@ abstract class AbstractModule {
 
     protected abstract onPublish(File file)
 
-    static File getSha1File(File file) {
-        getHashFile(file, "sha1")
-    }
-
     static File sha1File(File file) {
         hashFile(file, "sha1", 40)
-    }
-
-    static File getMd5File(File file) {
-        getHashFile(file, "md5")
     }
 
     static File md5File(File file) {
