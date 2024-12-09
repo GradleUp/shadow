@@ -198,7 +198,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
       val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
       // Make sure that search pattern starts at word boundary and that we look for literal ".", not regex jokers
       val snippets = sourceContent.split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
-        .dropLastWhile { it.isEmpty() }
+        .filter(CharSequence::isNotEmpty)
       snippets.forEachIndexed { i, snippet ->
         val isFirstSnippet = i == 0
         val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
