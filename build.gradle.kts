@@ -140,7 +140,7 @@ tasks.whenTaskAdded {
   }
 }
 
-tasks.register("release") {
+tasks.register("releaseAll") {
   description = "Publishes the plugin to maven repos and deploys website."
   group = PublishingPlugin.PUBLISH_TASK_GROUP
 
