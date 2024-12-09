@@ -51,6 +51,7 @@ class RelocatorRemapper extends Remapper {
         return !relocators.empty
     }
 
+    @Override
     Object mapValue(Object object) {
         if (object instanceof String) {
             String name = (String) object
@@ -85,6 +86,7 @@ class RelocatorRemapper extends Remapper {
         return super.mapValue(object)
     }
 
+    @Override
     String map(String name) {
         String value = name
 

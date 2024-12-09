@@ -44,11 +44,13 @@ class ComponentsXmlResourceTransformer implements Transformer {
 
     public static final String COMPONENTS_XML_PATH = "META-INF/plexus/components.xml"
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
         return COMPONENTS_XML_PATH == path
     }
 
+    @Override
     void transform(TransformerContext context) {
         Xpp3Dom newDom
 
@@ -114,6 +116,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
         }
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         byte[] data = getTransformedResource()
 
@@ -127,6 +130,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
         components.clear()
     }
 
+    @Override
     boolean hasTransformedResource() {
         return !components.isEmpty()
     }

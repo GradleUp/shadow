@@ -13,7 +13,6 @@ class DefaultMavenMetaData implements MavenMetaData{
     String artifactId
     String version
 
-    List<String> versions = []
     String lastUpdated
 
     DefaultMavenMetaData(File file) {
@@ -31,5 +30,10 @@ class DefaultMavenMetaData implements MavenMetaData{
         versioning.versions[0].version.each {
             versions << it.text()
         }
+    }
+
+    @Override
+    List<String> getVersions() {
+        return []
     }
 }

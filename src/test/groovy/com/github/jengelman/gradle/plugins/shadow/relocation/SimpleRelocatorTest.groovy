@@ -20,7 +20,10 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
-import junit.framework.TestCase
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+
+import static org.junit.jupiter.api.Assertions.*
 
 /**
  * Test for {@link SimpleRelocator}.
@@ -29,19 +32,20 @@ import junit.framework.TestCase
  * @version $Id: SimpleRelocatorTest.java 1342979 2012-05-26 22:05:45Z bimargulies $
  *
  * Modified from org.apache.maven.plugins.shade.relocation.SimpleRelocatorTest.java
- * 
+ *
  * Modifications
  * @author John Engelman
  */
-class SimpleRelocatorTest extends TestCase {
+class SimpleRelocatorTest {
 
-    ShadowStats stats
+    private static ShadowStats stats
 
-    @Override
-    protected void setUp() {
+    @BeforeEach
+    void setUp() {
       stats = new ShadowStats()
     }
 
+    @Test
     void testCanRelocateSourceFile() {
         SimpleRelocator relocator
 
@@ -120,7 +124,8 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(true, relocator.canRelocatePath("org/f"))   // equal to path pattern
         assertEquals(true, relocator.canRelocatePath("/org/f"))  // equal to path pattern with /
     }
-  
+
+   @Test
    void testCanRelocatePathWithRegex() {
         SimpleRelocator relocator
 
@@ -154,6 +159,7 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocatePath("org/foo/R.class"))
    }
 
+    @Test
     void testCanRelocateClass() {
         SimpleRelocator relocator
 
@@ -182,6 +188,7 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals(false, relocator.canRelocateClass("org.foo.recurse.sub.Class"))
     }
 
+    @Test
     void testCanRelocateRawString() {
         SimpleRelocator relocator
 
@@ -193,12 +200,14 @@ class SimpleRelocatorTest extends TestCase {
     }
 
     //MSHADE-119, make sure that the easy part of this works.
+    @Test
     void testCanRelocateAbsClassPath() {
         SimpleRelocator relocator = new SimpleRelocator("org.apache.velocity", "org.apache.momentum", null, null)
         assertEquals("/org/apache/momentum/mass.properties", relocator.relocatePath(pathContext("/org/apache/velocity/mass.properties")))
 
     }
 
+    @Test
     void testRelocatePath() {
         SimpleRelocator relocator
 
@@ -209,6 +218,7 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals("private/stuff/bar/Class.class", relocator.relocatePath(pathContext("org/foo/bar/Class.class")))
     }
 
+    @Test
     void testRelocateClass() {
         SimpleRelocator relocator
 
@@ -219,6 +229,7 @@ class SimpleRelocatorTest extends TestCase {
         assertEquals("private.stuff.bar.Class", relocator.relocateClass(classContext("org.foo.bar.Class")))
     }
 
+    @Test
     void testRelocateRawString() {
         SimpleRelocator relocator
 
@@ -228,12 +239,12 @@ class SimpleRelocatorTest extends TestCase {
         relocator = new SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", null, null, true)
         assertEquals("META-INF/hidden.org.foo.xml", relocator.relocatePath(pathContext("META-INF/org.foo.xml")))
     }
-    
-    protected RelocatePathContext pathContext(String path) {
+
+    protected static RelocatePathContext pathContext(String path) {
         return RelocatePathContext.builder().path(path).stats(stats).build()
     }
 
-    protected RelocateClassContext classContext(String className) {
+    protected static RelocateClassContext classContext(String className) {
         return RelocateClassContext.builder().className(className).stats(stats).build()
     }
 }

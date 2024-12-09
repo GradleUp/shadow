@@ -8,6 +8,7 @@ import spock.lang.Issue
 
 class FilteringSpec extends PluginSpecification {
 
+    @Override
     def setup() {
         repo.module('shadow', 'a', '1.0')
                 .insertFile('a.properties', 'a')

@@ -12,6 +12,7 @@ class PublishingSpec extends PluginSpecification {
 
     AppendableMavenFileRepository publishingRepo
 
+    @Override
     def setup() {
         publishingRepo = repo('remote_repo')
     }

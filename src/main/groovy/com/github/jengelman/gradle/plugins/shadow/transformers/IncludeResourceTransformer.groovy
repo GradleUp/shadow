@@ -45,18 +45,22 @@ class IncludeResourceTransformer implements Transformer {
     @Input
     String resource
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
         return false
     }
 
+    @Override
     void transform(TransformerContext context) {
         // no op
     }
 
+    @Override
     boolean hasTransformedResource() {
         return file != null ? file.exists() : false
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         ZipEntry entry = new ZipEntry(resource)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)

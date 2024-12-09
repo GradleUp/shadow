@@ -19,7 +19,10 @@
 
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import junit.framework.TestCase
+import org.junit.jupiter.api.Test
+
+import static org.junit.jupiter.api.Assertions.*
+
 
 /**
  * Modified from org.apache.maven.plugins.shade.relocation.SimpleRelocatorParameterTest.java
@@ -27,17 +30,14 @@ import junit.framework.TestCase
  * Modifications
  * @author John Engelman
  */
-class SimpleRelocatorParameterTest extends TestCase {
+class SimpleRelocatorParameterTest {
 
-
-    protected void setUp() {
-        super.setUp()
-    }
-
+    @Test
     void testThatNullPatternInConstructorShouldNotThrowNullPointerException() {
         constructThenFailOnNullPointerException(null, "")
     }
 
+    @Test
     void testThatNullShadedPatternInConstructorShouldNotThrowNullPointerException() {
         constructThenFailOnNullPointerException("", null)
     }
