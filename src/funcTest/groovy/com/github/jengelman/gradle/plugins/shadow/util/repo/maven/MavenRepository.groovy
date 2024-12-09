@@ -8,5 +8,5 @@ interface MavenRepository {
 
     MavenModule module(String groupId, String artifactId)
 
-    MavenModule module(String groupId, String artifactId, Object version)
+    MavenModule module(String groupId, String artifactId, String version)
 }
