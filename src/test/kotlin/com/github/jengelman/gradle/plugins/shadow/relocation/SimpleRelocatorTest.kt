@@ -71,7 +71,10 @@ class SimpleRelocatorTest {
   @Test
   fun testCanRelocatePathWithRegex() {
     // Include with Regex
-    var relocator = SimpleRelocator("org.foo", includes = listOf("%regex[org/foo/R(\\\$.*)?\$]"))
+    var relocator = SimpleRelocator(
+      "org.foo",
+      includes = listOf("%regex[org/foo/R(\\\$.*)?\$]"),
+    )
     assertThat(relocator.canRelocatePath("org/foo/R.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/R\$string.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/R\$layout.class")).isTrue()
@@ -82,8 +85,10 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("org/R\$string.class")).isFalse()
 
     // Exclude with Regex
-    relocator = SimpleRelocator("org.foo")
-    relocator.exclude("%regex[org/foo/.*Factory[0-9].*]")
+    relocator = SimpleRelocator(
+      "org.foo",
+      excludes = listOf("%regex[org/foo/.*Factory[0-9].*]"),
+    )
     assertThat(relocator.canRelocatePath("org/foo/Factory.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/FooFactoryMain.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/BarFactory.class")).isTrue()
@@ -247,7 +252,11 @@ class SimpleRelocatorTest {
     // Check corner case which was not working in PR #100
     val asmRelocator = SimpleRelocator("org.objectweb.asm", "aj.org.objectweb.asm")
     // Make sure not to replace 'foo' package by path-like 'shaded/foo'
-    val fooRelocator = SimpleRelocator("foo", "shaded.foo", excludes = listOf("foo.bar"))
+    val fooRelocator = SimpleRelocator(
+      "foo",
+      "shaded.foo",
+      excludes = listOf("foo.bar"),
+    )
     assertThat(
       fooRelocator.applyToSourceContent(
         asmRelocator.applyToSourceContent(
