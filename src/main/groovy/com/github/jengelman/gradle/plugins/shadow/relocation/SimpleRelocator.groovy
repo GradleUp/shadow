@@ -46,7 +46,9 @@ class SimpleRelocator implements Relocator {
     private final Set<String> includes
 
     private final Set<String> excludes
-    
+
+    private final Set<String> excludeSources
+
     private final boolean rawString
 
     SimpleRelocator() {
@@ -57,8 +59,12 @@ class SimpleRelocator implements Relocator {
         this(patt, shadedPattern, includes, excludes, false)
     }
 
+    SimpleRelocator(String patt, String shadedPattern, List<String> includes, List<String> excludes, boolean rawString) {
+        this(patt, shadedPattern, includes, excludes, [], rawString)
+    }
+
     SimpleRelocator(String patt, String shadedPattern, List<String> includes, List<String> excludes,
-                           boolean rawString) {
+                    List<String> excludeSources, boolean rawString) {
         this.rawString = rawString
 
         if (rawString) {
@@ -87,6 +93,7 @@ class SimpleRelocator implements Relocator {
 
         this.includes = normalizePatterns(includes)
         this.excludes = normalizePatterns(excludes)
+        this.excludeSources = normalizePatterns(excludeSources)
     }
 
     SimpleRelocator include(String pattern) {
@@ -96,6 +103,11 @@ class SimpleRelocator implements Relocator {
 
     SimpleRelocator exclude(String pattern) {
         this.excludes.addAll normalizePatterns([pattern])
+        return this
+    }
+
+    SimpleRelocator excludeSource(String pattern) {
+        this.excludeSources.addAll normalizePatterns([pattern])
         return this
     }
 
@@ -149,6 +161,17 @@ class SimpleRelocator implements Relocator {
         return false
     }
 
+    private boolean isExcludedSource(String srcPath) {
+        if (excludeSources != null && !excludeSources.isEmpty() && srcPath != null) {
+            for (String excludeSource : excludeSources) {
+                if (SelectorUtils.matchPath(excludeSource, srcPath, '/', true)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     @Override
     boolean canRelocatePath(String path) {
         if (rawString) {
@@ -182,6 +205,18 @@ class SimpleRelocator implements Relocator {
         return !rawString &&
                 className.indexOf('/') < 0 &&
                 canRelocatePath(className.replace('.', '/'))
+    }
+
+    boolean canRelocateSourceFile(String srcPath) {
+        if (srcPath != null && srcPath.endsWith(".class")) {
+            // Safeguard against strings containing only ".class"
+            if (srcPath.length() == 6) {
+                return false
+            }
+            srcPath = srcPath.substring(0, srcPath.length() - 6)
+        }
+
+        return !isExcludedSource(srcPath)
     }
 
     @Override
@@ -241,6 +276,11 @@ class SimpleRelocator implements Relocator {
     @Input
     Set<String> getExcludes() {
         return excludes
+    }
+
+    @Input
+    Set<String> getExcludeSources() {
+        return excludeSources
     }
 
     @Input

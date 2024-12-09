@@ -40,6 +40,7 @@ class RelocatorRemapper extends Remapper {
 
     List<Relocator> relocators
     ShadowStats stats
+    String currentFilePath
 
     RelocatorRemapper(List<Relocator> relocators, ShadowStats stats) {
         this.relocators = relocators
@@ -67,6 +68,7 @@ class RelocatorRemapper extends Remapper {
             }
 
             for (Relocator r : relocators) {
+                if (!r.canRelocateSourceFile(currentFilePath)) continue
                 if (r.canRelocateClass(name)) {
                     RelocateClassContext classContext = RelocateClassContext.builder().className(name).stats(stats).build()
                     value = prefix + r.relocateClass(classContext) + suffix
