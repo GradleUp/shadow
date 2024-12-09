@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException
 import org.gradle.internal.UncheckedException
 
 object HashUtil {
-  @JvmStatic
   fun createHash(file: File, algorithm: String): HashValue {
     try {
       return createHash(FileInputStream(file), algorithm)
