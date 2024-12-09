@@ -99,13 +99,9 @@ public open class SimpleRelocator @JvmOverloads constructor(
     if (rawString) return Pattern.compile(pathPattern).matcher(path).find()
     // If string is too short - no need to perform expensive string operations
     if (path.length < pathPattern.length) return false
-    var adjustedPath = if (path.endsWith(".class")) {
-      // Safeguard against strings containing only ".class"
-      if (path.length == 6) return false
-      path.dropLast(6)
-    } else {
-      path
-    }
+    var adjustedPath = path.removeSuffix(".class")
+    // Safeguard against strings containing only ".class"
+    if (adjustedPath.isEmpty()) return false
     // Allow for annoying option of an extra / on the front of a path. See MSHADE-119;
     // comes from getClass().getResource("/a/b/c.properties").
     adjustedPath = adjustedPath.removePrefix("/")
@@ -200,14 +196,11 @@ public open class SimpleRelocator @JvmOverloads constructor(
     ): String {
       // Usually shading makes package names a bit longer, so make buffer 10% bigger than original source
       val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
-      var isFirstSnippet = true
       // Make sure that search pattern starts at word boundary and that we look for literal ".", not regex jokers
       val snippets = sourceContent.split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
-        .dropLastWhile { it.isEmpty() }.toTypedArray()
-      var i = 0
-      val snippetsLength = snippets.size
-      while (i < snippetsLength) {
-        val snippet = snippets[i]
+        .filter(CharSequence::isNotEmpty)
+      snippets.forEachIndexed { i, snippet ->
+        val isFirstSnippet = i == 0
         val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
         var doExclude = false
         for (excludedPattern in excludedPatterns) {
@@ -218,7 +211,6 @@ public open class SimpleRelocator @JvmOverloads constructor(
         }
         if (isFirstSnippet) {
           shadedSourceContent.append(snippet)
-          isFirstSnippet = false
         } else {
           val previousSnippetOneLine = previousSnippet.replace("\\s+".toRegex(), " ")
           val afterDotSlashSpace = RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
@@ -228,7 +220,6 @@ public open class SimpleRelocator @JvmOverloads constructor(
             .append(if (shouldExclude) patternFrom else patternTo)
             .append(snippet)
         }
-        i++
       }
       return shadedSourceContent.toString()
     }
