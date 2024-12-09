@@ -247,7 +247,6 @@ class SimpleRelocatorTest {
   @Test
   fun testCanRelocateIncludedSourceFile() {
     val relocator = SimpleRelocator(
-      "org.foo",
       includes = listOf("org/apache/iceberg/spark/parquet/**", "org/apache/spark/sql/execution/datasources/parquet/**"),
     )
     assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isTrue()
@@ -259,7 +258,6 @@ class SimpleRelocatorTest {
   @Test
   fun testCanRelocateIncludedSourceFileWithRegex() {
     val relocator = SimpleRelocator(
-      "org.foo",
       includes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
     )
     assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isTrue()
