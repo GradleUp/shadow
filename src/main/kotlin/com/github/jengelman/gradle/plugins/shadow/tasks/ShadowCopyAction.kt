@@ -390,7 +390,7 @@ public open class ShadowCopyAction internal constructor(
   ) : RelativePath(
     !entry.isDirectory,
     // `dir/` will be split into ["dir", ""], we have to trim empty segments here.
-    *entry.name.split('/').filter(CharSequence::isNotEmpty).toTypedArray(),
+    *entry.name.split('/').dropLastWhile(CharSequence::isEmpty).toTypedArray(),
   ) {
     public open val isClassFile: Boolean get() = lastName.endsWith(".class")
 
