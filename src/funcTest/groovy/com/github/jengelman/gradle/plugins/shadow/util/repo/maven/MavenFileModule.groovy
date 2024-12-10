@@ -1,15 +1,15 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-class MavenFileModule extends AbstractMavenModule {
-    private boolean uniqueSnapshots = true
+import org.jetbrains.annotations.NotNull
 
+class MavenFileModule extends AbstractMavenModule {
     MavenFileModule(File moduleDir, String groupId, String artifactId, String version) {
         super(moduleDir, groupId, artifactId, version)
     }
 
     @Override
-    boolean getUniqueSnapshots() {
-        return uniqueSnapshots
+    boolean isUniqueSnapshots() {
+        return true
     }
 
     @Override
@@ -32,7 +32,7 @@ class MavenFileModule extends AbstractMavenModule {
     }
 
     @Override
-    protected onPublish(File file) {
+    protected void onPublish(@NotNull File file) {
         sha1File(file)
         md5File(file)
     }
