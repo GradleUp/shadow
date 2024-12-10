@@ -30,7 +30,3 @@ gitPublish {
     )
   }
 }
-
-node {
-  yarnVersion = "1.5.1"
-}
