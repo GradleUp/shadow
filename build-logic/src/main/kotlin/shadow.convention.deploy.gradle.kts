@@ -15,6 +15,7 @@ val yarnBuild = tasks.named("yarn_build") {
 gitPublish {
   repoUri = "https://github.com/GradleUp/shadow.git"
   branch = "gh-pages"
+  username = providers.environmentVariable("GITHUB_USER")
   password = providers.environmentVariable("GITHUB_TOKEN")
   contents {
     from(yarnBuild)

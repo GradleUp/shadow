@@ -29,4 +29,5 @@ jobs:
           node-version: '16'
       - run: ./gradlew gitPublishPush --no-configuration-cache
         env:
+          GITHUB_USER: ${{ github.repository_owner }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
