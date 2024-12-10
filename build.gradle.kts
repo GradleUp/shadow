@@ -147,6 +147,7 @@ tasks.clean {
   val dirs = includedBuilds.map { it.projectDir } + projectDir
   delete.addAll(dirs.map { it.resolve(".gradle") })
   delete.addAll(dirs.map { it.resolve(".kotlin") })
+  delete.add("node_modules")
 }
 
 tasks.register("releaseAll") {
