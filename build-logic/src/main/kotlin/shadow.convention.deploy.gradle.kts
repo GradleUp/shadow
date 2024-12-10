@@ -1,15 +1,8 @@
-import gradle.kotlin.dsl.accessors._a257bd6ce496772590aa10dcded4cc98.dokkaHtml
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
   id("org.ajoberstar.git-publish")
   id("com.github.node-gradle.node")
-}
-
-val yarnBuild = tasks.named("yarn_build") {
-  dependsOn(tasks.yarn)
-  inputs.files(fileTree("src/docs"))
-  outputs.dir(file("build/site"))
 }
 
 gitPublish {
@@ -19,7 +12,7 @@ gitPublish {
   password = providers.environmentVariable("GITHUB_TOKEN")
   contents {
     from(yarnBuild)
-    from(tasks.dokkaHtml) {
+    from(tasks.named("dokkaHtml")) {
       into("api")
     }
     filter<ReplaceTokens>(
@@ -29,4 +22,10 @@ gitPublish {
       ),
     )
   }
+}
+
+val yarnBuild = tasks.named("yarn_build") {
+  dependsOn(tasks.yarn)
+  inputs.files(fileTree("src/docs"))
+  outputs.dir(file("build/site"))
 }
