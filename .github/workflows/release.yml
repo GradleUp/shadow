@@ -26,8 +26,8 @@ jobs:
           node-version: '16'
       - name: Set up Git
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
       # Disable CC due to https://github.com/gradle/gradle/issues/22779
       - run: ./gradlew releaseAll --no-configuration-cache
         env:

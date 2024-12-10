@@ -8,22 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest ]
-        # Always test on the latest version and some LTS.
-        java: [ 17, 21, 23 ]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: ${{ matrix.java }}
-      - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew build
-
   deply-wbsites:
     runs-on: ubuntu-latest
     steps:
@@ -37,8 +21,8 @@ jobs:
           cache-read-only: true
       - name: Set up Git
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
       - uses: actions/setup-node@v4
         with:
           # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
@@ -46,22 +30,3 @@ jobs:
       - run: ./gradlew gitPublishPush --no-configuration-cache
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-snapshot:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.repository == 'GradleUp/shadow' && github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: true
-      # Disable CC due to https://github.com/gradle/gradle/issues/22779
-      - run: ./gradlew publish --no-configuration-cache
-        env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
