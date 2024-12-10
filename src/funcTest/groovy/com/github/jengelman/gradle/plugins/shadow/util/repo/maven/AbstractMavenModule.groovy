@@ -1,25 +1,32 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
 import com.github.jengelman.gradle.plugins.shadow.util.repo.AbstractModule
-import groovy.xml.MarkupBuilder
-import groovy.xml.XmlParser
+import org.apache.maven.artifact.repository.metadata.Metadata
+import org.apache.maven.artifact.repository.metadata.Snapshot
+import org.apache.maven.artifact.repository.metadata.Versioning
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer
+import org.apache.maven.model.Dependency
+import org.apache.maven.model.Model
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer
 
 import java.text.SimpleDateFormat
 
 abstract class AbstractMavenModule extends AbstractModule implements MavenModule {
     protected static final String MAVEN_METADATA_FILE = "maven-metadata.xml"
-    final File moduleDir
-    final String groupId
-    final String artifactId
-    final String version
-    String parentPomSection
-    String type = 'jar'
-    String packaging
-    int publishCount = 1
-    private final List dependencies = []
-    private final List artifacts = []
-    final updateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
-    final timestampFormat = new SimpleDateFormat("yyyyMMdd.HHmmss")
+
+    protected final File moduleDir
+    protected final String groupId
+    protected final String artifactId
+    protected final String version
+    protected final def updateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
+    protected final def timestampFormat = new SimpleDateFormat("yyyyMMdd.HHmmss")
+    protected final List<Map<String, String>> dependencies = []
+    protected final List<Map<String, String>> artifacts = []
+
+    protected String type = 'jar'
+    protected String packaging
+    protected int publishCount = 1
 
     AbstractMavenModule(File moduleDir, String groupId, String artifactId, String version) {
         this.moduleDir = moduleDir
@@ -28,7 +35,9 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         this.version = version
     }
 
-    abstract boolean getUniqueSnapshots()
+    protected abstract boolean isUniqueSnapshots()
+
+    protected abstract boolean isPublishesMetaDataFile()
 
     String getPublishArtifactVersion() {
         if (uniqueSnapshots && version.endsWith("-SNAPSHOT")) {
@@ -40,9 +49,9 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     private String getUniqueSnapshotVersion() {
         assert uniqueSnapshots && version.endsWith('-SNAPSHOT')
         if (metaDataFile.isFile()) {
-            def metaData = new XmlParser().parse(metaDataFile)
-            def timestamp = metaData.versioning.snapshot.timestamp[0].text().trim()
-            def build = metaData.versioning.snapshot.buildNumber[0].text().trim()
+            Metadata metaData = new MetadataXpp3Reader().read(metaDataFile.newReader())
+            String timestamp = metaData.versioning.snapshot.timestamp
+            String build = metaData.versioning.snapshot.buildNumber
             return "${timestamp}-${build}"
         }
         return "${timestampFormat.format(publishTimestamp)}-${publishCount}"
@@ -61,14 +70,6 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         return this
     }
 
-    String getPackaging() {
-        return packaging
-    }
-
-    List getDependencies() {
-        return dependencies
-    }
-
     @Override
     File getPomFile() {
         return moduleDir.resolve("$artifactId-${publishArtifactVersion}.pom")
@@ -76,11 +77,11 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
     @Override
     File getMetaDataFile() {
-        moduleDir.resolve(MAVEN_METADATA_FILE)
+        return moduleDir.resolve(MAVEN_METADATA_FILE)
     }
 
     File getRootMetaDataFile() {
-        moduleDir.parentFile.resolve(MAVEN_METADATA_FILE)
+        return moduleDir.parentFile.resolve(MAVEN_METADATA_FILE)
     }
 
     File artifactFile(Map<String, ?> options) {
@@ -107,10 +108,9 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     MavenModule publishPom() {
         moduleDir.createDir()
         def rootMavenMetaData = getRootMetaDataFile()
-
         updateRootMavenMetaData(rootMavenMetaData)
 
-        if (publishesMetaDataFile()) {
+        if (publishesMetaDataFile) {
             publishWithWriter(metaDataFile) { Writer writer ->
                 writer << getMetaDataFileContent()
             }
@@ -118,78 +118,97 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
         publishWithWriter(pomFile) { Writer writer ->
             def pomPackaging = packaging ?: type
-            writer << """
-            <project xmlns="http://maven.apache.org/POM/4.0.0">
-              <!-- ${getArtifactContent()} -->
-              <modelVersion>4.0.0</modelVersion>
-              <groupId>$groupId</groupId>
-              <artifactId>$artifactId</artifactId>
-              <packaging>$pomPackaging</packaging>
-              <version>$version</version>
-              <description>Published on $publishTimestamp</description>
-            """.stripIndent()
+            // Create a new Maven Model
+            Model model = new Model()
+            model.modelVersion = '4.0.0'
+            model.groupId = groupId
+            model.artifactId = artifactId
+            model.version = version
+            model.packaging = pomPackaging
+            model.description = "Published on $publishTimestamp"
 
-            if (parentPomSection) {
-                writer << "\n$parentPomSection\n"
+            dependencies.each { dep ->
+                Dependency dependency = new Dependency()
+                dependency.groupId = dep.groupId
+                dependency.artifactId = dep.artifactId
+                dependency.version = dep.version
+                if (dep.type) {
+                    dependency.type = dep.type
+                }
+                if (dep.classifier) {
+                    dependency.classifier = dep.classifier
+                }
+                model.addDependency(dependency)
             }
 
-            if (!dependencies.empty) {
-                writer << "<dependencies>"
-            }
-
-            dependencies.each { dependency ->
-                def typeAttribute = dependency['type'] == null ? "" : "<type>$dependency.type</type>"
-                writer << """
-                <dependency>
-                  <groupId>$dependency.groupId</groupId>
-                  <artifactId>$dependency.artifactId</artifactId>
-                  <version>$dependency.version</version>
-                  $typeAttribute
-                </dependency>""".stripIndent()
-            }
-
-            if (!dependencies.empty) {
-                writer << "</dependencies>"
-            }
-
-            writer << "\n</project>"
+            // Write the model to the POM file
+            MavenXpp3Writer pomWriter = new MavenXpp3Writer()
+            pomWriter.write(writer, model)
         }
         return this
     }
 
     private void updateRootMavenMetaData(File rootMavenMetaData) {
-        def allVersions = rootMavenMetaData.exists() ? new XmlParser().parseText(rootMavenMetaData.text).versioning.versions.version*.value().flatten() : []
+        List<String> allVersions = []
+        if (rootMavenMetaData.exists()) {
+            def metaData = new MetadataXpp3Reader().read(rootMavenMetaData.newReader())
+            allVersions = metaData.versioning.versions
+        }
         allVersions << version
         publishWithWriter(rootMavenMetaData) { Writer writer ->
-            def builder = new MarkupBuilder(writer)
-            builder.metadata {
-                groupId(groupId)
-                artifactId(artifactId)
-                version(allVersions.max())
-                versioning {
-                    if (uniqueSnapshots && version.endsWith("-SNAPSHOT")) {
-                        snapshot {
-                            timestamp(timestampFormat.format(publishTimestamp))
-                            buildNumber(publishCount)
-                            lastUpdated(updateFormat.format(publishTimestamp))
-                        }
-                    } else {
-                        versions {
-                            allVersions.each { currVersion ->
-                                version(currVersion)
-                            }
-                        }
-                    }
-                }
+            // Create Maven Metadata
+            Metadata metadata = new Metadata()
+            metadata.groupId = groupId
+            metadata.artifactId = artifactId
+
+            Versioning versioning = new Versioning()
+            versioning.versions = allVersions.unique().sort()
+            versioning.latest = versioning.versions.last()
+            versioning.release = versioning.versions.last()
+            versioning.lastUpdated = updateFormat.format(publishTimestamp)
+
+            if (uniqueSnapshots && version.endsWith("-SNAPSHOT")) {
+                Snapshot snapshot = new Snapshot()
+                snapshot.timestamp = timestampFormat.format(publishTimestamp)
+                snapshot.buildNumber = publishCount
+                versioning.snapshot = snapshot
             }
+
+            metadata.versioning = versioning
+
+            // Write the metadata to the file
+            MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer()
+            metadataWriter.write(writer, metadata)
         }
     }
 
-    abstract String getMetaDataFileContent()
+    String getMetaDataFileContent() {
+        // Similar to updateRootMavenMetaData but for the artifact's own metadata file
+        StringWriter writer = new StringWriter()
+        // Create Maven Metadata
+        Metadata metadata = new Metadata()
+        metadata.groupId = groupId
+        metadata.artifactId = artifactId
+        metadata.version = version
+
+        Versioning versioning = new Versioning()
+        versioning.lastUpdated = updateFormat.format(publishTimestamp)
+        if (uniqueSnapshots && version.endsWith("-SNAPSHOT")) {
+            Snapshot snapshot = new Snapshot()
+            snapshot.timestamp = timestampFormat.format(publishTimestamp)
+            snapshot.buildNumber = publishCount
+            versioning.snapshot = snapshot
+        }
+        metadata.versioning = versioning
+
+        // Write the metadata to the string
+        MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer()
+        metadataWriter.write(writer, metadata)
+        return writer.toString()
+    }
 
     @Override
     MavenModule publish() {
-
         publishPom()
         artifacts.each { artifact ->
             publishArtifact(artifact as Map<String, ?>)
@@ -213,6 +232,4 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         // Some content to include in each artifact, so that its size and content varies on each publish
         return (0..publishCount).join("-")
     }
-
-    protected abstract boolean publishesMetaDataFile()
 }
