@@ -8,10 +8,12 @@ plugins {
 gitPublish {
   repoUri = "https://github.com/GradleUp/shadow.git"
   branch = "gh-pages"
+  username = providers.environmentVariable("GITHUB_USER")
+  password = providers.environmentVariable("GITHUB_TOKEN")
   contents {
-    from("build/site")
-    into("api") {
-      from(tasks.named("dokkaHtml"))
+    from(yarnBuild)
+    from(tasks.named("dokkaHtml")) {
+      into("api")
     }
     filter<ReplaceTokens>(
       "tokens" to mapOf(
@@ -22,16 +24,8 @@ gitPublish {
   }
 }
 
-node {
-  yarnVersion = "1.5.1"
-}
-
 val yarnBuild = tasks.named("yarn_build") {
+  dependsOn(tasks.yarn)
   inputs.files(fileTree("src/docs"))
   outputs.dir(file("build/site"))
-  dependsOn(tasks.yarn)
-}
-
-tasks.gitPublishCopy {
-  dependsOn(yarnBuild, tasks.named("dokkaHtml"))
 }
