@@ -1,3 +1,4 @@
+import gradle.kotlin.dsl.accessors._a257bd6ce496772590aa10dcded4cc98.dokkaHtml
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
@@ -10,8 +11,8 @@ gitPublish {
   branch = "gh-pages"
   contents {
     from("build/site")
-    into("api") {
-      from(tasks.named("dokkaHtml"))
+    from(tasks.dokkaHtml) {
+      into("api")
     }
     filter<ReplaceTokens>(
       "tokens" to mapOf(
