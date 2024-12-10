@@ -3,15 +3,13 @@ package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 import org.jetbrains.annotations.NotNull
 
 class MavenFileModule extends AbstractMavenModule {
-    private boolean uniqueSnapshots = true
-
     MavenFileModule(File moduleDir, String groupId, String artifactId, String version) {
         super(moduleDir, groupId, artifactId, version)
     }
 
     @Override
-    boolean getUniqueSnapshots() {
-        return uniqueSnapshots
+    boolean isUniqueSnapshots() {
+        return true
     }
 
     @Override
@@ -40,7 +38,7 @@ class MavenFileModule extends AbstractMavenModule {
     }
 
     @Override
-    protected boolean publishesMetaDataFile() {
+    protected boolean isPublishesMetaDataFile() {
         uniqueSnapshots && version.endsWith("-SNAPSHOT")
     }
 }
