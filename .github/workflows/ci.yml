@@ -19,10 +19,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
-      - name: Set up Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
       - uses: actions/setup-node@v4
         with:
           # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
