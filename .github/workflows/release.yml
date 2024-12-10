@@ -24,6 +24,10 @@ jobs:
         with:
           # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
           node-version: '16'
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
       # Disable CC due to https://github.com/gradle/gradle/issues/22779
       - run: ./gradlew releaseAll --no-configuration-cache
         env:
