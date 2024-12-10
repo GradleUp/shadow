@@ -5,6 +5,12 @@ plugins {
   id("com.github.node-gradle.node")
 }
 
+val yarnBuild = tasks.named("yarn_build") {
+  dependsOn(tasks.yarn)
+  inputs.files(fileTree("src/docs"))
+  outputs.dir(file("build/site"))
+}
+
 gitPublish {
   repoUri = "https://github.com/GradleUp/shadow.git"
   branch = "gh-pages"
@@ -22,10 +28,4 @@ gitPublish {
       ),
     )
   }
-}
-
-val yarnBuild = tasks.named("yarn_build") {
-  dependsOn(tasks.yarn)
-  inputs.files(fileTree("src/docs"))
-  outputs.dir(file("build/site"))
 }
