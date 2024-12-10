@@ -1,5 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
+import org.apache.maven.artifact.repository.metadata.Metadata
+import org.apache.maven.artifact.repository.metadata.Snapshot
+import org.apache.maven.artifact.repository.metadata.Versioning
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer
 import org.jetbrains.annotations.NotNull
 
 class MavenFileModule extends AbstractMavenModule {
@@ -14,21 +18,21 @@ class MavenFileModule extends AbstractMavenModule {
 
     @Override
     String getMetaDataFileContent() {
-        """
-            <metadata>
-              <!-- ${getArtifactContent()} -->
-              <groupId>$groupId</groupId>
-              <artifactId>$artifactId</artifactId>
-              <version>$version</version>
-              <versioning>
-                <snapshot>
-                  <timestamp>${timestampFormat.format(publishTimestamp)}</timestamp>
-                  <buildNumber>$publishCount</buildNumber>
-                </snapshot>
-                <lastUpdated>${updateFormat.format(publishTimestamp)}</lastUpdated>
-              </versioning>
-            </metadata>
-        """.stripIndent()
+        Metadata metadata = new Metadata()
+        metadata.groupId = groupId
+        metadata.artifactId = artifactId
+        metadata.version = version
+
+        Versioning versioning = new Versioning()
+        versioning.snapshot = new Snapshot()
+        versioning.snapshot.timestamp = timestampFormat.format(publishTimestamp)
+        versioning.snapshot.buildNumber = publishCount
+        versioning.lastUpdated = updateFormat.format(publishTimestamp)
+        metadata.versioning = versioning
+
+        StringWriter writer = new StringWriter()
+        new MetadataXpp3Writer().write(writer, metadata)
+        return writer.toString()
     }
 
     @Override
