@@ -24,7 +24,7 @@ jobs:
         with:
           # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
           node-version: '16'
-      # Uses for gitPublish tasks.
+      # Used for gitPublish tasks.
       - name: Set up Git
         run: |
           git config --global user.name 'github-actions[bot]'
