@@ -24,6 +24,25 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build
 
+  deply-wbsites:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+      - uses: actions/setup-node@v4
+        with:
+          # Due to some limitations of https://github.com/node-gradle/gradle-node-plugin.
+          node-version: '16'
+      - run: ./gradlew gitPublishPush --no-configuration-cache
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
