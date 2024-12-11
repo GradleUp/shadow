@@ -3,25 +3,16 @@ package com.github.jengelman.gradle.plugins.shadow.util.repo
 import com.github.jengelman.gradle.plugins.shadow.util.HashUtil
 import java.io.File
 import java.io.OutputStream
-import java.io.Writer
 import java.math.BigInteger
 
 abstract class AbstractModule {
 
   protected abstract fun onPublish(file: File)
 
-  protected fun publishWithWriter(file: File, action: (Writer) -> Unit) {
-    publishCommon(file) { it.writer().use(action) }
-  }
-
-  protected fun publishWithStream(file: File, action: (OutputStream) -> Unit) {
-    publishCommon(file) { it.outputStream().use(action) }
-  }
-
-  private fun publishCommon(file: File, action: (File) -> Unit) {
+  protected fun publish(file: File, action: (OutputStream) -> Unit) {
     val hashBefore = if (file.exists()) getHash(file, "sha1") else null
     val tempFile = file.resolveSibling("${file.name}.tmp")
-    action(tempFile)
+    tempFile.outputStream().use(action)
 
     val hashAfter = getHash(tempFile, "sha1")
     if (hashAfter == hashBefore) {
