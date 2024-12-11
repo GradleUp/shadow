@@ -113,7 +113,8 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
         if (publishesMetaDataFile) {
             publishWithWriter(metaDataFile) { Writer writer ->
-                writer << getMetaDataFileContent()
+                MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer()
+                metadataWriter.write(writer, getMetaData([]))
             }
         }
 
@@ -144,42 +145,22 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         }
         allVersions << version
         publishWithWriter(rootMavenMetaData) { Writer writer ->
-            // Create Maven Metadata
-            Metadata metadata = new Metadata()
-            metadata.groupId = groupId
-            metadata.artifactId = artifactId
-
-            Versioning versioning = new Versioning()
-            versioning.versions = allVersions.unique().sort()
-            versioning.latest = versioning.versions.last()
-            versioning.release = versioning.versions.last()
-            versioning.lastUpdated = updateFormat.format(publishTimestamp)
-
-            if (uniqueSnapshots && version.endsWith("-SNAPSHOT")) {
-                Snapshot snapshot = new Snapshot()
-                snapshot.timestamp = timestampFormat.format(publishTimestamp)
-                snapshot.buildNumber = publishCount
-                versioning.snapshot = snapshot
-            }
-
-            metadata.versioning = versioning
-
-            // Write the metadata to the file
             MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer()
-            metadataWriter.write(writer, metadata)
+            metadataWriter.write(writer, getMetaData(allVersions))
         }
     }
 
-    String getMetaDataFileContent() {
-        // Similar to updateRootMavenMetaData but for the artifact's own metadata file
-        StringWriter writer = new StringWriter()
-        // Create Maven Metadata
+    /**
+     * Similar to updateRootMavenMetaData but for the artifact's own metadata file
+     */
+    Metadata getMetaData(List<String> versions) {
         Metadata metadata = new Metadata()
         metadata.groupId = groupId
         metadata.artifactId = artifactId
         metadata.version = version
 
         Versioning versioning = new Versioning()
+        versioning.versions = versions
         versioning.lastUpdated = updateFormat.format(publishTimestamp)
         if (uniqueSnapshots && version.endsWith("-SNAPSHOT")) {
             Snapshot snapshot = new Snapshot()
@@ -188,11 +169,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
             versioning.snapshot = snapshot
         }
         metadata.versioning = versioning
-
-        // Write the metadata to the string
-        MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer()
-        metadataWriter.write(writer, metadata)
-        return writer.toString()
+        return metadata
     }
 
     @Override
