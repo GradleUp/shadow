@@ -14,7 +14,7 @@ interface MavenModule {
    */
   fun publishPom(): MavenModule
 
-  fun dependsOn(group: String, artifactId: String, version: String): MavenModule
+  fun dependsOn(groupId: String, artifactId: String, version: String): MavenModule
 
   val pomFile: File
 
