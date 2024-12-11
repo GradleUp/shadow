@@ -56,8 +56,8 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     }
 
     @Override
-    MavenModule dependsOn(String group, String artifactId, String version) {
-        this.dependencies << [groupId: group, artifactId: artifactId, version: version, type: type]
+    MavenModule dependsOn(String groupId, String artifactId, String version) {
+        this.dependencies << [groupId: groupId, artifactId: artifactId, version: version, type: type]
         return this
     }
 
@@ -111,12 +111,12 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         updateRootMavenMetaData(rootMavenMetaData)
 
         if (publishesMetaDataFile()) {
-            publish(metaDataFile) { Writer writer ->
+            publishWithWriter(metaDataFile) { Writer writer ->
                 writer << getMetaDataFileContent()
             }
         }
 
-        publish(pomFile) { Writer writer ->
+        publishWithWriter(pomFile) { Writer writer ->
             def pomPackaging = packaging ?: type
             writer << """
             <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -160,7 +160,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     private void updateRootMavenMetaData(File rootMavenMetaData) {
         def allVersions = rootMavenMetaData.exists() ? new XmlParser().parseText(rootMavenMetaData.text).versioning.versions.version*.value().flatten() : []
         allVersions << version
-        publish(rootMavenMetaData) { Writer writer ->
+        publishWithWriter(rootMavenMetaData) { Writer writer ->
             def builder = new MarkupBuilder(writer)
             builder.metadata {
                 groupId(groupId)
@@ -203,7 +203,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         if (type == 'pom') {
             return artifactFile
         }
-        publish(artifactFile) { Writer writer ->
+        publishWithWriter(artifactFile) { Writer writer ->
             writer << "${artifactFile.name} : $artifactContent"
         }
         return artifactFile
