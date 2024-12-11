@@ -21,7 +21,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
     protected final String version
     protected final def updateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
     protected final def timestampFormat = new SimpleDateFormat("yyyyMMdd.HHmmss")
-    protected final List<Map<String, String>> dependencies = []
+    protected final List<Dependency> dependencies = []
     protected final List<Map<String, String>> artifacts = []
 
     protected String type = 'jar'
@@ -66,7 +66,11 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
     @Override
     MavenModule dependsOn(String groupId, String artifactId, String version) {
-        this.dependencies << [groupId: groupId, artifactId: artifactId, version: version, type: type]
+        def dep = new Dependency()
+        dep.groupId = groupId
+        dep.artifactId = artifactId
+        dep.version = version
+        dependencies.add(dep)
         return this
     }
 
@@ -126,20 +130,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
             model.version = version
             model.packaging = pomPackaging
             model.description = "Published on $publishTimestamp"
-
-            dependencies.each { dep ->
-                Dependency dependency = new Dependency()
-                dependency.groupId = dep.groupId
-                dependency.artifactId = dep.artifactId
-                dependency.version = dep.version
-                if (dep.type) {
-                    dependency.type = dep.type
-                }
-                if (dep.classifier) {
-                    dependency.classifier = dep.classifier
-                }
-                model.addDependency(dependency)
-            }
+            model.dependencies = dependencies
 
             // Write the model to the POM file
             MavenXpp3Writer pomWriter = new MavenXpp3Writer()
