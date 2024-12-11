@@ -6,7 +6,7 @@ import java.net.URI
 /**
  * A fixture for dealing with file Maven repositories.
  */
-abstract class MavenFileRepository(val rootDir: File) : MavenRepository {
+abstract class MavenFileRepository(private val rootDir: File) : MavenRepository {
 
   override val uri: URI = rootDir.toURI()
 
