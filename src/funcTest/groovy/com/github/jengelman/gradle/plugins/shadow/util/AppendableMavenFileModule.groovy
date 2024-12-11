@@ -37,11 +37,11 @@ class AppendableMavenFileModule extends MavenFileModule {
         }
         String classifier = (String) artifact['classifier'] ?: ''
         if (files.containsKey(classifier)) {
-            publishWithStream(artifactFile) { OutputStream os ->
+            publish(artifactFile) { OutputStream os ->
                 IOUtils.copy(files[classifier].newInputStream(), os)
             }
         } else {
-            publishWithStream(artifactFile) { OutputStream os ->
+            publish(artifactFile) { OutputStream os ->
                 writeJar(os, contents[classifier])
             }
         }

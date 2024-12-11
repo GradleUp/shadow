@@ -112,13 +112,13 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         updateRootMavenMetaData(rootMavenMetaData)
 
         if (publishesMetaDataFile) {
-            publishWithWriter(metaDataFile) { Writer writer ->
+            publish(metaDataFile) { OutputStream outputStream ->
                 MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer()
-                metadataWriter.write(writer, getMetaData([]))
+                metadataWriter.write(outputStream, getMetaData([]))
             }
         }
 
-        publishWithWriter(pomFile) { Writer writer ->
+        publish(pomFile) { OutputStream outputStream ->
             def pomPackaging = packaging ?: type
             // Create a new Maven Model
             Model model = new Model()
@@ -132,7 +132,7 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
 
             // Write the model to the POM file
             MavenXpp3Writer pomWriter = new MavenXpp3Writer()
-            pomWriter.write(writer, model)
+            pomWriter.write(outputStream, model)
         }
         return this
     }
@@ -144,9 +144,9 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
             allVersions = metaData.versioning.versions
         }
         allVersions << version
-        publishWithWriter(rootMavenMetaData) { Writer writer ->
+        publish(rootMavenMetaData) { OutputStream outputStream ->
             MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer()
-            metadataWriter.write(writer, getMetaData(allVersions))
+            metadataWriter.write(outputStream, getMetaData(allVersions))
         }
     }
 
@@ -187,8 +187,8 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         if (type == 'pom') {
             return artifactFile
         }
-        publishWithWriter(artifactFile) { Writer writer ->
-            writer << "${artifactFile.name} : $artifactContent"
+        publish(artifactFile) { OutputStream outputStream ->
+            outputStream.write("${artifactFile.name} : $artifactContent".bytes)
         }
         return artifactFile
     }
