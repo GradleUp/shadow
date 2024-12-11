@@ -57,11 +57,8 @@ abstract class AbstractMavenModule extends AbstractModule implements MavenModule
         return "${timestampFormat.format(publishTimestamp)}-${publishCount}"
     }
 
-    MavenModule dependsOn(String... dependencyArtifactIds) {
-        for (String id : dependencyArtifactIds) {
-            dependsOn(groupId, id, '1.0')
-        }
-        return this
+    MavenModule dependsOn(String artifactId) {
+        return dependsOn(groupId, artifactId, '1.0')
     }
 
     @Override
