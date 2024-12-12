@@ -10,7 +10,7 @@ plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.2"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.0.4"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.10.0"
 
-androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha02"
+androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha03"
 assertk-lint = "com.jzbrooks:assertk-lint:1.3.0"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.5.0"

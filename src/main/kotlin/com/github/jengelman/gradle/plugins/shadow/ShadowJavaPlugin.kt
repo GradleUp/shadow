@@ -82,7 +82,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       @Suppress("EagerGradleConfiguration")
       shadow.manifest.inheritFrom(jarTask.get().manifest)
       val attrProvider = jarTask.map { it.manifest.attributes["Class-Path"]?.toString().orEmpty() }
-      val files = project.objects.fileCollection().from(shadowConfiguration)
+      val files = project.files(shadowConfiguration)
       shadow.doFirst {
         if (!files.isEmpty) {
           val attrs = listOf(attrProvider.getOrElse("")) + files.map { it.name }
