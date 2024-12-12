@@ -15,7 +15,7 @@ import org.objectweb.asm.commons.Remapper
  * @author John Engelman
  */
 public open class RelocatorRemapper(
-  private val relocators: List<Relocator>,
+  private val relocators: Set<Relocator>,
   private val stats: ShadowStats,
 ) : Remapper() {
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")

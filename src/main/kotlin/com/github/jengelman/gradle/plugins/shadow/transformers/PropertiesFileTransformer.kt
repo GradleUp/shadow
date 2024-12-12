@@ -14,9 +14,9 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 
@@ -107,7 +107,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
 
   @get:Input
-  public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
+  public open val paths: SetProperty<String> = objectFactory.setProperty(String::class.java)
 
   @Suppress("UNCHECKED_CAST")
   @get:Input

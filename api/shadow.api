@@ -83,7 +83,7 @@ public class com/github/jengelman/gradle/plugins/shadow/ShadowStats {
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper : org/objectweb/asm/commons/Remapper {
-	public fun <init> (Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public fun <init> (Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
 	public fun hasRelocators ()Z
 	public fun map (Ljava/lang/String;)Ljava/lang/String;
 	public fun mapPath (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;)Ljava/lang/String;
@@ -245,7 +245,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Co
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
-	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZZ)V
+	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZZ)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 
@@ -302,7 +302,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public fun getConfigurations ()Lorg/gradle/api/provider/ListProperty;
+	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getEnableRelocation ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
@@ -311,12 +311,12 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
 	public fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
-	public fun getRelocators ()Lorg/gradle/api/provider/ListProperty;
+	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
 	protected fun getRootPatternSet ()Lorg/gradle/api/tasks/util/PatternSet;
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public fun getTransformers ()Lorg/gradle/api/provider/ListProperty;
+	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
 	public fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
@@ -465,7 +465,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer;
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public fun getAttributes ()Lorg/gradle/api/provider/ListProperty;
+	public fun getAttributes ()Lorg/gradle/api/provider/SetProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
@@ -501,7 +501,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesF
 	public fun getMergeSeparator ()Lorg/gradle/api/provider/Property;
 	public fun getMergeStrategy ()Lorg/gradle/api/provider/Property;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public fun getPaths ()Lorg/gradle/api/provider/ListProperty;
+	public fun getPaths ()Lorg/gradle/api/provider/SetProperty;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -574,21 +574,21 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;)V
-	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;)V
-	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;)V
+	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/io/InputStream;
-	public final fun component3 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/Set;
 	public final fun component4 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
-	public final fun copy (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
-	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;Ljava/lang/String;Ljava/io/InputStream;Ljava/util/List;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
+	public final fun copy (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
 	public fun equals (Ljava/lang/Object;)Z
 	public static final fun getEntryTimestamp (ZJ)J
 	public final fun getInputStream ()Ljava/io/InputStream;
 	public final fun getPath ()Ljava/lang/String;
-	public final fun getRelocators ()Ljava/util/List;
+	public final fun getRelocators ()Ljava/util/Set;
 	public final fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -599,7 +599,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 	public final fun build ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
 	public final fun inputStream (Ljava/io/InputStream;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 	public final fun path (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
-	public final fun relocators (Ljava/util/List;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
+	public final fun relocators (Ljava/util/Set;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 	public final fun stats (Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 }
 

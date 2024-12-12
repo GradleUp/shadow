@@ -31,8 +31,8 @@ import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.DefaultCopySpec
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
@@ -113,14 +113,14 @@ public abstract class ShadowJar :
     }
 
   @get:Nested
-  public open val transformers: ListProperty<Transformer> = objectFactory.listProperty(Transformer::class.java)
+  public open val transformers: SetProperty<Transformer> = objectFactory.setProperty(Transformer::class.java)
 
   @get:Nested
-  public open val relocators: ListProperty<Relocator> = objectFactory.listProperty(Relocator::class.java)
+  public open val relocators: SetProperty<Relocator> = objectFactory.setProperty(Relocator::class.java)
 
   @get:Classpath
   @get:Optional
-  public open val configurations: ListProperty<Configuration> = objectFactory.listProperty(Configuration::class.java)
+  public open val configurations: SetProperty<Configuration> = objectFactory.setProperty(Configuration::class.java)
 
   @get:Internal
   public open val dependencyFilter: Property<DependencyFilter> =
@@ -294,8 +294,8 @@ public abstract class ShadowJar :
       if (!enableRelocation.get()) return emptyList()
 
       val prefix = relocationPrefix.get()
-      // Must cast configurations to List<FileCollection> to fix type mismatch in runtime.
-      return (configurations.get() as List<FileCollection>).flatMap { configuration ->
+      // Must cast configurations to Set<FileCollection> to fix type mismatch in runtime.
+      return (configurations.get() as Set<FileCollection>).flatMap { configuration ->
         configuration.files.flatMap { file ->
           JarFile(file).use { jarFile ->
             jarFile.entries().toList()
