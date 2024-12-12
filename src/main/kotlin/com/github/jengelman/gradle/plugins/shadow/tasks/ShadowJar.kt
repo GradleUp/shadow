@@ -113,14 +113,14 @@ public abstract class ShadowJar :
     }
 
   @get:Nested
-  public open val transformers: ListProperty<Transformer> = objectFactory.listProperty(Transformer::class.java)
+  public open val transformers: ListProperty<Transformer> = objectFactory.property()
 
   @get:Nested
-  public open val relocators: ListProperty<Relocator> = objectFactory.listProperty(Relocator::class.java)
+  public open val relocators: ListProperty<Relocator> = objectFactory.property()
 
   @get:Classpath
   @get:Optional
-  public open val configurations: ListProperty<Configuration> = objectFactory.listProperty(Configuration::class.java)
+  public open val configurations: ListProperty<Configuration> = objectFactory.property()
 
   @get:Internal
   public open val dependencyFilter: Property<DependencyFilter> =

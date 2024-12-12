@@ -107,12 +107,10 @@ public open class PropertiesFileTransformer @Inject constructor(
   internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
 
   @get:Input
-  public open val paths: ListProperty<String> = objectFactory.listProperty(String::class.java)
+  public open val paths: ListProperty<String> = objectFactory.property()
 
-  @Suppress("UNCHECKED_CAST")
   @get:Input
-  public open val mappings: MapProperty<String, Map<String, String>> =
-    objectFactory.mapProperty(String::class.java, Map::class.java) as MapProperty<String, Map<String, String>>
+  public open val mappings: MapProperty<String, Map<String, String>> = objectFactory.property()
 
   @get:Input
   public open val mergeStrategy: Property<MergeStrategy> = objectFactory.property(MergeStrategy.First)
@@ -123,10 +121,8 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
-  @Suppress("UNCHECKED_CAST")
   @get:Internal
-  public open val keyTransformer: Property<Closure<String>> =
-    objectFactory.property(IDENTITY) as Property<Closure<String>>
+  public open val keyTransformer: Property<Closure<String>> = objectFactory.property(IDENTITY)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
