@@ -294,8 +294,8 @@ public abstract class ShadowJar :
       if (!enableRelocation.get()) return emptyList()
 
       val prefix = relocationPrefix.get()
-      // Must cast configurations to List<FileCollection> to fix type mismatch in runtime.
-      return (configurations.get() as List<FileCollection>).flatMap { configuration ->
+      // Must cast configurations to Set<FileCollection> to fix type mismatch in runtime.
+      return (configurations.get() as Set<FileCollection>).flatMap { configuration ->
         configuration.files.flatMap { file ->
           JarFile(file).use { jarFile ->
             jarFile.entries().toList()
