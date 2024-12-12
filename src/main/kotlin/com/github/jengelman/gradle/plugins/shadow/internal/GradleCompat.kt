@@ -45,6 +45,7 @@ internal inline fun <reified V : Any, reified P : Provider<V>> ObjectFactory.pro
  */
 internal fun ConfigurableFileCollection.conventionCompat(vararg paths: Any): ConfigurableFileCollection {
   return if (GradleVersion.current() >= GradleVersion.version("8.8")) {
+    @Suppress("UnstableApiUsage")
     convention(paths)
   } else {
     setFrom(paths)
