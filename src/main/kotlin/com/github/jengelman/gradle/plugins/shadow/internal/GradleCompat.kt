@@ -24,18 +24,39 @@ internal inline val Project.runtimeConfiguration: Configuration
 internal inline fun <reified V : Any, reified P : Provider<V>> ObjectFactory.property(
   defaultValue: Any? = null,
 ): P {
+  val valueClass = V::class.java
   return when (P::class.java) {
-    ListProperty::class.java -> listProperty(V::class.java).apply {
-      if (defaultValue != null) convention(defaultValue as List<V>)
+    ListProperty::class.java -> listProperty(valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<Iterable<V>>)
+      } else {
+        convention(defaultValue as Iterable<V>)
+      }
     }
-    SetProperty::class.java -> setProperty(V::class.java).apply {
-      if (defaultValue != null) convention(defaultValue as Set<V>)
+    SetProperty::class.java -> setProperty(valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<Iterable<V>>)
+      } else {
+        convention(defaultValue as Iterable<V>)
+      }
     }
-    MapProperty::class.java -> mapProperty(String::class.java, V::class.java).apply {
-      if (defaultValue != null) convention(defaultValue as Map<String, V>)
+    MapProperty::class.java -> mapProperty(String::class.java, valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<Map<String, V>>)
+      } else {
+        convention(defaultValue as Map<String, V>)
+      }
     }
-    else -> property(V::class.java).apply {
-      if (defaultValue != null) convention(defaultValue as V)
+    else -> property(valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<V>)
+      } else {
+        convention(defaultValue as V)
+      }
     }
   } as P
 }
