@@ -87,6 +87,8 @@ dependencies {
   }
   funcTestImplementation(sourceSets.main.get().output)
   funcTestImplementation(intiTest.output)
+  funcTestImplementation(libs.apache.maven.modelBuilder)
+  funcTestImplementation(libs.apache.maven.repositoryMetadata)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)

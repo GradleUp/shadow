@@ -1,36 +1,36 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
+import org.apache.maven.artifact.repository.metadata.Metadata
+import org.apache.maven.artifact.repository.metadata.Snapshot
+import org.apache.maven.artifact.repository.metadata.Versioning
 import org.jetbrains.annotations.NotNull
 
 class MavenFileModule extends AbstractMavenModule {
-    private boolean uniqueSnapshots = true
-
     MavenFileModule(File moduleDir, String groupId, String artifactId, String version) {
         super(moduleDir, groupId, artifactId, version)
     }
 
     @Override
-    boolean getUniqueSnapshots() {
-        return uniqueSnapshots
+    boolean isUniqueSnapshots() {
+        return true
     }
 
     @Override
-    String getMetaDataFileContent() {
-        """
-            <metadata>
-              <!-- ${getArtifactContent()} -->
-              <groupId>$groupId</groupId>
-              <artifactId>$artifactId</artifactId>
-              <version>$version</version>
-              <versioning>
-                <snapshot>
-                  <timestamp>${timestampFormat.format(publishTimestamp)}</timestamp>
-                  <buildNumber>$publishCount</buildNumber>
-                </snapshot>
-                <lastUpdated>${updateFormat.format(publishTimestamp)}</lastUpdated>
-              </versioning>
-            </metadata>
-        """.stripIndent()
+    Metadata getMetaData(List<String> versions) {
+        Metadata metadata = new Metadata()
+        metadata.groupId = groupId
+        metadata.artifactId = artifactId
+        metadata.version = version
+
+        Versioning versioning = new Versioning()
+        versioning.versions = versions
+        versioning.snapshot = new Snapshot()
+        versioning.snapshot.timestamp = timestampFormat.format(publishTimestamp)
+        versioning.snapshot.buildNumber = publishCount
+        versioning.lastUpdated = updateFormat.format(publishTimestamp)
+        metadata.versioning = versioning
+
+        return metadata
     }
 
     @Override
@@ -40,7 +40,7 @@ class MavenFileModule extends AbstractMavenModule {
     }
 
     @Override
-    protected boolean publishesMetaDataFile() {
+    protected boolean isPublishesMetaDataFile() {
         uniqueSnapshots && version.endsWith("-SNAPSHOT")
     }
 }
