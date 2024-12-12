@@ -9,7 +9,7 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.slf4j.LoggerFactory
 
@@ -27,7 +27,7 @@ public open class ManifestAppenderTransformer @Inject constructor(
   private var manifestContents = ByteArray(0)
 
   @get:Input
-  public open val attributes: ListProperty<Pair<String, Comparable<*>>> = objectFactory.property()
+  public open val attributes: SetProperty<Pair<String, Comparable<*>>> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)

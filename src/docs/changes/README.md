@@ -7,6 +7,11 @@
 
 - Sync `SimpleRelocator` changes from maven-shade-plugin. ([#1076](https://github.com/GradleUp/shadow/pull/1076))
 
+**Changed**
+
+- **BREAKING CHANGE:** Migrate all `ListProperty` usages to `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
+  Some public `List` parameters are also changed to `Set`.
+
 
 ## [v9.0.0-beta4] (2024-12-06)
 
