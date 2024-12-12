@@ -5,7 +5,10 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.provider.Property
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.util.GradleVersion
 
 /**
@@ -17,10 +20,45 @@ internal inline val Project.runtimeConfiguration: Configuration
       ?: configurations.getByName("runtime")
   }
 
-internal inline fun <reified T : Any> ObjectFactory.property(defaultValue: T? = null): Property<T> {
-  return property(T::class.java).apply {
-    if (defaultValue != null) convention(defaultValue)
-  }
+@Suppress("UNCHECKED_CAST")
+internal inline fun <reified V : Any, reified P : Provider<V>> ObjectFactory.property(
+  defaultValue: Any? = null,
+): P {
+  val valueClass = V::class.java
+  return when (P::class.java) {
+    ListProperty::class.java -> listProperty(valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<Iterable<V>>)
+      } else {
+        convention(defaultValue as Iterable<V>)
+      }
+    }
+    SetProperty::class.java -> setProperty(valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<Iterable<V>>)
+      } else {
+        convention(defaultValue as Iterable<V>)
+      }
+    }
+    MapProperty::class.java -> mapProperty(String::class.java, valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<Map<String, V>>)
+      } else {
+        convention(defaultValue as Map<String, V>)
+      }
+    }
+    else -> property(valueClass).apply {
+      defaultValue ?: return@apply
+      if (defaultValue is Provider<*>) {
+        convention(defaultValue as Provider<V>)
+      } else {
+        convention(defaultValue as V)
+      }
+    }
+  } as P
 }
 
 /**
@@ -28,6 +66,7 @@ internal inline fun <reified T : Any> ObjectFactory.property(defaultValue: T? = 
  */
 internal fun ConfigurableFileCollection.conventionCompat(vararg paths: Any): ConfigurableFileCollection {
   return if (GradleVersion.current() >= GradleVersion.version("8.8")) {
+    @Suppress("UnstableApiUsage")
     convention(paths)
   } else {
     setFrom(paths)
