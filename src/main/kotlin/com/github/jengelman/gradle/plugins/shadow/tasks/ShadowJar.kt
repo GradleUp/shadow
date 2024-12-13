@@ -53,7 +53,6 @@ public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-  private inline val sourceSets get() = project.extensions.getByType(SourceSetContainer::class.java)
 
   init {
     // shadow filters out files later. This was the default behavior in  Gradle < 6.x
@@ -96,7 +95,8 @@ public abstract class ShadowJar :
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.map {
       if (it) {
-        sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
+        project.extensions.getByType(SourceSetContainer::class.java)
+          .map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
       } else {
         emptySet()
       }
