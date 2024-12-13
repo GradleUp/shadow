@@ -21,15 +21,15 @@ internal inline val Project.runtimeConfiguration: Configuration
       ?: configurations.getByName("runtime")
   }
 
-internal inline fun <reified V : Any> ObjectFactory.property(defaultValue: Any? = null): Property<V> {
-  return property(V::class.java).apply {
-    defaultValue ?: return@apply
-    if (defaultValue is Provider<*>) {
-      @Suppress("UNCHECKED_CAST")
-      convention(defaultValue as Provider<V>)
-    } else {
-      convention(defaultValue as V)
-    }
+internal inline fun <reified V : Any> ObjectFactory.property(
+  defaultValue: Any? = null,
+): Property<V> = property(V::class.java).apply {
+  defaultValue ?: return@apply
+  if (defaultValue is Provider<*>) {
+    @Suppress("UNCHECKED_CAST")
+    convention(defaultValue as Provider<V>)
+  } else {
+    convention(defaultValue as V)
   }
 }
 
@@ -60,14 +60,14 @@ internal inline fun <reified V : Any> ObjectFactory.mapProperty(
 /**
  * TODO: this could be removed after bumping the min Gradle requirement to 8.8 or above.
  */
-internal inline fun ObjectFactory.fileCollection(path: () -> Any): ConfigurableFileCollection {
-  return fileCollection().apply {
-    @Suppress("UnstableApiUsage")
-    if (GradleVersion.current() >= GradleVersion.version("8.8")) {
-      convention(path())
-    } else {
-      setFrom(path())
-    }
+internal inline fun ObjectFactory.fileCollection(
+  path: () -> Any,
+): ConfigurableFileCollection = fileCollection().apply {
+  @Suppress("UnstableApiUsage")
+  if (GradleVersion.current() >= GradleVersion.version("8.8")) {
+    convention(path())
+  } else {
+    setFrom(path())
   }
 }
 
