@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.model.ObjectFactory
@@ -31,10 +31,10 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input
-  public val includes: SetProperty<String> = objectFactory.property()
+  public val includes: SetProperty<String> = objectFactory.setProperty()
 
   @get:Input
-  public val excludes: SetProperty<String> = objectFactory.property()
+  public val excludes: SetProperty<String> = objectFactory.setProperty()
 
   init {
     if (rawString) {

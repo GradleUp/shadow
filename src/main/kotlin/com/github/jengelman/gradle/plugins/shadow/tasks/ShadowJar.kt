@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -118,14 +119,14 @@ public abstract class ShadowJar :
     }
 
   @get:Nested
-  public open val transformers: SetProperty<Transformer> = objectFactory.property()
+  public open val transformers: SetProperty<Transformer> = objectFactory.setProperty()
 
   @get:Nested
-  public open val relocators: SetProperty<Relocator> = objectFactory.property()
+  public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
 
   @get:Classpath
   @get:Optional
-  public open val configurations: SetProperty<Configuration> = objectFactory.property()
+  public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
 
   @get:Internal
   public open val dependencyFilter: Property<DependencyFilter> =

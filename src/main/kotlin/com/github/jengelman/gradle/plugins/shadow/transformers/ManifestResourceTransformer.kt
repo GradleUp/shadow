@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
 import java.io.IOException
@@ -39,7 +40,7 @@ public open class ManifestResourceTransformer @Inject constructor(
 
   @get:Optional
   @get:Input
-  public open val manifestEntries: MapProperty<String, Attributes> = objectFactory.property()
+  public open val manifestEntries: MapProperty<String, Attributes> = objectFactory.mapProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString

@@ -2,7 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
+import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import groovy.lang.Closure
 import groovy.lang.Closure.IDENTITY
@@ -107,10 +109,10 @@ public open class PropertiesFileTransformer @Inject constructor(
   internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
 
   @get:Input
-  public open val paths: SetProperty<String> = objectFactory.property()
+  public open val paths: SetProperty<String> = objectFactory.setProperty()
 
   @get:Input
-  public open val mappings: MapProperty<String, Map<String, String>> = objectFactory.property()
+  public open val mappings: MapProperty<String, Map<String, String>> = objectFactory.mapProperty()
 
   @get:Input
   public open val mergeStrategy: Property<MergeStrategy> = objectFactory.property(MergeStrategy.First)
