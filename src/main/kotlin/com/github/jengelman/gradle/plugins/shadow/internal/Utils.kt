@@ -26,11 +26,6 @@ internal fun createDefaultFileTreeElement(
   return DefaultFileTreeElement(file, relativePath, chmod, stat)
 }
 
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun <T> unsafeLazy(noinline initializer: () -> T): Lazy<T> {
-  return lazy(LazyThreadSafetyMode.NONE, initializer)
-}
-
 internal fun Properties.inputStream(
   charset: Charset = Charsets.ISO_8859_1,
   comments: String = "",
