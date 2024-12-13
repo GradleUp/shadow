@@ -8,7 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
-import com.github.jengelman.gradle.plugins.shadow.internal.conventionCompat
+import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -78,29 +78,30 @@ public abstract class ShadowJar :
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @get:Classpath
-  public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection()
-    .conventionCompat(
-      minimizeJar.map {
-        if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
-      },
-    )
+  public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map {
+      if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
+    }
+  }
 
   @get:Classpath
-  public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection()
-    .conventionCompat(
-      minimizeJar.map {
-        if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet()
-      },
-    )
+  public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map { minimize ->
+      if (minimize) UnusedTracker.getApiJarsFromProject(project) else emptySet()
+    }
+  }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection()
-    .conventionCompat(
-      minimizeJar.map {
-        if (it) sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) } else emptySet()
-      },
-    )
+  public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map { minimize ->
+      if (minimize) {
+        sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
+      } else {
+        emptySet()
+      }
+    }
+  }
 
   @get:Internal
   protected open val rootPatternSet: PatternSet
@@ -131,8 +132,9 @@ public abstract class ShadowJar :
     objectFactory.property(DefaultDependencyFilter(project))
 
   @get:Classpath
-  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
-    .conventionCompat(dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) })
+  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
+    dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
+  }
 
   /**
    * Enable relocation of packages in the jar.
