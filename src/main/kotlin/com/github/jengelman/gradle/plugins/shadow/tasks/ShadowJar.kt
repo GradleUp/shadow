@@ -128,7 +128,7 @@ public abstract class ShadowJar :
 
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
-    .conventionCompat(dependencyFilter.map { it.resolve(configurations.get()) })
+    .conventionCompat(dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) })
 
   /**
    * Enable relocation of packages in the jar.
