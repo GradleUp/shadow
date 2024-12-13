@@ -8,9 +8,8 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
-import com.github.jengelman.gradle.plugins.shadow.internal.conventionCompat
+import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -20,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
+import java.io.File
 import java.util.jar.JarFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
@@ -53,6 +53,7 @@ public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  private inline val sourceSets get() = project.extensions.getByType(SourceSetContainer::class.java)
 
   init {
     // shadow filters out files later. This was the default behavior in  Gradle < 6.x
@@ -68,32 +69,36 @@ public abstract class ShadowJar :
   @get:Internal
   override val stats: ShadowStats = ShadowStats()
 
+  /**
+   * Minimize the jar by removing unused classes.
+   *
+   * Defaults to `false`.
+   */
+  @get:Input
+  public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
+
   @get:Classpath
-  public open val toMinimize: ConfigurableFileCollection by unsafeLazy {
-    objectFactory.fileCollection().apply {
-      if (minimizeJar.get()) {
-        conventionCompat(dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
-      }
+  public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map {
+      if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
     }
   }
 
   @get:Classpath
-  public open val apiJars: ConfigurableFileCollection by unsafeLazy {
-    objectFactory.fileCollection().apply {
-      if (minimizeJar.get()) {
-        conventionCompat(UnusedTracker.getApiJarsFromProject(project))
-      }
+  public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map {
+      if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet()
     }
   }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public open val sourceSetsClassesDirs: ConfigurableFileCollection by unsafeLazy {
-    objectFactory.fileCollection().apply {
-      if (minimizeJar.get()) {
-        project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
-          from(sourceSet.output.classesDirs.filter { it.isDirectory })
-        }
+  public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map {
+      if (it) {
+        sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
+      } else {
+        emptySet()
       }
     }
   }
@@ -127,8 +132,9 @@ public abstract class ShadowJar :
     objectFactory.property(DefaultDependencyFilter(project))
 
   @get:Classpath
-  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection()
-    .conventionCompat(dependencyFilter.map { it.resolve(configurations.get()) })
+  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
+    dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
+  }
 
   /**
    * Enable relocation of packages in the jar.
@@ -145,14 +151,6 @@ public abstract class ShadowJar :
    */
   @get:Input
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
-
-  /**
-   * Minimize the jar by removing unused classes.
-   *
-   * Defaults to `false`.
-   */
-  @get:Input
-  public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @Internal
   override fun getManifest(): InheritManifest = super.manifest as InheritManifest

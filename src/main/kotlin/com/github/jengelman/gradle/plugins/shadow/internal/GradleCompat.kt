@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaPlugin
@@ -64,12 +65,25 @@ internal inline fun <reified V : Any, reified P : Provider<V>> ObjectFactory.pro
 /**
  * TODO: this could be removed after bumping the min Gradle requirement to 8.8 or above.
  */
-internal fun ConfigurableFileCollection.conventionCompat(vararg paths: Any): ConfigurableFileCollection {
-  return if (GradleVersion.current() >= GradleVersion.version("8.8")) {
+internal inline fun ObjectFactory.fileCollection(path: () -> Any): ConfigurableFileCollection {
+  return fileCollection().apply {
     @Suppress("UnstableApiUsage")
-    convention(paths)
+    if (GradleVersion.current() >= GradleVersion.version("8.8")) {
+      convention(path())
+    } else {
+      setFrom(path())
+    }
+  }
+}
+
+/**
+ * TODO: this could be removed after bumping the min Gradle requirement to 8.11 or above.
+ */
+internal fun ProjectDependency.dependencyProjectCompat(project: Project): Project {
+  return if (GradleVersion.current() >= GradleVersion.version("8.11")) {
+    project.project(path)
   } else {
-    setFrom(paths)
-    this
+    @Suppress("DEPRECATION")
+    dependencyProject
   }
 }

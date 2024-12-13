@@ -56,7 +56,7 @@ internal class UnusedTracker private constructor(
       apiDependencies.forEach { dep ->
         when (dep) {
           is ProjectDependency -> {
-            apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
+            apiJars.addAll(getApiJarsFromProject(dep.dependencyProjectCompat(project)))
             addJar(runtimeConfiguration, dep, apiJars)
           }
           is SelfResolvingDependency -> {
