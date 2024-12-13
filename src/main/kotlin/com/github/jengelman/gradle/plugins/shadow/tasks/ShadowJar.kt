@@ -86,16 +86,16 @@ public abstract class ShadowJar :
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map { minimize ->
-      if (minimize) UnusedTracker.getApiJarsFromProject(project) else emptySet()
+    minimizeJar.map {
+      if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet()
     }
   }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map { minimize ->
-      if (minimize) {
+    minimizeJar.map {
+      if (it) {
         sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
       } else {
         emptySet()
