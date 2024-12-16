@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
@@ -25,10 +26,8 @@ public open class ManifestAppenderTransformer @Inject constructor(
 ) : Transformer {
   private var manifestContents = ByteArray(0)
 
-  @Suppress("UNCHECKED_CAST")
   @get:Input
-  public open val attributes: SetProperty<Pair<String, Comparable<*>>> =
-    objectFactory.setProperty(Pair::class.java) as SetProperty<Pair<String, Comparable<*>>>
+  public open val attributes: SetProperty<Pair<String, Comparable<*>>> = objectFactory.setProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
