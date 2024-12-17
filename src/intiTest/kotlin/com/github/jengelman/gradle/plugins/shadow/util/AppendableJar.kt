@@ -20,7 +20,7 @@ class AppendableJar(initialContents: Map<String, String>) {
     return outputFile
   }
 
-  private fun write(outputStream: OutputStream) {
+  fun write(outputStream: OutputStream) {
     val builder = JarBuilder(outputStream)
     contents.forEach { (path, content) ->
       builder.withFile(path, content)
