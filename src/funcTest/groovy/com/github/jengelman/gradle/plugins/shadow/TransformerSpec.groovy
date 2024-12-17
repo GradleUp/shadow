@@ -16,15 +16,15 @@ class TransformerSpec extends PluginSpecification {
     def 'service resource transformer'() {
         given:
         File one = buildJar('one.jar')
-            .insertFile('META-INF/services/org.apache.maven.Shade',
+            .insert('META-INF/services/org.apache.maven.Shade',
                 'one # NOTE: No newline terminates this line/file')
-            .insertFile('META-INF/services/com.acme.Foo', 'one')
+            .insert('META-INF/services/com.acme.Foo', 'one')
             .write()
 
         File two = buildJar('two.jar')
-            .insertFile('META-INF/services/org.apache.maven.Shade',
+            .insert('META-INF/services/org.apache.maven.Shade',
                 'two # NOTE: No newline terminates this line/file')
-            .insertFile('META-INF/services/com.acme.Foo', 'two')
+            .insert('META-INF/services/com.acme.Foo', 'two')
             .write()
 
         buildFile << """
@@ -61,10 +61,10 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
     def 'service resource transformer alternate path'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+        File one = buildJar('one.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+        File two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -97,15 +97,15 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
     def 'service resource transformer short syntax'() {
         given:
         File one = buildJar('one.jar')
-            .insertFile('META-INF/services/org.apache.maven.Shade',
+            .insert('META-INF/services/org.apache.maven.Shade',
                 'one # NOTE: No newline terminates this line/file')
-            .insertFile('META-INF/services/com.acme.Foo', 'one')
+            .insert('META-INF/services/com.acme.Foo', 'one')
             .write()
 
         File two = buildJar('two.jar')
-            .insertFile('META-INF/services/org.apache.maven.Shade',
+            .insert('META-INF/services/org.apache.maven.Shade',
                 'two # NOTE: No newline terminates this line/file')
-            .insertFile('META-INF/services/com.acme.Foo', 'two')
+            .insert('META-INF/services/com.acme.Foo', 'two')
             .write()
 
         buildFile << """
@@ -142,22 +142,22 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
     def 'service resource transformer short syntax relocation'() {
         given:
         File one = buildJar('one.jar')
-            .insertFile('META-INF/services/java.sql.Driver',
+            .insert('META-INF/services/java.sql.Driver',
                 '''oracle.jdbc.OracleDriver
 org.apache.hive.jdbc.HiveDriver'''.stripIndent())
-            .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
+            .insert('META-INF/services/org.apache.axis.components.compiler.Compiler',
                 'org.apache.axis.components.compiler.Javac')
-            .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
+            .insert('META-INF/services/org.apache.commons.logging.LogFactory',
                 'org.apache.commons.logging.impl.LogFactoryImpl')
             .write()
 
         File two = buildJar('two.jar')
-            .insertFile('META-INF/services/java.sql.Driver',
+            .insert('META-INF/services/java.sql.Driver',
                 '''org.apache.derby.jdbc.AutoloadedDriver
 com.mysql.jdbc.Driver'''.stripIndent())
-            .insertFile('META-INF/services/org.apache.axis.components.compiler.Compiler',
+            .insert('META-INF/services/org.apache.axis.components.compiler.Compiler',
                 'org.apache.axis.components.compiler.Jikes')
-            .insertFile('META-INF/services/org.apache.commons.logging.LogFactory',
+            .insert('META-INF/services/org.apache.commons.logging.LogFactory',
                 'org.mortbay.log.Factory')
             .write()
 
@@ -207,10 +207,10 @@ org.mortbay.log.Factory'''.stripIndent()
 
     def 'service resource transformer short syntax alternate path'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+        File one = buildJar('one.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insertFile('META-INF/foo/org.apache.maven.Shade',
+        File two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -240,7 +240,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
     @Issue(['SHADOW-70', 'SHADOW-71'])
     def 'apply transformers to project resources'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
+        File one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
             'one # NOTE: No newline terminates this line/file').write()
 
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
@@ -277,10 +277,10 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
     def 'appending transformer'() {
         given:
-        File one = buildJar('one.jar').insertFile('test.properties',
+        File one = buildJar('one.jar').insert('test.properties',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insertFile('test.properties',
+        File two = buildJar('two.jar').insert('test.properties',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -313,10 +313,10 @@ two # NOTE: No newline terminates this line/file
 
     def 'appending transformer short syntax'() {
         given:
-        File one = buildJar('one.jar').insertFile('test.properties',
+        File one = buildJar('one.jar').insert('test.properties',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insertFile('test.properties',
+        File two = buildJar('two.jar').insert('test.properties',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -428,7 +428,7 @@ two # NOTE: No newline terminates this line/file
 
     def 'append xml files'() {
         given:
-        File xml1 = buildJar('xml1.jar').insertFile('properties.xml',
+        File xml1 = buildJar('xml1.jar').insert('properties.xml',
             '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 
 <properties version="1.0">
@@ -437,7 +437,7 @@ two # NOTE: No newline terminates this line/file
 '''.stripIndent()
         ).write()
 
-        File xml2 = buildJar('xml2.jar').insertFile('properties.xml',
+        File xml2 = buildJar('xml2.jar').insert('properties.xml',
             '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 
 <properties version="1.0">
@@ -602,14 +602,14 @@ two # NOTE: No newline terminates this line/file
     def 'Groovy extension module transformer'() {
         given:
         def one = buildJar('one.jar')
-            .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+            .insert('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
                 '''moduleName=foo
 moduleVersion=1.0.5
 extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
 staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripIndent()).write()
 
         def two = buildJar('two.jar')
-            .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+            .insert('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
                 '''moduleName=bar
 moduleVersion=2.3.5
 extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
@@ -646,14 +646,14 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
     def 'Groovy extension module transformer works for Groovy2_5+'() {
         given:
         def one = buildJar('one.jar')
-            .insertFile('META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule',
+            .insert('META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule',
                 '''moduleName=foo
 moduleVersion=1.0.5
 extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
 staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripIndent()).write()
 
         def two = buildJar('two.jar')
-            .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+            .insert('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
                 '''moduleName=bar
 moduleVersion=2.3.5
 extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
@@ -691,14 +691,14 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
     def 'Groovy extension module transformer short syntax'() {
         given:
         def one = buildJar('one.jar')
-            .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+            .insert('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
                 '''moduleName=foo
 moduleVersion=1.0.5
 extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
 staticExtensionClasses=com.acme.foo.FooStaticExtension'''.stripIndent()).write()
 
         def two = buildJar('two.jar')
-            .insertFile('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
+            .insert('META-INF/services/org.codehaus.groovy.runtime.ExtensionModule',
                 '''moduleName=bar
 moduleVersion=2.3.5
 extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension

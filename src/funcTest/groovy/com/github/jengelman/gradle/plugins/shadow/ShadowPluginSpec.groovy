@@ -63,7 +63,7 @@ class ShadowPluginSpec extends PluginSpecification {
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
+        File one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
             'one # NOTE: No newline terminates this line/file').write()
 
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',

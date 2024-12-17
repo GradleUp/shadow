@@ -1,20 +1,30 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import java.io.File
+import java.io.OutputStream
 
-class AppendableJar(private val file: File) {
-  private val contents = mutableMapOf<String, String>()
+class AppendableJar(initialContents: Map<String, String>) {
+  private val contents = initialContents.toMutableMap()
+  private lateinit var outputFile: File
 
-  fun insertFile(path: String, content: String): AppendableJar = apply {
+  constructor(outputFile: File) : this(emptyMap()) {
+    this.outputFile = outputFile
+  }
+
+  fun insert(path: String, content: String): AppendableJar = apply {
     contents[path] = content
   }
 
   fun write(): File {
-    val builder = JarBuilder(file.outputStream())
+    write(outputFile.outputStream())
+    return outputFile
+  }
+
+  private fun write(outputStream: OutputStream) {
+    val builder = JarBuilder(outputStream)
     contents.forEach { (path, content) ->
       builder.withFile(path, content)
     }
     builder.build()
-    return file
   }
 }
