@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore

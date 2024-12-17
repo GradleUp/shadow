@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-
 import org.apache.tools.zip.ZipFile
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Issue

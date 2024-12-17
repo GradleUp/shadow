@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-
 import spock.lang.Ignore
 import spock.lang.Issue
 
