@@ -1,10 +1,13 @@
+[versions]
+maven = "3.9.9"
+
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
 apache-commonsIo = "commons-io:commons-io:2.18.0"
 apache-commonsLang = "org.apache.commons:commons-lang3:3.17.0"
 apache-log4j = "org.apache.logging.log4j:log4j-core:2.24.3"
-apache-maven-modelBuilder = "org.apache.maven:maven-model-builder:3.9.9"
-apache-maven-repositoryMetadata = "org.apache.maven:maven-repository-metadata:3.9.9"
+apache-maven-modelBuilder = { module = "org.apache.maven:maven-model-builder", version.ref = "maven" }
+apache-maven-repositoryMetadata = { module = "org.apache.maven:maven-repository-metadata", version.ref = "maven" }
 asm = "org.ow2.asm:asm-commons:9.7.1"
 jdependency = "org.vafer:jdependency:2.11"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
