@@ -1,9 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-
-
-class ConfigureShadowRelocationSpec extends PluginSpecification {
+class ConfigureShadowRelocationSpec extends BasePluginSpecification {
 
     def "auto relocate plugin dependencies"() {
         given:

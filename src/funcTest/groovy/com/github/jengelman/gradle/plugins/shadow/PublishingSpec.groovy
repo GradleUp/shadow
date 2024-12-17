@@ -1,14 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import groovy.json.JsonSlurper
 import groovy.xml.XmlSlurper
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Usage
 import spock.lang.Issue
 
-class PublishingSpec extends PluginSpecification {
+class PublishingSpec extends BasePluginSpecification {
 
     AppendableMavenFileRepository publishingRepo
 

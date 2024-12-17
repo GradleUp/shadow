@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+
 import org.apache.tools.zip.ZipFile
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Issue
@@ -8,7 +8,7 @@ import spock.lang.Issue
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
-class ApplicationSpec extends PluginSpecification {
+class ApplicationSpec extends BasePluginSpecification {
 
     def 'integration with application plugin'() {
         given:
