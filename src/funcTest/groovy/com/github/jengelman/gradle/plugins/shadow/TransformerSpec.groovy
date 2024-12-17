@@ -4,14 +4,13 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransfor
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import spock.lang.Issue
 import spock.lang.Unroll
 
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
 
-class TransformerSpec extends PluginSpecification {
+class TransformerSpec extends BasePluginSpecification {
 
     def 'service resource transformer'() {
         given:

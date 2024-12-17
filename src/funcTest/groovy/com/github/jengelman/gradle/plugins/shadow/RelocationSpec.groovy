@@ -1,13 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+
 import spock.lang.Ignore
 import spock.lang.Issue
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
-class RelocationSpec extends PluginSpecification {
+class RelocationSpec extends BasePluginSpecification {
 
     @Issue('SHADOW-58')
     def "relocate dependency files"() {

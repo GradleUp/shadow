@@ -1,5 +1,7 @@
-package com.github.jengelman.gradle.plugins.shadow.util
+package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -11,7 +13,7 @@ import java.util.function.Function
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
-abstract class PluginSpecification extends Specification {
+abstract class BasePluginSpecification extends Specification {
 
     @TempDir
     Path dir

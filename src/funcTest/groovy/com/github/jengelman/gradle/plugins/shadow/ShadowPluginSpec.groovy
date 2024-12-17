@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -17,7 +16,7 @@ import spock.lang.Unroll
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
-class ShadowPluginSpec extends PluginSpecification {
+class ShadowPluginSpec extends BasePluginSpecification {
 
     def 'apply plugin'() {
         given:
