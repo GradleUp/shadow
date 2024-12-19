@@ -1,12 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore
 import spock.lang.Issue
 
-class FilteringSpec extends PluginSpecification {
+class FilteringSpec extends BasePluginSpecification {
 
     @Override
     def setup() {

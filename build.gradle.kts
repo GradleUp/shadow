@@ -54,6 +54,8 @@ val intiTestRuntimeOnly: Configuration by configurations.getting {
 val funcTest: SourceSet by sourceSets.creating
 val funcTestImplementation: Configuration by configurations.getting {
   extendsFrom(configurations.testImplementation.get())
+  // TODO: this will be removed after we migrated all functional tests to Kotlin.
+  extendsFrom(intiTestImplementation)
 }
 val funcTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
@@ -87,6 +89,9 @@ dependencies {
   }
   funcTestImplementation(sourceSets.main.get().output)
   funcTestImplementation(intiTest.output)
+
+  intiTestImplementation(libs.apache.maven.modelBuilder)
+  intiTestImplementation(libs.apache.maven.repositoryMetadata)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)
