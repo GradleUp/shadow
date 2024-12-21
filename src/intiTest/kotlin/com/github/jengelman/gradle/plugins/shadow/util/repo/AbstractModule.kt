@@ -28,12 +28,10 @@ abstract class AbstractModule {
   }
 
   companion object {
-    @JvmStatic
     fun sha1File(file: File): File {
       return hashFile(file, "sha1", 40)
     }
 
-    @JvmStatic
     fun md5File(file: File): File {
       return hashFile(file, "md5", 32)
     }
@@ -46,7 +44,7 @@ abstract class AbstractModule {
     }
 
     private fun getHashFile(file: File, algorithm: String): File {
-      return File(file.parentFile, "${file.name}.$algorithm")
+      return file.resolveSibling("${file.name}.$algorithm")
     }
 
     private fun getHash(file: File, algorithm: String): BigInteger {
