@@ -90,6 +90,7 @@ dependencies {
   funcTestImplementation(sourceSets.main.get().output)
   funcTestImplementation(intiTest.output)
 
+  intiTestImplementation(libs.okio)
   intiTestImplementation(libs.apache.maven.modelBuilder)
   intiTestImplementation(libs.apache.maven.repositoryMetadata)
 

@@ -1,9 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo
 
-import com.github.jengelman.gradle.plugins.shadow.util.HashUtil
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.OutputStream
+import java.io.UncheckedIOException
 import java.math.BigInteger
+import okio.ByteString.Companion.toByteString
 
 abstract class AbstractModule {
 
@@ -48,7 +50,25 @@ abstract class AbstractModule {
     }
 
     private fun getHash(file: File, algorithm: String): BigInteger {
-      return HashUtil.createHash(file, algorithm.uppercase()).digest
+      try {
+        val byteString = file.readBytes().toByteString()
+        val byteArray = when (algorithm.uppercase()) {
+          "MD5" -> byteString.md5()
+          "SHA1" -> byteString.sha1()
+          "SHA256" -> byteString.sha256()
+          "SHA512" -> byteString.sha512()
+          else -> throw IllegalArgumentException("Unsupported algorithm: $algorithm")
+        }.toByteArray()
+        return BigInteger(1, byteArray)
+      } catch (e: UncheckedIOException) {
+        // Catch any unchecked io exceptions and add the file path for troubleshooting
+        throw UncheckedIOException(
+          "Failed to create $algorithm hash for file ${file.absolutePath}.",
+          e.cause,
+        )
+      } catch (e: FileNotFoundException) {
+        throw UncheckedIOException(e)
+      }
     }
   }
 }
