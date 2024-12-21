@@ -11,6 +11,7 @@
 
 - **BREAKING CHANGE:** Migrate all `ListProperty` usages to `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
   Some public `List` parameters are also changed to `Set`.
+- Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
 
 
 ## [v9.0.0-beta4] (2024-12-06)
