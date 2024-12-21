@@ -186,7 +186,7 @@ class RelocationSpec extends PluginSpecification {
         file('core/build.gradle') << """
         apply plugin: 'java-library'
 
-        repositories { maven { url "${repo.uri}" } }
+        repositories { maven { url = "${repo.uri}" } }
         dependencies { api 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -205,7 +205,7 @@ class RelocationSpec extends PluginSpecification {
         apply plugin: 'java'
         apply plugin: 'com.gradleup.shadow'
 
-        repositories { maven { url "${repo.uri}" } }
+        repositories { maven { url = "${repo.uri}" } }
         dependencies { implementation project(':core') }
 
         tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -296,7 +296,7 @@ class RelocationSpec extends PluginSpecification {
             repositories {
                 mavenCentral()
                 maven {
-                    url 'https://repository.mapr.com/nexus/content/groups/mapr-public/releases'
+                    url = 'https://repository.mapr.com/nexus/content/groups/mapr-public/releases'
                 }
             }
 

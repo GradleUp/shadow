@@ -172,7 +172,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -188,7 +188,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
 
         """.stripIndent()
@@ -224,7 +224,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -246,7 +246,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 minimize()
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -282,7 +282,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -301,7 +301,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 }
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -336,7 +336,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -354,7 +354,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 }
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -390,7 +390,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -409,7 +409,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 }
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -443,7 +443,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -462,7 +462,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 }
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -503,7 +503,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('lib/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
         """.stripIndent()
 
         file('api/src/main/java/api/Entity.java') << """
@@ -519,7 +519,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('api/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies {
                 implementation 'junit:junit:3.8.2'
                 implementation project(':lib')
@@ -540,7 +540,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 minimize()
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { api project(':api') }
         """.stripIndent()
 
@@ -582,7 +582,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('lib/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
         """.stripIndent()
 
         file('api/src/main/java/api/Entity.java') << """
@@ -598,7 +598,7 @@ class ShadowPluginSpec extends PluginSpecification {
 
         file('api/build.gradle') << """
             apply plugin: 'java-library'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { api project(':lib') }
         """.stripIndent()
 
@@ -616,7 +616,7 @@ class ShadowPluginSpec extends PluginSpecification {
                 minimize()
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { api project(':api') }
         """.stripIndent()
 
@@ -650,7 +650,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
 
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -670,7 +670,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('server/build.gradle') << """
             apply plugin: 'java'
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
@@ -707,7 +707,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('client/build.gradle') << """
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
 
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -728,7 +728,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
@@ -979,7 +979,7 @@ class ShadowPluginSpec extends PluginSpecification {
             dependencies { shadow 'junit:junit:3.8.2' }
 
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-                zip64 true
+                zip64 = true
                 entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
             }
         """.stripIndent()
@@ -1001,7 +1001,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('lib/build.gradle') << """
             apply plugin: 'java'
             version = '1.0'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
         """.stripIndent()
 
         file('api/src/main/java/api/UnusedEntity.java') << """
@@ -1012,7 +1012,7 @@ class ShadowPluginSpec extends PluginSpecification {
         file('api/build.gradle') << """
             apply plugin: 'java'
             version = '1.0'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies {
                 implementation 'junit:junit:3.8.2'
                 implementation project(':lib')
@@ -1024,7 +1024,7 @@ class ShadowPluginSpec extends PluginSpecification {
             apply plugin: 'com.gradleup.shadow'
 
             version = '1.0'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { api project(':api') }
 
             shadowJar.minimize()
@@ -1123,7 +1123,7 @@ class ShadowPluginSpec extends PluginSpecification {
         buildscript {
             repositories {
                 maven {
-                    url "https://maven.eveoh.nl/content/repositories/releases"
+                    url = "https://maven.eveoh.nl/content/repositories/releases"
                 }
             }
 

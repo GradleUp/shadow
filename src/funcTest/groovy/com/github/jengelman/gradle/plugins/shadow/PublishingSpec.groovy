@@ -50,7 +50,7 @@ class PublishingSpec extends PluginSpecification {
                }
                repositories {
                    maven {
-                       url "${publishingRepo.uri}"
+                       url = "${publishingRepo.uri}"
                    }
                }
             }
@@ -112,7 +112,7 @@ class PublishingSpec extends PluginSpecification {
                }
                repositories {
                    maven {
-                       url "${publishingRepo.uri}"
+                       url = "${publishingRepo.uri}"
                    }
                }
             }
@@ -150,11 +150,11 @@ class PublishingSpec extends PluginSpecification {
                 version = "1.0"
                 group = 'shadow'
 
-                repositories { maven { url "${repo.uri}" } }
+                repositories { maven { url = "${repo.uri}" } }
                 publishing {
                    repositories {
                        maven {
-                           url "${publishingRepo.uri}"
+                           url = "${publishingRepo.uri}"
                        }
                    }
                 }
@@ -263,7 +263,7 @@ class PublishingSpec extends PluginSpecification {
                }
                repositories {
                    maven {
-                       url "${publishingRepo.uri}"
+                       url = "${publishingRepo.uri}"
                    }
                }
             }
