@@ -93,7 +93,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -112,7 +112,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
                 }
             }
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -151,7 +151,7 @@ class ConfigurationCacheSpec extends PluginSpecification {
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
 
-            repositories { maven { url "${repo.uri}" } }
+            repositories { maven { url = "${repo.uri}" } }
             dependencies {
                 implementation "junit:junit:3.8.2"
             }

@@ -49,7 +49,7 @@ abstract class PluginSpecification extends Specification {
           integTest
         }
 
-        repositories { maven { url "${repo.uri}" } }
+        repositories { maven { url = "${repo.uri}" } }
         """.stripIndent()
     }
 

@@ -16,7 +16,7 @@ class RelocationSpec extends PluginSpecification {
             dependencies {
                implementation 'junit:junit:3.8.2'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate 'junit.textui', 'a'
                relocate 'junit.framework', 'b'
@@ -81,7 +81,7 @@ class RelocationSpec extends PluginSpecification {
             dependencies {
                implementation 'junit:junit:3.8.2'
             }
-            
+
             // tag::relocateFilter[]
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate('junit.textui', 'a') {
@@ -138,7 +138,7 @@ class RelocationSpec extends PluginSpecification {
             dependencies {
                implementation 'junit:junit:3.8.2'
             }
-            
+
             // tag::relocate[]
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate 'junit.framework', 'shadow.junit'
@@ -148,7 +148,7 @@ class RelocationSpec extends PluginSpecification {
 
         file('src/main/java/shadow/ShadowTest.java') << '''
             package shadow;
-            
+
             import junit.framework.Test;
             import junit.framework.TestResult;
             public class ShadowTest implements Test {
@@ -185,8 +185,8 @@ class RelocationSpec extends PluginSpecification {
         given: 'Core project with dependency and resource'
         file('core/build.gradle') << """
         apply plugin: 'java-library'
-        
-        repositories { maven { url "${repo.uri}" } }
+
+        repositories { maven { url = "${repo.uri}" } }
         dependencies { api 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -194,9 +194,9 @@ class RelocationSpec extends PluginSpecification {
         file('core/src/main/resources/test.properties') << 'name=test'
         file('core/src/main/java/core/Core.java') << '''
         package core;
-        
+
         import junit.framework.Test;
-        
+
         public class Core {}
         '''.stripIndent()
 
@@ -204,10 +204,10 @@ class RelocationSpec extends PluginSpecification {
         file('app/build.gradle') << """
         apply plugin: 'java'
         apply plugin: 'com.gradleup.shadow'
-        
-        repositories { maven { url "${repo.uri}" } }
+
+        repositories { maven { url = "${repo.uri}" } }
         dependencies { implementation project(':core') }
-        
+
         tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
           relocate 'core', 'app.core'
           relocate 'junit.framework', 'app.junit.framework'
@@ -217,10 +217,10 @@ class RelocationSpec extends PluginSpecification {
         file('app/src/main/resources/APP-TEST') << 'APP TEST RESOURCE'
         file('app/src/main/java/app/App.java') << '''
         package app;
-        
+
         import core.Core;
         import junit.framework.Test;
-        
+
         public class App {}
         '''.stripIndent()
 
@@ -255,7 +255,7 @@ class RelocationSpec extends PluginSpecification {
                 .publish()
         file('src/main/java/foo/Foo.java') << '''
         package foo;
-        
+
         class Foo {}
         '''.stripIndent()
         file('src/main/resources/foo/foo.properties') << 'name=foo'
@@ -264,7 +264,7 @@ class RelocationSpec extends PluginSpecification {
             dependencies {
                implementation 'shadow:dep:1.0'
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                relocate 'foo', 'bar'
             }
@@ -296,7 +296,7 @@ class RelocationSpec extends PluginSpecification {
             repositories {
                 mavenCentral()
                 maven {
-                    url 'https://repository.mapr.com/nexus/content/groups/mapr-public/releases'
+                    url = 'https://repository.mapr.com/nexus/content/groups/mapr-public/releases'
                 }
             }
 
