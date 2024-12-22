@@ -7,7 +7,7 @@ import org.gradle.api.publish.maven.MavenPublication
 public abstract class ShadowExtension(project: Project) {
   private val components = project.components
 
-  @Deprecated("configure publication using component.shadow directly.")
+  @Deprecated("Configure publication using `components.shadow` directly.")
   public fun component(publication: MavenPublication) {
     publication.from(components.findByName(ShadowBasePlugin.COMPONENT_NAME))
   }
