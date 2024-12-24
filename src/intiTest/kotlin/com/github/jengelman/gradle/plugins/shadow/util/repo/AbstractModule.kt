@@ -1,27 +1,20 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo
 
-import com.github.jengelman.gradle.plugins.shadow.util.HashUtil
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.OutputStream
-import java.io.Writer
+import java.io.UncheckedIOException
 import java.math.BigInteger
+import okio.ByteString.Companion.toByteString
 
 abstract class AbstractModule {
 
   protected abstract fun onPublish(file: File)
 
-  protected fun publishWithWriter(file: File, action: (Writer) -> Unit) {
-    publishCommon(file) { it.writer().use(action) }
-  }
-
-  protected fun publishWithStream(file: File, action: (OutputStream) -> Unit) {
-    publishCommon(file) { it.outputStream().use(action) }
-  }
-
-  private fun publishCommon(file: File, action: (File) -> Unit) {
+  protected fun publish(file: File, action: (OutputStream) -> Unit) {
     val hashBefore = if (file.exists()) getHash(file, "sha1") else null
     val tempFile = file.resolveSibling("${file.name}.tmp")
-    action(tempFile)
+    tempFile.outputStream().use(action)
 
     val hashAfter = getHash(tempFile, "sha1")
     if (hashAfter == hashBefore) {
@@ -35,12 +28,10 @@ abstract class AbstractModule {
   }
 
   companion object {
-    @JvmStatic
     fun sha1File(file: File): File {
       return hashFile(file, "sha1", 40)
     }
 
-    @JvmStatic
     fun md5File(file: File): File {
       return hashFile(file, "md5", 32)
     }
@@ -53,11 +44,29 @@ abstract class AbstractModule {
     }
 
     private fun getHashFile(file: File, algorithm: String): File {
-      return File(file.parentFile, "${file.name}.$algorithm")
+      return file.resolveSibling("${file.name}.$algorithm")
     }
 
     private fun getHash(file: File, algorithm: String): BigInteger {
-      return HashUtil.createHash(file, algorithm.uppercase()).digest
+      try {
+        val byteString = file.readBytes().toByteString()
+        val byteArray = when (algorithm.uppercase()) {
+          "MD5" -> byteString.md5()
+          "SHA1" -> byteString.sha1()
+          "SHA256" -> byteString.sha256()
+          "SHA512" -> byteString.sha512()
+          else -> throw IllegalArgumentException("Unsupported algorithm: $algorithm")
+        }.toByteArray()
+        return BigInteger(1, byteArray)
+      } catch (e: UncheckedIOException) {
+        // Catch any unchecked io exceptions and add the file path for troubleshooting
+        throw UncheckedIOException(
+          "Failed to create $algorithm hash for file ${file.absolutePath}.",
+          e.cause,
+        )
+      } catch (e: FileNotFoundException) {
+        throw UncheckedIOException(e)
+      }
     }
   }
 }

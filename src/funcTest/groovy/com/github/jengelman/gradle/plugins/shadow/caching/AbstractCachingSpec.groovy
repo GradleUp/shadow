@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
+import com.github.jengelman.gradle.plugins.shadow.BasePluginSpecification
 import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
@@ -11,7 +11,7 @@ import java.nio.file.Path
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-abstract class AbstractCachingSpec extends PluginSpecification {
+abstract class AbstractCachingSpec extends BasePluginSpecification {
     @TempDir
     Path alternateDir
 
