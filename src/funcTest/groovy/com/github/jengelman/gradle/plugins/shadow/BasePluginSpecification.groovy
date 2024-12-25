@@ -186,8 +186,4 @@ abstract class BasePluginSpecification extends Specification {
         }
         return new File(gradleUserHome, "testkit")
     }
-
-    protected static String escapedPath(Path path) {
-        path.toString().replaceAll('\\\\', '\\\\\\\\')
-    }
 }
