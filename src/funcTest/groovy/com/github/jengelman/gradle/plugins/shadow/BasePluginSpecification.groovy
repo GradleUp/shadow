@@ -44,10 +44,6 @@ abstract class BasePluginSpecification extends Specification {
         version = "1.0"
         group = 'shadow'
 
-        sourceSets {
-          integTest
-        }
-
         repositories {
             maven { url = "${repo.uri}" }
         }
