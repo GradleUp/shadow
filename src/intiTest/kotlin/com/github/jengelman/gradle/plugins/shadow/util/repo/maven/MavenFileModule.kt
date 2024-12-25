@@ -30,11 +30,6 @@ open class MavenFileModule(
     }
   }
 
-  override fun postPublish(path: Path) {
-    writeSha1Path(path)
-    writeMd5Path(path)
-  }
-
   override val isPublishesMetaDataFile: Boolean
     get() = isUniqueSnapshots && version.endsWith("-SNAPSHOT")
 }

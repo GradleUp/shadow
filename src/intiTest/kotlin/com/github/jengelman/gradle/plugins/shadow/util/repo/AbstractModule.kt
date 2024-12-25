@@ -5,7 +5,6 @@ import java.io.UncheckedIOException
 import java.math.BigInteger
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.moveTo
 import kotlin.io.path.name
@@ -16,7 +15,7 @@ import okio.ByteString.Companion.toByteString
 
 abstract class AbstractModule {
 
-  protected abstract fun postPublish(path: Path)
+  protected open fun postPublish(path: Path) = Unit
 
   protected fun publish(path: Path, action: (OutputStream) -> Unit) {
     val hashBefore = if (path.exists()) getHash(path, "sha1") else null
@@ -29,9 +28,11 @@ abstract class AbstractModule {
       return
     }
 
-    check(!path.deleteIfExists())
-    tempPath.moveTo(path)
+    tempPath.moveTo(path, true)
     check(path.exists())
+    writeSha1Path(path)
+    writeMd5Path(path)
+
     postPublish(path)
   }
 
