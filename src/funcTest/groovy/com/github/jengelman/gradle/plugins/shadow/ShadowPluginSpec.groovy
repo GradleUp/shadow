@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -17,7 +16,7 @@ import spock.lang.Unroll
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
-class ShadowPluginSpec extends PluginSpecification {
+class ShadowPluginSpec extends BasePluginSpecification {
 
     def 'apply plugin'() {
         given:
@@ -63,7 +62,7 @@ class ShadowPluginSpec extends PluginSpecification {
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
+        def one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
             'one # NOTE: No newline terminates this line/file').write()
 
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
@@ -1271,9 +1270,5 @@ class ShadowPluginSpec extends PluginSpecification {
         and:
         def jarFile = new JarFile(output("shadow-1.0-tests.jar"))
         assert jarFile.getEntry('junit') != null
-    }
-
-    private String escapedPath(File file) {
-        file.path.replaceAll('\\\\', '\\\\\\\\')
     }
 }

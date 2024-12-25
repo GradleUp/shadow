@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import java.io.File
+import java.nio.file.Path
 
 interface MavenModule {
   /**
@@ -16,7 +16,7 @@ interface MavenModule {
 
   fun dependsOn(groupId: String, artifactId: String, version: String): MavenModule
 
-  val pomFile: File
+  val pomPath: Path
 
-  val metaDataFile: File
+  val metaDataPath: Path
 }

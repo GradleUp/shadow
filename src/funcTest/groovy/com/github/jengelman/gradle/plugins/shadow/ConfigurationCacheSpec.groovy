@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-
-class ConfigurationCacheSpec extends PluginSpecification {
+class ConfigurationCacheSpec extends BasePluginSpecification {
 
     @Override
     def setup() {

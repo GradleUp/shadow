@@ -5,33 +5,28 @@ import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 
 class JarBuilder(os: OutputStream) {
-  private val entries = mutableListOf<String>()
+  private val entries = mutableSetOf<String>()
   private val jos = JarOutputStream(os)
 
   private fun addDirectory(name: String) {
-    if (!entries.contains(name)) {
+    if (entries.add(name)) {
       val parent = name.substringBeforeLast('/', "")
       if (parent.isNotEmpty() && !entries.contains(parent)) {
         addDirectory(parent)
       }
-
       // directory entries must end in "/"
-      val entry = JarEntry("$name/")
-      jos.putNextEntry(entry)
-      entries.add(name)
+      jos.putNextEntry(JarEntry("$name/"))
     }
   }
 
-  fun withFile(path: String, data: String): JarBuilder {
+  fun withPath(path: String, data: String): JarBuilder {
     val idx = path.lastIndexOf('/')
     if (idx != -1) {
       addDirectory(path.substring(0, idx))
     }
-    if (!entries.contains(path)) {
-      val entry = JarEntry(path)
-      jos.putNextEntry(entry)
-      entries.add(path)
-      data.byteInputStream().use { it.copyTo(jos) }
+    if (entries.add(path)) {
+      jos.putNextEntry(JarEntry(path))
+      data.byteInputStream().copyTo(jos)
     }
     return this
   }
