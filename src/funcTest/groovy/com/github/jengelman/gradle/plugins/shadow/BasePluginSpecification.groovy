@@ -27,9 +27,7 @@ abstract class BasePluginSpecification extends Specification {
 
         buildFile << defaultBuildScript
 
-        settingsFile << '''
-            rootProject.name = 'shadow'
-        '''
+        settingsFile << settingsBuildScript
     }
 
     def cleanup() {
@@ -50,8 +48,23 @@ abstract class BasePluginSpecification extends Specification {
           integTest
         }
 
-        repositories { maven { url = "${repo.uri}" } }
+        repositories {
+            maven { url = "${repo.uri}" }
+        }
         """.stripIndent()
+    }
+
+    String getSettingsBuildScript() {
+        return """
+            dependencyResolutionManagement {
+              repositories {
+                maven { url = "${repo.uri}" }
+                mavenCentral()
+              }
+            }
+
+            rootProject.name = 'shadow'
+        """
     }
 
     GradleRunner getRunner() {

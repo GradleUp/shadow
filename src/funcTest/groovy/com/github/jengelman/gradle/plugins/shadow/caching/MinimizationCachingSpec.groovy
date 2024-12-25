@@ -20,7 +20,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -33,7 +33,6 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
             apply plugin: 'java'
             apply plugin: 'com.gradleup.shadow'
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -61,7 +60,6 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
                 }
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
         assertShadowJarExecutes()

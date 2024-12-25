@@ -149,7 +149,6 @@ class PublishingSpec extends BasePluginSpecification {
                 version = "1.0"
                 group = 'shadow'
 
-                repositories { maven { url = "${repo.uri}" } }
                 publishing {
                    repositories {
                        maven {
