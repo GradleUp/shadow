@@ -30,7 +30,7 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'a2.properties', 'b.properties'])
+        assertContains(output, ['a.properties', 'a2.properties', 'b.properties'])
     }
 
     def 'exclude files'() {
@@ -45,10 +45,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'b.properties'])
+        assertContains(output, ['a.properties', 'b.properties'])
 
         and:
-        doesNotContain(output, ['a2.properties'])
+        assertDoesNotContain(output, ['a2.properties'])
     }
 
     def "exclude dependency"() {
@@ -77,10 +77,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+        assertContains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
 
         and:
-        doesNotContain(output, ['d.properties'])
+        assertDoesNotContain(output, ['d.properties'])
     }
 
     @Issue('https://github.com/GradleUp/shadow/issues/83')
@@ -110,10 +110,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+        assertContains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
 
         and:
-        doesNotContain(output, ['d.properties'])
+        assertDoesNotContain(output, ['d.properties'])
     }
 
     @Issue("https://github.com/GradleUp/shadow/issues/54")
@@ -143,10 +143,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+        assertContains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
 
         and:
-        doesNotContain(output, ['d.properties'])
+        assertDoesNotContain(output, ['d.properties'])
 
         when: 'Update build file shadowJar dependency exclusion'
         buildFile.text = buildFile.text.replace('exclude(dependency(\'shadow:d:1.0\'))',
@@ -158,10 +158,10 @@ class FilteringSpec extends BasePluginSpecification {
         assert result.task(':shadowJar').outcome == TaskOutcome.SUCCESS
 
         and:
-        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'd.properties'])
+        assertContains(output, ['a.properties', 'a2.properties', 'b.properties', 'd.properties'])
 
         and:
-        doesNotContain(output, ['c.properties'])
+        assertDoesNotContain(output, ['c.properties'])
     }
 
     @Issue("https://github.com/GradleUp/shadow/issues/62")
@@ -191,10 +191,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+        assertContains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
 
         and:
-        doesNotContain(output, ['d.properties'])
+        assertDoesNotContain(output, ['d.properties'])
 
         when: 'Update build file shadowJar dependency exclusion'
         buildFile.text = buildFile.text.replace('exclude(dependency(\'shadow:d:1.0\'))',
@@ -206,10 +206,10 @@ class FilteringSpec extends BasePluginSpecification {
         assert result.task(':shadowJar').outcome == TaskOutcome.SUCCESS
 
         and:
-        contains(output, ['a2.properties', 'b.properties', 'c.properties', 'd.properties'])
+        assertContains(output, ['a2.properties', 'b.properties', 'c.properties', 'd.properties'])
 
         and:
-        doesNotContain(output, ['a.properties'])
+        assertDoesNotContain(output, ['a.properties'])
     }
 
     def "include dependency, excluding all others"() {
@@ -243,10 +243,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['d.properties', 'shadow/Passed.class'])
+        assertContains(output, ['d.properties', 'shadow/Passed.class'])
 
         and:
-        doesNotContain(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+        assertDoesNotContain(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
     }
 
     def 'filter project dependencies'() {
@@ -294,12 +294,12 @@ class FilteringSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        doesNotContain(serverOutput, [
+        assertDoesNotContain(serverOutput, [
             'client/Client.class',
         ])
 
         and:
-        contains(serverOutput, ['server/Server.class', 'junit/framework/Test.class'])
+        assertContains(serverOutput, ['server/Server.class', 'junit/framework/Test.class'])
     }
 
     def 'exclude a transitive project dependency'() {
@@ -346,12 +346,12 @@ class FilteringSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        doesNotContain(serverOutput, [
+        assertDoesNotContain(serverOutput, [
             'junit/framework/Test.class'
         ])
 
         and:
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class'])
     }
@@ -371,10 +371,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'b.properties'])
+        assertContains(output, ['a.properties', 'b.properties'])
 
         and:
-        doesNotContain(output, ['a2.properties'])
+        assertDoesNotContain(output, ['a2.properties'])
     }
 
     @Issue("https://github.com/GradleUp/shadow/issues/69")
@@ -405,10 +405,10 @@ class FilteringSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
+        assertContains(output, ['a.properties', 'a2.properties', 'b.properties', 'c.properties'])
 
         and:
-        doesNotContain(output, ['d.properties'])
+        assertDoesNotContain(output, ['d.properties'])
     }
 
 }

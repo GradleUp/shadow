@@ -71,10 +71,10 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
         def result = run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'b.properties'])
+        assertContains(output, ['a.properties', 'b.properties'])
 
         and:
-        doesNotContain(output, ['a2.properties'])
+        assertDoesNotContain(output, ['a2.properties'])
         result.output.contains("Reusing configuration cache.")
     }
 
@@ -122,11 +122,11 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
-        doesNotContain(output, ['client/Client.class'])
+        assertDoesNotContain(output, ['client/Client.class'])
 
         and:
         result.output.contains("Reusing configuration cache.")

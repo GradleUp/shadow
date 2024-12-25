@@ -54,7 +54,7 @@ class ApplicationSpec extends BasePluginSpecification {
         assert installedJar.exists()
 
         and: 'And that jar file as the correct files in it'
-        contains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
+        assertContains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
 
         and: 'Check the manifest attributes in the jar file are correct'
         JarFile jar = new JarFile(installedJar)
@@ -134,7 +134,7 @@ class ApplicationSpec extends BasePluginSpecification {
         assert installedJar.exists()
 
         and: 'And that jar file as the correct files in it'
-        contains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
+        assertContains(installedJar, ['a.properties', 'a2.properties', 'myapp/Main.class'])
 
         and: 'Check the manifest attributes in the jar file are correct'
         JarFile jar = new JarFile(installedJar)
