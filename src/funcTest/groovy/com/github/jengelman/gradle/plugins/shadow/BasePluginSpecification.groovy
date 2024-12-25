@@ -9,6 +9,7 @@ import spock.lang.Specification
 import spock.lang.TempDir
 
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.function.Function
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -120,7 +121,7 @@ abstract class BasePluginSpecification extends Specification {
     }
 
     AppendableMavenFileRepository repo(String path = 'maven-repo') {
-        new AppendableMavenFileRepository(dir.resolve(path).toFile())
+        new AppendableMavenFileRepository(dir.resolve(path))
     }
 
     void assertJarFileContentsEqual(File f, String path, String contents) {
@@ -163,7 +164,7 @@ abstract class BasePluginSpecification extends Specification {
     }
 
     AppendableJar buildJar(String path) {
-        return new AppendableJar(file(path))
+        return new AppendableJar(file(path).toPath())
     }
 
     protected File getOutput() {
@@ -174,8 +175,8 @@ abstract class BasePluginSpecification extends Specification {
         getFile("build/libs/${name}")
     }
 
-    protected File getTestJar(String name = 'junit-3.8.2.jar') {
-        return new File(this.class.classLoader.getResource(name).toURI())
+    protected Path getTestJar(String name = 'junit-3.8.2.jar') {
+        return Paths.get(this.class.classLoader.getResource(name).toURI())
     }
 
     protected static File getTestKitDir() {
@@ -184,5 +185,9 @@ abstract class BasePluginSpecification extends Specification {
             gradleUserHome = new File(System.getProperty("user.home"), ".gradle").absolutePath
         }
         return new File(gradleUserHome, "testkit")
+    }
+
+    protected static String escapedPath(Path path) {
+        path.toString().replaceAll('\\\\', '\\\\\\\\')
     }
 }

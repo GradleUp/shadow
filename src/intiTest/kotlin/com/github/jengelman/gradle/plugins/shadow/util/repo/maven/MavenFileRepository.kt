@@ -1,14 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import java.io.File
 import java.net.URI
+import java.nio.file.Path
 
 /**
  * A fixture for dealing with file Maven repositories.
  */
-open class MavenFileRepository(val rootDir: File) : MavenRepository {
+open class MavenFileRepository(val rootDir: Path) : MavenRepository {
 
-  override val uri: URI = rootDir.toURI()
+  override val uri: URI = rootDir.toUri()
 
   override fun module(groupId: String, artifactId: String): MavenFileModule {
     return module(groupId = groupId, artifactId = artifactId, version = "0.0.0")

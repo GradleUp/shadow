@@ -1,24 +1,25 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.util.repo.maven.MavenFileModule
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.inputStream
 
 class AppendableMavenFileModule(
-  moduleDir: File,
+  moduleDir: Path,
   groupId: String,
   artifactId: String,
   version: String,
 ) : MavenFileModule(moduleDir, groupId, artifactId, version) {
 
   private val contents = mutableMapOf<String, MutableMap<String, String>>().withDefault { mutableMapOf() }
-  private val files = mutableMapOf<String, File>()
+  private val paths = mutableMapOf<String, Path>()
 
-  fun use(file: File): AppendableMavenFileModule {
-    return use("", file)
+  fun use(path: Path): AppendableMavenFileModule {
+    return use("", path)
   }
 
-  fun use(classifier: String, file: File): AppendableMavenFileModule = apply {
-    files[classifier] = file
+  fun use(classifier: String, path: Path): AppendableMavenFileModule = apply {
+    paths[classifier] = path
   }
 
   fun insertFile(path: String, content: String): AppendableMavenFileModule {
@@ -29,22 +30,22 @@ class AppendableMavenFileModule(
     contents.getOrPut(classifier) { mutableMapOf() }[path] = content
   }
 
-  override fun publishArtifact(artifact: Map<String, Any?>): File {
-    val artifactFile = artifactFile(artifact)
+  override fun publishArtifact(artifact: Map<String, Any?>): Path {
+    val artifactPath = artifactPath(artifact)
     if (type == "pom") {
-      return artifactFile
+      return artifactPath
     }
     val classifier = artifact["classifier"] as? String ?: ""
-    val classifierFile = files[classifier]
-    if (classifierFile != null) {
-      publish(artifactFile) { os ->
-        classifierFile.inputStream().copyTo(os)
+    val classifierPath = paths[classifier]
+    if (classifierPath != null) {
+      publish(artifactPath) { os ->
+        classifierPath.inputStream().copyTo(os)
       }
     } else {
-      publish(artifactFile) { os ->
+      publish(artifactPath) { os ->
         AppendableJar(contents[classifier].orEmpty()).write(os)
       }
     }
-    return artifactFile
+    return artifactPath
   }
 }

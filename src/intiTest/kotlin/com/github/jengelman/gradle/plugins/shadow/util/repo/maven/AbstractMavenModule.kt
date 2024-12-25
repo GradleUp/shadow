@@ -1,9 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
 import com.github.jengelman.gradle.plugins.shadow.util.repo.AbstractModule
-import java.io.File
+import java.nio.file.Path
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.name
+import kotlin.io.path.reader
 import org.apache.maven.artifact.repository.metadata.Metadata
 import org.apache.maven.artifact.repository.metadata.Snapshot
 import org.apache.maven.artifact.repository.metadata.Versioning
@@ -14,7 +19,7 @@ import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer
 
 abstract class AbstractMavenModule(
-  protected val moduleDir: File,
+  protected val moduleDir: Path,
   protected val groupId: String,
   protected val artifactId: String,
   protected val version: String,
@@ -46,16 +51,16 @@ abstract class AbstractMavenModule(
     dependencies.add(dep)
   }
 
-  override val pomFile: File
+  override val pomPath: Path
     get() = moduleDir.resolve("$artifactId-$publishArtifactVersion.pom")
 
-  override val metaDataFile: File
+  override val metaDataPath: Path
     get() = moduleDir.resolve(MAVEN_METADATA_FILE)
 
-  val rootMetaDataFile: File
+  val rootMetaDataPath: Path
     get() = moduleDir.resolveSibling(MAVEN_METADATA_FILE)
 
-  fun artifactFile(options: Map<String, Any?>): File {
+  fun artifactPath(options: Map<String, Any?>): Path {
     val artifact = toArtifact(options)
     var fileName = "$artifactId-$publishArtifactVersion.${artifact["type"]}"
     if (artifact["classifier"] != null) {
@@ -65,17 +70,17 @@ abstract class AbstractMavenModule(
   }
 
   override fun publishPom(): MavenModule = apply {
-    moduleDir.mkdirs()
-    val rootMavenMetaData = rootMetaDataFile
+    moduleDir.createDirectories()
+    val rootMavenMetaData = rootMetaDataPath
     updateRootMavenMetaData(rootMavenMetaData)
 
     if (isPublishesMetaDataFile) {
-      publish(metaDataFile) { outputStream ->
+      publish(metaDataPath) { outputStream ->
         MetadataXpp3Writer().write(outputStream, getMetaData(emptyList()))
       }
     }
 
-    publish(pomFile) { outputStream ->
+    publish(pomPath) { outputStream ->
       val pomPackaging = packaging ?: type
       val model = Model().also {
         it.modelVersion = "4.0.0"
@@ -114,15 +119,15 @@ abstract class AbstractMavenModule(
     publishArtifact(emptyMap())
   }
 
-  open fun publishArtifact(artifact: Map<String, Any?>): File {
-    val artifactFile = artifactFile(artifact)
+  open fun publishArtifact(artifact: Map<String, Any?>): Path {
+    val artifactPath = artifactPath(artifact)
     if (type == "pom") {
-      return artifactFile
+      return artifactPath
     }
-    publish(artifactFile) { outputStream ->
-      outputStream.write("${artifactFile.name} : $artifactContent".toByteArray())
+    publish(artifactPath) { outputStream ->
+      outputStream.write("${artifactPath.name} : $artifactContent".toByteArray())
     }
-    return artifactFile
+    return artifactPath
   }
 
   protected fun toArtifact(options: Map<String, Any?>): Map<String, Any?> {
@@ -144,7 +149,7 @@ abstract class AbstractMavenModule(
   protected val publishTimestamp: Date
     get() = Date(updateFormat.parse("20100101120000").time + publishCount * 1000)
 
-  private fun updateRootMavenMetaData(rootMavenMetaData: File) {
+  private fun updateRootMavenMetaData(rootMavenMetaData: Path) {
     val allVersions = if (rootMavenMetaData.exists()) {
       MetadataXpp3Reader().read(rootMavenMetaData.reader()).versioning.versions
     } else {
@@ -163,8 +168,8 @@ abstract class AbstractMavenModule(
   private val uniqueSnapshotVersion: String
     get() {
       require(isUniqueSnapshots && version.endsWith("-SNAPSHOT"))
-      return if (metaDataFile.isFile) {
-        val metaData = MetadataXpp3Reader().read(metaDataFile.reader())
+      return if (metaDataPath.isRegularFile()) {
+        val metaData = MetadataXpp3Reader().read(metaDataPath.reader())
         val timestamp = metaData.versioning.snapshot.timestamp
         val build = metaData.versioning.snapshot.buildNumber
         "$timestamp-$build"

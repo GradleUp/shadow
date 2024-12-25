@@ -1,12 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.util.repo.maven
 
-import java.io.File
+import java.nio.file.Path
 import org.apache.maven.artifact.repository.metadata.Metadata
 import org.apache.maven.artifact.repository.metadata.Snapshot
 import org.apache.maven.artifact.repository.metadata.Versioning
 
 open class MavenFileModule(
-  moduleDir: File,
+  moduleDir: Path,
   groupId: String,
   artifactId: String,
   version: String,
@@ -30,9 +30,9 @@ open class MavenFileModule(
     }
   }
 
-  override fun postPublish(file: File) {
-    sha1File(file)
-    md5File(file)
+  override fun postPublish(path: Path) {
+    writeSha1Path(path)
+    writeMd5Path(path)
   }
 
   override val isPublishesMetaDataFile: Boolean

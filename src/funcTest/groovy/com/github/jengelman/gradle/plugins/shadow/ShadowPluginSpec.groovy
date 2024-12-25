@@ -62,7 +62,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
-        File one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
+        def one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
             'one # NOTE: No newline terminates this line/file').write()
 
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
@@ -1270,9 +1270,5 @@ class ShadowPluginSpec extends BasePluginSpecification {
         and:
         def jarFile = new JarFile(output("shadow-1.0-tests.jar"))
         assert jarFile.getEntry('junit') != null
-    }
-
-    private String escapedPath(File file) {
-        file.path.replaceAll('\\\\', '\\\\\\\\')
     }
 }

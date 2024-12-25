@@ -19,7 +19,7 @@ class JarBuilder(os: OutputStream) {
     }
   }
 
-  fun withFile(path: String, data: String): JarBuilder {
+  fun withPath(path: String, data: String): JarBuilder {
     val idx = path.lastIndexOf('/')
     if (idx != -1) {
       addDirectory(path.substring(0, idx))

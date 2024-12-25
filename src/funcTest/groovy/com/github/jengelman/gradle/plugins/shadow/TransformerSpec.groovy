@@ -14,13 +14,13 @@ class TransformerSpec extends BasePluginSpecification {
 
     def 'service resource transformer'() {
         given:
-        File one = buildJar('one.jar')
+        def one = buildJar('one.jar')
             .insert('META-INF/services/org.apache.maven.Shade',
                 'one # NOTE: No newline terminates this line/file')
             .insert('META-INF/services/com.acme.Foo', 'one')
             .write()
 
-        File two = buildJar('two.jar')
+        def two = buildJar('two.jar')
             .insert('META-INF/services/org.apache.maven.Shade',
                 'two # NOTE: No newline terminates this line/file')
             .insert('META-INF/services/com.acme.Foo', 'two')
@@ -60,10 +60,10 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
     def 'service resource transformer alternate path'() {
         given:
-        File one = buildJar('one.jar').insert('META-INF/foo/org.apache.maven.Shade',
+        def one = buildJar('one.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
+        def two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -95,13 +95,13 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
     def 'service resource transformer short syntax'() {
         given:
-        File one = buildJar('one.jar')
+        def one = buildJar('one.jar')
             .insert('META-INF/services/org.apache.maven.Shade',
                 'one # NOTE: No newline terminates this line/file')
             .insert('META-INF/services/com.acme.Foo', 'one')
             .write()
 
-        File two = buildJar('two.jar')
+        def two = buildJar('two.jar')
             .insert('META-INF/services/org.apache.maven.Shade',
                 'two # NOTE: No newline terminates this line/file')
             .insert('META-INF/services/com.acme.Foo', 'two')
@@ -140,7 +140,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
     def 'service resource transformer short syntax relocation'() {
         given:
-        File one = buildJar('one.jar')
+        def one = buildJar('one.jar')
             .insert('META-INF/services/java.sql.Driver',
                 '''oracle.jdbc.OracleDriver
 org.apache.hive.jdbc.HiveDriver'''.stripIndent())
@@ -150,7 +150,7 @@ org.apache.hive.jdbc.HiveDriver'''.stripIndent())
                 'org.apache.commons.logging.impl.LogFactoryImpl')
             .write()
 
-        File two = buildJar('two.jar')
+        def two = buildJar('two.jar')
             .insert('META-INF/services/java.sql.Driver',
                 '''org.apache.derby.jdbc.AutoloadedDriver
 com.mysql.jdbc.Driver'''.stripIndent())
@@ -206,10 +206,10 @@ org.mortbay.log.Factory'''.stripIndent()
 
     def 'service resource transformer short syntax alternate path'() {
         given:
-        File one = buildJar('one.jar').insert('META-INF/foo/org.apache.maven.Shade',
+        def one = buildJar('one.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
+        def two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -239,7 +239,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
     @Issue(['SHADOW-70', 'SHADOW-71'])
     def 'apply transformers to project resources'() {
         given:
-        File one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
+        def one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
             'one # NOTE: No newline terminates this line/file').write()
 
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
@@ -276,10 +276,10 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
     def 'appending transformer'() {
         given:
-        File one = buildJar('one.jar').insert('test.properties',
+        def one = buildJar('one.jar').insert('test.properties',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insert('test.properties',
+        def two = buildJar('two.jar').insert('test.properties',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -312,10 +312,10 @@ two # NOTE: No newline terminates this line/file
 
     def 'appending transformer short syntax'() {
         given:
-        File one = buildJar('one.jar').insert('test.properties',
+        def one = buildJar('one.jar').insert('test.properties',
             'one # NOTE: No newline terminates this line/file').write()
 
-        File two = buildJar('two.jar').insert('test.properties',
+        def two = buildJar('two.jar').insert('test.properties',
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
@@ -427,7 +427,7 @@ two # NOTE: No newline terminates this line/file
 
     def 'append xml files'() {
         given:
-        File xml1 = buildJar('xml1.jar').insert('properties.xml',
+        def xml1 = buildJar('xml1.jar').insert('properties.xml',
             '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 
 <properties version="1.0">
@@ -436,7 +436,7 @@ two # NOTE: No newline terminates this line/file
 '''.stripIndent()
         ).write()
 
-        File xml2 = buildJar('xml2.jar').insert('properties.xml',
+        def xml2 = buildJar('xml2.jar').insert('properties.xml',
             '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 
 <properties version="1.0">
@@ -764,9 +764,5 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         'PropertiesFileTransformer'         | '{ keyTransformer = { it.toLowerCase() } }'
         'ServiceFileTransformer'            | ''
         'XmlAppendingTransformer'           | ''
-    }
-
-    private String escapedPath(File file) {
-        file.path.replaceAll('\\\\', '\\\\\\\\')
     }
 }
