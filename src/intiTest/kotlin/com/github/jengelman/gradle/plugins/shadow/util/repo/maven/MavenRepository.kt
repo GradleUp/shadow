@@ -8,7 +8,5 @@ import java.net.URI
 interface MavenRepository {
   val uri: URI
 
-  fun module(groupId: String, artifactId: String): MavenModule
-
   fun module(groupId: String, artifactId: String, version: String): MavenModule
 }
