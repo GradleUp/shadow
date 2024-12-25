@@ -9,7 +9,7 @@ import okio.ByteString.Companion.toByteString
 
 abstract class AbstractModule {
 
-  protected abstract fun onPublish(file: File)
+  protected abstract fun postPublish(file: File)
 
   protected fun publish(file: File, action: (OutputStream) -> Unit) {
     val hashBefore = if (file.exists()) getHash(file, "sha1") else null
@@ -24,7 +24,7 @@ abstract class AbstractModule {
 
     check(!file.exists() || file.delete())
     check(tempFile.renameTo(file))
-    onPublish(file)
+    postPublish(file)
   }
 
   companion object {

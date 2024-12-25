@@ -30,7 +30,7 @@ open class MavenFileModule(
     }
   }
 
-  override fun onPublish(file: File) {
+  override fun postPublish(file: File) {
     sha1File(file)
     md5File(file)
   }
