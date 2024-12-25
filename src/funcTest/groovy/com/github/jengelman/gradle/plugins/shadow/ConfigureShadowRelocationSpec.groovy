@@ -15,7 +15,7 @@ class ConfigureShadowRelocationSpec extends BasePluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar', '-s')
+        run('shadowJar')
 
         then:
         contains(output, [

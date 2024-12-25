@@ -116,9 +116,9 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
         def output = getFile('server/build/libs/server-all.jar')
 
         when:
-        run('shadowJar', '-s')
+        run('shadowJar')
         output.delete()
-        def result = run('shadowJar', '-s')
+        def result = run('shadowJar')
 
         then:
         output.exists()
@@ -157,8 +157,8 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar', '-s')
-        def result = run('shadowJar', '-s')
+        run('shadowJar')
+        def result = run('shadowJar')
 
         then:
         result.output.contains(":lib:shadowJar UP-TO-DATE")
