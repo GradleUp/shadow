@@ -38,7 +38,7 @@ class AppendableMavenFileModule(module: MavenFileModule) : MavenFileModule(modul
       }
     } else {
       publish(artifactPath) { os ->
-        AppendableJar(contents[classifier].orEmpty()).write(os)
+        AppendableJar.write(contents[classifier].orEmpty(), os)
       }
     }
     return artifactPath
