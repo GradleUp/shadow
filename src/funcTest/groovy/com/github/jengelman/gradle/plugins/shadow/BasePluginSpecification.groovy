@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import org.codehaus.plexus.util.IOUtil
@@ -25,32 +26,37 @@ abstract class BasePluginSpecification extends Specification {
         repo = repo()
         repo.module('junit', 'junit', '3.8.2').use(testJar).publish()
 
-        buildFile << defaultBuildScript
-
+        buildFile << getDefaultBuildScript('java', true, true)
+        buildFile << System.lineSeparator()
         settingsFile << settingsBuildScript
+        settingsFile << System.lineSeparator()
     }
 
     def cleanup() {
         println buildFile.text
     }
 
-    String getDefaultBuildScript(String javaPlugin = 'java') {
+    String getDefaultBuildScript(
+        String javaPlugin = 'java',
+        boolean withGroup = false,
+        boolean withVersion = false
+    ) {
+        def groupInfo = withGroup ? "group = 'shadow'" : ""
+        def versionInfo = withVersion ? "version = '1.0'" : ""
+
         return """
         plugins {
             id '${javaPlugin}'
             id 'com.gradleup.shadow'
         }
 
-        version = "1.0"
-        group = 'shadow'
-
-        repositories {
-            maven { url = "${repo.uri}" }
-        }
-        """.stripIndent()
+        $groupInfo
+        $versionInfo
+        """.stripIndent().trim()
     }
 
-    String getSettingsBuildScript() {
+    String getSettingsBuildScript(boolean withRootProject = true) {
+        def rootProjectInfo = withRootProject ? "rootProject.name = 'shadow'" : ""
         return """
             dependencyResolutionManagement {
               repositories {
@@ -59,9 +65,11 @@ abstract class BasePluginSpecification extends Specification {
               }
             }
 
-            rootProject.name = 'shadow'
-        """
+            $rootProjectInfo
+        """.stripIndent().trim()
     }
+
+    static def shadowJar = "tasks.named('shadowJar', ${ShadowJar.class.name})".trim()
 
     GradleRunner getRunner() {
         GradleRunner.create()

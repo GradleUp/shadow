@@ -15,7 +15,7 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'junit:junit:3.8.2'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'junit.textui', 'a'
                relocate 'junit.framework', 'b'
                manifest {
@@ -80,8 +80,7 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'junit:junit:3.8.2'
             }
 
-            // tag::relocateFilter[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate('junit.textui', 'a') {
                    exclude 'junit.textui.TestRunner'
                }
@@ -89,7 +88,6 @@ class RelocationSpec extends BasePluginSpecification {
                    include 'junit.framework.Test*'
                }
             }
-            // end::relocateFilter[]
         """.stripIndent()
 
         when:
@@ -137,11 +135,9 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'junit:junit:3.8.2'
             }
 
-            // tag::relocate[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'junit.framework', 'shadow.junit'
             }
-            // end::relocate[]
         """.stripIndent()
 
         file('src/main/java/shadow/ShadowTest.java') << '''
@@ -184,7 +180,6 @@ class RelocationSpec extends BasePluginSpecification {
         file('core/build.gradle') << """
         apply plugin: 'java-library'
 
-        repositories { maven { url = "${repo.uri}" } }
         dependencies { api 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -200,13 +195,11 @@ class RelocationSpec extends BasePluginSpecification {
 
         and: 'App project with shadow, relocation, and project dependency'
         file('app/build.gradle') << """
-        apply plugin: 'java'
-        apply plugin: 'com.gradleup.shadow'
+        $defaultBuildScript
 
-        repositories { maven { url = "${repo.uri}" } }
         dependencies { implementation project(':core') }
 
-        tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+        $shadowJar {
           relocate 'core', 'app.core'
           relocate 'junit.framework', 'app.junit.framework'
         }
@@ -263,7 +256,7 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'shadow:dep:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'foo', 'bar'
             }
         """.stripIndent()
@@ -290,22 +283,14 @@ class RelocationSpec extends BasePluginSpecification {
     def "does not error on relocating java9 classes"() {
         given:
         buildFile << """
-            repositories {
-                mavenCentral()
-                maven {
-                    url = 'https://repository.mapr.com/nexus/content/groups/mapr-public/releases'
-                }
-            }
-
             dependencies {
                 implementation 'org.slf4j:slf4j-api:1.7.21'
                 implementation group: 'io.netty', name: 'netty-all', version: '4.0.23.Final'
                 implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
                 implementation group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6'
-                implementation group: 'org.hbase', name: 'asynchbase', version: '1.7.0-mapr-1603'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 zip64 = true
                 relocate 'com.google.protobuf', 'shaded.com.google.protobuf'
                 relocate 'io.netty', 'shaded.io.netty'

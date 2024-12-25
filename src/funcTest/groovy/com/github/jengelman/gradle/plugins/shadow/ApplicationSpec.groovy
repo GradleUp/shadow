@@ -120,7 +120,7 @@ class ApplicationSpec extends BasePluginSpecification {
             }
 
             rootProject.name = 'myapp'
-        """.stripIndent()
+        """.stripIndent() + getSettingsBuildScript(false)
 
         when:
         BuildResult result = run('runShadow')

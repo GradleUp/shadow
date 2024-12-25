@@ -2,7 +2,11 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 class MinimizationCachingSpec extends AbstractCachingSpec {
     File output
-    String shadowJarTask = ":server:shadowJar"
+
+    @Override
+    String getShadowJarTask() {
+        return ":server:shadowJar"
+    }
 
     /**
      * Ensure that we get a cache miss when minimization is added and that caching works with minimization
@@ -30,8 +34,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
             dependencies { implementation project(':client') }
         """.stripIndent()
@@ -50,11 +53,8 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         ])
 
         when:
-        file('server/build.gradle').text = """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
-
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+        file('server/build.gradle') << """
+            $shadowJar {
                 minimize {
                     exclude(dependency('junit:junit:.*'))
                 }
