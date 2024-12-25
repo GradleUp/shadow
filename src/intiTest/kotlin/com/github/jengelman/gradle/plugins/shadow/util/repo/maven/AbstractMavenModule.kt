@@ -19,10 +19,10 @@ import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer
 
 abstract class AbstractMavenModule(
-  protected val moduleDir: Path,
-  protected val groupId: String,
-  protected val artifactId: String,
-  protected val version: String,
+  val moduleDir: Path,
+  val groupId: String,
+  val artifactId: String,
+  val version: String,
 ) : AbstractModule(),
   MavenModule {
 

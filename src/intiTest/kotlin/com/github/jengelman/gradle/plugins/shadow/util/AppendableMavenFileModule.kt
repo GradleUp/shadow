@@ -4,12 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.repo.maven.MavenFileModul
 import java.nio.file.Path
 import kotlin.io.path.inputStream
 
-class AppendableMavenFileModule(
-  moduleDir: Path,
-  groupId: String,
-  artifactId: String,
-  version: String,
-) : MavenFileModule(moduleDir, groupId, artifactId, version) {
+class AppendableMavenFileModule(module: MavenFileModule) : MavenFileModule(module.moduleDir, module.groupId, module.artifactId, module.version) {
 
   private val contents = mutableMapOf<String, MutableMap<String, String>>().withDefault { mutableMapOf() }
   private val paths = mutableMapOf<String, Path>()
