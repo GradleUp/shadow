@@ -71,7 +71,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         buildFile << """
             dependencies {
               implementation 'junit:junit:3.8.2'
-              implementation files('$one')
+              implementation files('${escapedPath(one)}')
             }
 
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
