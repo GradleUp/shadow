@@ -5,11 +5,14 @@ import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import java.nio.file.Path
 import java.util.jar.JarFile
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
@@ -20,17 +23,17 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.io.TempDir
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
-  @TempDir
   lateinit var root: Path
 
   lateinit var repo: AppendableMavenFileRepository
 
   @BeforeEach
   fun setup() {
+    root = createTempDirectory()
+
     repo = repo()
     repo.module("junit", "junit", "3.8.2")
       .use(testJar)
@@ -42,8 +45,14 @@ abstract class BasePluginTest {
     settingsScript.appendText(System.lineSeparator())
   }
 
+  @ExperimentalPathApi
   @AfterEach
   fun cleanup() {
+    runCatching {
+      // TODO: workaround for https://github.com/junit-team/junit5/issues/2811.
+      root.deleteRecursively()
+    }
+
     println(buildScript.readText())
   }
 
