@@ -18,27 +18,21 @@ class ApplicationTest : BasePluginTest() {
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
-      projectBlock = {
-        """
-          java {
-            toolchain.languageVersion = JavaLanguageVersion.of(17)
-          }
-        """.trimIndent()
-      },
-      settingsBlock = {
-        """
-          plugins {
-            id('org.gradle.toolchains.foojay-resolver-convention') version '0.7.0'
-          }
-        """.trimIndent()
-      },
-      runShadowBlock = {
-        """
-          doFirst {
-            logger.lifecycle("Running application with JDK ${'$'}{it.javaLauncher.get().metadata.languageVersion.asInt()}")
-          }
-        """.trimIndent()
-      },
+      projectBlock = """
+        java {
+          toolchain.languageVersion = JavaLanguageVersion.of(17)
+        }
+      """.trimIndent(),
+      settingsBlock = """
+        plugins {
+          id('org.gradle.toolchains.foojay-resolver-convention') version '0.7.0'
+        }
+      """.trimIndent(),
+      runShadowBlock = """
+        doFirst {
+          logger.lifecycle("Running application with JDK ${'$'}{it.javaLauncher.get().metadata.languageVersion.asInt()}")
+        }
+      """.trimIndent(),
     )
 
     val result: BuildResult = run("runShadow")
@@ -66,13 +60,11 @@ class ApplicationTest : BasePluginTest() {
   @Test
   fun shadowApplicationDistributionsShouldUseShadowJar() {
     prepare(
-      projectBlock = {
-        """
-          dependencies {
-             shadow 'shadow:a:1.0'
-          }
-        """.trimIndent()
-      },
+      projectBlock = """
+        dependencies {
+           shadow 'shadow:a:1.0'
+        }
+      """.trimIndent(),
     )
 
     run("shadowDistZip")
@@ -98,9 +90,9 @@ class ApplicationTest : BasePluginTest() {
   }
 
   private fun prepare(
-    projectBlock: () -> String = { "" },
-    settingsBlock: () -> String = { "" },
-    runShadowBlock: () -> String = { "" },
+    projectBlock: String = "",
+    settingsBlock: String = "",
+    runShadowBlock: String = "",
   ) {
     repo.module("shadow", "a", "1.0")
       .insertFile("a.properties", "a")
@@ -119,7 +111,7 @@ class ApplicationTest : BasePluginTest() {
     buildScript.appendText(
       """
         apply plugin: 'application'
-        ${projectBlock()}
+        $projectBlock
         application {
           mainClass = 'myapp.Main'
         }
@@ -128,14 +120,14 @@ class ApplicationTest : BasePluginTest() {
         }
         $runShadow {
           args 'foo'
-          ${runShadowBlock()}
+          $runShadowBlock
         }
       """.trimIndent(),
     )
     settingsScript.writeText(
       getSettingsBuildScript(
-        start = settingsBlock,
-        end = { "rootProject.name = 'myapp'" },
+        startBlock = settingsBlock,
+        endBlock = "rootProject.name = 'myapp'",
       ),
     )
   }

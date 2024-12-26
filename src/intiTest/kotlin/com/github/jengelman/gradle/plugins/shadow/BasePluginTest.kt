@@ -39,7 +39,12 @@ abstract class BasePluginTest {
       .use(testJar)
       .publish()
 
-    buildScript.writeText(getProjectBuildScript(withGroup = true, withVersion = true))
+    buildScript.writeText(
+      getProjectBuildScript(
+        groupInfo = "group = 'shadow'",
+        versionInfo = "version = '1.0'",
+      ),
+    )
     buildScript.appendText(System.lineSeparator())
     settingsScript.writeText(getSettingsBuildScript())
     settingsScript.appendText(System.lineSeparator())
@@ -59,16 +64,13 @@ abstract class BasePluginTest {
   @Language("Groovy")
   protected fun getProjectBuildScript(
     javaPlugin: String = "java",
-    withGroup: Boolean = false,
-    withVersion: Boolean = false,
+    groupInfo: String = "",
+    versionInfo: String = "",
   ): String {
-    val groupInfo = if (withGroup) "group = 'shadow'" else ""
-    val versionInfo = if (withVersion) "version = '1.0'" else ""
-
     return """
       plugins {
-          id('$javaPlugin')
-          id('com.gradleup.shadow')
+        id('$javaPlugin')
+        id('com.gradleup.shadow')
       }
       $groupInfo
       $versionInfo
@@ -77,18 +79,18 @@ abstract class BasePluginTest {
 
   @Language("Groovy")
   protected fun getSettingsBuildScript(
-    start: () -> String = { "" },
-    end: () -> String = { "rootProject.name = 'shadow'" },
+    startBlock: String = "",
+    endBlock: String = "rootProject.name = 'shadow'",
   ): String {
     return """
-      ${start()}
+      $startBlock
       dependencyResolutionManagement {
         repositories {
           maven { url = '${repo.uri}' }
           mavenCentral()
         }
       }
-      ${end()}
+      $endBlock
     """.trimIndent()
   }
 
