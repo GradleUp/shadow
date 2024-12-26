@@ -35,7 +35,7 @@ class ApplicationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result: BuildResult = run("runShadow")
+    val result: BuildResult = run(runShadowTask)
 
     assertThat(result.output).contains("Running application with JDK 17")
     assertThat(result.output).contains("TestApp: Hello World! (foo)")

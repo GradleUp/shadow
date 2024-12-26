@@ -1,5 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
@@ -26,9 +29,11 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
-  lateinit var root: Path
+  protected lateinit var root: Path
+  protected lateinit var repo: AppendableMavenFileRepository
 
-  lateinit var repo: AppendableMavenFileRepository
+  protected open val shadowJarTask = SHADOW_JAR_TASK_NAME
+  protected open val runShadowTask = SHADOW_RUN_TASK_NAME
 
   @BeforeEach
   fun setup() {
@@ -196,11 +201,11 @@ abstract class BasePluginTest {
     val testJar: Path = requireNotNull(this::class.java.classLoader.getResource("junit-3.8.2.jar")).toURI().toPath()
 
     val shadowJar: String = """
-      tasks.named("shadowJar", ${ShadowJar::class.java.name})
+      tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
     """.trimIndent()
 
     val runShadow = """
-      tasks.named('runShadow')
+      tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
 
     fun BuildResult.assertNoDeprecationWarnings() {

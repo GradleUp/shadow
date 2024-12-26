@@ -25,7 +25,7 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    run("shadowJar", "-s")
+    run(shadowJarTask)
 
     assertContains(
       outputShadowJar,
@@ -70,7 +70,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("shadowJar")
+    run(shadowJarTask)
 
     assertContains(
       outputShadowJar,
@@ -139,7 +139,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("shadowJar")
+    run(shadowJarTask)
 
     assertContains(
       outputShadowJar,
@@ -212,7 +212,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("shadowJar")
+    run(shadowJarTask)
 
     assertContains(
       outputShadowJar,
@@ -298,7 +298,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":app:shadowJar")
+    run(":app:$shadowJarTask")
 
     val appOutput = path("app/build/libs/app-all.jar")
     assertThat(appOutput).exists()
@@ -345,7 +345,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("shadowJar")
+    run(shadowJarTask)
 
     assertContains(
       outputShadowJar,
@@ -386,7 +386,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("shadowJar")
+    run(shadowJarTask)
     // No exception should be thrown
   }
 }
