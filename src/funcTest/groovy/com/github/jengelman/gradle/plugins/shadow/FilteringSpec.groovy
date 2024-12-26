@@ -124,7 +124,6 @@ class FilteringSpec extends BasePluginSpecification {
     }
 
     @Issue("SHADOW-54")
-    @Ignore("TODO - need to figure out the test pollution here")
     def "dependency exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
