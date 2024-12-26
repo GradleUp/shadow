@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import spock.lang.Ignore
 import spock.lang.Issue
 
 import java.util.jar.Attributes
@@ -288,7 +287,6 @@ class RelocationSpec extends BasePluginSpecification {
     }
 
     @Issue("SHADOW-294")
-    @Ignore
     def "does not error on relocating java9 classes"() {
         given:
         buildFile << """
@@ -308,7 +306,7 @@ class RelocationSpec extends BasePluginSpecification {
             }
 
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-                zip64 true
+                zip64 = true
                 relocate 'com.google.protobuf', 'shaded.com.google.protobuf'
                 relocate 'io.netty', 'shaded.io.netty'
             }
@@ -319,6 +317,5 @@ class RelocationSpec extends BasePluginSpecification {
 
         then:
         noExceptionThrown()
-
     }
 }
