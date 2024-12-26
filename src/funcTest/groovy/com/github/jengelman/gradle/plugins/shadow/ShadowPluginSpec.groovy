@@ -55,10 +55,13 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     }
 
-    @IgnoreIf({
-        // Gradle 8.3 doesn't support Java 21.
-        JavaVersion.current().majorVersion.toInteger() >= 21
-    })
+    @IgnoreIf(
+        reason = "Gradle 8.3 doesn't support Java 21.",
+        value = {
+            // Gradle 8.3 doesn't support Java 21.
+            JavaVersion.current().majorVersion.toInteger() >= 21
+        }
+    )
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
@@ -1112,64 +1115,6 @@ class ShadowPluginSpec extends BasePluginSpecification {
         assert result.output.contains('TestApp: Hello World! (foo)')
 
 
-    }
-
-    @Issue("SHADOW-303")
-    @Ignore("Plugin has been deprecated")
-    def "doesn't error when adding aspectj plugin"() {
-        given:
-        buildFile.text = """
-        buildscript {
-            repositories {
-                maven {
-                    url = "https://maven.eveoh.nl/content/repositories/releases"
-                }
-            }
-
-            dependencies {
-                classpath "nl.eveoh:gradle-aspectj:2.0"
-            }
-        }
-        """.stripIndent()
-
-        buildFile << defaultBuildScript
-
-        buildFile << """
-            project.ext {
-                aspectjVersion = '1.8.12'
-            }
-
-            apply plugin: 'aspectj'
-            apply plugin: 'application'
-
-            application {
-               mainClass = 'myapp.Main'
-            }
-
-            repositories {
-                mavenCentral()
-            }
-
-            runShadow {
-               args 'foo'
-            }
-
-        """
-
-        file('src/main/java/myapp/Main.java') << """
-            package myapp;
-            public class Main {
-               public static void main(String[] args) {
-                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
-               }
-            }
-        """.stripIndent()
-
-        when:
-        BuildResult result = run('runShadow')
-
-        then: 'tests that runShadow executed and exited'
-        assert result.output.contains('TestApp: Hello World! (foo)')
     }
 
     @Issue("https://github.com/GradleUp/shadow/issues/609")
