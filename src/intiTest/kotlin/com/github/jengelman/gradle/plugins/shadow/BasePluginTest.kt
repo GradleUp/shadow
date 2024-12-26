@@ -41,7 +41,7 @@ abstract class BasePluginTest {
 
     buildScript.writeText(getProjectBuildScript(withGroup = true, withVersion = true))
     buildScript.appendText(System.lineSeparator())
-    settingsScript.writeText(getSettingsBuildScript(withRootProject = true))
+    settingsScript.writeText(getSettingsBuildScript())
     settingsScript.appendText(System.lineSeparator())
   }
 
@@ -77,17 +77,18 @@ abstract class BasePluginTest {
 
   @Language("Groovy")
   protected fun getSettingsBuildScript(
-    withRootProject: Boolean = true,
+    start: () -> String = { "" },
+    end: () -> String = { "rootProject.name = 'shadow'" },
   ): String {
-    val rootProjectInfo = if (withRootProject) "rootProject.name = 'shadow'" else ""
     return """
-    dependencyResolutionManagement {
-      repositories {
-        maven { url = '${repo.uri}' }
-        mavenCentral()
+      ${start()}
+      dependencyResolutionManagement {
+        repositories {
+          maven { url = '${repo.uri}' }
+          mavenCentral()
+        }
       }
-    }
-    $rootProjectInfo
+      ${end()}
     """.trimIndent()
   }
 
@@ -194,6 +195,10 @@ abstract class BasePluginTest {
 
     val shadowJar: String = """
       tasks.named("shadowJar", ${ShadowJar::class.java.name})
+    """.trimIndent()
+
+    val runShadow = """
+      tasks.named('runShadow')
     """.trimIndent()
 
     fun BuildResult.assertNoDeprecationWarnings() {
