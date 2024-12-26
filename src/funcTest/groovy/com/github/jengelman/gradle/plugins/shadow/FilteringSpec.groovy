@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Ignore
 import spock.lang.Issue
 
 class FilteringSpec extends BasePluginSpecification {
@@ -172,7 +171,6 @@ class FilteringSpec extends BasePluginSpecification {
     }
 
     @Issue("SHADOW-62")
-    @Ignore
     def "project exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -205,11 +203,8 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['d.properties'])
 
         when: 'Update build file shadowJar dependency exclusion'
-        buildFile.text << '''
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-               exclude 'a.properties'
-            }
-        '''.stripIndent()
+        buildFile.text = buildFile.text.replace('exclude(dependency(\'shadow:d:1.0\'))',
+            'exclude \'a.properties\'')
 
         BuildResult result = run('shadowJar')
 
@@ -217,10 +212,10 @@ class FilteringSpec extends BasePluginSpecification {
         assert result.task(':shadowJar').outcome == TaskOutcome.SUCCESS
 
         and:
-        contains(output, ['a2.properties', 'b.properties', 'd.properties'])
+        contains(output, ['a2.properties', 'b.properties', 'c.properties', 'd.properties'])
 
         and:
-        doesNotContain(output, ['a.properties', 'c.properties'])
+        doesNotContain(output, ['a.properties'])
     }
 
     def "include dependency, excluding all others"() {
