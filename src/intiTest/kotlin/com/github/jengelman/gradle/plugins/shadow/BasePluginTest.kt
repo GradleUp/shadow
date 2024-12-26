@@ -33,7 +33,7 @@ abstract class BasePluginTest {
   lateinit var repo: AppendableMavenFileRepository
 
   @BeforeEach
-  fun setup() {
+  open fun setup() {
     root = createTempDirectory()
 
     repo = repo()
