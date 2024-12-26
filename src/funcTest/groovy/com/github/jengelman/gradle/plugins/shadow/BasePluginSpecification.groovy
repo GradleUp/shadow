@@ -80,7 +80,7 @@ abstract class BasePluginSpecification extends Specification {
     }
 
     GradleRunner runner(Collection<String> tasks) {
-        runner.withArguments(["-Dorg.gradle.warning.mode=all", "--configuration-cache", "--stacktrace"] + tasks.toList())
+        runner.withArguments(["--warning-mode=fail", "--configuration-cache", "--stacktrace"] + tasks.toList())
     }
 
     BuildResult run(String... tasks) {
