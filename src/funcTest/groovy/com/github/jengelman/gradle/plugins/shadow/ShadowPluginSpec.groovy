@@ -894,7 +894,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         assert attributes.getValue('Class-Path') == null
     }
 
-    @Issue('SHADOW-65')
+    @Issue('https://github.com/GradleUp/shadow/issues/65')
     def "add shadow configuration to Class-Path in Manifest"() {
         given:
 
@@ -916,7 +916,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         then:
         assert output.exists()
 
-        and: 'SHADOW-65 - combine w/ existing Class-Path'
+        and: 'https://github.com/GradleUp/shadow/issues/65 - combine w/ existing Class-Path'
         JarFile jar = new JarFile(output)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
@@ -924,7 +924,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     }
 
-    @Issue('SHADOW-92')
+    @Issue('https://github.com/GradleUp/shadow/issues/92')
     def "do not include null value in Class-Path when jar file does not contain Class-Path"() {
         given:
 
@@ -946,7 +946,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     }
 
-    @Issue('SHADOW-203')
+    @Issue('https://github.com/GradleUp/shadow/issues/203')
     def "support ZipCompression.STORED"() {
         given:
 
@@ -1016,7 +1016,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue('SHADOW-143')
+    @Issue('https://github.com/GradleUp/shadow/issues/143')
     @Ignore("This spec requires > 15 minutes and > 8GB of disk space to run")
     def "check large zip files with zip64 enabled"() {
         given:

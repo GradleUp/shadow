@@ -226,7 +226,10 @@ org.mortbay.log.Factory'''.stripIndent()
 two # NOTE: No newline terminates this line/file'''.stripIndent()
     }
 
-    @Issue(['SHADOW-70', 'SHADOW-71'])
+    @Issue([
+        'https://github.com/GradleUp/shadow/issues/70',
+        'https://github.com/GradleUp/shadow/issues/-71',
+    ])
     def 'apply transformers to project resources'() {
         given:
         def one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
@@ -461,7 +464,7 @@ two # NOTE: No newline terminates this line/file
 '''.stripIndent()
     }
 
-    @Issue('SHADOW-82')
+    @Issue('https://github.com/GradleUp/shadow/issues/82')
     def 'shadow.manifest leaks to jar.manifest'() {
         given:
         File main = file('src/main/java/shadow/Main.java')
@@ -521,7 +524,7 @@ two # NOTE: No newline terminates this line/file
         jis2?.close()
     }
 
-    @Issue('SHADOW-82')
+    @Issue('https://github.com/GradleUp/shadow/issues/82')
     def 'shadow manifest leaks to jar manifest'() {
         given:
         File main = file('src/main/java/shadow/Main.java')

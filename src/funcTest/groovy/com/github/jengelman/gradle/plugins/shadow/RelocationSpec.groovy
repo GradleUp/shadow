@@ -7,7 +7,7 @@ import java.util.jar.JarFile
 
 class RelocationSpec extends BasePluginSpecification {
 
-    @Issue('SHADOW-58')
+    @Issue('https://github.com/GradleUp/shadow/issues/58')
     def "relocate dependency files"() {
         given:
         buildFile << """
@@ -127,7 +127,10 @@ class RelocationSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue(['SHADOW-55', 'SHADOW-53'])
+    @Issue([
+        'https://github.com/GradleUp/shadow/issues/55',
+        'https://github.com/GradleUp/shadow/issues/53',
+    ])
     def "remap class names for relocated files in project source"() {
         given:
         buildFile << """
@@ -174,7 +177,7 @@ class RelocationSpec extends BasePluginSpecification {
         classLoader.loadClass('shadow.ShadowTest')
     }
 
-    @Issue('SHADOW-61')
+    @Issue('https://github.com/GradleUp/shadow/issues/61')
     def "relocate does not drop dependency resources"() {
         given: 'Core project with dependency and resource'
         file('core/build.gradle') << """
@@ -238,7 +241,10 @@ class RelocationSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue(['SHADOW-93', 'SHADOW-114'])
+    @Issue([
+        'https://github.com/GradleUp/shadow/issues/93',
+        'https://github.com/GradleUp/shadow/issues/114',
+    ])
     def "relocate resource files"() {
         given:
         repo.module('shadow', 'dep', '1.0')
@@ -279,7 +285,7 @@ class RelocationSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue("SHADOW-294")
+    @Issue("https://github.com/GradleUp/shadow/issues/294")
     def "does not error on relocating java9 classes"() {
         given:
         buildFile << """

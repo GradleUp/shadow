@@ -152,7 +152,7 @@ class ApplicationSpec extends BasePluginSpecification {
         jar?.close()
     }
 
-    @Issue('SHADOW-89')
+    @Issue('https://github.com/GradleUp/shadow/issues/89')
     def 'shadow application distributions should use shadow jar'() {
         given:
         repo.module('shadow', 'a', '1.0')
@@ -204,7 +204,7 @@ class ApplicationSpec extends BasePluginSpecification {
         zipFile?.close()
     }
 
-    @Issue('SHADOW-90')
+    @Issue('https://github.com/GradleUp/shadow/issues/90')
     def 'installShadow does not execute dependent shadow task'() {
         given:
         repo.module('shadow', 'a', '1.0')

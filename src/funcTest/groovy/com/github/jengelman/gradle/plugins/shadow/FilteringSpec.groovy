@@ -83,7 +83,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['d.properties'])
     }
 
-    @Issue('SHADOW-83')
+    @Issue('https://github.com/GradleUp/shadow/issues/83')
     def "exclude dependency using wildcard syntax"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -116,7 +116,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['d.properties'])
     }
 
-    @Issue("SHADOW-54")
+    @Issue("https://github.com/GradleUp/shadow/issues/54")
     def "dependency exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -164,7 +164,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['c.properties'])
     }
 
-    @Issue("SHADOW-62")
+    @Issue("https://github.com/GradleUp/shadow/issues/62")
     def "project exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -377,7 +377,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['a2.properties'])
     }
 
-    @Issue("SHADOW-69")
+    @Issue("https://github.com/GradleUp/shadow/issues/69")
     def "handle exclude with circular dependency"() {
         given:
         repo.module('shadow', 'c', '1.0')
