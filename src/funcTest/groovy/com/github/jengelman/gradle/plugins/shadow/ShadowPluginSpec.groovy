@@ -55,10 +55,13 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     }
 
-    @IgnoreIf({
-        // Gradle 8.3 doesn't support Java 21.
-        JavaVersion.current().majorVersion.toInteger() >= 21
-    })
+    @IgnoreIf(
+        reason = "Gradle 8.3 doesn't support Java 21.",
+        value = {
+            // Gradle 8.3 doesn't support Java 21.
+            JavaVersion.current().majorVersion.toInteger() >= 21
+        }
+    )
     @Unroll
     def 'Compatible with Gradle #version'() {
         given:
