@@ -7,7 +7,43 @@ import java.util.jar.JarFile
 
 class RelocationSpec extends BasePluginSpecification {
 
-    @Issue('SHADOW-58')
+    def "auto relocate plugin dependencies"() {
+        given:
+        buildFile << """
+            $shadowJar {
+                enableRelocation = true
+            }
+
+            dependencies {
+               implementation 'junit:junit:3.8.2'
+            }
+        """.stripIndent()
+
+        when:
+        run('shadowJar')
+
+        then:
+        contains(output, [
+            'META-INF/MANIFEST.MF',
+            'shadow/junit/textui/ResultPrinter.class',
+            'shadow/junit/textui/TestRunner.class',
+            'shadow/junit/framework/Assert.class',
+            'shadow/junit/framework/AssertionFailedError.class',
+            'shadow/junit/framework/ComparisonCompactor.class',
+            'shadow/junit/framework/ComparisonFailure.class',
+            'shadow/junit/framework/Protectable.class',
+            'shadow/junit/framework/Test.class',
+            'shadow/junit/framework/TestCase.class',
+            'shadow/junit/framework/TestFailure.class',
+            'shadow/junit/framework/TestListener.class',
+            'shadow/junit/framework/TestResult$1.class',
+            'shadow/junit/framework/TestResult.class',
+            'shadow/junit/framework/TestSuite$1.class',
+            'shadow/junit/framework/TestSuite.class'
+        ])
+    }
+
+    @Issue('https://github.com/GradleUp/shadow/issues/58')
     def "relocate dependency files"() {
         given:
         buildFile << """
@@ -15,7 +51,7 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'junit:junit:3.8.2'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'junit.textui', 'a'
                relocate 'junit.framework', 'b'
                manifest {
@@ -80,8 +116,7 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'junit:junit:3.8.2'
             }
 
-            // tag::relocateFilter[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate('junit.textui', 'a') {
                    exclude 'junit.textui.TestRunner'
                }
@@ -89,7 +124,6 @@ class RelocationSpec extends BasePluginSpecification {
                    include 'junit.framework.Test*'
                }
             }
-            // end::relocateFilter[]
         """.stripIndent()
 
         when:
@@ -129,7 +163,10 @@ class RelocationSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue(['SHADOW-55', 'SHADOW-53'])
+    @Issue([
+        'https://github.com/GradleUp/shadow/issues/55',
+        'https://github.com/GradleUp/shadow/issues/53',
+    ])
     def "remap class names for relocated files in project source"() {
         given:
         buildFile << """
@@ -137,11 +174,9 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'junit:junit:3.8.2'
             }
 
-            // tag::relocate[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'junit.framework', 'shadow.junit'
             }
-            // end::relocate[]
         """.stripIndent()
 
         file('src/main/java/shadow/ShadowTest.java') << '''
@@ -178,13 +213,12 @@ class RelocationSpec extends BasePluginSpecification {
         classLoader.loadClass('shadow.ShadowTest')
     }
 
-    @Issue('SHADOW-61')
+    @Issue('https://github.com/GradleUp/shadow/issues/61')
     def "relocate does not drop dependency resources"() {
         given: 'Core project with dependency and resource'
         file('core/build.gradle') << """
         apply plugin: 'java-library'
 
-        repositories { maven { url = "${repo.uri}" } }
         dependencies { api 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -200,13 +234,11 @@ class RelocationSpec extends BasePluginSpecification {
 
         and: 'App project with shadow, relocation, and project dependency'
         file('app/build.gradle') << """
-        apply plugin: 'java'
-        apply plugin: 'com.gradleup.shadow'
+        $defaultBuildScript
 
-        repositories { maven { url = "${repo.uri}" } }
         dependencies { implementation project(':core') }
 
-        tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+        $shadowJar {
           relocate 'core', 'app.core'
           relocate 'junit.framework', 'app.junit.framework'
         }
@@ -245,7 +277,10 @@ class RelocationSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue(['SHADOW-93', 'SHADOW-114'])
+    @Issue([
+        'https://github.com/GradleUp/shadow/issues/93',
+        'https://github.com/GradleUp/shadow/issues/114',
+    ])
     def "relocate resource files"() {
         given:
         repo.module('shadow', 'dep', '1.0')
@@ -263,7 +298,7 @@ class RelocationSpec extends BasePluginSpecification {
                implementation 'shadow:dep:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'foo', 'bar'
             }
         """.stripIndent()
@@ -286,26 +321,18 @@ class RelocationSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue("SHADOW-294")
+    @Issue("https://github.com/GradleUp/shadow/issues/294")
     def "does not error on relocating java9 classes"() {
         given:
         buildFile << """
-            repositories {
-                mavenCentral()
-                maven {
-                    url = 'https://repository.mapr.com/nexus/content/groups/mapr-public/releases'
-                }
-            }
-
             dependencies {
                 implementation 'org.slf4j:slf4j-api:1.7.21'
                 implementation group: 'io.netty', name: 'netty-all', version: '4.0.23.Final'
                 implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
                 implementation group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6'
-                implementation group: 'org.hbase', name: 'asynchbase', version: '1.7.0-mapr-1603'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 zip64 = true
                 relocate 'com.google.protobuf', 'shaded.com.google.protobuf'
                 relocate 'io.netty', 'shaded.io.netty'

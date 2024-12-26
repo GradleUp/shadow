@@ -36,11 +36,9 @@ class FilteringSpec extends BasePluginSpecification {
     def 'exclude files'() {
         given:
         buildFile << """
-            // tag::excludeFile[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                exclude 'a2.properties'
             }
-            // end::excludeFile[]
         """.stripIndent()
 
         when:
@@ -63,19 +61,17 @@ class FilteringSpec extends BasePluginSpecification {
             .dependsOn('c')
             .publish()
 
-        buildFile << '''
-            // tag::excludeDep[]
+        buildFile << """
             dependencies {
                implementation 'shadow:d:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
             }
-            // end::excludeDep[]
-        '''.stripIndent()
+        """.stripIndent()
 
         when:
         run('shadowJar')
@@ -87,7 +83,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['d.properties'])
     }
 
-    @Issue('SHADOW-83')
+    @Issue('https://github.com/GradleUp/shadow/issues/83')
     def "exclude dependency using wildcard syntax"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -98,19 +94,17 @@ class FilteringSpec extends BasePluginSpecification {
             .dependsOn('c')
             .publish()
 
-        buildFile << '''
-            // tag::excludeDepWildcard[]
+        buildFile << """
             dependencies {
                implementation 'shadow:d:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                   exclude(dependency('shadow:d:.*'))
                }
             }
-            // end::excludeDepWildcard[]
-        '''.stripIndent()
+        """.stripIndent()
 
         when:
         run('shadowJar')
@@ -122,7 +116,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['d.properties'])
     }
 
-    @Issue("SHADOW-54")
+    @Issue("https://github.com/GradleUp/shadow/issues/54")
     def "dependency exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -133,17 +127,17 @@ class FilteringSpec extends BasePluginSpecification {
             .dependsOn('c')
             .publish()
 
-        buildFile << '''
+        buildFile << """
             dependencies {
                implementation 'shadow:d:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
             }
-        '''.stripIndent()
+        """.stripIndent()
 
         when:
         run('shadowJar')
@@ -170,7 +164,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['c.properties'])
     }
 
-    @Issue("SHADOW-62")
+    @Issue("https://github.com/GradleUp/shadow/issues/62")
     def "project exclusions affect UP-TO-DATE check"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -181,17 +175,17 @@ class FilteringSpec extends BasePluginSpecification {
             .dependsOn('c')
             .publish()
 
-        buildFile << '''
+        buildFile << """
             dependencies {
                implementation 'shadow:d:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
             }
-        '''.stripIndent()
+        """.stripIndent()
 
         when:
         run('shadowJar')
@@ -233,17 +227,17 @@ class FilteringSpec extends BasePluginSpecification {
             public class Passed {}
         '''.stripIndent()
 
-        buildFile << '''
+        buildFile << """
             dependencies {
                implementation 'shadow:d:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                    include(dependency('shadow:d:1.0'))
                }
             }
-        '''.stripIndent()
+        """.stripIndent()
 
         when:
         run('shadowJar')
@@ -269,7 +263,7 @@ class FilteringSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('client/build.gradle') << """
-            ${defaultBuildScript}
+            ${getDefaultBuildScript('java', false, true)}
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -280,19 +274,17 @@ class FilteringSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            ${defaultBuildScript}
+            ${getDefaultBuildScript('java', false, true)}
 
-            // tag::excludeProject[]
             dependencies {
               implementation project(':client')
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                    exclude(project(':client'))
                }
             }
-            // end::excludeProject[]
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server-1.0-all.jar')
@@ -324,7 +316,7 @@ class FilteringSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('client/build.gradle') << """
-            ${defaultBuildScript}
+            ${getDefaultBuildScript('java', false, true)}
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -335,18 +327,16 @@ class FilteringSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            ${defaultBuildScript}
+            ${getDefaultBuildScript('java', false, true)}
             dependencies { implementation project(':client') }
 
-            // tag::excludeSpec[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                    exclude(dependency {
                        it.moduleGroup == 'junit'
                    })
                }
             }
-            // end::excludeSpec[]
         """.stripIndent()
 
         File serverOutput = getFile('server/build/libs/server-1.0-all.jar')
@@ -370,13 +360,11 @@ class FilteringSpec extends BasePluginSpecification {
     def 'verify exclude precedence over include'() {
         given:
         buildFile << """
-            // tag::excludeOverInclude[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                include '*.jar'
                include '*.properties'
                exclude 'a2.properties'
             }
-            // end::excludeOverInclude[]
         """.stripIndent()
 
         when:
@@ -389,7 +377,7 @@ class FilteringSpec extends BasePluginSpecification {
         doesNotContain(output, ['a2.properties'])
     }
 
-    @Issue("SHADOW-69")
+    @Issue("https://github.com/GradleUp/shadow/issues/69")
     def "handle exclude with circular dependency"() {
         given:
         repo.module('shadow', 'c', '1.0')
@@ -401,17 +389,17 @@ class FilteringSpec extends BasePluginSpecification {
             .dependsOn('c')
             .publish()
 
-        buildFile << '''
+        buildFile << """
             dependencies {
                implementation 'shadow:d:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                dependencies {
                   exclude(dependency('shadow:d:1.0'))
                }
             }
-        '''.stripIndent()
+        """.stripIndent()
 
         when:
         run('shadowJar')

@@ -77,7 +77,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
               implementation files('${escapedPath(one)}')
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                mergeServiceFiles()
             }
         """.stripIndent()
@@ -101,7 +101,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
               implementation 'junit:junit:3.8.2'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                mergeServiceFiles()
             }
         """.stripIndent()
@@ -118,7 +118,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
         buildFile << """
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${artifact.path}')
                 from('${project.path}')
             }
@@ -141,14 +141,12 @@ class ShadowPluginSpec extends BasePluginSpecification {
         buildFile << """
             dependencies { implementation 'junit:junit:3.8.2' }
 
-            // tag::rename[]
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                archiveBaseName = 'shadow'
                archiveClassifier = null
                archiveVersion = null
                archiveVersion.convention(null)
             }
-            // end::rename[]
         """.stripIndent()
 
         when:
@@ -174,7 +172,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -187,10 +185,8 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
 
         """.stripIndent()
@@ -226,7 +222,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -241,14 +237,12 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize()
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -284,7 +278,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -294,16 +288,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize {
                     exclude(dependency('junit:junit:.*'))
                 }
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -338,7 +330,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
         """.stripIndent()
 
         file('server/src/main/java/server/Server.java') << """
@@ -347,16 +339,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize {
                     exclude(project(':client'))
                 }
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -392,7 +382,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -402,16 +392,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize {
                     exclude(project(':client'))
                 }
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -445,7 +433,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -455,16 +443,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize {
                     exclude(project(':client'))
                 }
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -505,7 +491,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('lib/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
         """.stripIndent()
 
         file('api/src/main/java/api/Entity.java') << """
@@ -521,7 +507,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('api/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies {
                 implementation 'junit:junit:3.8.2'
                 implementation project(':lib')
@@ -535,14 +521,12 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            apply plugin: 'java-library'
-            apply plugin: 'com.gradleup.shadow'
+            ${getDefaultBuildScript('java-library')}
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize()
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { api project(':api') }
         """.stripIndent()
 
@@ -584,7 +568,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('lib/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
         """.stripIndent()
 
         file('api/src/main/java/api/Entity.java') << """
@@ -600,7 +584,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         file('api/build.gradle') << """
             apply plugin: 'java-library'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { api project(':lib') }
         """.stripIndent()
 
@@ -611,14 +595,12 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            apply plugin: 'java-library'
-            apply plugin: 'com.gradleup.shadow'
+            ${getDefaultBuildScript('java-library')}
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize()
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { api project(':api') }
         """.stripIndent()
 
@@ -650,12 +632,11 @@ class ShadowPluginSpec extends BasePluginSpecification {
             """.stripIndent()
 
         file('client/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
-            repositories { maven { url = "${repo.uri}" } }
+            $defaultBuildScript
+
             dependencies { implementation 'junit:junit:3.8.2' }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'junit.framework', 'client.junit.framework'
             }
         """.stripIndent()
@@ -672,7 +653,6 @@ class ShadowPluginSpec extends BasePluginSpecification {
         file('server/build.gradle') << """
             apply plugin: 'java'
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
@@ -707,12 +687,11 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('client/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
-            repositories { maven { url = "${repo.uri}" } }
+            $defaultBuildScript
+
             dependencies { implementation 'junit:junit:3.8.2' }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                relocate 'junit.framework', 'client.junit.framework'
             }
         """.stripIndent()
@@ -727,10 +706,8 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
@@ -829,7 +806,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('runtimeOnly.properties', 'runtimeOnly')
             .publish()
 
-        buildFile.text = getDefaultBuildScript('java-library')
+        buildFile.text = getDefaultBuildScript('java-library', true, true)
         buildFile << """
             dependencies {
                api 'shadow:api:1.0'
@@ -917,24 +894,20 @@ class ShadowPluginSpec extends BasePluginSpecification {
         assert attributes.getValue('Class-Path') == null
     }
 
-    @Issue('SHADOW-65')
+    @Issue('https://github.com/GradleUp/shadow/issues/65')
     def "add shadow configuration to Class-Path in Manifest"() {
         given:
 
         buildFile << """
-            // tag::shadowConfig[]
             dependencies {
               shadow 'junit:junit:3.8.2'
             }
-            // end::shadowConfig[]
 
-            // tag::jarManifest[]
             jar {
                manifest {
                    attributes 'Class-Path': '/libs/a.jar'
                }
             }
-            // end::jarManifest[]
         """.stripIndent()
 
         when:
@@ -943,7 +916,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         then:
         assert output.exists()
 
-        and: 'SHADOW-65 - combine w/ existing Class-Path'
+        and: 'https://github.com/GradleUp/shadow/issues/65 - combine w/ existing Class-Path'
         JarFile jar = new JarFile(output)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
@@ -951,7 +924,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     }
 
-    @Issue('SHADOW-92')
+    @Issue('https://github.com/GradleUp/shadow/issues/92')
     def "do not include null value in Class-Path when jar file does not contain Class-Path"() {
         given:
 
@@ -973,14 +946,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     }
 
-    @Issue('SHADOW-203')
+    @Issue('https://github.com/GradleUp/shadow/issues/203')
     def "support ZipCompression.STORED"() {
         given:
 
         buildFile << """
             dependencies { shadow 'junit:junit:3.8.2' }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 zip64 = true
                 entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
             }
@@ -1003,7 +976,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         file('lib/build.gradle') << """
             apply plugin: 'java'
             version = '1.0'
-            repositories { maven { url = "${repo.uri}" } }
+
         """.stripIndent()
 
         file('api/src/main/java/api/UnusedEntity.java') << """
@@ -1014,7 +987,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         file('api/build.gradle') << """
             apply plugin: 'java'
             version = '1.0'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies {
                 implementation 'junit:junit:3.8.2'
                 implementation project(':lib')
@@ -1022,11 +995,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            apply plugin: 'java-library'
-            apply plugin: 'com.gradleup.shadow'
+            ${getDefaultBuildScript('java-library')}
 
             version = '1.0'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { api project(':api') }
 
             shadowJar.minimize()
@@ -1044,7 +1016,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         ])
     }
 
-    @Issue('SHADOW-143')
+    @Issue('https://github.com/GradleUp/shadow/issues/143')
     @Ignore("This spec requires > 15 minutes and > 8GB of disk space to run")
     def "check large zip files with zip64 enabled"() {
         given:
@@ -1097,7 +1069,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
                 }
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 zip64 = true
             }
 
@@ -1133,10 +1105,6 @@ class ShadowPluginSpec extends BasePluginSpecification {
                 mainClass.set('myapp.Main')
             }
 
-            repositories {
-                mavenCentral()
-            }
-
             runShadow {
                args 'foo'
             }
@@ -1162,7 +1130,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/pull/459")
     def 'exclude gradleApi() by default'() {
         given:
-        buildFile.text = getDefaultBuildScript('java-gradle-plugin')
+        buildFile.text = getDefaultBuildScript('java-gradle-plugin', true, true)
 
         file('src/main/java/my/plugin/MyPlugin.java') << """
             package my.plugin;

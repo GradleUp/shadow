@@ -35,7 +35,7 @@ class PublishingSpec extends BasePluginSpecification {
                shadow 'shadow:b:1.0'
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                archiveClassifier = ''
                archiveBaseName = 'maven-all'
             }
@@ -116,7 +116,7 @@ class PublishingSpec extends BasePluginSpecification {
                }
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                archiveClassifier = 'my-classifier'
                archiveExtension = 'my-ext'
                archiveBaseName = 'maven-all'
@@ -149,7 +149,6 @@ class PublishingSpec extends BasePluginSpecification {
                 version = "1.0"
                 group = 'shadow'
 
-                repositories { maven { url = "${repo.uri}" } }
                 publishing {
                    repositories {
                        maven {
@@ -189,7 +188,7 @@ class PublishingSpec extends BasePluginSpecification {
                 shadow project(':b')
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                archiveClassifier = ''
                archiveBaseName = 'maven-all'
             }

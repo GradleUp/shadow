@@ -28,11 +28,9 @@ class TransformerSpec extends BasePluginSpecification {
 
         buildFile << """
             import ${ServiceFileTransformer.name}
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-            }
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 transform(ServiceFileTransformer) {
                     exclude 'META-INF/services/com.acme.*'
                 }
@@ -68,11 +66,9 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
         buildFile << """
             import ${ServiceFileTransformer.name}
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-            }
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 transform(ServiceFileTransformer) {
                     path = 'META-INF/foo'
                 }
@@ -108,11 +104,9 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
             .write()
 
         buildFile << """
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-            }
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 mergeServiceFiles {
                     exclude 'META-INF/services/com.acme.*'
                 }
@@ -161,11 +155,9 @@ com.mysql.jdbc.Driver'''.stripIndent())
             .write()
 
         buildFile << """
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-            }
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 mergeServiceFiles()
                 relocate('org.apache', 'myapache') {
                     exclude 'org.apache.axis.components.compiler.Jikes'
@@ -213,11 +205,9 @@ org.mortbay.log.Factory'''.stripIndent()
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-            }
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 mergeServiceFiles('META-INF/foo')
             }
         """.stripIndent()
@@ -236,7 +226,10 @@ org.mortbay.log.Factory'''.stripIndent()
 two # NOTE: No newline terminates this line/file'''.stripIndent()
     }
 
-    @Issue(['SHADOW-70', 'SHADOW-71'])
+    @Issue([
+        'https://github.com/GradleUp/shadow/issues/70',
+        'https://github.com/GradleUp/shadow/issues/-71',
+    ])
     def 'apply transformers to project resources'() {
         given:
         def one = buildJar('one.jar').insert('META-INF/services/shadow.Shadow',
@@ -251,7 +244,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
               implementation files('${escapedPath(one)}')
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
               mergeServiceFiles()
             }
         """.stripIndent()
@@ -284,11 +277,9 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
 
         buildFile << """
             import ${AppendingTransformer.name}
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-            }
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 transform(AppendingTransformer) {
                     resource = 'test.properties'
                 }
@@ -319,11 +310,9 @@ two # NOTE: No newline terminates this line/file
             'two # NOTE: No newline terminates this line/file').write()
 
         buildFile << """
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
-            }
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 append('test.properties')
             }
         """.stripIndent()
@@ -400,7 +389,7 @@ two # NOTE: No newline terminates this line/file
                }
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
                    attributes 'New-Entry': 'NEW'
@@ -448,12 +437,9 @@ two # NOTE: No newline terminates this line/file
         buildFile << """
             import ${XmlAppendingTransformer.name}
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                from('${escapedPath(xml1)}')
                from('${escapedPath(xml2)}')
-            }
-
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                transform(XmlAppendingTransformer) {
                    resource = 'properties.xml'
                }
@@ -478,7 +464,7 @@ two # NOTE: No newline terminates this line/file
 '''.stripIndent()
     }
 
-    @Issue('SHADOW-82')
+    @Issue('https://github.com/GradleUp/shadow/issues/82')
     def 'shadow.manifest leaks to jar.manifest'() {
         given:
         File main = file('src/main/java/shadow/Main.java')
@@ -499,7 +485,7 @@ two # NOTE: No newline terminates this line/file
                }
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
                    attributes 'New-Entry': 'NEW'
@@ -538,7 +524,7 @@ two # NOTE: No newline terminates this line/file
         jis2?.close()
     }
 
-    @Issue('SHADOW-82')
+    @Issue('https://github.com/GradleUp/shadow/issues/82')
     def 'shadow manifest leaks to jar manifest'() {
         given:
         File main = file('src/main/java/shadow/Main.java')
@@ -559,7 +545,7 @@ two # NOTE: No newline terminates this line/file
                }
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
                    attributes 'New-Entry': 'NEW'
@@ -616,12 +602,9 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
 
         buildFile << """
                 import ${GroovyExtensionModuleTransformer.name}
-                tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+                $shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
-                }
-
-                tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                     transform(GroovyExtensionModuleTransformer)
                 }
             """.stripIndent()
@@ -660,12 +643,9 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
 
         buildFile << """
                 import ${GroovyExtensionModuleTransformer.name}
-                tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+                $shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
-                }
-
-                tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                     transform(GroovyExtensionModuleTransformer)
                 }
             """.stripIndent()
@@ -704,11 +684,9 @@ extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
 staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
 
         buildFile << """
-                tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+                $shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
-                }
-                tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                     mergeGroovyExtensionModules()
                 }
             """.stripIndent()
@@ -738,13 +716,13 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         buildFile << """
             import com.github.jengelman.gradle.plugins.shadow.transformers.${transformer}
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 transform(${transformer})${configuration}
             }
         """.stripIndent()
 
         when:
-        run('shadowJar', '--warning-mode=all')
+        run('shadowJar')
 
         then:
         assert output.exists()

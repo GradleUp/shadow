@@ -60,7 +60,7 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
     def "configuration caching supports includes"() {
         given:
         buildFile << """
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                exclude 'a2.properties'
             }
         """.stripIndent()
@@ -91,7 +91,7 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
         """.stripIndent()
         file('client/build.gradle') << """
             apply plugin: 'java'
-            repositories { maven { url = "${repo.uri}" } }
+
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -101,16 +101,14 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
             public class Server {}
         """.stripIndent()
         file('server/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 minimize {
                     exclude(dependency('junit:junit:.*'))
                 }
             }
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies { implementation project(':client') }
         """.stripIndent()
 
@@ -118,9 +116,9 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
         def output = getFile('server/build/libs/server-all.jar')
 
         when:
-        run('shadowJar', '-s')
+        run('shadowJar')
         output.delete()
-        def result = run('shadowJar', '-s')
+        def result = run('shadowJar')
 
         then:
         output.exists()
@@ -146,23 +144,21 @@ class ConfigurationCacheSpec extends BasePluginSpecification {
             public class Lib {}
         """.stripIndent()
         file('lib/build.gradle') << """
-            apply plugin: 'java'
-            apply plugin: 'com.gradleup.shadow'
+            $defaultBuildScript
 
-            repositories { maven { url = "${repo.uri}" } }
             dependencies {
                 implementation "junit:junit:3.8.2"
             }
 
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+            $shadowJar {
                 configurations = [project.configurations.compileClasspath]
             }
 
         """.stripIndent()
 
         when:
-        run('shadowJar', '-s')
-        def result = run('shadowJar', '-s')
+        run('shadowJar')
+        def result = run('shadowJar')
 
         then:
         result.output.contains(":lib:shadowJar UP-TO-DATE")
