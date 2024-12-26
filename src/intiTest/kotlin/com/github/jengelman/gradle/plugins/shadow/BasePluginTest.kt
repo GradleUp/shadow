@@ -29,11 +29,8 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
-  protected lateinit var root: Path
-  protected lateinit var repo: AppendableMavenFileRepository
-
-  protected open val shadowJarTask = SHADOW_JAR_TASK_NAME
-  protected open val runShadowTask = SHADOW_RUN_TASK_NAME
+  lateinit var root: Path
+  lateinit var repo: AppendableMavenFileRepository
 
   @BeforeEach
   fun setup() {
@@ -67,7 +64,7 @@ abstract class BasePluginTest {
   }
 
   @Language("Groovy")
-  protected fun getProjectBuildScript(
+  fun getProjectBuildScript(
     javaPlugin: String = "java",
     groupInfo: String = "",
     versionInfo: String = "",
@@ -83,7 +80,7 @@ abstract class BasePluginTest {
   }
 
   @Language("Groovy")
-  protected fun getSettingsBuildScript(
+  fun getSettingsBuildScript(
     startBlock: String = "",
     endBlock: String = "rootProject.name = 'shadow'",
   ): String {
@@ -99,24 +96,40 @@ abstract class BasePluginTest {
     """.trimIndent()
   }
 
-  protected val buildScript: Path
+  fun publishArtifactA() {
+    repo.module("shadow", "a", "1.0")
+      .insertFile("a.properties", "a")
+      .insertFile("a2.properties", "a2")
+      .publish()
+  }
+
+  fun publishArtifactB() {
+    repo.module("shadow", "b", "1.0")
+      .insertFile("b.properties", "b")
+      .publish()
+  }
+
+  open val shadowJarTask = SHADOW_JAR_TASK_NAME
+  open val runShadowTask = SHADOW_RUN_TASK_NAME
+
+  val buildScript: Path
     get() = path("build.gradle")
 
-  protected val settingsScript: Path
+  val settingsScript: Path
     get() = path("settings.gradle")
 
-  protected fun buildJar(path: String): AppendableJar {
+  fun buildJar(path: String): AppendableJar {
     return AppendableJar(path(path))
   }
 
-  protected val outputShadowJar: Path
+  val outputShadowJar: Path
     get() = path("build/libs/shadow-1.0-all.jar")
 
-  protected fun output(name: String): Path {
+  fun output(name: String): Path {
     return path("build/libs/$name")
   }
 
-  protected fun path(path: String): Path {
+  fun path(path: String): Path {
     return root.resolve(path).also {
       if (!it.exists()) {
         it.parent.createDirectories()
@@ -125,11 +138,11 @@ abstract class BasePluginTest {
     }
   }
 
-  protected fun repo(path: String = "maven-repo"): AppendableMavenFileRepository {
+  fun repo(path: String = "maven-repo"): AppendableMavenFileRepository {
     return AppendableMavenFileRepository(root.resolve(path))
   }
 
-  protected fun assertContains(jarPath: Path, paths: List<String>) {
+  fun assertContains(jarPath: Path, paths: List<String>) {
     JarFile(jarPath.toFile()).use { jar ->
       paths.forEach { path ->
         assert(jar.getJarEntry(path) != null) { "Jar file $jarPath does not contain entry $path" }
@@ -137,7 +150,7 @@ abstract class BasePluginTest {
     }
   }
 
-  protected fun assertDoesNotContain(jarPath: Path, paths: List<String>) {
+  fun assertDoesNotContain(jarPath: Path, paths: List<String>) {
     JarFile(jarPath.toFile()).use { jar ->
       paths.forEach { path ->
         assert(jar.getJarEntry(path) == null) { "Jar file $jarPath contains entry $path" }
@@ -145,7 +158,7 @@ abstract class BasePluginTest {
     }
   }
 
-  protected val runner: GradleRunner
+  val runner: GradleRunner
     get() {
       return GradleRunner.create()
         .withProjectDir(root.toFile())
@@ -154,7 +167,7 @@ abstract class BasePluginTest {
         .withTestKitDir(testKitDir.toFile())
     }
 
-  protected fun runner(arguments: Iterable<String>): GradleRunner {
+  fun runner(arguments: Iterable<String>): GradleRunner {
     val allArguments = listOf(
       "--warning-mode=fail",
       "--configuration-cache",
@@ -163,11 +176,11 @@ abstract class BasePluginTest {
     return runner.withArguments(allArguments)
   }
 
-  protected fun run(vararg tasks: String): BuildResult {
+  fun run(vararg tasks: String): BuildResult {
     return run(tasks.toList())
   }
 
-  protected inline fun run(
+  inline fun run(
     tasks: Iterable<String>,
     block: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
@@ -176,11 +189,11 @@ abstract class BasePluginTest {
     }
   }
 
-  protected fun runWithDebug(vararg tasks: String): BuildResult {
+  fun runWithDebug(vararg tasks: String): BuildResult {
     return run(tasks.toList()) { it.withDebug(true) }
   }
 
-  protected fun runWithFailure(
+  fun runWithFailure(
     vararg tasks: String,
     block: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
@@ -189,7 +202,7 @@ abstract class BasePluginTest {
     }
   }
 
-  protected companion object {
+  companion object {
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
       if (gradleUserHome == null) {

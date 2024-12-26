@@ -115,10 +115,8 @@ class RelocationTest : BasePluginTest() {
       ),
     )
 
-    JarFile(outputShadowJar.toFile()).use { jar ->
-      val value = jar.manifest.mainAttributes.getValue("TEST-VALUE")
-      assertThat(value).isEqualTo("FOO")
-    }
+    val jarFile = JarFile(outputShadowJar.toFile())
+    assertThat(jarFile.manifest.mainAttributes.getValue("TEST-VALUE")).isEqualTo("FOO")
   }
 
   @Test

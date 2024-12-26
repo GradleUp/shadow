@@ -94,10 +94,7 @@ class ApplicationTest : BasePluginTest() {
     settingsBlock: String = "",
     runShadowBlock: String = "",
   ) {
-    repo.module("shadow", "a", "1.0")
-      .insertFile("a.properties", "a")
-      .insertFile("a2.properties", "a2")
-      .publish()
+    publishArtifactA()
     path("src/main/java/myapp/Main.java").appendText(
       """
         package myapp;
