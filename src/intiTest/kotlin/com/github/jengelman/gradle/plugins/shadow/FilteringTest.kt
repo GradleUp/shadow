@@ -67,14 +67,7 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
-    )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("d.properties"),
-    )
+    commonAssertions()
   }
 
   @Test
@@ -95,14 +88,7 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
-    )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("d.properties"),
-    )
+    commonAssertions()
   }
 
   @Test
@@ -112,14 +98,7 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
-    )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("d.properties"),
-    )
+    commonAssertions()
 
     val replaced = buildScript.readText()
       .replace("exclude(dependency('shadow:d:1.0'))", "exclude(dependency('shadow:c:1.0'))")
@@ -145,14 +124,7 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
-    )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("d.properties"),
-    )
+    commonAssertions()
 
     val replaced = buildScript.readText()
       .replace("exclude(dependency('shadow:d:1.0'))", "exclude 'a.properties'")
@@ -280,19 +252,12 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun handleExcludeWithCircularDependency() {
-    publishArtifactCD()
+    publishArtifactCD(circular = true)
     dependOnAndExcludeArtifactD()
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
-    )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("d.properties"),
-    )
+    commonAssertions()
   }
 
   private fun dependOnAndExcludeArtifactD() {
@@ -310,46 +275,14 @@ class FilteringTest : BasePluginTest() {
     )
   }
 
-  private fun writeClientAndServerModules(
-    serverShadowBlock: String = "",
-  ) {
-    settingsScript.appendText(
-      """
-        include 'client', 'server'
-      """.trimIndent(),
+  private fun commonAssertions() {
+    assertContains(
+      outputShadowJar,
+      listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
     )
-    buildScript.writeText("")
-
-    path("client/src/main/java/client/Client.java").writeText(
-      """
-        package client;
-        public class Client {}
-      """.trimIndent(),
-    )
-    path("client/build.gradle").writeText(
-      """
-        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
-        dependencies { implementation 'junit:junit:3.8.2' }
-      """.trimIndent(),
-    )
-
-    path("server/src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        import client.Client;
-        public class Server {}
-      """.trimIndent(),
-    )
-    path("server/build.gradle").writeText(
-      """
-        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
-        dependencies {
-          implementation project(':client')
-        }
-        $shadowJar {
-          $serverShadowBlock
-        }
-      """.trimIndent(),
+    assertDoesNotContain(
+      outputShadowJar,
+      listOf("d.properties"),
     )
   }
 }

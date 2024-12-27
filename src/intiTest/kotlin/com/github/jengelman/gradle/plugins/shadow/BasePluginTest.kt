@@ -4,13 +4,13 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import java.nio.file.Path
 import java.util.jar.JarFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
-  lateinit var root: Path
+  private lateinit var root: Path
   lateinit var repo: AppendableMavenFileRepository
 
   @BeforeEach
@@ -103,9 +103,10 @@ abstract class BasePluginTest {
       .publish()
   }
 
-  fun publishArtifactCD() {
+  fun publishArtifactCD(circular: Boolean = false) {
     repo.module("shadow", "c", "1.0")
       .insertFile("c.properties", "c")
+      .apply { if (circular) dependsOn("d") }
       .publish()
     repo.module("shadow", "d", "1.0")
       .insertFile("d.properties", "d")
@@ -122,16 +123,8 @@ abstract class BasePluginTest {
   val settingsScript: Path
     get() = path("settings.gradle")
 
-  fun buildJar(path: String): AppendableJar {
-    return AppendableJar(path(path))
-  }
-
   val outputShadowJar: Path
     get() = path("build/libs/shadow-1.0-all.jar")
-
-  fun output(name: String): Path {
-    return path("build/libs/$name")
-  }
 
   fun path(path: String): Path {
     return root.resolve(path).also {
@@ -162,7 +155,7 @@ abstract class BasePluginTest {
     }
   }
 
-  val runner: GradleRunner
+  private val runner: GradleRunner
     get() {
       return GradleRunner.create()
         .withProjectDir(root.toFile())
@@ -193,17 +186,47 @@ abstract class BasePluginTest {
     }
   }
 
-  fun runWithDebug(vararg tasks: String): BuildResult {
-    return run(tasks.toList()) { it.withDebug(true) }
-  }
+  fun writeClientAndServerModules(
+    serverShadowBlock: String = "",
+  ) {
+    settingsScript.appendText(
+      """
+        include 'client', 'server'
+      """.trimIndent(),
+    )
+    buildScript.writeText("")
 
-  fun runWithFailure(
-    vararg tasks: String,
-    block: (GradleRunner) -> GradleRunner = { it },
-  ): BuildResult {
-    return block(runner(tasks.toList())).buildAndFail().also {
-      it.assertNoDeprecationWarnings()
-    }
+    path("client/src/main/java/client/Client.java").writeText(
+      """
+        package client;
+        public class Client {}
+      """.trimIndent(),
+    )
+    path("client/build.gradle").writeText(
+      """
+        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
+        dependencies { implementation 'junit:junit:3.8.2' }
+      """.trimIndent(),
+    )
+
+    path("server/src/main/java/server/Server.java").writeText(
+      """
+        package server;
+        import client.Client;
+        public class Server {}
+      """.trimIndent(),
+    )
+    path("server/build.gradle").writeText(
+      """
+        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
+        dependencies {
+          implementation project(':client')
+        }
+        $shadowJar {
+          $serverShadowBlock
+        }
+      """.trimIndent(),
+    )
   }
 
   companion object {
@@ -231,13 +254,9 @@ abstract class BasePluginTest {
       }
     }
 
-    fun containsDeprecationWarning(output: String): Boolean {
+    private fun containsDeprecationWarning(output: String): Boolean {
       return output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
         output.contains("has been deprecated. This is scheduled to be removed in Gradle")
-    }
-
-    fun escapedPath(path: Path): String {
-      return path.toString().replace("\\", "\\\\")
     }
   }
 }

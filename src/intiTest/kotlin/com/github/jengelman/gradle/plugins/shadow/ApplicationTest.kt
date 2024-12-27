@@ -10,7 +10,6 @@ import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.tools.zip.ZipFile
-import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.Test
 
 class ApplicationTest : BasePluginTest() {
@@ -35,7 +34,7 @@ class ApplicationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result: BuildResult = run(runShadowTask)
+    val result = run(runShadowTask)
 
     assertThat(result.output).contains("Running application with JDK 17")
     assertThat(result.output).contains("TestApp: Hello World! (foo)")
@@ -85,8 +84,7 @@ class ApplicationTest : BasePluginTest() {
 
     run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
-    val installedJar = path("build/install/myapp-shadow/lib/myapp-1.0-all.jar")
-    assertThat(installedJar).exists()
+    assertThat(path("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).exists()
   }
 
   private fun prepare(

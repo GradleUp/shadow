@@ -20,7 +20,6 @@ class ConfigurationCacheSpec : BasePluginTest() {
     super.setup()
     publishArtifactA()
     publishArtifactB()
-
     buildScript.appendText(
       """
         dependencies {
@@ -90,50 +89,14 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun configurationCachingSupportsMinimize() {
-    settingsScript.appendText(
-      """
-        include 'client', 'server'
-      """.trimIndent(),
-    )
-
-    path("client/src/main/java/client/Client.java").writeText(
-      """
-        package client;
-        public class Client {}
-      """.trimIndent(),
-    )
-    path("client/build.gradle").writeText(
-      """
-        plugins {
-          id 'java'
-        }
-        dependencies {
-          implementation 'junit:junit:3.8.2'
+    writeClientAndServerModules(
+      serverShadowBlock = """
+        minimize {
+          exclude(dependency('junit:junit:.*'))
         }
       """.trimIndent(),
     )
-
-    path("server/src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        public class Server {}
-      """.trimIndent(),
-    )
-    path("server/build.gradle").writeText(
-      """
-        ${getProjectBuildScript()}
-        $shadowJar {
-          minimize {
-            exclude(dependency('junit:junit:.*'))
-          }
-        }
-        dependencies {
-          implementation project(':client')
-        }
-      """.trimIndent(),
-    )
-
-    val output = path("server/build/libs/server-all.jar")
+    val output = path("server/build/libs/server-1.0-all.jar")
 
     run(shadowJarTask)
     output.deleteExisting()
