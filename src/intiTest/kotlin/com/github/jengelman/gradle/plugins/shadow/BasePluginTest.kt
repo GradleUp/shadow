@@ -11,7 +11,6 @@ import java.util.jar.JarFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
@@ -22,7 +21,6 @@ import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -47,9 +45,7 @@ abstract class BasePluginTest {
         versionInfo = "version = '1.0'",
       ),
     )
-    buildScript.appendText(System.lineSeparator())
     settingsScript.writeText(getSettingsBuildScript())
-    settingsScript.appendText(System.lineSeparator())
   }
 
   @ExperimentalPathApi
@@ -63,7 +59,6 @@ abstract class BasePluginTest {
     println(buildScript.readText())
   }
 
-  @Language("Groovy")
   fun getProjectBuildScript(
     javaPlugin: String = "java",
     groupInfo: String = "",
@@ -76,10 +71,9 @@ abstract class BasePluginTest {
       }
       $groupInfo
       $versionInfo
-    """.trimIndent()
+    """.trimIndent() + System.lineSeparator()
   }
 
-  @Language("Groovy")
   fun getSettingsBuildScript(
     startBlock: String = "",
     endBlock: String = "rootProject.name = 'shadow'",
@@ -93,7 +87,7 @@ abstract class BasePluginTest {
         }
       }
       $endBlock
-    """.trimIndent()
+    """.trimIndent() + System.lineSeparator()
   }
 
   fun publishArtifactA() {

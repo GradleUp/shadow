@@ -21,14 +21,13 @@ class ConfigurationCacheSpec : BasePluginTest() {
     publishArtifactA()
     publishArtifactB()
 
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         dependencies {
           implementation 'shadow:a:1.0'
           implementation 'shadow:b:1.0'
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
   }
 
@@ -45,7 +44,6 @@ class ConfigurationCacheSpec : BasePluginTest() {
       """.trimIndent(),
     )
 
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         apply plugin: 'application'
@@ -67,7 +65,6 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun configurationCachingSupportsExcludes() {
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         $shadowJar {
@@ -93,7 +90,6 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun configurationCachingSupportsMinimize() {
-    settingsScript.appendText(System.lineSeparator())
     settingsScript.appendText(
       """
         include 'client', 'server'

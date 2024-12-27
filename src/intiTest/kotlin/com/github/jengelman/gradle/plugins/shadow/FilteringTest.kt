@@ -19,14 +19,13 @@ class FilteringTest : BasePluginTest() {
     publishArtifactA()
     publishArtifactB()
 
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         dependencies {
           implementation 'shadow:a:1.0'
           implementation 'shadow:b:1.0'
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
   }
 
@@ -41,7 +40,6 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun excludeFiles() {
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         $shadowJar {
@@ -82,7 +80,6 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun excludeDependencyUsingWildcardSyntax() {
     publishArtifactCD()
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         dependencies {
@@ -178,7 +175,6 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun includeDependencyAndExcludeOthers() {
     publishArtifactCD()
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         dependencies {
@@ -260,7 +256,6 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun verifyExcludePrecedenceOverInclude() {
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         $shadowJar {
@@ -301,7 +296,6 @@ class FilteringTest : BasePluginTest() {
   }
 
   private fun dependOnAndExcludeArtifactD() {
-    buildScript.appendText(System.lineSeparator())
     buildScript.appendText(
       """
         dependencies {
@@ -319,7 +313,6 @@ class FilteringTest : BasePluginTest() {
   private fun writeClientAndServerModules(
     serverShadowBlock: String = "",
   ) {
-    settingsScript.appendText(System.lineSeparator())
     settingsScript.appendText(
       """
         include 'client', 'server'
