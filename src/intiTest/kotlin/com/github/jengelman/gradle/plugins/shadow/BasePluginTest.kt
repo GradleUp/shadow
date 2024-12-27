@@ -109,6 +109,16 @@ abstract class BasePluginTest {
       .publish()
   }
 
+  fun publishArtifactCD() {
+    repo.module("shadow", "c", "1.0")
+      .insertFile("c.properties", "c")
+      .publish()
+    repo.module("shadow", "d", "1.0")
+      .insertFile("d.properties", "d")
+      .dependsOn("c")
+      .publish()
+  }
+
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
   open val runShadowTask = SHADOW_RUN_TASK_NAME
 
