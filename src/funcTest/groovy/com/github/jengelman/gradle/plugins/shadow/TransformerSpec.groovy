@@ -664,7 +664,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         props.getProperty('moduleVersion') == '1.0.0'
         props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
         props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
-        doesNotContain(output, ['META-INF/services/org.codehaus.groovy.runtime.ExtensionModule'])
+        assertDoesNotContain(output, ['META-INF/services/org.codehaus.groovy.runtime.ExtensionModule'])
     }
 
     def 'Groovy extension module transformer short syntax'() {

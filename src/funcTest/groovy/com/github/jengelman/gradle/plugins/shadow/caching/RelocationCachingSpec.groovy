@@ -23,7 +23,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
@@ -40,13 +40,13 @@ class RelocationCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'foo/junit/framework/Test.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(output, [
             'junit/framework/Test.class'
         ])
 
@@ -55,13 +55,13 @@ class RelocationCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'foo/junit/framework/Test.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(output, [
             'junit/framework/Test.class'
         ])
     }

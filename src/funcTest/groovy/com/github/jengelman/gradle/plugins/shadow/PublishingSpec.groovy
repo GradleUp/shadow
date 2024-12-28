@@ -63,7 +63,7 @@ class PublishingSpec extends BasePluginSpecification {
         assert publishedFile.exists()
 
         and:
-        contains(publishedFile, ['a.properties', 'a2.properties'])
+        assertContains(publishedFile, ['a.properties', 'a2.properties'])
 
         and:
         File pom = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.pom').toFile().canonicalFile
@@ -211,7 +211,7 @@ class PublishingSpec extends BasePluginSpecification {
         assert publishedFile.exists()
 
         and:
-        contains(publishedFile, ['a.properties', 'a2.properties'])
+        assertContains(publishedFile, ['a.properties', 'a2.properties'])
 
         and:
         File pom = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.pom').toFile().canonicalFile
@@ -277,7 +277,7 @@ class PublishingSpec extends BasePluginSpecification {
         assert shadowJar.exists()
 
         and:
-        contains(shadowJar, ['a.properties', 'a2.properties'])
+        assertContains(shadowJar, ['a.properties', 'a2.properties'])
 
         and: "publishes both a POM file and a Gradle metadata file"
         File pom = publishingRepo.rootDir.resolve('com/acme/maven/1.0/maven-1.0.pom').toFile().canonicalFile
@@ -328,7 +328,7 @@ class PublishingSpec extends BasePluginSpecification {
         assertions {
             shadowJar = publishingRepo.rootDir.resolve('com/acme/maven-all/1.0/maven-all-1.0-all.jar').toFile().canonicalFile
             assert shadowJar.exists()
-            contains(shadowJar, ['a.properties', 'a2.properties'])
+            assertContains(shadowJar, ['a.properties', 'a2.properties'])
         }
 
         assertions {

@@ -153,10 +153,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output("shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
+        assertContains(output("shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
 
         and:
-        doesNotContain(output("shadow.jar"), ['/'])
+        assertDoesNotContain(output("shadow.jar"), ['/'])
     }
 
     def 'include project dependencies'() {
@@ -198,7 +198,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class',
             'junit/framework/Test.class'
@@ -253,11 +253,11 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class'
         ])
-        doesNotContain(serverOutput, ['junit/framework/Test.class'])
+        assertDoesNotContain(serverOutput, ['junit/framework/Test.class'])
     }
 
     /**
@@ -306,11 +306,11 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
-        doesNotContain(serverOutput, ['client/Client.class'])
+        assertDoesNotContain(serverOutput, ['client/Client.class'])
     }
 
     /**
@@ -356,7 +356,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         runWithDebug(':server:shadowJar')
 
         then:
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class'
         ])
@@ -409,7 +409,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         runWithDebug(':server:shadowJar')
 
         then:
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class',
             'junit/framework/TestCase.class'
@@ -460,7 +460,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         runWithDebug(':server:shadowJar')
 
         then:
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class',
             'junit/framework/TestCase.class'
@@ -537,13 +537,13 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'impl/SimpleEntity.class',
             'api/Entity.class',
             'api/UnusedEntity.class',
             'lib/LibEntity.class',
         ])
-        doesNotContain(serverOutput, ['junit/framework/Test.class', 'lib/UnusedLibEntity.class'])
+        assertDoesNotContain(serverOutput, ['junit/framework/Test.class', 'lib/UnusedLibEntity.class'])
     }
 
     /**
@@ -611,7 +611,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'impl/SimpleEntity.class',
             'api/Entity.class',
             'api/UnusedEntity.class',
@@ -663,12 +663,12 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'server/Server.class'
         ])
 
         and:
-        doesNotContain(serverOutput, [
+        assertDoesNotContain(serverOutput, [
             'client/Client.class',
             'junit/framework/Test.class',
             'client/junit/framework/Test.class'
@@ -718,14 +718,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'client/junit/framework/Test.class',
             'server/Server.class',
         ])
 
         and:
-        doesNotContain(serverOutput, [
+        assertDoesNotContain(serverOutput, [
             'junit/framework/Test.class'
         ])
     }
@@ -754,10 +754,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'META-INF/a.properties'])
+        assertContains(output, ['a.properties', 'META-INF/a.properties'])
 
         and:
-        doesNotContain(output, ['META-INF/INDEX.LIST', 'META-INF/a.SF', 'META-INF/a.DSA', 'META-INF/a.RSA'])
+        assertDoesNotContain(output, ['META-INF/INDEX.LIST', 'META-INF/a.SF', 'META-INF/a.DSA', 'META-INF/a.RSA'])
     }
 
     def "include runtime configuration by default"() {
@@ -781,10 +781,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties'])
+        assertContains(output, ['a.properties'])
 
         and:
-        doesNotContain(output, ['b.properties'])
+        assertDoesNotContain(output, ['b.properties'])
     }
 
     def "include java-library configurations by default"() {
@@ -819,8 +819,8 @@ class ShadowPluginSpec extends BasePluginSpecification {
         runWithDebug('shadowJar')
 
         then:
-        contains(output, ['api.properties', 'implementation.properties',
-                          'runtimeOnly.properties', 'implementation-dep.properties'])
+        assertContains(output, ['api.properties', 'implementation.properties',
+                                'runtimeOnly.properties', 'implementation-dep.properties'])
     }
 
     def "doesn't include compileOnly configuration by default"() {
@@ -844,10 +844,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties'])
+        assertContains(output, ['a.properties'])
 
         and:
-        doesNotContain(output, ['b.properties'])
+        assertDoesNotContain(output, ['b.properties'])
     }
 
     def "default copying strategy"() {
@@ -1011,7 +1011,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'api/UnusedEntity.class',
         ])
     }

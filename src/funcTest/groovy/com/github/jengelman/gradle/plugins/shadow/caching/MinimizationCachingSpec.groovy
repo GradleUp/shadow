@@ -46,7 +46,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'junit/framework/Test.class',
             'client/Client.class'
@@ -66,21 +66,21 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
-        doesNotContain(output, ['client/Client.class'])
+        assertDoesNotContain(output, ['client/Client.class'])
 
         when:
         assertShadowJarIsCachedAndRelocatable()
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
-        doesNotContain(output, ['client/Client.class'])
+        assertDoesNotContain(output, ['client/Client.class'])
     }
 }

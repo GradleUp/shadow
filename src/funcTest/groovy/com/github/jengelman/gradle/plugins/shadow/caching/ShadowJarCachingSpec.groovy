@@ -111,7 +111,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'server/Util.class'
         ])
@@ -129,12 +129,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(output, [
             'server/Util.class',
             'junit/framework/Test.class'
         ])
@@ -144,12 +144,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(output, [
             'server/Util.class',
             'junit/framework/Test.class'
         ])
@@ -177,7 +177,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
@@ -196,12 +196,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(output, [
             'junit/framework/Test.class'
         ])
 
@@ -210,12 +210,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         output.exists()
-        contains(output, [
+        assertContains(output, [
             'server/Server.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(output, [
             'junit/framework/Test.class'
         ])
     }
