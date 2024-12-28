@@ -93,6 +93,8 @@ dependencies {
   intiTestImplementation(libs.okio)
   intiTestImplementation(libs.apache.maven.modelBuilder)
   intiTestImplementation(libs.apache.maven.repositoryMetadata)
+  // TODO: this will be removed after we migrated all functional tests to Kotlin.
+  intiTestImplementation(sourceSets.main.get().output)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)
