@@ -6,7 +6,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
      */
     def 'shadowJar is cached correctly when relocation is added'() {
         given:
-        buildFile << """
+        projectScriptFile << """
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -22,8 +22,8 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        contains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
@@ -39,14 +39,14 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        contains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/junit/framework/Test.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(outputShadowJar, [
             'junit/framework/Test.class'
         ])
 
@@ -54,14 +54,14 @@ class RelocationCachingSpec extends AbstractCachingSpec {
         assertShadowJarIsCachedAndRelocatable()
 
         then:
-        output.exists()
-        contains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/junit/framework/Test.class'
         ])
 
         and:
-        doesNotContain(output, [
+        assertDoesNotContain(outputShadowJar, [
             'junit/framework/Test.class'
         ])
     }

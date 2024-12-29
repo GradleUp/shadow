@@ -16,6 +16,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.extension
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
@@ -39,13 +40,8 @@ abstract class BasePluginTest {
       .use(testJar)
       .publish()
 
-    buildScript.writeText(
-      getProjectBuildScript(
-        groupInfo = "group = 'shadow'",
-        versionInfo = "version = '1.0'",
-      ),
-    )
-    settingsScript.writeText(getSettingsBuildScript())
+    projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
+    settingsScriptPath.writeText(getDefaultSettingsBuildScript())
   }
 
   @ExperimentalPathApi
@@ -56,14 +52,16 @@ abstract class BasePluginTest {
       root.deleteRecursively()
     }
 
-    println(buildScript.readText())
+    println(projectScriptPath.readText())
   }
 
-  fun getProjectBuildScript(
+  fun getDefaultProjectBuildScript(
     javaPlugin: String = "java",
-    groupInfo: String = "",
-    versionInfo: String = "",
+    withGroup: Boolean = false,
+    withVersion: Boolean = false,
   ): String {
+    val groupInfo = if (withGroup) "group = 'shadow'" else ""
+    val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
         id('$javaPlugin')
@@ -74,7 +72,7 @@ abstract class BasePluginTest {
     """.trimIndent() + System.lineSeparator()
   }
 
-  fun getSettingsBuildScript(
+  fun getDefaultSettingsBuildScript(
     startBlock: String = "",
     endBlock: String = "rootProject.name = 'shadow'",
   ): String {
@@ -117,10 +115,10 @@ abstract class BasePluginTest {
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
   open val runShadowTask = SHADOW_RUN_TASK_NAME
 
-  val buildScript: Path
+  val projectScriptPath: Path
     get() = path("build.gradle")
 
-  val settingsScript: Path
+  val settingsScriptPath: Path
     get() = path("settings.gradle")
 
   val outputShadowJar: Path
@@ -128,10 +126,12 @@ abstract class BasePluginTest {
 
   fun path(path: String): Path {
     return root.resolve(path).also {
-      if (!it.exists()) {
-        it.parent.createDirectories()
-        it.createFile()
-      }
+      val extension = it.extension
+      // Binary files should not be created, text files should be created.
+      if (it.exists() || extension == "jar" || extension == "zip") return@also
+
+      it.parent.createDirectories()
+      it.createFile()
     }
   }
 
@@ -189,12 +189,12 @@ abstract class BasePluginTest {
   fun writeClientAndServerModules(
     serverShadowBlock: String = "",
   ) {
-    settingsScript.appendText(
+    settingsScriptPath.appendText(
       """
         include 'client', 'server'
       """.trimIndent(),
     )
-    buildScript.writeText("")
+    projectScriptPath.writeText("")
 
     path("client/src/main/java/client/Client.java").writeText(
       """
@@ -204,7 +204,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
+        ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies { implementation 'junit:junit:3.8.2' }
       """.trimIndent(),
     )
@@ -218,7 +218,7 @@ abstract class BasePluginTest {
     )
     path("server/build.gradle").writeText(
       """
-        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
+        ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
           implementation project(':client')
         }

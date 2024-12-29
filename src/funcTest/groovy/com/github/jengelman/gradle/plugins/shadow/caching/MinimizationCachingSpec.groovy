@@ -1,11 +1,15 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 class MinimizationCachingSpec extends AbstractCachingSpec {
-    File output
 
     @Override
     String getShadowJarTask() {
         return ":server:shadowJar"
+    }
+
+    @Override
+    File getOutputShadowJar() {
+        return file('server/build/libs/server-all.jar')
     }
 
     /**
@@ -34,19 +38,17 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation project(':client') }
         """.stripIndent()
-
-        output = getFile('server/build/libs/server-all.jar')
 
         when:
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        contains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'junit/framework/Test.class',
             'client/Client.class'
@@ -65,22 +67,22 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        contains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
-        doesNotContain(output, ['client/Client.class'])
+        assertDoesNotContain(outputShadowJar, ['client/Client.class'])
 
         when:
         assertShadowJarIsCachedAndRelocatable()
 
         then:
-        output.exists()
-        contains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
-        doesNotContain(output, ['client/Client.class'])
+        assertDoesNotContain(outputShadowJar, ['client/Client.class'])
     }
 }

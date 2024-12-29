@@ -71,7 +71,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
             'two # NOTE: No newline terminates this line/file').publish()
 
-        buildFile << """
+        projectScriptFile << """
             dependencies {
               implementation 'junit:junit:3.8.2'
               implementation files('${escapedPath(one)}')
@@ -88,7 +88,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         }
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         where:
         version << ['8.3']
@@ -96,7 +96,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     def 'Error in Gradle versions < 8.3'() {
         given:
-        buildFile << """
+        projectScriptFile << """
             dependencies {
               implementation 'junit:junit:3.8.2'
             }
@@ -117,7 +117,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
-        buildFile << """
+        projectScriptFile << """
             $shadowJar {
                 from('${artifact.path}')
                 from('${project.path}')
@@ -128,7 +128,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
     }
 
     def 'include project sources'() {
@@ -138,7 +138,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             public class Passed {}
         '''.stripIndent()
 
-        buildFile << """
+        projectScriptFile << """
             dependencies { implementation 'junit:junit:3.8.2' }
 
             $shadowJar {
@@ -153,10 +153,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output("shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
+        assertContains(file("build/libs/shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
 
         and:
-        doesNotContain(output("shadow.jar"), ['/'])
+        assertDoesNotContain(file("build/libs/shadow.jar"), ['/'])
     }
 
     def 'include project dependencies'() {
@@ -185,20 +185,20 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation project(':client') }
 
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         run(':server:shadowJar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class',
             'junit/framework/Test.class'
@@ -237,7 +237,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize()
@@ -246,18 +246,18 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { implementation project(':client') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class'
         ])
-        doesNotContain(serverOutput, ['junit/framework/Test.class'])
+        assertDoesNotContain(serverOutput, ['junit/framework/Test.class'])
     }
 
     /**
@@ -288,7 +288,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -299,18 +299,18 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { implementation project(':client') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
-        doesNotContain(serverOutput, ['client/Client.class'])
+        assertDoesNotContain(serverOutput, ['client/Client.class'])
     }
 
     /**
@@ -339,7 +339,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -353,10 +353,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class'
         ])
@@ -392,7 +392,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -406,10 +406,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class',
             'junit/framework/TestCase.class'
@@ -443,7 +443,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -457,10 +457,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'server/Server.class',
             'junit/framework/TestCase.class'
@@ -521,7 +521,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getDefaultBuildScript('java-library')}
+            ${getDefaultProjectBuildScript('java-library')}
 
             $shadowJar {
                 minimize()
@@ -530,20 +530,20 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { api project(':api') }
         """.stripIndent()
 
-        File serverOutput = getFile('impl/build/libs/impl-all.jar')
+        File serverOutput = file('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        run(':impl:shadowJar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'impl/SimpleEntity.class',
             'api/Entity.class',
             'api/UnusedEntity.class',
             'lib/LibEntity.class',
         ])
-        doesNotContain(serverOutput, ['junit/framework/Test.class', 'lib/UnusedLibEntity.class'])
+        assertDoesNotContain(serverOutput, ['junit/framework/Test.class', 'lib/UnusedLibEntity.class'])
     }
 
     /**
@@ -595,7 +595,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getDefaultBuildScript('java-library')}
+            ${getDefaultProjectBuildScript('java-library')}
 
             $shadowJar {
                 minimize()
@@ -604,14 +604,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { api project(':api') }
         """.stripIndent()
 
-        File serverOutput = getFile('impl/build/libs/impl-all.jar')
+        File serverOutput = file('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        run(':impl:shadowJar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'impl/SimpleEntity.class',
             'api/Entity.class',
             'api/UnusedEntity.class',
@@ -632,7 +632,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             """.stripIndent()
 
         file('client/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -656,19 +656,19 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server.jar')
+        File serverOutput = file('server/build/libs/server.jar')
 
         when:
         run(':server:jar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'server/Server.class'
         ])
 
         and:
-        doesNotContain(serverOutput, [
+        assertDoesNotContain(serverOutput, [
             'client/Client.class',
             'junit/framework/Test.class',
             'client/junit/framework/Test.class'
@@ -687,7 +687,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('client/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -706,26 +706,26 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         run(':server:shadowJar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'client/Client.class',
             'client/junit/framework/Test.class',
             'server/Server.class',
         ])
 
         and:
-        doesNotContain(serverOutput, [
+        assertDoesNotContain(serverOutput, [
             'junit/framework/Test.class'
         ])
     }
@@ -746,7 +746,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             public class Passed {}
         '''.stripIndent()
 
-        buildFile << """
+        projectScriptFile << """
             dependencies { implementation 'shadow:a:1.0' }
         """.stripIndent()
 
@@ -754,10 +754,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties', 'META-INF/a.properties'])
+        assertContains(outputShadowJar, ['a.properties', 'META-INF/a.properties'])
 
         and:
-        doesNotContain(output, ['META-INF/INDEX.LIST', 'META-INF/a.SF', 'META-INF/a.DSA', 'META-INF/a.RSA'])
+        assertDoesNotContain(outputShadowJar, ['META-INF/INDEX.LIST', 'META-INF/a.SF', 'META-INF/a.DSA', 'META-INF/a.RSA'])
     }
 
     def "include runtime configuration by default"() {
@@ -770,7 +770,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('b.properties', 'b')
             .publish()
 
-        buildFile << """
+        projectScriptFile << """
             dependencies {
                runtimeOnly 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
@@ -781,10 +781,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties'])
+        assertContains(outputShadowJar, ['a.properties'])
 
         and:
-        doesNotContain(output, ['b.properties'])
+        assertDoesNotContain(outputShadowJar, ['b.properties'])
     }
 
     def "include java-library configurations by default"() {
@@ -806,8 +806,8 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('runtimeOnly.properties', 'runtimeOnly')
             .publish()
 
-        buildFile.text = getDefaultBuildScript('java-library', true, true)
-        buildFile << """
+        projectScriptFile.text = getDefaultProjectBuildScript('java-library', true, true)
+        projectScriptFile << """
             dependencies {
                api 'shadow:api:1.0'
                implementation 'shadow:implementation:1.0'
@@ -816,11 +816,11 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         when:
-        runWithDebug('shadowJar')
+        run('shadowJar')
 
         then:
-        contains(output, ['api.properties', 'implementation.properties',
-                          'runtimeOnly.properties', 'implementation-dep.properties'])
+        assertContains(outputShadowJar, ['api.properties', 'implementation.properties',
+                                         'runtimeOnly.properties', 'implementation-dep.properties'])
     }
 
     def "doesn't include compileOnly configuration by default"() {
@@ -833,7 +833,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('b.properties', 'b')
             .publish()
 
-        buildFile << """
+        projectScriptFile << """
             dependencies {
                runtimeOnly 'shadow:a:1.0'
                compileOnly 'shadow:b:1.0'
@@ -844,10 +844,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        contains(output, ['a.properties'])
+        assertContains(outputShadowJar, ['a.properties'])
 
         and:
-        doesNotContain(output, ['b.properties'])
+        assertDoesNotContain(outputShadowJar, ['b.properties'])
     }
 
     def "default copying strategy"() {
@@ -860,7 +860,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('META-INF/MANIFEST.MF', 'MANIFEST B')
             .publish()
 
-        buildFile << """
+        projectScriptFile << """
             dependencies {
                runtimeOnly 'shadow:a:1.0'
                runtimeOnly 'shadow:b:1.0'
@@ -871,14 +871,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         assert jar.entries().collect().size() == 2
     }
 
     def "Class-Path in Manifest not added if empty"() {
         given:
 
-        buildFile << """
+        projectScriptFile << """
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -886,10 +886,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         Attributes attributes = jar.manifest.getMainAttributes()
         assert attributes.getValue('Class-Path') == null
     }
@@ -898,7 +898,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     def "add shadow configuration to Class-Path in Manifest"() {
         given:
 
-        buildFile << """
+        projectScriptFile << """
             dependencies {
               shadow 'junit:junit:3.8.2'
             }
@@ -914,10 +914,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and: 'https://github.com/GradleUp/shadow/issues/65 - combine w/ existing Class-Path'
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
         assert classpath == '/libs/a.jar junit-3.8.2.jar'
@@ -928,7 +928,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     def "do not include null value in Class-Path when jar file does not contain Class-Path"() {
         given:
 
-        buildFile << """
+        projectScriptFile << """
             dependencies { shadow 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -936,10 +936,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
         assert classpath == 'junit-3.8.2.jar'
@@ -950,7 +950,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     def "support ZipCompression.STORED"() {
         given:
 
-        buildFile << """
+        projectScriptFile << """
             dependencies { shadow 'junit:junit:3.8.2' }
 
             $shadowJar {
@@ -963,7 +963,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
     }
 
@@ -995,7 +995,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getDefaultBuildScript('java-library')}
+            ${getDefaultProjectBuildScript('java-library')}
 
             version = '1.0'
 
@@ -1004,14 +1004,14 @@ class ShadowPluginSpec extends BasePluginSpecification {
             shadowJar.minimize()
         """.stripIndent()
 
-        File serverOutput = getFile('impl/build/libs/impl-1.0-all.jar')
+        File serverOutput = file('impl/build/libs/impl-1.0-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        run(':impl:shadowJar')
 
         then:
         serverOutput.exists()
-        contains(serverOutput, [
+        assertContains(serverOutput, [
             'api/UnusedEntity.class',
         ])
     }
@@ -1034,7 +1034,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             }
         """.stripIndent()
 
-        buildFile << """
+        projectScriptFile << """
             apply plugin: 'application'
 
             application {
@@ -1078,7 +1078,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             }
         """.stripIndent()
 
-        settingsFile << "rootProject.name = 'myapp'"
+        settingsScriptFile << "rootProject.name = 'myapp'"
 
         when:
         BuildResult result = run('runShadow')
@@ -1092,9 +1092,9 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/issues/609")
     def "doesn't error when using application mainClass property"() {
         given:
-        buildFile.text = defaultBuildScript
+        projectScriptFile.text = getDefaultProjectBuildScript()
 
-        buildFile << """
+        projectScriptFile << """
             project.ext {
                 aspectjVersion = '1.8.12'
             }
@@ -1130,7 +1130,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/pull/459")
     def 'exclude gradleApi() by default'() {
         given:
-        buildFile.text = getDefaultBuildScript('java-gradle-plugin', true, true)
+        projectScriptFile.text = getDefaultProjectBuildScript('java-gradle-plugin', true, true)
 
         file('src/main/java/my/plugin/MyPlugin.java') << """
             package my.plugin;
@@ -1150,16 +1150,16 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
     }
 
     @Issue("https://github.com/GradleUp/shadow/issues/1070")
     def 'can register a custom shadow jar task'() {
-        buildFile << """
+        projectScriptFile << """
             dependencies {
               testImplementation 'junit:junit:3.8.2'
             }
@@ -1181,7 +1181,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         assert result.task(":testShadowJar").outcome == TaskOutcome.SUCCESS
 
         and:
-        def jarFile = new JarFile(output("shadow-1.0-tests.jar"))
+        def jarFile = new JarFile(file("build/libs/shadow-1.0-tests.jar"))
         assert jarFile.getEntry('junit') != null
     }
 }

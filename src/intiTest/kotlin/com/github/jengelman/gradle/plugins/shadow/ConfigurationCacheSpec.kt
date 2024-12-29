@@ -20,7 +20,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
     super.setup()
     publishArtifactA()
     publishArtifactB()
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'shadow:a:1.0'
@@ -43,7 +43,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
       """.trimIndent(),
     )
 
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         apply plugin: 'application'
 
@@ -64,7 +64,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun configurationCachingSupportsExcludes() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         $shadowJar {
           exclude 'a2.properties'
@@ -96,9 +96,9 @@ class ConfigurationCacheSpec : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    val output = path("server/build/libs/server-1.0-all.jar")
 
     run(shadowJarTask)
+    val output = path("server/build/libs/server-1.0-all.jar")
     output.deleteExisting()
     val result = run(shadowJarTask)
 
@@ -116,7 +116,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun configurationCachingOfConfigurationsIsUpToDate() {
-    settingsScript.appendText(
+    settingsScriptPath.appendText(
       """
         include 'lib'
       """.trimIndent(),
@@ -130,7 +130,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
     )
     path("lib/build.gradle").writeText(
       """
-        ${getProjectBuildScript()}
+        ${getDefaultProjectBuildScript()}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }

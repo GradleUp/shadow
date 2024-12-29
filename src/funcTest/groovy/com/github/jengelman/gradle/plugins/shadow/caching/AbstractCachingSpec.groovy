@@ -19,7 +19,7 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     def setup() {
         // Use a test-specific build cache directory.  This ensures that we'll only use cached outputs generated during this
         // test and we won't accidentally use cached outputs from a different test or a different build.
-        settingsFile << """
+        settingsScriptFile << """
             buildCache {
                 local {
                     directory = new File(rootDir, 'build-cache')
@@ -29,8 +29,8 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     }
 
     void changeConfigurationTo(String content) {
-        buildFile.text = getDefaultBuildScript('java', true, true)
-        buildFile << content
+        projectScriptFile.text = getDefaultProjectBuildScript('java', true, true)
+        projectScriptFile << content
     }
 
     BuildResult runWithCacheEnabled(String... arguments) {
@@ -59,7 +59,7 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     void copyToAlternateDir() {
         FileUtils.deleteDirectory(alternateDir.toFile())
         FileUtils.forceMkdir(alternateDir.toFile())
-        FileUtils.copyDirectory(dir.toFile(), alternateDir.toFile())
+        FileUtils.copyDirectory(root.toFile(), alternateDir.toFile())
     }
 
     void assertShadowJarIsCachedAndRelocatable() {
@@ -78,8 +78,8 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     }
 
     void deleteOutputs() {
-        if (output.exists()) {
-            assert output.delete()
+        if (outputShadowJar.exists()) {
+            assert outputShadowJar.delete()
         }
     }
 
