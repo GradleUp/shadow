@@ -1092,7 +1092,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/issues/609")
     def "doesn't error when using application mainClass property"() {
         given:
-        buildScript.text = defaultBuildScript
+        buildScript.text = projectBuildScript
 
         buildScript << """
             project.ext {
