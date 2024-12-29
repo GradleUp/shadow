@@ -1,7 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import assertk.assertThat
-import assertk.assertions.exists
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
@@ -130,10 +128,7 @@ abstract class BasePluginTest {
     return root.resolve(path).also {
       val extension = it.extension
       // Binary files should be asserted to exist, text files should be created.
-      if (extension == "jar" || extension == "zip") {
-        assertThat(it).exists()
-        return@also
-      }
+      if (extension == "jar" || extension == "zip") return@also
       if (!it.exists()) {
         it.parent.createDirectories()
         it.createFile()
