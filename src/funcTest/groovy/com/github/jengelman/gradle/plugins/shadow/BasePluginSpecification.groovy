@@ -18,18 +18,18 @@ import java.util.jar.JarFile
 abstract class BasePluginSpecification extends Specification {
 
     @TempDir
-    Path dir
+    private Path dir
 
     AppendableMavenFileRepository repo
 
     def setup() {
         repo = repo()
-        repo.module('junit', 'junit', '3.8.2').use(testJar).publish()
+        repo.module('junit', 'junit', '3.8.2')
+            .use(Paths.get(this.class.classLoader.getResource('junit-3.8.2.jar').toURI()))
+            .publish()
 
         buildFile << getDefaultBuildScript('java', true, true)
-        buildFile << System.lineSeparator()
         settingsFile << settingsBuildScript
-        settingsFile << System.lineSeparator()
     }
 
     def cleanup() {
@@ -52,7 +52,7 @@ abstract class BasePluginSpecification extends Specification {
 
         $groupInfo
         $versionInfo
-        """.stripIndent().trim()
+        """.stripIndent().trim() + System.lineSeparator()
     }
 
     String getSettingsBuildScript(boolean withRootProject = true) {
@@ -66,7 +66,7 @@ abstract class BasePluginSpecification extends Specification {
             }
 
             $rootProjectInfo
-        """.stripIndent().trim()
+        """.stripIndent().trim() + System.lineSeparator()
     }
 
     static def shadowJar = "tasks.named('shadowJar', ${ShadowJar.class.name})".trim()
@@ -105,7 +105,7 @@ abstract class BasePluginSpecification extends Specification {
         }
     }
 
-    static boolean containsDeprecationWarning(String output) {
+    private static boolean containsDeprecationWarning(String output) {
         output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
             output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
@@ -176,19 +176,11 @@ abstract class BasePluginSpecification extends Specification {
         return new AppendableJar(file(path).toPath())
     }
 
-    protected File getOutput() {
+    File getOutput() {
         getFile('build/libs/shadow-1.0-all.jar')
     }
 
-    protected File output(String name) {
-        getFile("build/libs/${name}")
-    }
-
-    protected Path getTestJar(String name = 'junit-3.8.2.jar') {
-        return Paths.get(this.class.classLoader.getResource(name).toURI())
-    }
-
-    protected static File getTestKitDir() {
+    static File getTestKitDir() {
         def gradleUserHome = System.getenv("GRADLE_USER_HOME")
         if (!gradleUserHome) {
             gradleUserHome = new File(System.getProperty("user.home"), ".gradle").absolutePath
@@ -196,7 +188,7 @@ abstract class BasePluginSpecification extends Specification {
         return new File(gradleUserHome, "testkit")
     }
 
-    protected static String escapedPath(Path path) {
+    static String escapedPath(Path path) {
         return path.toString().replaceAll('\\\\', '\\\\\\\\')
     }
 }

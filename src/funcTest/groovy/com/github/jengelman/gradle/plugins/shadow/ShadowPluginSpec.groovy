@@ -153,10 +153,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assertContains(output("shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
+        assertContains(file("build/libs/shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
 
         and:
-        assertDoesNotContain(output("shadow.jar"), ['/'])
+        assertDoesNotContain(file("build/libs/shadow.jar"), ['/'])
     }
 
     def 'include project dependencies'() {
@@ -1181,7 +1181,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         assert result.task(":testShadowJar").outcome == TaskOutcome.SUCCESS
 
         and:
-        def jarFile = new JarFile(output("shadow-1.0-tests.jar"))
+        def jarFile = new JarFile(file("build/libs/shadow-1.0-tests.jar"))
         assert jarFile.getEntry('junit') != null
     }
 }
