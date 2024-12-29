@@ -29,15 +29,15 @@ abstract class BasePluginSpecification extends Specification {
             .use(Paths.get(this.class.classLoader.getResource('junit-3.8.2.jar').toURI()))
             .publish()
 
-        buildScript << getProjectBuildScript('java', true, true)
-        settingsScript << settingsBuildScript
+        buildScript << getDefaultProjectBuildScript('java', true, true)
+        settingsScript << getDefaultSettingsBuildScript()
     }
 
     def cleanup() {
         println buildScript.text
     }
 
-    String getProjectBuildScript(
+    String getDefaultProjectBuildScript(
         String javaPlugin = 'java',
         boolean withGroup = false,
         boolean withVersion = false
@@ -56,7 +56,7 @@ abstract class BasePluginSpecification extends Specification {
         """.stripIndent().trim() + System.lineSeparator()
     }
 
-    String getSettingsBuildScript(boolean withRootProject = true) {
+    String getDefaultSettingsBuildScript(boolean withRootProject = true) {
         def rootProjectInfo = withRootProject ? "rootProject.name = 'shadow'" : ""
         return """
             dependencyResolutionManagement {

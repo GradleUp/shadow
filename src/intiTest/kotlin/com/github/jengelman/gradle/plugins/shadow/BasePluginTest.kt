@@ -40,8 +40,8 @@ abstract class BasePluginTest {
       .use(testJar)
       .publish()
 
-    buildScript.writeText(getProjectBuildScript(withGroup = true, withVersion = true))
-    settingsScript.writeText(getSettingsBuildScript())
+    buildScript.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
+    settingsScript.writeText(getDefaultSettingsBuildScript())
   }
 
   @ExperimentalPathApi
@@ -55,7 +55,7 @@ abstract class BasePluginTest {
     println(buildScript.readText())
   }
 
-  fun getProjectBuildScript(
+  fun getDefaultProjectBuildScript(
     javaPlugin: String = "java",
     withGroup: Boolean = false,
     withVersion: Boolean = false,
@@ -72,7 +72,7 @@ abstract class BasePluginTest {
     """.trimIndent() + System.lineSeparator()
   }
 
-  fun getSettingsBuildScript(
+  fun getDefaultSettingsBuildScript(
     startBlock: String = "",
     endBlock: String = "rootProject.name = 'shadow'",
   ): String {
@@ -204,7 +204,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getProjectBuildScript("java", withVersion = true)}
+        ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies { implementation 'junit:junit:3.8.2' }
       """.trimIndent(),
     )
@@ -218,7 +218,7 @@ abstract class BasePluginTest {
     )
     path("server/build.gradle").writeText(
       """
-        ${getProjectBuildScript("java", withVersion = true)}
+        ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
           implementation project(':client')
         }

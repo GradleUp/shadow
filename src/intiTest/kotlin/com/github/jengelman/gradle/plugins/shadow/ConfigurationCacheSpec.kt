@@ -130,7 +130,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
     )
     path("lib/build.gradle").writeText(
       """
-        ${getProjectBuildScript()}
+        ${getDefaultProjectBuildScript()}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }

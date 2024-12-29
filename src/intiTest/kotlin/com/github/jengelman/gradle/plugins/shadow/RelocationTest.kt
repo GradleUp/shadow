@@ -268,7 +268,7 @@ class RelocationTest : BasePluginTest() {
 
     path("app/build.gradle").writeText(
       """
-        ${getProjectBuildScript()}
+        ${getDefaultProjectBuildScript()}
         dependencies {
           implementation project(':core')
         }

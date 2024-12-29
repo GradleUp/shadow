@@ -185,7 +185,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation project(':client') }
 
@@ -237,7 +237,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize()
@@ -288,7 +288,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -339,7 +339,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -392,7 +392,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -443,7 +443,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             $shadowJar {
                 minimize {
@@ -521,7 +521,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getProjectBuildScript('java-library')}
+            ${getDefaultProjectBuildScript('java-library')}
 
             $shadowJar {
                 minimize()
@@ -595,7 +595,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getProjectBuildScript('java-library')}
+            ${getDefaultProjectBuildScript('java-library')}
 
             $shadowJar {
                 minimize()
@@ -632,7 +632,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             """.stripIndent()
 
         file('client/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -687,7 +687,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('client/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -706,7 +706,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $projectBuildScript
+            $defaultProjectBuildScript
 
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
@@ -806,7 +806,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('runtimeOnly.properties', 'runtimeOnly')
             .publish()
 
-        buildScript.text = getProjectBuildScript('java-library', true, true)
+        buildScript.text = getDefaultProjectBuildScript('java-library', true, true)
         buildScript << """
             dependencies {
                api 'shadow:api:1.0'
@@ -995,7 +995,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getProjectBuildScript('java-library')}
+            ${getDefaultProjectBuildScript('java-library')}
 
             version = '1.0'
 
@@ -1092,7 +1092,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/issues/609")
     def "doesn't error when using application mainClass property"() {
         given:
-        buildScript.text = projectBuildScript
+        buildScript.text = getDefaultProjectBuildScript()
 
         buildScript << """
             project.ext {
@@ -1130,7 +1130,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/pull/459")
     def 'exclude gradleApi() by default'() {
         given:
-        buildScript.text = getProjectBuildScript('java-gradle-plugin', true, true)
+        buildScript.text = getDefaultProjectBuildScript('java-gradle-plugin', true, true)
 
         file('src/main/java/my/plugin/MyPlugin.java') << """
             package my.plugin;

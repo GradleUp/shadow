@@ -29,7 +29,7 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     }
 
     void changeConfigurationTo(String content) {
-        buildScript.text = getProjectBuildScript('java', true, true)
+        buildScript.text = getDefaultProjectBuildScript('java', true, true)
         buildScript << content
     }
 

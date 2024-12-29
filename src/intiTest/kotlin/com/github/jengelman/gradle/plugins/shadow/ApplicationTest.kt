@@ -120,7 +120,7 @@ class ApplicationTest : BasePluginTest() {
       """.trimIndent(),
     )
     settingsScript.writeText(
-      getSettingsBuildScript(
+      getDefaultSettingsBuildScript(
         startBlock = settingsBlock,
         endBlock = "rootProject.name = 'myapp'",
       ),
