@@ -18,7 +18,7 @@ import java.util.jar.JarFile
 abstract class BasePluginSpecification extends Specification {
 
     @TempDir
-    private Path dir
+    Path root
 
     AppendableMavenFileRepository repo
 
@@ -73,7 +73,7 @@ abstract class BasePluginSpecification extends Specification {
 
     GradleRunner getRunner() {
         GradleRunner.create()
-            .withProjectDir(dir.toFile())
+            .withProjectDir(root.toFile())
             .forwardOutput()
             .withPluginClasspath()
             .withTestKitDir(testKitDir)
@@ -119,7 +119,7 @@ abstract class BasePluginSpecification extends Specification {
     }
 
     File file(String path) {
-        File f = dir.resolve(path).toFile()
+        File f = root.resolve(path).toFile()
         if (!f.exists()) {
             f.parentFile.mkdirs()
             if (!f.createNewFile()) {
@@ -130,11 +130,11 @@ abstract class BasePluginSpecification extends Specification {
     }
 
     File getFile(String path) {
-        return dir.resolve(path).toFile()
+        return root.resolve(path).toFile()
     }
 
     AppendableMavenFileRepository repo(String path = 'maven-repo') {
-        new AppendableMavenFileRepository(dir.resolve(path))
+        new AppendableMavenFileRepository(root.resolve(path))
     }
 
     String getJarFileContents(File f, String path) {

@@ -59,7 +59,7 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     void copyToAlternateDir() {
         FileUtils.deleteDirectory(alternateDir.toFile())
         FileUtils.forceMkdir(alternateDir.toFile())
-        FileUtils.copyDirectory(dir.toFile(), alternateDir.toFile())
+        FileUtils.copyDirectory(root.toFile(), alternateDir.toFile())
     }
 
     void assertShadowJarIsCachedAndRelocatable() {
