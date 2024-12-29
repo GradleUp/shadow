@@ -141,10 +141,6 @@ abstract class BasePluginSpecification extends Specification {
         new AppendableMavenFileRepository(dir.resolve(path))
     }
 
-    void assertJarFileContentsEqual(File f, String path, String contents) {
-        assert getJarFileContents(f, path) == contents
-    }
-
     String getJarFileContents(File f, String path) {
         JarFile jf = new JarFile(f)
         def is = jf.getInputStream(new JarEntry(path))
