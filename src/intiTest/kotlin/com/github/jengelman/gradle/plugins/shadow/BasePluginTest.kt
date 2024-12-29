@@ -127,12 +127,11 @@ abstract class BasePluginTest {
   fun path(path: String): Path {
     return root.resolve(path).also {
       val extension = it.extension
-      // Binary files should be asserted to exist, text files should be created.
-      if (extension == "jar" || extension == "zip") return@also
-      if (!it.exists()) {
-        it.parent.createDirectories()
-        it.createFile()
-      }
+      // Binary files should not be created, text files should be created.
+      if (it.exists() || extension == "jar" || extension == "zip") return@also
+
+      it.parent.createDirectories()
+      it.createFile()
     }
   }
 
