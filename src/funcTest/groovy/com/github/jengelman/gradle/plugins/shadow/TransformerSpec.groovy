@@ -497,7 +497,7 @@ two # NOTE: No newline terminates this line/file
         run('jar', 'shadowJar')
 
         then:
-        File jar = getFile('build/libs/shadow-1.0.jar')
+        File jar = file('build/libs/shadow-1.0.jar')
         assert jar.exists()
         assert outputShadowJar.exists()
 
@@ -557,7 +557,7 @@ two # NOTE: No newline terminates this line/file
         run('jar', 'shadowJar')
 
         then:
-        File jar = getFile('build/libs/shadow-1.0.jar')
+        File jar = file('build/libs/shadow-1.0.jar')
         assert jar.exists()
         assert outputShadowJar.exists()
 

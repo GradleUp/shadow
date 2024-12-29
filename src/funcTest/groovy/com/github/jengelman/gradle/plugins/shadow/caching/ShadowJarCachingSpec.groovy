@@ -74,7 +74,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         assert !outputShadowJar.exists()
-        assert getFile("build/libs/foo-1.0-all.jar").exists()
+        assert file("build/libs/foo-1.0-all.jar").exists()
     }
 
     /**

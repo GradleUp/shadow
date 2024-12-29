@@ -191,7 +191,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         run(':server:shadowJar')
@@ -246,7 +246,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { implementation project(':client') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         run(':server:shadowJar')
@@ -299,7 +299,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { implementation project(':client') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         run(':server:shadowJar')
@@ -530,7 +530,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { api project(':api') }
         """.stripIndent()
 
-        File serverOutput = getFile('impl/build/libs/impl-all.jar')
+        File serverOutput = file('impl/build/libs/impl-all.jar')
 
         when:
         run(':impl:shadowJar')
@@ -604,7 +604,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { api project(':api') }
         """.stripIndent()
 
-        File serverOutput = getFile('impl/build/libs/impl-all.jar')
+        File serverOutput = file('impl/build/libs/impl-all.jar')
 
         when:
         run(':impl:shadowJar')
@@ -656,7 +656,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server.jar')
+        File serverOutput = file('server/build/libs/server.jar')
 
         when:
         run(':server:jar')
@@ -711,7 +711,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
 
-        File serverOutput = getFile('server/build/libs/server-all.jar')
+        File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
         run(':server:shadowJar')
@@ -1004,7 +1004,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             shadowJar.minimize()
         """.stripIndent()
 
-        File serverOutput = getFile('impl/build/libs/impl-1.0-all.jar')
+        File serverOutput = file('impl/build/libs/impl-1.0-all.jar')
 
         when:
         run(':impl:shadowJar')

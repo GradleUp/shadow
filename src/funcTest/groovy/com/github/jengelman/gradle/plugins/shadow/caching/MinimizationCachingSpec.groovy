@@ -9,7 +9,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
 
     @Override
     File getOutputShadowJar() {
-        return getFile('server/build/libs/server-all.jar')
+        return file('server/build/libs/server-all.jar')
     }
 
     /**

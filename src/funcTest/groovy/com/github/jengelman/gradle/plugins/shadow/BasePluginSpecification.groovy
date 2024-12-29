@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -120,6 +121,13 @@ abstract class BasePluginSpecification extends Specification {
 
     File file(String path) {
         File f = root.resolve(path).toFile()
+        String extension = StringUtils.substringAfterLast(path, '.')
+
+        // Binary files should be asserted to exist, text files should be created.
+        if (extension == "jar" || extension == "zip") {
+            return f
+        }
+
         if (!f.exists()) {
             f.parentFile.mkdirs()
             if (!f.createNewFile()) {
@@ -127,10 +135,6 @@ abstract class BasePluginSpecification extends Specification {
             }
         }
         return f
-    }
-
-    File getFile(String path) {
-        return root.resolve(path).toFile()
     }
 
     AppendableMavenFileRepository repo(String path = 'maven-repo') {
@@ -177,7 +181,7 @@ abstract class BasePluginSpecification extends Specification {
     }
 
     File getOutputShadowJar() {
-        getFile('build/libs/shadow-1.0-all.jar')
+        file('build/libs/shadow-1.0-all.jar')
     }
 
     static File getTestKitDir() {
