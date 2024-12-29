@@ -28,7 +28,7 @@ abstract class BasePluginSpecification extends Specification {
             .use(Paths.get(this.class.classLoader.getResource('junit-3.8.2.jar').toURI()))
             .publish()
 
-        buildFile << getDefaultBuildScript('java', true, true)
+        buildFile << getProjectBuildScript('java', true, true)
         settingsFile << settingsBuildScript
     }
 
@@ -36,7 +36,7 @@ abstract class BasePluginSpecification extends Specification {
         println buildFile.text
     }
 
-    String getDefaultBuildScript(
+    String getProjectBuildScript(
         String javaPlugin = 'java',
         boolean withGroup = false,
         boolean withVersion = false

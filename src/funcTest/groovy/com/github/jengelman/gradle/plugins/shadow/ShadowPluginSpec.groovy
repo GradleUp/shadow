@@ -185,7 +185,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             dependencies { implementation project(':client') }
 
@@ -237,7 +237,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             $shadowJar {
                 minimize()
@@ -288,7 +288,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             $shadowJar {
                 minimize {
@@ -339,7 +339,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             $shadowJar {
                 minimize {
@@ -392,7 +392,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             $shadowJar {
                 minimize {
@@ -443,7 +443,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             $shadowJar {
                 minimize {
@@ -521,7 +521,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getDefaultBuildScript('java-library')}
+            ${getProjectBuildScript('java-library')}
 
             $shadowJar {
                 minimize()
@@ -595,7 +595,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getDefaultBuildScript('java-library')}
+            ${getProjectBuildScript('java-library')}
 
             $shadowJar {
                 minimize()
@@ -632,7 +632,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             """.stripIndent()
 
         file('client/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -687,7 +687,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('client/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             dependencies { implementation 'junit:junit:3.8.2' }
 
@@ -706,7 +706,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             dependencies { implementation project(path: ':client', configuration: 'shadow') }
         """.stripIndent()
@@ -806,7 +806,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('runtimeOnly.properties', 'runtimeOnly')
             .publish()
 
-        buildFile.text = getDefaultBuildScript('java-library', true, true)
+        buildFile.text = getProjectBuildScript('java-library', true, true)
         buildFile << """
             dependencies {
                api 'shadow:api:1.0'
@@ -995,7 +995,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         """.stripIndent()
 
         file('impl/build.gradle') << """
-            ${getDefaultBuildScript('java-library')}
+            ${getProjectBuildScript('java-library')}
 
             version = '1.0'
 
@@ -1130,7 +1130,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/pull/459")
     def 'exclude gradleApi() by default'() {
         given:
-        buildFile.text = getDefaultBuildScript('java-gradle-plugin', true, true)
+        buildFile.text = getProjectBuildScript('java-gradle-plugin', true, true)
 
         file('src/main/java/my/plugin/MyPlugin.java') << """
             package my.plugin;

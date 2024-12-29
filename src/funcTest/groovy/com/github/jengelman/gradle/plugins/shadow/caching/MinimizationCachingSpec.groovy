@@ -34,7 +34,7 @@ class MinimizationCachingSpec extends AbstractCachingSpec {
         """.stripIndent()
 
         file('server/build.gradle') << """
-            $defaultBuildScript
+            $projectBuildScript
 
             dependencies { implementation project(':client') }
         """.stripIndent()
