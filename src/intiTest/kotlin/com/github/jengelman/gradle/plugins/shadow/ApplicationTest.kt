@@ -103,7 +103,7 @@ class ApplicationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         apply plugin: 'application'
         $projectBlock
@@ -119,7 +119,7 @@ class ApplicationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    settingsScript.writeText(
+    settingsScriptPath.writeText(
       getDefaultSettingsBuildScript(
         startBlock = settingsBlock,
         endBlock = "rootProject.name = 'myapp'",

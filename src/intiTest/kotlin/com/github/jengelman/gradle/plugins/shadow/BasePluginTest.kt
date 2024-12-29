@@ -40,8 +40,8 @@ abstract class BasePluginTest {
       .use(testJar)
       .publish()
 
-    buildScript.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
-    settingsScript.writeText(getDefaultSettingsBuildScript())
+    projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
+    settingsScriptPath.writeText(getDefaultSettingsBuildScript())
   }
 
   @ExperimentalPathApi
@@ -52,7 +52,7 @@ abstract class BasePluginTest {
       root.deleteRecursively()
     }
 
-    println(buildScript.readText())
+    println(projectScriptPath.readText())
   }
 
   fun getDefaultProjectBuildScript(
@@ -115,10 +115,10 @@ abstract class BasePluginTest {
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
   open val runShadowTask = SHADOW_RUN_TASK_NAME
 
-  val buildScript: Path
+  val projectScriptPath: Path
     get() = path("build.gradle")
 
-  val settingsScript: Path
+  val settingsScriptPath: Path
     get() = path("settings.gradle")
 
   val outputShadowJar: Path
@@ -189,12 +189,12 @@ abstract class BasePluginTest {
   fun writeClientAndServerModules(
     serverShadowBlock: String = "",
   ) {
-    settingsScript.appendText(
+    settingsScriptPath.appendText(
       """
         include 'client', 'server'
       """.trimIndent(),
     )
-    buildScript.writeText("")
+    projectScriptPath.writeText("")
 
     path("client/src/main/java/client/Client.java").writeText(
       """

@@ -15,7 +15,7 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun defaultEnableRelocation() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -55,7 +55,7 @@ class RelocationTest : BasePluginTest() {
    */
   @Test
   fun relocateDependencyFiles() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -121,7 +121,7 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun relocateDependencyFilesWithFiltering() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -185,7 +185,7 @@ class RelocationTest : BasePluginTest() {
    */
   @Test
   fun remapClassNamesForRelocatedFilesInProjectSource() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -290,7 +290,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    settingsScript.appendText(
+    settingsScriptPath.appendText(
       """
         include 'core', 'app'
       """.trimIndent(),
@@ -332,7 +332,7 @@ class RelocationTest : BasePluginTest() {
     )
     path("src/main/resources/foo/foo.properties").writeText("name=foo")
 
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'shadow:dep:1.0'
@@ -368,7 +368,7 @@ class RelocationTest : BasePluginTest() {
    */
   @Test
   fun doesNotErrorOnRelocatingJava9Classes() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'org.slf4j:slf4j-api:1.7.21'

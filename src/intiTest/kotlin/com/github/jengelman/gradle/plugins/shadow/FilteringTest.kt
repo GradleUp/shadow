@@ -19,7 +19,7 @@ class FilteringTest : BasePluginTest() {
     publishArtifactA()
     publishArtifactB()
 
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'shadow:a:1.0'
@@ -40,7 +40,7 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun excludeFiles() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         $shadowJar {
           exclude 'a2.properties'
@@ -73,7 +73,7 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun excludeDependencyUsingWildcardSyntax() {
     publishArtifactCD()
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'shadow:d:1.0'
@@ -100,9 +100,9 @@ class FilteringTest : BasePluginTest() {
 
     commonAssertions()
 
-    val replaced = buildScript.readText()
+    val replaced = projectScriptPath.readText()
       .replace("exclude(dependency('shadow:d:1.0'))", "exclude(dependency('shadow:c:1.0'))")
-    buildScript.writeText(replaced)
+    projectScriptPath.writeText(replaced)
     val result = run(shadowJarTask)
 
     assertThat(result.task(":shadowJar")).isNotNull()
@@ -126,9 +126,9 @@ class FilteringTest : BasePluginTest() {
 
     commonAssertions()
 
-    val replaced = buildScript.readText()
+    val replaced = projectScriptPath.readText()
       .replace("exclude(dependency('shadow:d:1.0'))", "exclude 'a.properties'")
-    buildScript.writeText(replaced)
+    projectScriptPath.writeText(replaced)
 
     val result = run(shadowJarTask)
 
@@ -147,7 +147,7 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun includeDependencyAndExcludeOthers() {
     publishArtifactCD()
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'shadow:d:1.0'
@@ -228,7 +228,7 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun verifyExcludePrecedenceOverInclude() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         $shadowJar {
           include '*.jar'
@@ -261,7 +261,7 @@ class FilteringTest : BasePluginTest() {
   }
 
   private fun dependOnAndExcludeArtifactD() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'shadow:d:1.0'

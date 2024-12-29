@@ -26,7 +26,7 @@ class TransformerSpec extends BasePluginSpecification {
             .insert('META-INF/services/com.acme.Foo', 'two')
             .write()
 
-        buildScript << """
+        projectScriptFile << """
             import ${ServiceFileTransformer.name}
             $shadowJar {
                 from('${escapedPath(one)}')
@@ -64,7 +64,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         def two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'two # NOTE: No newline terminates this line/file').write()
 
-        buildScript << """
+        projectScriptFile << """
             import ${ServiceFileTransformer.name}
             $shadowJar {
                 from('${escapedPath(one)}')
@@ -103,7 +103,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
             .insert('META-INF/services/com.acme.Foo', 'two')
             .write()
 
-        buildScript << """
+        projectScriptFile << """
             $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
@@ -154,7 +154,7 @@ com.mysql.jdbc.Driver'''.stripIndent())
                 'org.mortbay.log.Factory')
             .write()
 
-        buildScript << """
+        projectScriptFile << """
             $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
@@ -204,7 +204,7 @@ org.mortbay.log.Factory'''.stripIndent()
         def two = buildJar('two.jar').insert('META-INF/foo/org.apache.maven.Shade',
             'two # NOTE: No newline terminates this line/file').write()
 
-        buildScript << """
+        projectScriptFile << """
             $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
@@ -238,7 +238,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
             'two # NOTE: No newline terminates this line/file').publish()
 
-        buildScript << """
+        projectScriptFile << """
             dependencies {
               implementation 'shadow:two:1.0'
               implementation files('${escapedPath(one)}')
@@ -275,7 +275,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         def two = buildJar('two.jar').insert('test.properties',
             'two # NOTE: No newline terminates this line/file').write()
 
-        buildScript << """
+        projectScriptFile << """
             import ${AppendingTransformer.name}
             $shadowJar {
                 from('${escapedPath(one)}')
@@ -309,7 +309,7 @@ two # NOTE: No newline terminates this line/file
         def two = buildJar('two.jar').insert('test.properties',
             'two # NOTE: No newline terminates this line/file').write()
 
-        buildScript << """
+        projectScriptFile << """
             $shadowJar {
                 from('${escapedPath(one)}')
                 from('${escapedPath(two)}')
@@ -344,7 +344,7 @@ two # NOTE: No newline terminates this line/file
             }
         '''.stripIndent()
 
-        buildScript << """
+        projectScriptFile << """
             jar {
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
@@ -381,7 +381,7 @@ two # NOTE: No newline terminates this line/file
             }
         '''.stripIndent()
 
-        buildScript << """
+        projectScriptFile << """
             jar {
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
@@ -434,7 +434,7 @@ two # NOTE: No newline terminates this line/file
 '''.stripIndent()
         ).write()
 
-        buildScript << """
+        projectScriptFile << """
             import ${XmlAppendingTransformer.name}
 
             $shadowJar {
@@ -477,7 +477,7 @@ two # NOTE: No newline terminates this line/file
             }
         '''.stripIndent()
 
-        buildScript << """
+        projectScriptFile << """
             jar {
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
@@ -537,7 +537,7 @@ two # NOTE: No newline terminates this line/file
             }
         '''.stripIndent()
 
-        buildScript << """
+        projectScriptFile << """
             jar {
                manifest {
                    attributes 'Main-Class': 'shadow.Main'
@@ -600,7 +600,7 @@ moduleVersion=2.3.5
 extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
 staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
 
-        buildScript << """
+        projectScriptFile << """
                 import ${GroovyExtensionModuleTransformer.name}
                 $shadowJar {
                     from('${escapedPath(one)}')
@@ -641,7 +641,7 @@ moduleVersion=2.3.5
 extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
 staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
 
-        buildScript << """
+        projectScriptFile << """
                 import ${GroovyExtensionModuleTransformer.name}
                 $shadowJar {
                     from('${escapedPath(one)}')
@@ -683,7 +683,7 @@ moduleVersion=2.3.5
 extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
 staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write()
 
-        buildScript << """
+        projectScriptFile << """
                 $shadowJar {
                     from('${escapedPath(one)}')
                     from('${escapedPath(two)}')
@@ -713,7 +713,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         if (configuration.contains('test/some.file')) {
             file('test/some.file') << 'some content'
         }
-        buildScript << """
+        projectScriptFile << """
             import com.github.jengelman.gradle.plugins.shadow.transformers.${transformer}
 
             $shadowJar {

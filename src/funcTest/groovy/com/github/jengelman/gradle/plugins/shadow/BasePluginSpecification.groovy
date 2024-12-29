@@ -29,12 +29,12 @@ abstract class BasePluginSpecification extends Specification {
             .use(Paths.get(this.class.classLoader.getResource('junit-3.8.2.jar').toURI()))
             .publish()
 
-        buildScript << getDefaultProjectBuildScript('java', true, true)
-        settingsScript << getDefaultSettingsBuildScript()
+        projectScriptFile << getDefaultProjectBuildScript('java', true, true)
+        settingsScriptFile << getDefaultSettingsBuildScript()
     }
 
     def cleanup() {
-        println buildScript.text
+        println projectScriptFile.text
     }
 
     String getDefaultProjectBuildScript(
@@ -111,11 +111,11 @@ abstract class BasePluginSpecification extends Specification {
             output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
 
-    File getBuildScript() {
+    File getProjectScriptFile() {
         file('build.gradle')
     }
 
-    File getSettingsScript() {
+    File getSettingsScriptFile() {
         file('settings.gradle')
     }
 

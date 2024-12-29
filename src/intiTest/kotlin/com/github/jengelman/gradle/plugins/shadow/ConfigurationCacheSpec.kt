@@ -20,7 +20,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
     super.setup()
     publishArtifactA()
     publishArtifactB()
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         dependencies {
           implementation 'shadow:a:1.0'
@@ -43,7 +43,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
       """.trimIndent(),
     )
 
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         apply plugin: 'application'
 
@@ -64,7 +64,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun configurationCachingSupportsExcludes() {
-    buildScript.appendText(
+    projectScriptPath.appendText(
       """
         $shadowJar {
           exclude 'a2.properties'
@@ -116,7 +116,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun configurationCachingOfConfigurationsIsUpToDate() {
-    settingsScript.appendText(
+    settingsScriptPath.appendText(
       """
         include 'lib'
       """.trimIndent(),
