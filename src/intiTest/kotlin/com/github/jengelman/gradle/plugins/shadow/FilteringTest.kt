@@ -188,8 +188,8 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
     run(":server:$shadowJarTask")
+    val serverOutput = path("server/build/libs/server-1.0-all.jar")
 
     assertThat(serverOutput).exists()
     assertDoesNotContain(
@@ -212,8 +212,8 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
     run(":server:$shadowJarTask")
+    val serverOutput = path("server/build/libs/server-1.0-all.jar")
 
     assertThat(serverOutput).exists()
     assertDoesNotContain(

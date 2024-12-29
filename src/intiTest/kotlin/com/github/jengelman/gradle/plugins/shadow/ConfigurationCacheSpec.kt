@@ -96,9 +96,9 @@ class ConfigurationCacheSpec : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    val output = path("server/build/libs/server-1.0-all.jar")
 
     run(shadowJarTask)
+    val output = path("server/build/libs/server-1.0-all.jar")
     output.deleteExisting()
     val result = run(shadowJarTask)
 

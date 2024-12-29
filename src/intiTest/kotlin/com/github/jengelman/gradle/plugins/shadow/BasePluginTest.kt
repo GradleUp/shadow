@@ -1,5 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.assertThat
+import assertk.assertions.exists
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
@@ -16,6 +18,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.extension
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
@@ -128,6 +131,12 @@ abstract class BasePluginTest {
 
   fun path(path: String): Path {
     return root.resolve(path).also {
+      val extension = it.extension
+      // Binary files should be asserted to exist, text files should be created.
+      if (extension == "jar" || extension == "zip") {
+        assertThat(it).exists()
+        return@also
+      }
       if (!it.exists()) {
         it.parent.createDirectories()
         it.createFile()
