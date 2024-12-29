@@ -88,7 +88,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         }
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         where:
         version << ['8.3']
@@ -128,7 +128,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
     }
 
     def 'include project sources'() {
@@ -754,10 +754,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assertContains(output, ['a.properties', 'META-INF/a.properties'])
+        assertContains(outputShadowJar, ['a.properties', 'META-INF/a.properties'])
 
         and:
-        assertDoesNotContain(output, ['META-INF/INDEX.LIST', 'META-INF/a.SF', 'META-INF/a.DSA', 'META-INF/a.RSA'])
+        assertDoesNotContain(outputShadowJar, ['META-INF/INDEX.LIST', 'META-INF/a.SF', 'META-INF/a.DSA', 'META-INF/a.RSA'])
     }
 
     def "include runtime configuration by default"() {
@@ -781,10 +781,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assertContains(output, ['a.properties'])
+        assertContains(outputShadowJar, ['a.properties'])
 
         and:
-        assertDoesNotContain(output, ['b.properties'])
+        assertDoesNotContain(outputShadowJar, ['b.properties'])
     }
 
     def "include java-library configurations by default"() {
@@ -819,8 +819,8 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assertContains(output, ['api.properties', 'implementation.properties',
-                                'runtimeOnly.properties', 'implementation-dep.properties'])
+        assertContains(outputShadowJar, ['api.properties', 'implementation.properties',
+                                         'runtimeOnly.properties', 'implementation-dep.properties'])
     }
 
     def "doesn't include compileOnly configuration by default"() {
@@ -844,10 +844,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assertContains(output, ['a.properties'])
+        assertContains(outputShadowJar, ['a.properties'])
 
         and:
-        assertDoesNotContain(output, ['b.properties'])
+        assertDoesNotContain(outputShadowJar, ['b.properties'])
     }
 
     def "default copying strategy"() {
@@ -871,7 +871,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         assert jar.entries().collect().size() == 2
     }
 
@@ -886,10 +886,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         Attributes attributes = jar.manifest.getMainAttributes()
         assert attributes.getValue('Class-Path') == null
     }
@@ -914,10 +914,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and: 'https://github.com/GradleUp/shadow/issues/65 - combine w/ existing Class-Path'
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
         assert classpath == '/libs/a.jar junit-3.8.2.jar'
@@ -936,10 +936,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         Attributes attributes = jar.manifest.getMainAttributes()
         String classpath = attributes.getValue('Class-Path')
         assert classpath == 'junit-3.8.2.jar'
@@ -963,7 +963,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
     }
 
@@ -1150,10 +1150,10 @@ class ShadowPluginSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarFile jar = new JarFile(output)
+        JarFile jar = new JarFile(outputShadowJar)
         assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
     }
 

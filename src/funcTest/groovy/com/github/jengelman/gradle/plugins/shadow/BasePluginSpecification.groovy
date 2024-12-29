@@ -176,7 +176,7 @@ abstract class BasePluginSpecification extends Specification {
         return new AppendableJar(file(path).toPath())
     }
 
-    File getOutput() {
+    File getOutputShadowJar() {
         getFile('build/libs/shadow-1.0-all.jar')
     }
 

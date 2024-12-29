@@ -21,13 +21,13 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         when:
         assertShadowJarIsCachedAndRelocatable()
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         when:
         changeConfigurationTo """
@@ -38,7 +38,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
     }
 
     /**
@@ -60,7 +60,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         when:
         changeConfigurationTo """
@@ -73,7 +73,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarIsCachedAndRelocatable()
 
         then:
-        assert !output.exists()
+        assert !outputShadowJar.exists()
         assert getFile("build/libs/foo-1.0-all.jar").exists()
     }
 
@@ -110,8 +110,8 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        assertContains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'server/Util.class'
         ])
@@ -128,13 +128,13 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        assertContains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(output, [
+        assertDoesNotContain(outputShadowJar, [
             'server/Util.class',
             'junit/framework/Test.class'
         ])
@@ -143,13 +143,13 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarIsCachedAndRelocatable()
 
         then:
-        output.exists()
-        assertContains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(output, [
+        assertDoesNotContain(outputShadowJar, [
             'server/Util.class',
             'junit/framework/Test.class'
         ])
@@ -176,8 +176,8 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        assertContains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
@@ -195,13 +195,13 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarExecutes()
 
         then:
-        output.exists()
-        assertContains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(output, [
+        assertDoesNotContain(outputShadowJar, [
             'junit/framework/Test.class'
         ])
 
@@ -209,13 +209,13 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         assertShadowJarIsCachedAndRelocatable()
 
         then:
-        output.exists()
-        assertContains(output, [
+        outputShadowJar.exists()
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(output, [
+        assertDoesNotContain(outputShadowJar, [
             'junit/framework/Test.class'
         ])
     }

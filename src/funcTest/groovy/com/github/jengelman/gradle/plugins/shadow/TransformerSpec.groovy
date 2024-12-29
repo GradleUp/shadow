@@ -41,17 +41,17 @@ class TransformerSpec extends BasePluginSpecification {
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text1 = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
+        String text1 = getJarFileContents(outputShadowJar, 'META-INF/services/org.apache.maven.Shade')
         assert text1.split("\\r?\\n").size() == 2
         assert text1 ==
             '''one # NOTE: No newline terminates this line/file
 two # NOTE: No newline terminates this line/file'''.stripIndent()
 
         and:
-        String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
+        String text2 = getJarFileContents(outputShadowJar, 'META-INF/services/com.acme.Foo')
         assert text2.split("\\r?\\n").size() == 1
         assert text2 == 'one'
     }
@@ -79,10 +79,10 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
+        String text = getJarFileContents(outputShadowJar, 'META-INF/foo/org.apache.maven.Shade')
         assert text.split("\\r?\\n").size() == 2
         assert text ==
             '''one # NOTE: No newline terminates this line/file
@@ -117,17 +117,17 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text1 = getJarFileContents(output, 'META-INF/services/org.apache.maven.Shade')
+        String text1 = getJarFileContents(outputShadowJar, 'META-INF/services/org.apache.maven.Shade')
         assert text1.split("\\r?\\n").size() == 2
         assert text1 ==
             '''one # NOTE: No newline terminates this line/file
 two # NOTE: No newline terminates this line/file'''.stripIndent()
 
         and:
-        String text2 = getJarFileContents(output, 'META-INF/services/com.acme.Foo')
+        String text2 = getJarFileContents(outputShadowJar, 'META-INF/services/com.acme.Foo')
         assert text2.split("\\r?\\n").size() == 1
         assert text2 == 'one'
     }
@@ -170,10 +170,10 @@ com.mysql.jdbc.Driver'''.stripIndent())
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text1 = getJarFileContents(output, 'META-INF/services/java.sql.Driver')
+        String text1 = getJarFileContents(outputShadowJar, 'META-INF/services/java.sql.Driver')
         assert text1.split("\\r?\\n").size() == 4
         assert text1 ==
             '''oracle.jdbc.OracleDriver
@@ -182,14 +182,14 @@ myapache.derby.jdbc.AutoloadedDriver
 com.mysql.jdbc.Driver'''.stripIndent()
 
         and:
-        String text2 = getJarFileContents(output, 'META-INF/services/myapache.axis.components.compiler.Compiler')
+        String text2 = getJarFileContents(outputShadowJar, 'META-INF/services/myapache.axis.components.compiler.Compiler')
         assert text2.split("\\r?\\n").size() == 2
         assert text2 ==
             '''myapache.axis.components.compiler.Javac
 org.apache.axis.components.compiler.Jikes'''.stripIndent()
 
         and:
-        String text3 = getJarFileContents(output, 'META-INF/services/org.apache.commons.logging.LogFactory')
+        String text3 = getJarFileContents(outputShadowJar, 'META-INF/services/org.apache.commons.logging.LogFactory')
         assert text3.split("\\r?\\n").size() == 2
         assert text3 ==
             '''myapache.commons.logging.impl.LogFactoryImpl
@@ -216,10 +216,10 @@ org.mortbay.log.Factory'''.stripIndent()
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text = getJarFileContents(output, 'META-INF/foo/org.apache.maven.Shade')
+        String text = getJarFileContents(outputShadowJar, 'META-INF/foo/org.apache.maven.Shade')
         assert text.split("\\r?\\n").size() == 2
         assert text ==
             '''one # NOTE: No newline terminates this line/file
@@ -256,10 +256,10 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text = getJarFileContents(output, 'META-INF/services/shadow.Shadow')
+        String text = getJarFileContents(outputShadowJar, 'META-INF/services/shadow.Shadow')
         assert text.split("\\r?\\n").size() == 3
         assert text ==
             '''three # NOTE: No newline terminates this line/file
@@ -290,10 +290,10 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text = getJarFileContents(output, 'test.properties')
+        String text = getJarFileContents(outputShadowJar, 'test.properties')
         assert text.split("\\r?\\n").size() == 2
         assert text ==
             '''one # NOTE: No newline terminates this line/file
@@ -321,10 +321,10 @@ two # NOTE: No newline terminates this line/file
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text = getJarFileContents(output, 'test.properties')
+        String text = getJarFileContents(outputShadowJar, 'test.properties')
         assert text.split("\\r?\\n").size() == 2
         assert text ==
             '''one # NOTE: No newline terminates this line/file
@@ -357,10 +357,10 @@ two # NOTE: No newline terminates this line/file
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarInputStream jis = new JarInputStream(output.newInputStream())
+        JarInputStream jis = new JarInputStream(outputShadowJar.newInputStream())
         Manifest mf = jis.manifest
         jis.close()
 
@@ -401,10 +401,10 @@ two # NOTE: No newline terminates this line/file
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        JarInputStream jis = new JarInputStream(output.newInputStream())
+        JarInputStream jis = new JarInputStream(outputShadowJar.newInputStream())
         Manifest mf = jis.manifest
         jis.close()
 
@@ -450,10 +450,10 @@ two # NOTE: No newline terminates this line/file
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        String text = getJarFileContents(output, 'properties.xml')
+        String text = getJarFileContents(outputShadowJar, 'properties.xml')
         assert text.replaceAll('\r\n', '\n') ==
             '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
@@ -499,10 +499,10 @@ two # NOTE: No newline terminates this line/file
         then:
         File jar = getFile('build/libs/shadow-1.0.jar')
         assert jar.exists()
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         then: 'Check contents of Shadow jar manifest'
-        JarInputStream jis = new JarInputStream(output.newInputStream())
+        JarInputStream jis = new JarInputStream(outputShadowJar.newInputStream())
         Manifest mf = jis.manifest
 
         assert mf
@@ -559,10 +559,10 @@ two # NOTE: No newline terminates this line/file
         then:
         File jar = getFile('build/libs/shadow-1.0.jar')
         assert jar.exists()
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         then: 'Check contents of Shadow jar manifest'
-        JarInputStream jis = new JarInputStream(output.newInputStream())
+        JarInputStream jis = new JarInputStream(outputShadowJar.newInputStream())
         Manifest mf = jis.manifest
 
         assert mf
@@ -613,10 +613,10 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+        def text = getJarFileContents(outputShadowJar, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
         def props = new Properties()
         props.load(new StringReader(text))
         assert props.getProperty('moduleName') == 'MergedByShadowJar'
@@ -654,17 +654,17 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         run('shadowJar')
 
         then:
-        output.exists()
+        outputShadowJar.exists()
 
         and:
-        def text = getJarFileContents(output, 'META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule')
+        def text = getJarFileContents(outputShadowJar, 'META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule')
         def props = new Properties()
         props.load(new StringReader(text))
         props.getProperty('moduleName') == 'MergedByShadowJar'
         props.getProperty('moduleVersion') == '1.0.0'
         props.getProperty('extensionClasses') == 'com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension'
         props.getProperty('staticExtensionClasses') == 'com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension'
-        assertDoesNotContain(output, ['META-INF/services/org.codehaus.groovy.runtime.ExtensionModule'])
+        assertDoesNotContain(outputShadowJar, ['META-INF/services/org.codehaus.groovy.runtime.ExtensionModule'])
     }
 
     def 'Groovy extension module transformer short syntax'() {
@@ -695,10 +695,10 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         and:
-        def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+        def text = getJarFileContents(outputShadowJar, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
         def props = new Properties()
         props.load(new StringReader(text))
         assert props.getProperty('moduleName') == 'MergedByShadowJar'
@@ -725,7 +725,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         run('shadowJar')
 
         then:
-        assert output.exists()
+        assert outputShadowJar.exists()
 
         where:
         transformer                         | configuration

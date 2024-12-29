@@ -78,8 +78,8 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     }
 
     void deleteOutputs() {
-        if (output.exists()) {
-            assert output.delete()
+        if (outputShadowJar.exists()) {
+            assert outputShadowJar.delete()
         }
     }
 
