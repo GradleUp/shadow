@@ -42,12 +42,7 @@ abstract class BasePluginTest {
       .use(testJar)
       .publish()
 
-    buildScript.writeText(
-      getProjectBuildScript(
-        groupInfo = "group = 'shadow'",
-        versionInfo = "version = '1.0'",
-      ),
-    )
+    buildScript.writeText(getProjectBuildScript(withGroup = true, withVersion = true))
     settingsScript.writeText(getSettingsBuildScript())
   }
 
@@ -64,9 +59,11 @@ abstract class BasePluginTest {
 
   fun getProjectBuildScript(
     javaPlugin: String = "java",
-    groupInfo: String = "",
-    versionInfo: String = "",
+    withGroup: Boolean = false,
+    withVersion: Boolean = false,
   ): String {
+    val groupInfo = if (withGroup) "group = 'shadow'" else ""
+    val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
         id('$javaPlugin')
@@ -213,7 +210,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
+        ${getProjectBuildScript("java", withVersion = true)}
         dependencies { implementation 'junit:junit:3.8.2' }
       """.trimIndent(),
     )
@@ -227,7 +224,7 @@ abstract class BasePluginTest {
     )
     path("server/build.gradle").writeText(
       """
-        ${getProjectBuildScript("java", versionInfo = "version = '1.0'")}
+        ${getProjectBuildScript("java", withVersion = true)}
         dependencies {
           implementation project(':client')
         }
