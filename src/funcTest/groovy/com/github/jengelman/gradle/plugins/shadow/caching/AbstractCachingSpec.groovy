@@ -19,7 +19,7 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     def setup() {
         // Use a test-specific build cache directory.  This ensures that we'll only use cached outputs generated during this
         // test and we won't accidentally use cached outputs from a different test or a different build.
-        settingsFile << """
+        settingsScript << """
             buildCache {
                 local {
                     directory = new File(rootDir, 'build-cache')
@@ -29,8 +29,8 @@ abstract class AbstractCachingSpec extends BasePluginSpecification {
     }
 
     void changeConfigurationTo(String content) {
-        buildFile.text = getProjectBuildScript('java', true, true)
-        buildFile << content
+        buildScript.text = getProjectBuildScript('java', true, true)
+        buildScript << content
     }
 
     BuildResult runWithCacheEnabled(String... arguments) {

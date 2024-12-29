@@ -71,7 +71,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
             'two # NOTE: No newline terminates this line/file').publish()
 
-        buildFile << """
+        buildScript << """
             dependencies {
               implementation 'junit:junit:3.8.2'
               implementation files('${escapedPath(one)}')
@@ -96,7 +96,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     def 'Error in Gradle versions < 8.3'() {
         given:
-        buildFile << """
+        buildScript << """
             dependencies {
               implementation 'junit:junit:3.8.2'
             }
@@ -117,7 +117,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
         URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
-        buildFile << """
+        buildScript << """
             $shadowJar {
                 from('${artifact.path}')
                 from('${project.path}')
@@ -138,7 +138,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             public class Passed {}
         '''.stripIndent()
 
-        buildFile << """
+        buildScript << """
             dependencies { implementation 'junit:junit:3.8.2' }
 
             $shadowJar {
@@ -746,7 +746,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             public class Passed {}
         '''.stripIndent()
 
-        buildFile << """
+        buildScript << """
             dependencies { implementation 'shadow:a:1.0' }
         """.stripIndent()
 
@@ -770,7 +770,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('b.properties', 'b')
             .publish()
 
-        buildFile << """
+        buildScript << """
             dependencies {
                runtimeOnly 'shadow:a:1.0'
                shadow 'shadow:b:1.0'
@@ -806,8 +806,8 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('runtimeOnly.properties', 'runtimeOnly')
             .publish()
 
-        buildFile.text = getProjectBuildScript('java-library', true, true)
-        buildFile << """
+        buildScript.text = getProjectBuildScript('java-library', true, true)
+        buildScript << """
             dependencies {
                api 'shadow:api:1.0'
                implementation 'shadow:implementation:1.0'
@@ -833,7 +833,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('b.properties', 'b')
             .publish()
 
-        buildFile << """
+        buildScript << """
             dependencies {
                runtimeOnly 'shadow:a:1.0'
                compileOnly 'shadow:b:1.0'
@@ -860,7 +860,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             .insertFile('META-INF/MANIFEST.MF', 'MANIFEST B')
             .publish()
 
-        buildFile << """
+        buildScript << """
             dependencies {
                runtimeOnly 'shadow:a:1.0'
                runtimeOnly 'shadow:b:1.0'
@@ -878,7 +878,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     def "Class-Path in Manifest not added if empty"() {
         given:
 
-        buildFile << """
+        buildScript << """
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -898,7 +898,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     def "add shadow configuration to Class-Path in Manifest"() {
         given:
 
-        buildFile << """
+        buildScript << """
             dependencies {
               shadow 'junit:junit:3.8.2'
             }
@@ -928,7 +928,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     def "do not include null value in Class-Path when jar file does not contain Class-Path"() {
         given:
 
-        buildFile << """
+        buildScript << """
             dependencies { shadow 'junit:junit:3.8.2' }
         """.stripIndent()
 
@@ -950,7 +950,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     def "support ZipCompression.STORED"() {
         given:
 
-        buildFile << """
+        buildScript << """
             dependencies { shadow 'junit:junit:3.8.2' }
 
             $shadowJar {
@@ -1034,7 +1034,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             }
         """.stripIndent()
 
-        buildFile << """
+        buildScript << """
             apply plugin: 'application'
 
             application {
@@ -1078,7 +1078,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
             }
         """.stripIndent()
 
-        settingsFile << "rootProject.name = 'myapp'"
+        settingsScript << "rootProject.name = 'myapp'"
 
         when:
         BuildResult result = run('runShadow')
@@ -1092,9 +1092,9 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/issues/609")
     def "doesn't error when using application mainClass property"() {
         given:
-        buildFile.text = defaultBuildScript
+        buildScript.text = defaultBuildScript
 
-        buildFile << """
+        buildScript << """
             project.ext {
                 aspectjVersion = '1.8.12'
             }
@@ -1130,7 +1130,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
     @Issue("https://github.com/GradleUp/shadow/pull/459")
     def 'exclude gradleApi() by default'() {
         given:
-        buildFile.text = getProjectBuildScript('java-gradle-plugin', true, true)
+        buildScript.text = getProjectBuildScript('java-gradle-plugin', true, true)
 
         file('src/main/java/my/plugin/MyPlugin.java') << """
             package my.plugin;
@@ -1159,7 +1159,7 @@ class ShadowPluginSpec extends BasePluginSpecification {
 
     @Issue("https://github.com/GradleUp/shadow/issues/1070")
     def 'can register a custom shadow jar task'() {
-        buildFile << """
+        buildScript << """
             dependencies {
               testImplementation 'junit:junit:3.8.2'
             }

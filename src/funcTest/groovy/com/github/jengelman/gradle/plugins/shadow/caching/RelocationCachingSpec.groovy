@@ -6,7 +6,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
      */
     def 'shadowJar is cached correctly when relocation is added'() {
         given:
-        buildFile << """
+        buildScript << """
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 

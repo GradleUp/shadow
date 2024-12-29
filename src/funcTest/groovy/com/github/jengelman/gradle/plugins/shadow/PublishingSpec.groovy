@@ -26,8 +26,8 @@ class PublishingSpec extends BasePluginSpecification {
             .insertFile('b.properties', 'b')
             .publish()
 
-        settingsFile << "rootProject.name = 'maven'"
-        buildFile << """
+        settingsScript << "rootProject.name = 'maven'"
+        buildScript << """
             apply plugin: 'maven-publish'
 
             dependencies {
@@ -93,8 +93,8 @@ class PublishingSpec extends BasePluginSpecification {
             .insertFile('b.properties', 'b')
             .publish()
 
-        settingsFile << "rootProject.name = 'maven'"
-        buildFile << """
+        settingsScript << "rootProject.name = 'maven'"
+        buildScript << """
             apply plugin: 'maven-publish'
 
             dependencies {
@@ -134,14 +134,14 @@ class PublishingSpec extends BasePluginSpecification {
     def "publish multiproject shadow jar with maven-publish plugin"() {
         given:
 
-        settingsFile << """
+        settingsScript << """
             rootProject.name = 'maven'
             include 'a'
             include 'b'
             include 'c'
         """.stripMargin()
 
-        buildFile.text = """
+        buildScript.text = """
             subprojects {
                 apply plugin: 'java'
                 apply plugin: 'maven-publish'
@@ -237,10 +237,10 @@ class PublishingSpec extends BasePluginSpecification {
             .insertFile('b.properties', 'b')
             .publish()
 
-        settingsFile << """
+        settingsScript << """
             rootProject.name = 'maven'
         """
-        buildFile << """
+        buildScript << """
             apply plugin: 'maven-publish'
             dependencies {
                implementation 'shadow:a:1.0'

@@ -10,7 +10,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
-        buildFile << """
+        buildScript << """
             $shadowJar {
                 from('${artifact.path}')
                 from('${project.path}')
@@ -49,7 +49,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
         URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
         URL project = this.class.classLoader.getResource('test-project-1.0-SNAPSHOT.jar')
 
-        buildFile << """
+        buildScript << """
             $shadowJar {
                 from('${artifact.path}')
                 from('${project.path}')
@@ -82,7 +82,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
      */
     def 'shadowJar is cached correctly when using includes/excludes'() {
         given:
-        buildFile << """
+        buildScript << """
             dependencies { implementation 'junit:junit:3.8.2' }
 
             $shadowJar {
@@ -160,7 +160,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
      */
     def 'shadowJar is cached correctly when using dependency includes/excludes'() {
         given:
-        buildFile << """
+        buildScript << """
             dependencies { implementation 'junit:junit:3.8.2' }
         """.stripIndent()
 

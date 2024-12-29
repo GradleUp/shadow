@@ -18,7 +18,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
             public class Server {}
         """.stripIndent()
 
-        buildFile << """
+        buildScript << """
             import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
             import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
             import org.apache.tools.zip.ZipOutputStream
