@@ -291,6 +291,17 @@ class ShadowPluginTest : BasePluginTest() {
   @Test
   fun useMinimizeWithTransitiveDependenciesWithApiScope() {
     writeApiLibAndImplModules()
+    path("api/build.gradle").writeText(
+      """
+        plugins {
+          id 'java-library'
+        }
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+          api project(':lib')
+        }
+      """.trimIndent(),
+    )
 
     run(":impl:$shadowJarTask")
     val implOutput = path("impl/build/libs/impl-all.jar")

@@ -295,7 +295,7 @@ abstract class BasePluginTest {
     path("api/build.gradle").writeText(
       """
         plugins {
-          id 'java-library'
+          id 'java'
         }
         dependencies {
           implementation 'junit:junit:3.8.2'
