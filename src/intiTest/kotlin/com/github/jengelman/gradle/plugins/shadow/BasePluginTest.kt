@@ -21,7 +21,6 @@ import kotlin.io.path.extension
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
-import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.AfterEach
@@ -327,8 +326,6 @@ abstract class BasePluginTest {
   }
 
   companion object {
-    val javaVersion: Int = JavaVersion.current().majorVersion.toInt()
-
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
       if (gradleUserHome == null) {

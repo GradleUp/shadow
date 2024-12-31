@@ -20,7 +20,8 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledIf
+import org.junit.jupiter.api.condition.EnabledForJreRange
+import org.junit.jupiter.api.condition.JRE
 
 class ShadowPluginTest : BasePluginTest() {
 
@@ -55,8 +56,8 @@ class ShadowPluginTest : BasePluginTest() {
   }
 
   @Test
-  @DisabledIf(
-    value = "atLeastJava21",
+  @EnabledForJreRange(
+    max = JRE.JAVA_21,
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
@@ -785,10 +786,5 @@ class ShadowPluginTest : BasePluginTest() {
     val testJar = path("build/libs/shadow-1.0-tests.jar")
     assertThat(testJar).exists()
     assertThat(JarFile(testJar.toFile()).getEntry("junit")).isNotNull()
-  }
-
-  private companion object {
-    @JvmStatic
-    fun atLeastJava21(): Boolean = javaVersion >= 21
   }
 }
