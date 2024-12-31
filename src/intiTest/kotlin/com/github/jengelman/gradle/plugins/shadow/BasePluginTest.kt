@@ -4,7 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import java.nio.file.Path
 import java.util.jar.JarFile
@@ -111,10 +110,6 @@ abstract class BasePluginTest {
       .insertFile("d.properties", "d")
       .dependsOn("c")
       .publish()
-  }
-
-  fun buildJar(path: String): AppendableJar {
-    return AppendableJar(path(path))
   }
 
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
