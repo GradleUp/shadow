@@ -369,8 +369,8 @@ class ShadowPluginTest : BasePluginTest() {
       .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
     path("server/build.gradle").writeText(replaced)
 
-    run(":server:shadowJar")
-    val serverOutput = path("server/build/libs/server-all.jar")
+    run(":server:$shadowJarTask")
+    val serverOutput = path("server/build/libs/server-1.0-all.jar")
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -617,7 +617,7 @@ class ShadowPluginTest : BasePluginTest() {
     writeApiLibAndImplModules()
     path("lib/build.gradle").appendText(versionBlock)
     path("api/build.gradle").appendText(versionBlock)
-    path("impl/build.gradle").writeText(versionBlock)
+    path("impl/build.gradle").appendText(versionBlock)
 
     run(":impl:$shadowJarTask")
     val serverOutput = path("impl/build/libs/impl-1.0-all.jar")
@@ -768,19 +768,19 @@ class ShadowPluginTest : BasePluginTest() {
         dependencies {
           testImplementation 'junit:junit:3.8.2'
         }
-        val $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
+        def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
           group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
           description = "Create a combined JAR of project and test dependencies"
-          archiveClassifier.set("tests")
-          from(sourceSets.test.get().output)
-          configurations = listOf(project.configurations.testRuntimeClasspath.get())
+          archiveClassifier = "tests"
+          from sourceSets.test.output
+          configurations = [project.configurations.testRuntimeClasspath]
         }
       """.trimIndent(),
     )
 
     val result = run(testShadowJarTask)
 
-    assertThat(result.task(testShadowJarTask)).isNotNull()
+    assertThat(result.task(":$testShadowJarTask")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
 
     val testJar = path("build/libs/shadow-1.0-tests.jar")
