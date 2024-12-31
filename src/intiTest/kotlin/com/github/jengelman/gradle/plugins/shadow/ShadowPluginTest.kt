@@ -13,7 +13,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.util.jar.JarFile
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
-import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -88,16 +87,16 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun shadowCopy() {
-    val artifact = requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar"))
-      .toURI().toPath()
-    val project = requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar"))
-      .toURI().toPath()
+    val artifactJarPath = requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar"))
+      .path
+    val projectJarPath = requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar"))
+      .path
 
     projectScriptPath.appendText(
       """
         $shadowJar {
-          from(file('$artifact'))
-          from(file('$project'))
+          from('$artifactJarPath')
+          from('$projectJarPath')
         }
       """.trimIndent(),
     )
