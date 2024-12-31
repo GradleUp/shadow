@@ -1,18 +1,24 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.util.jar.JarFile
 import kotlin.io.path.appendText
+import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledIf
 
@@ -346,6 +352,439 @@ class ShadowPluginTest : BasePluginTest() {
       serverOutput,
       listOf("client/Client.class", "junit/framework/Test.class", "client/junit/framework/Test.class"),
     )
+  }
+
+  @Test
+  fun shadowAProjectShadowJar() {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        $shadowJar {
+          relocate 'junit.framework', 'client.junit.framework'
+        }
+      """.trimIndent(),
+    )
+    val replaced = path("server/build.gradle").readText()
+      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
+    path("server/build.gradle").writeText(replaced)
+
+    run(":server:shadowJar")
+    val serverOutput = path("server/build/libs/server-all.jar")
+
+    assertThat(serverOutput).exists()
+    assertContains(
+      serverOutput,
+      listOf("client/Client.class", "client/junit/framework/Test.class", "server/Server.class"),
+    )
+    assertDoesNotContain(
+      serverOutput,
+      listOf("junit/framework/Test.class"),
+    )
+  }
+
+  @Test
+  fun excludeIndexListSfDsaAndRsaByDefault() {
+    repo.module("shadow", "a", "1.0")
+      .insertFile("a.properties", "a")
+      .insertFile("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
+      .insertFile("META-INF/a.SF", "Signature File")
+      .insertFile("META-INF/a.DSA", "DSA Signature Block")
+      .insertFile("META-INF/a.RSA", "RSA Signature Block")
+      .insertFile("META-INF/a.properties", "key=value")
+      .publish()
+
+    path("src/main/java/shadow/Passed.java").writeText(
+      """
+        package shadow;
+        public class Passed {}
+      """.trimIndent(),
+    )
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'shadow:a:1.0'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertContains(
+      outputShadowJar,
+      listOf("a.properties", "META-INF/a.properties"),
+    )
+    assertDoesNotContain(
+      outputShadowJar,
+      listOf("META-INF/INDEX.LIST", "META-INF/a.SF", "META-INF/a.DSA", "META-INF/a.RSA"),
+    )
+  }
+
+  @Test
+  fun includeRuntimeConfigurationByDefault() {
+    publishArtifactA()
+    publishArtifactB()
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          runtimeOnly 'shadow:a:1.0'
+          shadow 'shadow:b:1.0'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertContains(
+      outputShadowJar,
+      listOf("a.properties"),
+    )
+    assertDoesNotContain(
+      outputShadowJar,
+      listOf("b.properties"),
+    )
+  }
+
+  @Test
+  fun includeJavaLibraryConfigurationsByDefault() {
+    repo.module("shadow", "api", "1.0")
+      .insertFile("api.properties", "api")
+      .publish()
+    repo.module("shadow", "implementation-dep", "1.0")
+      .insertFile("implementation-dep.properties", "implementation-dep")
+      .publish()
+    repo.module("shadow", "implementation", "1.0")
+      .insertFile("implementation.properties", "implementation")
+      .dependsOn("implementation-dep")
+      .publish()
+    repo.module("shadow", "runtimeOnly", "1.0")
+      .insertFile("runtimeOnly.properties", "runtimeOnly")
+      .publish()
+
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-library", withGroup = true, withVersion = true)}
+        dependencies {
+          api 'shadow:api:1.0'
+          implementation 'shadow:implementation:1.0'
+          runtimeOnly 'shadow:runtimeOnly:1.0'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertContains(
+      outputShadowJar,
+      listOf("api.properties", "implementation.properties", "runtimeOnly.properties", "implementation-dep.properties"),
+    )
+  }
+
+  @Test
+  fun doesNotIncludeCompileOnlyConfigurationByDefault() {
+    publishArtifactA()
+    publishArtifactB()
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          runtimeOnly 'shadow:a:1.0'
+          compileOnly 'shadow:b:1.0'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertContains(
+      outputShadowJar,
+      listOf("a.properties"),
+    )
+    assertDoesNotContain(
+      outputShadowJar,
+      listOf("b.properties"),
+    )
+  }
+
+  @Test
+  fun defaultCopyingStrategy() {
+    repo.module("shadow", "a", "1.0")
+      .insertFile("META-INF/MANIFEST.MF", "MANIFEST A")
+      .publish()
+    repo.module("shadow", "b", "1.0")
+      .insertFile("META-INF/MANIFEST.MF", "MANIFEST B")
+      .publish()
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          runtimeOnly 'shadow:a:1.0'
+          runtimeOnly 'shadow:b:1.0'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+    val entries = JarFile(outputShadowJar.toFile()).entries().toList()
+    assertThat(entries.size).isEqualTo(2)
+  }
+
+  @Test
+  fun classPathInManifestNotAddedIfEmpty() {
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
+    assertThat(attributes.getValue("Class-Path")).isNull()
+  }
+
+  @Test
+  fun addShadowConfigurationToClassPathInManifest() {
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          shadow 'junit:junit:3.8.2'
+        }
+        jar {
+          manifest {
+            attributes 'Class-Path': '/libs/a.jar'
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
+    assertThat(attributes.getValue("Class-Path")).isEqualTo("/libs/a.jar junit-3.8.2.jar")
+  }
+
+  @Test
+  fun doNotIncludeNullValueInClassPathWhenJarFileDoesNotContainClassPath() {
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          shadow 'junit:junit:3.8.2'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
+    assertThat(attributes.getValue("Class-Path")).isEqualTo("junit-3.8.2.jar")
+  }
+
+  @Test
+  fun supportZipCompressionStored() {
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          shadow 'junit:junit:3.8.2'
+        }
+        $shadowJar {
+          zip64 = true
+          entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+  }
+
+  @Test
+  fun apiProjectDependencyWithVersion() {
+    val versionBlock = """
+      version = '1.0'
+    """.trimIndent()
+
+    writeApiLibAndImplModules()
+    path("lib/build.gradle").appendText(versionBlock)
+    path("api/build.gradle").appendText(versionBlock)
+    path("impl/build.gradle").writeText(versionBlock)
+
+    run(":impl:$shadowJarTask")
+    val serverOutput = path("impl/build/libs/impl-1.0-all.jar")
+
+    assertThat(serverOutput).exists()
+    assertContains(
+      serverOutput,
+      listOf("api/UnusedEntity.class"),
+    )
+  }
+
+  /**
+   * This spec requires > 15 minutes and > 8GB of disk space to run
+   */
+  @Disabled
+  @Test
+  fun checkLargeZipFilesWithZip64Enabled() {
+    publishArtifactA()
+
+    path("src/main/java/myapp/Main.java").writeText(
+      """
+        package myapp;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("TestApp: Hello World! (" + args[0] + ")");
+          }
+        }
+      """.trimIndent(),
+    )
+
+    settingsScriptPath.appendText("rootProject.name = 'myapp'")
+    projectScriptPath.appendText(
+      """
+        apply plugin: 'application'
+
+        application {
+          mainClass = 'myapp.Main'
+        }
+        dependencies {
+          implementation 'shadow:a:1.0'
+        }
+        def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
+        def generateResources = tasks.register('generateResources') {
+          doLast {
+            def rnd = new Random()
+            def buf = new byte[128 * 1024]
+            for (x in 0..255) {
+              def dir = new File(generatedResourcesDir, x.toString())
+              dir.mkdirs()
+              for (y in 0..255) {
+                def file = new File(dir, y.toString())
+                rnd.nextBytes(buf)
+                file.bytes = buf
+              }
+            }
+          }
+        }
+        sourceSets {
+          main {
+            output.dir(generatedResourcesDir, builtBy: generateResources)
+          }
+        }
+        $shadowJar {
+          zip64 = true
+        }
+        $runShadow {
+          args 'foo'
+        }
+      """.trimIndent(),
+    )
+
+    val result = run("runShadow")
+
+    assertThat(result.output).contains("TestApp: Hello World! (foo)")
+  }
+
+  @Test
+  fun doesNotErrorWhenUsingApplicationMainClassProperty() {
+    projectScriptPath.appendText(
+      """
+        apply plugin: 'application'
+        ext {
+          aspectjVersion = '1.8.12'
+        }
+        application {
+          mainClass.set('myapp.Main')
+        }
+        $runShadow {
+          args 'foo'
+        }
+      """.trimIndent(),
+    )
+
+    path("src/main/java/myapp/Main.java").writeText(
+      """
+        package myapp;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("TestApp: Hello World! (" + args[0] + ")");
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run("runShadow")
+
+    assertThat(result.output).contains("TestApp: Hello World! (foo)")
+  }
+
+  @Test
+  fun excludeGradleApiByDefault() {
+    projectScriptPath.writeText(
+      getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true),
+    )
+
+    path("src/main/java/my/plugin/MyPlugin.java").writeText(
+      """
+        package my.plugin;
+        import org.gradle.api.Plugin;
+        import org.gradle.api.Project;
+        public class MyPlugin implements Plugin<Project> {
+          public void apply(Project project) {
+            System.out.println("MyPlugin: Hello World!");
+          }
+        }
+      """.trimIndent(),
+    )
+
+    path("src/main/resources/META-INF/gradle-plugins/my.plugin.properties").writeText(
+      """
+        implementation-class=my.plugin.MyPlugin
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+
+    val entries = JarFile(outputShadowJar.toFile()).entries().toList()
+    assertThat(entries.count { it.name.endsWith(".class") }).isEqualTo(1)
+  }
+
+  @Test
+  fun canRegisterACustomShadowJarTask() {
+    val testShadowJarTask = "testShadowJar"
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          testImplementation 'junit:junit:3.8.2'
+        }
+        val $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
+          group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+          description = "Create a combined JAR of project and test dependencies"
+          archiveClassifier.set("tests")
+          from(sourceSets.test.get().output)
+          configurations = listOf(project.configurations.testRuntimeClasspath.get())
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(testShadowJarTask)
+
+    assertThat(result.task(testShadowJarTask)).isNotNull()
+      .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
+
+    val testJar = path("build/libs/shadow-1.0-tests.jar")
+    assertThat(testJar).exists()
+    assertThat(JarFile(testJar.toFile()).getEntry("junit")).isNotNull()
   }
 
   private companion object {

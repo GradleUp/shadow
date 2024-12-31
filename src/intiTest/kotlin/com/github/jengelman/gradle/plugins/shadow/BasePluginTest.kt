@@ -227,7 +227,9 @@ abstract class BasePluginTest {
     path("client/build.gradle").writeText(
       """
         ${getDefaultProjectBuildScript("java", withVersion = true)}
-        dependencies { implementation 'junit:junit:3.8.2' }
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
       """.trimIndent() + System.lineSeparator(),
     )
 
@@ -255,7 +257,7 @@ abstract class BasePluginTest {
     settingsScriptPath.appendText(
       """
         include 'api', 'lib', 'impl'
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
     projectScriptPath.writeText("")
 
@@ -276,7 +278,7 @@ abstract class BasePluginTest {
         plugins {
           id 'java'
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
 
     path("api/src/main/java/api/Entity.java").writeText(
@@ -301,7 +303,7 @@ abstract class BasePluginTest {
           implementation 'junit:junit:3.8.2'
           implementation project(':lib')
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
 
     path("impl/src/main/java/impl/SimpleEntity.java").writeText(
@@ -320,7 +322,7 @@ abstract class BasePluginTest {
         $shadowJar {
           minimize()
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
   }
 
