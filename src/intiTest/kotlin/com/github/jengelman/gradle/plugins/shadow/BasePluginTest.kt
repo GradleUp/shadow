@@ -173,33 +173,18 @@ abstract class BasePluginTest {
     return runner.withArguments(allArguments)
   }
 
-  fun run(vararg tasks: String): BuildResult {
-    return run(tasks.toList())
-  }
-
-  fun run(
-    vararg tasks: String,
-    block: (GradleRunner) -> GradleRunner = { it },
-  ): BuildResult {
-    return run(tasks.toList(), block)
-  }
-
   inline fun run(
-    tasks: Iterable<String>,
-    block: (GradleRunner) -> GradleRunner = { it },
+    vararg tasks: String,
+    runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
-    return block(runner(tasks)).build().also {
-      it.assertNoDeprecationWarnings()
-    }
+    return runnerBlock(runner(tasks.toList())).build().assertNoDeprecationWarnings()
   }
 
-  fun runWithFailure(
+  inline fun runWithFailure(
     vararg tasks: String,
-    block: (GradleRunner) -> GradleRunner = { it },
+    runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
-    return block(runner(tasks.toList())).buildAndFail().also {
-      it.assertNoDeprecationWarnings()
-    }
+    return runnerBlock(runner(tasks.toList())).buildAndFail().assertNoDeprecationWarnings()
   }
 
   fun writeClientAndServerModules(
@@ -339,7 +324,7 @@ abstract class BasePluginTest {
       tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
 
-    fun BuildResult.assertNoDeprecationWarnings() {
+    fun BuildResult.assertNoDeprecationWarnings() = apply {
       output.lines().forEach {
         assert(!containsDeprecationWarning(it))
       }
