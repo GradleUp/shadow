@@ -22,6 +22,8 @@ import org.junit.jupiter.api.condition.EnabledForJreRange
 import org.junit.jupiter.api.condition.JRE
 
 class ShadowPluginTest : BasePluginTest() {
+  private val serverOutput get() = path("server/build/libs/server-1.0-all.jar")
+  private val serverShadowJarTask = ":server:$shadowJarTask"
 
   @Test
   fun applyPlugin() {
@@ -791,7 +793,4 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(testJar).exists()
     assertThat(JarFile(testJar.toFile()).getEntry("junit")).isNotNull()
   }
-
-  private val serverOutput get() = path("server/build/libs/server-1.0-all.jar")
-  private val serverShadowJarTask = ":server:$shadowJarTask"
 }
