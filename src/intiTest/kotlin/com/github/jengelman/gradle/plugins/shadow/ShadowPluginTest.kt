@@ -22,8 +22,6 @@ import org.junit.jupiter.api.condition.EnabledForJreRange
 import org.junit.jupiter.api.condition.JRE
 
 class ShadowPluginTest : BasePluginTest() {
-  private val serverOutput get() = path("server/build/libs/server-1.0-all.jar")
-  private val serverShadowJarTask = ":server:$shadowJarTask"
 
   @Test
   fun applyPlugin() {
@@ -143,9 +141,9 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class", "server/Server.class", "junit/framework/Test.class"),
     )
   }
@@ -173,13 +171,13 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class", "server/Server.class"),
     )
     assertDoesNotContain(
-      serverOutput,
+      outputServerShadowJar,
       listOf("junit/framework/Test.class"),
     )
   }
@@ -201,13 +199,13 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("server/Server.class", "junit/framework/Test.class"),
     )
     assertDoesNotContain(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class"),
     )
   }
@@ -228,9 +226,9 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class", "server/Server.class"),
     )
   }
@@ -260,9 +258,9 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class", "server/Server.class", "junit/framework/TestCase.class"),
     )
 
@@ -273,11 +271,11 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
     run(serverShadowJarTask)
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     // TODO: I don't think client/Client.class and junit classes should be in the output jar, but it's the test case
     //  from https://github.com/GradleUp/shadow/pull/420, need to investigate more...
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class", "server/Server.class", "junit/framework/TestCase.class"),
     )
   }
@@ -385,13 +383,13 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class", "client/junit/framework/Test.class", "server/Server.class"),
     )
     assertDoesNotContain(
-      serverOutput,
+      outputServerShadowJar,
       listOf("junit/framework/Test.class"),
     )
   }

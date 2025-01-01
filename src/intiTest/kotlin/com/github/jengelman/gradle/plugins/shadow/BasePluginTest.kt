@@ -114,6 +114,7 @@ abstract class BasePluginTest {
 
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
   open val runShadowTask = SHADOW_RUN_TASK_NAME
+  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
 
   val projectScriptPath: Path
     get() = path("build.gradle")
@@ -123,6 +124,9 @@ abstract class BasePluginTest {
 
   val outputShadowJar: Path
     get() = path("build/libs/shadow-1.0-all.jar")
+
+  val outputServerShadowJar: Path
+    get() = path("server/build/libs/server-1.0-all.jar")
 
   fun path(path: String): Path {
     return root.resolve(path).also {
@@ -205,7 +209,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java", withVersion = true)}
+        ${getDefaultProjectBuildScript("java")}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
