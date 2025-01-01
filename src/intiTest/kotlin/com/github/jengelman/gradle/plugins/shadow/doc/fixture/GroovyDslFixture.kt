@@ -1,10 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.doc.fixture
 
-import org.intellij.lang.annotations.Language
-
 object GroovyDslFixture : SnippetFixture {
 
-  @Language("Groovy")
   override val pre: String = """
     plugins {
       id 'java'
