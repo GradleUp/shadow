@@ -164,7 +164,8 @@ class ShadowPluginTest : BasePluginTest() {
         package server;
         import client.Client;
         public class Server {
-            private final String client = Client.class.getName();
+          // This is to make sure that 'Client' is not removed.
+          private final String client = Client.class.getName();
         }
       """.trimIndent(),
     )
@@ -272,7 +273,7 @@ class ShadowPluginTest : BasePluginTest() {
     )
     run(serverShadowJarTask)
     assertThat(outputServerShadowJar).exists()
-    // TODO: I don't think client/Client.class and junit classes should be in the output jar, but it's the test case
+    // TODO: I don't think junit classes should be in the output jar, but it's the test case
     //  from https://github.com/GradleUp/shadow/pull/420, need to investigate more...
     assertContains(
       outputServerShadowJar,
@@ -340,21 +341,11 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun dependOnProjectShadowJar() {
-    writeClientAndServerModules()
-    path("server/build.gradle").writeText(
-      """
-        plugins {
-          id 'java'
-        }
-        dependencies {
-          implementation project(path: ':client', configuration: 'shadow')
-        }
-      """.trimIndent(),
-    )
-
-    val serverOutput = path("server/build/libs/server.jar")
+    writeShadowedClientAndServerModules()
 
     run(":server:jar")
+    val serverOutput = path("server/build/libs/server-1.0.jar")
+    val clientOutput = path("client/build/libs/client-all.jar")
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -365,23 +356,19 @@ class ShadowPluginTest : BasePluginTest() {
       serverOutput,
       listOf("client/Client.class", "junit/framework/Test.class", "client/junit/framework/Test.class"),
     )
+    assertThat(clientOutput).exists()
+    assertContains(
+      clientOutput,
+      listOf("client/Client.class", "client/junit/framework/Test.class"),
+    )
   }
 
   @Test
   fun shadowProjectShadowJar() {
-    writeClientAndServerModules()
-    path("client/build.gradle").appendText(
-      """
-        $shadowJar {
-          relocate 'junit.framework', 'client.junit.framework'
-        }
-      """.trimIndent(),
-    )
-    val replaced = path("server/build.gradle").readText()
-      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
-    path("server/build.gradle").writeText(replaced)
+    writeShadowedClientAndServerModules()
 
     run(serverShadowJarTask)
+    val clientOutput = path("client/build/libs/client-all.jar")
 
     assertThat(outputServerShadowJar).exists()
     assertContains(
@@ -391,6 +378,11 @@ class ShadowPluginTest : BasePluginTest() {
     assertDoesNotContain(
       outputServerShadowJar,
       listOf("junit/framework/Test.class"),
+    )
+    assertThat(clientOutput).exists()
+    assertContains(
+      clientOutput,
+      listOf("client/Client.class", "client/junit/framework/Test.class"),
     )
   }
 
@@ -814,5 +806,27 @@ class ShadowPluginTest : BasePluginTest() {
     val testJar = path("build/libs/shadow-1.0-tests.jar")
     assertThat(testJar).exists()
     assertThat(JarFile(testJar.toFile()).getEntry("junit")).isNotNull()
+  }
+
+  private fun writeShadowedClientAndServerModules() {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        $shadowJar {
+          relocate 'junit.framework', 'client.junit.framework'
+        }
+      """.trimIndent(),
+    )
+    path("server/src/main/java/server/Server.java").writeText(
+      """
+        package server;
+        import client.Client;
+        import client.junit.framework.Test;
+        public class Server {}
+      """.trimIndent(),
+    )
+    val replaced = path("server/build.gradle").readText()
+      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
+    path("server/build.gradle").writeText(replaced)
   }
 }
