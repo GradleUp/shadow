@@ -40,8 +40,6 @@ class GroovyBuildExecutor(
       append(System.lineSeparator())
       append(snippetWithoutImports)
       append(System.lineSeparator())
-      append(fixture.post)
-      append(System.lineSeparator())
     }.trimIndent()
 
     tempDir.addSubProject("main", fullSnippet)

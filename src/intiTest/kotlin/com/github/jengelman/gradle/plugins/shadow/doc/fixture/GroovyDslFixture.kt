@@ -12,8 +12,6 @@ object GroovyDslFixture : SnippetFixture {
     }
   """.trimIndent()
 
-  override val post: String = ""
-
   val importsExtractor: (String) -> List<String> = { snippet ->
     val imports = StringBuilder()
     val scriptMinusImports = StringBuilder()
