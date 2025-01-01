@@ -9,6 +9,7 @@ This allows a [`Transformer`](https://gradleup.com/shadow/api/com/github/jengelm
 determine if it should process a particular entry and apply any modifications before writing the stream to the output.
 
 ```groovy
+// Adding a Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import javax.annotation.Nonnull
@@ -37,6 +38,7 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 Additionally, a `Transformer` can accept a `Closure` to configure the provided `Transformer`.
 
 ```groovy
+// Configuring a Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import javax.annotation.Nonnull
@@ -69,6 +71,7 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 An instantiated instance of a `Transformer` can also be provided.
 
 ```groovy
+// Adding a Transformer Instance
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import javax.annotation.Nonnull
