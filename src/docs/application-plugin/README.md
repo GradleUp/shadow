@@ -28,6 +28,14 @@ It can be configured the same as any other `JavaExec` task.
 
 ```groovy
 // Configuring the runShadow Task
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.gradleup.shadow'
+
+application {
+  mainClass = 'myapp.Main'
+}
+
 tasks.named('runShadow', com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec) {
   args 'foo'
 }

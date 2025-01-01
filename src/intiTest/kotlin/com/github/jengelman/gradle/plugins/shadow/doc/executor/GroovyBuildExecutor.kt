@@ -9,7 +9,7 @@ import org.gradle.testkit.runner.GradleRunner
 class GroovyBuildExecutor(
   override val fixture: SnippetFixture,
   private val importExtractor: (String) -> List<String>,
-  private val arguments: List<String> = listOf("build", "-m"),
+  private val arguments: List<String> = listOf("build"),
 ) : SnippetExecutor {
 
   override fun execute(tempDir: Path, snippet: String) {

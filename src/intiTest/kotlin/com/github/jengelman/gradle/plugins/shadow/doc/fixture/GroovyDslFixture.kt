@@ -9,10 +9,7 @@ object GroovyDslFixture : SnippetFixture {
     plugins {
       id("java")
       id("com.gradleup.shadow")
-      id("application")
     }
-    version = "1.0"
-    group = "shadow"
   """.trimIndent()
 
   override val post: String = ""
