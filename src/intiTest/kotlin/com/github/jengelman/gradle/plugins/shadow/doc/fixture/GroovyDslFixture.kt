@@ -11,10 +11,6 @@ object GroovyDslFixture : SnippetFixture {
       id("com.gradleup.shadow")
       id("application")
     }
-    repositories {
-      mavenLocal()
-      mavenCentral()
-    }
     version = "1.0"
     group = "shadow"
   """.trimIndent()

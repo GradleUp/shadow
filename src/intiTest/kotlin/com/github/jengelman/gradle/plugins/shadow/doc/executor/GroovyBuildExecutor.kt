@@ -5,7 +5,6 @@ import java.nio.file.Path
 import kotlin.io.path.createDirectory
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.GradleRunner
-import org.intellij.lang.annotations.Language
 
 class GroovyBuildExecutor(
   override val fixture: SnippetFixture,
@@ -14,17 +13,41 @@ class GroovyBuildExecutor(
 ) : SnippetExecutor {
 
   override fun execute(tempDir: Path, snippet: String) {
-    tempDir.resolve("settings.gradle").writeText(settingsBuildText)
+    tempDir.resolve("settings.gradle").writeText(
+      """
+        dependencyResolutionManagement {
+          repositories {
+            mavenLocal()
+            mavenCentral()
+          }
+        }
+        include 'api', 'main'
+      """.trimIndent(),
+    )
+    val projectBuildText = """
+      plugins {
+        id 'java'
+        id 'com.gradleup.shadow'
+      }
+    """.trimIndent()
     tempDir.addSubProject("api", projectBuildText)
 
     val (imports, snippetWithoutImports) = importExtractor(snippet)
-    val fullSnippet = imports + fixture.pre + '\n' + snippetWithoutImports + '\n' + fixture.post
+    val fullSnippet = buildString {
+      append(imports)
+      append(System.lineSeparator())
+      append(fixture.pre)
+      append(System.lineSeparator())
+      append(snippetWithoutImports)
+      append(System.lineSeparator())
+      append(fixture.post)
+      append(System.lineSeparator())
+    }.trimIndent()
 
     tempDir.addSubProject("main", fullSnippet)
 
     val allArguments = listOf(
       "--warning-mode=fail",
-      "--configuration-cache",
       "--stacktrace",
     ) + arguments
     try {
@@ -44,25 +67,5 @@ class GroovyBuildExecutor(
       .createDirectory()
       .resolve("build.gradle")
       .writeText(buildScriptText)
-  }
-
-  private companion object {
-    @Language("Groovy")
-    private val settingsBuildText = """
-      rootProject.name = 'shadowTest'
-      include 'api', 'main'
-    """.trimIndent()
-
-    @Language("Groovy")
-    private val projectBuildText = """
-      plugins {
-        id 'java'
-        id 'com.gradleup.shadow'
-      }
-      repositories {
-        mavenLocal()
-        mavenCentral()
-      }
-    """.trimIndent()
   }
 }
