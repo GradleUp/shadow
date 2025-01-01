@@ -7,8 +7,8 @@ object GroovyDslFixture : SnippetFixture {
   @Language("Groovy")
   override val pre: String = """
     plugins {
-      id("java")
-      id("com.gradleup.shadow")
+      id 'java'
+      id 'com.gradleup.shadow'
     }
   """.trimIndent()
 
