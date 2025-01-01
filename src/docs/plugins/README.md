@@ -11,9 +11,6 @@ and `relocationPrefix` settings on any `ShadowJar` task.
 A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the `shadowJar` task for relocation.
 
 ```groovy
-apply plugin: 'java'
-apply plugin: 'com.gradleup.shadow'
-
 dependencies {
   shadow localGroovy()
   shadow gradleApi()
