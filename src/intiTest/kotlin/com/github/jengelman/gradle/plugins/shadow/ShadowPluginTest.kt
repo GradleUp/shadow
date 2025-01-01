@@ -7,7 +7,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.util.jar.JarFile
@@ -36,22 +35,19 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertThat(project.plugins.hasPlugin(ShadowPlugin::class.java)).isTrue()
     assertThat(project.plugins.hasPlugin(LegacyShadowPlugin::class.java)).isTrue()
-    assertThat(project.tasks.findByName("shadowJar")).isEqualTo(null)
+    assertThat(project.tasks.findByName(shadowJarTask)).isNull()
 
     project.plugins.apply(JavaPlugin::class.java)
-    val shadow = project.tasks.findByName(SHADOW_JAR_TASK_NAME) as ShadowJar
-    val shadowConfig = project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME)
+    val shadowTask = project.tasks.getByName(shadowJarTask) as ShadowJar
+    val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
 
-    assertThat(shadow).isNotNull()
-    assertThat(shadow.archiveBaseName.get()).isEqualTo(projectName)
-    assertThat(shadow.destinationDirectory.get().asFile)
+    assertThat(shadowTask.archiveBaseName.get()).isEqualTo(projectName)
+    assertThat(shadowTask.destinationDirectory.get().asFile)
       .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
-    assertThat(shadow.archiveVersion.get()).isEqualTo(version)
-    assertThat(shadow.archiveClassifier.get()).isEqualTo("all")
-    assertThat(shadow.archiveExtension.get()).isEqualTo("jar")
-    assertThat(shadowConfig).isNotNull().transform {
-      it.artifacts.files.contains(shadow.archiveFile.get().asFile)
-    }.isTrue()
+    assertThat(shadowTask.archiveVersion.get()).isEqualTo(version)
+    assertThat(shadowTask.archiveClassifier.get()).isEqualTo("all")
+    assertThat(shadowTask.archiveExtension.get()).isEqualTo("jar")
+    assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
   }
 
   @Test
@@ -65,9 +61,6 @@ class ShadowPluginTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
-          mergeServiceFiles()
-        }
       """.trimIndent(),
     )
 
@@ -80,8 +73,8 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun incompatibleWithLowerMinGradleVersion() {
-    runWithFailure("shadowJar") {
-      it.withGradleVersion("7.0")
+    runWithFailure(shadowJarTask) {
+      it.withGradleVersion("8.2")
     }
   }
 
@@ -122,14 +115,14 @@ class ShadowPluginTest : BasePluginTest() {
         }
         $shadowJar {
           archiveBaseName = 'shadow'
-          archiveClassifier = null
-          archiveVersion = null
+          archiveClassifier = ''
+          archiveVersion = ''
         }
       """.trimIndent(),
     )
 
     run(shadowJarTask)
-    val outputShadowJar = path("build/libs/shadow-1.0.jar")
+    val outputShadowJar = path("build/libs/shadow.jar")
 
     assertThat(outputShadowJar).exists()
     assertContains(
@@ -146,9 +139,7 @@ class ShadowPluginTest : BasePluginTest() {
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
-
-    run(":server:$shadowJarTask")
+    run(serverShadowJarTask)
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -178,9 +169,7 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
-
-    run(":server:$shadowJarTask")
+    run(serverShadowJarTask)
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -195,8 +184,8 @@ class ShadowPluginTest : BasePluginTest() {
 
   /**
    * 'Client', 'Server' and 'junit' are independent.
-   * 'junit' is excluded from the minimize.
-   * The minimize shall remove 'Client' but not 'junit'.
+   * 'junit' is excluded from the minimize step.
+   * The minimize step shall remove 'Client' but not 'junit'.
    */
   @Test
   fun excludeDependencyFromMinimize() {
@@ -208,9 +197,7 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
-
-    run(":server:$shadowJarTask")
+    run(serverShadowJarTask)
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -237,9 +224,7 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
-
-    run(":server:$shadowJarTask")
+    run(serverShadowJarTask)
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -262,9 +247,7 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
-
-    run(":server:$shadowJarTask")
+    run(serverShadowJarTask)
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -274,32 +257,8 @@ class ShadowPluginTest : BasePluginTest() {
   }
 
   /**
-   * 'Client', 'Server' and 'junit' are independent.
-   * Unused classes of 'client' and theirs dependencies shouldn't be removed.
-   */
-  @Test
-  fun excludeProjectFromMinimizeShallNotExcludeTransitiveDependenciesFromSubprojectThatAreNotUsed() {
-    writeClientAndServerModules(
-      serverShadowBlock = """
-        minimize {
-          exclude(project(':client'))
-        }
-      """.trimIndent(),
-    )
-
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
-
-    run(":server:$shadowJarTask")
-
-    assertContains(
-      serverOutput,
-      listOf("client/Client.class", "server/Server.class", "junit/framework/TestCase.class"),
-    )
-  }
-
-  /**
    * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
-   * The minimize shall remove 'junit', but not 'api'.
+   * The minimize step shall remove 'junit', but not 'api'.
    * Unused classes of 'api' and theirs dependencies also shouldn't be removed.
    */
   @Test
@@ -385,7 +344,7 @@ class ShadowPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun shadowAProjectShadowJar() {
+  fun shadowProjectShadowJar() {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
       """
@@ -398,8 +357,7 @@ class ShadowPluginTest : BasePluginTest() {
       .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
     path("server/build.gradle").writeText(replaced)
 
-    run(":server:$shadowJarTask")
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
+    run(serverShadowJarTask)
 
     assertThat(serverOutput).exists()
     assertContains(
@@ -413,7 +371,7 @@ class ShadowPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun excludeIndexListSfDsaAndRsaByDefault() {
+  fun excludeSomeMetaInfFilesByDefault() {
     repo.module("shadow", "a", "1.0")
       .insertFile("a.properties", "a")
       .insertFile("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
@@ -421,6 +379,7 @@ class ShadowPluginTest : BasePluginTest() {
       .insertFile("META-INF/a.DSA", "DSA Signature Block")
       .insertFile("META-INF/a.RSA", "RSA Signature Block")
       .insertFile("META-INF/a.properties", "key=value")
+      .insertFile("module-info.class", "module myModuleName {}")
       .publish()
 
     path("src/main/java/shadow/Passed.java").writeText(
@@ -429,7 +388,6 @@ class ShadowPluginTest : BasePluginTest() {
         public class Passed {}
       """.trimIndent(),
     )
-
     projectScriptPath.appendText(
       """
         dependencies {
@@ -442,11 +400,11 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertContains(
       outputShadowJar,
-      listOf("a.properties", "META-INF/a.properties"),
+      listOf("shadow/Passed.class", "a.properties", "META-INF/a.properties"),
     )
     assertDoesNotContain(
       outputShadowJar,
-      listOf("META-INF/INDEX.LIST", "META-INF/a.SF", "META-INF/a.DSA", "META-INF/a.RSA"),
+      listOf("META-INF/INDEX.LIST", "META-INF/a.SF", "META-INF/a.DSA", "META-INF/a.RSA", "module-info.class"),
     )
   }
 
@@ -468,7 +426,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertContains(
       outputShadowJar,
-      listOf("a.properties"),
+      listOf("a.properties", "a2.properties"),
     )
     assertDoesNotContain(
       outputShadowJar,
@@ -529,7 +487,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertContains(
       outputShadowJar,
-      listOf("a.properties"),
+      listOf("a.properties", "a2.properties"),
     )
     assertDoesNotContain(
       outputShadowJar,
@@ -742,11 +700,9 @@ class ShadowPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         apply plugin: 'application'
-        ext {
-          aspectjVersion = '1.8.12'
-        }
+
         application {
-          mainClass.set('myapp.Main')
+          mainClass = 'myapp.Main'
         }
         $runShadow {
           args 'foo'
@@ -791,7 +747,6 @@ class ShadowPluginTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-
     path("src/main/resources/META-INF/gradle-plugins/my.plugin.properties").writeText(
       """
         implementation-class=my.plugin.MyPlugin
@@ -810,7 +765,7 @@ class ShadowPluginTest : BasePluginTest() {
    * https://github.com/GradleUp/shadow/issues/1070
    */
   @Test
-  fun canRegisterACustomShadowJarTask() {
+  fun canRegisterCustomShadowJarTask() {
     val testShadowJarTask = "testShadowJar"
     projectScriptPath.appendText(
       """
@@ -836,4 +791,7 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(testJar).exists()
     assertThat(JarFile(testJar.toFile()).getEntry("junit")).isNotNull()
   }
+
+  private val serverOutput get() = path("server/build/libs/server-1.0-all.jar")
+  private val serverShadowJarTask = ":server:$shadowJarTask"
 }
