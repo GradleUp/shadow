@@ -114,6 +114,7 @@ abstract class BasePluginTest {
 
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
   open val runShadowTask = SHADOW_RUN_TASK_NAME
+  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
 
   val projectScriptPath: Path
     get() = path("build.gradle")
@@ -123,6 +124,9 @@ abstract class BasePluginTest {
 
   val outputShadowJar: Path
     get() = path("build/libs/shadow-1.0-all.jar")
+
+  val outputServerShadowJar: Path
+    get() = path("server/build/libs/server-1.0-all.jar")
 
   fun path(path: String): Path {
     return root.resolve(path).also {
@@ -173,17 +177,18 @@ abstract class BasePluginTest {
     return runner.withArguments(allArguments)
   }
 
-  fun run(vararg tasks: String): BuildResult {
-    return run(tasks.toList())
+  inline fun run(
+    vararg tasks: String,
+    runnerBlock: (GradleRunner) -> GradleRunner = { it },
+  ): BuildResult {
+    return runnerBlock(runner(tasks.toList())).build().assertNoDeprecationWarnings()
   }
 
-  inline fun run(
-    tasks: Iterable<String>,
-    block: (GradleRunner) -> GradleRunner = { it },
+  inline fun runWithFailure(
+    vararg tasks: String,
+    runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
-    return block(runner(tasks)).build().also {
-      it.assertNoDeprecationWarnings()
-    }
+    return runnerBlock(runner(tasks.toList())).buildAndFail().assertNoDeprecationWarnings()
   }
 
   fun writeClientAndServerModules(
@@ -204,9 +209,11 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java", withVersion = true)}
-        dependencies { implementation 'junit:junit:3.8.2' }
-      """.trimIndent(),
+        ${getDefaultProjectBuildScript("java")}
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+      """.trimIndent() + System.lineSeparator(),
     )
 
     path("server/src/main/java/server/Server.java").writeText(
@@ -225,7 +232,80 @@ abstract class BasePluginTest {
         $shadowJar {
           $serverShadowBlock
         }
+      """.trimIndent() + System.lineSeparator(),
+    )
+  }
+
+  fun writeApiLibAndImplModules() {
+    settingsScriptPath.appendText(
+      """
+        include 'api', 'lib', 'impl'
+      """.trimIndent() + System.lineSeparator(),
+    )
+    projectScriptPath.writeText("")
+
+    path("lib/src/main/java/lib/LibEntity.java").writeText(
+      """
+        package lib;
+        public interface LibEntity {}
       """.trimIndent(),
+    )
+    path("lib/src/main/java/lib/UnusedLibEntity.java").writeText(
+      """
+        package lib;
+        public class UnusedLibEntity implements LibEntity {}
+      """.trimIndent(),
+    )
+    path("lib/build.gradle").writeText(
+      """
+        plugins {
+          id 'java'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    path("api/src/main/java/api/Entity.java").writeText(
+      """
+        package api;
+        public interface Entity {}
+      """.trimIndent(),
+    )
+    path("api/src/main/java/api/UnusedEntity.java").writeText(
+      """
+        package api;
+        import lib.LibEntity;
+        public class UnusedEntity implements LibEntity {}
+      """.trimIndent(),
+    )
+    path("api/build.gradle").writeText(
+      """
+        plugins {
+          id 'java'
+        }
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+          implementation project(':lib')
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    path("impl/src/main/java/impl/SimpleEntity.java").writeText(
+      """
+        package impl;
+        import api.Entity;
+        public class SimpleEntity implements Entity {}
+      """.trimIndent(),
+    )
+    path("impl/build.gradle").writeText(
+      """
+        ${getDefaultProjectBuildScript("java-library")}
+        dependencies {
+          api project(':api')
+        }
+        $shadowJar {
+          minimize()
+        }
+      """.trimIndent() + System.lineSeparator(),
     )
   }
 
@@ -248,7 +328,7 @@ abstract class BasePluginTest {
       tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
 
-    fun BuildResult.assertNoDeprecationWarnings() {
+    fun BuildResult.assertNoDeprecationWarnings() = apply {
       output.lines().forEach {
         assert(!containsDeprecationWarning(it))
       }

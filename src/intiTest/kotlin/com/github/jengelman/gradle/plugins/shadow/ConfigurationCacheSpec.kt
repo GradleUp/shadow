@@ -98,17 +98,16 @@ class ConfigurationCacheSpec : BasePluginTest() {
     )
 
     run(shadowJarTask)
-    val output = path("server/build/libs/server-1.0-all.jar")
-    output.deleteExisting()
+    outputServerShadowJar.deleteExisting()
     val result = run(shadowJarTask)
 
-    assertThat(output).exists()
+    assertThat(outputServerShadowJar).exists()
     assertContains(
-      output,
+      outputServerShadowJar,
       listOf("server/Server.class", "junit/framework/Test.class"),
     )
     assertDoesNotContain(
-      output,
+      outputServerShadowJar,
       listOf("client/Client.class"),
     )
     result.assertCcReused()

@@ -188,16 +188,15 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":server:$shadowJarTask")
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
+    run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertDoesNotContain(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class"),
     )
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("server/Server.class", "junit/framework/Test.class"),
     )
   }
@@ -212,16 +211,15 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":server:$shadowJarTask")
-    val serverOutput = path("server/build/libs/server-1.0-all.jar")
+    run(serverShadowJarTask)
 
-    assertThat(serverOutput).exists()
+    assertThat(outputServerShadowJar).exists()
     assertDoesNotContain(
-      serverOutput,
+      outputServerShadowJar,
       listOf("junit/framework/Test.class"),
     )
     assertContains(
-      serverOutput,
+      outputServerShadowJar,
       listOf("client/Client.class", "server/Server.class"),
     )
   }
