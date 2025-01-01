@@ -248,10 +248,34 @@ class ShadowPluginTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+    path("client/src/main/java/client/Client.java").writeText(
+      """
+        package client;
+        import junit.framework.TestCase;
+        public class Client extends TestCase {
+          public static void main(String[] args) {}
+        }
+      """.trimIndent(),
+    )
 
     run(serverShadowJarTask)
 
     assertThat(serverOutput).exists()
+    assertContains(
+      serverOutput,
+      listOf("client/Client.class", "server/Server.class", "junit/framework/TestCase.class"),
+    )
+
+    path("client/src/main/java/client/Client.java").writeText(
+      """
+        package client;
+        public class Client {}
+      """.trimIndent(),
+    )
+    run(serverShadowJarTask)
+    assertThat(serverOutput).exists()
+    // TODO: I don't think client/Client.class and junit classes should be in the output jar, but it's the test case
+    //  from https://github.com/GradleUp/shadow/pull/420, need to investigate more...
     assertContains(
       serverOutput,
       listOf("client/Client.class", "server/Server.class", "junit/framework/TestCase.class"),
