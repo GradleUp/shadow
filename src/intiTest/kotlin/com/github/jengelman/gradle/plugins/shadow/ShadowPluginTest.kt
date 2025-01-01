@@ -711,7 +711,7 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run("runShadow")
+    val result = run(runShadowTask)
 
     assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
@@ -745,7 +745,7 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run("runShadow")
+    val result = run(runShadowTask)
 
     assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
