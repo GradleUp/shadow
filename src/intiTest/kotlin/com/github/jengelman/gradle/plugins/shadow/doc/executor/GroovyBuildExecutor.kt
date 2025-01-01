@@ -9,7 +9,6 @@ import org.gradle.testkit.runner.GradleRunner
 class GroovyBuildExecutor(
   override val fixture: SnippetFixture,
   private val importExtractor: (String) -> List<String>,
-  private val arguments: List<String> = listOf("build"),
 ) : SnippetExecutor {
 
   override fun execute(tempDir: Path, snippet: String) {
@@ -44,16 +43,12 @@ class GroovyBuildExecutor(
 
     tempDir.addSubProject("main", fullSnippet)
 
-    val allArguments = listOf(
-      "--warning-mode=fail",
-      "--stacktrace",
-    ) + arguments
     try {
       GradleRunner.create()
         .withProjectDir(tempDir.toFile())
         .withPluginClasspath()
         .forwardOutput()
-        .withArguments(allArguments)
+        .withArguments(listOf("--warning-mode=fail", "build"))
         .build()
     } catch (t: Throwable) {
       throw RuntimeException("Failed to execute snippet:\n\n$fullSnippet", t)
