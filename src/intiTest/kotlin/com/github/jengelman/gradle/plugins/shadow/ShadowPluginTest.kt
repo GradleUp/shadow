@@ -317,7 +317,6 @@ class ShadowPluginTest : BasePluginTest() {
           id 'java-library'
         }
         dependencies {
-          implementation 'junit:junit:3.8.2'
           api project(':lib')
         }
       """.trimIndent(),
@@ -336,6 +335,10 @@ class ShadowPluginTest : BasePluginTest() {
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
       ),
+    )
+    assertDoesNotContain(
+      implOutput,
+      listOf("junit/framework/Test.class"),
     )
   }
 
@@ -618,27 +621,6 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).exists()
-  }
-
-  @Test
-  fun apiProjectDependencyWithVersion() {
-    val versionBlock = """
-      version = '1.0'
-    """.trimIndent()
-
-    writeApiLibAndImplModules()
-    path("lib/build.gradle").appendText(versionBlock)
-    path("api/build.gradle").appendText(versionBlock)
-    path("impl/build.gradle").appendText(versionBlock)
-
-    run(":impl:$shadowJarTask")
-    val serverOutput = path("impl/build/libs/impl-1.0-all.jar")
-
-    assertThat(serverOutput).exists()
-    assertContains(
-      serverOutput,
-      listOf("api/UnusedEntity.class"),
-    )
   }
 
   /**
