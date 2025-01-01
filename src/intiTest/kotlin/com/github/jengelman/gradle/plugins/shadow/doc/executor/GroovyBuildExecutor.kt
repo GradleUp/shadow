@@ -23,16 +23,17 @@ class GroovyBuildExecutor(
         include 'api', 'main'
       """.trimIndent(),
     )
-    val projectBuildText = """
+
+    val apiScript = """
       plugins {
         id 'java'
         id 'com.gradleup.shadow'
       }
     """.trimIndent()
-    tempDir.addSubProject("api", projectBuildText)
+    tempDir.addSubProject("api", apiScript)
 
     val (imports, snippetWithoutImports) = importExtractor(snippet)
-    val fullSnippet = buildString {
+    val mainScript = buildString {
       append(imports)
       append(System.lineSeparator())
       append(fixture.pre)
@@ -40,18 +41,17 @@ class GroovyBuildExecutor(
       append(snippetWithoutImports)
       append(System.lineSeparator())
     }.trimIndent()
-
-    tempDir.addSubProject("main", fullSnippet)
+    tempDir.addSubProject("main", mainScript)
 
     try {
       GradleRunner.create()
         .withProjectDir(tempDir.toFile())
         .withPluginClasspath()
         .forwardOutput()
-        .withArguments(listOf("--warning-mode=fail", "build"))
+        .withArguments("--warning-mode=fail", "build")
         .build()
     } catch (t: Throwable) {
-      throw RuntimeException("Failed to execute snippet:\n\n$fullSnippet", t)
+      throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)
     }
   }
 
