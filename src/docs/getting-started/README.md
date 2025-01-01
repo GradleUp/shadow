@@ -2,8 +2,8 @@
 
 ```groovy no-run
 plugins {
-  id 'com.gradleup.shadow' version '@version@'
   id 'java'
+  id 'com.gradleup.shadow' version '@version@'
 }
 ```
 
@@ -38,8 +38,8 @@ buildscript {
   }
 }
 
-apply plugin: 'com.gradleup.shadow'
 apply plugin: 'java'
+apply plugin: 'com.gradleup.shadow'
 ```
 
 </p>
