@@ -781,11 +781,11 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     val result = run(testShadowJarTask)
+    val testJar = path("build/libs/shadow-1.0-tests.jar")
 
     assertThat(result.task(":$testShadowJarTask")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
 
-    val testJar = path("build/libs/shadow-1.0-tests.jar")
     assertThat(testJar).exists()
     assertThat(JarFile(testJar.toFile()).getEntry("junit")).isNotNull()
   }
