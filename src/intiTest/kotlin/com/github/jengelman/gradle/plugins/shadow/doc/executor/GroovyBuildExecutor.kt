@@ -10,7 +10,7 @@ import org.intellij.lang.annotations.Language
 class GroovyBuildExecutor(
   override val fixture: SnippetFixture,
   private val importExtractor: (String) -> List<String>,
-  private val arguments: Array<String> = arrayOf("build", "-m"),
+  private val arguments: List<String> = listOf("build", "-m"),
 ) : SnippetExecutor {
 
   override fun execute(tempDir: Path, snippet: String) {
@@ -22,12 +22,17 @@ class GroovyBuildExecutor(
 
     tempDir.addSubProject("main", fullSnippet)
 
+    val allArguments = listOf(
+      "--warning-mode=fail",
+      "--configuration-cache",
+      "--stacktrace",
+    ) + arguments
     try {
       GradleRunner.create()
         .withProjectDir(tempDir.toFile())
         .withPluginClasspath()
         .forwardOutput()
-        .withArguments(*arguments)
+        .withArguments(allArguments)
         .build()
     } catch (t: Throwable) {
       throw RuntimeException("Failed to execute snippet:\n\n$fullSnippet", t)
