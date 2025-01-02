@@ -5,14 +5,18 @@ import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import java.nio.file.Path
+import java.util.Properties
 import java.util.jar.JarFile
 import java.util.jar.JarInputStream
 import kotlin.io.path.appendText
 import kotlin.io.path.inputStream
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
 class TransformersTest : BasePluginTest() {
 
@@ -134,13 +138,22 @@ class TransformersTest : BasePluginTest() {
   fun serviceResourceTransformerShortSyntaxRelocation() {
     val one = buildJar("one.jar")
       .insert("META-INF/services/java.sql.Driver", "oracle.jdbc.OracleDriver\norg.apache.hive.jdbc.HiveDriver")
-      .insert("META-INF/services/org.apache.axis.components.compiler.Compiler", "org.apache.axis.components.compiler.Javac")
-      .insert("META-INF/services/org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.LogFactoryImpl")
+      .insert(
+        "META-INF/services/org.apache.axis.components.compiler.Compiler",
+        "org.apache.axis.components.compiler.Javac",
+      )
+      .insert(
+        "META-INF/services/org.apache.commons.logging.LogFactory",
+        "org.apache.commons.logging.impl.LogFactoryImpl",
+      )
       .write().toUri().toURL().path
 
     val two = buildJar("two.jar")
       .insert("META-INF/services/java.sql.Driver", "org.apache.derby.jdbc.AutoloadedDriver\ncom.mysql.jdbc.Driver")
-      .insert("META-INF/services/org.apache.axis.components.compiler.Compiler", "org.apache.axis.components.compiler.Jikes")
+      .insert(
+        "META-INF/services/org.apache.axis.components.compiler.Compiler",
+        "org.apache.axis.components.compiler.Jikes",
+      )
       .insert("META-INF/services/org.apache.commons.logging.LogFactory", "org.mortbay.log.Factory")
       .write().toUri().toURL().path
 
@@ -510,11 +523,195 @@ class TransformersTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun groovyExtensionModuleTransformer() {
+    val one = buildJar("one.jar")
+      .insert(
+        "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule",
+        """
+          moduleName=foo
+          moduleVersion=1.0.5
+          extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+          staticExtensionClasses=com.acme.foo.FooStaticExtension
+        """.trimIndent(),
+      ).write().toUri().toURL().path
+
+    val two = buildJar("two.jar")
+      .insert(
+        "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule",
+        """
+          moduleName=bar
+          moduleVersion=2.3.5
+          extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+          staticExtensionClasses=com.acme.bar.SomeStaticExtension
+        """.trimIndent(),
+      ).write().toUri().toURL().path
+
+    projectScriptPath.appendText(
+      """
+        import ${GroovyExtensionModuleTransformer::class.java.name}
+        $shadowJar {
+          from('$one')
+          from('$two')
+          transform(${GroovyExtensionModuleTransformer::class.java.name})
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+
+    val text = getJarFileContents(outputShadowJar, "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule")
+    val props = Properties().apply { load(text.reader()) }
+    assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
+    assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
+    assertThat(props.getProperty("extensionClasses"))
+      .isEqualTo("com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension")
+    assertThat(props.getProperty("staticExtensionClasses"))
+      .isEqualTo("com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension")
+  }
+
+  @Test
+  fun groovyExtensionModuleTransformerWorksForGroovy25Plus() {
+    val one = buildJar("one.jar")
+      .insert(
+        "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule",
+        """
+          moduleName=foo
+          moduleVersion=1.0.5
+          extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+          staticExtensionClasses=com.acme.foo.FooStaticExtension
+        """.trimIndent(),
+      ).write().toUri().toURL().path
+
+    val two = buildJar("two.jar")
+      .insert(
+        "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule",
+        """
+          moduleName=bar
+          moduleVersion=2.3.5
+          extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+          staticExtensionClasses=com.acme.bar.SomeStaticExtension
+        """.trimIndent(),
+      ).write().toUri().toURL().path
+
+    projectScriptPath.appendText(
+      """
+        import ${GroovyExtensionModuleTransformer::class.java.name}
+        $shadowJar {
+          from('$one')
+          from('$two')
+          transform(${GroovyExtensionModuleTransformer::class.java.name})
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+
+    val text = getJarFileContents(outputShadowJar, "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule")
+    val props = Properties().apply { load(text.reader()) }
+    assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
+    assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
+    assertThat(props.getProperty("extensionClasses"))
+      .isEqualTo("com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension")
+    assertThat(props.getProperty("staticExtensionClasses"))
+      .isEqualTo("com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension")
+    assertDoesNotContain(outputShadowJar, listOf("META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"))
+  }
+
+  @Test
+  fun groovyExtensionModuleTransformerShortSyntax() {
+    val one = buildJar("one.jar")
+      .insert(
+        "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule",
+        """
+          moduleName=foo
+          moduleVersion=1.0.5
+          extensionClasses=com.acme.foo.FooExtension,com.acme.foo.BarExtension
+          staticExtensionClasses=com.acme.foo.FooStaticExtension
+        """.trimIndent(),
+      ).write().toUri().toURL().path
+
+    val two = buildJar("two.jar")
+      .insert(
+        "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule",
+        """
+          moduleName=bar
+          moduleVersion=2.3.5
+          extensionClasses=com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension
+          staticExtensionClasses=com.acme.bar.SomeStaticExtension
+        """.trimIndent(),
+      ).write().toUri().toURL().path
+
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          from('$one')
+          from('$two')
+          mergeGroovyExtensionModules()
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+
+    val text = getJarFileContents(outputShadowJar, "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule")
+    val props = Properties().apply { load(text.reader()) }
+    assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
+    assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
+    assertThat(props.getProperty("extensionClasses"))
+      .isEqualTo("com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension")
+    assertThat(props.getProperty("staticExtensionClasses"))
+      .isEqualTo("com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension")
+  }
+
+  @ParameterizedTest
+  @MethodSource("transformerConfigurations")
+  fun transformerShouldNotHaveDeprecatedBehaviours(pair: Pair<String, String>) {
+    val (configuration, transformer) = pair
+    if (configuration.contains("test/some.file")) {
+      path("test/some.file").writeText("some content")
+    }
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          transform(com.github.jengelman.gradle.plugins.shadow.transformers.$transformer) $configuration
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).exists()
+  }
+
   private fun buildJar(path: String): AppendableJar {
     return AppendableJar(path(path))
   }
 
   private companion object {
+    @JvmStatic
+    fun transformerConfigurations() = listOf(
+      "" to "ApacheLicenseResourceTransformer",
+      "" to "ApacheNoticeResourceTransformer",
+      "" to "AppendingTransformer",
+      "" to "ComponentsXmlResourceTransformer",
+      "" to "DontIncludeResourceTransformer",
+      "" to "GroovyExtensionModuleTransformer",
+      "{ resource.set(\"test.file\"); file.fileValue(file(\"test/some.file\")) }" to "IncludeResourceTransformer",
+      "" to "Log4j2PluginsCacheFileTransformer",
+      "" to "ManifestAppenderTransformer",
+      "" to "ManifestResourceTransformer",
+      "{ keyTransformer = { it.toLowerCase() } }" to "PropertiesFileTransformer",
+      "" to "ServiceFileTransformer",
+      "" to "XmlAppendingTransformer",
+    )
+
     fun getJarFileContents(jarPath: Path, entryName: String): String {
       JarFile(jarPath.toFile()).use { jar ->
         val entry = jar.getJarEntry(entryName) ?: error("Entry not found: $entryName")
