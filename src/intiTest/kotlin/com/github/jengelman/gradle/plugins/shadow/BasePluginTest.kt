@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import java.nio.file.Path
+import java.util.Properties
 import java.util.jar.JarFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
@@ -327,6 +328,12 @@ abstract class BasePluginTest {
     val runShadow = """
       tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
+
+    fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
+
+    fun fromJar(vararg paths: Path): String {
+      return paths.joinToString(System.lineSeparator()) { "from('${it.toUri().toURL().path}')" }
+    }
 
     fun BuildResult.assertNoDeprecationWarnings() = apply {
       output.lines().forEach {
