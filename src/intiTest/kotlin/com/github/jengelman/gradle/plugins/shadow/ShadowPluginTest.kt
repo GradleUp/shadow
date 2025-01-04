@@ -9,6 +9,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.util.jar.JarFile
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -556,9 +557,9 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(attributes.getValue("Class-Path")).isNull()
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/65
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/65",
+  )
   @Test
   fun addShadowConfigurationToClassPathInManifest() {
     projectScriptPath.appendText(
@@ -581,9 +582,9 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(attributes.getValue("Class-Path")).isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/92
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/92",
+  )
   @Test
   fun doNotIncludeNullValueInClassPathWhenJarFileDoesNotContainClassPath() {
     projectScriptPath.appendText(
@@ -601,9 +602,9 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(attributes.getValue("Class-Path")).isEqualTo("junit-3.8.2.jar")
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/203
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/203",
+  )
   @Test
   fun supportZipCompressionStored() {
     projectScriptPath.appendText(
@@ -625,9 +626,10 @@ class ShadowPluginTest : BasePluginTest() {
 
   /**
    * This spec requires > 15 minutes and > 8GB of disk space to run
-   *
-   * https://github.com/GradleUp/shadow/issues/143
    */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/143",
+  )
   @Disabled
   @Test
   fun checkLargeZipFilesWithZip64Enabled() {
@@ -690,9 +692,9 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/609
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/609",
+  )
   @Test
   fun doesNotErrorWhenUsingApplicationMainClassProperty() {
     projectScriptPath.appendText(
@@ -724,9 +726,9 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/pull/459
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/459",
+  )
   @Test
   fun excludeGradleApiByDefault() {
     projectScriptPath.writeText(
@@ -759,9 +761,9 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(entries.count { it.name.endsWith(".class") }).isEqualTo(1)
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/1070
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1070",
+  )
   @Test
   fun canRegisterCustomShadowJarTask() {
     val testShadowJarTask = "testShadowJar"
