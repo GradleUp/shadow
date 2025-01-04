@@ -18,17 +18,7 @@ class IssueExtension : BeforeEachCallback {
   override fun beforeEach(context: ExtensionContext) {
     val issueAnnotation = context.requiredTestMethod.getAnnotation(Issue::class.java) ?: return
     val store = context.getStore(Namespace.create(IssueExtension::class.java, context.requiredTestClass))
-    val tags = issueAnnotation.values.map(::issueLinkToTag)
-    store.put("tags", tags)
-    tagsMap["${context.requiredTestClass.name}#${context.requiredTestMethod.name}"] = tags
-  }
-
-  companion object {
-    private val tagsMap = mutableMapOf<String, List<String>>()
-
-    fun getTagsForTest(testClass: Class<*>, testName: String): List<String> {
-      return tagsMap["${testClass.name}#$testName"] ?: emptyList()
-    }
+    store.put("tags", issueAnnotation.values.map(::issueLinkToTag))
   }
 }
 
