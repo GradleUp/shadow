@@ -14,7 +14,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   fun serviceResourceTransformer() {
     projectScriptPath.appendText(
       transform<ServiceFileTransformer>(
-        shadowBlock = fromJar(buildJarOne(), buildJarTwo()),
+        shadowJarBlock = fromJar(buildJarOne(), buildJarTwo()),
         transformerBlock = """
           exclude 'META-INF/services/com.acme.*'
         """.trimIndent(),
@@ -42,7 +42,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(
       transform<ServiceFileTransformer>(
-        shadowBlock = fromJar(one, two),
+        shadowJarBlock = fromJar(one, two),
         transformerBlock = """
           path = "META-INF/foo"
         """.trimIndent(),

@@ -27,7 +27,7 @@ class TransformersTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(
       transform<AppendingTransformer>(
-        shadowBlock = fromJar(one, two),
+        shadowJarBlock = fromJar(one, two),
         transformerBlock = """
           resource = '$ENTRY_TEST_PROPERTIES'
         """.trimIndent(),
@@ -130,8 +130,8 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun appendXmlFiles() {
     val propertiesXml = "properties.xml"
-    val xml1 = buildJar("xml1.jar")
-      .insert(
+    val xml1 = buildJar("xml1.jar") {
+      insert(
         propertiesXml,
         """
         <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
@@ -139,20 +139,23 @@ class TransformersTest : BaseTransformerTest() {
           <entry key="key1">val1</entry>
         </properties>
         """.trimIndent(),
-      ).write()
-    val xml2 = buildJar("xml2.jar").insert(
-      propertiesXml,
-      """
+      )
+    }
+    val xml2 = buildJar("xml2.jar") {
+      insert(
+        propertiesXml,
+        """
         <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
         <properties version="1.0">
           <entry key="key2">val2</entry>
         </properties>
-      """.trimIndent(),
-    ).write()
+        """.trimIndent(),
+      )
+    }
 
     projectScriptPath.appendText(
       transform<XmlAppendingTransformer>(
-        shadowBlock = fromJar(xml1, xml2),
+        shadowJarBlock = fromJar(xml1, xml2),
         transformerBlock = """
           resource = "properties.xml"
         """.trimIndent(),
@@ -245,7 +248,7 @@ class TransformersTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(
       transform<GroovyExtensionModuleTransformer>(
-        shadowBlock = fromJar(one, two),
+        shadowJarBlock = fromJar(one, two),
       ),
     )
 
@@ -288,7 +291,7 @@ class TransformersTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(
       transform<GroovyExtensionModuleTransformer>(
-        shadowBlock = fromJar(one, two),
+        shadowJarBlock = fromJar(one, two),
       ),
     )
 

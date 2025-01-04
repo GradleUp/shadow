@@ -9,29 +9,25 @@ import kotlin.io.path.writeText
 sealed class BaseTransformerTest : BasePluginTest() {
 
   fun buildJarOne(
-    builder: AppendableJar.() -> AppendableJar = {
+    builder: AppendableJar.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_ONE)
       insert(ENTRY_SERVICES_FOO, "one")
     },
   ): Path {
-    return buildJar("one.jar")
-      .builder()
-      .write()
+    return buildJar("one.jar", builder)
   }
 
   fun buildJarTwo(
-    builder: AppendableJar.() -> AppendableJar = {
+    builder: AppendableJar.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_TWO)
       insert(ENTRY_SERVICES_FOO, "two")
     },
   ): Path {
-    return buildJar("two.jar")
-      .builder()
-      .write()
+    return buildJar("two.jar", builder)
   }
 
-  fun buildJar(path: String): AppendableJar {
-    return AppendableJar(path(path))
+  inline fun buildJar(path: String, builder: AppendableJar.() -> Unit): Path {
+    return AppendableJar(path(path)).apply(builder).write()
   }
 
   fun writeMainClass() {
@@ -68,12 +64,12 @@ sealed class BaseTransformerTest : BasePluginTest() {
     }
 
     inline fun <reified T : Transformer> transform(
-      shadowBlock: String = "",
+      shadowJarBlock: String = "",
       transformerBlock: String = "",
     ): String {
       return """
       $shadowJar {
-        $shadowBlock
+        $shadowJarBlock
         transform(${T::class.java.name}) {
           $transformerBlock
         }
