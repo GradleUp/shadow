@@ -5,7 +5,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
-import java.util.jar.JarFile
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -44,7 +43,7 @@ class ApplicationTest : BasePluginTest() {
 
     assertContains(installedJar, listOf("a.properties", "a2.properties", "myapp/Main.class"))
 
-    val jarFile = JarFile(installedJar.toFile())
+    val jarFile = installedJar.toJarFile()
     assertThat(jarFile.manifest.mainAttributes.getValue("Main-Class"))
       .isEqualTo("myapp.Main")
 

@@ -536,7 +536,7 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).exists()
-    val entries = JarFile(outputShadowJar.toFile()).entries().toList()
+    val entries = outputShadowJar.toJarFile().entries().toList()
     assertThat(entries.size).isEqualTo(2)
   }
 
@@ -553,7 +553,7 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).exists()
-    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
+    val attributes = outputShadowJar.toJarFile().manifest.mainAttributes
     assertThat(attributes.getValue("Class-Path")).isNull()
   }
 
@@ -578,7 +578,7 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).exists()
-    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
+    val attributes = outputShadowJar.toJarFile().manifest.mainAttributes
     assertThat(attributes.getValue("Class-Path")).isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
@@ -598,7 +598,7 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).exists()
-    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
+    val attributes = outputShadowJar.toJarFile().manifest.mainAttributes
     assertThat(attributes.getValue("Class-Path")).isEqualTo("junit-3.8.2.jar")
   }
 
@@ -757,7 +757,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).exists()
 
-    val entries = JarFile(outputShadowJar.toFile()).entries().toList()
+    val entries = outputShadowJar.toJarFile().entries().toList()
     assertThat(entries.count { it.name.endsWith(".class") }).isEqualTo(1)
   }
 

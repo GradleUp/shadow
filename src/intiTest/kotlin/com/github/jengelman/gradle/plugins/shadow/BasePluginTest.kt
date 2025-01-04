@@ -145,7 +145,7 @@ abstract class BasePluginTest {
   }
 
   fun assertContains(jarPath: Path, paths: List<String>) {
-    JarFile(jarPath.toFile()).use { jar ->
+    jarPath.toJarFile().use { jar ->
       paths.forEach { path ->
         assert(jar.getJarEntry(path) != null) { "Jar file $jarPath does not contain entry $path" }
       }
@@ -153,7 +153,7 @@ abstract class BasePluginTest {
   }
 
   fun assertDoesNotContain(jarPath: Path, paths: List<String>) {
-    JarFile(jarPath.toFile()).use { jar ->
+    jarPath.toJarFile().use { jar ->
       paths.forEach { path ->
         assert(jar.getJarEntry(path) == null) { "Jar file $jarPath contains entry $path" }
       }
@@ -330,6 +330,8 @@ abstract class BasePluginTest {
     """.trimIndent()
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
+
+    fun Path.toJarFile(): JarFile = JarFile(toFile())
 
     fun fromJar(vararg paths: Path): String {
       return paths.joinToString(System.lineSeparator()) { "from('${it.toUri().toURL().path}')" }

@@ -7,7 +7,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.net.URLClassLoader
-import java.util.jar.JarFile
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -116,7 +115,7 @@ class RelocationTest : BasePluginTest() {
       ),
     )
 
-    val jarFile = JarFile(outputShadowJar.toFile())
+    val jarFile = outputShadowJar.toJarFile()
     assertThat(jarFile.manifest.mainAttributes.getValue("TEST-VALUE")).isEqualTo("FOO")
   }
 

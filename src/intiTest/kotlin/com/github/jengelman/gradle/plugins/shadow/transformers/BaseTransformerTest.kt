@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import java.nio.file.Path
-import java.util.jar.JarFile
 import kotlin.io.path.writeText
 
 sealed class BaseTransformerTest : BasePluginTest() {
@@ -57,7 +56,7 @@ sealed class BaseTransformerTest : BasePluginTest() {
     const val ENTRY_GROOVY_EXTENSION_MODULE = "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
 
     fun getJarFileContents(jarPath: Path, entryName: String): String {
-      JarFile(jarPath.toFile()).use { jar ->
+      jarPath.toJarFile().use { jar ->
         val entry = jar.getJarEntry(entryName) ?: error("Entry not found: $entryName")
         return jar.getInputStream(entry).bufferedReader().readText()
       }
