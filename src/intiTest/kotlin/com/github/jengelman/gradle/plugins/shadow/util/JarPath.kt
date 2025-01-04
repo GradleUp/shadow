@@ -10,8 +10,8 @@ import kotlin.io.path.deleteExisting
 /**
  * A wrapper for [JarFile] that also implements [Path].
  *
- * We must declare some extensions like [kotlin.io.path.deleteExisting] or [assertk.assertions.exists]
- * as they could not be delegated to [JarPath] type.
+ * We must declare some functions like [kotlin.io.path.deleteExisting] explicitly as they could not
+ * be delegated to [JarPath] type.
  */
 class JarPath(val path: Path) :
   JarFile(path.toFile()),

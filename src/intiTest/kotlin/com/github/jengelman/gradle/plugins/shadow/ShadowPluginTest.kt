@@ -124,8 +124,8 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     run(shadowJarTask)
-    val outputShadowJar = jarPath("build/libs/shadow.jar")
 
+    val outputShadowJar = jarPath("build/libs/shadow.jar")
     assertThat(outputShadowJar).exists()
     assertThat(outputShadowJar).containsEntries(
       listOf("shadow/Passed.class", "junit/framework/Test.class"),
@@ -283,8 +283,8 @@ class ShadowPluginTest : BasePluginTest() {
     writeApiLibAndImplModules()
 
     run(":impl:$shadowJarTask")
-    val implOutput = jarPath("impl/build/libs/impl-all.jar")
 
+    val implOutput = jarPath("impl/build/libs/impl-all.jar")
     assertThat(implOutput).exists()
     assertThat(implOutput).containsEntries(
       listOf("impl/SimpleEntity.class", "api/Entity.class", "api/UnusedEntity.class", "lib/LibEntity.class"),
@@ -313,8 +313,8 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     run(":impl:$shadowJarTask")
-    val implOutput = jarPath("impl/build/libs/impl-all.jar")
 
+    val implOutput = jarPath("impl/build/libs/impl-all.jar")
     assertThat(implOutput).exists()
     assertThat(implOutput).containsEntries(
       listOf(
@@ -335,9 +335,8 @@ class ShadowPluginTest : BasePluginTest() {
     writeShadowedClientAndServerModules()
 
     run(":server:jar")
-    val serverOutput = jarPath("server/build/libs/server-1.0.jar")
-    val clientOutput = jarPath("client/build/libs/client-all.jar")
 
+    val serverOutput = jarPath("server/build/libs/server-1.0.jar")
     assertThat(serverOutput).exists()
     assertThat(serverOutput).containsEntries(
       listOf("server/Server.class"),
@@ -346,6 +345,7 @@ class ShadowPluginTest : BasePluginTest() {
       listOf("client/Client.class", "junit/framework/Test.class", "client/junit/framework/Test.class"),
     )
 
+    val clientOutput = jarPath("client/build/libs/client-all.jar")
     assertThat(clientOutput).exists()
     assertThat(clientOutput).containsEntries(
       listOf("client/Client.class", "client/junit/framework/Test.class"),
@@ -357,7 +357,6 @@ class ShadowPluginTest : BasePluginTest() {
     writeShadowedClientAndServerModules()
 
     run(serverShadowJarTask)
-    val clientOutput = jarPath("client/build/libs/client-all.jar")
 
     assertThat(outputServerShadowJar).exists()
     assertThat(outputServerShadowJar).containsEntries(
@@ -366,6 +365,8 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(outputServerShadowJar).doesNotContainEntries(
       listOf("junit/framework/Test.class"),
     )
+
+    val clientOutput = jarPath("client/build/libs/client-all.jar")
     assertThat(clientOutput).exists()
     assertThat(clientOutput).containsEntries(
       listOf("client/Client.class", "client/junit/framework/Test.class"),
@@ -757,11 +758,10 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     val result = run(testShadowJarTask)
-    val testJar = jarPath("build/libs/shadow-1.0-tests.jar")
 
     assertThat(result.task(":$testShadowJarTask")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-
+    val testJar = jarPath("build/libs/shadow-1.0-tests.jar")
     assertThat(testJar).exists()
     assertThat(testJar.getEntry("junit")).isNotNull()
   }

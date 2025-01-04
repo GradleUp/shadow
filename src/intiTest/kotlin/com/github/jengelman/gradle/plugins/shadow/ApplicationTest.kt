@@ -42,7 +42,9 @@ class ApplicationTest : BasePluginTest() {
 
     val installedJar = jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")
     assertThat(installedJar).exists()
-    assertThat(installedJar).containsEntries(listOf("a.properties", "a2.properties", "myapp/Main.class"))
+    assertThat(installedJar).containsEntries(
+      listOf("a.properties", "a2.properties", "myapp/Main.class"),
+    )
     assertThat(installedJar.manifest.mainAttributes.getValue("Main-Class"))
       .isEqualTo("myapp.Main")
 

@@ -114,7 +114,6 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).exists()
-
     val mf = outputShadowJar.manifest
     assertThat(mf).isNotNull()
     assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
@@ -197,16 +196,15 @@ class TransformersTest : BaseTransformerTest() {
 
     run("jar", shadowJarTask)
 
-    val outputJar = jarPath("build/libs/shadow-1.0.jar")
-    assertThat(outputJar).exists()
     assertThat(outputShadowJar).exists()
-
     val mf1 = outputShadowJar.manifest
     assertThat(mf1).isNotNull()
     assertThat(mf1.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
     assertThat(mf1.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
     assertThat(mf1.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
 
+    val outputJar = jarPath("build/libs/shadow-1.0.jar")
+    assertThat(outputJar).exists()
     val mf2 = outputJar.manifest
     assertThat(mf2).isNotNull()
     assertThat(mf2.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")

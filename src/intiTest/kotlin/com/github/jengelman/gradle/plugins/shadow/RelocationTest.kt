@@ -113,8 +113,8 @@ class RelocationTest : BasePluginTest() {
         "junit/framework/TestSuite.class",
       ),
     )
-
-    assertThat(outputShadowJar.manifest.mainAttributes.getValue("TEST-VALUE")).isEqualTo("FOO")
+    assertThat(outputShadowJar.manifest.mainAttributes.getValue("TEST-VALUE"))
+      .isEqualTo("FOO")
   }
 
   @Test
