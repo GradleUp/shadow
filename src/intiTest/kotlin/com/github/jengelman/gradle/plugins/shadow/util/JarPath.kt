@@ -43,10 +43,8 @@ class JarPath(val path: Path) :
       }
     }
   }
+}
 
-  companion object {
-    fun Assert<JarPath>.exists() {
-      transform { it.path }.exists()
-    }
-  }
+fun Assert<JarPath>.exists() {
+  transform { it.path }.exists()
 }

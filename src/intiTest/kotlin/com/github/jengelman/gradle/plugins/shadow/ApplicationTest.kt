@@ -5,7 +5,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.util.JarPath.Companion.exists
+import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText

@@ -9,7 +9,7 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.JarPath.Companion.exists
+import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.toPath

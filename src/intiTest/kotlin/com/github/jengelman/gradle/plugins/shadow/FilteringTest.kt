@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import com.github.jengelman.gradle.plugins.shadow.util.JarPath.Companion.exists
+import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText

@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.JarPath.Companion.exists
+import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
