@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
-import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath.Companion.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -32,8 +32,7 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun includeAllDependencies() {
     run(shadowJarTask)
-    assertContains(
-      outputShadowJar,
+    outputShadowJar.assertContains(
       listOf("a.properties", "a2.properties", "b.properties"),
     )
   }
@@ -50,12 +49,10 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
+    outputShadowJar.assertContains(
       listOf("a.properties", "b.properties"),
     )
-    assertDoesNotContain(
-      outputShadowJar,
+    outputShadowJar.assertDoesNotContain(
       listOf("a2.properties"),
     )
   }
@@ -107,12 +104,10 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(result.task(":shadowJar")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-    assertContains(
-      outputShadowJar,
+    outputShadowJar.assertContains(
       listOf("a.properties", "a2.properties", "b.properties", "d.properties"),
     )
-    assertDoesNotContain(
-      outputShadowJar,
+    outputShadowJar.assertDoesNotContain(
       listOf("c.properties"),
     )
   }
@@ -134,12 +129,10 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(result.task(":shadowJar")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-    assertContains(
-      outputShadowJar,
+    outputShadowJar.assertContains(
       listOf("a2.properties", "b.properties", "c.properties", "d.properties"),
     )
-    assertDoesNotContain(
-      outputShadowJar,
+    outputShadowJar.assertDoesNotContain(
       listOf("a.properties"),
     )
   }
@@ -168,12 +161,10 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
+    outputShadowJar.assertContains(
       listOf("d.properties", "shadow/Passed.class"),
     )
-    assertDoesNotContain(
-      outputShadowJar,
+    outputShadowJar.assertDoesNotContain(
       listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
     )
   }
@@ -191,12 +182,10 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).exists()
-    assertDoesNotContain(
-      outputServerShadowJar,
+    outputServerShadowJar.assertDoesNotContain(
       listOf("client/Client.class"),
     )
-    assertContains(
-      outputServerShadowJar,
+    outputServerShadowJar.assertContains(
       listOf("server/Server.class", "junit/framework/Test.class"),
     )
   }
@@ -214,12 +203,10 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).exists()
-    assertDoesNotContain(
-      outputServerShadowJar,
+    outputServerShadowJar.assertDoesNotContain(
       listOf("junit/framework/Test.class"),
     )
-    assertContains(
-      outputServerShadowJar,
+    outputServerShadowJar.assertContains(
       listOf("client/Client.class", "server/Server.class"),
     )
   }
@@ -238,12 +225,10 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
+    outputShadowJar.assertContains(
       listOf("a.properties", "b.properties"),
     )
-    assertDoesNotContain(
-      outputShadowJar,
+    outputShadowJar.assertDoesNotContain(
       listOf("a2.properties"),
     )
   }
@@ -274,12 +259,10 @@ class FilteringTest : BasePluginTest() {
   }
 
   private fun commonAssertions() {
-    assertContains(
-      outputShadowJar,
+    outputShadowJar.assertContains(
       listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
     )
-    assertDoesNotContain(
-      outputShadowJar,
+    outputShadowJar.assertDoesNotContain(
       listOf("d.properties"),
     )
   }

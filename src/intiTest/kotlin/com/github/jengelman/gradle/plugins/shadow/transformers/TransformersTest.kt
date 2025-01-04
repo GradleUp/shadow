@@ -1,14 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
-import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import java.util.jar.JarInputStream
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath.Companion.exists
 import kotlin.io.path.appendText
-import kotlin.io.path.inputStream
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.junit.jupiter.api.Test
@@ -38,7 +36,7 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    val text = getJarFileContents(outputShadowJar, ENTRY_TEST_PROPERTIES)
+    val text = outputShadowJar.getEntryContent(ENTRY_TEST_PROPERTIES)
     assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
   }
 
@@ -63,7 +61,7 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    val text = getJarFileContents(outputShadowJar, ENTRY_TEST_PROPERTIES)
+    val text = outputShadowJar.getEntryContent(ENTRY_TEST_PROPERTIES)
     assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
   }
 
@@ -85,12 +83,10 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    JarInputStream(outputShadowJar.inputStream()).use { jis ->
-      val mf = jis.manifest
-      assertThat(mf).isNotNull()
-      assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
-      assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-    }
+    val mf = outputShadowJar.manifest
+    assertThat(mf).isNotNull()
+    assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
+    assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
   }
 
   @Test
@@ -118,13 +114,11 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    JarInputStream(outputShadowJar.inputStream()).use { jis ->
-      val mf = jis.manifest
-      assertThat(mf).isNotNull()
-      assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
-      assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-      assertThat(mf.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
-    }
+    val mf = outputShadowJar.manifest
+    assertThat(mf).isNotNull()
+    assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
+    assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
+    assertThat(mf.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
   }
 
   @Test
@@ -166,7 +160,7 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    val text = getJarFileContents(outputShadowJar, propertiesXml)
+    val text = outputShadowJar.getEntryContent(propertiesXml)
     assertThat(text.trimIndent()).isEqualTo(
       """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -202,24 +196,21 @@ class TransformersTest : BaseTransformerTest() {
 
     run("jar", shadowJarTask)
 
-    val jar = path("build/libs/shadow-1.0.jar")
-    assertThat(jar).exists()
+    val outputJar = jarPath("build/libs/shadow-1.0.jar")
+    assertThat(outputJar).exists()
     assertThat(outputShadowJar).exists()
 
-    JarInputStream(outputShadowJar.inputStream()).use { jis ->
-      val mf = jis.manifest
-      assertThat(mf).isNotNull()
-      assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
-      assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-      assertThat(mf.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
-    }
-    JarInputStream(jar.inputStream()).use { jis ->
-      val mf = jis.manifest
-      assertThat(mf).isNotNull()
-      assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
-      assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-      assertThat(mf.mainAttributes.getValue("New-Entry")).isNull()
-    }
+    val mf1 = outputShadowJar.manifest
+    assertThat(mf1).isNotNull()
+    assertThat(mf1.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
+    assertThat(mf1.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
+    assertThat(mf1.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
+
+    val mf2 = outputJar.manifest
+    assertThat(mf2).isNotNull()
+    assertThat(mf2.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
+    assertThat(mf2.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
+    assertThat(mf2.mainAttributes.getValue("New-Entry")).isNull()
   }
 
   @Test
@@ -256,7 +247,7 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    val props = getJarFileContents(outputShadowJar, ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
+    val props = outputShadowJar.getEntryContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
     assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
     assertThat(props.getProperty("extensionClasses"))
@@ -299,14 +290,14 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    val props = getJarFileContents(outputShadowJar, ENTRY_GROOVY_EXTENSION_MODULE).toProperties()
+    val props = outputShadowJar.getEntryContent(ENTRY_GROOVY_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
     assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
     assertThat(props.getProperty("extensionClasses"))
       .isEqualTo("com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension")
     assertThat(props.getProperty("staticExtensionClasses"))
       .isEqualTo("com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension")
-    assertDoesNotContain(outputShadowJar, listOf(ENTRY_SERVICE_EXTENSION_MODULE))
+    outputShadowJar.assertDoesNotContain(listOf(ENTRY_SERVICE_EXTENSION_MODULE))
   }
 
   @Test
@@ -346,7 +337,7 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).exists()
 
-    val props = getJarFileContents(outputShadowJar, ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
+    val props = outputShadowJar.getEntryContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
     assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
     assertThat(props.getProperty("extensionClasses"))

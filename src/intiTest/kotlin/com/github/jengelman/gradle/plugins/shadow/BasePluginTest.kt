@@ -5,9 +5,9 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.nio.file.Path
 import java.util.Properties
-import java.util.jar.JarFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
@@ -123,11 +123,13 @@ abstract class BasePluginTest {
   val settingsScriptPath: Path
     get() = path("settings.gradle")
 
-  val outputShadowJar: Path
-    get() = path("build/libs/shadow-1.0-all.jar")
+  val outputShadowJar: JarPath
+    get() = jarPath("build/libs/shadow-1.0-all.jar")
 
-  val outputServerShadowJar: Path
-    get() = path("server/build/libs/server-1.0-all.jar")
+  val outputServerShadowJar: JarPath
+    get() = jarPath("server/build/libs/server-1.0-all.jar")
+
+  fun jarPath(path: String): JarPath = JarPath(path(path))
 
   fun path(path: String): Path {
     return root.resolve(path).also {
@@ -142,22 +144,6 @@ abstract class BasePluginTest {
 
   fun repo(path: String = "maven-repo"): AppendableMavenFileRepository {
     return AppendableMavenFileRepository(root.resolve(path))
-  }
-
-  fun assertContains(jarPath: Path, paths: List<String>) {
-    jarPath.toJarFile().use { jar ->
-      paths.forEach { path ->
-        assert(jar.getJarEntry(path) != null) { "Jar file $jarPath does not contain entry $path" }
-      }
-    }
-  }
-
-  fun assertDoesNotContain(jarPath: Path, paths: List<String>) {
-    jarPath.toJarFile().use { jar ->
-      paths.forEach { path ->
-        assert(jar.getJarEntry(path) == null) { "Jar file $jarPath contains entry $path" }
-      }
-    }
   }
 
   private val runner: GradleRunner
@@ -330,8 +316,6 @@ abstract class BasePluginTest {
     """.trimIndent()
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
-
-    fun Path.toJarFile(): JarFile = JarFile(toFile())
 
     fun fromJar(vararg paths: Path): String {
       return paths.joinToString(System.lineSeparator()) { "from('${it.toUri().toURL().path}')" }

@@ -5,6 +5,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath.Companion.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -38,13 +39,12 @@ class ApplicationTest : BasePluginTest() {
     assertThat(result.output).contains("Running application with JDK 17")
     assertThat(result.output).contains("TestApp: Hello World! (foo)")
 
-    val installedJar = path("build/install/myapp-shadow/lib/myapp-1.0-all.jar")
+    val installedJar = jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")
     assertThat(installedJar).exists()
 
-    assertContains(installedJar, listOf("a.properties", "a2.properties", "myapp/Main.class"))
+    installedJar.assertContains(listOf("a.properties", "a2.properties", "myapp/Main.class"))
 
-    val jarFile = installedJar.toJarFile()
-    assertThat(jarFile.manifest.mainAttributes.getValue("Main-Class"))
+    assertThat(installedJar.manifest.mainAttributes.getValue("Main-Class"))
       .isEqualTo("myapp.Main")
 
     path("build/install/myapp-shadow/bin/myapp").let { startScript ->
@@ -83,7 +83,7 @@ class ApplicationTest : BasePluginTest() {
 
     run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
-    assertThat(path("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).exists()
+    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).exists()
   }
 
   private fun prepare(

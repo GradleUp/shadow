@@ -55,13 +55,6 @@ sealed class BaseTransformerTest : BasePluginTest() {
     const val ENTRY_SERVICE_EXTENSION_MODULE = "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
     const val ENTRY_GROOVY_EXTENSION_MODULE = "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
 
-    fun getJarFileContents(jarPath: Path, entryName: String): String {
-      jarPath.toJarFile().use { jar ->
-        val entry = jar.getJarEntry(entryName) ?: error("Entry not found: $entryName")
-        return jar.getInputStream(entry).bufferedReader().readText()
-      }
-    }
-
     inline fun <reified T : Transformer> transform(
       shadowJarBlock: String = "",
       transformerBlock: String = "",
