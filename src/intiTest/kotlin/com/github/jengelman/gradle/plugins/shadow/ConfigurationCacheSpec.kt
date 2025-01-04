@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -75,10 +77,10 @@ class ConfigurationCacheSpec : BasePluginTest() {
     outputShadowJar.deleteExisting()
     val result = run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("a.properties", "b.properties"),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf("a2.properties"),
     )
     result.assertCcReused()
@@ -99,10 +101,10 @@ class ConfigurationCacheSpec : BasePluginTest() {
     val result = run(shadowJarTask)
 
     assertThat(outputServerShadowJar).exists()
-    outputServerShadowJar.assertContains(
+    assertThat(outputServerShadowJar).containsEntries(
       listOf("server/Server.class", "junit/framework/Test.class"),
     )
-    outputServerShadowJar.assertDoesNotContain(
+    assertThat(outputServerShadowJar).doesNotContainEntries(
       listOf("client/Client.class"),
     )
     result.assertCcReused()

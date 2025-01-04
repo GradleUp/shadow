@@ -3,6 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -32,7 +34,7 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun includeAllDependencies() {
     run(shadowJarTask)
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("a.properties", "a2.properties", "b.properties"),
     )
   }
@@ -49,10 +51,10 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("a.properties", "b.properties"),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf("a2.properties"),
     )
   }
@@ -104,10 +106,10 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(result.task(":shadowJar")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("a.properties", "a2.properties", "b.properties", "d.properties"),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf("c.properties"),
     )
   }
@@ -129,10 +131,10 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(result.task(":shadowJar")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("a2.properties", "b.properties", "c.properties", "d.properties"),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf("a.properties"),
     )
   }
@@ -161,10 +163,10 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("d.properties", "shadow/Passed.class"),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
     )
   }
@@ -182,10 +184,10 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).exists()
-    outputServerShadowJar.assertDoesNotContain(
+    assertThat(outputServerShadowJar).doesNotContainEntries(
       listOf("client/Client.class"),
     )
-    outputServerShadowJar.assertContains(
+    assertThat(outputServerShadowJar).containsEntries(
       listOf("server/Server.class", "junit/framework/Test.class"),
     )
   }
@@ -203,10 +205,10 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).exists()
-    outputServerShadowJar.assertDoesNotContain(
+    assertThat(outputServerShadowJar).doesNotContainEntries(
       listOf("junit/framework/Test.class"),
     )
-    outputServerShadowJar.assertContains(
+    assertThat(outputServerShadowJar).containsEntries(
       listOf("client/Client.class", "server/Server.class"),
     )
   }
@@ -225,10 +227,10 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("a.properties", "b.properties"),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf("a2.properties"),
     )
   }
@@ -259,10 +261,10 @@ class FilteringTest : BasePluginTest() {
   }
 
   private fun commonAssertions() {
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf("a.properties", "a2.properties", "b.properties", "c.properties"),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf("d.properties"),
     )
   }

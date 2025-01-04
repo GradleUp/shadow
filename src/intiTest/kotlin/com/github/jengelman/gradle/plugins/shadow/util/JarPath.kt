@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
-import assertk.assertThat
 import assertk.assertions.exists
 import assertk.fail
 import java.nio.file.Path
@@ -26,25 +25,19 @@ class JarPath(val path: Path) :
     val entry = getJarEntry(entryName) ?: error("Entry not found: $entryName")
     return getInputStream(entry).bufferedReader().readText()
   }
+}
 
-  fun assertContains(entries: Iterable<String>) {
-    entries.forEach { entry ->
-      assertThat(getEntry(entry)).given { actual ->
-        actual ?: fail("Jar file $path does not contain entry $entry")
-      }
-    }
-  }
+fun Assert<JarPath>.exists() = transform { it.path }.exists()
 
-  fun assertDoesNotContain(entries: Iterable<String>) {
-    entries.forEach { entry ->
-      assertThat(getEntry(entry)).given { actual ->
-        if (actual == null) return
-        fail("Jar file $path contains entry $entry")
-      }
-    }
+fun Assert<JarPath>.containsEntries(entries: Iterable<String>) = transform {
+  entries.forEach { entry ->
+    it.getEntry(entry) ?: fail("Jar file ${it.path} does not contain entry $entry")
   }
 }
 
-fun Assert<JarPath>.exists() {
-  transform { it.path }.exists()
+fun Assert<JarPath>.doesNotContainEntries(entries: Iterable<String>) = transform {
+  entries.forEach { entry ->
+    it.getEntry(entry) ?: return@forEach
+    fail("Jar file ${it.path} contains entry $entry")
+  }
 }

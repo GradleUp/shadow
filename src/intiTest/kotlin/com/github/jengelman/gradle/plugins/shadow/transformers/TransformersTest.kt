@@ -5,6 +5,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -297,7 +298,7 @@ class TransformersTest : BaseTransformerTest() {
       .isEqualTo("com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension")
     assertThat(props.getProperty("staticExtensionClasses"))
       .isEqualTo("com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension")
-    outputShadowJar.assertDoesNotContain(listOf(ENTRY_SERVICE_EXTENSION_MODULE))
+    assertThat(outputShadowJar).doesNotContainEntries(listOf(ENTRY_SERVICE_EXTENSION_MODULE))
   }
 
   @Test

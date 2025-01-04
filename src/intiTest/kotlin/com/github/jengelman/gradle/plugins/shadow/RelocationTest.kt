@@ -5,6 +5,8 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.exists
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
@@ -27,7 +29,7 @@ class RelocationTest : BasePluginTest() {
     )
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf(
         "META-INF/MANIFEST.MF",
         "shadow/junit/textui/ResultPrinter.class",
@@ -71,7 +73,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf(
         "META-INF/MANIFEST.MF",
         "a/ResultPrinter.class",
@@ -92,7 +94,7 @@ class RelocationTest : BasePluginTest() {
       ),
     )
 
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf(
         "junit/textui/ResultPrinter.class",
         "junit/textui/TestRunner.class",
@@ -135,7 +137,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf(
         "a/ResultPrinter.class",
         "b/Test.class",
@@ -149,7 +151,7 @@ class RelocationTest : BasePluginTest() {
       ),
     )
 
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf(
         "a/TestRunner.class",
         "b/Assert.class",
@@ -160,7 +162,7 @@ class RelocationTest : BasePluginTest() {
       ),
     )
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf(
         "junit/textui/TestRunner.class",
         "junit/framework/Assert.class",
@@ -205,7 +207,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf(
         "shadow/ShadowTest.class",
         "shadow/junit/Test.class",
@@ -213,7 +215,7 @@ class RelocationTest : BasePluginTest() {
       ),
     )
 
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf(
         "junit/framework",
         "junit/framework/Test.class",
@@ -291,8 +293,7 @@ class RelocationTest : BasePluginTest() {
 
     val appOutput = jarPath("app/build/libs/app-all.jar")
     assertThat(appOutput).exists()
-
-    appOutput.assertContains(
+    assertThat(appOutput).containsEntries(
       listOf(
         "TEST",
         "APP-TEST",
@@ -335,14 +336,14 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    outputShadowJar.assertContains(
+    assertThat(outputShadowJar).containsEntries(
       listOf(
         "bar/Foo.class",
         "bar/foo.properties",
         "bar/dep.properties",
       ),
     )
-    outputShadowJar.assertDoesNotContain(
+    assertThat(outputShadowJar).doesNotContainEntries(
       listOf(
         "foo/Foo.class",
         "foo/foo.properties",
