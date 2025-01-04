@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.Extension
 import org.junit.jupiter.engine.config.JupiterConfiguration
 import org.junit.jupiter.engine.extension.ExtensionRegistry
@@ -17,7 +16,6 @@ import org.mockito.Mockito.mock
 /**
  * Copied from [ExtensionRegistryTests.java](https://github.com/junit-team/junit5/blob/16c6f72c1c728c015e35cb739ea75884f19f990c/jupiter-tests/src/test/java/org/junit/jupiter/engine/extension/ExtensionRegistryTests.java).
  */
-@ExtendWith(IssueExtension::class)
 class ExtensionRegistryTests {
   private val configuration: JupiterConfiguration = mock()
   private lateinit var registry: MutableExtensionRegistry

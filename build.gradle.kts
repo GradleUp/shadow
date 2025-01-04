@@ -108,6 +108,10 @@ val integrationTest by tasks.registering(Test::class) {
   testClassesDirs = intiTest.output.classesDirs
   classpath = intiTest.runtimeClasspath
 
+  // TODO: this should be moved into functionalTest after we migrated all functional tests to Kotlin.
+  // Required to enable IssueExtension for all tests.
+  systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
+
   val docsDir = file("src/docs")
   // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
   inputs.dir(docsDir)
