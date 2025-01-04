@@ -107,7 +107,7 @@ val integrationTest by tasks.registering(Test::class) {
   classpath = intiTest.runtimeClasspath
 
   // TODO: this should be moved into functionalTest after we migrated all functional tests to Kotlin.
-  // Required to enable IssueExtension for all tests.
+  // Required to enable `IssueExtension` for all tests.
   systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
 
   val docsDir = file("src/docs")
