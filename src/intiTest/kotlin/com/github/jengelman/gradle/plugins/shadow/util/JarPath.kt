@@ -18,6 +18,7 @@ class JarPath(val path: Path) :
   Path by path {
 
   fun deleteExisting() {
+    close()
     path.deleteExisting()
   }
 
