@@ -5,6 +5,7 @@ import assertk.assertThat
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.net.URLClassLoader
 import java.util.jar.JarFile
 import kotlin.io.path.appendText
@@ -50,9 +51,9 @@ class RelocationTest : BasePluginTest() {
     )
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/58
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/58",
+  )
   @Test
   fun relocateDependencyFiles() {
     projectScriptPath.appendText(
@@ -179,10 +180,10 @@ class RelocationTest : BasePluginTest() {
     )
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/53
-   * https://github.com/GradleUp/shadow/issues/55
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/53",
+    "https://github.com/GradleUp/shadow/issues/55",
+  )
   @Test
   fun remapClassNamesForRelocatedFilesInProjectSource() {
     projectScriptPath.appendText(
@@ -314,10 +315,10 @@ class RelocationTest : BasePluginTest() {
     )
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/93
-   * https://github.com/GradleUp/shadow/issues/114
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/93",
+    "https://github.com/GradleUp/shadow/issues/114",
+  )
   @Test
   fun relocateResourceFiles() {
     repo.module("shadow", "dep", "1.0")
@@ -363,9 +364,9 @@ class RelocationTest : BasePluginTest() {
     )
   }
 
-  /**
-   * https://github.com/GradleUp/shadow/issues/294
-   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/294",
+  )
   @Test
   fun doesNotErrorOnRelocatingJava9Classes() {
     projectScriptPath.appendText(
