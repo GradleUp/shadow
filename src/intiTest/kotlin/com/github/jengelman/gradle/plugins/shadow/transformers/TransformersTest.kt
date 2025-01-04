@@ -1,28 +1,11 @@
-package com.github.jengelman.gradle.plugins.shadow
+package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
-import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.DontIncludeResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.IncludeResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import java.nio.file.Path
-import java.util.jar.JarFile
 import java.util.jar.JarInputStream
 import kotlin.io.path.appendText
 import kotlin.io.path.inputStream
@@ -32,7 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-class TransformersTest : BasePluginTest() {
+class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun serviceResourceTransformer() {
@@ -592,58 +575,7 @@ class TransformersTest : BasePluginTest() {
     assertThat(outputShadowJar).exists()
   }
 
-  private fun buildJarOne(
-    builder: AppendableJar.() -> AppendableJar = {
-      insert(ENTRY_SERVICES_SHADE, CONTENT_ONE)
-      insert(ENTRY_SERVICES_FOO, "one")
-    },
-  ): Path {
-    return buildJar("one.jar")
-      .builder()
-      .write()
-  }
-
-  private fun buildJarTwo(
-    builder: AppendableJar.() -> AppendableJar = {
-      insert(ENTRY_SERVICES_SHADE, CONTENT_TWO)
-      insert(ENTRY_SERVICES_FOO, "two")
-    },
-  ): Path {
-    return buildJar("two.jar")
-      .builder()
-      .write()
-  }
-
-  private fun buildJar(path: String): AppendableJar {
-    return AppendableJar(path(path))
-  }
-
-  private fun writeMainClass() {
-    path("src/main/java/shadow/Main.java").writeText(
-      """
-        package shadow;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("Hello, World!");
-          }
-        }
-      """.trimIndent(),
-    )
-  }
-
   private companion object {
-    const val CONTENT_ONE = "one # NOTE: No newline terminates this line/file"
-    const val CONTENT_TWO = "two # NOTE: No newline terminates this line/file"
-    const val CONTENT_THREE = "three # NOTE: No newline terminates this line/file"
-    const val CONTENT_ONE_TWO = "$CONTENT_ONE\n$CONTENT_TWO"
-
-    const val ENTRY_TEST_PROPERTIES = "test.properties"
-    const val ENTRY_SERVICES_SHADE = "META-INF/services/org.apache.maven.Shade"
-    const val ENTRY_SERVICES_FOO = "META-INF/services/com.acme.Foo"
-    const val ENTRY_FOO_SHADE = "META-INF/foo/org.apache.maven.Shade"
-    const val ENTRY_SERVICE_EXTENSION_MODULE = "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-    const val ENTRY_GROOVY_EXTENSION_MODULE = "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
-
     @JvmStatic
     fun transformerConfigurations() = listOf(
       "" to ApacheLicenseResourceTransformer::class,
@@ -660,26 +592,5 @@ class TransformersTest : BasePluginTest() {
       "" to ServiceFileTransformer::class,
       "" to XmlAppendingTransformer::class,
     )
-
-    fun getJarFileContents(jarPath: Path, entryName: String): String {
-      JarFile(jarPath.toFile()).use { jar ->
-        val entry = jar.getJarEntry(entryName) ?: error("Entry not found: $entryName")
-        return jar.getInputStream(entry).bufferedReader().readText()
-      }
-    }
-
-    inline fun <reified T : Transformer> transform(
-      shadowBlock: String = "",
-      transformerBlock: String = "",
-    ): String {
-      return """
-      $shadowJar {
-        $shadowBlock
-        transform(${T::class.java.name}) {
-          $transformerBlock
-        }
-      }
-      """.trimIndent()
-    }
   }
 }
