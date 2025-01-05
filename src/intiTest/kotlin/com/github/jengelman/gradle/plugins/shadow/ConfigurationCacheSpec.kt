@@ -77,10 +77,11 @@ class ConfigurationCacheSpec : BasePluginTest() {
     val result = run(shadowJarTask)
 
     assertThat(outputShadowJar).containsEntries(
-      listOf("a.properties", "b.properties"),
+      "a.properties",
+      "b.properties",
     )
     assertThat(outputShadowJar).doesNotContainEntries(
-      listOf("a2.properties"),
+      "a2.properties",
     )
     result.assertCcReused()
   }
@@ -100,10 +101,11 @@ class ConfigurationCacheSpec : BasePluginTest() {
     val result = run(shadowJarTask)
 
     assertThat(outputServerShadowJar).containsEntries(
-      listOf("server/Server.class", "junit/framework/Test.class"),
+      "server/Server.class",
+      "junit/framework/Test.class",
     )
     assertThat(outputServerShadowJar).doesNotContainEntries(
-      listOf("client/Client.class"),
+      "client/Client.class",
     )
     result.assertCcReused()
   }

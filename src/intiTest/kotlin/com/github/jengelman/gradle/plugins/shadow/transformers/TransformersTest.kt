@@ -280,7 +280,9 @@ class TransformersTest : BaseTransformerTest() {
       .isEqualTo("com.acme.foo.FooExtension,com.acme.foo.BarExtension,com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension")
     assertThat(props.getProperty("staticExtensionClasses"))
       .isEqualTo("com.acme.foo.FooStaticExtension,com.acme.bar.SomeStaticExtension")
-    assertThat(outputShadowJar).doesNotContainEntries(listOf(ENTRY_SERVICE_EXTENSION_MODULE))
+    assertThat(outputShadowJar).doesNotContainEntries(
+      ENTRY_SERVICE_EXTENSION_MODULE,
+    )
   }
 
   @Test

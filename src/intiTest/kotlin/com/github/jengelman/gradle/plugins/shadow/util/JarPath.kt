@@ -33,13 +33,13 @@ class JarPath(val path: Path) :
  */
 fun Assert<JarPath>.isRegular() = transform { it.entries().toList() }.isNotEmpty()
 
-fun Assert<JarPath>.containsEntries(entries: Iterable<String>) = transform { actual ->
+fun Assert<JarPath>.containsEntries(vararg entries: String) = transform { actual ->
   entries.forEach { entry ->
     actual.getEntry(entry) ?: fail("Jar file ${actual.path} does not contain entry $entry")
   }
 }
 
-fun Assert<JarPath>.doesNotContainEntries(entries: Iterable<String>) = transform { actual ->
+fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = transform { actual ->
   entries.forEach { entry ->
     actual.getEntry(entry) ?: return@forEach
     fail("Jar file ${actual.path} contains entry $entry")
