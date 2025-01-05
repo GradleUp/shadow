@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
@@ -12,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
@@ -71,7 +71,7 @@ class ShadowPluginTest : BasePluginTest() {
       it.withGradleVersion("8.3")
     }
 
-    assertThat(outputShadowJar.entries().toList()).isNotEmpty()
+    assertThat(outputShadowJar).isRegular()
   }
 
   @Test
@@ -98,7 +98,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.entries().toList()).isNotEmpty()
+    assertThat(outputShadowJar).isRegular()
   }
 
   @Test
@@ -580,7 +580,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.entries().toList()).isNotEmpty()
+    assertThat(outputShadowJar).isRegular()
   }
 
   /**

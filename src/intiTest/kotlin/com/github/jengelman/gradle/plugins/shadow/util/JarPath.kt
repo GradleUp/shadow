@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
+import assertk.assertions.isNotEmpty
 import assertk.fail
 import java.nio.file.Path
 import java.util.jar.JarFile
@@ -26,6 +27,11 @@ class JarPath(val path: Path) :
     return getInputStream(entry).bufferedReader().readText()
   }
 }
+
+/**
+ * Common regular assertions for [JarPath].
+ */
+fun Assert<JarPath>.isRegular() = transform { it.entries().toList() }.isNotEmpty()
 
 fun Assert<JarPath>.containsEntries(entries: Iterable<String>) = transform { actual ->
   entries.forEach { entry ->
