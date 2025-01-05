@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
-import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
@@ -23,13 +22,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
-    val text1 = getJarFileContents(outputShadowJar, ENTRY_SERVICES_SHADE)
-    assertThat(text1).isEqualTo(CONTENT_ONE_TWO)
-
-    val text2 = getJarFileContents(outputShadowJar, ENTRY_SERVICES_FOO)
-    assertThat(text2).isEqualTo("one")
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_SHADE)).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_FOO)).isEqualTo("one")
   }
 
   @Test
@@ -51,10 +45,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
-    val text = getJarFileContents(outputShadowJar, ENTRY_FOO_SHADE)
-    assertThat(text).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_FOO_SHADE)).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Test
@@ -72,13 +63,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
-    val text1 = getJarFileContents(outputShadowJar, ENTRY_SERVICES_SHADE)
-    assertThat(text1).isEqualTo(CONTENT_ONE_TWO)
-
-    val text2 = getJarFileContents(outputShadowJar, ENTRY_SERVICES_FOO)
-    assertThat(text2).isEqualTo("one")
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_SHADE)).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_FOO)).isEqualTo("one")
   }
 
   @Test
@@ -124,9 +110,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
-    val text1 = getJarFileContents(outputShadowJar, "META-INF/services/java.sql.Driver")
+    val text1 = outputShadowJar.getContent("META-INF/services/java.sql.Driver")
     assertThat(text1).isEqualTo(
       """
         oracle.jdbc.OracleDriver
@@ -136,7 +120,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    val text2 = getJarFileContents(outputShadowJar, "META-INF/services/myapache.axis.components.compiler.Compiler")
+    val text2 = outputShadowJar.getContent("META-INF/services/myapache.axis.components.compiler.Compiler")
     assertThat(text2).isEqualTo(
       """
         myapache.axis.components.compiler.Javac
@@ -144,7 +128,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    val text3 = getJarFileContents(outputShadowJar, "META-INF/services/org.apache.commons.logging.LogFactory")
+    val text3 = outputShadowJar.getContent("META-INF/services/org.apache.commons.logging.LogFactory")
     assertThat(text3).isEqualTo(
       """
         myapache.commons.logging.impl.LogFactoryImpl
@@ -172,10 +156,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
-    val text = getJarFileContents(outputShadowJar, ENTRY_FOO_SHADE)
-    assertThat(text).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_FOO_SHADE)).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Issue(
@@ -207,9 +188,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
-    val text = getJarFileContents(outputShadowJar, servicesShadowEntry)
-    assertThat(text).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(servicesShadowEntry))
+      .isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
   }
 }
