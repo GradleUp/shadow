@@ -6,7 +6,6 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
@@ -35,8 +34,6 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
     val text = outputShadowJar.getEntryContent(ENTRY_TEST_PROPERTIES)
     assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
   }
@@ -60,8 +57,6 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
     val text = outputShadowJar.getEntryContent(ENTRY_TEST_PROPERTIES)
     assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
   }
@@ -81,8 +76,6 @@ class TransformersTest : BaseTransformerTest() {
     )
 
     run(shadowJarTask)
-
-    assertThat(outputShadowJar).exists()
 
     val mf = outputShadowJar.manifest
     assertThat(mf).isNotNull()
@@ -113,7 +106,6 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
     val mf = outputShadowJar.manifest
     assertThat(mf).isNotNull()
     assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
@@ -158,8 +150,6 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
     val text = outputShadowJar.getEntryContent(propertiesXml)
     assertThat(text.trimIndent()).isEqualTo(
       """
@@ -196,7 +186,6 @@ class TransformersTest : BaseTransformerTest() {
 
     run("jar", shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
     val mf1 = outputShadowJar.manifest
     assertThat(mf1).isNotNull()
     assertThat(mf1.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
@@ -204,7 +193,6 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(mf1.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
 
     val outputJar = jarPath("build/libs/shadow-1.0.jar")
-    assertThat(outputJar).exists()
     val mf2 = outputJar.manifest
     assertThat(mf2).isNotNull()
     assertThat(mf2.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
@@ -243,8 +231,6 @@ class TransformersTest : BaseTransformerTest() {
     )
 
     run(shadowJarTask)
-
-    assertThat(outputShadowJar).exists()
 
     val props = outputShadowJar.getEntryContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
@@ -286,8 +272,6 @@ class TransformersTest : BaseTransformerTest() {
     )
 
     run(shadowJarTask)
-
-    assertThat(outputShadowJar).exists()
 
     val props = outputShadowJar.getEntryContent(ENTRY_GROOVY_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
@@ -334,8 +318,6 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
     val props = outputShadowJar.getEntryContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
     assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
@@ -361,8 +343,6 @@ class TransformersTest : BaseTransformerTest() {
     )
 
     run(shadowJarTask)
-
-    assertThat(outputShadowJar).exists()
   }
 
   private companion object {

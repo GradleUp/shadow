@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -22,8 +21,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     )
 
     run(shadowJarTask)
-
-    assertThat(outputShadowJar).exists()
 
     val text1 = outputShadowJar.getEntryContent(ENTRY_SERVICES_SHADE)
     assertThat(text1).isEqualTo(CONTENT_ONE_TWO)
@@ -51,8 +48,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
     val text = outputShadowJar.getEntryContent(ENTRY_FOO_SHADE)
     assertThat(text).isEqualTo(CONTENT_ONE_TWO)
   }
@@ -71,8 +66,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     )
 
     run(shadowJarTask)
-
-    assertThat(outputShadowJar).exists()
 
     val text1 = outputShadowJar.getEntryContent(ENTRY_SERVICES_SHADE)
     assertThat(text1).isEqualTo(CONTENT_ONE_TWO)
@@ -124,8 +117,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
     val text1 = outputShadowJar.getEntryContent("META-INF/services/java.sql.Driver")
     assertThat(text1).isEqualTo(
       """
@@ -172,8 +163,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
     val text = outputShadowJar.getEntryContent(ENTRY_FOO_SHADE)
     assertThat(text).isEqualTo(CONTENT_ONE_TWO)
   }
@@ -206,8 +195,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     path("src/main/resources/$servicesShadowEntry").writeText(CONTENT_THREE)
 
     run(shadowJarTask)
-
-    assertThat(outputShadowJar).exists()
 
     val text = outputShadowJar.getEntryContent(servicesShadowEntry)
     assertThat(text).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)

@@ -3,10 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
-import assertk.assertions.exists
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -41,7 +40,6 @@ class ApplicationTest : BasePluginTest() {
     assertThat(result.output).contains("TestApp: Hello World! (foo)")
 
     val installedJar = jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")
-    assertThat(installedJar).exists()
     assertThat(installedJar).containsEntries(
       listOf("a.properties", "a2.properties", "myapp/Main.class"),
     )
@@ -49,7 +47,6 @@ class ApplicationTest : BasePluginTest() {
       .isEqualTo("myapp.Main")
 
     path("build/install/myapp-shadow/bin/myapp").let { startScript ->
-      assertThat(startScript).exists()
       assertThat(startScript.readText()).contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
       assertThat(startScript.readText()).contains("-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
       assertThat(startScript.readText()).contains("exec \"\$JAVACMD\" \"\$@\"")
@@ -69,8 +66,6 @@ class ApplicationTest : BasePluginTest() {
     run("shadowDistZip")
 
     val zip = path("build/distributions/myapp-shadow-1.0.zip")
-    assertThat(zip).exists()
-
     val entries = ZipFile(zip.toFile()).entries.toList().map { it.name }
     assertThat(entries).containsAtLeast(
       "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
@@ -84,7 +79,7 @@ class ApplicationTest : BasePluginTest() {
 
     run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
-    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).exists()
+    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar").entries().toList()).isNotEmpty()
   }
 
   private fun prepare(

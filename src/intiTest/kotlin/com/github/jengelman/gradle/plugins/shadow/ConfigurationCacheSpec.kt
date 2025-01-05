@@ -6,7 +6,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
@@ -100,7 +99,6 @@ class ConfigurationCacheSpec : BasePluginTest() {
     outputServerShadowJar.deleteExisting()
     val result = run(shadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
     assertThat(outputServerShadowJar).containsEntries(
       listOf("server/Server.class", "junit/framework/Test.class"),
     )

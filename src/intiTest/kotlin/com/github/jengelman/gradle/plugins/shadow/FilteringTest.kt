@@ -5,7 +5,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.exists
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -183,7 +182,6 @@ class FilteringTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
     assertThat(outputServerShadowJar).doesNotContainEntries(
       listOf("client/Client.class"),
     )
@@ -204,7 +202,6 @@ class FilteringTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
     assertThat(outputServerShadowJar).doesNotContainEntries(
       listOf("junit/framework/Test.class"),
     )

@@ -7,7 +7,6 @@ import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.exists
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -292,7 +291,6 @@ class RelocationTest : BasePluginTest() {
     run(":app:$shadowJarTask")
 
     val appOutput = jarPath("app/build/libs/app-all.jar")
-    assertThat(appOutput).exists()
     assertThat(appOutput).containsEntries(
       listOf(
         "TEST",

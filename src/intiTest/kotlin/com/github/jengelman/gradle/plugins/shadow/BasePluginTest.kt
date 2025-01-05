@@ -17,6 +17,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
@@ -128,7 +129,13 @@ abstract class BasePluginTest {
   val outputServerShadowJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
 
-  fun jarPath(path: String): JarPath = JarPath(root.resolve(path))
+  fun jarPath(path: String): JarPath {
+    val realPath = root.resolve(path).also {
+      check(it.exists()) { "Path not found: $it" }
+      check(it.isRegularFile()) { "Path is not a regular file: $it" }
+    }
+    return JarPath(realPath)
+  }
 
   fun path(path: String): Path {
     return root.resolve(path).also {
