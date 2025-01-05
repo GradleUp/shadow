@@ -17,7 +17,6 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
-import kotlin.io.path.extension
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
@@ -129,15 +128,13 @@ abstract class BasePluginTest {
   val outputServerShadowJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
 
-  fun jarPath(path: String): JarPath = JarPath(path(path))
+  fun jarPath(path: String): JarPath = JarPath(root.resolve(path))
 
   fun path(path: String): Path {
     return root.resolve(path).also {
-      val extension = it.extension
-      // Binary files should not be created, text files should be created.
-      if (it.exists() || extension == "jar" || extension == "zip") return@also
-
+      if (it.exists()) return@also
       it.parent.createDirectories()
+      // We should create text file only if it doesn't exist.
       it.createFile()
     }
   }
