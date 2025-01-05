@@ -17,52 +17,6 @@ import org.junit.jupiter.params.provider.MethodSource
 class TransformersTest : BaseTransformerTest() {
 
   @Test
-  fun appendingTransformer() {
-    val one = buildJarOne {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE)
-    }
-    val two = buildJarTwo {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO)
-    }
-    projectScriptPath.appendText(
-      transform<AppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
-        transformerBlock = """
-          resource = '$ENTRY_TEST_PROPERTIES'
-        """.trimIndent(),
-      ),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowJar.getContent(ENTRY_TEST_PROPERTIES).trimIndent())
-      .isEqualTo(CONTENT_ONE_TWO)
-  }
-
-  @Test
-  fun appendingTransformerShortSyntax() {
-    val one = buildJarOne {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE)
-    }
-    val two = buildJarTwo {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO)
-    }
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          ${fromJar(one, two)}
-          append('$ENTRY_TEST_PROPERTIES')
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowJar.getContent(ENTRY_TEST_PROPERTIES).trimIndent())
-      .isEqualTo(CONTENT_ONE_TWO)
-  }
-
-  @Test
   fun manifestRetained() {
     writeMainClass()
     projectScriptPath.appendText(
@@ -354,7 +308,6 @@ class TransformersTest : BaseTransformerTest() {
     fun transformerConfigurations() = listOf(
       "" to ApacheLicenseResourceTransformer::class,
       "" to ApacheNoticeResourceTransformer::class,
-      "" to AppendingTransformer::class,
       "" to ComponentsXmlResourceTransformer::class,
       "" to DontIncludeResourceTransformer::class,
       "" to GroovyExtensionModuleTransformer::class,
