@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
@@ -10,9 +9,12 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import java.util.jar.JarFile
+import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
+import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -69,7 +71,7 @@ class ShadowPluginTest : BasePluginTest() {
       it.withGradleVersion("8.3")
     }
 
-    assertThat(outputShadowJar).exists()
+    assertThat(outputShadowJar).isRegular()
   }
 
   @Test
@@ -81,23 +83,22 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun shadowCopy() {
-    val artifactJarPath = requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar"))
-      .path
-    val projectJarPath = requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar"))
-      .path
+    val artifactJar = requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar"))
+      .toURI().toPath()
+    val projectJar = requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar"))
+      .toURI().toPath()
 
     projectScriptPath.appendText(
       """
         $shadowJar {
-          from('$artifactJarPath')
-          from('$projectJarPath')
+          ${fromJar(artifactJar, projectJar)}
         }
       """.trimIndent(),
     )
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
+    assertThat(outputShadowJar).isRegular()
   }
 
   @Test
@@ -123,16 +124,15 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     run(shadowJarTask)
-    val outputShadowJar = path("build/libs/shadow.jar")
 
-    assertThat(outputShadowJar).exists()
-    assertContains(
-      outputShadowJar,
-      listOf("shadow/Passed.class", "junit/framework/Test.class"),
+    val outputShadowJar = jarPath("build/libs/shadow.jar")
+
+    assertThat(outputShadowJar).containsEntries(
+      "shadow/Passed.class",
+      "junit/framework/Test.class",
     )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("/"),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "/",
     )
   }
 
@@ -142,10 +142,10 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
-    assertContains(
-      outputServerShadowJar,
-      listOf("client/Client.class", "server/Server.class", "junit/framework/Test.class"),
+    assertThat(outputServerShadowJar).containsEntries(
+      "client/Client.class",
+      "server/Server.class",
+      "junit/framework/Test.class",
     )
   }
 
@@ -173,14 +173,12 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
-    assertContains(
-      outputServerShadowJar,
-      listOf("client/Client.class", "server/Server.class"),
+    assertThat(outputServerShadowJar).containsEntries(
+      "client/Client.class",
+      "server/Server.class",
     )
-    assertDoesNotContain(
-      outputServerShadowJar,
-      listOf("junit/framework/Test.class"),
+    assertThat(outputServerShadowJar).doesNotContainEntries(
+      "junit/framework/Test.class",
     )
   }
 
@@ -201,14 +199,12 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
-    assertContains(
-      outputServerShadowJar,
-      listOf("server/Server.class", "junit/framework/Test.class"),
+    assertThat(outputServerShadowJar).containsEntries(
+      "server/Server.class",
+      "junit/framework/Test.class",
     )
-    assertDoesNotContain(
-      outputServerShadowJar,
-      listOf("client/Client.class"),
+    assertThat(outputServerShadowJar).doesNotContainEntries(
+      "client/Client.class",
     )
   }
 
@@ -228,10 +224,9 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
-    assertContains(
-      outputServerShadowJar,
-      listOf("client/Client.class", "server/Server.class"),
+    assertThat(outputServerShadowJar).containsEntries(
+      "client/Client.class",
+      "server/Server.class",
     )
   }
 
@@ -260,10 +255,10 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).exists()
-    assertContains(
-      outputServerShadowJar,
-      listOf("client/Client.class", "server/Server.class", "junit/framework/TestCase.class"),
+    assertThat(outputServerShadowJar).containsEntries(
+      "client/Client.class",
+      "server/Server.class",
+      "junit/framework/TestCase.class",
     )
 
     path("client/src/main/java/client/Client.java").writeText(
@@ -273,12 +268,13 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
     run(serverShadowJarTask)
-    assertThat(outputServerShadowJar).exists()
+
     // TODO: I don't think junit classes should be in the output jar, but it's the test case
     //  from https://github.com/GradleUp/shadow/pull/420, need to investigate more...
-    assertContains(
-      outputServerShadowJar,
-      listOf("client/Client.class", "server/Server.class", "junit/framework/TestCase.class"),
+    assertThat(outputServerShadowJar).containsEntries(
+      "client/Client.class",
+      "server/Server.class",
+      "junit/framework/TestCase.class",
     )
   }
 
@@ -292,16 +288,17 @@ class ShadowPluginTest : BasePluginTest() {
     writeApiLibAndImplModules()
 
     run(":impl:$shadowJarTask")
-    val implOutput = path("impl/build/libs/impl-all.jar")
 
-    assertThat(implOutput).exists()
-    assertContains(
-      implOutput,
-      listOf("impl/SimpleEntity.class", "api/Entity.class", "api/UnusedEntity.class", "lib/LibEntity.class"),
+    val implOutput = jarPath("impl/build/libs/impl-all.jar")
+    assertThat(implOutput).containsEntries(
+      "impl/SimpleEntity.class",
+      "api/Entity.class",
+      "api/UnusedEntity.class",
+      "lib/LibEntity.class",
     )
-    assertDoesNotContain(
-      implOutput,
-      listOf("junit/framework/Test.class", "lib/UnusedLibEntity.class"),
+    assertThat(implOutput).doesNotContainEntries(
+      "junit/framework/Test.class",
+      "lib/UnusedLibEntity.class",
     )
   }
 
@@ -324,22 +321,17 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     run(":impl:$shadowJarTask")
-    val implOutput = path("impl/build/libs/impl-all.jar")
 
-    assertThat(implOutput).exists()
-    assertContains(
-      implOutput,
-      listOf(
-        "impl/SimpleEntity.class",
-        "api/Entity.class",
-        "api/UnusedEntity.class",
-        "lib/LibEntity.class",
-        "lib/UnusedLibEntity.class",
-      ),
+    val implOutput = jarPath("impl/build/libs/impl-all.jar")
+    assertThat(implOutput).containsEntries(
+      "impl/SimpleEntity.class",
+      "api/Entity.class",
+      "api/UnusedEntity.class",
+      "lib/LibEntity.class",
+      "lib/UnusedLibEntity.class",
     )
-    assertDoesNotContain(
-      implOutput,
-      listOf("junit/framework/Test.class"),
+    assertThat(implOutput).doesNotContainEntries(
+      "junit/framework/Test.class",
     )
   }
 
@@ -348,22 +340,21 @@ class ShadowPluginTest : BasePluginTest() {
     writeShadowedClientAndServerModules()
 
     run(":server:jar")
-    val serverOutput = path("server/build/libs/server-1.0.jar")
-    val clientOutput = path("client/build/libs/client-all.jar")
 
-    assertThat(serverOutput).exists()
-    assertContains(
-      serverOutput,
-      listOf("server/Server.class"),
+    val serverOutput = jarPath("server/build/libs/server-1.0.jar")
+    assertThat(serverOutput).containsEntries(
+      "server/Server.class",
     )
-    assertDoesNotContain(
-      serverOutput,
-      listOf("client/Client.class", "junit/framework/Test.class", "client/junit/framework/Test.class"),
+    assertThat(serverOutput).doesNotContainEntries(
+      "client/Client.class",
+      "junit/framework/Test.class",
+      "client/junit/framework/Test.class",
     )
-    assertThat(clientOutput).exists()
-    assertContains(
-      clientOutput,
-      listOf("client/Client.class", "client/junit/framework/Test.class"),
+
+    val clientOutput = jarPath("client/build/libs/client-all.jar")
+    assertThat(clientOutput).containsEntries(
+      "client/Client.class",
+      "client/junit/framework/Test.class",
     )
   }
 
@@ -372,21 +363,20 @@ class ShadowPluginTest : BasePluginTest() {
     writeShadowedClientAndServerModules()
 
     run(serverShadowJarTask)
-    val clientOutput = path("client/build/libs/client-all.jar")
 
-    assertThat(outputServerShadowJar).exists()
-    assertContains(
-      outputServerShadowJar,
-      listOf("client/Client.class", "client/junit/framework/Test.class", "server/Server.class"),
+    assertThat(outputServerShadowJar).containsEntries(
+      "client/Client.class",
+      "client/junit/framework/Test.class",
+      "server/Server.class",
     )
-    assertDoesNotContain(
-      outputServerShadowJar,
-      listOf("junit/framework/Test.class"),
+    assertThat(outputServerShadowJar).doesNotContainEntries(
+      "junit/framework/Test.class",
     )
-    assertThat(clientOutput).exists()
-    assertContains(
-      clientOutput,
-      listOf("client/Client.class", "client/junit/framework/Test.class"),
+
+    val clientOutput = jarPath("client/build/libs/client-all.jar")
+    assertThat(clientOutput).containsEntries(
+      "client/Client.class",
+      "client/junit/framework/Test.class",
     )
   }
 
@@ -418,13 +408,17 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("shadow/Passed.class", "a.properties", "META-INF/a.properties"),
+    assertThat(outputShadowJar).containsEntries(
+      "shadow/Passed.class",
+      "a.properties",
+      "META-INF/a.properties",
     )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("META-INF/INDEX.LIST", "META-INF/a.SF", "META-INF/a.DSA", "META-INF/a.RSA", "module-info.class"),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "META-INF/INDEX.LIST",
+      "META-INF/a.SF",
+      "META-INF/a.DSA",
+      "META-INF/a.RSA",
+      "module-info.class",
     )
   }
 
@@ -444,13 +438,12 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("a.properties", "a2.properties"),
+    assertThat(outputShadowJar).containsEntries(
+      "a.properties",
+      "a2.properties",
     )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("b.properties"),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "b.properties",
     )
   }
 
@@ -483,9 +476,11 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("api.properties", "implementation.properties", "runtimeOnly.properties", "implementation-dep.properties"),
+    assertThat(outputShadowJar).containsEntries(
+      "api.properties",
+      "implementation.properties",
+      "runtimeOnly.properties",
+      "implementation-dep.properties",
     )
   }
 
@@ -505,13 +500,12 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf("a.properties", "a2.properties"),
+    assertThat(outputShadowJar).containsEntries(
+      "a.properties",
+      "a2.properties",
     )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf("b.properties"),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "b.properties",
     )
   }
 
@@ -535,9 +529,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-    val entries = JarFile(outputShadowJar.toFile()).entries().toList()
-    assertThat(entries.size).isEqualTo(2)
+    assertThat(outputShadowJar.entries().toList().size).isEqualTo(2)
   }
 
   @Test
@@ -552,9 +544,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
-    assertThat(attributes.getValue("Class-Path")).isNull()
+    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path")).isNull()
   }
 
   @Issue(
@@ -577,9 +567,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
-    assertThat(attributes.getValue("Class-Path")).isEqualTo("/libs/a.jar junit-3.8.2.jar")
+    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path"))
+      .isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
   @Issue(
@@ -597,9 +586,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-    val attributes = JarFile(outputShadowJar.toFile()).manifest.mainAttributes
-    assertThat(attributes.getValue("Class-Path")).isEqualTo("junit-3.8.2.jar")
+    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path"))
+      .isEqualTo("junit-3.8.2.jar")
   }
 
   @Issue(
@@ -621,7 +609,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
+    assertThat(outputShadowJar).isRegular()
   }
 
   /**
@@ -755,9 +743,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).exists()
-
-    val entries = JarFile(outputShadowJar.toFile()).entries().toList()
+    val entries = outputShadowJar.entries().toList()
     assertThat(entries.count { it.name.endsWith(".class") }).isEqualTo(1)
   }
 
@@ -783,13 +769,11 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     val result = run(testShadowJarTask)
-    val testJar = path("build/libs/shadow-1.0-tests.jar")
 
     assertThat(result.task(":$testShadowJarTask")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-
-    assertThat(testJar).exists()
-    assertThat(JarFile(testJar.toFile()).getEntry("junit")).isNotNull()
+    val testJar = jarPath("build/libs/shadow-1.0-tests.jar")
+    assertThat(testJar.getEntry("junit")).isNotNull()
   }
 
   private fun writeShadowedClientAndServerModules() {

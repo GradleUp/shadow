@@ -5,8 +5,9 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.nio.file.Path
-import java.util.jar.JarFile
+import java.util.Properties
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
@@ -16,7 +17,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
-import kotlin.io.path.extension
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
@@ -122,41 +123,31 @@ abstract class BasePluginTest {
   val settingsScriptPath: Path
     get() = path("settings.gradle")
 
-  val outputShadowJar: Path
-    get() = path("build/libs/shadow-1.0-all.jar")
+  val outputShadowJar: JarPath
+    get() = jarPath("build/libs/shadow-1.0-all.jar")
 
-  val outputServerShadowJar: Path
-    get() = path("server/build/libs/server-1.0-all.jar")
+  val outputServerShadowJar: JarPath
+    get() = jarPath("server/build/libs/server-1.0-all.jar")
+
+  fun jarPath(path: String): JarPath {
+    val realPath = root.resolve(path).also {
+      check(it.exists()) { "Path not found: $it" }
+      check(it.isRegularFile()) { "Path is not a regular file: $it" }
+    }
+    return JarPath(realPath)
+  }
 
   fun path(path: String): Path {
     return root.resolve(path).also {
-      val extension = it.extension
-      // Binary files should not be created, text files should be created.
-      if (it.exists() || extension == "jar" || extension == "zip") return@also
-
+      if (it.exists()) return@also
       it.parent.createDirectories()
+      // We should create text file only if it doesn't exist.
       it.createFile()
     }
   }
 
   fun repo(path: String = "maven-repo"): AppendableMavenFileRepository {
     return AppendableMavenFileRepository(root.resolve(path))
-  }
-
-  fun assertContains(jarPath: Path, paths: List<String>) {
-    JarFile(jarPath.toFile()).use { jar ->
-      paths.forEach { path ->
-        assert(jar.getJarEntry(path) != null) { "Jar file $jarPath does not contain entry $path" }
-      }
-    }
-  }
-
-  fun assertDoesNotContain(jarPath: Path, paths: List<String>) {
-    JarFile(jarPath.toFile()).use { jar ->
-      paths.forEach { path ->
-        assert(jar.getJarEntry(path) == null) { "Jar file $jarPath contains entry $path" }
-      }
-    }
   }
 
   private val runner: GradleRunner
@@ -327,6 +318,12 @@ abstract class BasePluginTest {
     val runShadow = """
       tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
+
+    fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
+
+    fun fromJar(vararg paths: Path): String {
+      return paths.joinToString(System.lineSeparator()) { "from('${it.toUri().toURL().path}')" }
+    }
 
     fun BuildResult.assertNoDeprecationWarnings() = apply {
       output.lines().forEach {

@@ -2,12 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import java.net.URLClassLoader
-import java.util.jar.JarFile
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -28,26 +28,23 @@ class RelocationTest : BasePluginTest() {
     )
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf(
-        "META-INF/MANIFEST.MF",
-        "shadow/junit/textui/ResultPrinter.class",
-        "shadow/junit/textui/TestRunner.class",
-        "shadow/junit/framework/Assert.class",
-        "shadow/junit/framework/AssertionFailedError.class",
-        "shadow/junit/framework/ComparisonCompactor.class",
-        "shadow/junit/framework/ComparisonFailure.class",
-        "shadow/junit/framework/Protectable.class",
-        "shadow/junit/framework/Test.class",
-        "shadow/junit/framework/TestCase.class",
-        "shadow/junit/framework/TestFailure.class",
-        "shadow/junit/framework/TestListener.class",
-        "shadow/junit/framework/TestResult$1.class",
-        "shadow/junit/framework/TestResult.class",
-        "shadow/junit/framework/TestSuite$1.class",
-        "shadow/junit/framework/TestSuite.class",
-      ),
+    assertThat(outputShadowJar).containsEntries(
+      "META-INF/MANIFEST.MF",
+      "shadow/junit/textui/ResultPrinter.class",
+      "shadow/junit/textui/TestRunner.class",
+      "shadow/junit/framework/Assert.class",
+      "shadow/junit/framework/AssertionFailedError.class",
+      "shadow/junit/framework/ComparisonCompactor.class",
+      "shadow/junit/framework/ComparisonFailure.class",
+      "shadow/junit/framework/Protectable.class",
+      "shadow/junit/framework/Test.class",
+      "shadow/junit/framework/TestCase.class",
+      "shadow/junit/framework/TestFailure.class",
+      "shadow/junit/framework/TestListener.class",
+      "shadow/junit/framework/TestResult$1.class",
+      "shadow/junit/framework/TestResult.class",
+      "shadow/junit/framework/TestSuite$1.class",
+      "shadow/junit/framework/TestSuite.class",
     )
   }
 
@@ -73,51 +70,44 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf(
-        "META-INF/MANIFEST.MF",
-        "a/ResultPrinter.class",
-        "a/TestRunner.class",
-        "b/Assert.class",
-        "b/AssertionFailedError.class",
-        "b/ComparisonCompactor.class",
-        "b/ComparisonFailure.class",
-        "b/Protectable.class",
-        "b/Test.class",
-        "b/TestCase.class",
-        "b/TestFailure.class",
-        "b/TestListener.class",
-        "b/TestResult\$1.class",
-        "b/TestResult.class",
-        "b/TestSuite\$1.class",
-        "b/TestSuite.class",
-      ),
+    assertThat(outputShadowJar).containsEntries(
+      "META-INF/MANIFEST.MF",
+      "a/ResultPrinter.class",
+      "a/TestRunner.class",
+      "b/Assert.class",
+      "b/AssertionFailedError.class",
+      "b/ComparisonCompactor.class",
+      "b/ComparisonFailure.class",
+      "b/Protectable.class",
+      "b/Test.class",
+      "b/TestCase.class",
+      "b/TestFailure.class",
+      "b/TestListener.class",
+      "b/TestResult\$1.class",
+      "b/TestResult.class",
+      "b/TestSuite\$1.class",
+      "b/TestSuite.class",
     )
 
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf(
-        "junit/textui/ResultPrinter.class",
-        "junit/textui/TestRunner.class",
-        "junit/framework/Assert.class",
-        "junit/framework/AssertionFailedError.class",
-        "junit/framework/ComparisonCompactor.class",
-        "junit/framework/ComparisonFailure.class",
-        "junit/framework/Protectable.class",
-        "junit/framework/Test.class",
-        "junit/framework/TestCase.class",
-        "junit/framework/TestFailure.class",
-        "junit/framework/TestListener.class",
-        "junit/framework/TestResult\$1.class",
-        "junit/framework/TestResult.class",
-        "junit/framework/TestSuite\$1.class",
-        "junit/framework/TestSuite.class",
-      ),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "junit/textui/ResultPrinter.class",
+      "junit/textui/TestRunner.class",
+      "junit/framework/Assert.class",
+      "junit/framework/AssertionFailedError.class",
+      "junit/framework/ComparisonCompactor.class",
+      "junit/framework/ComparisonFailure.class",
+      "junit/framework/Protectable.class",
+      "junit/framework/Test.class",
+      "junit/framework/TestCase.class",
+      "junit/framework/TestFailure.class",
+      "junit/framework/TestListener.class",
+      "junit/framework/TestResult\$1.class",
+      "junit/framework/TestResult.class",
+      "junit/framework/TestSuite\$1.class",
+      "junit/framework/TestSuite.class",
     )
-
-    val jarFile = JarFile(outputShadowJar.toFile())
-    assertThat(jarFile.manifest.mainAttributes.getValue("TEST-VALUE")).isEqualTo("FOO")
+    assertThat(outputShadowJar.manifest.mainAttributes.getValue("TEST-VALUE"))
+      .isEqualTo("FOO")
   }
 
   @Test
@@ -140,37 +130,31 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf(
-        "a/ResultPrinter.class",
-        "b/Test.class",
-        "b/TestCase.class",
-        "b/TestFailure.class",
-        "b/TestListener.class",
-        "b/TestResult\$1.class",
-        "b/TestResult.class",
-        "b/TestSuite\$1.class",
-        "b/TestSuite.class",
-        "junit/textui/TestRunner.class",
-        "junit/framework/Assert.class",
-        "junit/framework/AssertionFailedError.class",
-        "junit/framework/ComparisonCompactor.class",
-        "junit/framework/ComparisonFailure.class",
-        "junit/framework/Protectable.class",
-      ),
+    assertThat(outputShadowJar).containsEntries(
+      "a/ResultPrinter.class",
+      "b/Test.class",
+      "b/TestCase.class",
+      "b/TestFailure.class",
+      "b/TestListener.class",
+      "b/TestResult\$1.class",
+      "b/TestResult.class",
+      "b/TestSuite\$1.class",
+      "b/TestSuite.class",
+      "junit/textui/TestRunner.class",
+      "junit/framework/Assert.class",
+      "junit/framework/AssertionFailedError.class",
+      "junit/framework/ComparisonCompactor.class",
+      "junit/framework/ComparisonFailure.class",
+      "junit/framework/Protectable.class",
     )
 
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf(
-        "a/TestRunner.class",
-        "b/Assert.class",
-        "b/AssertionFailedError.class",
-        "b/ComparisonCompactor.class",
-        "b/ComparisonFailure.class",
-        "b/Protectable.class",
-      ),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "a/TestRunner.class",
+      "b/Assert.class",
+      "b/AssertionFailedError.class",
+      "b/ComparisonCompactor.class",
+      "b/ComparisonFailure.class",
+      "b/Protectable.class",
     )
   }
 
@@ -207,21 +191,15 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf(
-        "shadow/ShadowTest.class",
-        "shadow/junit/Test.class",
-        "shadow/junit",
-      ),
+    assertThat(outputShadowJar).containsEntries(
+      "shadow/ShadowTest.class",
+      "shadow/junit/Test.class",
+      "shadow/junit",
     )
 
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf(
-        "junit/framework",
-        "junit/framework/Test.class",
-      ),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "junit/framework",
+      "junit/framework/Test.class",
     )
 
     val classLoader = URLClassLoader(
@@ -293,19 +271,14 @@ class RelocationTest : BasePluginTest() {
 
     run(":app:$shadowJarTask")
 
-    val appOutput = path("app/build/libs/app-all.jar")
-    assertThat(appOutput).exists()
-
-    assertContains(
-      appOutput,
-      listOf(
-        "TEST",
-        "APP-TEST",
-        "test.properties",
-        "app/core/Core.class",
-        "app/App.class",
-        "app/junit/framework/Test.class",
-      ),
+    val appOutput = jarPath("app/build/libs/app-all.jar")
+    assertThat(appOutput).containsEntries(
+      "TEST",
+      "APP-TEST",
+      "test.properties",
+      "app/core/Core.class",
+      "app/App.class",
+      "app/junit/framework/Test.class",
     )
   }
 
@@ -340,21 +313,15 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertContains(
-      outputShadowJar,
-      listOf(
-        "bar/Foo.class",
-        "bar/foo.properties",
-        "bar/dep.properties",
-      ),
+    assertThat(outputShadowJar).containsEntries(
+      "bar/Foo.class",
+      "bar/foo.properties",
+      "bar/dep.properties",
     )
-    assertDoesNotContain(
-      outputShadowJar,
-      listOf(
-        "foo/Foo.class",
-        "foo/foo.properties",
-        "foo/dep.properties",
-      ),
+    assertThat(outputShadowJar).doesNotContainEntries(
+      "foo/Foo.class",
+      "foo/foo.properties",
+      "foo/dep.properties",
     )
   }
 
