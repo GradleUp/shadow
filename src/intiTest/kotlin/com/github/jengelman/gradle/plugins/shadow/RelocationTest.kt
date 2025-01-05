@@ -140,6 +140,12 @@ class RelocationTest : BasePluginTest() {
       "b/TestResult.class",
       "b/TestSuite\$1.class",
       "b/TestSuite.class",
+      "junit/textui/TestRunner.class",
+      "junit/framework/Assert.class",
+      "junit/framework/AssertionFailedError.class",
+      "junit/framework/ComparisonCompactor.class",
+      "junit/framework/ComparisonFailure.class",
+      "junit/framework/Protectable.class",
     )
 
     assertThat(outputShadowJar).doesNotContainEntries(
@@ -149,15 +155,6 @@ class RelocationTest : BasePluginTest() {
       "b/ComparisonCompactor.class",
       "b/ComparisonFailure.class",
       "b/Protectable.class",
-    )
-
-    assertThat(outputShadowJar).containsEntries(
-      "junit/textui/TestRunner.class",
-      "junit/framework/Assert.class",
-      "junit/framework/AssertionFailedError.class",
-      "junit/framework/ComparisonCompactor.class",
-      "junit/framework/ComparisonFailure.class",
-      "junit/framework/Protectable.class",
     )
   }
 
