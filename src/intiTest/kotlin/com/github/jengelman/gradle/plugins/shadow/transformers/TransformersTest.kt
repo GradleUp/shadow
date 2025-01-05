@@ -155,7 +155,7 @@ class TransformersTest : BaseTransformerTest() {
 
   @ParameterizedTest
   @MethodSource("transformerConfigurations")
-  fun transformerShouldNotHaveDeprecatedBehaviours(pair: Pair<String, KClass<*>>) {
+  fun otherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
     if (configuration.contains("test/some.file")) {
       path("test/some.file").writeText("some content")
