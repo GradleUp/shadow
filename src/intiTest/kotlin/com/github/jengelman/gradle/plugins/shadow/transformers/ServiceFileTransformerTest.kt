@@ -38,7 +38,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       transform<ServiceFileTransformer>(
         shadowJarBlock = fromJar(one, two),
         transformerBlock = """
-          path = "META-INF/foo"
+          path = 'META-INF/foo'
         """.trimIndent(),
       ),
     )
@@ -55,7 +55,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         $shadowJar {
           ${fromJar(buildJarOne(), buildJarTwo())}
           mergeServiceFiles {
-            exclude("META-INF/services/com.acme.*")
+            exclude 'META-INF/services/com.acme.*'
           }
         }
       """.trimIndent(),
@@ -72,7 +72,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val one = buildJarOne {
       insert(
         "META-INF/services/java.sql.Driver",
-        "oracle.jdbc.OracleDriver\norg.apache.hive.jdbc.HiveDriver",
+        """
+          oracle.jdbc.OracleDriver
+          org.apache.hive.jdbc.HiveDriver
+        """.trimIndent(),
       )
       insert(
         "META-INF/services/org.apache.axis.components.compiler.Compiler",
@@ -86,13 +89,19 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo {
       insert(
         "META-INF/services/java.sql.Driver",
-        "org.apache.derby.jdbc.AutoloadedDriver\ncom.mysql.jdbc.Driver",
+        """
+          org.apache.derby.jdbc.AutoloadedDriver
+          com.mysql.jdbc.Driver
+        """.trimIndent(),
       )
       insert(
         "META-INF/services/org.apache.axis.components.compiler.Compiler",
         "org.apache.axis.components.compiler.Jikes",
       )
-      insert("META-INF/services/org.apache.commons.logging.LogFactory", "org.mortbay.log.Factory")
+      insert(
+        "META-INF/services/org.apache.commons.logging.LogFactory",
+        "org.mortbay.log.Factory",
+      )
     }
 
     projectScriptPath.appendText(
@@ -101,8 +110,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           ${fromJar(one, two)}
           mergeServiceFiles()
           relocate("org.apache", "myapache") {
-            exclude("org.apache.axis.components.compiler.Jikes")
-            exclude("org.apache.commons.logging.LogFactory")
+            exclude 'org.apache.axis.components.compiler.Jikes'
+            exclude 'org.apache.commons.logging.LogFactory'
           }
         }
       """.trimIndent(),
@@ -176,8 +185,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation("shadow:two:1.0")
-          implementation(files('$one'))
+          implementation 'shadow:two:1.0'
+          implementation files('$one')
         }
         $shadowJar {
           mergeServiceFiles()

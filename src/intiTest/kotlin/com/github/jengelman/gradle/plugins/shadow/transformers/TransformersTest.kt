@@ -41,22 +41,7 @@ class TransformersTest : BaseTransformerTest() {
   fun manifestTransformed() {
     writeMainClass()
 
-    projectScriptPath.appendText(
-      """
-        jar {
-          manifest {
-            attributes 'Main-Class': 'shadow.Main'
-            attributes 'Test-Entry': 'FAILED'
-          }
-        }
-        $shadowJar {
-          manifest {
-            attributes 'Test-Entry': 'PASSED'
-            attributes 'New-Entry': 'NEW'
-          }
-        }
-      """.trimIndent(),
-    )
+    projectScriptPath.appendText(MANIFEST_ATTRS)
 
     run(shadowJarTask)
 
@@ -70,34 +55,26 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun appendXmlFiles() {
     val propertiesXml = "properties.xml"
+    val xmlContent = """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+      <properties version="1.0">
+        <entry key="%s">%s</entry>
+      </properties>
+    """.trimIndent()
+
     val xml1 = buildJar("xml1.jar") {
-      insert(
-        propertiesXml,
-        """
-        <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-        <properties version="1.0">
-          <entry key="key1">val1</entry>
-        </properties>
-        """.trimIndent(),
-      )
+      insert(propertiesXml, xmlContent.format("key1", "val1"))
     }
     val xml2 = buildJar("xml2.jar") {
-      insert(
-        propertiesXml,
-        """
-        <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-        <properties version="1.0">
-          <entry key="key2">val2</entry>
-        </properties>
-        """.trimIndent(),
-      )
+      insert(propertiesXml, xmlContent.format("key2", "val2"))
     }
 
     projectScriptPath.appendText(
       transform<XmlAppendingTransformer>(
         shadowJarBlock = fromJar(xml1, xml2),
         transformerBlock = """
-          resource = "properties.xml"
+          resource = 'properties.xml'
         """.trimIndent(),
       ),
     )
@@ -120,22 +97,7 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun shadowManifestLeaksToJarManifest() {
     writeMainClass()
-    projectScriptPath.appendText(
-      """
-        jar {
-          manifest {
-            attributes 'Main-Class': 'shadow.Main'
-            attributes 'Test-Entry': 'FAILED'
-          }
-        }
-        $shadowJar {
-          manifest {
-            attributes 'Test-Entry': 'PASSED'
-            attributes 'New-Entry': 'NEW'
-          }
-        }
-      """.trimIndent(),
-    )
+    projectScriptPath.appendText(MANIFEST_ATTRS)
 
     run("jar", shadowJarTask)
 
@@ -145,8 +107,7 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(mf1.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
     assertThat(mf1.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
 
-    val outputJar = jarPath("build/libs/shadow-1.0.jar")
-    val mf2 = outputJar.manifest
+    val mf2 = jarPath("build/libs/shadow-1.0.jar").manifest
     assertThat(mf2).isNotNull()
     assertThat(mf2.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
     assertThat(mf2.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
@@ -174,6 +135,21 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   private companion object {
+    val MANIFEST_ATTRS = """
+        jar {
+          manifest {
+            attributes 'Main-Class': 'shadow.Main'
+            attributes 'Test-Entry': 'FAILED'
+          }
+        }
+        $shadowJar {
+          manifest {
+            attributes 'New-Entry': 'NEW'
+            attributes 'Test-Entry': 'PASSED'
+          }
+        }
+    """.trimIndent()
+
     @JvmStatic
     fun transformerConfigurations() = listOf(
       "" to ApacheLicenseResourceTransformer::class,

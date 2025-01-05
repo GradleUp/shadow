@@ -52,8 +52,6 @@ sealed class BaseTransformerTest : BasePluginTest() {
     const val ENTRY_SERVICES_SHADE = "META-INF/services/org.apache.maven.Shade"
     const val ENTRY_SERVICES_FOO = "META-INF/services/com.acme.Foo"
     const val ENTRY_FOO_SHADE = "META-INF/foo/org.apache.maven.Shade"
-    const val ENTRY_SERVICE_EXTENSION_MODULE = "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-    const val ENTRY_GROOVY_EXTENSION_MODULE = "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
 
     inline fun <reified T : Transformer> transform(
       shadowJarBlock: String = "",
