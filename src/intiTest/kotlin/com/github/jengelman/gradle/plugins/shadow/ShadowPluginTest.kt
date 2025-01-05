@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
@@ -69,6 +70,8 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask) {
       it.withGradleVersion("8.3")
     }
+
+    assertThat(outputShadowJar.entries().toList()).isNotEmpty()
   }
 
   @Test
@@ -94,6 +97,8 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     run(shadowJarTask)
+
+    assertThat(outputShadowJar.entries().toList()).isNotEmpty()
   }
 
   @Test
@@ -510,8 +515,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val attributes = outputShadowJar.manifest.mainAttributes
-    assertThat(attributes.getValue("Class-Path")).isNull()
+    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path")).isNull()
   }
 
   @Issue(
@@ -534,8 +538,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val attributes = outputShadowJar.manifest.mainAttributes
-    assertThat(attributes.getValue("Class-Path")).isEqualTo("/libs/a.jar junit-3.8.2.jar")
+    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path"))
+      .isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
   @Issue(
@@ -575,6 +579,8 @@ class ShadowPluginTest : BasePluginTest() {
     )
 
     run(shadowJarTask)
+
+    assertThat(outputShadowJar.entries().toList()).isNotEmpty()
   }
 
   /**

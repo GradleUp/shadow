@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
+import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
@@ -47,6 +48,7 @@ class ApplicationTest : BasePluginTest() {
       .isEqualTo("myapp.Main")
 
     path("build/install/myapp-shadow/bin/myapp").let { startScript ->
+      assertThat(startScript).exists()
       assertThat(startScript.readText()).contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
       assertThat(startScript.readText()).contains("-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
       assertThat(startScript.readText()).contains("exec \"\$JAVACMD\" \"\$@\"")
@@ -66,6 +68,8 @@ class ApplicationTest : BasePluginTest() {
     run("shadowDistZip")
 
     val zip = path("build/distributions/myapp-shadow-1.0.zip")
+    assertThat(zip).exists()
+
     val entries = ZipFile(zip.toFile()).entries.toList().map { it.name }
     assertThat(entries).containsAtLeast(
       "myapp-shadow-1.0/lib/myapp-1.0-all.jar",

@@ -27,15 +27,15 @@ class JarPath(val path: Path) :
   }
 }
 
-fun Assert<JarPath>.containsEntries(entries: Iterable<String>) = transform {
+fun Assert<JarPath>.containsEntries(entries: Iterable<String>) = transform { actual ->
   entries.forEach { entry ->
-    it.getEntry(entry) ?: fail("Jar file ${it.path} does not contain entry $entry")
+    actual.getEntry(entry) ?: fail("Jar file ${actual.path} does not contain entry $entry")
   }
 }
 
-fun Assert<JarPath>.doesNotContainEntries(entries: Iterable<String>) = transform {
+fun Assert<JarPath>.doesNotContainEntries(entries: Iterable<String>) = transform { actual ->
   entries.forEach { entry ->
-    it.getEntry(entry) ?: return@forEach
-    fail("Jar file ${it.path} contains entry $entry")
+    actual.getEntry(entry) ?: return@forEach
+    fail("Jar file ${actual.path} contains entry $entry")
   }
 }

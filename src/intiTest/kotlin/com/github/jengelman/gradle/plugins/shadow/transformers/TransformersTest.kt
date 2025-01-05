@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -34,8 +35,8 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getContent(ENTRY_TEST_PROPERTIES)
-    assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_TEST_PROPERTIES).trimIndent())
+      .isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Test
@@ -57,8 +58,8 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getContent(ENTRY_TEST_PROPERTIES)
-    assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_TEST_PROPERTIES).trimIndent())
+      .isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Test
@@ -150,8 +151,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getContent(propertiesXml)
-    assertThat(text.trimIndent()).isEqualTo(
+    assertThat(outputShadowJar.getContent(propertiesXml).trimIndent()).isEqualTo(
       """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
@@ -343,6 +343,8 @@ class TransformersTest : BaseTransformerTest() {
     )
 
     run(shadowJarTask)
+
+    assertThat(outputShadowJar.entries().toList()).isNotEmpty()
   }
 
   private companion object {

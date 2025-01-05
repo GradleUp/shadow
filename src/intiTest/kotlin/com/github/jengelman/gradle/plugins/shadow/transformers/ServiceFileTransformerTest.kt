@@ -22,11 +22,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text1 = outputShadowJar.getContent(ENTRY_SERVICES_SHADE)
-    assertThat(text1).isEqualTo(CONTENT_ONE_TWO)
-
-    val text2 = outputShadowJar.getContent(ENTRY_SERVICES_FOO)
-    assertThat(text2).isEqualTo("one")
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_SHADE)).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_FOO)).isEqualTo("one")
   }
 
   @Test
@@ -48,8 +45,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getContent(ENTRY_FOO_SHADE)
-    assertThat(text).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_FOO_SHADE)).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Test
@@ -67,11 +63,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text1 = outputShadowJar.getContent(ENTRY_SERVICES_SHADE)
-    assertThat(text1).isEqualTo(CONTENT_ONE_TWO)
-
-    val text2 = outputShadowJar.getContent(ENTRY_SERVICES_FOO)
-    assertThat(text2).isEqualTo("one")
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_SHADE)).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_FOO)).isEqualTo("one")
   }
 
   @Test
@@ -163,8 +156,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getContent(ENTRY_FOO_SHADE)
-    assertThat(text).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(ENTRY_FOO_SHADE)).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Issue(
@@ -196,7 +188,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getContent(servicesShadowEntry)
-    assertThat(text).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
+    assertThat(outputShadowJar.getContent(servicesShadowEntry))
+      .isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
   }
 }
