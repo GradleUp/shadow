@@ -1,9 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.util.Properties
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -88,22 +86,16 @@ public open class GroovyExtensionModuleTransformer : Transformer {
     os.closeEntry()
   }
 
-  private companion object {
-    private fun Properties.inputStream(): InputStream {
-      val os = ByteArrayOutputStream()
-      store(os, null)
-      return ByteArrayInputStream(os.toByteArray())
-    }
-
-    private const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+  public companion object {
+    public const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH: String =
       "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-    private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
+    public const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH: String =
       "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
-    private const val MODULE_NAME_KEY = "moduleName"
-    private const val MODULE_VERSION_KEY = "moduleVersion"
-    private const val EXTENSION_CLASSES_KEY = "extensionClasses"
-    private const val STATIC_EXTENSION_CLASSES_KEY = "staticExtensionClasses"
-    private const val MERGED_MODULE_NAME = "MergedByShadowJar"
-    private const val MERGED_MODULE_VERSION = "1.0.0"
+    public const val MODULE_NAME_KEY: String = "moduleName"
+    public const val MODULE_VERSION_KEY: String = "moduleVersion"
+    public const val EXTENSION_CLASSES_KEY: String = "extensionClasses"
+    public const val STATIC_EXTENSION_CLASSES_KEY: String = "staticExtensionClasses"
+    public const val MERGED_MODULE_NAME: String = "MergedByShadowJar"
+    public const val MERGED_MODULE_VERSION: String = "1.0.0"
   }
 }
