@@ -34,7 +34,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getEntryContent(ENTRY_TEST_PROPERTIES)
+    val text = outputShadowJar.getContent(ENTRY_TEST_PROPERTIES)
     assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
   }
 
@@ -57,7 +57,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getEntryContent(ENTRY_TEST_PROPERTIES)
+    val text = outputShadowJar.getContent(ENTRY_TEST_PROPERTIES)
     assertThat(text.trimIndent()).isEqualTo(CONTENT_ONE_TWO)
   }
 
@@ -150,7 +150,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text = outputShadowJar.getEntryContent(propertiesXml)
+    val text = outputShadowJar.getContent(propertiesXml)
     assertThat(text.trimIndent()).isEqualTo(
       """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -232,7 +232,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val props = outputShadowJar.getEntryContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
+    val props = outputShadowJar.getContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
     assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
     assertThat(props.getProperty("extensionClasses"))
@@ -273,7 +273,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val props = outputShadowJar.getEntryContent(ENTRY_GROOVY_EXTENSION_MODULE).toProperties()
+    val props = outputShadowJar.getContent(ENTRY_GROOVY_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
     assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
     assertThat(props.getProperty("extensionClasses"))
@@ -318,7 +318,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val props = outputShadowJar.getEntryContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
+    val props = outputShadowJar.getContent(ENTRY_SERVICE_EXTENSION_MODULE).toProperties()
     assertThat(props.getProperty("moduleName")).isEqualTo("MergedByShadowJar")
     assertThat(props.getProperty("moduleVersion")).isEqualTo("1.0.0")
     assertThat(props.getProperty("extensionClasses"))

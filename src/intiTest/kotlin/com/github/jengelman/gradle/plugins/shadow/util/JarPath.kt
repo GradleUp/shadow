@@ -21,7 +21,7 @@ class JarPath(val path: Path) :
     path.deleteExisting()
   }
 
-  fun getEntryContent(entryName: String): String {
+  fun getContent(entryName: String): String {
     val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
     return getInputStream(entry).bufferedReader().readText()
   }
