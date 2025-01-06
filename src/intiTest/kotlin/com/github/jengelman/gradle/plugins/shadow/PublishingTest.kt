@@ -43,40 +43,23 @@ class PublishingTest : BasePluginTest() {
     publishArtifactB()
 
     settingsScriptPath.appendText("rootProject.name = 'maven'" + System.lineSeparator())
-    projectScriptPath.appendText(
-      """
-        apply plugin: 'maven-publish'
-
-        dependencies {
-          implementation 'shadow:a:1.0'
-          shadow 'shadow:b:1.0'
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
   }
 
   @Test
   fun publishShadowJarWithMavenPublishPlugin() {
     projectScriptPath.appendText(
-      """
-        $shadowJar {
+      publishConfiguration(
+        shadowBlock = """
           archiveClassifier = ''
           archiveBaseName = 'maven-all'
-        }
-        publishing {
-          publications {
-            shadow(MavenPublication) {
-              from components.shadow
-              artifactId = 'maven-all'
-            }
+        """.trimIndent(),
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            from components.shadow
+            artifactId = 'maven-all'
           }
-          repositories {
-            maven {
-              url = "${publishingRepo.uri}"
-            }
-          }
-        }
-      """.trimIndent(),
+        """.trimIndent(),
+      ),
     )
 
     publish()
@@ -87,40 +70,25 @@ class PublishingTest : BasePluginTest() {
       "a2.properties",
     )
 
-    val contents = pomReader.read(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-    assertThat(contents.dependencies.size).isEqualTo(1)
-
-    val dependency = contents.dependencies[0]
-    assertThat(dependency.groupId).isEqualTo("shadow")
-    assertThat(dependency.artifactId).isEqualTo("b")
-    assertThat(dependency.version).isEqualTo("1.0")
+    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
   }
 
   @Test
   fun publishShadowJarWithCustomClassifierAndExtension() {
     projectScriptPath.appendText(
-      """
-        apply plugin: 'maven-publish'
-
-        publishing {
-          publications {
-            shadow(MavenPublication) { publication ->
-              project.shadow.component(publication)
-              artifactId = 'maven-all'
-            }
-          }
-          repositories {
-            maven {
-              url = "${publishingRepo.uri}"
-            }
-          }
-        }
-        $shadowJar {
+      publishConfiguration(
+        shadowBlock = """
           archiveClassifier = 'my-classifier'
           archiveExtension = 'my-ext'
           archiveBaseName = 'maven-all'
-        }
-      """.trimIndent(),
+        """.trimIndent(),
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            from components.shadow
+            artifactId = 'maven-all'
+          }
+        """.trimIndent(),
+      ),
     )
 
     publish()
@@ -144,46 +112,36 @@ class PublishingTest : BasePluginTest() {
         subprojects {
           apply plugin: 'java'
           apply plugin: 'maven-publish'
-
-          version = "1.0"
+          version = '1.0'
           group = 'shadow'
-
-          publishing {
-            repositories {
-              maven {
-                url = "${publishingRepo.uri}"
-              }
-            }
-          }
         }
       """.trimIndent(),
     )
 
-    path("a/src/main/resources/a.properties").writeText("a")
-    path("a/src/main/resources/a2.properties").writeText("a2")
-    path("b/src/main/resources/b.properties").writeText("b")
+    path("a/src/main/resources/aa.properties").writeText("aa")
+    path("a/src/main/resources/aa2.properties").writeText("aa2")
+    path("b/src/main/resources/bb.properties").writeText("bb")
 
+    val publishBlock = publishConfiguration(
+      dependenciesBlock = """
+        implementation project(':a')
+        shadow project(':b')
+      """.trimIndent(),
+      shadowBlock = """
+        archiveClassifier = ''
+        archiveBaseName = 'maven-all'
+      """.trimIndent(),
+      publicationsBlock = """
+        shadow(MavenPublication) {
+          from components.shadow
+          artifactId = 'maven-all'
+        }
+      """.trimIndent(),
+    )
     path("c/build.gradle").writeText(
       """
-        plugins {
-          id 'com.gradleup.shadow'
-        }
-        dependencies {
-          implementation project(':a')
-          shadow project(':b')
-        }
-        $shadowJar {
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
-        }
-        publishing {
-          publications {
-            shadow(MavenPublication) {
-              from components.shadow
-              artifactId = 'maven-all'
-            }
-          }
-        }
+        ${getDefaultProjectBuildScript(withGroup = true, withVersion = true)}
+        $publishBlock
       """.trimIndent(),
     )
 
@@ -191,117 +149,92 @@ class PublishingTest : BasePluginTest() {
 
     val publishedJar = repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar")
     assertThat(publishedJar).containsEntries(
+      "aa.properties",
+      "aa2.properties",
+    )
+    assertThat(publishedJar).doesNotContainEntries(
       "a.properties",
       "a2.properties",
     )
 
-    val contents = pomReader.read(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-    assertThat(contents.dependencies.size).isEqualTo(1)
-
-    val dependency = contents.dependencies[0]
-    assertThat(dependency.groupId).isEqualTo("shadow")
-    assertThat(dependency.artifactId).isEqualTo("b")
-    assertThat(dependency.version).isEqualTo("1.0")
+    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
   }
 
   @Test
   fun publishShadowJarWithGradleMetadata() {
     projectScriptPath.appendText(
-      """
-        apply plugin: 'maven-publish'
-        dependencies {
+      publishConfiguration(
+        projectBlock = """
+          group = 'com.acme'
+          version = '1.0'
+        """.trimIndent(),
+        dependenciesBlock = """
           implementation 'shadow:a:1.0'
           implementation 'shadow:b:1.0'
           shadow 'shadow:b:1.0'
-        }
-        group = 'com.acme'
-        version = '1.0'
-        publishing {
-          publications {
-            java(MavenPublication) {
-              from components.java
-            }
-            shadow(MavenPublication) {
-              from components.shadow
-              artifactId = "maven-all"
-            }
+        """.trimIndent(),
+        publicationsBlock = """
+          java(MavenPublication) {
+            from components.java
           }
-          repositories {
-            maven {
-              url = "${publishingRepo.uri}"
-            }
+          shadow(MavenPublication) {
+            from components.shadow
+            artifactId = "maven-all"
           }
-        }
-      """.trimIndent(),
+        """.trimIndent(),
+      ),
     )
 
     publish()
 
-    val entries = arrayOf("a.properties", "a2.properties")
+    val entries = arrayOf("a.properties", "a2.properties", "b.properties")
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).doesNotContainEntries(*entries)
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).containsEntries(*entries)
 
-    val pomContents = pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom"))
-    assertThat(pomContents.dependencies.size).isEqualTo(2)
+    pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pomContents ->
+      assertThat(pomContents.dependencies.size).isEqualTo(2)
 
-    val dependency1 = pomContents.dependencies[0]
-    assertThat(dependency1.groupId).isEqualTo("shadow")
-    assertThat(dependency1.artifactId).isEqualTo("a")
-    assertThat(dependency1.version).isEqualTo("1.0")
+      val dependency1 = pomContents.dependencies[0]
+      assertThat(dependency1.groupId).isEqualTo("shadow")
+      assertThat(dependency1.artifactId).isEqualTo("a")
+      assertThat(dependency1.version).isEqualTo("1.0")
 
-    val dependency2 = pomContents.dependencies[1]
-    assertThat(dependency2.groupId).isEqualTo("shadow")
-    assertThat(dependency2.artifactId).isEqualTo("b")
-    assertThat(dependency2.version).isEqualTo("1.0")
+      val dependency2 = pomContents.dependencies[1]
+      assertThat(dependency2.groupId).isEqualTo("shadow")
+      assertThat(dependency2.artifactId).isEqualTo("b")
+      assertThat(dependency2.version).isEqualTo("1.0")
+    }
 
-    val gmmContents = gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module"))
-    assertThat(gmmContents.variants.size).isEqualTo(3)
-    assertThat(gmmContents.variants.map { it.name }.toSet()).containsOnly(
-      "apiElements",
-      "runtimeElements",
-      "shadowRuntimeElements",
-    )
+    gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmmContents ->
+      assertThat(gmmContents.variants.size).isEqualTo(3)
+      assertThat(gmmContents.variants.map { it.name }).containsOnly(
+        "apiElements",
+        "runtimeElements",
+        "shadowRuntimeElements",
+      )
 
-    val apiVariant = gmmContents.variants.single { it.name == "apiElements" }
-    assertThat(apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_API)
-    assertThat(apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
-    assertThat(apiVariant.dependencies).isEmpty()
+      val apiVariant = gmmContents.variants.single { it.name == "apiElements" }
+      assertThat(apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_API)
+      assertThat(apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
+      assertThat(apiVariant.dependencies).isEmpty()
 
-    val runtimeVariant = gmmContents.variants.single { it.name == "runtimeElements" }
-    assertThat(runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
-    assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
-    assertThat(runtimeVariant.dependencies.size).isEqualTo(2)
-    assertThat(runtimeVariant.dependencies.map { it.module }.toSet()).containsOnly(
-      "a",
-      "b",
-    )
+      val runtimeVariant = gmmContents.variants.single { it.name == "runtimeElements" }
+      assertThat(runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
+      assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
+      assertThat(runtimeVariant.dependencies.size).isEqualTo(2)
+      assertThat(runtimeVariant.dependencies.map { it.module }).containsOnly(
+        "a",
+        "b",
+      )
 
-    val shadowRuntimeVariant = gmmContents.variants.single { it.name == "shadowRuntimeElements" }
-    assertThat(shadowRuntimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
-    assertThat(shadowRuntimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
-    assertThat(shadowRuntimeVariant.dependencies.size).isEqualTo(1)
-    assertThat(shadowRuntimeVariant.dependencies[0].module).isEqualTo("b")
+      assertShadowVariantCommon(gmmContents.variants.single { it.name == "shadowRuntimeElements" })
+    }
+    assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
 
-    assertThat(repoJarPath("com/acme/maven-all/1.0/maven-all-1.0-all.jar")).containsEntries(
-      "a.properties",
-      "a2.properties",
-    )
-    val shadowPomContents = pomReader.read(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
-    assertThat(shadowPomContents.dependencies.size).isEqualTo(1)
-    val shadowDependency = shadowPomContents.dependencies[0]
-    assertThat(shadowDependency.groupId).isEqualTo("shadow")
-    assertThat(shadowDependency.artifactId).isEqualTo("b")
-    assertThat(shadowDependency.version).isEqualTo("1.0")
-
-    val shadowGmmContents = gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module"))
-    assertThat(shadowGmmContents.variants.size).isEqualTo(1)
-    assertThat(shadowGmmContents.variants.map { it.name }.toSet()).containsOnly("shadowRuntimeElements")
-
-    val shadowRuntimeVariant2 = shadowGmmContents.variants.single { it.name == "shadowRuntimeElements" }
-    assertThat(shadowRuntimeVariant2.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
-    assertThat(shadowRuntimeVariant2.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
-    assertThat(shadowRuntimeVariant2.dependencies.size).isEqualTo(1)
-    assertThat(shadowRuntimeVariant2.dependencies[0].module).isEqualTo("b")
+    gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmmContents ->
+      assertThat(gmmContents.variants.size).isEqualTo(1)
+      assertShadowVariantCommon(gmmContents.variants.single { it.name == "shadowRuntimeElements" })
+    }
   }
 
   private fun repoPath(path: String): Path {
@@ -316,6 +249,54 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun publish(): BuildResult = run("publish")
+
+  private fun publishConfiguration(
+    projectBlock: String = "",
+    dependenciesBlock: String = """
+      implementation 'shadow:a:1.0'
+      shadow 'shadow:b:1.0'
+    """.trimIndent(),
+    shadowBlock: String = "",
+    publicationsBlock: String = "",
+  ): String {
+    return """
+        apply plugin: 'maven-publish'
+        $projectBlock
+        dependencies {
+          $dependenciesBlock
+        }
+        $shadowJar {
+          $shadowBlock
+        }
+        publishing {
+          publications {
+            $publicationsBlock
+          }
+          repositories {
+            maven {
+              url = '${publishingRepo.uri}'
+            }
+          }
+        }
+    """.trimIndent()
+  }
+
+  private fun assertPomCommon(pomPath: Path) {
+    val contents = pomReader.read(pomPath)
+    assertThat(contents.dependencies.size).isEqualTo(1)
+
+    val dependency = contents.dependencies[0]
+    assertThat(dependency.groupId).isEqualTo("shadow")
+    assertThat(dependency.artifactId).isEqualTo("b")
+    assertThat(dependency.version).isEqualTo("1.0")
+  }
+
+  private fun assertShadowVariantCommon(variant: GradleModuleMetadata.Variant) {
+    assertThat(variant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
+    assertThat(variant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
+    assertThat(variant.dependencies.size).isEqualTo(1)
+    assertThat(variant.dependencies[0].module).isEqualTo("b")
+  }
 
   private companion object {
     fun MavenXpp3Reader.read(path: Path): Model = read(path.inputStream())
