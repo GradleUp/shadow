@@ -57,7 +57,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -66,7 +66,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
     }
@@ -88,7 +88,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -105,7 +105,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -114,7 +114,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -131,7 +131,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -140,7 +140,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
     }
@@ -163,7 +163,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -180,7 +180,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/bar.properties'
         ])
@@ -190,7 +190,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/bar.properties'
         ])
@@ -210,7 +210,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/baz.properties'
         ])
@@ -220,7 +220,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/baz.properties'
         ])
@@ -244,7 +244,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -261,7 +261,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/bar.xml'
         ])
@@ -271,7 +271,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/bar.xml'
         ])
@@ -291,7 +291,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/baz.xml'
         ])
@@ -301,7 +301,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class',
             'foo/baz.xml'
         ])
@@ -324,7 +324,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -339,7 +339,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
 
@@ -348,7 +348,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        containsEntries(outputShadowJar, [
+        assertContains(outputShadowJar, [
             'server/Server.class'
         ])
     }

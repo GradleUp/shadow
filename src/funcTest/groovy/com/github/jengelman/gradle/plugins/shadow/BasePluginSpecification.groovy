@@ -117,7 +117,7 @@ abstract class BasePluginSpecification extends Specification {
         return f
     }
 
-    void containsEntries(File f, List<String> paths) {
+    void assertContains(File f, List<String> paths) {
         JarFile jar = new JarFile(f)
         paths.each { path ->
             assert jar.getJarEntry(path), "${f.path} does not contain [$path]"
@@ -125,7 +125,7 @@ abstract class BasePluginSpecification extends Specification {
         jar.close()
     }
 
-    void doesNotContainEntries(File f, List<String> paths) {
+    void assertDoesNotContain(File f, List<String> paths) {
         JarFile jar = new JarFile(f)
         paths.each { path ->
             assert !jar.getJarEntry(path), "${f.path} contains [$path]"
