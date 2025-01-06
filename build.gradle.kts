@@ -2,8 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
-  alias(libs.plugins.kotlin.jvm)
-  alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.kotlin)
   alias(libs.plugins.android.lint)
   alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.spotless)
@@ -96,7 +95,8 @@ dependencies {
   intiTestImplementation(libs.apache.maven.repositoryMetadata)
   // TODO: this will be removed after we migrated all functional tests to Kotlin.
   intiTestImplementation(sourceSets.main.get().output)
-  intiTestImplementation(libs.kotlinx.serialization.json)
+  intiTestImplementation(libs.moshi)
+  intiTestImplementation(libs.moshi.kotlin)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)
