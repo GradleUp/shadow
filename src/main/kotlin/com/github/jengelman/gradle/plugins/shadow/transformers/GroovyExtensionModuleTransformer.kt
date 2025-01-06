@@ -36,12 +36,12 @@ public open class GroovyExtensionModuleTransformer : Transformer {
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
-    if (path == GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH) {
+    if (path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) {
       // Groovy 2.5+
       legacy = false
       return true
     }
-    return path == GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH
+    return path == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
   }
 
   override fun transform(context: TransformerContext) {
@@ -49,14 +49,14 @@ public open class GroovyExtensionModuleTransformer : Transformer {
     props.load(context.inputStream)
     props.forEach { key, value ->
       when (key as String) {
-        MODULE_NAME_KEY -> handle(key, value as String) {
+        KEY_MODULE_NAME -> handle(key, value as String) {
           module.setProperty(key, MERGED_MODULE_NAME)
         }
-        MODULE_VERSION_KEY -> handle(key, value as String) {
+        KEY_MODULE_VERSION -> handle(key, value as String) {
           module.setProperty(key, MERGED_MODULE_VERSION)
         }
-        EXTENSION_CLASSES_KEY,
-        STATIC_EXTENSION_CLASSES_KEY,
+        KEY_EXTENSION_CLASSES,
+        KEY_STATIC_EXTENSION_CLASSES,
         -> handle(key, value as String) { existingValue ->
           module.setProperty(key, "$existingValue,$value")
         }
@@ -76,7 +76,7 @@ public open class GroovyExtensionModuleTransformer : Transformer {
   override fun hasTransformedResource(): Boolean = module.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val name = if (legacy) GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH else GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH
+    val name = if (legacy) PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR else PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
     val entry = ZipEntry(name)
     entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
@@ -87,14 +87,16 @@ public open class GroovyExtensionModuleTransformer : Transformer {
   }
 
   public companion object {
-    public const val GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH: String =
+    public const val PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
       "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-    public const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH: String =
+    public const val PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
       "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
-    public const val MODULE_NAME_KEY: String = "moduleName"
-    public const val MODULE_VERSION_KEY: String = "moduleVersion"
-    public const val EXTENSION_CLASSES_KEY: String = "extensionClasses"
-    public const val STATIC_EXTENSION_CLASSES_KEY: String = "staticExtensionClasses"
+
+    public const val KEY_MODULE_NAME: String = "moduleName"
+    public const val KEY_MODULE_VERSION: String = "moduleVersion"
+    public const val KEY_EXTENSION_CLASSES: String = "extensionClasses"
+    public const val KEY_STATIC_EXTENSION_CLASSES: String = "staticExtensionClasses"
+
     public const val MERGED_MODULE_NAME: String = "MergedByShadowJar"
     public const val MERGED_MODULE_VERSION: String = "1.0.0"
   }
