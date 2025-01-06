@@ -1,11 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
@@ -53,26 +55,19 @@ class PublishingTest : BasePluginTest() {
           archiveClassifier = ''
           archiveBaseName = 'maven-all'
         """.trimIndent(),
-        publicationsBlock = """
-          shadow(MavenPublication) {
-            from components.shadow
-            artifactId = 'maven-all'
-          }
-        """.trimIndent(),
       ),
     )
 
     publish()
 
-    val publishedJar = repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar")
-    assertThat(publishedJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-    )
-
+    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/860",
+    "https://github.com/GradleUp/shadow/issues/945",
+  )
   @Test
   fun publishShadowJarWithCustomClassifierAndExtension() {
     projectScriptPath.appendText(
@@ -82,26 +77,17 @@ class PublishingTest : BasePluginTest() {
           archiveExtension = 'my-ext'
           archiveBaseName = 'maven-all'
         """.trimIndent(),
-        publicationsBlock = """
-          shadow(MavenPublication) {
-            from components.shadow
-            artifactId = 'maven-all'
-          }
-        """.trimIndent(),
       ),
     )
 
     publish()
 
-    val publishedJar = repoJarPath("shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext")
-    assertThat(publishedJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-    )
+    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext"))
+    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
   }
 
   @Test
-  fun publishMultiprojectShadowJarWithMavenPublishPlugin() {
+  fun publishMultiProjectShadowJarWithMavenPublishPlugin() {
     settingsScriptPath.appendText(
       """
         include 'a', 'b', 'c'
@@ -131,12 +117,6 @@ class PublishingTest : BasePluginTest() {
         archiveClassifier = ''
         archiveBaseName = 'maven-all'
       """.trimIndent(),
-      publicationsBlock = """
-        shadow(MavenPublication) {
-          from components.shadow
-          artifactId = 'maven-all'
-        }
-      """.trimIndent(),
     )
     path("c/build.gradle").writeText(
       """
@@ -155,6 +135,8 @@ class PublishingTest : BasePluginTest() {
     assertThat(publishedJar).doesNotContainEntries(
       "a.properties",
       "a2.properties",
+      "b.properties",
+      "bb.properties",
     )
 
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
@@ -193,16 +175,16 @@ class PublishingTest : BasePluginTest() {
 
     pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pomContents ->
       assertThat(pomContents.dependencies.size).isEqualTo(2)
-
-      val dependency1 = pomContents.dependencies[0]
-      assertThat(dependency1.groupId).isEqualTo("shadow")
-      assertThat(dependency1.artifactId).isEqualTo("a")
-      assertThat(dependency1.version).isEqualTo("1.0")
-
-      val dependency2 = pomContents.dependencies[1]
-      assertThat(dependency2.groupId).isEqualTo("shadow")
-      assertThat(dependency2.artifactId).isEqualTo("b")
-      assertThat(dependency2.version).isEqualTo("1.0")
+      pomContents.dependencies[0].let { dependency ->
+        assertThat(dependency.groupId).isEqualTo("shadow")
+        assertThat(dependency.artifactId).isEqualTo("a")
+        assertThat(dependency.version).isEqualTo("1.0")
+      }
+      pomContents.dependencies[1].let { dependency ->
+        assertThat(dependency.groupId).isEqualTo("shadow")
+        assertThat(dependency.artifactId).isEqualTo("b")
+        assertThat(dependency.version).isEqualTo("1.0")
+      }
     }
 
     gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmmContents ->
@@ -222,10 +204,7 @@ class PublishingTest : BasePluginTest() {
       assertThat(runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
       assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
       assertThat(runtimeVariant.dependencies.size).isEqualTo(2)
-      assertThat(runtimeVariant.dependencies.map { it.module }).containsOnly(
-        "a",
-        "b",
-      )
+      assertThat(runtimeVariant.dependencies.map { it.module }).containsOnly("a", "b")
 
       assertShadowVariantCommon(gmmContents.variants.single { it.name == "shadowRuntimeElements" })
     }
@@ -257,7 +236,12 @@ class PublishingTest : BasePluginTest() {
       shadow 'shadow:b:1.0'
     """.trimIndent(),
     shadowBlock: String = "",
-    publicationsBlock: String = "",
+    publicationsBlock: String = """
+      shadow(MavenPublication) {
+        from components.shadow
+        artifactId = 'maven-all'
+      }
+    """.trimIndent(),
   ): String {
     return """
         apply plugin: 'maven-publish'
@@ -295,7 +279,19 @@ class PublishingTest : BasePluginTest() {
     assertThat(variant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
     assertThat(variant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
     assertThat(variant.dependencies.size).isEqualTo(1)
-    assertThat(variant.dependencies[0].module).isEqualTo("b")
+    assertThat(variant.dependencies.map { it.module }).containsOnly("b")
+  }
+
+  private fun assertShadowJarCommon(jarPath: JarPath) {
+    assertThat(jarPath).all {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+      )
+      doesNotContainEntries(
+        "b.properties",
+      )
+    }
   }
 
   private companion object {
