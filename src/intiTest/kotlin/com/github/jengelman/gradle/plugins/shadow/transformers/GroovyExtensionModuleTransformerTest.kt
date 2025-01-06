@@ -2,14 +2,14 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.EXTENSION_CLASSES_KEY
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_EXTENSION_CLASSES
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_MODULE_NAME
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_MODULE_VERSION
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_STATIC_EXTENSION_CLASSES
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_VERSION
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MODULE_NAME_KEY
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MODULE_VERSION_KEY
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.STATIC_EXTENSION_CLASSES_KEY
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.appendText
@@ -26,7 +26,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val props = outputShadowJar.getContent(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH).toProperties()
+    val props = outputShadowJar.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties()
     commonAssertions(props)
   }
 
@@ -35,15 +35,15 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       transform<GroovyExtensionModuleTransformer>(
         shadowJarBlock = fromJar(
-          buildJarFoo(GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH),
-          buildJarBar(GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH),
+          buildJarFoo(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+          buildJarBar(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
         ),
       ),
     )
 
     run(shadowJarTask)
 
-    val props = outputShadowJar.getContent(GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH).toProperties()
+    val props = outputShadowJar.getContent(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties()
     commonAssertions(props)
   }
 
@@ -60,34 +60,34 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val props = outputShadowJar.getContent(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH).toProperties()
+    val props = outputShadowJar.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties()
     commonAssertions(props)
   }
 
   private fun buildJarFoo(
-    path: String = GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH,
+    path: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
   ): Path = buildJar("foo.jar") {
     insert(
       path,
       """
-        $MODULE_NAME_KEY=foo
-        $MODULE_VERSION_KEY=1.0.5
-        $EXTENSION_CLASSES_KEY=$EXTENSION_CLASSES_FOO
-        $STATIC_EXTENSION_CLASSES_KEY=$STATIC_EXTENSION_CLASSES_FOO
+        $KEY_MODULE_NAME=foo
+        $KEY_MODULE_VERSION=1.0.5
+        $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_FOO
+        $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_FOO
       """.trimIndent(),
     )
   }
 
   private fun buildJarBar(
-    path: String = GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH,
+    path: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
   ): Path = buildJar("bar.jar") {
     insert(
       path,
       """
-        $MODULE_NAME_KEY=bar
-        $MODULE_VERSION_KEY=2.3.5
-        $EXTENSION_CLASSES_KEY=$EXTENSION_CLASSES_BAR
-        $STATIC_EXTENSION_CLASSES_KEY=$STATIC_EXTENSION_CLASSES_BAR
+        $KEY_MODULE_NAME=bar
+        $KEY_MODULE_VERSION=2.3.5
+        $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_BAR
+        $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_BAR
       """.trimIndent(),
     )
   }
@@ -99,11 +99,11 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     const val STATIC_EXTENSION_CLASSES_BAR = "com.acme.bar.SomeStaticExtension"
 
     fun commonAssertions(properties: Properties) {
-      assertThat(properties.getProperty(MODULE_NAME_KEY)).isEqualTo(MERGED_MODULE_NAME)
-      assertThat(properties.getProperty(MODULE_VERSION_KEY)).isEqualTo(MERGED_MODULE_VERSION)
-      assertThat(properties.getProperty(EXTENSION_CLASSES_KEY))
+      assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
+      assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
+      assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
         .isEqualTo("$EXTENSION_CLASSES_FOO,$EXTENSION_CLASSES_BAR")
-      assertThat(properties.getProperty(STATIC_EXTENSION_CLASSES_KEY))
+      assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
         .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
     }
   }
