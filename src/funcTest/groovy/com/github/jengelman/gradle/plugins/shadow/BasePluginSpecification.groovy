@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import org.apache.commons.lang3.StringUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -17,13 +17,13 @@ abstract class BasePluginSpecification extends Specification {
     @TempDir
     Path root
 
-    AppendableMavenFileRepository repo
+    AppendableMavenRepository repo
 
     def setup() {
-        repo = new AppendableMavenFileRepository(root.resolve('maven-repo'))
-        repo.module('junit', 'junit', '3.8.2')
-            .use(Paths.get(this.class.classLoader.getResource('junit-3.8.2.jar').toURI()))
-            .publish()
+        repo = new AppendableMavenRepository(root.resolve('local-maven-repo'), runner)
+        repo.module('junit', 'junit', '3.8.2') { module ->
+            module.useJar(Paths.get(this.class.classLoader.getResource('junit-3.8.2.jar').toURI()))
+        }.publish()
 
         projectScriptFile << getDefaultProjectBuildScript('java', true, true)
         settingsScriptFile << getDefaultSettingsBuildScript()
@@ -57,7 +57,7 @@ abstract class BasePluginSpecification extends Specification {
         return """
             dependencyResolutionManagement {
               repositories {
-                maven { url = "${repo.uri}" }
+                maven { url = "${repo.repoDir.toUri()}" }
                 mavenCentral()
               }
             }

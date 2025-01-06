@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.nio.file.Path
 import java.util.Properties
@@ -30,16 +30,16 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
   private lateinit var root: Path
-  lateinit var repo: AppendableMavenFileRepository
+  lateinit var localRepo: AppendableMavenRepository
 
   @BeforeEach
   open fun setup() {
     root = createTempDirectory()
 
-    repo = repo()
-    repo.module("junit", "junit", "3.8.2")
-      .use(testJar)
-      .publish()
+    localRepo = repo()
+    localRepo.module("junit", "junit", "3.8.2") {
+      useJar(testJar)
+    }.publish()
 
     projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
     settingsScriptPath.writeText(getDefaultSettingsBuildScript())
@@ -81,7 +81,7 @@ abstract class BasePluginTest {
       $startBlock
       dependencyResolutionManagement {
         repositories {
-          maven { url = '${repo.uri}' }
+          maven { url = '${localRepo.repoDir.toUri()}' }
           mavenCentral()
         }
       }
@@ -90,27 +90,28 @@ abstract class BasePluginTest {
   }
 
   fun publishArtifactA() {
-    repo.module("shadow", "a", "1.0")
-      .insertFile("a.properties", "a")
-      .insertFile("a2.properties", "a2")
-      .publish()
+    localRepo.module("shadow", "a", "1.0") {
+      insertFile("a.properties", "a")
+      insertFile("a2.properties", "a2")
+    }.publish()
   }
 
   fun publishArtifactB() {
-    repo.module("shadow", "b", "1.0")
-      .insertFile("b.properties", "b")
-      .publish()
+    localRepo.module("shadow", "b", "1.0") {
+      insertFile("b.properties", "b")
+    }.publish()
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
-    repo.module("shadow", "c", "1.0")
-      .insertFile("c.properties", "c")
-      .apply { if (circular) dependsOn("d") }
-      .publish()
-    repo.module("shadow", "d", "1.0")
-      .insertFile("d.properties", "d")
-      .dependsOn("c")
-      .publish()
+    localRepo.module("shadow", "c", "1.0") {
+      insertFile("c.properties", "c")
+      if (circular) {
+        addDependency("shadow", "d", "1.0")
+      }
+    }.module("shadow", "d", "1.0") {
+      insertFile("d.properties", "d")
+      addDependency("shadow", "c", "1.0")
+    }.publish()
   }
 
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
@@ -146,8 +147,8 @@ abstract class BasePluginTest {
     }
   }
 
-  fun repo(path: String = "maven-repo"): AppendableMavenFileRepository {
-    return AppendableMavenFileRepository(root.resolve(path))
+  fun repo(path: String = "local-maven-repo"): AppendableMavenRepository {
+    return AppendableMavenRepository(root.resolve(path), runner)
   }
 
   private val runner: GradleRunner
@@ -160,12 +161,7 @@ abstract class BasePluginTest {
     }
 
   fun runner(arguments: Iterable<String>): GradleRunner {
-    val allArguments = listOf(
-      "--warning-mode=fail",
-      "--configuration-cache",
-      "--stacktrace",
-    ) + arguments
-    return runner.withArguments(allArguments)
+    return runner.withArguments(commonArguments + arguments)
   }
 
   inline fun run(
@@ -318,6 +314,12 @@ abstract class BasePluginTest {
     val runShadow = """
       tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
+
+    val commonArguments = listOf(
+      "--warning-mode=fail",
+      "--configuration-cache",
+      "--stacktrace",
+    )
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
