@@ -57,7 +57,7 @@ abstract class BasePluginSpecification extends Specification {
         return """
             dependencyResolutionManagement {
               repositories {
-                maven { url = "${repo.repoDir.toUri()}" }
+                maven { url = "${repo.root.toUri()}" }
                 mavenCentral()
               }
             }

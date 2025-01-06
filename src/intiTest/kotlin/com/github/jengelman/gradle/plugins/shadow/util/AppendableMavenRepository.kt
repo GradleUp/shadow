@@ -11,17 +11,17 @@ import org.apache.maven.model.Model
 import org.gradle.testkit.runner.GradleRunner
 
 class AppendableMavenRepository(
-  val repoDir: Path,
+  val root: Path,
   private val gradleRunner: GradleRunner,
 ) {
   private val projectBuildScript: Path
   private val modules = mutableListOf<Module>()
 
   init {
-    repoDir.createDirectories()
-    repoDir.resolve("settings.gradle").createFile()
-      .writeText("rootProject.name = 'appendable-maven-repo'")
-    projectBuildScript = repoDir.resolve("build.gradle").createFile()
+    root.createDirectories()
+    root.resolve("settings.gradle").createFile()
+      .writeText("rootProject.name = '${root.name}'")
+    projectBuildScript = root.resolve("build.gradle").createFile()
   }
 
   fun module(
@@ -38,7 +38,6 @@ class AppendableMavenRepository(
     projectBuildScript.writeText(
       """
         plugins {
-          id 'java'
           id 'maven-publish'
         }
         publishing {
@@ -47,18 +46,18 @@ class AppendableMavenRepository(
           }
           repositories {
             maven {
-              url = '${repoDir.toUri()}'
+              url = '${root.toUri()}'
             }
           }
         }
       """.trimIndent(),
     )
-    gradleRunner.withProjectDir(repoDir.toFile()).withArguments(commonArguments + "publish").build()
+    gradleRunner.withProjectDir(root.toFile()).withArguments(commonArguments + "publish").build()
     modules.clear()
   }
 
   private fun createPublication(module: Module) = with(module) {
-    val outputJar = build(repoDir)
+    val outputJar = build(root)
     val pubName = outputJar.name.replace(".", "")
 
     var index = -1
@@ -106,7 +105,7 @@ class AppendableMavenRepository(
       this.existingJar = existingJar
     }
 
-    fun insertFile(entry: String, content: String) {
+    fun insert(entry: String, content: String) {
       contents[entry] = content
     }
 
@@ -121,10 +120,7 @@ class AppendableMavenRepository(
     }
 
     fun build(root: Path): Path {
-      return existingJar ?: JarBuilder(
-        outputPath = root.resolve("$groupId-$artifactId-$version.jar"),
-        contents = contents,
-      ).write()
+      return existingJar ?: JarBuilder(root.resolve("$groupId-$artifactId-$version.jar"), contents).write()
     }
   }
 }

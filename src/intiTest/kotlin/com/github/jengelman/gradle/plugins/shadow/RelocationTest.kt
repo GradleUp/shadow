@@ -289,7 +289,7 @@ class RelocationTest : BasePluginTest() {
   @Test
   fun relocateResourceFiles() {
     localRepo.module("shadow", "dep", "1.0") {
-      insertFile("foo/dep.properties", "c")
+      insert("foo/dep.properties", "c")
     }.publish()
     path("src/main/java/foo/Foo.java").writeText(
       """

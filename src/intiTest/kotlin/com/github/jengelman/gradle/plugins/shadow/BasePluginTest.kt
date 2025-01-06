@@ -81,7 +81,7 @@ abstract class BasePluginTest {
       $startBlock
       dependencyResolutionManagement {
         repositories {
-          maven { url = '${localRepo.repoDir.toUri()}' }
+          maven { url = '${localRepo.root.toUri()}' }
           mavenCentral()
         }
       }
@@ -91,25 +91,25 @@ abstract class BasePluginTest {
 
   fun publishArtifactA() {
     localRepo.module("shadow", "a", "1.0") {
-      insertFile("a.properties", "a")
-      insertFile("a2.properties", "a2")
+      insert("a.properties", "a")
+      insert("a2.properties", "a2")
     }.publish()
   }
 
   fun publishArtifactB() {
     localRepo.module("shadow", "b", "1.0") {
-      insertFile("b.properties", "b")
+      insert("b.properties", "b")
     }.publish()
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
     localRepo.module("shadow", "c", "1.0") {
-      insertFile("c.properties", "c")
+      insert("c.properties", "c")
       if (circular) {
         addDependency("shadow", "d", "1.0")
       }
     }.module("shadow", "d", "1.0") {
-      insertFile("d.properties", "d")
+      insert("d.properties", "d")
       addDependency("shadow", "c", "1.0")
     }.publish()
   }

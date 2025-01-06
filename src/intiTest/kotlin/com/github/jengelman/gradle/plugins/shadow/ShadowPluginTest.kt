@@ -383,13 +383,13 @@ class ShadowPluginTest : BasePluginTest() {
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
     localRepo.module("shadow", "a", "1.0") {
-      insertFile("a.properties", "a")
-      insertFile("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
-      insertFile("META-INF/a.SF", "Signature File")
-      insertFile("META-INF/a.DSA", "DSA Signature Block")
-      insertFile("META-INF/a.RSA", "RSA Signature Block")
-      insertFile("META-INF/a.properties", "key=value")
-      insertFile("module-info.class", "module myModuleName {}")
+      insert("a.properties", "a")
+      insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
+      insert("META-INF/a.SF", "Signature File")
+      insert("META-INF/a.DSA", "DSA Signature Block")
+      insert("META-INF/a.RSA", "RSA Signature Block")
+      insert("META-INF/a.properties", "key=value")
+      insert("module-info.class", "module myModuleName {}")
     }.publish()
 
     path("src/main/java/shadow/Passed.java").writeText(
@@ -450,14 +450,14 @@ class ShadowPluginTest : BasePluginTest() {
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
     localRepo.module("shadow", "api", "1.0") {
-      insertFile("api.properties", "api")
+      insert("api.properties", "api")
     }.module("shadow", "implementation-dep", "1.0") {
-      insertFile("implementation-dep.properties", "implementation-dep")
+      insert("implementation-dep.properties", "implementation-dep")
     }.module("shadow", "implementation", "1.0") {
-      insertFile("implementation.properties", "implementation")
+      insert("implementation.properties", "implementation")
       addDependency("shadow", "implementation-dep", "1.0")
     }.module("shadow", "runtimeOnly", "1.0") {
-      insertFile("runtimeOnly.properties", "runtimeOnly")
+      insert("runtimeOnly.properties", "runtimeOnly")
     }.publish()
 
     projectScriptPath.writeText(
@@ -509,9 +509,9 @@ class ShadowPluginTest : BasePluginTest() {
   @Test
   fun defaultCopyingStrategy() {
     localRepo.module("shadow", "a", "1.0") {
-      insertFile("META-INF/MANIFEST.MF", "MANIFEST A")
+      insert("META-INF/MANIFEST.MF", "MANIFEST A")
     }.module("shadow", "b", "1.0") {
-      insertFile("META-INF/MANIFEST.MF", "MANIFEST B")
+      insert("META-INF/MANIFEST.MF", "MANIFEST B")
     }.publish()
 
     projectScriptPath.appendText(

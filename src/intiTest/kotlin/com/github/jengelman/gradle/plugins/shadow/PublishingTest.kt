@@ -217,7 +217,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun repoPath(path: String): Path {
-    return remoteRepo.repoDir.resolve(path).also {
+    return remoteRepo.root.resolve(path).also {
       check(it.exists()) { "Path not found: $it" }
       check(it.isRegularFile()) { "Path is not a regular file: $it" }
     }
@@ -258,7 +258,7 @@ class PublishingTest : BasePluginTest() {
           }
           repositories {
             maven {
-              url = '${remoteRepo.repoDir.toUri()}'
+              url = '${remoteRepo.root.toUri()}'
             }
           }
         }
