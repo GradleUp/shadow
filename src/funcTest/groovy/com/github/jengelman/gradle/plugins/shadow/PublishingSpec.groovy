@@ -1,13 +1,34 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
-import groovy.json.JsonSlurper
-import groovy.xml.XmlSlurper
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Usage
 import spock.lang.Issue
 
+/**
+ * Refs the format from https://github.com/gradle/gradle/blob/master/platforms/documentation/docs/src/docs/design/gradle-module-metadata-latest-specification.md.
+ */
+class GradleModuleMetadata {
+    List<Variant> variants
+
+    static class Variant {
+        String name
+        Map<String, String> attributes
+        List<Dependency> dependencies
+
+        static class Dependency {
+            String module
+        }
+    }
+}
+
 class PublishingSpec extends BasePluginSpecification {
+    private static final def moshi = new Moshi.Builder().add(new KotlinJsonAdapterFactory()).build()
+    private static final def gmmAdapter = moshi.adapter(GradleModuleMetadata)
+    private static final def pomReader = new MavenXpp3Reader()
 
     AppendableMavenFileRepository publishingRepo
 
@@ -69,14 +90,13 @@ class PublishingSpec extends BasePluginSpecification {
         File pom = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.pom').toFile().canonicalFile
         assert pom.exists()
 
-        def contents = new XmlSlurper().parse(pom)
+        def contents = pomReader.read(new FileReader(pom))
         assert contents.dependencies.size() == 1
-        assert contents.dependencies[0].dependency.size() == 1
 
-        def dependency = contents.dependencies[0].dependency[0]
-        assert dependency.groupId.text() == 'shadow'
-        assert dependency.artifactId.text() == 'b'
-        assert dependency.version.text() == '1.0'
+        def dependency = contents.dependencies[0]
+        assert dependency.groupId == 'shadow'
+        assert dependency.artifactId == 'b'
+        assert dependency.version == '1.0'
     }
 
     @Issue([
@@ -217,14 +237,13 @@ class PublishingSpec extends BasePluginSpecification {
         File pom = publishingRepo.rootDir.resolve('shadow/maven-all/1.0/maven-all-1.0.pom').toFile().canonicalFile
         assert pom.exists()
 
-        def contents = new XmlSlurper().parse(pom)
+        def contents = pomReader.read(new FileReader(pom))
         assert contents.dependencies.size() == 1
-        assert contents.dependencies[0].dependency.size() == 1
 
-        def dependency = contents.dependencies[0].dependency[0]
-        assert dependency.groupId.text() == 'shadow'
-        assert dependency.artifactId.text() == 'b'
-        assert dependency.version.text() == '1.0'
+        def dependency = contents.dependencies[0]
+        assert dependency.groupId == 'shadow'
+        assert dependency.artifactId == 'b'
+        assert dependency.version == '1.0'
     }
 
     def "publish shadow jar with maven-publish plugin and Gradle metadata"() {
@@ -286,26 +305,26 @@ class PublishingSpec extends BasePluginSpecification {
         gmm.exists()
 
         when: "POM file corresponds to a regular Java publication"
-        def pomContents = new XmlSlurper().parse(pom)
+        def pomContents = pomReader.read(new FileReader(pom))
         pomContents.dependencies.size() == 2
 
         then:
-        def dependency1 = pomContents.dependencies[0].dependency[0]
-        dependency1.groupId.text() == 'shadow'
-        dependency1.artifactId.text() == 'a'
-        dependency1.version.text() == '1.0'
+        def dependency1 = pomContents.dependencies[0]
+        dependency1.groupId == 'shadow'
+        dependency1.artifactId == 'a'
+        dependency1.version == '1.0'
 
-        def dependency2 = pomContents.dependencies[0].dependency[1]
-        dependency2.groupId.text() == 'shadow'
-        dependency2.artifactId.text() == 'b'
-        dependency2.version.text() == '1.0'
+        def dependency2 = pomContents.dependencies[1]
+        dependency2.groupId == 'shadow'
+        dependency2.artifactId == 'b'
+        dependency2.version == '1.0'
 
         when: "Gradle module metadata contains the Shadow variants"
-        def gmmContents = new JsonSlurper().parse(gmm)
+        def gmmContents = gmmAdapter.fromJson(gmm.text)
 
         then:
         gmmContents.variants.size() == 3
-        gmmContents.variants.name as Set == ['apiElements', 'runtimeElements', 'shadowRuntimeElements'] as Set
+        gmmContents.variants.collect { it.name } as Set == ['apiElements', 'runtimeElements', 'shadowRuntimeElements'] as Set
 
         def apiVariant = gmmContents.variants.find { it.name == 'apiElements' }
         apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_API
@@ -316,13 +335,13 @@ class PublishingSpec extends BasePluginSpecification {
         runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
         runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.EXTERNAL
         runtimeVariant.dependencies.size() == 2
-        runtimeVariant.dependencies.module as Set == ['a', 'b'] as Set
+        runtimeVariant.dependencies.collect { it.module } as Set == ['a', 'b'] as Set
 
         def shadowRuntimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
         shadowRuntimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
         shadowRuntimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.SHADOWED
         shadowRuntimeVariant.dependencies.size() == 1
-        shadowRuntimeVariant.dependencies.module as Set == ['b'] as Set
+        shadowRuntimeVariant.dependencies.collect { it.module } as Set == ['b'] as Set
 
         and: "verify shadow publication"
         assertions {
@@ -334,32 +353,27 @@ class PublishingSpec extends BasePluginSpecification {
         assertions {
             pom = publishingRepo.rootDir.resolve('com/acme/maven-all/1.0/maven-all-1.0.pom').toFile().canonicalFile
             assert pom.exists()
-            pomContents = new XmlSlurper().parse(pom)
-            assert pomContents.dependencies[0].dependency.size() == 1
+            pomContents = pomReader.read(new FileReader(pom))
+            assert pomContents.dependencies.size() == 1
 
-            dependency1 = pomContents.dependencies[0].dependency[0]
-            assert dependency1.groupId.text() == 'shadow'
-            assert dependency1.artifactId.text() == 'b'
-            assert dependency1.version.text() == '1.0'
-
-            dependency2 = pomContents.dependencies[0].dependency[1]
-            dependency2.groupId.text() == 'shadow'
-            dependency2.artifactId.text() == 'b'
-            dependency2.version.text() == '1.0'
+            dependency1 = pomContents.dependencies[0]
+            assert dependency1.groupId == 'shadow'
+            assert dependency1.artifactId == 'b'
+            assert dependency1.version == '1.0'
         }
 
         assertions {
             gmm = publishingRepo.rootDir.resolve('com/acme/maven-all/1.0/maven-all-1.0.module').toFile().canonicalFile
             assert gmm.exists()
-            gmmContents = new JsonSlurper().parse(gmm)
+            gmmContents = gmmAdapter.fromJson(gmm.text)
             assert gmmContents.variants.size() == 1
-            assert gmmContents.variants.name as Set == ['shadowRuntimeElements'] as Set
+            assert gmmContents.variants.collect { it.name } as Set == ['shadowRuntimeElements'] as Set
 
             runtimeVariant = gmmContents.variants.find { it.name == 'shadowRuntimeElements' }
             assert runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name] == Usage.JAVA_RUNTIME
             assert runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name] == Bundling.SHADOWED
             assert runtimeVariant.dependencies.size() == 1
-            assert runtimeVariant.dependencies.module as Set == ['b'] as Set
+            assert runtimeVariant.dependencies[0].module == 'b'
         }
     }
 }
