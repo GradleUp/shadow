@@ -111,7 +111,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class',
             'server/Util.class'
         ])
@@ -129,12 +129,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(outputShadowJar, [
+        doesNotContainEntries(outputShadowJar, [
             'server/Util.class',
             'junit/framework/Test.class'
         ])
@@ -144,12 +144,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(outputShadowJar, [
+        doesNotContainEntries(outputShadowJar, [
             'server/Util.class',
             'junit/framework/Test.class'
         ])
@@ -177,7 +177,7 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
@@ -196,12 +196,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(outputShadowJar, [
+        doesNotContainEntries(outputShadowJar, [
             'junit/framework/Test.class'
         ])
 
@@ -210,12 +210,12 @@ class ShadowJarCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class'
         ])
 
         and:
-        assertDoesNotContain(outputShadowJar, [
+        doesNotContainEntries(outputShadowJar, [
             'junit/framework/Test.class'
         ])
     }

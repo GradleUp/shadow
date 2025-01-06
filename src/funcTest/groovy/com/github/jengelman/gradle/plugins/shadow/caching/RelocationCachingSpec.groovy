@@ -23,7 +23,7 @@ class RelocationCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class',
             'junit/framework/Test.class'
         ])
@@ -40,13 +40,13 @@ class RelocationCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class',
             'foo/junit/framework/Test.class'
         ])
 
         and:
-        assertDoesNotContain(outputShadowJar, [
+        doesNotContainEntries(outputShadowJar, [
             'junit/framework/Test.class'
         ])
 
@@ -55,13 +55,13 @@ class RelocationCachingSpec extends AbstractCachingSpec {
 
         then:
         outputShadowJar.exists()
-        assertContains(outputShadowJar, [
+        containsEntries(outputShadowJar, [
             'server/Server.class',
             'foo/junit/framework/Test.class'
         ])
 
         and:
-        assertDoesNotContain(outputShadowJar, [
+        doesNotContainEntries(outputShadowJar, [
             'junit/framework/Test.class'
         ])
     }
