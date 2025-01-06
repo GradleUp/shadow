@@ -5,7 +5,6 @@ import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.name
-import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
@@ -122,12 +121,10 @@ class AppendableMavenRepository(
     }
 
     fun build(root: Path): Path {
-      if (existingJar != null) {
-        return existingJar!!
-      }
-      val outputPath = root.resolve("$groupId-$artifactId-$version.jar")
-      AppendableJar.write(contents, outputPath.outputStream())
-      return outputPath
+      return existingJar ?: JarBuilder(
+        outputPath = root.resolve("$groupId-$artifactId-$version.jar"),
+        contents = contents,
+      ).write()
     }
   }
 }
