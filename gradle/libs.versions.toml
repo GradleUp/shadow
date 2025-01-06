@@ -1,5 +1,6 @@
 [versions]
 maven = "3.9.9"
+moshi = "1.15.2"
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
@@ -15,6 +16,8 @@ plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.2"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.0.4"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.10.0"
 okio = "com.squareup.okio:okio:3.9.1"
+moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
+moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 pluginPublish = "com.gradle.publish:plugin-publish-plugin:1.3.0"
 mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.30.0"
