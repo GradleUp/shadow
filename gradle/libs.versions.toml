@@ -1,8 +1,9 @@
 [versions]
+kotlin = "2.1.0"
 maven = "3.9.9"
-moshi = "1.15.2"
 
 [libraries]
+kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
 apache-ant = "org.apache.ant:ant:1.10.15"
 apache-commonsIo = "commons-io:commons-io:2.18.0"
 apache-commonsLang = "org.apache.commons:commons-lang3:3.17.0"
@@ -16,8 +17,6 @@ plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.2"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.0.4"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.10.0"
 okio = "com.squareup.okio:okio:3.9.1"
-moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 pluginPublish = "com.gradle.publish:plugin-publish-plugin:1.3.0"
 mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.30.0"
@@ -37,7 +36,8 @@ junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
-kotlin = "org.jetbrains.kotlin.jvm:2.1.0"
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-lint = "com.android.lint:8.7.3"
 jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.17.0"
 spotless = "com.diffplug.spotless:7.0.0.BETA4"

@@ -8,16 +8,14 @@ import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileReposi
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.decodeFromPath
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.github.jengelman.gradle.plugins.shadow.util.kotlinxJson
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
@@ -28,8 +26,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class PublishingTest : BasePluginTest() {
-  private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-  private val gmmAdapter = moshi.adapter(GradleModuleMetadata::class.java)
   private val pomReader = MavenXpp3Reader()
 
   private lateinit var publishingRepo: AppendableMavenFileRepository
@@ -254,7 +250,7 @@ class PublishingTest : BasePluginTest() {
     assertThat(dependency2.artifactId).isEqualTo("b")
     assertThat(dependency2.version).isEqualTo("1.0")
 
-    val gmmContents = gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module"))
+    val gmmContents: GradleModuleMetadata = kotlinxJson.decodeFromPath(repoPath("com/acme/maven/1.0/maven-1.0.module"))
     assertThat(gmmContents.variants.size).isEqualTo(3)
     assertThat(gmmContents.variants.map { it.name }.toSet()).containsOnly(
       "apiElements",
@@ -293,7 +289,7 @@ class PublishingTest : BasePluginTest() {
     assertThat(shadowDependency.artifactId).isEqualTo("b")
     assertThat(shadowDependency.version).isEqualTo("1.0")
 
-    val shadowGmmContents = gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module"))
+    val shadowGmmContents: GradleModuleMetadata = kotlinxJson.decodeFromPath(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module"))
     assertThat(shadowGmmContents.variants.size).isEqualTo(1)
     assertThat(shadowGmmContents.variants.map { it.name }.toSet()).containsOnly("shadowRuntimeElements")
 
@@ -319,7 +315,5 @@ class PublishingTest : BasePluginTest() {
 
   private companion object {
     fun MavenXpp3Reader.read(path: Path): Model = read(path.inputStream())
-
-    fun <T : Any> JsonAdapter<T>.fromJson(path: Path): T = requireNotNull(fromJson(path.readText()))
   }
 }
