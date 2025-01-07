@@ -35,7 +35,7 @@ abstract class BasePluginTest {
 
   @BeforeAll
   open fun doFirst() {
-    localRepo = AppendableMavenRepository(createTempDirectory().resolve("local-maven-repo"), runner)
+    localRepo = AppendableMavenRepository(createTempDirectory().resolve("local-maven-repo"), getRunner(null))
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(testJar)
     }.publish()
@@ -156,21 +156,8 @@ abstract class BasePluginTest {
     }
   }
 
-  private val runner: GradleRunner
-    get() {
-      return GradleRunner.create()
-        .forwardOutput()
-        .withPluginClasspath()
-        .withTestKitDir(testKitDir.toFile())
-        .apply {
-          if (::root.isInitialized) {
-            withProjectDir(root.toFile())
-          }
-        }
-    }
-
   fun runner(arguments: Iterable<String>): GradleRunner {
-    return runner.withArguments(commonArguments + arguments)
+    return getRunner().withArguments(commonArguments + arguments)
   }
 
   inline fun run(
@@ -304,6 +291,16 @@ abstract class BasePluginTest {
       """.trimIndent() + System.lineSeparator(),
     )
   }
+
+  private fun getRunner(projectDir: Path? = root) = GradleRunner.create()
+    .forwardOutput()
+    .withPluginClasspath()
+    .withTestKitDir(testKitDir.toFile())
+    .apply {
+      if (projectDir != null) {
+        withProjectDir(projectDir.toFile())
+      }
+    }
 
   companion object {
     val testKitDir: Path = run {
