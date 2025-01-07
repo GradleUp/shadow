@@ -5,7 +5,6 @@ import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
@@ -34,12 +33,12 @@ class PublishingTest : BasePluginTest() {
   private val gmmAdapter = moshi.adapter(GradleModuleMetadata::class.java)
   private val pomReader = MavenXpp3Reader()
 
-  private lateinit var remoteRepo: AppendableMavenRepository
+  private lateinit var remoteRepo: Path
 
   @BeforeEach
   override fun setup() {
     super.setup()
-    remoteRepo = repo("remote-maven-repo")
+    remoteRepo = root.resolve("remote-maven-repo")
 
     publishArtifactA()
     publishArtifactB()
@@ -217,7 +216,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun repoPath(path: String): Path {
-    return remoteRepo.root.resolve(path).also {
+    return remoteRepo.resolve(path).also {
       check(it.exists()) { "Path not found: $it" }
       check(it.isRegularFile()) { "Path is not a regular file: $it" }
     }
@@ -258,7 +257,7 @@ class PublishingTest : BasePluginTest() {
           }
           repositories {
             maven {
-              url = '${remoteRepo.root.toUri()}'
+              url = '${remoteRepo.toUri()}'
             }
           }
         }

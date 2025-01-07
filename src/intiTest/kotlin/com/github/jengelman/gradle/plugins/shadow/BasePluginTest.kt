@@ -29,7 +29,7 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
-  private lateinit var root: Path
+  lateinit var root: Path
   lateinit var localRepo: AppendableMavenRepository
 
   @BeforeEach
