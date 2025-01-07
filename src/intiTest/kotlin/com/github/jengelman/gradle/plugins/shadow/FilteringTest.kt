@@ -285,12 +285,16 @@ class FilteringTest : BasePluginTest() {
 
   private fun publishArtifactCD(circular: Boolean = false) {
     localRepo.module("shadow", "c", "1.0") {
-      insert("c.properties", "c")
+      buildJar {
+        insert("c.properties", "c")
+      }
       if (circular) {
         addDependency("shadow", "d", "1.0")
       }
     }.module("shadow", "d", "1.0") {
-      insert("d.properties", "d")
+      buildJar {
+        insert("d.properties", "d")
+      }
       addDependency("shadow", "c", "1.0")
     }.publish()
   }

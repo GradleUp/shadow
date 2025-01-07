@@ -383,13 +383,15 @@ class ShadowPluginTest : BasePluginTest() {
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
     localRepo.module("shadow", "a", "1.0") {
-      insert("a.properties", "a")
-      insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
-      insert("META-INF/a.SF", "Signature File")
-      insert("META-INF/a.DSA", "DSA Signature Block")
-      insert("META-INF/a.RSA", "RSA Signature Block")
-      insert("META-INF/a.properties", "key=value")
-      insert("module-info.class", "module myModuleName {}")
+      buildJar {
+        insert("a.properties", "a")
+        insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
+        insert("META-INF/a.SF", "Signature File")
+        insert("META-INF/a.DSA", "DSA Signature Block")
+        insert("META-INF/a.RSA", "RSA Signature Block")
+        insert("META-INF/a.properties", "key=value")
+        insert("module-info.class", "module myModuleName {}")
+      }
     }.publish()
 
     path("src/main/java/shadow/Passed.java").writeText(
@@ -447,14 +449,22 @@ class ShadowPluginTest : BasePluginTest() {
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
     localRepo.module("shadow", "api", "1.0") {
-      insert("api.properties", "api")
+      buildJar {
+        insert("api.properties", "api")
+      }
     }.module("shadow", "implementation-dep", "1.0") {
-      insert("implementation-dep.properties", "implementation-dep")
+      buildJar {
+        insert("implementation-dep.properties", "implementation-dep")
+      }
     }.module("shadow", "implementation", "1.0") {
-      insert("implementation.properties", "implementation")
+      buildJar {
+        insert("implementation.properties", "implementation")
+      }
       addDependency("shadow", "implementation-dep", "1.0")
     }.module("shadow", "runtimeOnly", "1.0") {
-      insert("runtimeOnly.properties", "runtimeOnly")
+      buildJar {
+        insert("runtimeOnly.properties", "runtimeOnly")
+      }
     }.publish()
 
     projectScriptPath.writeText(
@@ -503,9 +513,13 @@ class ShadowPluginTest : BasePluginTest() {
   @Test
   fun defaultCopyingStrategy() {
     localRepo.module("shadow", "a", "1.0") {
-      insert("META-INF/MANIFEST.MF", "MANIFEST A")
+      buildJar {
+        insert("META-INF/MANIFEST.MF", "MANIFEST A")
+      }
     }.module("shadow", "b", "1.0") {
-      insert("META-INF/MANIFEST.MF", "MANIFEST B")
+      buildJar {
+        insert("META-INF/MANIFEST.MF", "MANIFEST B")
+      }
     }.publish()
 
     projectScriptPath.appendText(

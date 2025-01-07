@@ -7,8 +7,8 @@ import kotlin.io.path.outputStream
 
 class JarBuilder(
   private val outputPath: Path,
-  private val contents: MutableMap<String, String> = mutableMapOf(),
 ) {
+  private val contents = mutableMapOf<String, String>()
   private val entries = mutableSetOf<String>()
   private val jos = JarOutputStream(outputPath.outputStream())
 

@@ -179,7 +179,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       insert(servicesShadowEntry, CONTENT_ONE)
     }.toUri().toURL().path
     localRepo.module("shadow", "two", "1.0") {
-      insert(servicesShadowEntry, CONTENT_TWO)
+      buildJar {
+        insert(servicesShadowEntry, CONTENT_TWO)
+      }
     }.publish()
 
     projectScriptPath.appendText(

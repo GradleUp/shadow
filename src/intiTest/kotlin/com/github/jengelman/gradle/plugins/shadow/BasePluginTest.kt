@@ -39,10 +39,14 @@ abstract class BasePluginTest {
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(testJar)
     }.module("shadow", "a", "1.0") {
-      insert("a.properties", "a")
-      insert("a2.properties", "a2")
+      buildJar {
+        insert("a.properties", "a")
+        insert("a2.properties", "a2")
+      }
     }.module("shadow", "b", "1.0") {
-      insert("b.properties", "b")
+      buildJar {
+        insert("b.properties", "b")
+      }
     }.publish()
   }
 

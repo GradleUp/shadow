@@ -4,6 +4,8 @@ import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.commo
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
@@ -57,7 +59,7 @@ class AppendableMavenRepository(
   }
 
   private fun createPublication(module: Module) = with(module) {
-    val outputJar = build(root)
+    val outputJar = build()
     val pubName = outputJar.name.replace(".", "")
 
     var index = -1
@@ -87,13 +89,13 @@ class AppendableMavenRepository(
     """.trimIndent() + System.lineSeparator()
   }
 
-  class Module(
+  inner class Module(
     groupId: String,
     artifactId: String,
     version: String,
   ) : Model() {
-    private val contents = mutableMapOf<String, String>()
-    private var existingJar: Path? = null
+    private val coordinate = "$groupId:$artifactId:$version"
+    private lateinit var existingJar: Path
 
     init {
       this.groupId = groupId
@@ -105,8 +107,9 @@ class AppendableMavenRepository(
       this.existingJar = existingJar
     }
 
-    fun insert(entry: String, content: String) {
-      contents[entry] = content
+    fun buildJar(builder: JarBuilder.() -> Unit) {
+      val jarName = coordinate.replace(":", "-") + ".jar"
+      existingJar = JarBuilder(root.resolve(jarName)).apply(builder).write()
     }
 
     fun addDependency(groupId: String, artifactId: String, version: String, scope: String = "runtime") {
@@ -119,8 +122,12 @@ class AppendableMavenRepository(
       addDependency(dependency)
     }
 
-    fun build(root: Path): Path {
-      return existingJar ?: JarBuilder(root.resolve("$groupId-$artifactId-$version.jar"), contents).write()
+    fun build(): Path {
+      if (!::existingJar.isInitialized) error("No jar file provided for $coordinate")
+      return existingJar.also {
+        check(it.exists()) { "Jar file doesn't exist for $coordinate in: $it" }
+        check(it.isRegularFile()) { "Jar is not a regular file for $coordinate in: $it" }
+      }
     }
   }
 }
