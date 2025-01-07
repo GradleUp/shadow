@@ -9,19 +9,10 @@ import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class FilteringTest : BasePluginTest() {
-
-  @BeforeAll
-  override fun doFirst() {
-    super.doFirst()
-    publishArtifactA()
-    publishArtifactB()
-  }
-
   @BeforeEach
   override fun setup() {
     super.setup()

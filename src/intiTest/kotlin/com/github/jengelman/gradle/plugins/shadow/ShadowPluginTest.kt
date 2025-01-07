@@ -424,9 +424,6 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun includeRuntimeConfigurationByDefault() {
-    publishArtifactA()
-    publishArtifactB()
-
     projectScriptPath.appendText(
       """
         dependencies {
@@ -483,9 +480,6 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun doesNotIncludeCompileOnlyConfigurationByDefault() {
-    publishArtifactA()
-    publishArtifactB()
-
     projectScriptPath.appendText(
       """
         dependencies {
@@ -617,8 +611,6 @@ class ShadowPluginTest : BasePluginTest() {
   @Disabled
   @Test
   fun checkLargeZipFilesWithZip64Enabled() {
-    publishArtifactA()
-
     path("src/main/java/myapp/Main.java").writeText(
       """
         package myapp;

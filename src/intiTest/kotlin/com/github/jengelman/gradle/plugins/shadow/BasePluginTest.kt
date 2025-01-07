@@ -38,6 +38,11 @@ abstract class BasePluginTest {
     localRepo = AppendableMavenRepository(createTempDirectory().resolve("local-maven-repo"), getRunner(null))
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(testJar)
+    }.module("shadow", "a", "1.0") {
+      insert("a.properties", "a")
+      insert("a2.properties", "a2")
+    }.module("shadow", "b", "1.0") {
+      insert("b.properties", "b")
     }.publish()
   }
 
@@ -96,19 +101,6 @@ abstract class BasePluginTest {
       }
       $endBlock
     """.trimIndent() + System.lineSeparator()
-  }
-
-  fun publishArtifactA() {
-    localRepo.module("shadow", "a", "1.0") {
-      insert("a.properties", "a")
-      insert("a2.properties", "a2")
-    }.publish()
-  }
-
-  fun publishArtifactB() {
-    localRepo.module("shadow", "b", "1.0") {
-      insert("b.properties", "b")
-    }.publish()
   }
 
   fun publishArtifactCD(circular: Boolean = false) {

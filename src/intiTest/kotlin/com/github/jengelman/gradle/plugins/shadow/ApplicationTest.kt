@@ -14,7 +14,6 @@ import org.apache.tools.zip.ZipFile
 import org.junit.jupiter.api.Test
 
 class ApplicationTest : BasePluginTest() {
-
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
@@ -93,7 +92,6 @@ class ApplicationTest : BasePluginTest() {
     settingsBlock: String = "",
     runShadowBlock: String = "",
   ) {
-    publishArtifactA()
     path("src/main/java/myapp/Main.java").appendText(
       """
         package myapp;
