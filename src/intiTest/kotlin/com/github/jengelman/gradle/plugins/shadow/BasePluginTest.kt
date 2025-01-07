@@ -117,7 +117,7 @@ abstract class BasePluginTest {
   val settingsScriptPath: Path
     get() = path("settings.gradle")
 
-  val outputShadowJar: JarPath
+  open val outputShadowJar: JarPath
     get() = jarPath("build/libs/shadow-1.0-all.jar")
 
   val outputServerShadowJar: JarPath
@@ -276,7 +276,7 @@ abstract class BasePluginTest {
     )
   }
 
-  private fun getRunner(projectDir: Path? = root) = GradleRunner.create()
+  fun getRunner(projectDir: Path? = root) = GradleRunner.create()
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())

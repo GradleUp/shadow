@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
+import assertk.all
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import java.nio.file.Path
@@ -26,6 +27,11 @@ class JarPath(val path: Path) :
     val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
     return getInputStream(entry).bufferedReader().readText()
   }
+}
+
+fun Assert<JarPath>.useAll(body: Assert<JarPath>.() -> Unit) = all {
+  body()
+  given { it.close() }
 }
 
 /**
