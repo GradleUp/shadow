@@ -14,12 +14,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ConfigurationCacheSpec : BasePluginTest() {
-
   @BeforeEach
   override fun setup() {
     super.setup()
-    publishArtifactA()
-    publishArtifactB()
     projectScriptPath.appendText(
       """
         dependencies {

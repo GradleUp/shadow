@@ -95,6 +95,8 @@ dependencies {
   intiTestImplementation(libs.apache.maven.repositoryMetadata)
   // TODO: this will be removed after we migrated all functional tests to Kotlin.
   intiTestImplementation(sourceSets.main.get().output)
+  intiTestImplementation(libs.moshi)
+  intiTestImplementation(libs.moshi.kotlin)
 
   lintChecks(libs.androidx.gradlePluginLints)
   lintChecks(libs.assertk.lint)

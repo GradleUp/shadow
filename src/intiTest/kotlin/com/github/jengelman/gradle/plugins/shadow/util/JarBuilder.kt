@@ -1,12 +1,36 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-import java.io.OutputStream
+import java.nio.file.Path
 import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
+import kotlin.io.path.outputStream
 
-class JarBuilder(os: OutputStream) {
+class JarBuilder(
+  private val outputPath: Path,
+) {
+  private val contents = mutableMapOf<String, String>()
   private val entries = mutableSetOf<String>()
-  private val jos = JarOutputStream(os)
+  private val jos = JarOutputStream(outputPath.outputStream())
+
+  fun insert(path: String, content: String): JarBuilder = apply {
+    contents[path] = content
+  }
+
+  fun write(): Path {
+    jos.use {
+      contents.forEach { (entry, content) ->
+        val idx = entry.lastIndexOf('/')
+        if (idx != -1) {
+          addDirectory(entry.substring(0, idx))
+        }
+        if (entries.add(entry)) {
+          jos.putNextEntry(JarEntry(entry))
+          content.byteInputStream().copyTo(jos)
+        }
+      }
+    }
+    return outputPath
+  }
 
   private fun addDirectory(name: String) {
     if (entries.add(name)) {
@@ -17,21 +41,5 @@ class JarBuilder(os: OutputStream) {
       // directory entries must end in "/"
       jos.putNextEntry(JarEntry("$name/"))
     }
-  }
-
-  fun withPath(path: String, data: String): JarBuilder {
-    val idx = path.lastIndexOf('/')
-    if (idx != -1) {
-      addDirectory(path.substring(0, idx))
-    }
-    if (entries.add(path)) {
-      jos.putNextEntry(JarEntry(path))
-      data.byteInputStream().copyTo(jos)
-    }
-    return this
-  }
-
-  fun build() {
-    jos.close()
   }
 }

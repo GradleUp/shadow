@@ -382,15 +382,17 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
-    repo.module("shadow", "a", "1.0")
-      .insertFile("a.properties", "a")
-      .insertFile("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
-      .insertFile("META-INF/a.SF", "Signature File")
-      .insertFile("META-INF/a.DSA", "DSA Signature Block")
-      .insertFile("META-INF/a.RSA", "RSA Signature Block")
-      .insertFile("META-INF/a.properties", "key=value")
-      .insertFile("module-info.class", "module myModuleName {}")
-      .publish()
+    localRepo.module("shadow", "a", "1.0") {
+      buildJar {
+        insert("a.properties", "a")
+        insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
+        insert("META-INF/a.SF", "Signature File")
+        insert("META-INF/a.DSA", "DSA Signature Block")
+        insert("META-INF/a.RSA", "RSA Signature Block")
+        insert("META-INF/a.properties", "key=value")
+        insert("module-info.class", "module myModuleName {}")
+      }
+    }.publish()
 
     path("src/main/java/shadow/Passed.java").writeText(
       """
@@ -424,9 +426,6 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun includeRuntimeConfigurationByDefault() {
-    publishArtifactA()
-    publishArtifactB()
-
     projectScriptPath.appendText(
       """
         dependencies {
@@ -449,19 +448,24 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
-    repo.module("shadow", "api", "1.0")
-      .insertFile("api.properties", "api")
-      .publish()
-    repo.module("shadow", "implementation-dep", "1.0")
-      .insertFile("implementation-dep.properties", "implementation-dep")
-      .publish()
-    repo.module("shadow", "implementation", "1.0")
-      .insertFile("implementation.properties", "implementation")
-      .dependsOn("implementation-dep")
-      .publish()
-    repo.module("shadow", "runtimeOnly", "1.0")
-      .insertFile("runtimeOnly.properties", "runtimeOnly")
-      .publish()
+    localRepo.module("shadow", "api", "1.0") {
+      buildJar {
+        insert("api.properties", "api")
+      }
+    }.module("shadow", "implementation-dep", "1.0") {
+      buildJar {
+        insert("implementation-dep.properties", "implementation-dep")
+      }
+    }.module("shadow", "implementation", "1.0") {
+      buildJar {
+        insert("implementation.properties", "implementation")
+      }
+      addDependency("shadow", "implementation-dep", "1.0")
+    }.module("shadow", "runtimeOnly", "1.0") {
+      buildJar {
+        insert("runtimeOnly.properties", "runtimeOnly")
+      }
+    }.publish()
 
     projectScriptPath.writeText(
       """
@@ -486,9 +490,6 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun doesNotIncludeCompileOnlyConfigurationByDefault() {
-    publishArtifactA()
-    publishArtifactB()
-
     projectScriptPath.appendText(
       """
         dependencies {
@@ -511,12 +512,15 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun defaultCopyingStrategy() {
-    repo.module("shadow", "a", "1.0")
-      .insertFile("META-INF/MANIFEST.MF", "MANIFEST A")
-      .publish()
-    repo.module("shadow", "b", "1.0")
-      .insertFile("META-INF/MANIFEST.MF", "MANIFEST B")
-      .publish()
+    localRepo.module("shadow", "a", "1.0") {
+      buildJar {
+        insert("META-INF/MANIFEST.MF", "MANIFEST A")
+      }
+    }.module("shadow", "b", "1.0") {
+      buildJar {
+        insert("META-INF/MANIFEST.MF", "MANIFEST B")
+      }
+    }.publish()
 
     projectScriptPath.appendText(
       """
@@ -621,8 +625,6 @@ class ShadowPluginTest : BasePluginTest() {
   @Disabled
   @Test
   fun checkLargeZipFilesWithZip64Enabled() {
-    publishArtifactA()
-
     path("src/main/java/myapp/Main.java").writeText(
       """
         package myapp;

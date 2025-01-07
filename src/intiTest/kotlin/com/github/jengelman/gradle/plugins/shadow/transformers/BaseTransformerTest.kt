@@ -1,14 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableJar
+import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import java.nio.file.Path
 import kotlin.io.path.writeText
 
 sealed class BaseTransformerTest : BasePluginTest() {
 
   fun buildJarOne(
-    builder: AppendableJar.() -> Unit = {
+    builder: JarBuilder.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_ONE)
       insert(ENTRY_SERVICES_FOO, "one")
     },
@@ -17,7 +17,7 @@ sealed class BaseTransformerTest : BasePluginTest() {
   }
 
   fun buildJarTwo(
-    builder: AppendableJar.() -> Unit = {
+    builder: JarBuilder.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_TWO)
       insert(ENTRY_SERVICES_FOO, "two")
     },
@@ -25,8 +25,8 @@ sealed class BaseTransformerTest : BasePluginTest() {
     return buildJar("two.jar", builder)
   }
 
-  inline fun buildJar(path: String, builder: AppendableJar.() -> Unit): Path {
-    return AppendableJar(path(path)).apply(builder).write()
+  inline fun buildJar(path: String, builder: JarBuilder.() -> Unit): Path {
+    return JarBuilder(path(path)).apply(builder).write()
   }
 
   fun writeMainClass() {

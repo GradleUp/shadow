@@ -178,9 +178,11 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val one = buildJarOne {
       insert(servicesShadowEntry, CONTENT_ONE)
     }.toUri().toURL().path
-    repo.module("shadow", "two", "1.0")
-      .insertFile(servicesShadowEntry, CONTENT_TWO)
-      .publish()
+    localRepo.module("shadow", "two", "1.0") {
+      buildJar {
+        insert(servicesShadowEntry, CONTENT_TWO)
+      }
+    }.publish()
 
     projectScriptPath.appendText(
       """

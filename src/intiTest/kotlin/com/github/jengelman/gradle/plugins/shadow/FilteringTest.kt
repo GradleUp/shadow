@@ -9,17 +9,20 @@ import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class FilteringTest : BasePluginTest() {
+  @BeforeAll
+  override fun doFirst() {
+    super.doFirst()
+    publishArtifactCD()
+  }
 
   @BeforeEach
   override fun setup() {
     super.setup()
-    publishArtifactA()
-    publishArtifactB()
-
     projectScriptPath.appendText(
       """
         dependencies {
@@ -63,7 +66,6 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun excludeDependency() {
-    publishArtifactCD()
     dependOnAndExcludeArtifactD()
 
     run(shadowJarTask)
@@ -73,7 +75,6 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun excludeDependencyUsingWildcardSyntax() {
-    publishArtifactCD()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -94,7 +95,6 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun dependencyExclusionsAffectUpToDateCheck() {
-    publishArtifactCD()
     dependOnAndExcludeArtifactD()
 
     run(shadowJarTask)
@@ -121,7 +121,6 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun projectExclusionsAffectUpToDateCheck() {
-    publishArtifactCD()
     dependOnAndExcludeArtifactD()
 
     run(shadowJarTask)
@@ -149,7 +148,6 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun includeDependencyAndExcludeOthers() {
-    publishArtifactCD()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -283,5 +281,21 @@ class FilteringTest : BasePluginTest() {
     assertThat(outputShadowJar).doesNotContainEntries(
       "d.properties",
     )
+  }
+
+  private fun publishArtifactCD(circular: Boolean = false) {
+    localRepo.module("shadow", "c", "1.0") {
+      buildJar {
+        insert("c.properties", "c")
+      }
+      if (circular) {
+        addDependency("shadow", "d", "1.0")
+      }
+    }.module("shadow", "d", "1.0") {
+      buildJar {
+        insert("d.properties", "d")
+      }
+      addDependency("shadow", "c", "1.0")
+    }.publish()
   }
 }

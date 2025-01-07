@@ -288,9 +288,11 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateResourceFiles() {
-    repo.module("shadow", "dep", "1.0")
-      .insertFile("foo/dep.properties", "c")
-      .publish()
+    localRepo.module("shadow", "dep", "1.0") {
+      buildJar {
+        insert("foo/dep.properties", "c")
+      }
+    }.publish()
     path("src/main/java/foo/Foo.java").writeText(
       """
         package foo;

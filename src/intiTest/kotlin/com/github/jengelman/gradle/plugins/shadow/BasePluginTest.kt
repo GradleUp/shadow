@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenFileRepository
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.nio.file.Path
 import java.util.Properties
@@ -24,22 +24,35 @@ import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
-  private lateinit var root: Path
-  lateinit var repo: AppendableMavenFileRepository
+  lateinit var root: Path
+  lateinit var localRepo: AppendableMavenRepository
+
+  @BeforeAll
+  open fun doFirst() {
+    localRepo = AppendableMavenRepository(createTempDirectory().resolve("local-maven-repo"), getRunner(null))
+    localRepo.module("junit", "junit", "3.8.2") {
+      useJar(testJar)
+    }.module("shadow", "a", "1.0") {
+      buildJar {
+        insert("a.properties", "a")
+        insert("a2.properties", "a2")
+      }
+    }.module("shadow", "b", "1.0") {
+      buildJar {
+        insert("b.properties", "b")
+      }
+    }.publish()
+  }
 
   @BeforeEach
   open fun setup() {
     root = createTempDirectory()
-
-    repo = repo()
-    repo.module("junit", "junit", "3.8.2")
-      .use(testJar)
-      .publish()
 
     projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
     settingsScriptPath.writeText(getDefaultSettingsBuildScript())
@@ -54,6 +67,11 @@ abstract class BasePluginTest {
     }
 
     println(projectScriptPath.readText())
+  }
+
+  @OptIn(ExperimentalPathApi::class)
+  fun doLast() {
+    localRepo.root.deleteRecursively()
   }
 
   fun getDefaultProjectBuildScript(
@@ -81,36 +99,12 @@ abstract class BasePluginTest {
       $startBlock
       dependencyResolutionManagement {
         repositories {
-          maven { url = '${repo.uri}' }
+          maven { url = '${localRepo.root.toUri()}' }
           mavenCentral()
         }
       }
       $endBlock
     """.trimIndent() + System.lineSeparator()
-  }
-
-  fun publishArtifactA() {
-    repo.module("shadow", "a", "1.0")
-      .insertFile("a.properties", "a")
-      .insertFile("a2.properties", "a2")
-      .publish()
-  }
-
-  fun publishArtifactB() {
-    repo.module("shadow", "b", "1.0")
-      .insertFile("b.properties", "b")
-      .publish()
-  }
-
-  fun publishArtifactCD(circular: Boolean = false) {
-    repo.module("shadow", "c", "1.0")
-      .insertFile("c.properties", "c")
-      .apply { if (circular) dependsOn("d") }
-      .publish()
-    repo.module("shadow", "d", "1.0")
-      .insertFile("d.properties", "d")
-      .dependsOn("c")
-      .publish()
   }
 
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
@@ -146,26 +140,8 @@ abstract class BasePluginTest {
     }
   }
 
-  fun repo(path: String = "maven-repo"): AppendableMavenFileRepository {
-    return AppendableMavenFileRepository(root.resolve(path))
-  }
-
-  private val runner: GradleRunner
-    get() {
-      return GradleRunner.create()
-        .withProjectDir(root.toFile())
-        .forwardOutput()
-        .withPluginClasspath()
-        .withTestKitDir(testKitDir.toFile())
-    }
-
   fun runner(arguments: Iterable<String>): GradleRunner {
-    val allArguments = listOf(
-      "--warning-mode=fail",
-      "--configuration-cache",
-      "--stacktrace",
-    ) + arguments
-    return runner.withArguments(allArguments)
+    return getRunner().withArguments(commonArguments + arguments)
   }
 
   inline fun run(
@@ -300,6 +276,16 @@ abstract class BasePluginTest {
     )
   }
 
+  private fun getRunner(projectDir: Path? = root) = GradleRunner.create()
+    .forwardOutput()
+    .withPluginClasspath()
+    .withTestKitDir(testKitDir.toFile())
+    .apply {
+      if (projectDir != null) {
+        withProjectDir(projectDir.toFile())
+      }
+    }
+
   companion object {
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
@@ -318,6 +304,12 @@ abstract class BasePluginTest {
     val runShadow = """
       tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
+
+    val commonArguments = listOf(
+      "--warning-mode=fail",
+      "--configuration-cache",
+      "--stacktrace",
+    )
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
