@@ -5,9 +5,11 @@ import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import org.apache.commons.lang3.StringUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.TempDir
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.jar.JarFile
@@ -17,20 +19,30 @@ abstract class BasePluginSpecification extends Specification {
     @TempDir
     Path root
 
-    AppendableMavenRepository repo
+    @Shared
+    static AppendableMavenRepository repo
 
-    def setup() {
-        repo = new AppendableMavenRepository(root.resolve('local-maven-repo'), runner)
+    def setupSpec() {
+        repo = new AppendableMavenRepository(
+            Files.createTempDirectory(null).resolve('local-maven-repo'),
+            runner,
+        )
         repo.module('junit', 'junit', '3.8.2') { module ->
             module.useJar(Paths.get(this.class.classLoader.getResource('junit-3.8.2.jar').toURI()))
         }.publish()
+    }
 
+    def setup() {
         projectScriptFile << getDefaultProjectBuildScript('java', true, true)
         settingsScriptFile << getDefaultSettingsBuildScript()
     }
 
     def cleanup() {
         println projectScriptFile.text
+    }
+
+    def cleanupSpec() {
+        // TODO: Delete repo recursively.
     }
 
     String getDefaultProjectBuildScript(
@@ -69,11 +81,14 @@ abstract class BasePluginSpecification extends Specification {
     static def shadowJar = "tasks.named('shadowJar', ${ShadowJar.class.name})".trim()
 
     GradleRunner getRunner() {
-        GradleRunner.create()
-            .withProjectDir(root.toFile())
+        def runner = GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
             .withTestKitDir(testKitDir)
+        if (root != null) {
+            runner.withProjectDir(root.toFile())
+        }
+        return runner
     }
 
     GradleRunner runner(Collection<String> tasks) {

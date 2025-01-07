@@ -24,6 +24,7 @@ import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 
@@ -32,14 +33,17 @@ abstract class BasePluginTest {
   lateinit var root: Path
   lateinit var localRepo: AppendableMavenRepository
 
-  @BeforeEach
-  open fun setup() {
-    root = createTempDirectory()
-
-    localRepo = repo()
+  @BeforeAll
+  open fun doFirst() {
+    localRepo = AppendableMavenRepository(createTempDirectory().resolve("local-maven-repo"), runner)
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(testJar)
     }.publish()
+  }
+
+  @BeforeEach
+  open fun setup() {
+    root = createTempDirectory()
 
     projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
     settingsScriptPath.writeText(getDefaultSettingsBuildScript())
@@ -54,6 +58,11 @@ abstract class BasePluginTest {
     }
 
     println(projectScriptPath.readText())
+  }
+
+  @OptIn(ExperimentalPathApi::class)
+  fun doLast() {
+    localRepo.root.deleteRecursively()
   }
 
   fun getDefaultProjectBuildScript(
@@ -147,17 +156,17 @@ abstract class BasePluginTest {
     }
   }
 
-  fun repo(path: String = "local-maven-repo"): AppendableMavenRepository {
-    return AppendableMavenRepository(root.resolve(path), runner)
-  }
-
   private val runner: GradleRunner
     get() {
       return GradleRunner.create()
-        .withProjectDir(root.toFile())
         .forwardOutput()
         .withPluginClasspath()
         .withTestKitDir(testKitDir.toFile())
+        .apply {
+          if (::root.isInitialized) {
+            withProjectDir(root.toFile())
+          }
+        }
     }
 
   fun runner(arguments: Iterable<String>): GradleRunner {

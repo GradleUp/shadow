@@ -25,6 +25,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Usage
 import org.gradle.testkit.runner.BuildResult
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -35,14 +36,17 @@ class PublishingTest : BasePluginTest() {
 
   private lateinit var remoteRepo: Path
 
+  @BeforeAll
+  override fun doFirst() {
+    super.doFirst()
+    publishArtifactA()
+    publishArtifactB()
+  }
+
   @BeforeEach
   override fun setup() {
     super.setup()
     remoteRepo = root.resolve("remote-maven-repo")
-
-    publishArtifactA()
-    publishArtifactB()
-
     settingsScriptPath.appendText("rootProject.name = 'maven'" + System.lineSeparator())
   }
 
