@@ -103,18 +103,6 @@ abstract class BasePluginTest {
     """.trimIndent() + System.lineSeparator()
   }
 
-  fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.module("shadow", "c", "1.0") {
-      insert("c.properties", "c")
-      if (circular) {
-        addDependency("shadow", "d", "1.0")
-      }
-    }.module("shadow", "d", "1.0") {
-      insert("d.properties", "d")
-      addDependency("shadow", "c", "1.0")
-    }.publish()
-  }
-
   open val shadowJarTask = SHADOW_JAR_TASK_NAME
   open val runShadowTask = SHADOW_RUN_TASK_NAME
   val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
