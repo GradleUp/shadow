@@ -14,7 +14,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
-import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -83,11 +82,6 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Test
   fun shadowCopy() {
-    val artifactJar = requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar"))
-      .toURI().toPath()
-    val projectJar = requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar"))
-      .toURI().toPath()
-
     projectScriptPath.appendText(
       """
         $shadowJar {

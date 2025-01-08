@@ -296,6 +296,8 @@ abstract class BasePluginTest {
     }
 
     val testJar: Path = requireNotNull(this::class.java.classLoader.getResource("junit-3.8.2.jar")).toURI().toPath()
+    val artifactJar: Path = requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar")).toURI().toPath()
+    val projectJar: Path = requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar")).toURI().toPath()
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})

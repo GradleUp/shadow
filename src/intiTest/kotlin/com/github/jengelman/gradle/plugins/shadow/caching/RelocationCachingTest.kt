@@ -10,11 +10,6 @@ import org.junit.jupiter.api.Test
 
 class RelocationCachingTest : BaseCachingTest() {
   /**
-   * TODO: have to invistigate why `:` is necessary here.
-   */
-  override val shadowJarTask: String = ":" + super.shadowJarTask
-
-  /**
    * Ensure that we get a cache miss when relocation changes and that caching works with relocation
    */
   @Test
