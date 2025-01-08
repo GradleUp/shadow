@@ -29,6 +29,9 @@ sealed class BaseTransformerTest : BasePluginTest() {
     return JarBuilder(path(path)).apply(builder).write()
   }
 
+  /**
+   * TODO: this should be shared in base.
+   */
   fun writeMainClass() {
     path("src/main/java/shadow/Main.java").writeText(
       """
@@ -42,7 +45,7 @@ sealed class BaseTransformerTest : BasePluginTest() {
     )
   }
 
-  protected companion object {
+  companion object {
     const val CONTENT_ONE = "one # NOTE: No newline terminates this line/file"
     const val CONTENT_TWO = "two # NOTE: No newline terminates this line/file"
     const val CONTENT_THREE = "three # NOTE: No newline terminates this line/file"
