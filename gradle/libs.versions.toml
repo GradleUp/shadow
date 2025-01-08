@@ -15,7 +15,7 @@ jdom2 = "org.jdom:jdom2:2.0.6.1"
 plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.2"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.0.4"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.10.0"
-okio = "com.squareup.okio:okio:3.9.1"
+okio = "com.squareup.okio:okio:3.10.1"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
