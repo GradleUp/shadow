@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.BaseTransformerTest.Companion.transform
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.NoOpTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
@@ -58,13 +59,11 @@ class TransformCachingTest : BaseCachingTest() {
     }
 
     projectScriptPath.appendText(
-      """
-        $shadowJar {
-          transform(${ServiceFileTransformer::class.java.name}) {
-            path = 'META-INF/foo'
-          }
-        }
-      """.trimIndent(),
+      transform<ServiceFileTransformer>(
+        transformerBlock = """
+          path = 'META-INF/foo'
+        """.trimIndent(),
+      ),
     )
 
     assertShadowJarExecutes()
@@ -107,13 +106,11 @@ class TransformCachingTest : BaseCachingTest() {
     }
 
     projectScriptPath.appendText(
-      """
-        $shadowJar {
-          transform(${AppendingTransformer::class.java.name}) {
-            resource = 'foo/bar.properties'
-          }
-        }
-      """.trimIndent(),
+      transform<AppendingTransformer>(
+        transformerBlock = """
+          resource = 'foo/bar.properties'
+        """.trimIndent(),
+      ),
     )
 
     assertShadowJarExecutes()
@@ -158,13 +155,11 @@ class TransformCachingTest : BaseCachingTest() {
     }
 
     projectScriptPath.appendText(
-      """
-        $shadowJar {
-          transform(${XmlAppendingTransformer::class.java.name}) {
-            resource = 'foo/bar.xml'
-          }
-        }
-      """.trimIndent(),
+      transform<XmlAppendingTransformer>(
+        transformerBlock = """
+          resource = 'foo/bar.xml'
+        """.trimIndent(),
+      ),
     )
 
     assertShadowJarExecutes()
@@ -208,11 +203,7 @@ class TransformCachingTest : BaseCachingTest() {
     }
 
     projectScriptPath.appendText(
-      """
-        $shadowJar {
-          transform(${GroovyExtensionModuleTransformer::class.java.name})
-        }
-      """.trimIndent(),
+      transform<GroovyExtensionModuleTransformer>(),
     )
 
     assertShadowJarExecutes()
