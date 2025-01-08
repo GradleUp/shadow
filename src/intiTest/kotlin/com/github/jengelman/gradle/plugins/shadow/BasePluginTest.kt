@@ -295,7 +295,7 @@ abstract class BasePluginTest {
     )
   }
 
-  fun getRunner(projectDir: Path? = root) = GradleRunner.create()
+  private fun getRunner(projectDir: Path? = root) = GradleRunner.create()
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())

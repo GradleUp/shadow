@@ -10,11 +10,11 @@ import kotlin.io.path.appendText
 import kotlin.io.path.copyToRecursively
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.listDirectoryEntries
-import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 
@@ -24,7 +24,7 @@ abstract class BaseCachingTest : BasePluginTest() {
   lateinit var alternateDir: Path
 
   /**
-   * TODO: have to invistigate why `:` is necessary here.
+   * TODO: have to investigate why `:` is necessary here.
    */
   override val shadowJarTask: String = ":" + super.shadowJarTask
 
@@ -56,7 +56,7 @@ abstract class BaseCachingTest : BasePluginTest() {
     // check that shadowJar pulls from cache in the original directory
     assertShadowJarHasResult(FROM_CACHE)
     // check that shadowJar pulls from cache in a different directory
-    assertShadowJarHasResult(FROM_CACHE) {
+    assertShadowJarHasResult(UP_TO_DATE) {
       if (alternateDir.listDirectoryEntries().isEmpty()) {
         error("Directory was not copied to alternate directory")
       }
@@ -78,14 +78,8 @@ abstract class BaseCachingTest : BasePluginTest() {
     expectedOutcome: TaskOutcome,
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ) {
-    // TODO: Use PluginSpecification.run here to reuse flags, but cache tests failed for now, need to investigate.
-    runnerBlock(getRunner().withArguments("--build-cache", shadowJarTask))
-      .build()
-      .assert(expectedOutcome)
-  }
-
-  private fun BuildResult.assert(expectedOutcome: TaskOutcome) {
-    assertThat(task(shadowJarTask)).isNotNull()
+    val result = run("--build-cache", shadowJarTask, runnerBlock = runnerBlock)
+    assertThat(result.task(shadowJarTask)).isNotNull()
       .transform { it.outcome }.isEqualTo(expectedOutcome)
   }
 }
