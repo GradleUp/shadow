@@ -13,7 +13,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class ConfigurationCacheSpec : BasePluginTest() {
+class ConfigurationCacheTest : BasePluginTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
