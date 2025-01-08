@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.BaseTransformerTest.Companion.transform
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.NoOpTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer

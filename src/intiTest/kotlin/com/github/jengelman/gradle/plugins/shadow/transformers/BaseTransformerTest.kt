@@ -28,7 +28,7 @@ sealed class BaseTransformerTest : BasePluginTest() {
     return JarBuilder(path(path)).apply(builder).write()
   }
 
-  companion object {
+  protected companion object {
     const val CONTENT_ONE = "one # NOTE: No newline terminates this line/file"
     const val CONTENT_TWO = "two # NOTE: No newline terminates this line/file"
     const val CONTENT_THREE = "three # NOTE: No newline terminates this line/file"
@@ -38,19 +38,5 @@ sealed class BaseTransformerTest : BasePluginTest() {
     const val ENTRY_SERVICES_SHADE = "META-INF/services/org.apache.maven.Shade"
     const val ENTRY_SERVICES_FOO = "META-INF/services/com.acme.Foo"
     const val ENTRY_FOO_SHADE = "META-INF/foo/org.apache.maven.Shade"
-
-    inline fun <reified T : Transformer> transform(
-      shadowJarBlock: String = "",
-      transformerBlock: String = "",
-    ): String {
-      return """
-      $shadowJar {
-        $shadowJarBlock
-        transform(${T::class.java.name}) {
-          $transformerBlock
-        }
-      }
-      """.trimIndent()
-    }
   }
 }

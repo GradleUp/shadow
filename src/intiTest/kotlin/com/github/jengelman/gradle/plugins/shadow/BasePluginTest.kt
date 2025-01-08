@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.nio.file.Path
@@ -335,6 +336,20 @@ abstract class BasePluginTest {
 
     fun fromJar(vararg paths: Path): String {
       return paths.joinToString(System.lineSeparator()) { "from('${it.toUri().toURL().path}')" }
+    }
+
+    inline fun <reified T : Transformer> transform(
+      shadowJarBlock: String = "",
+      transformerBlock: String = "",
+    ): String {
+      return """
+      $shadowJar {
+        $shadowJarBlock
+        transform(${T::class.java.name}) {
+          $transformerBlock
+        }
+      }
+      """.trimIndent()
     }
 
     fun BuildResult.assertNoDeprecationWarnings() = apply {
