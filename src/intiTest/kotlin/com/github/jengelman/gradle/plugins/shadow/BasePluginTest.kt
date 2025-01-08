@@ -158,6 +158,22 @@ abstract class BasePluginTest {
     return runnerBlock(runner(tasks.toList())).buildAndFail().assertNoDeprecationWarnings()
   }
 
+  fun writeMainClass(
+    imports: String = "import junit.framework.Test;",
+  ) {
+    path("src/main/java/shadow/Main.java").writeText(
+      """
+        package shadow;
+        $imports
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("Hello, World!");
+          }
+        }
+      """.trimIndent(),
+    )
+  }
+
   fun writeClientAndServerModules(
     serverShadowBlock: String = "",
   ) {

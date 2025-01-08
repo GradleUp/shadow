@@ -10,7 +10,6 @@ import kotlin.io.path.appendText
 import kotlin.io.path.copyToRecursively
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
@@ -45,21 +44,6 @@ abstract class BaseCachingTest : BasePluginTest() {
     )
   }
 
-  fun changeConfigurationTo(content: String) {
-    projectScriptPath.writeText(getDefaultProjectBuildScript("java", withGroup = true, withVersion = true))
-    projectScriptPath.appendText(content)
-  }
-
-  fun assertShadowJarHasResult(
-    expectedOutcome: TaskOutcome,
-    runnerBlock: (GradleRunner) -> GradleRunner = { it },
-  ) {
-    // TODO: Use PluginSpecification.run here to reuse flags, but cache tests failed for now, need to investigate.
-    runnerBlock(getRunner().withArguments("--build-cache", shadowJarTask))
-      .build()
-      .assert(expectedOutcome)
-  }
-
   @OptIn(ExperimentalPathApi::class)
   fun assertShadowJarIsCachedAndRelocatable() {
     try {
@@ -88,6 +72,16 @@ abstract class BaseCachingTest : BasePluginTest() {
     }
     // task was executed and not pulled from cache
     assertShadowJarHasResult(SUCCESS)
+  }
+
+  private fun assertShadowJarHasResult(
+    expectedOutcome: TaskOutcome,
+    runnerBlock: (GradleRunner) -> GradleRunner = { it },
+  ) {
+    // TODO: Use PluginSpecification.run here to reuse flags, but cache tests failed for now, need to investigate.
+    runnerBlock(getRunner().withArguments("--build-cache", shadowJarTask))
+      .build()
+      .assert(expectedOutcome)
   }
 
   private fun BuildResult.assert(expectedOutcome: TaskOutcome) {

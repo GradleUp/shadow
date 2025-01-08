@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import java.nio.file.Path
-import kotlin.io.path.writeText
 
 sealed class BaseTransformerTest : BasePluginTest() {
 
@@ -27,22 +26,6 @@ sealed class BaseTransformerTest : BasePluginTest() {
 
   inline fun buildJar(path: String, builder: JarBuilder.() -> Unit): Path {
     return JarBuilder(path(path)).apply(builder).write()
-  }
-
-  /**
-   * TODO: this should be shared in base.
-   */
-  fun writeMainClass() {
-    path("src/main/java/shadow/Main.java").writeText(
-      """
-        package shadow;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("Hello, World!");
-          }
-        }
-      """.trimIndent(),
-    )
   }
 
   companion object {
