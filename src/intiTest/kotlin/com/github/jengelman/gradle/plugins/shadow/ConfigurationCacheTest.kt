@@ -29,16 +29,7 @@ class ConfigurationCacheTest : BasePluginTest() {
 
   @Test
   fun supportsConfigurationCache() {
-    path("src/main/java/myapp/Main.java").writeText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
+    writeMainClass()
 
     projectScriptPath.appendText(
       """

@@ -17,13 +17,7 @@ import org.junit.jupiter.api.Test
 class TransformCachingTest : BaseCachingTest() {
   @Test
   fun shadowJarIsNotCachedWhenCustomTransformsAreUsed() {
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        public class Server {}
-      """.trimIndent(),
-    )
-
+    writeMainClass()
     projectScriptPath.appendText(
       """
         $shadowJar {
@@ -35,27 +29,22 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        public class Server {}
-      """.trimIndent(),
-    )
+    writeMainClass()
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     projectScriptPath.appendText(
@@ -68,12 +57,12 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     val replaced = projectScriptPath.readText().replace("META-INF/foo", "META-INF/bar")
@@ -81,28 +70,23 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        public class Server {}
-      """.trimIndent(),
-    )
+    writeMainClass()
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     projectScriptPath.appendText(
@@ -115,12 +99,12 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/bar.properties")
+      containsEntries("shadow/Main.class", "foo/bar.properties")
     }
 
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/bar.properties")
+      containsEntries("shadow/Main.class", "foo/bar.properties")
     }
 
     path("src/main/resources/foo/bar.properties").toFile().delete()
@@ -130,28 +114,23 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/baz.properties")
+      containsEntries("shadow/Main.class", "foo/baz.properties")
     }
 
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/baz.properties")
+      containsEntries("shadow/Main.class", "foo/baz.properties")
     }
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        public class Server {}
-      """.trimIndent(),
-    )
+    writeMainClass()
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     projectScriptPath.appendText(
@@ -164,12 +143,12 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/bar.xml")
+      containsEntries("shadow/Main.class", "foo/bar.xml")
     }
 
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/bar.xml")
+      containsEntries("shadow/Main.class", "foo/bar.xml")
     }
 
     path("src/main/resources/foo/bar.xml").toFile().delete()
@@ -179,27 +158,22 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/baz.xml")
+      containsEntries("shadow/Main.class", "foo/baz.xml")
     }
 
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class", "foo/baz.xml")
+      containsEntries("shadow/Main.class", "foo/baz.xml")
     }
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingGroovyExtensionModuleTransformer() {
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        public class Server {}
-      """.trimIndent(),
-    )
+    writeMainClass()
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     projectScriptPath.appendText(
@@ -208,12 +182,12 @@ class TransformCachingTest : BaseCachingTest() {
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
 
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
-      containsEntries("server/Server.class")
+      containsEntries("shadow/Main.class")
     }
   }
 }

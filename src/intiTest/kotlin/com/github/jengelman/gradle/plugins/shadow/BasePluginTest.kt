@@ -159,8 +159,10 @@ abstract class BasePluginTest {
   }
 
   fun writeMainClass(
-    imports: String = "import junit.framework.Test;",
+    withImports: Boolean = false,
   ) {
+    val imports = if (withImports) "import junit.framework.Test;" else ""
+
     path("src/main/java/shadow/Main.java").writeText(
       """
         package shadow;

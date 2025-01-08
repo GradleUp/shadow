@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
-import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
 class RelocationCachingTest : BaseCachingTest() {
@@ -21,18 +20,12 @@ class RelocationCachingTest : BaseCachingTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        import junit.framework.Test;
-        public class Server {}
-      """.trimIndent(),
-    )
+    writeMainClass(withImports = true)
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
         "junit/framework/Test.class",
       )
     }
@@ -48,7 +41,7 @@ class RelocationCachingTest : BaseCachingTest() {
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
         "foo/junit/framework/Test.class",
       )
       doesNotContainEntries(
@@ -59,7 +52,7 @@ class RelocationCachingTest : BaseCachingTest() {
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
         "foo/junit/framework/Test.class",
       )
       doesNotContainEntries(

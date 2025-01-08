@@ -136,18 +136,12 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        import junit.framework.Test;
-        public class Server {}
-      """.trimIndent(),
-    )
+    writeMainClass(withImports = true)
 
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
         "junit/framework/Test.class",
       )
     }
@@ -164,7 +158,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertShadowJarExecutes()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
       )
       doesNotContainEntries(
         "junit/framework/Test.class",
@@ -174,7 +168,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertShadowJarIsCachedAndRelocatable()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
       )
       doesNotContainEntries(
         "junit/framework/Test.class",
