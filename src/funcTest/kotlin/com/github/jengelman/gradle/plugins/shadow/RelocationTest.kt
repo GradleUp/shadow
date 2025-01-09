@@ -210,16 +210,15 @@ class RelocationTest : BasePluginTest() {
       )
     }
 
-    val classLoader = URLClassLoader(
-      arrayOf(outputShadowJar.toUri().toURL()),
-      ClassLoader.getSystemClassLoader().parent,
-    )
-    assertFailure {
-      // check that the class can be loaded. If the file was not relocated properly, we should get a NoDefClassFound
-      // Isolated class loader with only the JVM system jars and the output jar from the test project
-      classLoader.loadClass("shadow.ShadowTest")
-      fail("Should not reach here.")
-    }.isInstanceOf(AssertionFailedError::class)
+    val url = outputShadowJar.use { it.toUri().toURL() }
+    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+      assertFailure {
+        // check that the class can be loaded. If the file was not relocated properly, we should get a NoDefClassFound
+        // Isolated class loader with only the JVM system jars and the output jar from the test project
+        classLoader.loadClass("shadow.ShadowTest")
+        fail("Should not reach here.")
+      }.isInstanceOf(AssertionFailedError::class)
+    }
   }
 
   @Test

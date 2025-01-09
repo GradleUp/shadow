@@ -36,9 +36,11 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.io.TempDir
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
+  @TempDir
   lateinit var projectRoot: Path
   lateinit var localRepo: AppendableMavenRepository
 
@@ -64,20 +66,12 @@ abstract class BasePluginTest {
 
   @BeforeEach
   open fun setup() {
-    projectRoot = createTempDirectory()
-
     projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
     settingsScriptPath.writeText(getDefaultSettingsBuildScript())
   }
 
-  @ExperimentalPathApi
   @AfterEach
   fun cleanup() {
-    runCatching {
-      // TODO: workaround for https://github.com/junit-team/junit5/issues/2811.
-      projectRoot.deleteRecursively()
-    }
-
     println(projectScriptPath.readText())
   }
 

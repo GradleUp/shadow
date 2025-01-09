@@ -77,7 +77,7 @@ class ApplicationTest : BasePluginTest() {
     val zip = path("build/distributions/myapp-shadow-1.0.zip")
     assertThat(zip).exists()
 
-    val entries = ZipFile(zip.toFile()).entries.toList().map { it.name }
+    val entries = ZipFile(zip.toFile()).use { it.entries }.toList().map { it.name }
     assertThat(entries).containsAtLeast(
       "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
       "myapp-shadow-1.0/lib/a-1.0.jar",
