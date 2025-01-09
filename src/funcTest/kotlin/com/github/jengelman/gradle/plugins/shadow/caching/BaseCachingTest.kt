@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -77,7 +75,6 @@ sealed class BaseCachingTest : BasePluginTest() {
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ) {
     val result = run("--build-cache", shadowJarTask, runnerBlock = runnerBlock)
-    assertThat(result.task(shadowJarTask)).isNotNull()
-      .transform { it.outcome }.isEqualTo(expectedOutcome)
+    assertThat(result).taskOutcomeEquals(shadowJarTask, expectedOutcome)
   }
 }

@@ -19,7 +19,8 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledForJreRange
@@ -793,8 +794,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     val result = run(testShadowJarTask)
 
-    assertThat(result.task(":$testShadowJarTask")).isNotNull()
-      .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
     val junitEntry = jarPath("build/libs/shadow-1.0-tests.jar").use { it.getEntry("junit") }
     assertThat(junitEntry).isNotNull()
   }
@@ -830,8 +830,7 @@ class ShadowPluginTest : BasePluginTest() {
     run(libShadowJarTask)
     val result = run(libShadowJarTask)
 
-    assertThat(result.task(libShadowJarTask)).isNotNull()
-      .transform { it.outcome }.isEqualTo(TaskOutcome.UP_TO_DATE)
+    assertThat(result).taskOutcomeEquals(libShadowJarTask, UP_TO_DATE)
     assertThat(result.output).contains("Reusing configuration cache.")
   }
 

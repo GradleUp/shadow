@@ -1,15 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -111,8 +109,7 @@ class FilteringTest : BasePluginTest() {
     projectScriptPath.writeText(replaced)
     val result = run(shadowJarTask)
 
-    assertThat(result.task(shadowJarTask)).isNotNull()
-      .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "a.properties",
@@ -140,8 +137,7 @@ class FilteringTest : BasePluginTest() {
 
     val result = run(shadowJarTask)
 
-    assertThat(result.task(shadowJarTask)).isNotNull()
-      .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "a2.properties",

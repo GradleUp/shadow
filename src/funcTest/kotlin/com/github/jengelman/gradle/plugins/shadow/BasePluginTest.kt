@@ -1,5 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.Assert
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
@@ -24,6 +27,7 @@ import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -361,6 +365,10 @@ abstract class BasePluginTest {
       output.lines().forEach {
         assert(!containsDeprecationWarning(it))
       }
+    }
+
+    fun Assert<BuildResult>.taskOutcomeEquals(taskPath: String, expectedOutcome: TaskOutcome) {
+      return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)
     }
 
     private fun containsDeprecationWarning(output: String): Boolean {
