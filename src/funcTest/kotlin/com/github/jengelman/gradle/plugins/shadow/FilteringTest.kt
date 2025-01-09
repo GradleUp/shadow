@@ -5,6 +5,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -36,11 +37,13 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun includeAllDependencies() {
     run(shadowJarTask)
-    assertThat(outputShadowJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-      "b.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+      )
+    }
   }
 
   @Test
@@ -55,13 +58,15 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).containsEntries(
-      "a.properties",
-      "b.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "a2.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a.properties",
+        "b.properties",
+      )
+      doesNotContainEntries(
+        "a2.properties",
+      )
+    }
   }
 
   @Test
@@ -108,15 +113,17 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(result.task(shadowJarTask)).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-    assertThat(outputShadowJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-      "b.properties",
-      "d.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "c.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+        "d.properties",
+      )
+      doesNotContainEntries(
+        "c.properties",
+      )
+    }
   }
 
   @Test
@@ -135,15 +142,17 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(result.task(shadowJarTask)).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-    assertThat(outputShadowJar).containsEntries(
-      "a2.properties",
-      "b.properties",
-      "c.properties",
-      "d.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "a.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a2.properties",
+        "b.properties",
+        "c.properties",
+        "d.properties",
+      )
+      doesNotContainEntries(
+        "a.properties",
+      )
+    }
   }
 
   @Test
@@ -169,16 +178,18 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).containsEntries(
-      "d.properties",
-      "shadow/Passed.class",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "a.properties",
-      "a2.properties",
-      "b.properties",
-      "c.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "d.properties",
+        "shadow/Passed.class",
+      )
+      doesNotContainEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+        "c.properties",
+      )
+    }
   }
 
   @Test
@@ -193,13 +204,15 @@ class FilteringTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).doesNotContainEntries(
-      "client/Client.class",
-    )
-    assertThat(outputServerShadowJar).containsEntries(
-      "server/Server.class",
-      "junit/framework/Test.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      doesNotContainEntries(
+        "client/Client.class",
+      )
+      containsEntries(
+        "server/Server.class",
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   @Test
@@ -214,13 +227,15 @@ class FilteringTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).doesNotContainEntries(
-      "junit/framework/Test.class",
-    )
-    assertThat(outputServerShadowJar).containsEntries(
-      "client/Client.class",
-      "server/Server.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      doesNotContainEntries(
+        "junit/framework/Test.class",
+      )
+      containsEntries(
+        "client/Client.class",
+        "server/Server.class",
+      )
+    }
   }
 
   @Test
@@ -237,13 +252,15 @@ class FilteringTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).containsEntries(
-      "a.properties",
-      "b.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "a2.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a.properties",
+        "b.properties",
+      )
+      doesNotContainEntries(
+        "a2.properties",
+      )
+    }
   }
 
   @Test
@@ -272,15 +289,17 @@ class FilteringTest : BasePluginTest() {
   }
 
   private fun commonAssertions() {
-    assertThat(outputShadowJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-      "b.properties",
-      "c.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "d.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+        "c.properties",
+      )
+      doesNotContainEntries(
+        "d.properties",
+      )
+    }
   }
 
   private fun publishArtifactCD(circular: Boolean = false) {

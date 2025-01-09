@@ -12,8 +12,8 @@ class JarBuilder(
   private val entries = mutableSetOf<String>()
   private val jos = JarOutputStream(outputPath.outputStream())
 
-  fun insert(path: String, content: String): JarBuilder = apply {
-    contents[path] = content
+  fun insert(entry: String, content: String): JarBuilder = apply {
+    contents[entry] = content
   }
 
   fun write(): Path {

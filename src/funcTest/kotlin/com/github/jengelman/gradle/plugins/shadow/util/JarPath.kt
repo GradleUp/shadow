@@ -37,7 +37,9 @@ fun Assert<JarPath>.useAll(body: Assert<JarPath>.() -> Unit) = all {
 /**
  * Common regular assertions for [JarPath].
  */
-fun Assert<JarPath>.isRegular() = transform { it.entries().toList() }.isNotEmpty()
+fun Assert<JarPath>.isRegular() = useAll {
+  transform { it.entries().toList() }.isNotEmpty()
+}
 
 fun Assert<JarPath>.containsEntries(vararg entries: String) = transform { actual ->
   entries.forEach { entry ->

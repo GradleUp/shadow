@@ -18,7 +18,7 @@ import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 
-abstract class BaseCachingTest : BasePluginTest() {
+sealed class BaseCachingTest : BasePluginTest() {
 
   @TempDir
   lateinit var alternateDir: Path

@@ -13,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -120,15 +121,13 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val outputShadowJar = jarPath("build/libs/shadow.jar")
-
-    assertThat(outputShadowJar).containsEntries(
-      "shadow/Passed.class",
-      "junit/framework/Test.class",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "/",
-    )
+    assertThat(jarPath("build/libs/shadow.jar")).useAll {
+      containsEntries(
+        "shadow/Passed.class",
+        "junit/framework/Test.class",
+      )
+      doesNotContainEntries("/")
+    }
   }
 
   @Test
@@ -137,11 +136,13 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).containsEntries(
-      "client/Client.class",
-      "server/Server.class",
-      "junit/framework/Test.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      containsEntries(
+        "client/Client.class",
+        "server/Server.class",
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   /**
@@ -168,13 +169,15 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).containsEntries(
-      "client/Client.class",
-      "server/Server.class",
-    )
-    assertThat(outputServerShadowJar).doesNotContainEntries(
-      "junit/framework/Test.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      containsEntries(
+        "client/Client.class",
+        "server/Server.class",
+      )
+      doesNotContainEntries(
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   /**
@@ -194,13 +197,15 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).containsEntries(
-      "server/Server.class",
-      "junit/framework/Test.class",
-    )
-    assertThat(outputServerShadowJar).doesNotContainEntries(
-      "client/Client.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      containsEntries(
+        "server/Server.class",
+        "junit/framework/Test.class",
+      )
+      doesNotContainEntries(
+        "client/Client.class",
+      )
+    }
   }
 
   /**
@@ -219,10 +224,12 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).containsEntries(
-      "client/Client.class",
-      "server/Server.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      containsEntries(
+        "client/Client.class",
+        "server/Server.class",
+      )
+    }
   }
 
   /**
@@ -250,11 +257,13 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).containsEntries(
-      "client/Client.class",
-      "server/Server.class",
-      "junit/framework/TestCase.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      containsEntries(
+        "client/Client.class",
+        "server/Server.class",
+        "junit/framework/TestCase.class",
+      )
+    }
 
     path("client/src/main/java/client/Client.java").writeText(
       """
@@ -266,11 +275,13 @@ class ShadowPluginTest : BasePluginTest() {
 
     // TODO: I don't think junit classes should be in the output jar, but it's the test case
     //  from https://github.com/GradleUp/shadow/pull/420, need to investigate more...
-    assertThat(outputServerShadowJar).containsEntries(
-      "client/Client.class",
-      "server/Server.class",
-      "junit/framework/TestCase.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      containsEntries(
+        "client/Client.class",
+        "server/Server.class",
+        "junit/framework/TestCase.class",
+      )
+    }
   }
 
   /**
@@ -284,17 +295,18 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
-    val implOutput = jarPath("impl/build/libs/impl-all.jar")
-    assertThat(implOutput).containsEntries(
-      "impl/SimpleEntity.class",
-      "api/Entity.class",
-      "api/UnusedEntity.class",
-      "lib/LibEntity.class",
-    )
-    assertThat(implOutput).doesNotContainEntries(
-      "junit/framework/Test.class",
-      "lib/UnusedLibEntity.class",
-    )
+    assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
+      containsEntries(
+        "impl/SimpleEntity.class",
+        "api/Entity.class",
+        "api/UnusedEntity.class",
+        "lib/LibEntity.class",
+      )
+      doesNotContainEntries(
+        "junit/framework/Test.class",
+        "lib/UnusedLibEntity.class",
+      )
+    }
   }
 
   /**
@@ -317,17 +329,18 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
-    val implOutput = jarPath("impl/build/libs/impl-all.jar")
-    assertThat(implOutput).containsEntries(
-      "impl/SimpleEntity.class",
-      "api/Entity.class",
-      "api/UnusedEntity.class",
-      "lib/LibEntity.class",
-      "lib/UnusedLibEntity.class",
-    )
-    assertThat(implOutput).doesNotContainEntries(
-      "junit/framework/Test.class",
-    )
+    assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
+      containsEntries(
+        "impl/SimpleEntity.class",
+        "api/Entity.class",
+        "api/UnusedEntity.class",
+        "lib/LibEntity.class",
+        "lib/UnusedLibEntity.class",
+      )
+      doesNotContainEntries(
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   @Test
@@ -336,21 +349,22 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(":server:jar")
 
-    val serverOutput = jarPath("server/build/libs/server-1.0.jar")
-    assertThat(serverOutput).containsEntries(
-      "server/Server.class",
-    )
-    assertThat(serverOutput).doesNotContainEntries(
-      "client/Client.class",
-      "junit/framework/Test.class",
-      "client/junit/framework/Test.class",
-    )
-
-    val clientOutput = jarPath("client/build/libs/client-all.jar")
-    assertThat(clientOutput).containsEntries(
-      "client/Client.class",
-      "client/junit/framework/Test.class",
-    )
+    assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
+      containsEntries(
+        "server/Server.class",
+      )
+      doesNotContainEntries(
+        "client/Client.class",
+        "junit/framework/Test.class",
+        "client/junit/framework/Test.class",
+      )
+    }
+    assertThat(jarPath("client/build/libs/client-all.jar")).useAll {
+      containsEntries(
+        "client/Client.class",
+        "client/junit/framework/Test.class",
+      )
+    }
   }
 
   @Test
@@ -359,20 +373,22 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(serverShadowJarTask)
 
-    assertThat(outputServerShadowJar).containsEntries(
-      "client/Client.class",
-      "client/junit/framework/Test.class",
-      "server/Server.class",
-    )
-    assertThat(outputServerShadowJar).doesNotContainEntries(
-      "junit/framework/Test.class",
-    )
-
-    val clientOutput = jarPath("client/build/libs/client-all.jar")
-    assertThat(clientOutput).containsEntries(
-      "client/Client.class",
-      "client/junit/framework/Test.class",
-    )
+    assertThat(outputServerShadowJar).useAll {
+      containsEntries(
+        "client/Client.class",
+        "client/junit/framework/Test.class",
+        "server/Server.class",
+      )
+      doesNotContainEntries(
+        "junit/framework/Test.class",
+      )
+    }
+    assertThat(jarPath("client/build/libs/client-all.jar")).useAll {
+      containsEntries(
+        "client/Client.class",
+        "client/junit/framework/Test.class",
+      )
+    }
   }
 
   @Test
@@ -405,18 +421,20 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).containsEntries(
-      "shadow/Passed.class",
-      "a.properties",
-      "META-INF/a.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "META-INF/INDEX.LIST",
-      "META-INF/a.SF",
-      "META-INF/a.DSA",
-      "META-INF/a.RSA",
-      "module-info.class",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Passed.class",
+        "a.properties",
+        "META-INF/a.properties",
+      )
+      doesNotContainEntries(
+        "META-INF/INDEX.LIST",
+        "META-INF/a.SF",
+        "META-INF/a.DSA",
+        "META-INF/a.RSA",
+        "module-info.class",
+      )
+    }
   }
 
   @Test
@@ -432,13 +450,15 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "b.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+      )
+      doesNotContainEntries(
+        "b.properties",
+      )
+    }
   }
 
   @Test
@@ -475,12 +495,14 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).containsEntries(
-      "api.properties",
-      "implementation.properties",
-      "runtimeOnly.properties",
-      "implementation-dep.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "api.properties",
+        "implementation.properties",
+        "runtimeOnly.properties",
+        "implementation-dep.properties",
+      )
+    }
   }
 
   @Test
@@ -496,13 +518,15 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-    )
-    assertThat(outputShadowJar).doesNotContainEntries(
-      "b.properties",
-    )
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+      )
+      doesNotContainEntries(
+        "b.properties",
+      )
+    }
   }
 
   @Test
@@ -528,7 +552,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.entries().toList().size).isEqualTo(2)
+    val entries = outputShadowJar.use { it.entries().toList() }
+    assertThat(entries.size).isEqualTo(2)
   }
 
   @Test
@@ -543,7 +568,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path")).isNull()
+    val value = outputShadowJar.use { it.manifest.mainAttributes.getValue("Class-Path") }
+    assertThat(value).isNull()
   }
 
   @Issue(
@@ -566,8 +592,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path"))
-      .isEqualTo("/libs/a.jar junit-3.8.2.jar")
+    val value = outputShadowJar.use { it.manifest.mainAttributes.getValue("Class-Path") }
+    assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
   @Issue(
@@ -585,8 +611,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.manifest.mainAttributes.getValue("Class-Path"))
-      .isEqualTo("junit-3.8.2.jar")
+    val value = outputShadowJar.use { it.manifest.mainAttributes.getValue("Class-Path") }
+    assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 
   @Issue(
@@ -740,7 +766,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val entries = outputShadowJar.entries().toList()
+    val entries = outputShadowJar.use { it.entries().toList() }
     assertThat(entries.count { it.name.endsWith(".class") }).isEqualTo(1)
   }
 
@@ -769,8 +795,8 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertThat(result.task(":$testShadowJarTask")).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
-    val testJar = jarPath("build/libs/shadow-1.0-tests.jar")
-    assertThat(testJar.getEntry("junit")).isNotNull()
+    val junitEntry = jarPath("build/libs/shadow-1.0-tests.jar").use { it.getEntry("junit") }
+    assertThat(junitEntry).isNotNull()
   }
 
   @Test

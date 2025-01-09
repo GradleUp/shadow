@@ -25,8 +25,8 @@ class AppendingTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(ENTRY_TEST_PROPERTIES).trimIndent())
-      .isEqualTo(CONTENT_ONE_TWO)
+    val content = outputShadowJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }.trimIndent()
+    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Test
@@ -48,7 +48,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(ENTRY_TEST_PROPERTIES).trimIndent())
-      .isEqualTo(CONTENT_ONE_TWO)
+    val content = outputShadowJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }.trimIndent()
+    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 }

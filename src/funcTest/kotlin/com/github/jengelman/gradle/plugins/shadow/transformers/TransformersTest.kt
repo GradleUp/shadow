@@ -6,6 +6,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import java.util.jar.Attributes
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
@@ -31,10 +32,10 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val mf = outputShadowJar.manifest
-    assertThat(mf).isNotNull()
-    assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
-    assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
+    commonAssertions {
+      assertThat(getValue("Test-Entry")).isEqualTo("PASSED")
+      assertThat(getValue("Main-Class")).isEqualTo("shadow.Main")
+    }
   }
 
   @Test
@@ -45,11 +46,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val mf = outputShadowJar.manifest
-    assertThat(mf).isNotNull()
-    assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
-    assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-    assertThat(mf.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
+    commonAssertions()
   }
 
   @Test
@@ -81,7 +78,8 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(propertiesXml).trimIndent()).isEqualTo(
+    val content = outputShadowJar.use { it.getContent(propertiesXml) }.trimIndent()
+    assertThat(content).isEqualTo(
       """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
@@ -101,17 +99,13 @@ class TransformersTest : BaseTransformerTest() {
 
     run("jar", shadowJarTask)
 
-    val mf1 = outputShadowJar.manifest
-    assertThat(mf1).isNotNull()
-    assertThat(mf1.mainAttributes.getValue("Test-Entry")).isEqualTo("PASSED")
-    assertThat(mf1.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-    assertThat(mf1.mainAttributes.getValue("New-Entry")).isEqualTo("NEW")
+    commonAssertions()
 
-    val mf2 = jarPath("build/libs/shadow-1.0.jar").manifest
-    assertThat(mf2).isNotNull()
-    assertThat(mf2.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
-    assertThat(mf2.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-    assertThat(mf2.mainAttributes.getValue("New-Entry")).isNull()
+    val mf = jarPath("build/libs/shadow-1.0.jar").use { it.manifest }
+    assertThat(mf).isNotNull()
+    assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
+    assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
+    assertThat(mf.mainAttributes.getValue("New-Entry")).isNull()
   }
 
   @ParameterizedTest
@@ -132,6 +126,18 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).isRegular()
+  }
+
+  private fun commonAssertions(
+    mainAttributesBlock: Attributes.() -> Unit = {
+      assertThat(getValue("Test-Entry")).isEqualTo("PASSED")
+      assertThat(getValue("Main-Class")).isEqualTo("shadow.Main")
+      assertThat(getValue("New-Entry")).isEqualTo("NEW")
+    },
+  ) {
+    val mf = outputShadowJar.use { it.manifest }
+    assertThat(mf).isNotNull()
+    mainAttributesBlock(mf.mainAttributes)
   }
 
   private companion object {

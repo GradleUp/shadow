@@ -1,12 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -36,23 +38,27 @@ class ApplicationTest : BasePluginTest() {
 
     val result = run(runShadowTask)
 
-    assertThat(result.output).contains("Running application with JDK 17")
-    assertThat(result.output).contains("TestApp: Hello World! (foo)")
-
-    val installedJar = jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")
-    assertThat(installedJar).containsEntries(
-      "a.properties",
-      "a2.properties",
-      "myapp/Main.class",
+    assertThat(result.output).contains(
+      "Running application with JDK 17",
+      "TestApp: Hello World! (foo)",
     )
-    assertThat(installedJar.manifest.mainAttributes.getValue("Main-Class"))
-      .isEqualTo("myapp.Main")
 
-    path("build/install/myapp-shadow/bin/myapp").let { startScript ->
-      assertThat(startScript).exists()
-      assertThat(startScript.readText()).contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
-      assertThat(startScript.readText()).contains("-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
-      assertThat(startScript.readText()).contains("exec \"\$JAVACMD\" \"\$@\"")
+    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+        "myapp/Main.class",
+      )
+      transform { it.manifest.mainAttributes.getValue("Main-Class") }.isEqualTo("myapp.Main")
+    }
+
+    assertThat(path("build/install/myapp-shadow/bin/myapp")).all {
+      exists()
+      transform { it.readText() }.contains(
+        "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
+        "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
+        "exec \"\$JAVACMD\" \"\$@\"",
+      )
     }
   }
 
@@ -84,7 +90,7 @@ class ApplicationTest : BasePluginTest() {
 
     run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
-    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar").entries().toList()).isNotEmpty()
+    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).isRegular()
   }
 
   private fun prepare(

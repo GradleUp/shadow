@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
@@ -10,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -122,18 +122,18 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    val publishedJar = repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar")
-    assertThat(publishedJar).containsEntries(
-      "aa.properties",
-      "aa2.properties",
-    )
-    assertThat(publishedJar).doesNotContainEntries(
-      "a.properties",
-      "a2.properties",
-      "b.properties",
-      "bb.properties",
-    )
-
+    assertThat(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar")).useAll {
+      containsEntries(
+        "aa.properties",
+        "aa2.properties",
+      )
+      doesNotContainEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+        "bb.properties",
+      )
+    }
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
   }
 
@@ -165,8 +165,12 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     val entries = arrayOf("a.properties", "a2.properties", "b.properties")
-    assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).doesNotContainEntries(*entries)
-    assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).containsEntries(*entries)
+    assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).useAll {
+      doesNotContainEntries(*entries)
+    }
+    assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
+      containsEntries(*entries)
+    }
 
     pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pomContents ->
       assertThat(pomContents.dependencies.size).isEqualTo(2)
@@ -278,7 +282,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
-    assertThat(jarPath).all {
+    assertThat(jarPath).useAll {
       containsEntries(
         "a.properties",
         "a2.properties",
@@ -290,7 +294,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   private companion object {
-    fun MavenXpp3Reader.read(path: Path): Model = read(path.inputStream())
+    fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
     fun <T : Any> JsonAdapter<T>.fromJson(path: Path): T = requireNotNull(fromJson(path.readText()))
   }

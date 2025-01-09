@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -22,8 +23,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_SHADE)).isEqualTo(CONTENT_ONE_TWO)
-    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_FOO)).isEqualTo("one")
+    assertThat(outputShadowJar).useAll {
+      transform { it.getContent(ENTRY_SERVICES_SHADE) }.isEqualTo(CONTENT_ONE_TWO)
+      transform { it.getContent(ENTRY_SERVICES_FOO) }.isEqualTo("one")
+    }
   }
 
   @Test
@@ -45,7 +48,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(ENTRY_FOO_SHADE)).isEqualTo(CONTENT_ONE_TWO)
+    val content = outputShadowJar.use { it.getContent(ENTRY_FOO_SHADE) }
+    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Test
@@ -63,8 +67,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_SHADE)).isEqualTo(CONTENT_ONE_TWO)
-    assertThat(outputShadowJar.getContent(ENTRY_SERVICES_FOO)).isEqualTo("one")
+    assertThat(outputShadowJar).useAll {
+      transform { it.getContent(ENTRY_SERVICES_SHADE) }.isEqualTo(CONTENT_ONE_TWO)
+      transform { it.getContent(ENTRY_SERVICES_FOO) }.isEqualTo("one")
+    }
   }
 
   @Test
@@ -119,31 +125,31 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val text1 = outputShadowJar.getContent("META-INF/services/java.sql.Driver")
-    assertThat(text1).isEqualTo(
-      """
-        oracle.jdbc.OracleDriver
-        myapache.hive.jdbc.HiveDriver
-        myapache.derby.jdbc.AutoloadedDriver
-        com.mysql.jdbc.Driver
-      """.trimIndent(),
-    )
-
-    val text2 = outputShadowJar.getContent("META-INF/services/myapache.axis.components.compiler.Compiler")
-    assertThat(text2).isEqualTo(
-      """
-        myapache.axis.components.compiler.Javac
-        org.apache.axis.components.compiler.Jikes
-      """.trimIndent(),
-    )
-
-    val text3 = outputShadowJar.getContent("META-INF/services/org.apache.commons.logging.LogFactory")
-    assertThat(text3).isEqualTo(
-      """
-        myapache.commons.logging.impl.LogFactoryImpl
-        org.mortbay.log.Factory
-      """.trimIndent(),
-    )
+    assertThat(outputShadowJar).useAll {
+      transform { it.getContent("META-INF/services/java.sql.Driver") }
+        .isEqualTo(
+          """
+            oracle.jdbc.OracleDriver
+            myapache.hive.jdbc.HiveDriver
+            myapache.derby.jdbc.AutoloadedDriver
+            com.mysql.jdbc.Driver
+          """.trimIndent(),
+        )
+      transform { it.getContent("META-INF/services/myapache.axis.components.compiler.Compiler") }
+        .isEqualTo(
+          """
+            myapache.axis.components.compiler.Javac
+            org.apache.axis.components.compiler.Jikes
+          """.trimIndent(),
+        )
+      transform { it.getContent("META-INF/services/org.apache.commons.logging.LogFactory") }
+        .isEqualTo(
+          """
+            myapache.commons.logging.impl.LogFactoryImpl
+            org.mortbay.log.Factory
+          """.trimIndent(),
+        )
+    }
   }
 
   @Test
@@ -165,7 +171,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(ENTRY_FOO_SHADE)).isEqualTo(CONTENT_ONE_TWO)
+    val content = outputShadowJar.use { it.getContent(ENTRY_FOO_SHADE) }
+    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Issue(
@@ -199,7 +206,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar.getContent(servicesShadowEntry))
-      .isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
+    val content = outputShadowJar.use { it.getContent(servicesShadowEntry) }
+    assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
   }
 }
