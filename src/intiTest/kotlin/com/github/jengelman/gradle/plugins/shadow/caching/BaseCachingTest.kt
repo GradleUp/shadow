@@ -23,11 +23,6 @@ abstract class BaseCachingTest : BasePluginTest() {
   @TempDir
   lateinit var alternateDir: Path
 
-  /**
-   * TODO: have to investigate why `:` is necessary here.
-   */
-  override val shadowJarTask: String = ":" + super.shadowJarTask
-
   @BeforeEach
   override fun setup() {
     super.setup()

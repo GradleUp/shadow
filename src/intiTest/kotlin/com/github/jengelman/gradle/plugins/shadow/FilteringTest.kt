@@ -106,7 +106,7 @@ class FilteringTest : BasePluginTest() {
     projectScriptPath.writeText(replaced)
     val result = run(shadowJarTask)
 
-    assertThat(result.task(":shadowJar")).isNotNull()
+    assertThat(result.task(shadowJarTask)).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
     assertThat(outputShadowJar).containsEntries(
       "a.properties",
@@ -133,7 +133,7 @@ class FilteringTest : BasePluginTest() {
 
     val result = run(shadowJarTask)
 
-    assertThat(result.task(":shadowJar")).isNotNull()
+    assertThat(result.task(shadowJarTask)).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.SUCCESS)
     assertThat(outputShadowJar).containsEntries(
       "a2.properties",

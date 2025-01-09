@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import kotlin.io.path.appendText
@@ -84,9 +85,9 @@ class ConfigurationCacheTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(serverShadowJarTask)
     outputServerShadowJar.deleteExisting()
-    val result = run(shadowJarTask)
+    val result = run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).containsEntries(
       "server/Server.class",
@@ -124,10 +125,11 @@ class ConfigurationCacheTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
-    val result = run(shadowJarTask)
+    val libShadowJarTask = ":lib:$SHADOW_JAR_TASK_NAME"
+    run(libShadowJarTask)
+    val result = run(libShadowJarTask)
 
-    assertThat(result.task(":lib:shadowJar")).isNotNull()
+    assertThat(result.task(libShadowJarTask)).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.UP_TO_DATE)
     result.assertCcReused()
   }

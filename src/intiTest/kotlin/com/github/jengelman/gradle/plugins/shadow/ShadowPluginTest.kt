@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -37,10 +38,10 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertThat(project.plugins.hasPlugin(ShadowPlugin::class.java)).isTrue()
     assertThat(project.plugins.hasPlugin(LegacyShadowPlugin::class.java)).isTrue()
-    assertThat(project.tasks.findByName(shadowJarTask)).isNull()
+    assertThat(project.tasks.findByName(SHADOW_JAR_TASK_NAME)).isNull()
 
     project.plugins.apply(JavaPlugin::class.java)
-    val shadowTask = project.tasks.getByName(shadowJarTask) as ShadowJar
+    val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
 
     assertThat(shadowTask.archiveBaseName.get()).isEqualTo(projectName)
@@ -281,7 +282,7 @@ class ShadowPluginTest : BasePluginTest() {
   fun useMinimizeWithDependenciesWithApiScope() {
     writeApiLibAndImplModules()
 
-    run(":impl:$shadowJarTask")
+    run(":impl:$SHADOW_JAR_TASK_NAME")
 
     val implOutput = jarPath("impl/build/libs/impl-all.jar")
     assertThat(implOutput).containsEntries(
@@ -314,7 +315,7 @@ class ShadowPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":impl:$shadowJarTask")
+    run(":impl:$SHADOW_JAR_TASK_NAME")
 
     val implOutput = jarPath("impl/build/libs/impl-all.jar")
     assertThat(implOutput).containsEntries(

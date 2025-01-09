@@ -108,8 +108,8 @@ abstract class BasePluginTest {
     """.trimIndent() + System.lineSeparator()
   }
 
-  open val shadowJarTask = SHADOW_JAR_TASK_NAME
-  open val runShadowTask = SHADOW_RUN_TASK_NAME
+  open val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
+  open val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
   val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
 
   val projectScriptPath: Path
