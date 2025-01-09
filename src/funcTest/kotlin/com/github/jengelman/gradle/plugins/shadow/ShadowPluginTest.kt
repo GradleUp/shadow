@@ -272,8 +272,6 @@ class ShadowPluginTest : BasePluginTest() {
     )
     run(serverShadowJarTask)
 
-    // TODO: I don't think junit classes should be in the output jar, but it's the test case
-    //  from https://github.com/GradleUp/shadow/pull/420, need to investigate more...
     assertThat(outputServerShadowJar).useAll {
       containsEntries(
         "client/Client.class",
