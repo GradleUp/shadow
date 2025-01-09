@@ -1,6 +1,6 @@
-package com.github.jengelman.gradle.plugins.shadow.doc.executable
+package com.github.jengelman.gradle.plugins.shadow.executable
 
-import com.github.jengelman.gradle.plugins.shadow.doc.executor.SnippetExecutor
+import com.github.jengelman.gradle.plugins.shadow.executor.SnippetExecutor
 import java.nio.file.Path
 import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.function.Executable

@@ -1,6 +1,6 @@
-package com.github.jengelman.gradle.plugins.shadow.doc.executor
+package com.github.jengelman.gradle.plugins.shadow.executor
 
-import com.github.jengelman.gradle.plugins.shadow.doc.fixture.SnippetFixture
+import com.github.jengelman.gradle.plugins.shadow.fixture.SnippetFixture
 import java.nio.file.Path
 import kotlin.io.path.createDirectory
 import kotlin.io.path.writeText

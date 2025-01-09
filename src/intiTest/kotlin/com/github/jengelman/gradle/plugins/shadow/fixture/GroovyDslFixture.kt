@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.doc.fixture
+package com.github.jengelman.gradle.plugins.shadow.fixture
 
 object GroovyDslFixture : SnippetFixture {
 

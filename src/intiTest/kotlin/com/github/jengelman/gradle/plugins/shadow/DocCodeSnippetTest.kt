@@ -1,9 +1,9 @@
-package com.github.jengelman.gradle.plugins.shadow.doc
+package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.doc.executable.CodeSnippetExtractor
-import com.github.jengelman.gradle.plugins.shadow.doc.executor.GroovyBuildExecutor
-import com.github.jengelman.gradle.plugins.shadow.doc.executor.NoopExecutor
-import com.github.jengelman.gradle.plugins.shadow.doc.fixture.GroovyDslFixture
+import com.github.jengelman.gradle.plugins.shadow.executable.CodeSnippetExtractor
+import com.github.jengelman.gradle.plugins.shadow.executor.GroovyBuildExecutor
+import com.github.jengelman.gradle.plugins.shadow.executor.NoopExecutor
+import com.github.jengelman.gradle.plugins.shadow.fixture.GroovyDslFixture
 import java.nio.file.Path
 import kotlin.io.path.Path
 import org.junit.jupiter.api.DynamicTest
