@@ -40,7 +40,10 @@ abstract class BaseCachingTest : BasePluginTest() {
   }
 
   @OptIn(ExperimentalPathApi::class)
-  fun assertShadowJarIsCachedAndRelocatable() {
+  fun assertShadowJarIsCachedAndRelocatable(
+    firstOutcome: TaskOutcome = FROM_CACHE,
+    secondOutcome: TaskOutcome = UP_TO_DATE,
+  ) {
     try {
       outputShadowJar.deleteExisting()
     } catch (ignored: IllegalStateException) {
@@ -49,9 +52,9 @@ abstract class BaseCachingTest : BasePluginTest() {
     alternateDir.deleteRecursively()
     root.copyToRecursively(alternateDir, followLinks = false, overwrite = false)
     // check that shadowJar pulls from cache in the original directory
-    assertShadowJarHasResult(FROM_CACHE)
+    assertShadowJarHasResult(firstOutcome)
     // check that shadowJar pulls from cache in a different directory
-    assertShadowJarHasResult(UP_TO_DATE) {
+    assertShadowJarHasResult(secondOutcome) {
       if (alternateDir.listDirectoryEntries().isEmpty()) {
         error("Directory was not copied to alternate directory")
       }

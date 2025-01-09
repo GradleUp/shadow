@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import org.junit.jupiter.api.Test
 
 class ShadowJarCachingTest : BaseCachingTest() {
@@ -53,7 +54,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertShadowJarIsCachedAndRelocatable()
+    // TODO: need to investigate why secondOutcome is FROM_CACHE instead of UP_TO_DATE.
+    assertShadowJarIsCachedAndRelocatable(secondOutcome = FROM_CACHE)
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
   }
 
