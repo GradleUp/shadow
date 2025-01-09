@@ -1,6 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.Assert
+import assertk.all
+import assertk.assertThat
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
@@ -10,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
+import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.ExperimentalPathApi
@@ -35,7 +39,7 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
-  lateinit var root: Path
+  lateinit var projectRoot: Path
   lateinit var localRepo: AppendableMavenRepository
 
   @BeforeAll
@@ -60,7 +64,7 @@ abstract class BasePluginTest {
 
   @BeforeEach
   open fun setup() {
-    root = createTempDirectory()
+    projectRoot = createTempDirectory()
 
     projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
     settingsScriptPath.writeText(getDefaultSettingsBuildScript())
@@ -71,7 +75,7 @@ abstract class BasePluginTest {
   fun cleanup() {
     runCatching {
       // TODO: workaround for https://github.com/junit-team/junit5/issues/2811.
-      root.deleteRecursively()
+      projectRoot.deleteRecursively()
     }
 
     println(projectScriptPath.readText())
@@ -81,6 +85,15 @@ abstract class BasePluginTest {
   fun doLast() {
     localRepo.root.deleteRecursively()
   }
+
+  open val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
+  open val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
+  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
+
+  val projectScriptPath: Path get() = path("build.gradle")
+  val settingsScriptPath: Path get() = path("settings.gradle")
+  open val outputShadowJar: JarPath get() = jarPath("build/libs/shadow-1.0-all.jar")
+  val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   fun getDefaultProjectBuildScript(
     javaPlugin: String = "java",
@@ -115,24 +128,8 @@ abstract class BasePluginTest {
     """.trimIndent() + System.lineSeparator()
   }
 
-  open val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
-  open val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
-  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
-
-  val projectScriptPath: Path
-    get() = path("build.gradle")
-
-  val settingsScriptPath: Path
-    get() = path("settings.gradle")
-
-  open val outputShadowJar: JarPath
-    get() = jarPath("build/libs/shadow-1.0-all.jar")
-
-  val outputServerShadowJar: JarPath
-    get() = jarPath("server/build/libs/server-1.0-all.jar")
-
   fun jarPath(path: String): JarPath {
-    val realPath = root.resolve(path).also {
+    val realPath = projectRoot.resolve(path).also {
       check(it.exists()) { "Path not found: $it" }
       check(it.isRegularFile()) { "Path is not a regular file: $it" }
     }
@@ -140,7 +137,7 @@ abstract class BasePluginTest {
   }
 
   fun path(path: String): Path {
-    return root.resolve(path).also {
+    return projectRoot.resolve(path).also {
       if (it.exists()) return@also
       it.parent.createDirectories()
       // We should create text file only if it doesn't exist.
@@ -300,7 +297,7 @@ abstract class BasePluginTest {
 
   fun runner(
     arguments: Iterable<String> = emptyList(),
-    projectDir: Path? = root,
+    projectDir: Path? = projectRoot,
   ): GradleRunner = GradleRunner.create()
     .forwardOutput()
     .withPluginClasspath()
@@ -362,18 +359,20 @@ abstract class BasePluginTest {
     }
 
     fun BuildResult.assertNoDeprecationWarnings() = apply {
-      output.lines().forEach {
-        assert(!containsDeprecationWarning(it))
-      }
+      assertThat(output).doesNotContain(
+        "has been deprecated and is scheduled to be removed in Gradle",
+        "has been deprecated. This is scheduled to be removed in Gradle",
+      )
+    }
+
+    fun <T : Closeable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {
+      body()
+      // Close the resource after all assertions are done.
+      given { it.use(block = {}) }
     }
 
     fun Assert<BuildResult>.taskOutcomeEquals(taskPath: String, expectedOutcome: TaskOutcome) {
       return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)
-    }
-
-    private fun containsDeprecationWarning(output: String): Boolean {
-      return output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
-        output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
   }
 }

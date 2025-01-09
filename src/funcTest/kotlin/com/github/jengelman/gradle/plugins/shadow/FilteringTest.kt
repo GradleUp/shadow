@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -201,12 +200,12 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      doesNotContainEntries(
-        "client/Client.class",
-      )
       containsEntries(
         "server/Server.class",
         "junit/framework/Test.class",
+      )
+      doesNotContainEntries(
+        "client/Client.class",
       )
     }
   }
@@ -224,12 +223,12 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      doesNotContainEntries(
-        "junit/framework/Test.class",
-      )
       containsEntries(
         "client/Client.class",
         "server/Server.class",
+      )
+      doesNotContainEntries(
+        "junit/framework/Test.class",
       )
     }
   }

@@ -4,8 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import java.nio.file.Path
 
-sealed class BaseTransformerTest : BasePluginTest() {
-
+abstract class BaseTransformerTest : BasePluginTest() {
   fun buildJarOne(
     builder: JarBuilder.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_ONE)

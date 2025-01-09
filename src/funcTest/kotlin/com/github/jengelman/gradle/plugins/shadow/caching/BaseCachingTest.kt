@@ -16,8 +16,7 @@ import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 
-sealed class BaseCachingTest : BasePluginTest() {
-
+abstract class BaseCachingTest : BasePluginTest() {
   @TempDir
   lateinit var alternateDir: Path
 
@@ -48,7 +47,7 @@ sealed class BaseCachingTest : BasePluginTest() {
       // ignore if the file does not exist
     }
     alternateDir.deleteRecursively()
-    root.copyToRecursively(alternateDir, followLinks = false, overwrite = false)
+    projectRoot.copyToRecursively(alternateDir, followLinks = false, overwrite = false)
     // check that shadowJar pulls from cache in the original directory
     assertShadowJarHasResult(firstOutcome)
     // check that shadowJar pulls from cache in a different directory

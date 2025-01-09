@@ -9,7 +9,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -33,12 +32,12 @@ class PublishingTest : BasePluginTest() {
   private val gmmAdapter = moshi.adapter(GradleModuleMetadata::class.java)
   private val pomReader = MavenXpp3Reader()
 
-  private lateinit var remoteRepo: Path
+  private lateinit var remoteRepoPath: Path
 
   @BeforeEach
   override fun setup() {
     super.setup()
-    remoteRepo = root.resolve("remote-maven-repo")
+    remoteRepoPath = projectRoot.resolve("remote-maven-repo")
     settingsScriptPath.appendText("rootProject.name = 'maven'" + System.lineSeparator())
   }
 
@@ -216,7 +215,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun repoPath(path: String): Path {
-    return remoteRepo.resolve(path).also {
+    return remoteRepoPath.resolve(path).also {
       check(it.exists()) { "Path not found: $it" }
       check(it.isRegularFile()) { "Path is not a regular file: $it" }
     }
@@ -257,7 +256,7 @@ class PublishingTest : BasePluginTest() {
           }
           repositories {
             maven {
-              url = '${remoteRepo.toUri()}'
+              url = '${remoteRepoPath.toUri()}'
             }
           }
         }

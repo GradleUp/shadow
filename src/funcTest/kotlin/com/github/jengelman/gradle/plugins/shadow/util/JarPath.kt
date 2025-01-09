@@ -29,16 +29,13 @@ class JarPath(val path: Path) :
   }
 }
 
-fun Assert<JarPath>.useAll(body: Assert<JarPath>.() -> Unit) = all {
-  body()
-  given { it.close() }
-}
-
 /**
  * Common regular assertions for [JarPath].
  */
-fun Assert<JarPath>.isRegular() = useAll {
+fun Assert<JarPath>.isRegular() = all {
   transform { it.entries().toList() }.isNotEmpty()
+  // Close the resource after all assertions are done.
+  given { it.use(block = {}) }
 }
 
 fun Assert<JarPath>.containsEntries(vararg entries: String) = transform { actual ->

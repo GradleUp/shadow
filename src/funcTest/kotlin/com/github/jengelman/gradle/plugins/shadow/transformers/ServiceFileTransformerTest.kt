@@ -3,13 +3,11 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.useAll
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
-
   @Test
   fun serviceResourceTransformer() {
     projectScriptPath.appendText(
