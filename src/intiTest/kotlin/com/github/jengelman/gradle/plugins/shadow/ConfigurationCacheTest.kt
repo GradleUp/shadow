@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import kotlin.io.path.appendText
@@ -13,7 +14,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class ConfigurationCacheSpec : BasePluginTest() {
+class ConfigurationCacheTest : BasePluginTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
@@ -29,16 +30,7 @@ class ConfigurationCacheSpec : BasePluginTest() {
 
   @Test
   fun supportsConfigurationCache() {
-    path("src/main/java/myapp/Main.java").writeText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
+    writeMainClass()
 
     projectScriptPath.appendText(
       """
@@ -93,9 +85,9 @@ class ConfigurationCacheSpec : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(serverShadowJarTask)
     outputServerShadowJar.deleteExisting()
-    val result = run(shadowJarTask)
+    val result = run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).containsEntries(
       "server/Server.class",
@@ -133,10 +125,11 @@ class ConfigurationCacheSpec : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
-    val result = run(shadowJarTask)
+    val libShadowJarTask = ":lib:$SHADOW_JAR_TASK_NAME"
+    run(libShadowJarTask)
+    val result = run(libShadowJarTask)
 
-    assertThat(result.task(":lib:shadowJar")).isNotNull()
+    assertThat(result.task(libShadowJarTask)).isNotNull()
       .transform { it.outcome }.isEqualTo(TaskOutcome.UP_TO_DATE)
     result.assertCcReused()
   }

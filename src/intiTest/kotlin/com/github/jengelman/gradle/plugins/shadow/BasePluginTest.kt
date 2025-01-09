@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.nio.file.Path
@@ -35,7 +36,10 @@ abstract class BasePluginTest {
 
   @BeforeAll
   open fun doFirst() {
-    localRepo = AppendableMavenRepository(createTempDirectory().resolve("local-maven-repo"), getRunner(null))
+    localRepo = AppendableMavenRepository(
+      createTempDirectory().resolve("local-maven-repo"),
+      runner(projectDir = null),
+    )
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(testJar)
     }.module("shadow", "a", "1.0") {
@@ -107,8 +111,8 @@ abstract class BasePluginTest {
     """.trimIndent() + System.lineSeparator()
   }
 
-  open val shadowJarTask = SHADOW_JAR_TASK_NAME
-  open val runShadowTask = SHADOW_RUN_TASK_NAME
+  open val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
+  open val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
   val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
 
   val projectScriptPath: Path
@@ -117,7 +121,7 @@ abstract class BasePluginTest {
   val settingsScriptPath: Path
     get() = path("settings.gradle")
 
-  val outputShadowJar: JarPath
+  open val outputShadowJar: JarPath
     get() = jarPath("build/libs/shadow-1.0-all.jar")
 
   val outputServerShadowJar: JarPath
@@ -140,10 +144,6 @@ abstract class BasePluginTest {
     }
   }
 
-  fun runner(arguments: Iterable<String>): GradleRunner {
-    return getRunner().withArguments(commonArguments + arguments)
-  }
-
   inline fun run(
     vararg tasks: String,
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
@@ -156,6 +156,24 @@ abstract class BasePluginTest {
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
     return runnerBlock(runner(tasks.toList())).buildAndFail().assertNoDeprecationWarnings()
+  }
+
+  fun writeMainClass(
+    withImports: Boolean = false,
+  ) {
+    val imports = if (withImports) "import junit.framework.Test;" else ""
+
+    path("src/main/java/shadow/Main.java").writeText(
+      """
+        package shadow;
+        $imports
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("Hello, World!");
+          }
+        }
+      """.trimIndent(),
+    )
   }
 
   fun writeClientAndServerModules(
@@ -276,10 +294,14 @@ abstract class BasePluginTest {
     )
   }
 
-  private fun getRunner(projectDir: Path? = root) = GradleRunner.create()
+  fun runner(
+    arguments: Iterable<String> = emptyList(),
+    projectDir: Path? = root,
+  ): GradleRunner = GradleRunner.create()
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())
+    .withArguments(commonArguments + arguments)
     .apply {
       if (projectDir != null) {
         withProjectDir(projectDir.toFile())
@@ -296,6 +318,10 @@ abstract class BasePluginTest {
     }
 
     val testJar: Path = requireNotNull(this::class.java.classLoader.getResource("junit-3.8.2.jar")).toURI().toPath()
+    val artifactJar: Path =
+      requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar")).toURI().toPath()
+    val projectJar: Path =
+      requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar")).toURI().toPath()
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
@@ -315,6 +341,20 @@ abstract class BasePluginTest {
 
     fun fromJar(vararg paths: Path): String {
       return paths.joinToString(System.lineSeparator()) { "from('${it.toUri().toURL().path}')" }
+    }
+
+    inline fun <reified T : Transformer> transform(
+      shadowJarBlock: String = "",
+      transformerBlock: String = "",
+    ): String {
+      return """
+      $shadowJar {
+        $shadowJarBlock
+        transform(${T::class.java.name}) {
+          $transformerBlock
+        }
+      }
+      """.trimIndent()
     }
 
     fun BuildResult.assertNoDeprecationWarnings() = apply {

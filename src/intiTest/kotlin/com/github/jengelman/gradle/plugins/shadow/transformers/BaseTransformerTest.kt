@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import java.nio.file.Path
-import kotlin.io.path.writeText
 
 sealed class BaseTransformerTest : BasePluginTest() {
 
@@ -29,19 +28,6 @@ sealed class BaseTransformerTest : BasePluginTest() {
     return JarBuilder(path(path)).apply(builder).write()
   }
 
-  fun writeMainClass() {
-    path("src/main/java/shadow/Main.java").writeText(
-      """
-        package shadow;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("Hello, World!");
-          }
-        }
-      """.trimIndent(),
-    )
-  }
-
   protected companion object {
     const val CONTENT_ONE = "one # NOTE: No newline terminates this line/file"
     const val CONTENT_TWO = "two # NOTE: No newline terminates this line/file"
@@ -52,19 +38,5 @@ sealed class BaseTransformerTest : BasePluginTest() {
     const val ENTRY_SERVICES_SHADE = "META-INF/services/org.apache.maven.Shade"
     const val ENTRY_SERVICES_FOO = "META-INF/services/com.acme.Foo"
     const val ENTRY_FOO_SHADE = "META-INF/foo/org.apache.maven.Shade"
-
-    inline fun <reified T : Transformer> transform(
-      shadowJarBlock: String = "",
-      transformerBlock: String = "",
-    ): String {
-      return """
-      $shadowJar {
-        $shadowJarBlock
-        transform(${T::class.java.name}) {
-          $transformerBlock
-        }
-      }
-      """.trimIndent()
-    }
   }
 }

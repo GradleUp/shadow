@@ -4,6 +4,7 @@ import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
@@ -269,7 +270,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":app:$shadowJarTask")
+    run(":app:$SHADOW_JAR_TASK_NAME")
 
     val appOutput = jarPath("app/build/libs/app-all.jar")
     assertThat(appOutput).containsEntries(
