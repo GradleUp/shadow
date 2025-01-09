@@ -214,15 +214,15 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
-  private fun repoPath(path: String): Path {
-    return remoteRepoPath.resolve(path).also {
+  private fun repoPath(relative: String): Path {
+    return remoteRepoPath.resolve(relative).also {
       check(it.exists()) { "Path not found: $it" }
       check(it.isRegularFile()) { "Path is not a regular file: $it" }
     }
   }
 
-  private fun repoJarPath(path: String): JarPath {
-    return JarPath(remoteRepoPath.resolve(path))
+  private fun repoJarPath(relative: String): JarPath {
+    return JarPath(remoteRepoPath.resolve(relative))
   }
 
   private fun publish(): BuildResult = run("publish")

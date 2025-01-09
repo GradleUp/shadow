@@ -20,7 +20,7 @@ class AppendableMavenRepository(
   private val modules = mutableListOf<Module>()
 
   init {
-    root.createDirectories()
+    root.resolve("temp").createDirectories()
     root.resolve("settings.gradle").createFile()
       .writeText("rootProject.name = '${root.name}'")
     projectBuildScript = root.resolve("build.gradle").createFile()
@@ -109,7 +109,7 @@ class AppendableMavenRepository(
 
     fun buildJar(builder: JarBuilder.() -> Unit) {
       val jarName = coordinate.replace(":", "-") + ".jar"
-      existingJar = JarBuilder(root.resolve(jarName)).apply(builder).write()
+      existingJar = JarBuilder(root.resolve("temp/$jarName")).apply(builder).write()
     }
 
     fun addDependency(groupId: String, artifactId: String, version: String, scope: String = "runtime") {

@@ -23,8 +23,8 @@ abstract class BaseTransformerTest : BasePluginTest() {
     return buildJar("two.jar", builder)
   }
 
-  inline fun buildJar(path: String, builder: JarBuilder.() -> Unit): Path {
-    return JarBuilder(path(path)).apply(builder).write()
+  inline fun buildJar(relative: String, builder: JarBuilder.() -> Unit): Path {
+    return JarBuilder(path("temp/$relative")).apply(builder).write()
   }
 
   protected companion object {
