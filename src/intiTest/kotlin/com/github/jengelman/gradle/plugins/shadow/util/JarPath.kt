@@ -25,7 +25,7 @@ class JarPath(val path: Path) :
 
   fun getContent(entryName: String): String {
     val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
-    return getInputStream(entry).bufferedReader().readText()
+    return getInputStream(entry).bufferedReader().use { it.readText() }
   }
 }
 
