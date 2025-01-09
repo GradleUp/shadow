@@ -222,7 +222,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun repoJarPath(path: String): JarPath {
-    return JarPath(repoPath(path))
+    return JarPath(remoteRepoPath.resolve(path))
   }
 
   private fun publish(): BuildResult = run("publish")

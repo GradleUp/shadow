@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
@@ -43,11 +44,10 @@ abstract class BaseCachingTest : BasePluginTest() {
   ) {
     try {
       outputShadowJar.deleteExisting()
-    } catch (ignored: IllegalStateException) {
-      // ignore if the file does not exist
+    } catch (ignored: NoSuchFileException) {
     }
     alternateDir.deleteRecursively()
-    projectRoot.copyToRecursively(alternateDir, followLinks = false, overwrite = false)
+    projectRoot.copyToRecursively(target = alternateDir, followLinks = false)
     // check that shadowJar pulls from cache in the original directory
     assertShadowJarHasResult(firstOutcome)
     // check that shadowJar pulls from cache in a different directory
@@ -62,8 +62,7 @@ abstract class BaseCachingTest : BasePluginTest() {
   fun assertShadowJarExecutes() {
     try {
       outputShadowJar.deleteExisting()
-    } catch (ignored: IllegalStateException) {
-      // ignore if the file does not exist
+    } catch (ignored: NoSuchFileException) {
     }
     // task was executed and not pulled from cache
     assertShadowJarHasResult(SUCCESS)

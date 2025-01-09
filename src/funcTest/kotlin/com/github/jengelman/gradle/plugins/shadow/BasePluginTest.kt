@@ -25,7 +25,6 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
-import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.writeText
@@ -122,16 +121,12 @@ abstract class BasePluginTest {
     """.trimIndent() + System.lineSeparator()
   }
 
-  fun jarPath(path: String): JarPath {
-    val realPath = projectRoot.resolve(path).also {
-      check(it.exists()) { "Path not found: $it" }
-      check(it.isRegularFile()) { "Path is not a regular file: $it" }
-    }
-    return JarPath(realPath)
+  fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
+    return JarPath(parent.resolve(relative))
   }
 
-  fun path(path: String): Path {
-    return projectRoot.resolve(path).also {
+  fun path(relative: String, parent: Path = projectRoot): Path {
+    return parent.resolve(relative).also {
       if (it.exists()) return@also
       it.parent.createDirectories()
       // We should create text file only if it doesn't exist.
