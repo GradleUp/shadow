@@ -5,11 +5,8 @@ import assertk.all
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import java.nio.file.Path
-import java.util.concurrent.ConcurrentHashMap
 import java.util.jar.JarFile
 import kotlin.io.path.deleteExisting
-import kotlin.io.path.exists
-import kotlin.io.path.isRegularFile
 
 /**
  * A wrapper for [JarFile] that also implements [Path].
@@ -17,7 +14,7 @@ import kotlin.io.path.isRegularFile
  * We must declare some functions like [kotlin.io.path.deleteExisting] explicitly as they could not
  * be delegated to [JarPath] type.
  */
-class JarPath private constructor(val path: Path) :
+class JarPath(val path: Path) :
   JarFile(path.toFile()),
   Path by path {
 
@@ -26,25 +23,9 @@ class JarPath private constructor(val path: Path) :
     path.deleteExisting()
   }
 
-  override fun close() {
-    super.close()
-    cached.remove(path)
-  }
-
   fun getContent(entryName: String): String {
     val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
     return getInputStream(entry).bufferedReader().readText()
-  }
-
-  companion object {
-    private val cached = ConcurrentHashMap<Path, JarPath>()
-
-    fun from(path: Path): JarPath {
-      check(path.exists()) { "Path not found: $path" }
-      check(path.isRegularFile()) { "Path is not a regular file: $path" }
-
-      return cached[path] ?: JarPath(path).also { cached[path] = it }
-    }
   }
 }
 
