@@ -36,7 +36,10 @@ abstract class BasePluginTest {
 
   @BeforeAll
   open fun doFirst() {
-    localRepo = AppendableMavenRepository(createTempDirectory().resolve("local-maven-repo"), getRunner(null))
+    localRepo = AppendableMavenRepository(
+      createTempDirectory().resolve("local-maven-repo"),
+      runner(projectDir = null),
+    )
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(testJar)
     }.module("shadow", "a", "1.0") {
@@ -139,10 +142,6 @@ abstract class BasePluginTest {
       // We should create text file only if it doesn't exist.
       it.createFile()
     }
-  }
-
-  fun runner(arguments: Iterable<String>): GradleRunner {
-    return getRunner().withArguments(commonArguments + arguments)
   }
 
   inline fun run(
@@ -295,10 +294,14 @@ abstract class BasePluginTest {
     )
   }
 
-  private fun getRunner(projectDir: Path? = root) = GradleRunner.create()
+  fun runner(
+    arguments: Iterable<String> = emptyList(),
+    projectDir: Path? = root,
+  ): GradleRunner = GradleRunner.create()
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())
+    .withArguments(commonArguments + arguments)
     .apply {
       if (projectDir != null) {
         withProjectDir(projectDir.toFile())
@@ -315,8 +318,10 @@ abstract class BasePluginTest {
     }
 
     val testJar: Path = requireNotNull(this::class.java.classLoader.getResource("junit-3.8.2.jar")).toURI().toPath()
-    val artifactJar: Path = requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar")).toURI().toPath()
-    val projectJar: Path = requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar")).toURI().toPath()
+    val artifactJar: Path =
+      requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar")).toURI().toPath()
+    val projectJar: Path =
+      requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar")).toURI().toPath()
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
