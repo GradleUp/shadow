@@ -773,6 +773,42 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(testJar.getEntry("junit")).isNotNull()
   }
 
+  @Test
+  fun configurationCachingOfConfigurationsIsUpToDate() {
+    settingsScriptPath.appendText(
+      """
+        include 'lib'
+      """.trimIndent(),
+    )
+    projectScriptPath.writeText("")
+
+    path("lib/src/main/java/lib/Lib.java").writeText(
+      """
+        package lib;
+        public class Lib {}
+      """.trimIndent(),
+    )
+    path("lib/build.gradle").writeText(
+      """
+        ${getDefaultProjectBuildScript()}
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        $shadowJar {
+          configurations = [project.configurations.compileClasspath]
+        }
+      """.trimIndent(),
+    )
+
+    val libShadowJarTask = ":lib:$SHADOW_JAR_TASK_NAME"
+    run(libShadowJarTask)
+    val result = run(libShadowJarTask)
+
+    assertThat(result.task(libShadowJarTask)).isNotNull()
+      .transform { it.outcome }.isEqualTo(TaskOutcome.UP_TO_DATE)
+    assertThat(result.output).contains("Reusing configuration cache.")
+  }
+
   private fun writeShadowedClientAndServerModules() {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
