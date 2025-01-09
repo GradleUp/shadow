@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -22,8 +23,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      transform { it.getContent(ENTRY_SERVICES_SHADE) }.isEqualTo(CONTENT_ONE_TWO)
-      transform { it.getContent(ENTRY_SERVICES_FOO) }.isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
     }
   }
 
@@ -66,8 +67,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      transform { it.getContent(ENTRY_SERVICES_SHADE) }.isEqualTo(CONTENT_ONE_TWO)
-      transform { it.getContent(ENTRY_SERVICES_FOO) }.isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
     }
   }
 
@@ -124,29 +125,26 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      transform { it.getContent("META-INF/services/java.sql.Driver") }
-        .isEqualTo(
-          """
-            oracle.jdbc.OracleDriver
-            myapache.hive.jdbc.HiveDriver
-            myapache.derby.jdbc.AutoloadedDriver
-            com.mysql.jdbc.Driver
-          """.trimIndent(),
-        )
-      transform { it.getContent("META-INF/services/myapache.axis.components.compiler.Compiler") }
-        .isEqualTo(
-          """
-            myapache.axis.components.compiler.Javac
-            org.apache.axis.components.compiler.Jikes
-          """.trimIndent(),
-        )
-      transform { it.getContent("META-INF/services/org.apache.commons.logging.LogFactory") }
-        .isEqualTo(
-          """
-            myapache.commons.logging.impl.LogFactoryImpl
-            org.mortbay.log.Factory
-          """.trimIndent(),
-        )
+      getContent("META-INF/services/java.sql.Driver").isEqualTo(
+        """
+          oracle.jdbc.OracleDriver
+          myapache.hive.jdbc.HiveDriver
+          myapache.derby.jdbc.AutoloadedDriver
+          com.mysql.jdbc.Driver
+        """.trimIndent(),
+      )
+      getContent("META-INF/services/myapache.axis.components.compiler.Compiler").isEqualTo(
+        """
+          myapache.axis.components.compiler.Javac
+          org.apache.axis.components.compiler.Jikes
+        """.trimIndent(),
+      )
+      getContent("META-INF/services/org.apache.commons.logging.LogFactory").isEqualTo(
+        """
+          myapache.commons.logging.impl.LogFactoryImpl
+          org.mortbay.log.Factory
+        """.trimIndent(),
+      )
     }
   }
 

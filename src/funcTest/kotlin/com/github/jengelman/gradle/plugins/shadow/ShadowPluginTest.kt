@@ -567,7 +567,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val value = outputShadowJar.use { it.manifest.mainAttributes.getValue("Class-Path") }
+    val value = outputShadowJar.use { it.getMainAttr("Class-Path") }
     assertThat(value).isNull()
   }
 
@@ -591,7 +591,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val value = outputShadowJar.use { it.manifest.mainAttributes.getValue("Class-Path") }
+    val value = outputShadowJar.use { it.getMainAttr("Class-Path") }
     assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
@@ -610,7 +610,7 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val value = outputShadowJar.use { it.manifest.mainAttributes.getValue("Class-Path") }
+    val value = outputShadowJar.use { it.getMainAttr("Class-Path") }
     assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 

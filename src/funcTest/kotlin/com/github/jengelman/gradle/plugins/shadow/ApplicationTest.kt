@@ -7,6 +7,7 @@ import assertk.assertions.containsAtLeast
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -48,7 +49,7 @@ class ApplicationTest : BasePluginTest() {
         "a2.properties",
         "myapp/Main.class",
       )
-      transform { it.manifest.mainAttributes.getValue("Main-Class") }.isEqualTo("myapp.Main")
+      getMainAttr("Main-Class").isEqualTo("myapp.Main")
     }
 
     assertThat(path("build/install/myapp-shadow/bin/myapp")).all {

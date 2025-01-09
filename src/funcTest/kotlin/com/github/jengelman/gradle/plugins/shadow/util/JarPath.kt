@@ -23,6 +23,10 @@ class JarPath(val path: Path) :
     path.deleteExisting()
   }
 
+  fun getMainAttr(name: String): String? {
+    return manifest.mainAttributes.getValue(name)
+  }
+
   fun getContent(entryName: String): String {
     val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
     return getInputStream(entry).bufferedReader().use { it.readText() }
@@ -38,13 +42,17 @@ fun Assert<JarPath>.isRegular() = all {
   given { it.use(block = {}) }
 }
 
-fun Assert<JarPath>.containsEntries(vararg entries: String) = transform { actual ->
+fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
+
+fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
+
+fun Assert<JarPath>.containsEntries(vararg entries: String) = given { actual ->
   entries.forEach { entry ->
     actual.getEntry(entry) ?: fail("Jar file ${actual.path} does not contain entry $entry")
   }
 }
 
-fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = transform { actual ->
+fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = given { actual ->
   entries.forEach { entry ->
     actual.getEntry(entry) ?: return@forEach
     fail("Jar file ${actual.path} contains entry $entry")

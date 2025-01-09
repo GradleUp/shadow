@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -111,7 +112,7 @@ class RelocationTest : BasePluginTest() {
         "junit/framework/TestSuite\$1.class",
         "junit/framework/TestSuite.class",
       )
-      transform { it.manifest.mainAttributes.getValue("TEST-VALUE") }.isEqualTo("FOO")
+      getMainAttr("TEST-VALUE").isEqualTo("FOO")
     }
   }
 
