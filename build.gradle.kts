@@ -29,6 +29,8 @@ kotlin {
 
 lint {
   baseline = file("lint-baseline.xml")
+  ignoreTestSources = true
+  warningsAsErrors = true
 }
 
 spotless {
@@ -84,7 +86,6 @@ dependencies {
   funcTestImplementation(libs.moshi.kotlin)
 
   lintChecks(libs.androidx.gradlePluginLints)
-  lintChecks(libs.assertk.lint)
 }
 
 val integrationTest by tasks.registering(Test::class) {
@@ -129,14 +130,6 @@ tasks.withType<Test>().configureEach {
     "--add-opens",
     "java.base/java.net=ALL-UNNAMED",
   )
-}
-
-tasks.whenTaskAdded {
-  if (name == "lintAnalyzeJvmTest") {
-    // This task often fails on Windows CI devices.
-    enabled = !providers.systemProperty("os.name").get().startsWith("Windows") &&
-      !providers.environmentVariable("CI").isPresent
-  }
 }
 
 tasks.clean {

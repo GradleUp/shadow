@@ -22,7 +22,6 @@ jetbrains-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.0.0"
 node = "com.github.node-gradle:gradle-node-plugin:7.1.0"
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha03"
-assertk-lint = "com.jzbrooks:assertk-lint:1.4.0"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.5.0"
 
