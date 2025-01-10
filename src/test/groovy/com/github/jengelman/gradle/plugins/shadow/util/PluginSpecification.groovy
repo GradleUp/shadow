@@ -61,7 +61,7 @@ abstract class PluginSpecification extends Specification {
     }
 
     GradleRunner runner(Collection<String> tasks) {
-        runner.withArguments(["-Dorg.gradle.warning.mode=all", "--configuration-cache", "--stacktrace"] + tasks.toList())
+        runner.withArguments(["-Dorg.gradle.warning.mode=all", "--configuration-cache", "-Dorg.gradle.unsafe.isolated-projects=true", "--stacktrace"] + tasks.toList())
     }
 
     BuildResult run(String... tasks) {
