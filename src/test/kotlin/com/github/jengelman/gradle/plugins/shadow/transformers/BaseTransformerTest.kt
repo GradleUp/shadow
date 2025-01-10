@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTree
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
-import java.io.InputStream
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
 import java.util.Locale
@@ -64,10 +63,6 @@ abstract class BaseTransformerTest<T : Transformer> {
     fun setupTurkishLocale() {
       @Suppress("DEPRECATION")
       Locale.setDefault(Locale("tr"))
-    }
-
-    fun requireResourceAsStream(name: String): InputStream {
-      return this::class.java.classLoader.requireResourceAsStream(name)
     }
   }
 }

@@ -364,7 +364,8 @@ abstract class BasePluginTest {
     }
 
     private fun requireResourceAsPath(name: String): Path {
-      val resource = this::class.java.classLoader.getResource(name) ?: throw NoSuchFileException("Resource $name not found.")
+      val resource = this::class.java.classLoader.getResource(name)
+        ?: throw NoSuchFileException("Resource $name not found.")
       return resource.toURI().toPath()
     }
   }

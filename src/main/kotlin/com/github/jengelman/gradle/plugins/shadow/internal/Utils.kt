@@ -37,12 +37,13 @@ internal fun Properties.inputStream(
   return os.toByteArray().inputStream()
 }
 
-internal fun ClassLoader.requireResourceAsText(name: String): String {
+internal fun requireResourceAsText(name: String): String {
   return requireResourceAsStream(name).bufferedReader().use { it.readText() }
 }
 
-internal fun ClassLoader.requireResourceAsStream(name: String): InputStream {
-  return getResourceAsStream(name) ?: throw NoSuchFileException("Resource $name not found.")
+internal fun requireResourceAsStream(name: String): InputStream {
+  return Utils::class.java.classLoader.getResourceAsStream(name)
+    ?: throw NoSuchFileException("Resource $name not found.")
 }
 
 private val DummyFile = File("dummy")
@@ -51,3 +52,5 @@ private val DummyStat = object : Stat {
   override fun getUnixMode(f: File): Int = error("This is a dummy implementation.")
   override fun stat(f: File): FileMetadata = error("This is a dummy implementation.")
 }
+
+private object Utils
