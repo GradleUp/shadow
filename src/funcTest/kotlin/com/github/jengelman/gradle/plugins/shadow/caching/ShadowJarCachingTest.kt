@@ -7,7 +7,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import org.junit.jupiter.api.Test
 
 class ShadowJarCachingTest : BaseCachingTest() {
@@ -24,14 +23,14 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertShadowJarExecutes()
-    assertShadowJarIsCachedAndRelocatable()
+    assertFirstExecutionSuccess()
+    assertExecutionsAreCachedAndUpToDate()
 
     val replaced = projectScriptPath.readText().lines().filter {
       it != fromJar(projectJar)
     }.joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
   }
 
   @Test
@@ -44,7 +43,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
 
     projectScriptPath.appendText(
       """
@@ -53,8 +52,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    // TODO: need to investigate why secondOutcome is FROM_CACHE instead of UP_TO_DATE.
-    assertShadowJarIsCachedAndRelocatable(secondOutcome = FROM_CACHE)
+    assertExecutionsAreCachedAndUpToDate()
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
   }
 
@@ -86,7 +84,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "server/Server.class",
@@ -104,7 +102,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "server/Server.class",
@@ -115,7 +113,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       )
     }
 
-    assertShadowJarIsCachedAndRelocatable()
+    assertExecutionsAreCachedAndUpToDate()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "server/Server.class",
@@ -139,7 +137,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     writeMainClass(withImports = true)
 
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -156,7 +154,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -166,7 +164,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       )
     }
 
-    assertShadowJarIsCachedAndRelocatable()
+    assertExecutionsAreCachedAndUpToDate()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",

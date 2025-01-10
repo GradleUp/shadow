@@ -22,7 +22,7 @@ class MinimizationCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "server/Server.class",
@@ -41,7 +41,7 @@ class MinimizationCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertShadowJarExecutes()
+    assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "server/Server.class",
@@ -52,7 +52,7 @@ class MinimizationCachingTest : BaseCachingTest() {
       )
     }
 
-    assertShadowJarIsCachedAndRelocatable()
+    assertExecutionsAreCachedAndUpToDate()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "server/Server.class",

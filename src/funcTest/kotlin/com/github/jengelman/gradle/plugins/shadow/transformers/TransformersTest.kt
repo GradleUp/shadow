@@ -107,6 +107,23 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(mf.mainAttributes.getValue("New-Entry")).isNull()
   }
 
+  @Test
+  fun canUseCustomTransformer() {
+    writeMainClass()
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          // Use NoOpTransformer to mock a custom transformer here.
+          transform(${NoOpTransformer::class.java.name}.INSTANCE)
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).isRegular()
+  }
+
   @ParameterizedTest
   @MethodSource("transformerConfigurations")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {

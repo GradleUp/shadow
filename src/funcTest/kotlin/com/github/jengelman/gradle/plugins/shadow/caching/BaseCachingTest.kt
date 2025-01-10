@@ -1,60 +1,46 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
+import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.isEmpty
+import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import java.nio.file.NoSuchFileException
-import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.copyToRecursively
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.listDirectoryEntries
-import org.gradle.testkit.runner.GradleRunner
+import kotlin.io.path.isDirectory
+import kotlin.io.path.name
+import kotlin.io.path.walk
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
-import org.junit.jupiter.api.io.TempDir
 
 abstract class BaseCachingTest : BasePluginTest() {
-  @TempDir
-  lateinit var alternateDir: Path
-
-  @OptIn(ExperimentalPathApi::class)
-  fun assertShadowJarIsCachedAndRelocatable(
-    firstOutcome: TaskOutcome = FROM_CACHE,
-    secondOutcome: TaskOutcome = UP_TO_DATE,
-  ) {
-    try {
-      outputShadowJar.deleteExisting()
-    } catch (ignored: NoSuchFileException) {
-    }
-    alternateDir.deleteRecursively()
-    projectRoot.copyToRecursively(target = alternateDir, followLinks = false)
-    // check that shadowJar pulls from cache in the original directory
-    assertShadowJarHasResult(firstOutcome)
-    // check that shadowJar pulls from cache in a different directory
-    assertShadowJarHasResult(secondOutcome) {
-      if (alternateDir.listDirectoryEntries().isEmpty()) {
-        error("Directory was not copied to alternate directory")
-      }
-      it.withProjectDir(alternateDir.toFile())
-    }
-  }
-
-  fun assertShadowJarExecutes() {
-    try {
-      outputShadowJar.deleteExisting()
-    } catch (ignored: NoSuchFileException) {
-    }
+  fun assertFirstExecutionSuccess() {
     // task was executed and not pulled from cache
-    assertShadowJarHasResult(SUCCESS)
+    assertRunWithOutcome(SUCCESS)
   }
 
-  private fun assertShadowJarHasResult(
-    expectedOutcome: TaskOutcome,
-    runnerBlock: (GradleRunner) -> GradleRunner = { it },
-  ) {
-    val result = run(shadowJarTask, runnerBlock = runnerBlock)
+  /**
+   * This should be called after [assertFirstExecutionSuccess] to ensure that the shadowJar task is cached.
+   */
+  fun assertExecutionsAreCachedAndUpToDate() {
+    run("clean")
+    // Make sure the output shadow jar has been deleted.
+    assertFailure { outputShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
+    @OptIn(ExperimentalPathApi::class)
+    val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
+    // Make sure build folders are deleted by clean task.
+    assertThat(buildDirs).isEmpty()
+
+    // check that shadowJar pulls from cache in the original directory
+    assertRunWithOutcome(FROM_CACHE)
+    // check that shadowJar pulls from cache in a different directory
+    assertRunWithOutcome(UP_TO_DATE)
+  }
+
+  private fun assertRunWithOutcome(expectedOutcome: TaskOutcome) {
+    val result = run(shadowJarTask)
     assertThat(result).taskOutcomeEquals(shadowJarTask, expectedOutcome)
   }
 }

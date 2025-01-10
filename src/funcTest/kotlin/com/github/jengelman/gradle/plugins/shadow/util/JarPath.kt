@@ -6,7 +6,6 @@ import assertk.assertions.isNotEmpty
 import assertk.fail
 import java.nio.file.Path
 import java.util.jar.JarFile
-import kotlin.io.path.deleteExisting
 
 /**
  * A wrapper for [JarFile] that also implements [Path].
@@ -17,11 +16,6 @@ import kotlin.io.path.deleteExisting
 class JarPath(val path: Path) :
   JarFile(path.toFile()),
   Path by path {
-
-  fun deleteExisting() {
-    close()
-    path.deleteExisting()
-  }
 
   fun getMainAttr(name: String): String? {
     return manifest.mainAttributes.getValue(name)
