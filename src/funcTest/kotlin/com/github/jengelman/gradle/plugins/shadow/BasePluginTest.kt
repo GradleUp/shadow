@@ -14,6 +14,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.io.Closeable
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.ExperimentalPathApi
@@ -307,11 +308,9 @@ abstract class BasePluginTest {
       Path(gradleUserHome, "testkit")
     }
 
-    val testJar: Path = requireNotNull(this::class.java.classLoader.getResource("junit-3.8.2.jar")).toURI().toPath()
-    val artifactJar: Path =
-      requireNotNull(this::class.java.classLoader.getResource("test-artifact-1.0-SNAPSHOT.jar")).toURI().toPath()
-    val projectJar: Path =
-      requireNotNull(this::class.java.classLoader.getResource("test-project-1.0-SNAPSHOT.jar")).toURI().toPath()
+    val testJar: Path = requireResourceAsPath("junit-3.8.2.jar")
+    val artifactJar: Path = requireResourceAsPath("test-artifact-1.0-SNAPSHOT.jar")
+    val projectJar: Path = requireResourceAsPath("test-project-1.0-SNAPSHOT.jar")
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
@@ -362,6 +361,11 @@ abstract class BasePluginTest {
 
     fun Assert<BuildResult>.taskOutcomeEquals(taskPath: String, expectedOutcome: TaskOutcome) {
       return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)
+    }
+
+    private fun requireResourceAsPath(name: String): Path {
+      val resource = this::class.java.classLoader.getResource(name) ?: throw NoSuchFileException("Resource $name not found.")
+      return resource.toURI().toPath()
     }
   }
 }

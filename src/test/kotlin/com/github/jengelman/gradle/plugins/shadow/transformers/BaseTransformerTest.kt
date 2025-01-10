@@ -2,9 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
-import java.io.FileNotFoundException
 import java.io.InputStream
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
@@ -22,10 +22,6 @@ abstract class BaseTransformerTest<T : Transformer> {
 
   protected val manifestTransformerContext: TransformerContext
     get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
-
-  protected fun requireResourceAsStream(name: String): InputStream {
-    return this::class.java.classLoader.getResourceAsStream(name) ?: throw FileNotFoundException("Resource $name not found.")
-  }
 
   @BeforeEach
   fun setup() {
@@ -68,6 +64,10 @@ abstract class BaseTransformerTest<T : Transformer> {
     fun setupTurkishLocale() {
       @Suppress("DEPRECATION")
       Locale.setDefault(Locale("tr"))
+    }
+
+    fun requireResourceAsStream(name: String): InputStream {
+      return this::class.java.classLoader.requireResourceAsStream(name)
     }
   }
 }

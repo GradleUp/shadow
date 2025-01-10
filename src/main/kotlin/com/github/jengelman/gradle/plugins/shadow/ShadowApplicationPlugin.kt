@@ -63,10 +63,15 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun addCreateScriptsTask() {
     project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) {
+      val unixStartScript = this::class.java.classLoader
+        .requireResourceAsText("com/github/jengelman/gradle/plugins/shadow/internal/unixStartScript.txt")
+      val windowsStartScript = this::class.java.classLoader
+        .requireResourceAsText("com/github/jengelman/gradle/plugins/shadow/internal/windowsStartScript.txt")
+
       (it.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        project.resources.text.fromString(this::class.java.requireResourceAsText("internal/unixStartScript.txt"))
+        project.resources.text.fromString(unixStartScript)
       (it.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        project.resources.text.fromString(this::class.java.requireResourceAsText("internal/windowsStartScript.txt"))
+        project.resources.text.fromString(windowsStartScript)
       it.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.classpath = project.files(shadowJar)

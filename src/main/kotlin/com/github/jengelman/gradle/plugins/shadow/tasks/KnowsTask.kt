@@ -12,7 +12,7 @@ public abstract class KnowsTask : DefaultTask() {
       """
       No, The Shadow Knows....
 
-      ${this::class.java.requireResourceAsText("/shadowBanner.txt")}
+      ${this::class.java.classLoader.requireResourceAsText("shadowBanner.txt")}
       """.trimIndent(),
     )
   }

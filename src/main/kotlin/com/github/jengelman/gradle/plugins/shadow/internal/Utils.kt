@@ -3,9 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.InputStream
 import java.nio.charset.Charset
+import java.nio.file.NoSuchFileException
 import java.util.Properties
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.DefaultFileTreeElement
@@ -37,12 +37,12 @@ internal fun Properties.inputStream(
   return os.toByteArray().inputStream()
 }
 
-internal fun Class<*>.requireResourceAsText(name: String): String {
-  return requireResourceAsStream(name).bufferedReader().readText()
+internal fun ClassLoader.requireResourceAsText(name: String): String {
+  return requireResourceAsStream(name).bufferedReader().use { it.readText() }
 }
 
-private fun Class<*>.requireResourceAsStream(name: String): InputStream {
-  return getResourceAsStream(name) ?: throw FileNotFoundException("Resource $name not found.")
+internal fun ClassLoader.requireResourceAsStream(name: String): InputStream {
+  return getResourceAsStream(name) ?: throw NoSuchFileException("Resource $name not found.")
 }
 
 private val DummyFile = File("dummy")
