@@ -108,6 +108,10 @@ abstract class BasePluginTest {
 
   fun getDefaultSettingsBuildScript(
     startBlock: String = "",
+    // Use a test-specific build cache directory. This ensures that we'll only use cached outputs generated during
+    // this test, and we won't accidentally use cached outputs from a different test or a different build.
+    // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
+    buildCacheBlock: String = "local { directory = file('build-cache') }",
     endBlock: String = "rootProject.name = 'shadow'",
   ): String {
     return """
@@ -117,6 +121,9 @@ abstract class BasePluginTest {
           maven { url = '${localRepo.root.toUri()}' }
           mavenCentral()
         }
+      }
+      buildCache {
+        $buildCacheBlock
       }
       $endBlock
     """.trimIndent() + System.lineSeparator()
@@ -323,6 +330,7 @@ abstract class BasePluginTest {
     val commonArguments = listOf(
       "--warning-mode=fail",
       "--configuration-cache",
+      "--build-cache",
       "--stacktrace",
     )
 

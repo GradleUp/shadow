@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.appendText
 import kotlin.io.path.copyToRecursively
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.listDirectoryEntries
@@ -14,28 +13,11 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 
 abstract class BaseCachingTest : BasePluginTest() {
   @TempDir
   lateinit var alternateDir: Path
-
-  @BeforeEach
-  override fun setup() {
-    super.setup()
-    // Use a test-specific build cache directory. This ensures that we'll only use cached outputs generated during
-    // this test, and we won't accidentally use cached outputs from a different test or a different build.
-    settingsScriptPath.appendText(
-      """
-        buildCache {
-          local {
-            directory = file('build-cache')
-          }
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-  }
 
   @OptIn(ExperimentalPathApi::class)
   fun assertShadowJarIsCachedAndRelocatable(
@@ -72,7 +54,7 @@ abstract class BaseCachingTest : BasePluginTest() {
     expectedOutcome: TaskOutcome,
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ) {
-    val result = run("--build-cache", shadowJarTask, runnerBlock = runnerBlock)
+    val result = run(shadowJarTask, runnerBlock = runnerBlock)
     assertThat(result).taskOutcomeEquals(shadowJarTask, expectedOutcome)
   }
 }
