@@ -53,6 +53,7 @@ public open class AppendingTransformer @Inject constructor(
     entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
 
+    // Closing a ByteArrayOutputStream has no effect, so we don't use a use block here.
     data.toByteArray().inputStream().copyTo(os)
     data.reset()
   }

@@ -25,7 +25,7 @@ class JarBuilder(
         }
         if (entries.add(entry)) {
           jos.putNextEntry(JarEntry(entry))
-          content.byteInputStream().copyTo(jos)
+          content.byteInputStream().use { it.copyTo(jos) }
         }
       }
     }
