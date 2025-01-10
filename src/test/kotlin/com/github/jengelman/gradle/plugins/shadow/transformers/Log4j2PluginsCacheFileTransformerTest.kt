@@ -6,7 +6,7 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
 import java.io.File
-import java.net.URL
+import java.net.URI
 import java.util.Collections
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.tools.zip.ZipOutputStream
@@ -39,8 +39,9 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
 
     // Pull the data back out and make sure it was transformed
     val cache = PluginCache()
-    val urlString = "jar:" + testableZipFile.toURI().toURL() + "!/" + PLUGIN_CACHE_FILE
-    cache.loadCacheFiles(Collections.enumeration(listOf(URL(urlString))))
+    val url = URI("jar:" + testableZipFile.toURI().toURL() + "!/" + PLUGIN_CACHE_FILE).toURL()
+    val resources = Collections.enumeration(listOf(url))
+    cache.loadCacheFiles(resources)
 
     assertThat(cache.getCategory("lookup")["date"]?.className)
       .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")

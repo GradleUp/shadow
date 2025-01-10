@@ -66,6 +66,7 @@ abstract class BaseTransformerTest<T : Transformer> {
      * choice to test for improper case-less string comparisons.
      */
     fun setupTurkishLocale() {
+      @Suppress("DEPRECATION")
       Locale.setDefault(Locale("tr"))
     }
   }
