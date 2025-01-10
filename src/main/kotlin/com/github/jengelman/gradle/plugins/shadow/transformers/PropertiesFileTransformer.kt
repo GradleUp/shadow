@@ -169,7 +169,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   private fun loadAndTransformKeys(inputStream: InputStream): CleanProperties {
     val props = CleanProperties()
     // InputStream closed by caller, so we don't do it here.
-    props.load(inputStream.reader(charset))
+    props.load(inputStream.bufferedReader(charset))
     return transformKeys(props)
   }
 
@@ -225,7 +225,7 @@ public open class PropertiesFileTransformer @Inject constructor(
       val entry = ZipEntry(path)
       entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
-      props.inputStream(charset).reader(charset).use {
+      props.inputStream(charset).bufferedReader(charset).use {
         it.copyTo(zipWriter)
       }
       zipWriter.flush()

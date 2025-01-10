@@ -28,8 +28,8 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     }
 
     assertThat(transformer.hasTransformedResource()).isTrue()
-    assertThat(transformer.serviceEntries.getValue(path).toInputStream().bufferedReader().readText())
-      .isEqualTo(output)
+    val entry = transformer.serviceEntries.getValue(path).toInputStream().bufferedReader().use { it.readText() }
+    assertThat(entry).isEqualTo(output)
   }
 
   @Test

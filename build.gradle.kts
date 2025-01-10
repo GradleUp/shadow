@@ -2,11 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
-  alias(libs.plugins.kotlin)
+  alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.android.lint)
   alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.spotless)
-  groovy // Required for Spock tests.
   id("shadow.convention.publish")
   id("shadow.convention.deploy")
 }
@@ -30,6 +29,8 @@ kotlin {
 
 lint {
   baseline = file("lint-baseline.xml")
+  ignoreTestSources = true
+  warningsAsErrors = true
 }
 
 spotless {
@@ -54,15 +55,12 @@ val intiTestRuntimeOnly: Configuration by configurations.getting {
 val funcTest: SourceSet by sourceSets.creating
 val funcTestImplementation: Configuration by configurations.getting {
   extendsFrom(configurations.testImplementation.get())
-  // TODO: this will be removed after we migrated all functional tests to Kotlin.
-  extendsFrom(intiTestImplementation)
 }
 val funcTestRuntimeOnly: Configuration by configurations.getting {
   extendsFrom(configurations.testRuntimeOnly.get())
 }
 
 gradlePlugin {
-  testSourceSets.add(intiTest)
   testSourceSets.add(funcTest)
 }
 
@@ -80,26 +78,14 @@ dependencies {
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.assertk)
   testImplementation(libs.xmlunit)
-  testImplementation(libs.apache.commonsLang)
   testRuntimeOnly(libs.junit.platformLauncher)
 
-  funcTestImplementation(libs.spock) {
-    exclude(group = "org.codehaus.groovy")
-    exclude(group = "org.hamcrest")
-  }
   funcTestImplementation(sourceSets.main.get().output)
-  funcTestImplementation(intiTest.output)
-
-  intiTestImplementation(libs.okio)
-  intiTestImplementation(libs.apache.maven.modelBuilder)
-  intiTestImplementation(libs.apache.maven.repositoryMetadata)
-  // TODO: this will be removed after we migrated all functional tests to Kotlin.
-  intiTestImplementation(sourceSets.main.get().output)
-  intiTestImplementation(libs.moshi)
-  intiTestImplementation(libs.moshi.kotlin)
+  funcTestImplementation(libs.apache.maven.modelBuilder)
+  funcTestImplementation(libs.moshi)
+  funcTestImplementation(libs.moshi.kotlin)
 
   lintChecks(libs.androidx.gradlePluginLints)
-  lintChecks(libs.assertk.lint)
 }
 
 val integrationTest by tasks.registering(Test::class) {
@@ -107,10 +93,6 @@ val integrationTest by tasks.registering(Test::class) {
   group = LifecycleBasePlugin.VERIFICATION_GROUP
   testClassesDirs = intiTest.output.classesDirs
   classpath = intiTest.runtimeClasspath
-
-  // TODO: this should be moved into functionalTest after we migrated all functional tests to Kotlin.
-  // Required to enable `IssueExtension` for all tests.
-  systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
 
   val docsDir = file("src/docs")
   // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
@@ -123,6 +105,9 @@ val functionalTest by tasks.registering(Test::class) {
   group = LifecycleBasePlugin.VERIFICATION_GROUP
   testClassesDirs = funcTest.output.classesDirs
   classpath = funcTest.runtimeClasspath
+
+  // Required to enable `IssueExtension` for all tests.
+  systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
 }
 
 tasks.check {
@@ -145,14 +130,6 @@ tasks.withType<Test>().configureEach {
     "--add-opens",
     "java.base/java.net=ALL-UNNAMED",
   )
-}
-
-tasks.whenTaskAdded {
-  if (name == "lintAnalyzeJvmTest") {
-    // This task often fails on Windows CI devices.
-    enabled = !providers.systemProperty("os.name").get().startsWith("Windows") &&
-      !providers.environmentVariable("CI").isPresent
-  }
 }
 
 tasks.clean {
