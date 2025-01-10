@@ -60,6 +60,12 @@ class ApplicationTest : BasePluginTest() {
         "exec \"\$JAVACMD\" \"\$@\"",
       )
     }
+    assertThat(path("build/install/myapp-shadow/bin/myapp.bat")).all {
+      exists()
+      transform { it.readText() }.contains(
+        "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+      )
+    }
   }
 
   @Test
