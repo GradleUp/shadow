@@ -832,6 +832,9 @@ class ShadowPluginTest : BasePluginTest() {
     assertThat(result.output).contains("Reusing configuration cache.")
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/915",
+  )
   @Test
   fun failBuildIfProcessingBadJar() {
     val badJarPath = path("bad.jar").apply {
