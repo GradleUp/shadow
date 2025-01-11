@@ -13,6 +13,10 @@
   Some public `List` parameters are also changed to `Set`.
 - Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
 
+**Fixed**
+
+- Fail builds if processing bad jars.  ([#1146](https://github.com/GradleUp/shadow/pull/1146))  
+
 
 ## [v9.0.0-beta4] (2024-12-06)
 
