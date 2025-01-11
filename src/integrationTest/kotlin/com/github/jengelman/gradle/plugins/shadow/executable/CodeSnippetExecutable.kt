@@ -6,7 +6,7 @@ import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.function.Executable
 
 class CodeSnippetExecutable(
-  private val tempDir: Path,
+  private val root: Path,
   private val snippet: String,
   val testName: String,
   private val executor: SnippetExecutor,
@@ -14,8 +14,7 @@ class CodeSnippetExecutable(
 ) : Executable {
   override fun execute() {
     try {
-      // TODO: any way to createTempDirectory with `@TempDir` for each `Executable`?
-      executor.execute(createTempDirectory(tempDir, "doc-"), snippet)
+      executor.execute(createTempDirectory(root), snippet)
     } catch (t: Throwable) {
       throw exceptionTransformer(t)
     }

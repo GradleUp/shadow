@@ -13,9 +13,9 @@ import org.junit.jupiter.api.io.TempDir
 class DocCodeSnippetTest {
 
   @TestFactory
-  fun provideDynamicTests(@TempDir tempDir: Path): List<DynamicTest> {
+  fun provideDynamicTests(@TempDir root: Path): List<DynamicTest> {
     return fixtures.flatMap { (selector, executor) ->
-      CodeSnippetExtractor.extract(tempDir, docsDir, selector, executor)
+      CodeSnippetExtractor.extract(root, docsDir, selector, executor)
     }.map {
       DynamicTest.dynamicTest(it.testName, it)
     }

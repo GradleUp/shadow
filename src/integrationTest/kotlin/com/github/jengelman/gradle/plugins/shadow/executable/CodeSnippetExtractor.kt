@@ -13,7 +13,7 @@ import kotlin.io.path.walk
 
 object CodeSnippetExtractor {
   fun extract(
-    tempDir: Path,
+    root: Path,
     docRoot: Path,
     cssClass: String,
     executor: SnippetExecutor,
@@ -24,13 +24,13 @@ object CodeSnippetExtractor {
     docRoot.walk()
       .filter { it.name.endsWith(".md", ignoreCase = true) }
       .forEach {
-        addSnippets(tempDir, snippets, it, snippetBlockPattern, executor)
+        addSnippets(root, snippets, it, snippetBlockPattern, executor)
       }
     return snippets
   }
 
   private fun addSnippets(
-    tempDir: Path,
+    root: Path,
     snippets: MutableList<CodeSnippetExecutable>,
     path: Path,
     snippetBlockPattern: Pattern,
@@ -41,7 +41,7 @@ object CodeSnippetExtractor {
     val snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
 
     snippetsByLine.forEach { (lineNumber, snippet) ->
-      snippets.add(createSnippet(tempDir, relativeDocPath, path, lineNumber, snippet, executor))
+      snippets.add(createSnippet(root, relativeDocPath, path, lineNumber, snippet, executor))
     }
   }
 
@@ -72,7 +72,7 @@ object CodeSnippetExtractor {
   }
 
   private fun createSnippet(
-    tempDir: Path,
+    root: Path,
     sourceClassName: String,
     sourcePath: Path,
     lineNumber: Int,
@@ -80,7 +80,7 @@ object CodeSnippetExtractor {
     executor: SnippetExecutor,
   ): CodeSnippetExecutable {
     return CodeSnippetExecutable(
-      tempDir,
+      root,
       snippet,
       "$sourceClassName:$lineNumber",
       executor,
