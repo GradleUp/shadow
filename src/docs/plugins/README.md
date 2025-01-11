@@ -11,10 +11,10 @@ and `relocationPrefix` settings on any `ShadowJar` task.
 A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the `shadowJar` task for relocation.
 
 ```groovy
-dependencies {
-  shadow localGroovy()
-  shadow gradleApi()
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.gradleup.shadow'
 
+dependencies {
   implementation 'org.jdom:jdom2:2.0.6'
   implementation 'org.ow2.asm:asm:6.0'
   implementation 'org.ow2.asm:asm-commons:6.0'
@@ -25,13 +25,9 @@ dependencies {
 
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
   enableRelocation = true
+  archiveClassifier = ''
 }
 ```
-
-Note that the `localGroovy()` and `gradleApi()` dependencies are added to the `shadow` configuration instead of the
-normal `compile` configuration. These 2 dependencies are provided by Gradle to compile your project but are ultimately
-provided by the Gradle runtime when executing the plugin. Thus, it is **not** advisable to bundle these dependencies
-with your plugin.
 
 ## Publishing shadowed Gradle plugins
 The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
