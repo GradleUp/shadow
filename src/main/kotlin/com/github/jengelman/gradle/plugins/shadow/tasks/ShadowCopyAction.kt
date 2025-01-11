@@ -118,10 +118,14 @@ public open class ShadowCopyAction internal constructor(
         processTransformers(outputStream)
       }
     } catch (e: IOException) {
-      throw Zip64RequiredException(
-        "${e.cause?.message}\n\nTo build this archive, please enable the zip64 extension.\n" +
-          "See: ${documentationRegistry.getDslRefForProperty(Zip::class.java, "zip64")}",
-      )
+      if (e.cause is Zip64RequiredException) {
+        throw Zip64RequiredException(
+          "${e.cause?.message}\n\nTo build this archive, please enable the zip64 extension.\n" +
+            "See: ${documentationRegistry.getDslRefForProperty(Zip::class.java, "zip64")}",
+        )
+      }
+      // Rethrow the exception like `java.util.zip.ZipException: archive is not a ZIP archive`.
+      throw e
     }
     return WorkResults.didWork(true)
   }
