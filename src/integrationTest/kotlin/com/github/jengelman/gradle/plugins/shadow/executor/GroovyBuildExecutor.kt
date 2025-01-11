@@ -44,7 +44,12 @@ class GroovyBuildExecutor(
     tempDir.addSubProject("main", mainScript)
 
     try {
-      runner.withProjectDir(tempDir.toFile()).build()
+      GradleRunner.create()
+        .withProjectDir(tempDir.toFile())
+        .withPluginClasspath()
+        .forwardOutput()
+        .withArguments("--warning-mode=fail", "build")
+        .build()
     } catch (t: Throwable) {
       throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)
     }
@@ -55,12 +60,5 @@ class GroovyBuildExecutor(
       .createDirectory()
       .resolve("build.gradle")
       .writeText(buildScriptText)
-  }
-
-  private companion object {
-    val runner: GradleRunner get() = GradleRunner.create()
-      .withPluginClasspath()
-      .forwardOutput()
-      .withArguments("--warning-mode=fail", "build")
   }
 }
