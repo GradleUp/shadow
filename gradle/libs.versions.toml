@@ -26,8 +26,6 @@ androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha03"
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.5.0"
 
 junit-bom = "org.junit:junit-bom:5.11.4"
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
