@@ -108,7 +108,7 @@ testing.suites {
   }
 
   withType<JvmTestSuite>().configureEach {
-    useJUnitJupiter(libs.junit.bom.get().version)
+    useJUnitJupiter(libs.junit.bom.map { requireNotNull(it.version) })
     dependencies {
       implementation(libs.assertk)
     }
