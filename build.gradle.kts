@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
@@ -57,7 +59,6 @@ dependencies {
   lintChecks(libs.androidx.gradlePluginLints)
 }
 
-@Suppress("UnstableApiUsage")
 testing.suites {
   getByName<JvmTestSuite>("test") {
     dependencies {
