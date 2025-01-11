@@ -44,26 +44,6 @@ spotless {
   }
 }
 
-val intiTest: SourceSet by sourceSets.creating
-val intiTestImplementation: Configuration by configurations.getting {
-  extendsFrom(configurations.testImplementation.get())
-}
-val intiTestRuntimeOnly: Configuration by configurations.getting {
-  extendsFrom(configurations.testRuntimeOnly.get())
-}
-
-val funcTest: SourceSet by sourceSets.creating
-val funcTestImplementation: Configuration by configurations.getting {
-  extendsFrom(configurations.testImplementation.get())
-}
-val funcTestRuntimeOnly: Configuration by configurations.getting {
-  extendsFrom(configurations.testRuntimeOnly.get())
-}
-
-gradlePlugin {
-  testSourceSets.add(funcTest)
-}
-
 dependencies {
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
@@ -74,48 +54,70 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
-  testImplementation(platform(libs.junit.bom))
-  testImplementation(libs.junit.jupiter)
-  testImplementation(libs.assertk)
-  testImplementation(libs.xmlunit)
-  testRuntimeOnly(libs.junit.platformLauncher)
-
-  funcTestImplementation(sourceSets.main.get().output)
-  funcTestImplementation(libs.apache.maven.modelBuilder)
-  funcTestImplementation(libs.moshi)
-  funcTestImplementation(libs.moshi.kotlin)
-
   lintChecks(libs.androidx.gradlePluginLints)
 }
 
-val integrationTest by tasks.registering(Test::class) {
-  description = "Runs the integration tests."
-  group = LifecycleBasePlugin.VERIFICATION_GROUP
-  testClassesDirs = intiTest.output.classesDirs
-  classpath = intiTest.runtimeClasspath
+@Suppress("UnstableApiUsage")
+testing.suites {
+  getByName<JvmTestSuite>("test") {
+    dependencies {
+      implementation(libs.xmlunit)
+    }
+  }
+  register<JvmTestSuite>("integrationTest") {
+    testType = TestSuiteType.INTEGRATION_TEST
+    targets.configureEach {
+      testTask {
+        val docsDir = file("src/docs")
+        // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
+        inputs.dir(docsDir)
+        systemProperty("DOCS_DIR", docsDir.absolutePath)
+      }
+    }
+  }
+  register<JvmTestSuite>("functionalTest") {
+    testType = TestSuiteType.FUNCTIONAL_TEST
+    targets.configureEach {
+      testTask {
+        // Required to enable `IssueExtension` for all tests.
+        systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
+      }
+    }
+    dependencies {
+      // Seems we can't ref project() here due to some limitations of rootProject.
+      implementation(sourceSets.main.get().output)
+      implementation(libs.apache.ant)
+      implementation(libs.apache.maven.modelBuilder)
+      implementation(libs.moshi)
+      implementation(libs.moshi.kotlin)
+    }
+  }
 
-  val docsDir = file("src/docs")
-  // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
-  inputs.dir(docsDir)
-  systemProperty("DOCS_DIR", docsDir.absolutePath)
+  withType<JvmTestSuite>().configureEach {
+    dependencies {
+      implementation(platform(libs.junit.bom))
+      implementation(libs.junit.jupiter)
+      implementation(libs.assertk)
+      runtimeOnly(libs.junit.platformLauncher)
+    }
+  }
 }
 
-val functionalTest by tasks.registering(Test::class) {
-  description = "Runs the functional tests."
-  group = LifecycleBasePlugin.VERIFICATION_GROUP
-  testClassesDirs = funcTest.output.classesDirs
-  classpath = funcTest.runtimeClasspath
-
-  // Required to enable `IssueExtension` for all tests.
-  systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
+gradlePlugin {
+  testSourceSets(
+    sourceSets["functionalTest"],
+    sourceSets["integrationTest"],
+  )
 }
 
 tasks.check {
-  dependsOn(integrationTest, functionalTest)
+  dependsOn(
+    testing.suites.named("integrationTest"),
+    testing.suites.named("functionalTest"),
+  )
 }
 
 tasks.withType<Test>().configureEach {
-  useJUnitPlatform()
   maxParallelForks = Runtime.getRuntime().availableProcessors()
 
   // Required to test configuration cache in tests when using withDebug()
