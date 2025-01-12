@@ -47,7 +47,7 @@ be manually configured.
 
 # Publish the Shadowed JAR instead of the Original JAR
 
-You may want to publish the shadowed JAR instead of the original JAR. This can be done by trim 
+You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming 
 the `archiveClassifier` of the shadowed JAR like the following:
 
 ```groovy
