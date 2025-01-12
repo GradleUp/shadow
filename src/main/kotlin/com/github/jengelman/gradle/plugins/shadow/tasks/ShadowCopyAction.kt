@@ -124,6 +124,8 @@ public open class ShadowCopyAction internal constructor(
             "See: ${documentationRegistry.getDslRefForProperty(Zip::class.java, "zip64")}",
         )
       }
+      // Rethrow the exception like `java.util.zip.ZipException: archive is not a ZIP archive`.
+      throw e
     }
     return WorkResults.didWork(true)
   }

@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
@@ -18,6 +19,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Disabled
@@ -828,6 +830,33 @@ class ShadowPluginTest : BasePluginTest() {
 
     assertThat(result).taskOutcomeEquals(libShadowJarTask, UP_TO_DATE)
     assertThat(result.output).contains("Reusing configuration cache.")
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/915",
+  )
+  @Test
+  fun failBuildIfProcessingBadJar() {
+    val badJarPath = path("bad.jar").apply {
+      writeText("A bad jar.")
+    }.toUri().toURL().path
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation files('$badJarPath')
+        }
+      """.trimIndent(),
+    )
+
+    val result = runWithFailure(shadowJarTask)
+
+    assertThat(result).all {
+      taskOutcomeEquals(shadowJarTask, FAILED)
+      transform { it.output }.contains(
+        "java.util.zip.ZipException: archive is not a ZIP archive",
+      )
+    }
   }
 
   private fun writeShadowedClientAndServerModules() {
