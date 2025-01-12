@@ -3,10 +3,13 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
+import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -738,6 +741,7 @@ class ShadowPluginTest : BasePluginTest() {
 
   @Issue(
     "https://github.com/GradleUp/shadow/issues/459",
+    "https://github.com/GradleUp/shadow/issues/852",
   )
   @Test
   fun excludeGradleApiByDefault() {
@@ -765,8 +769,15 @@ class ShadowPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val entries = outputShadowJar.use { it.entries().toList() }
-    assertThat(entries.count { it.name.endsWith(".class") }).isEqualTo(1)
+    assertThat(outputShadowJar).useAll {
+      transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
+        .single().isEqualTo("my/plugin/MyPlugin.class")
+      transform { it.manifest.mainAttributes.keys }.all {
+        isNotEmpty()
+        // Doesn't contain Gradle classes.
+        doesNotContain("Class-Path")
+      }
+    }
   }
 
   @Issue(
