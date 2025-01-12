@@ -59,7 +59,7 @@ group = 'shadow'
 version = '1.0'
 
 dependencies {
-  // This will be bundled in the shadowed JAR.
+  // This will be bundled in the shadowed JAR and not declared in the POM.
   implementation 'some:a:1.0'
   // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
   // file's `Class-Path` entry, and also in the POM file.
