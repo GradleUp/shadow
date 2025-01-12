@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -56,6 +57,36 @@ class PublishingTest : BasePluginTest() {
 
     assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+  }
+
+  @Test
+  fun publishShadowJarInsteadOfJarWithMavenPublishPlugin() {
+    projectScriptPath.appendText(
+      publishConfiguration(
+        shadowBlock = """
+          archiveClassifier = ''
+        """.trimIndent(),
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            from components.shadow
+          }
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    assertThat(repoJarPath("shadow/maven/1.0/maven-1.0.jar")).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+      )
+      doesNotContainEntries(
+        "b.properties",
+      )
+      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
+    }
+    assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
   }
 
   @Issue(
