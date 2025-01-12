@@ -859,6 +859,30 @@ class ShadowPluginTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun worksWithArchiveFileName() {
+    writeMainClass()
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        $shadowJar {
+          archiveFileName = 'my-shadow.tar'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
+      containsEntries(
+        "shadow/Main.class",
+        "junit/framework/Test.class",
+      )
+    }
+  }
+
   private fun writeShadowedClientAndServerModules() {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
