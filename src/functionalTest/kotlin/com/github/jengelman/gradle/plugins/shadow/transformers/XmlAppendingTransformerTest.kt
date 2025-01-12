@@ -47,4 +47,29 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun canBundleMetaInfoPluginXml() {
+    val xmlEntry = "META-INF/plugin.xml"
+    val xmlContent = """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <plugin>
+        <id>my.plugin.id</id>
+      </plugin>
+    """.trimIndent()
+    val pluginJar = buildJar("plugin.jar") {
+      insert(xmlEntry, xmlContent)
+    }
+
+    projectScriptPath.appendText(
+      transform<XmlAppendingTransformer>(
+        shadowJarBlock = fromJar(pluginJar),
+      ),
+    )
+
+    run(shadowJarTask)
+
+    val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
+    assertThat(content).isEqualTo(xmlContent)
+  }
 }
