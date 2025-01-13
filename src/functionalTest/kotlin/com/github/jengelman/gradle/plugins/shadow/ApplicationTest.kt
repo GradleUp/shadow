@@ -14,7 +14,6 @@ import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.tools.zip.ZipFile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ApplicationTest : BasePluginTest() {
@@ -107,49 +106,6 @@ class ApplicationTest : BasePluginTest() {
   @Test
   fun doesNotErrorWhenUsingApplicationMainClassProperty() {
     prepare()
-
-    val result = run(runShadowTask)
-
-    assertThat(result.output).contains("TestApp: Hello World! (foo)")
-  }
-
-  /**
-   * This spec requires > 15 minutes and > 8GB of disk space to run
-   */
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/143",
-  )
-  @Disabled
-  @Test
-  fun checkLargeZipFilesWithZip64Enabled() {
-    prepare(
-      projectBlock = """
-        def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
-        def generateResources = tasks.register('generateResources') {
-          doLast {
-            def rnd = new Random()
-            def buf = new byte[128 * 1024]
-            for (x in 0..255) {
-              def dir = new File(generatedResourcesDir, x.toString())
-              dir.mkdirs()
-              for (y in 0..255) {
-                def file = new File(dir, y.toString())
-                rnd.nextBytes(buf)
-                file.bytes = buf
-              }
-            }
-          }
-        }
-        sourceSets {
-          main {
-            output.dir(generatedResourcesDir, builtBy: generateResources)
-          }
-        }
-        $shadowJar {
-          zip64 = true
-        }
-      """.trimIndent(),
-    )
 
     val result = run(runShadowTask)
 
