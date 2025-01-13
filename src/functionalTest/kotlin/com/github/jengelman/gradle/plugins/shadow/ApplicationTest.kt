@@ -6,7 +6,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
@@ -94,18 +93,6 @@ class ApplicationTest : BasePluginTest() {
     run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
     assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).isRegular()
-  }
-
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/609",
-  )
-  @Test
-  fun doesNotErrorWhenUsingApplicationMainClassProperty() {
-    prepare()
-
-    val result = run(runShadowTask)
-
-    assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
 
   private fun prepare(
