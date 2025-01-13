@@ -6,6 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
@@ -13,6 +14,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.tools.zip.ZipFile
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ApplicationTest : BasePluginTest() {
@@ -97,6 +99,106 @@ class ApplicationTest : BasePluginTest() {
     run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
     assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).isRegular()
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/609",
+  )
+  @Test
+  fun doesNotErrorWhenUsingApplicationMainClassProperty() {
+    projectScriptPath.appendText(
+      """
+        apply plugin: 'application'
+
+        application {
+          mainClass = 'myapp.Main'
+        }
+        $runShadow {
+          args 'foo'
+        }
+      """.trimIndent(),
+    )
+
+    path("src/main/java/myapp/Main.java").writeText(
+      """
+        package myapp;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("TestApp: Hello World! (" + args[0] + ")");
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(runShadowTask)
+
+    assertThat(result.output).contains("TestApp: Hello World! (foo)")
+  }
+
+  /**
+   * This spec requires > 15 minutes and > 8GB of disk space to run
+   */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/143",
+  )
+  @Disabled
+  @Test
+  fun checkLargeZipFilesWithZip64Enabled() {
+    path("src/main/java/myapp/Main.java").writeText(
+      """
+        package myapp;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("TestApp: Hello World! (" + args[0] + ")");
+          }
+        }
+      """.trimIndent(),
+    )
+
+    settingsScriptPath.appendText("rootProject.name = 'myapp'")
+    projectScriptPath.appendText(
+      """
+        apply plugin: 'application'
+
+        application {
+          mainClass = 'myapp.Main'
+        }
+        dependencies {
+          implementation 'shadow:a:1.0'
+        }
+        def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
+        def generateResources = tasks.register('generateResources') {
+          doLast {
+            def rnd = new Random()
+            def buf = new byte[128 * 1024]
+            for (x in 0..255) {
+              def dir = new File(generatedResourcesDir, x.toString())
+              dir.mkdirs()
+              for (y in 0..255) {
+                def file = new File(dir, y.toString())
+                rnd.nextBytes(buf)
+                file.bytes = buf
+              }
+            }
+          }
+        }
+        sourceSets {
+          main {
+            output.dir(generatedResourcesDir, builtBy: generateResources)
+          }
+        }
+        $shadowJar {
+          zip64 = true
+        }
+        $runShadow {
+          args 'foo'
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(runShadowTask)
+
+    assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
 
   private fun prepare(
