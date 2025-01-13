@@ -17,7 +17,7 @@ import kotlin.io.path.writeText
 import org.apache.tools.zip.ZipFile
 import org.junit.jupiter.api.Test
 
-class ApplicationTest : BasePluginTest() {
+class ApplicationPluginTest : BasePluginTest() {
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
