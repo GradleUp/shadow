@@ -8,12 +8,14 @@ import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import java.util.zip.ZipFile
 import kotlin.io.path.appendText
+import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -46,14 +48,7 @@ class ApplicationPluginTest : BasePluginTest() {
       "TestApp: Hello World! (foo)",
     )
 
-    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "myapp/Main.class",
-      )
-      getMainAttr("Main-Class").isEqualTo("myapp.Main")
-    }
+    commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
 
     assertThat(path("build/install/myapp-shadow/bin/myapp")).all {
       exists()
@@ -88,6 +83,11 @@ class ApplicationPluginTest : BasePluginTest() {
         "myapp-shadow-1.0/lib/a-1.0.jar",
       )
 
+      val extractedJar = path("extracted/myapp-1.0-all.jar")
+      zip.getStream("myapp-shadow-1.0/lib/myapp-1.0-all.jar")
+        .use { it.copyTo(extractedJar.outputStream()) }
+      commonAssertions(JarPath(extractedJar), entriesContained = arrayOf("myapp/Main.class"))
+
       assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp")).contains(
         "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
         "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
@@ -105,7 +105,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     run(SHADOW_INSTALL_TASK_NAME)
 
-    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).isRegular()
+    commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
   private fun prepare(
@@ -146,6 +146,16 @@ class ApplicationPluginTest : BasePluginTest() {
         endBlock = "rootProject.name = 'myapp'",
       ),
     )
+  }
+
+  private fun commonAssertions(
+    jarPath: JarPath,
+    entriesContained: Array<String> = arrayOf("a.properties", "a2.properties", "myapp/Main.class"),
+  ) {
+    assertThat(jarPath).useAll {
+      containsEntries(*entriesContained)
+      getMainAttr("Main-Class").isEqualTo("myapp.Main")
+    }
   }
 
   private companion object {
