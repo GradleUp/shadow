@@ -6,6 +6,8 @@ import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
@@ -36,7 +38,7 @@ class ApplicationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(runShadowTask)
+    val result = run(SHADOW_RUN_TASK_NAME)
 
     assertThat(result.output).contains(
       "Running application with JDK 17",
@@ -90,7 +92,7 @@ class ApplicationTest : BasePluginTest() {
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 
-    run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
+    run(SHADOW_INSTALL_TASK_NAME)
 
     assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).isRegular()
   }
@@ -133,5 +135,9 @@ class ApplicationTest : BasePluginTest() {
         endBlock = "rootProject.name = 'myapp'",
       ),
     )
+  }
+
+  private companion object {
+    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME')".trim()
   }
 }
