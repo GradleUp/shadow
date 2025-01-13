@@ -72,11 +72,7 @@ class ApplicationTest : BasePluginTest() {
   @Test
   fun shadowApplicationDistributionsShouldUseShadowJar() {
     prepare(
-      projectBlock = """
-        dependencies {
-           shadow 'shadow:a:1.0'
-        }
-      """.trimIndent(),
+      dependenciesBlock = " shadow 'shadow:a:1.0'",
     )
 
     run("shadowDistZip")
@@ -115,6 +111,7 @@ class ApplicationTest : BasePluginTest() {
   private fun prepare(
     projectBlock: String = "",
     settingsBlock: String = "",
+    dependenciesBlock: String = "implementation 'shadow:a:1.0'",
     runShadowBlock: String = "",
   ) {
     path("src/main/java/myapp/Main.java").appendText(
@@ -135,7 +132,7 @@ class ApplicationTest : BasePluginTest() {
           mainClass = 'myapp.Main'
         }
         dependencies {
-          implementation 'shadow:a:1.0'
+          $dependenciesBlock
         }
         $runShadow {
           args 'foo'
