@@ -3,19 +3,24 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsAtLeast
+import assertk.assertions.containsOnly
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import com.github.jengelman.gradle.plugins.shadow.util.getStream
+import java.util.zip.ZipFile
 import kotlin.io.path.appendText
+import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import org.apache.tools.zip.ZipFile
 import org.junit.jupiter.api.Test
 
-class ApplicationTest : BasePluginTest() {
+class ApplicationPluginTest : BasePluginTest() {
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
@@ -26,7 +31,7 @@ class ApplicationTest : BasePluginTest() {
       """.trimIndent(),
       settingsBlock = """
         plugins {
-          id('org.gradle.toolchains.foojay-resolver-convention') version '0.7.0'
+          id 'org.gradle.toolchains.foojay-resolver-convention' version '0.9.0'
         }
       """.trimIndent(),
       runShadowBlock = """
@@ -36,21 +41,14 @@ class ApplicationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(runShadowTask)
+    val result = run(SHADOW_RUN_TASK_NAME)
 
     assertThat(result.output).contains(
       "Running application with JDK 17",
       "TestApp: Hello World! (foo)",
     )
 
-    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "myapp/Main.class",
-      )
-      getMainAttr("Main-Class").isEqualTo("myapp.Main")
-    }
+    commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
 
     assertThat(path("build/install/myapp-shadow/bin/myapp")).all {
       exists()
@@ -71,37 +69,49 @@ class ApplicationTest : BasePluginTest() {
   @Test
   fun shadowApplicationDistributionsShouldUseShadowJar() {
     prepare(
-      projectBlock = """
-        dependencies {
-           shadow 'shadow:a:1.0'
-        }
-      """.trimIndent(),
+      dependenciesBlock = "shadow 'shadow:a:1.0'",
     )
 
     run("shadowDistZip")
 
-    val zip = path("build/distributions/myapp-shadow-1.0.zip")
-    assertThat(zip).exists()
+    ZipFile(path("build/distributions/myapp-shadow-1.0.zip").toFile()).use { zip ->
+      val fileEntries = zip.entries().toList().map { it.name }.filter { !it.endsWith("/") }
+      assertThat(fileEntries).containsOnly(
+        "myapp-shadow-1.0/bin/myapp",
+        "myapp-shadow-1.0/bin/myapp.bat",
+        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+        "myapp-shadow-1.0/lib/a-1.0.jar",
+      )
 
-    val entries = ZipFile(zip.toFile()).use { it.entries }.toList().map { it.name }
-    assertThat(entries).containsAtLeast(
-      "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
-      "myapp-shadow-1.0/lib/a-1.0.jar",
-    )
+      val extractedJar = path("extracted/myapp-1.0-all.jar")
+      zip.getStream("myapp-shadow-1.0/lib/myapp-1.0-all.jar")
+        .use { it.copyTo(extractedJar.outputStream()) }
+      commonAssertions(JarPath(extractedJar), entriesContained = arrayOf("myapp/Main.class"))
+
+      assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp")).contains(
+        "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
+        "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
+        "exec \"\$JAVACMD\" \"\$@\"",
+      )
+      assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp.bat")).contains(
+        "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+      )
+    }
   }
 
   @Test
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 
-    run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
+    run(SHADOW_INSTALL_TASK_NAME)
 
-    assertThat(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar")).isRegular()
+    commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
   private fun prepare(
     projectBlock: String = "",
     settingsBlock: String = "",
+    dependenciesBlock: String = "implementation 'shadow:a:1.0'",
     runShadowBlock: String = "",
   ) {
     path("src/main/java/myapp/Main.java").appendText(
@@ -122,7 +132,7 @@ class ApplicationTest : BasePluginTest() {
           mainClass = 'myapp.Main'
         }
         dependencies {
-          implementation 'shadow:a:1.0'
+          $dependenciesBlock
         }
         $runShadow {
           args 'foo'
@@ -136,5 +146,19 @@ class ApplicationTest : BasePluginTest() {
         endBlock = "rootProject.name = 'myapp'",
       ),
     )
+  }
+
+  private fun commonAssertions(
+    jarPath: JarPath,
+    entriesContained: Array<String> = arrayOf("a.properties", "a2.properties", "myapp/Main.class"),
+  ) {
+    assertThat(jarPath).useAll {
+      containsEntries(*entriesContained)
+      getMainAttr("Main-Class").isEqualTo("myapp.Main")
+    }
+  }
+
+  private companion object {
+    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME')".trim()
   }
 }

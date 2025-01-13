@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
 
-class ShadowPluginTest : BasePluginTest() {
+class JavaPluginTest : BasePluginTest() {
   @Test
   fun applyPlugin() {
     val projectName = "my-shadow"
@@ -636,40 +636,6 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).isRegular()
-  }
-
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/609",
-  )
-  @Test
-  fun doesNotErrorWhenUsingApplicationMainClassProperty() {
-    projectScriptPath.appendText(
-      """
-        apply plugin: 'application'
-
-        application {
-          mainClass = 'myapp.Main'
-        }
-        $runShadow {
-          args 'foo'
-        }
-      """.trimIndent(),
-    )
-
-    path("src/main/java/myapp/Main.java").writeText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
-
-    val result = run(runShadowTask)
-
-    assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
 
   @Issue(

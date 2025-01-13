@@ -4,8 +4,10 @@ import assertk.Assert
 import assertk.all
 import assertk.assertions.isNotEmpty
 import assertk.fail
+import java.io.InputStream
 import java.nio.file.Path
 import java.util.jar.JarFile
+import java.util.zip.ZipFile
 
 /**
  * A wrapper for [JarFile] that also implements [Path].
@@ -20,11 +22,15 @@ class JarPath(val path: Path) :
   fun getMainAttr(name: String): String? {
     return manifest.mainAttributes.getValue(name)
   }
+}
 
-  fun getContent(entryName: String): String {
-    val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
-    return getInputStream(entry).bufferedReader().use { it.readText() }
-  }
+fun ZipFile.getContent(entryName: String): String {
+  return getStream(entryName).bufferedReader().use { it.readText() }
+}
+
+fun ZipFile.getStream(entryName: String): InputStream {
+  val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
+  return getInputStream(entry)
 }
 
 /**

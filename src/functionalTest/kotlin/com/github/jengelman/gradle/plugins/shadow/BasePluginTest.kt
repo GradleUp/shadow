@@ -6,9 +6,7 @@ import assertk.assertThat
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
-import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
@@ -81,7 +79,6 @@ abstract class BasePluginTest {
   }
 
   open val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
-  open val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
   val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
 
   val projectScriptPath: Path get() = path("build.gradle")
@@ -321,10 +318,6 @@ abstract class BasePluginTest {
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
-    """.trimIndent()
-
-    val runShadow = """
-      tasks.named('$SHADOW_RUN_TASK_NAME', ${JavaJarExec::class.java.name})
     """.trimIndent()
 
     val commonArguments = listOf(
