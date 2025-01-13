@@ -122,28 +122,8 @@ class ApplicationTest : BasePluginTest() {
   @Disabled
   @Test
   fun checkLargeZipFilesWithZip64Enabled() {
-    path("src/main/java/myapp/Main.java").writeText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
-
-    settingsScriptPath.appendText("rootProject.name = 'myapp'")
-    projectScriptPath.appendText(
-      """
-        apply plugin: 'application'
-
-        application {
-          mainClass = 'myapp.Main'
-        }
-        dependencies {
-          implementation 'shadow:a:1.0'
-        }
+    prepare(
+      projectBlock = """
         def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
         def generateResources = tasks.register('generateResources') {
           doLast {
@@ -167,9 +147,6 @@ class ApplicationTest : BasePluginTest() {
         }
         $shadowJar {
           zip64 = true
-        }
-        $runShadow {
-          args 'foo'
         }
       """.trimIndent(),
     )
