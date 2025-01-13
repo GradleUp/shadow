@@ -26,7 +26,7 @@ import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledForJreRange
+import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
 
 class ShadowPluginTest : BasePluginTest() {
@@ -58,8 +58,8 @@ class ShadowPluginTest : BasePluginTest() {
   }
 
   @Test
-  @EnabledForJreRange(
-    max = JRE.JAVA_21,
+  @DisabledForJreRange(
+    min = JRE.JAVA_21,
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
