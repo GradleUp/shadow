@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsAtLeast
+import assertk.assertions.containsExactly
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -81,7 +81,7 @@ class ApplicationTest : BasePluginTest() {
     assertThat(zip).exists()
 
     val entries = ZipFile(zip.toFile()).use { it.entries }.toList().map { it.name }
-    assertThat(entries).containsAtLeast(
+    assertThat(entries.filter { it.endsWith(".jar") }).containsExactly(
       "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
       "myapp-shadow-1.0/lib/a-1.0.jar",
     )
