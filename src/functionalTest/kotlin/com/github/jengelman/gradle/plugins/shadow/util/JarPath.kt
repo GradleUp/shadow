@@ -21,11 +21,6 @@ class JarPath(val path: Path) :
   fun getMainAttr(name: String): String? {
     return manifest.mainAttributes.getValue(name)
   }
-
-  fun getContent(entryName: String): String {
-    val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
-    return getInputStream(entry).bufferedReader().use { it.readText() }
-  }
 }
 
 fun ZipFile.getContent(entryName: String): String {
