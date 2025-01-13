@@ -106,29 +106,7 @@ class ApplicationTest : BasePluginTest() {
   )
   @Test
   fun doesNotErrorWhenUsingApplicationMainClassProperty() {
-    projectScriptPath.appendText(
-      """
-        apply plugin: 'application'
-
-        application {
-          mainClass = 'myapp.Main'
-        }
-        $runShadow {
-          args 'foo'
-        }
-      """.trimIndent(),
-    )
-
-    path("src/main/java/myapp/Main.java").writeText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
+    prepare()
 
     val result = run(runShadowTask)
 
