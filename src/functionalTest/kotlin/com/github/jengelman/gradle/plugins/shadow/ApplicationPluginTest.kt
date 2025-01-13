@@ -3,18 +3,19 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsExactly
+import assertk.assertions.containsOnly
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import java.util.zip.ZipFile
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import org.apache.tools.zip.ZipFile
 import org.junit.jupiter.api.Test
 
 class ApplicationPluginTest : BasePluginTest() {
@@ -73,19 +74,29 @@ class ApplicationPluginTest : BasePluginTest() {
   @Test
   fun shadowApplicationDistributionsShouldUseShadowJar() {
     prepare(
-      dependenciesBlock = " shadow 'shadow:a:1.0'",
+      dependenciesBlock = "shadow 'shadow:a:1.0'",
     )
 
     run("shadowDistZip")
 
-    val zip = path("build/distributions/myapp-shadow-1.0.zip")
-    assertThat(zip).exists()
+    ZipFile(path("build/distributions/myapp-shadow-1.0.zip").toFile()).use { zip ->
+      val fileEntries = zip.entries().toList().map { it.name }.filter { !it.endsWith("/") }
+      assertThat(fileEntries).containsOnly(
+        "myapp-shadow-1.0/bin/myapp",
+        "myapp-shadow-1.0/bin/myapp.bat",
+        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+        "myapp-shadow-1.0/lib/a-1.0.jar",
+      )
 
-    val entries = ZipFile(zip.toFile()).use { it.entries }.toList().map { it.name }
-    assertThat(entries.filter { it.endsWith(".jar") }).containsExactly(
-      "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
-      "myapp-shadow-1.0/lib/a-1.0.jar",
-    )
+      assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp")).contains(
+        "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
+        "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
+        "exec \"\$JAVACMD\" \"\$@\"",
+      )
+      assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp.bat")).contains(
+        "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+      )
+    }
   }
 
   @Test

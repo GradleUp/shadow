@@ -6,6 +6,7 @@ import assertk.assertions.isNotEmpty
 import assertk.fail
 import java.nio.file.Path
 import java.util.jar.JarFile
+import java.util.zip.ZipFile
 
 /**
  * A wrapper for [JarFile] that also implements [Path].
@@ -25,6 +26,11 @@ class JarPath(val path: Path) :
     val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
     return getInputStream(entry).bufferedReader().use { it.readText() }
   }
+}
+
+fun ZipFile.getContent(entryName: String): String {
+  val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
+  return getInputStream(entry).bufferedReader().use { it.readText() }
 }
 
 /**
