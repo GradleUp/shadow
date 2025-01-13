@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
 
-class ShadowPluginTest : BasePluginTest() {
+class JavaPluginTest : BasePluginTest() {
   @Test
   fun applyPlugin() {
     val projectName = "my-shadow"
