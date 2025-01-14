@@ -289,9 +289,30 @@ abstract class BasePluginTest {
     )
   }
 
-  fun writeGradlePluginModule() {
+  fun writeGradlePluginModule(useProperties: Boolean) {
+    val pluginId = "my.plugin"
+    val pluginClass = "my.plugin.MyPlugin"
+
+    val gradlePluginBlock = if (useProperties) {
+      ""
+    } else {
+      """
+      gradlePlugin {
+        plugins {
+          create("myPlugin") {
+            id = '$pluginId'
+            implementationClass = '$pluginClass'
+          }
+        }
+      }
+      """.trimIndent()
+    }
+
     projectScriptPath.writeText(
-      getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true),
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true)}
+        $gradlePluginBlock
+      """.trimIndent() + System.lineSeparator(),
     )
 
     path("src/main/java/my/plugin/MyPlugin.java").writeText(
@@ -306,11 +327,13 @@ abstract class BasePluginTest {
         }
       """.trimIndent(),
     )
-    path("src/main/resources/META-INF/gradle-plugins/my.plugin.properties").writeText(
-      """
-        implementation-class=my.plugin.MyPlugin
-      """.trimIndent(),
-    )
+    if (useProperties) {
+      path("src/main/resources/META-INF/gradle-plugins/$pluginId.properties").writeText(
+        """
+          implementation-class=$pluginClass
+        """.trimIndent(),
+      )
+    }
   }
 
   fun runner(
