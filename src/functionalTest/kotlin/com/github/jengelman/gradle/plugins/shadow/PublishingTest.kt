@@ -175,14 +175,14 @@ class PublishingTest : BasePluginTest() {
       containsEntries(*entries)
     }
 
-    pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pomContents ->
-      assertThat(pomContents.dependencies.size).isEqualTo(2)
-      pomContents.dependencies[0].let { dependency ->
+    pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pom ->
+      assertThat(pom.dependencies.size).isEqualTo(2)
+      pom.dependencies[0].let { dependency ->
         assertThat(dependency.groupId).isEqualTo("shadow")
         assertThat(dependency.artifactId).isEqualTo("a")
         assertThat(dependency.version).isEqualTo("1.0")
       }
-      pomContents.dependencies[1].let { dependency ->
+      pom.dependencies[1].let { dependency ->
         assertThat(dependency.groupId).isEqualTo("shadow")
         assertThat(dependency.artifactId).isEqualTo("b")
         assertThat(dependency.version).isEqualTo("1.0")
