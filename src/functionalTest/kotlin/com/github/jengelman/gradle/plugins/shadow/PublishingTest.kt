@@ -24,6 +24,8 @@ import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Usage
+import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -188,18 +190,19 @@ class PublishingTest : BasePluginTest() {
 
     gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmm ->
       assertThat(gmm.variants.size).isEqualTo(3)
+      // apiElements, runtimeElements, shadowRuntimeElements
       assertThat(gmm.variants.map { it.name }).containsOnly(
-        "apiElements",
-        "runtimeElements",
-        "shadowRuntimeElements",
+        API_ELEMENTS_CONFIGURATION_NAME,
+        RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
 
-      val apiVariant = gmm.variants.single { it.name == "apiElements" }
+      val apiVariant = gmm.variants.single { it.name == API_ELEMENTS_CONFIGURATION_NAME }
       assertThat(apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_API)
       assertThat(apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
       assertThat(apiVariant.dependencies).isEmpty()
 
-      val runtimeVariant = gmm.variants.single { it.name == "runtimeElements" }
+      val runtimeVariant = gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }
       assertThat(runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
       assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
       assertThat(runtimeVariant.dependencies.size).isEqualTo(2)
