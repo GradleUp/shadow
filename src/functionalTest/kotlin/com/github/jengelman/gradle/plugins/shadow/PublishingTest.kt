@@ -1,6 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -229,27 +231,32 @@ class PublishingTest : BasePluginTest() {
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-
-      val apiVariant = gmm.variants.single { it.name == API_ELEMENTS_CONFIGURATION_NAME }
-      assertThat(apiVariant.attributes[Category.CATEGORY_ATTRIBUTE.name]).isEqualTo(Category.LIBRARY)
-      assertThat(apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
-      assertThat(apiVariant.attributes[LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name]).isEqualTo(LibraryElements.JAR)
-      assertThat(apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_API)
-      assertThat(apiVariant.dependencies).isEmpty()
-
-      val runtimeVariant = gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }
-      assertThat(runtimeVariant.attributes[Category.CATEGORY_ATTRIBUTE.name]).isEqualTo(Category.LIBRARY)
-      assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
-      assertThat(runtimeVariant.attributes[LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name]).isEqualTo(LibraryElements.JAR)
-      assertThat(runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
-      assertThat(runtimeVariant.dependencies.map { it.module }).containsOnly("a", "b")
-
+      assertThat(gmm.variants.single { it.name == API_ELEMENTS_CONFIGURATION_NAME }).all {
+        transform { it.attributes }.all {
+          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
+          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
+          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
+          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_API)
+        }
+        transform { it.dependencies }.isEmpty()
+      }
+      assertThat(gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
+        transform { it.attributes }.all {
+          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
+          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
+          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
+          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
+        }
+        transform { it.dependencies.map { dep -> dep.module } }.containsOnly("a", "b")
+      }
       assertShadowVariantCommon(gmm)
     }
 
     assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
     gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
-      assertThat(gmm.variants).single().transform { it.name }.isEqualTo(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+      assertThat(gmm.variants.map { it.name }).containsOnly(
+        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+      )
       assertShadowVariantCommon(gmm)
     }
   }
@@ -312,12 +319,15 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun assertShadowVariantCommon(gmm: GradleModuleMetadata) {
-    val variant = gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }
-    assertThat(variant.attributes[Category.CATEGORY_ATTRIBUTE.name]).isEqualTo(Category.LIBRARY)
-    assertThat(variant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
-    assertThat(variant.attributes[LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name]).isEqualTo(LibraryElements.JAR)
-    assertThat(variant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
-    assertThat(variant.dependencies).single().transform { it.module }.isEqualTo("b")
+    assertThat(gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
+      transform { it.attributes }.all {
+        contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
+        contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.SHADOWED)
+        contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
+        contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
+      }
+      transform { it.dependencies.map { dep -> dep.module } }.containsOnly("b")
+    }
   }
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
