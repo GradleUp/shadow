@@ -213,7 +213,7 @@ class PublishingTest : BasePluginTest() {
     assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
 
     gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
-      assertThat(gmm.variants.size).isEqualTo(1)
+      assertThat(gmm.variants.map { it.name }).containsOnly(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
       gmm.assertShadowVariantCommon()
     }
   }
