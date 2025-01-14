@@ -22,6 +22,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.maven.model.Model
@@ -36,6 +37,8 @@ import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class PublishingTest : BasePluginTest() {
   private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -88,6 +91,46 @@ class PublishingTest : BasePluginTest() {
     assertShadowJarCommon(repoJarPath("shadow/maven/1.0/maven-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun publishShadowedGradlePluginWithMavenPublishPlugin(legacy: Boolean) {
+    writeGradlePluginModule(legacy)
+    projectScriptPath.appendText(
+      publishConfiguration(
+        projectBlock = """
+          group = 'my.plugin'
+          version = '1.0'
+          // Workaround for overriding the jar task output by shadowJar.
+          tasks.named('jar') {
+            archiveExtension = 'ignored'
+          }
+        """.trimIndent(),
+        shadowBlock = """
+          archiveClassifier = ''
+        """.trimIndent(),
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            from components.shadow
+          }
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    assertShadowJarCommon(repoJarPath("my/plugin/maven/1.0/maven-1.0.jar"))
+    assertPomCommon(repoPath("my/plugin/maven/1.0/maven-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/plugin/maven/1.0/maven-1.0.module")))
+
+    assertThat(repoJarPath("my/plugin/maven/1.0/maven-1.0.jar")).useAll {
+      transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
+        .single().isEqualTo("my/plugin/MyPlugin.class")
+
+      // Only the shadowed jar should be included.
+      transform { it.parent.listDirectoryEntries("*.jar") }.single()
+    }
   }
 
   @Issue(
