@@ -207,13 +207,13 @@ class PublishingTest : BasePluginTest() {
       assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
       assertThat(runtimeVariant.dependencies.map { it.module }).containsOnly("a", "b")
 
-      gmm.assertShadowVariantCommon()
+      assertShadowVariantCommon(gmm)
     }
     assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
 
     gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
-      assertThat(gmm.variants.map { it.name }).containsOnly(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
-      gmm.assertShadowVariantCommon()
+      assertThat(gmm.variants).single().transform { it.name }.isEqualTo(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+      assertShadowVariantCommon(gmm)
     }
   }
 
@@ -274,12 +274,11 @@ class PublishingTest : BasePluginTest() {
     assertThat(dependency.version).isEqualTo("1.0")
   }
 
-  private fun GradleModuleMetadata.assertShadowVariantCommon() {
-    val variant = variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }
+  private fun assertShadowVariantCommon(gmm: GradleModuleMetadata) {
+    val variant = gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }
     assertThat(variant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
     assertThat(variant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
-    assertThat(variant.dependencies).single()
-    assertThat(variant.dependencies.map { it.module }).containsOnly("b")
+    assertThat(variant.dependencies).single().transform { it.module }.isEqualTo("b")
   }
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
