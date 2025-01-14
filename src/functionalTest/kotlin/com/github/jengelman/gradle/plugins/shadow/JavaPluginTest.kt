@@ -644,27 +644,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun excludeGradleApiByDefault() {
-    projectScriptPath.writeText(
-      getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true),
-    )
-
-    path("src/main/java/my/plugin/MyPlugin.java").writeText(
-      """
-        package my.plugin;
-        import org.gradle.api.Plugin;
-        import org.gradle.api.Project;
-        public class MyPlugin implements Plugin<Project> {
-          public void apply(Project project) {
-            System.out.println("MyPlugin: Hello World!");
-          }
-        }
-      """.trimIndent(),
-    )
-    path("src/main/resources/META-INF/gradle-plugins/my.plugin.properties").writeText(
-      """
-        implementation-class=my.plugin.MyPlugin
-      """.trimIndent(),
-    )
+    writeGradlePluginModule()
 
     run(shadowJarTask)
 
