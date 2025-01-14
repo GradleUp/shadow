@@ -25,12 +25,11 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledForJreRange
+import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
 
-class ShadowPluginTest : BasePluginTest() {
+class JavaPluginTest : BasePluginTest() {
   @Test
   fun applyPlugin() {
     val projectName = "my-shadow"
@@ -59,8 +58,8 @@ class ShadowPluginTest : BasePluginTest() {
   }
 
   @Test
-  @EnabledForJreRange(
-    max = JRE.JAVA_21,
+  @DisabledForJreRange(
+    min = JRE.JAVA_21,
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
@@ -637,106 +636,6 @@ class ShadowPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).isRegular()
-  }
-
-  /**
-   * This spec requires > 15 minutes and > 8GB of disk space to run
-   */
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/143",
-  )
-  @Disabled
-  @Test
-  fun checkLargeZipFilesWithZip64Enabled() {
-    path("src/main/java/myapp/Main.java").writeText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
-
-    settingsScriptPath.appendText("rootProject.name = 'myapp'")
-    projectScriptPath.appendText(
-      """
-        apply plugin: 'application'
-
-        application {
-          mainClass = 'myapp.Main'
-        }
-        dependencies {
-          implementation 'shadow:a:1.0'
-        }
-        def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
-        def generateResources = tasks.register('generateResources') {
-          doLast {
-            def rnd = new Random()
-            def buf = new byte[128 * 1024]
-            for (x in 0..255) {
-              def dir = new File(generatedResourcesDir, x.toString())
-              dir.mkdirs()
-              for (y in 0..255) {
-                def file = new File(dir, y.toString())
-                rnd.nextBytes(buf)
-                file.bytes = buf
-              }
-            }
-          }
-        }
-        sourceSets {
-          main {
-            output.dir(generatedResourcesDir, builtBy: generateResources)
-          }
-        }
-        $shadowJar {
-          zip64 = true
-        }
-        $runShadow {
-          args 'foo'
-        }
-      """.trimIndent(),
-    )
-
-    val result = run(runShadowTask)
-
-    assertThat(result.output).contains("TestApp: Hello World! (foo)")
-  }
-
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/609",
-  )
-  @Test
-  fun doesNotErrorWhenUsingApplicationMainClassProperty() {
-    projectScriptPath.appendText(
-      """
-        apply plugin: 'application'
-
-        application {
-          mainClass = 'myapp.Main'
-        }
-        $runShadow {
-          args 'foo'
-        }
-      """.trimIndent(),
-    )
-
-    path("src/main/java/myapp/Main.java").writeText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
-
-    val result = run(runShadowTask)
-
-    assertThat(result.output).contains("TestApp: Hello World! (foo)")
   }
 
   @Issue(
