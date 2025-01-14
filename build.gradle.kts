@@ -103,6 +103,8 @@ testing.suites {
       implementation(libs.apache.maven.modelBuilder)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
+      // Used in test `plugins` blocks.
+      implementation(libs.foojayResolver)
     }
   }
 
@@ -123,6 +125,15 @@ gradlePlugin {
   testSourceSets(
     sourceSets["functionalTest"],
     sourceSets["integrationTest"],
+  )
+}
+
+tasks.pluginUnderTestMetadata {
+  val functionalTestImplementation = configurations.named("functionalTestImplementation") {
+    isCanBeResolved = true
+  }
+  pluginClasspath.from(
+    functionalTestImplementation,
   )
 }
 
