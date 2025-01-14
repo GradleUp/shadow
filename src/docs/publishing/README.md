@@ -45,6 +45,7 @@ This automatic configuration occurs _only_ when using the above methods for
 configuring publishing. If this behavior is not desirable, then publishing **must**
 be manually configured.
 
+
 # Publish the Shadowed JAR instead of the Original JAR
 
 You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming 
