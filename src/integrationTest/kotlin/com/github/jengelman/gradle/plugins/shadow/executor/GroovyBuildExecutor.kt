@@ -36,8 +36,10 @@ class GroovyBuildExecutor(
     val mainScript = buildString {
       append(imports)
       append(System.lineSeparator())
-      append(fixture.pre)
-      append(System.lineSeparator())
+      if (!snippetWithoutImports.contains("plugins {")) {
+        append(fixture.pluginsBlock)
+        append(System.lineSeparator())
+      }
       append(snippetWithoutImports)
       append(System.lineSeparator())
     }.trimIndent()
