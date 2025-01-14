@@ -9,9 +9,11 @@ artifact and dependencies in the POM file.
 
 ```groovy
 // Publishing a Shadow JAR with the Maven-Publish Plugin
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'com.gradleup.shadow'
+plugins {
+  id 'java'
+  id 'maven-publish'
+  id 'com.gradleup.shadow'
+}
 
 publishing {
   publications {
@@ -52,9 +54,11 @@ You may want to publish the shadowed JAR instead of the original JAR. This can b
 the `archiveClassifier` of the shadowed JAR like the following:
 
 ```groovy
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'com.gradleup.shadow'
+plugins {
+  id 'java'
+  id 'maven-publish'
+  id 'com.gradleup.shadow'
+}
 
 group = 'shadow'
 version = '1.0'

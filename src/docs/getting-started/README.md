@@ -19,8 +19,9 @@ buildscript {
   }
 }
 
-apply plugin: 'com.gradleup.shadow'
+// `apply plugin` stuffs are used with `buildscript`.
 apply plugin: 'java'
+apply plugin: 'com.gradleup.shadow'
 ```
 
 <details>
@@ -38,6 +39,7 @@ buildscript {
   }
 }
 
+// `apply plugin` stuffs are used with `buildscript`.
 apply plugin: 'java'
 apply plugin: 'com.gradleup.shadow'
 ```
