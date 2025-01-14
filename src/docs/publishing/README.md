@@ -46,7 +46,7 @@ configuring publishing. If this behavior is not desirable, then publishing **mus
 be manually configured.
 
 
-# Publish the Shadowed JAR instead of the Original JAR
+## Publish the Shadowed JAR instead of the Original JAR
 
 You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming 
 the `archiveClassifier` of the shadowed JAR like the following:
