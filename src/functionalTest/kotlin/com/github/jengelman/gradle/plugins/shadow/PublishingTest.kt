@@ -91,6 +91,7 @@ class PublishingTest : BasePluginTest() {
       getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
     }
     assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
   }
 
   @Issue(
