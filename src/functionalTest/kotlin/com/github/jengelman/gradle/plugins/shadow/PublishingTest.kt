@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -189,7 +190,6 @@ class PublishingTest : BasePluginTest() {
     }
 
     gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmm ->
-      assertThat(gmm.variants.size).isEqualTo(3)
       // apiElements, runtimeElements, shadowRuntimeElements
       assertThat(gmm.variants.map { it.name }).containsOnly(
         API_ELEMENTS_CONFIGURATION_NAME,
@@ -205,7 +205,6 @@ class PublishingTest : BasePluginTest() {
       val runtimeVariant = gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }
       assertThat(runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
       assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
-      assertThat(runtimeVariant.dependencies.size).isEqualTo(2)
       assertThat(runtimeVariant.dependencies.map { it.module }).containsOnly("a", "b")
 
       gmm.assertShadowVariantCommon()
@@ -268,10 +267,8 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun assertPomCommon(pomPath: Path) {
-    val contents = pomReader.read(pomPath)
-    assertThat(contents.dependencies.size).isEqualTo(1)
-
-    val dependency = contents.dependencies[0]
+    val pom = pomReader.read(pomPath)
+    val dependency = pom.dependencies.single()
     assertThat(dependency.groupId).isEqualTo("shadow")
     assertThat(dependency.artifactId).isEqualTo("b")
     assertThat(dependency.version).isEqualTo("1.0")
@@ -281,7 +278,7 @@ class PublishingTest : BasePluginTest() {
     val variant = variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }
     assertThat(variant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
     assertThat(variant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
-    assertThat(variant.dependencies.size).isEqualTo(1)
+    assertThat(variant.dependencies).single()
     assertThat(variant.dependencies.map { it.module }).containsOnly("b")
   }
 
