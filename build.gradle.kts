@@ -132,6 +132,7 @@ tasks.pluginUnderTestMetadata {
   val functionalTestImplementation = configurations.named("functionalTestImplementation") {
     isCanBeResolved = true
   }
+  // Plugins used in tests could be resolved in classpath.
   pluginClasspath.from(
     functionalTestImplementation,
   )
