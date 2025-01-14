@@ -28,6 +28,8 @@ import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginTest : BasePluginTest() {
   @Test
@@ -642,9 +644,10 @@ class JavaPluginTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/459",
     "https://github.com/GradleUp/shadow/issues/852",
   )
-  @Test
-  fun excludeGradleApiByDefault() {
-    writeGradlePluginModule()
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun excludeGradleApiByDefault(legacy: Boolean) {
+    writeGradlePluginModule(legacy)
 
     run(shadowJarTask)
 
