@@ -1,9 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.single
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
@@ -22,22 +26,27 @@ import kotlin.io.path.writeText
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.gradle.api.attributes.Bundling
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
+import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
 class PublishingTest : BasePluginTest() {
   private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
   private val gmmAdapter = moshi.adapter(GradleModuleMetadata::class.java)
   private val pomReader = MavenXpp3Reader()
 
-  private lateinit var remoteRepoPath: Path
+  @TempDir
+  lateinit var remoteRepoPath: Path
 
   @BeforeEach
   override fun setup() {
     super.setup()
-    remoteRepoPath = projectRoot.resolve("remote-maven-repo")
     settingsScriptPath.appendText("rootProject.name = 'maven'" + System.lineSeparator())
   }
 
@@ -171,46 +180,53 @@ class PublishingTest : BasePluginTest() {
       containsEntries(*entries)
     }
 
-    pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pomContents ->
-      assertThat(pomContents.dependencies.size).isEqualTo(2)
-      pomContents.dependencies[0].let { dependency ->
+    pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pom ->
+      assertThat(pom.dependencies.size).isEqualTo(2)
+      pom.dependencies[0].let { dependency ->
         assertThat(dependency.groupId).isEqualTo("shadow")
         assertThat(dependency.artifactId).isEqualTo("a")
         assertThat(dependency.version).isEqualTo("1.0")
       }
-      pomContents.dependencies[1].let { dependency ->
+      pom.dependencies[1].let { dependency ->
         assertThat(dependency.groupId).isEqualTo("shadow")
         assertThat(dependency.artifactId).isEqualTo("b")
         assertThat(dependency.version).isEqualTo("1.0")
       }
     }
-
-    gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmmContents ->
-      assertThat(gmmContents.variants.size).isEqualTo(3)
-      assertThat(gmmContents.variants.map { it.name }).containsOnly(
-        "apiElements",
-        "runtimeElements",
-        "shadowRuntimeElements",
+    gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmm ->
+      // apiElements, runtimeElements, shadowRuntimeElements
+      assertThat(gmm.variants.map { it.name }).containsOnly(
+        API_ELEMENTS_CONFIGURATION_NAME,
+        RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-
-      val apiVariant = gmmContents.variants.single { it.name == "apiElements" }
-      assertThat(apiVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_API)
-      assertThat(apiVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
-      assertThat(apiVariant.dependencies).isEmpty()
-
-      val runtimeVariant = gmmContents.variants.single { it.name == "runtimeElements" }
-      assertThat(runtimeVariant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
-      assertThat(runtimeVariant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.EXTERNAL)
-      assertThat(runtimeVariant.dependencies.size).isEqualTo(2)
-      assertThat(runtimeVariant.dependencies.map { it.module }).containsOnly("a", "b")
-
-      assertShadowVariantCommon(gmmContents.variants.single { it.name == "shadowRuntimeElements" })
+      assertThat(gmm.variants.single { it.name == API_ELEMENTS_CONFIGURATION_NAME }).all {
+        transform { it.attributes }.all {
+          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
+          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
+          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
+          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_API)
+        }
+        transform { it.dependencies }.isEmpty()
+      }
+      assertThat(gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
+        transform { it.attributes }.all {
+          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
+          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
+          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
+          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
+        }
+        transform { it.dependencies.map { dep -> dep.module } }.containsOnly("a", "b")
+      }
+      assertShadowVariantCommon(gmm)
     }
-    assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
 
-    gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmmContents ->
-      assertThat(gmmContents.variants.size).isEqualTo(1)
-      assertShadowVariantCommon(gmmContents.variants.single { it.name == "shadowRuntimeElements" })
+    assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
+    gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
+      assertThat(gmm.variants.map { it.name }).containsOnly(
+        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+      )
+      assertShadowVariantCommon(gmm)
     }
   }
 
@@ -264,20 +280,23 @@ class PublishingTest : BasePluginTest() {
   }
 
   private fun assertPomCommon(pomPath: Path) {
-    val contents = pomReader.read(pomPath)
-    assertThat(contents.dependencies.size).isEqualTo(1)
-
-    val dependency = contents.dependencies[0]
+    val pom = pomReader.read(pomPath)
+    val dependency = pom.dependencies.single()
     assertThat(dependency.groupId).isEqualTo("shadow")
     assertThat(dependency.artifactId).isEqualTo("b")
     assertThat(dependency.version).isEqualTo("1.0")
   }
 
-  private fun assertShadowVariantCommon(variant: GradleModuleMetadata.Variant) {
-    assertThat(variant.attributes[Usage.USAGE_ATTRIBUTE.name]).isEqualTo(Usage.JAVA_RUNTIME)
-    assertThat(variant.attributes[Bundling.BUNDLING_ATTRIBUTE.name]).isEqualTo(Bundling.SHADOWED)
-    assertThat(variant.dependencies.size).isEqualTo(1)
-    assertThat(variant.dependencies.map { it.module }).containsOnly("b")
+  private fun assertShadowVariantCommon(gmm: GradleModuleMetadata) {
+    assertThat(gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
+      transform { it.attributes }.all {
+        contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
+        contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.SHADOWED)
+        contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
+        contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
+      }
+      transform { it.dependencies.map { dep -> dep.module } }.containsOnly("b")
+    }
   }
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
