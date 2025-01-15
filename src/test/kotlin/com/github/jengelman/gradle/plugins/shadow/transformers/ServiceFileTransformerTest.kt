@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
   @ParameterizedTest(name = "{index} => path={0}, exclude={1}, expected={2}")
   @MethodSource("canTransformResourceData")
-  fun testCanTransformResource(path: String, exclude: Boolean, expected: Boolean) {
+  fun canTransformResource(path: String, exclude: Boolean, expected: Boolean) {
     if (exclude) {
       transformer.exclude(path)
     }
@@ -21,7 +21,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
   @ParameterizedTest(name = "{index} => path={0}")
   @MethodSource("transformsServiceFileData")
-  fun testTransformServiceFile(path: String, input1: String, input2: String, output: String) {
+  fun transformServiceFile(path: String, input1: String, input2: String, output: String) {
     if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
       transformer.transform(context(path, input2))
@@ -33,7 +33,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   }
 
   @Test
-  fun testExcludesGroovyExtensionModuleDescriptorFilesByDefault() {
+  fun excludesGroovyExtensionModuleDescriptorFilesByDefault() {
     val element = "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
     assertThat(transformer.canTransformResource(element)).isFalse()
   }

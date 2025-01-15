@@ -18,19 +18,19 @@ import org.junit.jupiter.params.provider.MethodSource
 
 class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransformer>() {
   @Test
-  fun testHasTransformedResource() {
+  fun hasTransformedResource() {
     transformer.transform(manifestTransformerContext)
 
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
   @Test
-  fun testHasNotTransformedResource() {
+  fun hasNotTransformedResource() {
     assertThat(transformer.hasTransformedResource()).isFalse()
   }
 
   @Test
-  fun testTransformation() {
+  fun transformation() {
     transformer.transform(manifestTransformerContext)
 
     val testableZipPath = doTransformAndGetTransformedPath(transformer, false)
@@ -41,7 +41,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   @Test
-  fun testTransformationPropertiesAreReproducible() {
+  fun transformationPropertiesAreReproducible() {
     transformer.transform(manifestTransformerContext)
 
     val firstRunTransformedPath = doTransformAndGetTransformedPath(transformer, true)

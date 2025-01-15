@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
  */
 class ComponentsXmlResourceTransformerTest : BaseTransformerTest<ComponentsXmlResourceTransformer>() {
   @Test
-  fun testConfigurationMerging() {
+  fun configurationMerging() {
     XMLUnit.setNormalizeWhitespace(true)
 
     transformer.transform(

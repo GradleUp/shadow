@@ -12,7 +12,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
   }
 
   @Test
-  fun testCanTransformResource() {
+  fun canTransformResource() {
     transformer.resource.set("abcdefghijklmnopqrstuvwxyz")
 
     assertThat(transformer.canTransformResource("abcdefghijklmnopqrstuvwxyz")).isTrue()

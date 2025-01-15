@@ -15,7 +15,7 @@ class ApacheLicenseResourceTransformerTest : BaseTransformerTest<ApacheLicenseRe
   }
 
   @Test
-  fun testCanTransformResource() {
+  fun canTransformResource() {
     assertThat(transformer.canTransformResource("META-INF/LICENSE")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/LICENSE.TXT")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/License.txt")).isTrue()
