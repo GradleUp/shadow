@@ -57,7 +57,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
   @ParameterizedTest(name = "Path {0} {2} transformed")
   @MethodSource("pathProvider")
-  fun `canTransformResource with paths`(path: String, expected: Boolean, transform: String) {
+  fun canTransformResourceWithPaths(path: String, expected: Boolean, transform: String) {
     assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
