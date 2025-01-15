@@ -3,9 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
@@ -16,6 +14,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -28,6 +27,8 @@ import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginTest : BasePluginTest() {
   @Test
@@ -642,40 +643,18 @@ class JavaPluginTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/459",
     "https://github.com/GradleUp/shadow/issues/852",
   )
-  @Test
-  fun excludeGradleApiByDefault() {
-    projectScriptPath.writeText(
-      getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true),
-    )
-
-    path("src/main/java/my/plugin/MyPlugin.java").writeText(
-      """
-        package my.plugin;
-        import org.gradle.api.Plugin;
-        import org.gradle.api.Project;
-        public class MyPlugin implements Plugin<Project> {
-          public void apply(Project project) {
-            System.out.println("MyPlugin: Hello World!");
-          }
-        }
-      """.trimIndent(),
-    )
-    path("src/main/resources/META-INF/gradle-plugins/my.plugin.properties").writeText(
-      """
-        implementation-class=my.plugin.MyPlugin
-      """.trimIndent(),
-    )
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun excludeGradleApiByDefault(legacy: Boolean) {
+    writeGradlePluginModule(legacy)
 
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
-      transform { it.manifest.mainAttributes.keys }.all {
-        isNotEmpty()
-        // Doesn't contain Gradle classes.
-        doesNotContain("Class-Path")
-      }
+      // Doesn't contain Gradle classes.
+      getMainAttr("Class-Path").isNull()
     }
   }
 
