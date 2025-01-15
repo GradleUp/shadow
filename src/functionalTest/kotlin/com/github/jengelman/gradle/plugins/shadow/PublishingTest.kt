@@ -346,10 +346,12 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertPomCommon(pomPath: Path) {
     val pom = pomReader.read(pomPath)
-    val dependency = pom.dependencies.single()
-    assertThat(dependency.groupId).isEqualTo("shadow")
-    assertThat(dependency.artifactId).isEqualTo("b")
-    assertThat(dependency.version).isEqualTo("1.0")
+    assertThat(pom.dependencies).single().all {
+      transform { it.groupId }.isEqualTo("shadow")
+      transform { it.artifactId }.isEqualTo("b")
+      transform { it.version }.isEqualTo("1.0")
+      transform { it.scope }.isEqualTo("runtime")
+    }
   }
 
   private fun assertShadowVariantCommon(gmm: GradleModuleMetadata) {
