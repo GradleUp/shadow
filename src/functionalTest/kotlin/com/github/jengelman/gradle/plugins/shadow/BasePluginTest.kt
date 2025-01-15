@@ -289,22 +289,25 @@ abstract class BasePluginTest {
     )
   }
 
-  fun writeGradlePluginModule(useProperties: Boolean) {
+  fun writeGradlePluginModule(legacy: Boolean) {
     val pluginId = "my.plugin"
     val pluginClass = "my.plugin.MyPlugin"
+    val gradlePluginBlock: String
 
-    val gradlePluginBlock = if (useProperties) {
-      ""
+    if (legacy) {
+      gradlePluginBlock = ""
+      path("src/main/resources/META-INF/gradle-plugins/$pluginId.properties")
+        .writeText("implementation-class=$pluginClass")
     } else {
-      """
-      gradlePlugin {
-        plugins {
-          create("myPlugin") {
-            id = '$pluginId'
-            implementationClass = '$pluginClass'
+      gradlePluginBlock = """
+        gradlePlugin {
+          plugins {
+            create("myPlugin") {
+              id = '$pluginId'
+              implementationClass = '$pluginClass'
+            }
           }
         }
-      }
       """.trimIndent()
     }
 
@@ -327,13 +330,6 @@ abstract class BasePluginTest {
         }
       """.trimIndent(),
     )
-    if (useProperties) {
-      path("src/main/resources/META-INF/gradle-plugins/$pluginId.properties").writeText(
-        """
-          implementation-class=$pluginClass
-        """.trimIndent(),
-      )
-    }
   }
 
   fun runner(

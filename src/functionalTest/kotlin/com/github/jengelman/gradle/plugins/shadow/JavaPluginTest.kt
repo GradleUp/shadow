@@ -3,9 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
@@ -16,6 +14,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -646,19 +645,16 @@ class JavaPluginTest : BasePluginTest() {
   )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun excludeGradleApiByDefault(useProperties: Boolean) {
-    writeGradlePluginModule(useProperties)
+  fun excludeGradleApiByDefault(legacy: Boolean) {
+    writeGradlePluginModule(legacy)
 
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
-      transform { it.manifest.mainAttributes.keys }.all {
-        isNotEmpty()
-        // Doesn't contain Gradle classes.
-        doesNotContain("Class-Path")
-      }
+      // Doesn't contain Gradle classes.
+      getMainAttr("Class-Path").isNull()
     }
   }
 

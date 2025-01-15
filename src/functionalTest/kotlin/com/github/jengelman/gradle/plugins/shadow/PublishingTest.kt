@@ -87,24 +87,15 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertThat(repoJarPath("shadow/maven/1.0/maven-1.0.jar")).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
-      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
-    }
+    assertShadowJarCommon(repoJarPath("shadow/maven/1.0/maven-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
   }
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun publishShadowedGradlePluginWithMavenPublishPlugin(useProperties: Boolean) {
-    writeGradlePluginModule(useProperties)
+  fun publishShadowedGradlePluginWithMavenPublishPlugin(legacy: Boolean) {
+    writeGradlePluginModule(legacy)
     projectScriptPath.appendText(
       publishConfiguration(
         projectBlock = """
@@ -128,23 +119,17 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
+    assertShadowJarCommon(repoJarPath("my/plugin/maven/1.0/maven-1.0.jar"))
+    assertPomCommon(repoPath("my/plugin/maven/1.0/maven-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/plugin/maven/1.0/maven-1.0.module")))
+
     assertThat(repoJarPath("my/plugin/maven/1.0/maven-1.0.jar")).useAll {
-      // Only the shadowed jar should be included.
-      transform { it.parent.listDirectoryEntries("*.jar") }.single()
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
 
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
-      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
+      // Only the shadowed jar should be included.
+      transform { it.parent.listDirectoryEntries("*.jar") }.single()
     }
-    assertPomCommon(repoPath("my/plugin/maven/1.0/maven-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/plugin/maven/1.0/maven-1.0.module")))
   }
 
   @Issue(
@@ -388,6 +373,7 @@ class PublishingTest : BasePluginTest() {
       doesNotContainEntries(
         "b.properties",
       )
+      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
     }
   }
 
