@@ -15,19 +15,19 @@ import org.junit.jupiter.api.Test
 
 class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
   @Test
-  fun `should transform`() {
+  fun shouldTransform() {
     transformer.transform(context(SimpleRelocator()))
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
   @Test
-  fun `should transform for a single file`() {
+  fun shouldTransformForSingleFile() {
     transformer.transform(context())
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
   @Test
-  fun `relocate classes inside DAT file`() {
+  fun relocateClassesInsideDatFile() {
     val relocator = SimpleRelocator("org.apache.logging", "new.location.org.apache.logging")
     transformer.transform(context(relocator))
     assertThat(transformer.hasTransformedResource()).isTrue()

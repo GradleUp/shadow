@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   @Test
-  fun testCanTransformResource() {
+  fun canTransformResource() {
     with(transformer) {
       append("Name", "org/foo/bar/")
       append("Sealed", true)
@@ -22,19 +22,19 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
   }
 
   @Test
-  fun testHasTransformedResource() {
+  fun hasTransformedResource() {
     transformer.append("Tag", "Something")
 
     assertThat(transformer.hasTransformedResource()).isTrue()
   }
 
   @Test
-  fun testHasNotTransformedResource() {
+  fun hasNotTransformedResource() {
     assertThat(transformer.hasTransformedResource()).isFalse()
   }
 
   @Test
-  fun testTransformation() {
+  fun transformation() {
     with(transformer) {
       append("Name", "org/foo/bar/")
       append("Sealed", true)
@@ -63,7 +63,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
   }
 
   @Test
-  fun testNoTransformation() {
+  fun noTransformation() {
     val sourceLines = requireResourceAsStream(MANIFEST_NAME).bufferedReader().readLines()
     transformer.transform(manifestTransformerContext)
     val testableZipPath = doTransformAndGetTransformedPath(transformer, true)
