@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
@@ -16,6 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -654,11 +654,9 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
-      transform { it.manifest.mainAttributes.keys }.all {
-        isNotEmpty()
-        // Doesn't contain Gradle classes.
-        doesNotContain("Class-Path")
-      }
+      transform { it.manifest.mainAttributes.keys }.isNotEmpty()
+      // Doesn't contain Gradle classes.
+      getMainAttr("Class-Path").isNull()
     }
   }
 
