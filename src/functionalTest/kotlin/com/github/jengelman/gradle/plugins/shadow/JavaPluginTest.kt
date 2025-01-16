@@ -648,15 +648,31 @@ class JavaPluginTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun excludeGradleApiByDefault(legacy: Boolean) {
     writeGradlePluginModule(legacy)
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'shadow:a:1.0'
+          compileOnly 'shadow:b:1.0'
+        }
+      """.trimIndent(),
+    )
 
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
-      transform { it.manifest.mainAttributes.keys }.isNotEmpty()
+      transform { it.manifest.mainAttributes }.isNotEmpty()
       // Doesn't contain Gradle classes.
       getMainAttr("Class-Path").isNull()
+
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+      )
+      doesNotContainEntries(
+        "b.properties",
+      )
     }
   }
 
