@@ -35,18 +35,19 @@ import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
 class PublishingTest : BasePluginTest() {
   private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
   private val gmmAdapter = moshi.adapter(GradleModuleMetadata::class.java)
   private val pomReader = MavenXpp3Reader()
 
-  private lateinit var remoteRepoPath: Path
+  @TempDir
+  lateinit var remoteRepoPath: Path
 
   @BeforeEach
   override fun setup() {
     super.setup()
-    remoteRepoPath = projectRoot.resolve("remote-maven-repo")
     settingsScriptPath.appendText("rootProject.name = 'maven'" + System.lineSeparator())
   }
 
@@ -84,16 +85,7 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertThat(repoJarPath("shadow/maven/1.0/maven-1.0.jar")).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
-      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
-    }
+    assertShadowJarCommon(repoJarPath("shadow/maven/1.0/maven-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
   }
@@ -339,6 +331,7 @@ class PublishingTest : BasePluginTest() {
       doesNotContainEntries(
         "b.properties",
       )
+      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
     }
   }
 
