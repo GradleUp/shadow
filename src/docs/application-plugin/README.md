@@ -9,9 +9,11 @@ configured to contain the `Main-Class` attribute with the value specified in the
 
 ```groovy
 // Using Shadow with Application Plugin
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'com.gradleup.shadow'
+plugins {
+  id 'java'
+  id 'application'
+  id 'com.gradleup.shadow'
+}
 
 application {
   mainClass = 'myapp.Main'
@@ -28,9 +30,11 @@ It can be configured the same as any other `JavaExec` task.
 
 ```groovy
 // Configuring the runShadow Task
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'com.gradleup.shadow'
+plugins {
+  id 'java'
+  id 'application'
+  id 'com.gradleup.shadow'
+}
 
 application {
   mainClass = 'myapp.Main'

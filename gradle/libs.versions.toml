@@ -14,6 +14,7 @@ plexus-xml = "org.codehaus.plexus:plexus-xml:4.0.4"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.10.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:0.9.0"
 
 pluginPublish = "com.gradle.publish:plugin-publish-plugin:1.3.0"
 mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.30.0"
@@ -32,4 +33,4 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 kotlin-jvm = "org.jetbrains.kotlin.jvm:2.1.0"
 android-lint = "com.android.lint:8.8.0"
 jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.17.0"
-spotless = "com.diffplug.spotless:7.0.1"
+spotless = "com.diffplug.spotless:7.0.2"

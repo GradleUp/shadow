@@ -16,7 +16,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   }
 
   @Test
-  fun testCanTransformResource() {
+  fun canTransformResource() {
     assertThat(transformer.canTransformResource("META-INF/NOTICE")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/NOTICE.TXT")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/Notice.txt")).isTrue()
@@ -26,37 +26,37 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   }
 
   @Test
-  fun testNoParametersShouldNotThrowNullPointerWhenNoInput() {
+  fun noParametersShouldNotThrowNullPointerWhenNoInput() {
     processAndFailOnNullPointer("")
   }
 
   @Test
-  fun testNoParametersShouldNotThrowNullPointerWhenNoLinesOfInput() {
+  fun noParametersShouldNotThrowNullPointerWhenNoLinesOfInput() {
     processAndFailOnNullPointer("Some notice text")
   }
 
   @Test
-  fun testNoParametersShouldNotThrowNullPointerWhenOneLineOfInput() {
+  fun noParametersShouldNotThrowNullPointerWhenOneLineOfInput() {
     processAndFailOnNullPointer("Some notice text\n")
   }
 
   @Test
-  fun testNoParametersShouldNotThrowNullPointerWhenTwoLinesOfInput() {
+  fun noParametersShouldNotThrowNullPointerWhenTwoLinesOfInput() {
     processAndFailOnNullPointer("Some notice text\nSome notice text\n")
   }
 
   @Test
-  fun testNoParametersShouldNotThrowNullPointerWhenLineStartsWithSlashSlash() {
+  fun noParametersShouldNotThrowNullPointerWhenLineStartsWithSlashSlash() {
     processAndFailOnNullPointer("Some notice text\n//Some notice text\n")
   }
 
   @Test
-  fun testNoParametersShouldNotThrowNullPointerWhenLineIsSlashSlash() {
+  fun noParametersShouldNotThrowNullPointerWhenLineIsSlashSlash() {
     processAndFailOnNullPointer("//\n")
   }
 
   @Test
-  fun testNoParametersShouldNotThrowNullPointerWhenLineIsEmpty() {
+  fun noParametersShouldNotThrowNullPointerWhenLineIsEmpty() {
     processAndFailOnNullPointer("\n")
   }
 

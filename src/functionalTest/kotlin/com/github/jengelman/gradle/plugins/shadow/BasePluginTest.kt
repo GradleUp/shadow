@@ -289,6 +289,49 @@ abstract class BasePluginTest {
     )
   }
 
+  fun writeGradlePluginModule(legacy: Boolean) {
+    val pluginId = "my.plugin"
+    val pluginClass = "my.plugin.MyPlugin"
+    val gradlePluginBlock: String
+
+    if (legacy) {
+      gradlePluginBlock = ""
+      path("src/main/resources/META-INF/gradle-plugins/$pluginId.properties")
+        .writeText("implementation-class=$pluginClass")
+    } else {
+      gradlePluginBlock = """
+        gradlePlugin {
+          plugins {
+            create("myPlugin") {
+              id = '$pluginId'
+              implementationClass = '$pluginClass'
+            }
+          }
+        }
+      """.trimIndent()
+    }
+
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true)}
+        $gradlePluginBlock
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    path("src/main/java/my/plugin/MyPlugin.java").writeText(
+      """
+        package my.plugin;
+        import org.gradle.api.Plugin;
+        import org.gradle.api.Project;
+        public class MyPlugin implements Plugin<Project> {
+          public void apply(Project project) {
+            System.out.println("MyPlugin: Hello World!");
+          }
+        }
+      """.trimIndent(),
+    )
+  }
+
   fun runner(
     arguments: Iterable<String> = emptyList(),
     projectDir: Path? = projectRoot,
