@@ -85,16 +85,7 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertThat(repoJarPath("shadow/maven/1.0/maven-1.0.jar")).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
-      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
-    }
+    assertShadowJarCommon(repoJarPath("shadow/maven/1.0/maven-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
   }
@@ -340,6 +331,7 @@ class PublishingTest : BasePluginTest() {
       doesNotContainEntries(
         "b.properties",
       )
+      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
     }
   }
 
