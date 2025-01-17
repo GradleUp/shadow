@@ -46,6 +46,10 @@ spotless {
   }
 }
 
+val testPluginClasspath: Configuration by configurations.creating {
+  isCanBeResolved = true
+}
+
 dependencies {
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
@@ -55,6 +59,8 @@ dependencies {
   implementation(libs.jdom2)
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
+
+  testPluginClasspath(libs.foojayResolver)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }
@@ -103,8 +109,6 @@ testing.suites {
       implementation(libs.apache.maven.modelBuilder)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
-      // Used in test `plugins` blocks.
-      implementation(libs.foojayResolver)
     }
   }
 
@@ -129,12 +133,9 @@ gradlePlugin {
 }
 
 tasks.pluginUnderTestMetadata {
-  val functionalTestImplementation = configurations.named("functionalTestImplementation") {
-    isCanBeResolved = true
-  }
   // Plugins used in tests could be resolved in classpath.
   pluginClasspath.from(
-    functionalTestImplementation,
+    testPluginClasspath,
   )
 }
 
