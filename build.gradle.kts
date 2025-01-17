@@ -140,10 +140,7 @@ tasks.pluginUnderTestMetadata {
 }
 
 tasks.check {
-  dependsOn(
-    testing.suites.named("integrationTest"),
-    testing.suites.named("functionalTest"),
-  )
+  dependsOn(tasks.withType<Test>())
 }
 
 tasks.clean {
