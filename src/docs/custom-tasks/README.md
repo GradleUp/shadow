@@ -1,7 +1,7 @@
 # Creating a Custom ShadowJar Task
 
 The built in `shadowJar` task only provides an output for the `main` source set of the project.
-It is possible to add arbitrary [`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) 
+It is possible to add arbitrary [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) 
 tasks to a project. When doing so, ensure that the `configurations` property is specified to inform Shadow which 
 dependencies to merge into the output.
 

@@ -3,7 +3,7 @@
 Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtimeClasspath` configuration
 into the final JAR.
 The configurations from which to source dependencies for the merging can be configured using the `configurations` property
-of the [`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task type.
+of the [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task type.
 
 ```groovy
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -15,10 +15,10 @@ The above code sample would configure the `shadowJar` task to merge dependencies
 This means any dependency declared in the `runtimeOnly` configuration would be **not** be included in the final JAR.
 
 > Note the literal use of `project.configurations` when setting the `configurations` attribute of a
-[`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task.
+[`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task.
 This is **required**. It maybe be tempting to specify `configurations = [configurations.compile]` but this will not
 have the intended effect, as `configurations.compile` will try to delegate to the `configurations` property of the
-the [`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task instead of the `project`
+the [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task instead of the `project`
 
 ## Embedding Jar Files Inside Your Shadow Jar
 
@@ -31,7 +31,7 @@ begins.
 ## Filtering Dependencies
 
 Individual dependencies can be filtered from the final JAR by using the `dependencies` block of a
-[`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task.
+[`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task.
 Dependency filtering does **not** apply to transitive dependencies.
 That is, excluding a dependency does not exclude any of its dependencies from the final JAR.
 
@@ -135,7 +135,7 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 ### Programmatically Selecting Dependencies to Filter
 
 If more complex decisions are needed to select the dependencies to be included, the
-[`dependencies`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#dependencies(Action<DependencyFilter>))
+[`dependencies`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html)
 block provides a method that accepts a `Closure` for selecting dependencies.
 
 ```groovy
