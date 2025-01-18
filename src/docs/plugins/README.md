@@ -12,7 +12,7 @@ A simple Gradle plugin can use this feature by applying the `shadow` plugin and 
 
 ```groovy
 plugins {
-  id 'java-gradle-plugin'
+  id 'java-gradle-plugin' // May have to apply the latest `com.gradle.plugin-publish` for better publishing support.
   id 'com.gradleup.shadow'
 }
 

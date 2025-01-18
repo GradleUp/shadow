@@ -6,7 +6,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -21,7 +20,8 @@ import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
-import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.maven.model.Model
@@ -36,6 +36,8 @@ import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class PublishingTest : BasePluginTest() {
   private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -88,6 +90,43 @@ class PublishingTest : BasePluginTest() {
     assertShadowJarCommon(repoJarPath("shadow/maven/1.0/maven-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun publishShadowedGradlePluginWithMavenPublishPlugin(legacy: Boolean) {
+    writeGradlePluginModule(legacy)
+    projectScriptPath.appendText(
+      publishConfiguration(
+        projectBlock = """
+          apply plugin: 'com.gradle.plugin-publish'
+          group = 'my.plugin'
+          version = '1.0'
+        """.trimIndent(),
+        shadowBlock = """
+          archiveClassifier = ''
+        """.trimIndent(),
+        publicationsBlock = """
+          pluginMaven(MavenPublication) {
+            artifactId = 'my-gradle-plugin'
+          }
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    val artifactRoot = "my/plugin/my-gradle-plugin/1.0"
+    assertThat(repoPath(artifactRoot).listDirectoryEntries("*.jar").map(Path::name)).containsOnly(
+      "my-gradle-plugin-1.0.jar",
+      "my-gradle-plugin-1.0-javadoc.jar",
+      "my-gradle-plugin-1.0-sources.jar",
+    )
+
+    val artifactPrefix = "$artifactRoot/my-gradle-plugin-1.0"
+    assertShadowJarCommon(repoJarPath("$artifactPrefix.jar"))
+    assertPomCommon(repoPath("$artifactPrefix.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactPrefix.module")))
   }
 
   @Issue(
@@ -256,7 +295,6 @@ class PublishingTest : BasePluginTest() {
   private fun repoPath(relative: String): Path {
     return remoteRepoPath.resolve(relative).also {
       check(it.exists()) { "Path not found: $it" }
-      check(it.isRegularFile()) { "Path is not a regular file: $it" }
     }
   }
 
