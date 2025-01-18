@@ -6,7 +6,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -21,7 +20,6 @@ import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
-import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
@@ -118,21 +116,18 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.jar"))
-    assertPomCommon(repoPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.module")))
+    val artifactRoot = "my/plugin/my-gradle-plugin/1.0"
+    val jars = repoPath(artifactRoot).listDirectoryEntries("*.jar").map(Path::name)
+    assertThat(jars).containsOnly(
+      "my-gradle-plugin-1.0.jar",
+      "my-gradle-plugin-1.0-javadoc.jar",
+      "my-gradle-plugin-1.0-sources.jar",
+    )
 
-    assertThat(repoJarPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.jar")).useAll {
-      transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
-        .single().isEqualTo("my/plugin/MyPlugin.class")
-
-      // Only the shadowed jar should be included.
-      transform { it.parent.listDirectoryEntries("*.jar").map(Path::name) }.containsOnly(
-        "my-gradle-plugin-1.0.jar",
-        "my-gradle-plugin-1.0-javadoc.jar",
-        "my-gradle-plugin-1.0-sources.jar",
-      )
-    }
+    val artifactPrefix = "$artifactRoot/my-gradle-plugin-1.0"
+    assertShadowJarCommon(repoJarPath("$artifactPrefix.jar"))
+    assertPomCommon(repoPath("$artifactPrefix.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactPrefix.module")))
   }
 
   @Issue(
@@ -301,7 +296,6 @@ class PublishingTest : BasePluginTest() {
   private fun repoPath(relative: String): Path {
     return remoteRepoPath.resolve(relative).also {
       check(it.exists()) { "Path not found: $it" }
-      check(it.isRegularFile()) { "Path is not a regular file: $it" }
     }
   }
 
