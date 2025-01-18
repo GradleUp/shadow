@@ -7,6 +7,7 @@ import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
+import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
@@ -36,8 +37,6 @@ import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
 class PublishingTest : BasePluginTest() {
   private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -92,8 +91,7 @@ class PublishingTest : BasePluginTest() {
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
+  @BooleanParameterizedTest
   fun publishShadowedGradlePluginWithMavenPublishPlugin(legacy: Boolean) {
     writeGradlePluginModule(legacy)
     projectScriptPath.appendText(
