@@ -23,6 +23,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.maven.model.Model
@@ -100,19 +101,16 @@ class PublishingTest : BasePluginTest() {
     projectScriptPath.appendText(
       publishConfiguration(
         projectBlock = """
+          apply plugin: 'com.gradle.plugin-publish'
           group = 'my.plugin'
           version = '1.0'
-          // Workaround for overriding the jar task output by shadowJar.
-          tasks.named('jar') {
-            archiveExtension = 'ignored'
-          }
         """.trimIndent(),
         shadowBlock = """
           archiveClassifier = ''
         """.trimIndent(),
         publicationsBlock = """
-          shadow(MavenPublication) {
-            from components.shadow
+          pluginMaven(MavenPublication) {
+            artifactId = 'my-gradle-plugin'
           }
         """.trimIndent(),
       ),
@@ -120,16 +118,20 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("my/plugin/maven/1.0/maven-1.0.jar"))
-    assertPomCommon(repoPath("my/plugin/maven/1.0/maven-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/plugin/maven/1.0/maven-1.0.module")))
+    assertShadowJarCommon(repoJarPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.jar"))
+    assertPomCommon(repoPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.module")))
 
-    assertThat(repoJarPath("my/plugin/maven/1.0/maven-1.0.jar")).useAll {
+    assertThat(repoJarPath("my/plugin/my-gradle-plugin/1.0/my-gradle-plugin-1.0.jar")).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
 
       // Only the shadowed jar should be included.
-      transform { it.parent.listDirectoryEntries("*.jar") }.single()
+      transform { it.parent.listDirectoryEntries("*.jar").map(Path::name) }.containsOnly(
+        "my-gradle-plugin-1.0.jar",
+        "my-gradle-plugin-1.0-javadoc.jar",
+        "my-gradle-plugin-1.0-sources.jar",
+      )
     }
   }
 

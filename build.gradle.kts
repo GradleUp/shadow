@@ -61,6 +61,7 @@ dependencies {
   implementation(libs.plexus.xml)
 
   testPluginClasspath(libs.foojayResolver)
+  testPluginClasspath(libs.pluginPublish)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }
