@@ -24,7 +24,6 @@ gitPublish {
     filter<ReplaceTokens>(
       "tokens" to mapOf(
         "version" to version,
-        "snapshot-version" to "$version-SNAPSHOT",
       ),
     )
   }
