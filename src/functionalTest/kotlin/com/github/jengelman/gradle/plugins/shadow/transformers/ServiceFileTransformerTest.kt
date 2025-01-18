@@ -73,7 +73,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun serviceResourceTransformerShortSyntaxRelocation() {
+  fun serviceResourceTransformerRelocation() {
     val one = buildJarOne {
       insert(
         "META-INF/services/java.sql.Driver",
