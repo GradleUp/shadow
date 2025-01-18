@@ -106,6 +106,9 @@ class PublishingTest : BasePluginTest() {
           tasks.named('jar') {
             archiveExtension = 'ignored'
           }
+          tasks.named('publish') {
+            notCompatibleWithConfigurationCache('https://github.com/GradleUp/shadow/pull/1156#discussion_r1916040827')
+          }
         """.trimIndent(),
         shadowBlock = """
           archiveClassifier = ''
