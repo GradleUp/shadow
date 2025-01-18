@@ -419,16 +419,11 @@ public abstract interface annotation class com/github/jengelman/gradle/plugins/s
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field COMPONENTS_XML_PATH Ljava/lang/String;
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion {
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/DontIncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
@@ -618,8 +613,6 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer$Companion;
-	public static final field XSI_NS Ljava/lang/String;
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getIgnoreDtd ()Lorg/gradle/api/provider/Property;
@@ -628,8 +621,5 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendin
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer$Companion {
 }
 
