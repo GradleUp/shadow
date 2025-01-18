@@ -3,50 +3,36 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
-import java.nio.file.Path
 import kotlin.io.path.appendText
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class AppendingTransformerTest : BaseTransformerTest() {
-  @Test
-  fun appendTestProperties() {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun appendTestProperties(shortSyntax: Boolean) {
     val one = buildJarOne {
       insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE)
     }
     val two = buildJarTwo {
       insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO)
     }
-    projectScriptPath.appendText(
-      transform<AppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
-        transformerBlock = """
-          resource = '$ENTRY_TEST_PROPERTIES'
-        """.trimIndent(),
-      ),
-    )
-
-    run(shadowJarTask)
-
-    val content = outputShadowJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
-    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
-  }
-
-  @Test
-  fun appendTestPropertiesShortSyntax() {
-    val one = buildJarOne {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE)
-    }
-    val two = buildJarTwo {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO)
-    }
-    projectScriptPath.appendText(
+    val config = if (shortSyntax) {
       """
         $shadowJar {
           ${fromJar(one, two)}
           append('$ENTRY_TEST_PROPERTIES')
         }
-      """.trimIndent(),
-    )
+      """.trimIndent()
+    } else {
+      transform<AppendingTransformer>(
+        shadowJarBlock = fromJar(one, two),
+        transformerBlock = """
+          resource = '$ENTRY_TEST_PROPERTIES'
+        """.trimIndent(),
+      )
+    }
+    projectScriptPath.appendText(config)
 
     run(shadowJarTask)
 
@@ -54,45 +40,44 @@ class AppendingTransformerTest : BaseTransformerTest() {
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
-  @Test
-  fun appendApplicationYaml() {
-    val (one, two) = writeApplicationYamlJars()
-
-    projectScriptPath.appendText(
-      transform<AppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
-        transformerBlock = """
-          resource = 'resources/$APPLICATION_YML_FILE'
-          separator = '$APPLICATION_YML_SEPARATOR'
-        """.trimIndent(),
-      ),
-    )
-
-    run(shadowJarTask)
-
-    val content = outputShadowJar.use { it.getContent("resources/$APPLICATION_YML_FILE") }
-    assertThat(content).isEqualTo(
-      """
-      $CONTENT_ONE
-      ---
-      $CONTENT_TWO
-      """.trimIndent(),
-    )
-  }
-
-  @Test
-  fun appendApplicationYamlShortSyntax() {
-    val (one, two) = writeApplicationYamlJars()
-
-    projectScriptPath.appendText(
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun appendApplicationYaml(shortSyntax: Boolean) {
+    val one = buildJarOne {
+      insert("resources/$APPLICATION_YML_FILE", CONTENT_ONE)
+      insert("resources/config/$APPLICATION_YML_FILE", CONTENT_TWO)
+    }
+    val two = buildJarTwo {
+      insert("resources/$APPLICATION_YML_FILE", CONTENT_TWO)
+      insert("resources/config/$APPLICATION_YML_FILE", CONTENT_THREE)
+    }
+    val config = if (shortSyntax) {
       """
         $shadowJar {
           ${fromJar(one, two)}
           append('resources/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
           append('resources/config/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
         }
-      """.trimIndent(),
-    )
+      """.trimIndent()
+    } else {
+      val block1 = transform<AppendingTransformer>(
+        shadowJarBlock = fromJar(one, two),
+        transformerBlock = """
+          resource = 'resources/$APPLICATION_YML_FILE'
+          separator = '$APPLICATION_YML_SEPARATOR'
+        """.trimIndent(),
+      )
+      val block2 = transform<AppendingTransformer>(
+        shadowJarBlock = fromJar(one, two),
+        transformerBlock = """
+          resource = 'resources/config/$APPLICATION_YML_FILE'
+          separator = '$APPLICATION_YML_SEPARATOR'
+        """.trimIndent(),
+      )
+      block1 + System.lineSeparator() + block2
+    }
+
+    projectScriptPath.appendText(config)
 
     run(shadowJarTask)
 
@@ -112,18 +97,6 @@ class AppendingTransformerTest : BaseTransformerTest() {
       $CONTENT_THREE
       """.trimIndent(),
     )
-  }
-
-  private fun writeApplicationYamlJars(): Pair<Path, Path> {
-    val one = buildJarOne {
-      insert("resources/$APPLICATION_YML_FILE", CONTENT_ONE)
-      insert("resources/config/$APPLICATION_YML_FILE", CONTENT_TWO)
-    }
-    val two = buildJarTwo {
-      insert("resources/$APPLICATION_YML_FILE", CONTENT_TWO)
-      insert("resources/config/$APPLICATION_YML_FILE", CONTENT_THREE)
-    }
-    return one to two
   }
 
   private companion object {

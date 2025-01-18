@@ -7,18 +7,31 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
-  @Test
-  fun serviceResourceTransformer() {
-    projectScriptPath.appendText(
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun serviceResourceTransformer(shortSyntax: Boolean) {
+    val config = if (shortSyntax) {
+      """
+        $shadowJar {
+          ${fromJar(buildJarOne(), buildJarTwo())}
+          mergeServiceFiles {
+            exclude 'META-INF/services/com.acme.*'
+          }
+        }
+      """.trimIndent()
+    } else {
       transform<ServiceFileTransformer>(
         shadowJarBlock = fromJar(buildJarOne(), buildJarTwo()),
         transformerBlock = """
           exclude 'META-INF/services/com.acme.*'
         """.trimIndent(),
-      ),
-    )
+      )
+    }
+    projectScriptPath.appendText(config)
 
     run(shadowJarTask)
 
@@ -28,22 +41,31 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Test
-  fun serviceResourceTransformerAlternatePath() {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun serviceResourceTransformerAlternatePath(shortSyntax: Boolean) {
     val one = buildJarOne {
       insert(ENTRY_FOO_SHADE, CONTENT_ONE)
     }
     val two = buildJarTwo {
       insert(ENTRY_FOO_SHADE, CONTENT_TWO)
     }
-    projectScriptPath.appendText(
+    val config = if (shortSyntax) {
+      """
+        $shadowJar {
+          ${fromJar(one, two)}
+          mergeServiceFiles("META-INF/foo")
+        }
+      """.trimIndent()
+    } else {
       transform<ServiceFileTransformer>(
         shadowJarBlock = fromJar(one, two),
         transformerBlock = """
           path = 'META-INF/foo'
         """.trimIndent(),
-      ),
-    )
+      )
+    }
+    projectScriptPath.appendText(config)
 
     run(shadowJarTask)
 
@@ -52,28 +74,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun serviceResourceTransformerShortSyntax() {
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          ${fromJar(buildJarOne(), buildJarTwo())}
-          mergeServiceFiles {
-            exclude 'META-INF/services/com.acme.*'
-          }
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
-    }
-  }
-
-  @Test
-  fun serviceResourceTransformerShortSyntaxRelocation() {
+  fun serviceResourceTransformerRelocation() {
     val one = buildJarOne {
       insert(
         "META-INF/services/java.sql.Driver",
@@ -146,29 +147,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         """.trimIndent(),
       )
     }
-  }
-
-  @Test
-  fun serviceResourceTransformerShortSyntaxAlternatePath() {
-    val one = buildJarOne {
-      insert(ENTRY_FOO_SHADE, CONTENT_ONE)
-    }
-    val two = buildJarTwo {
-      insert(ENTRY_FOO_SHADE, CONTENT_TWO)
-    }
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          ${fromJar(one, two)}
-          mergeServiceFiles("META-INF/foo")
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    val content = outputShadowJar.use { it.getContent(ENTRY_FOO_SHADE) }
-    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
   @Issue(

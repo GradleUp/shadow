@@ -14,15 +14,26 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
-  @Test
-  fun groovyExtensionModuleTransformer() {
-    projectScriptPath.appendText(
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun groovyExtensionModuleTransformer(shortSyntax: Boolean) {
+    val config = if (shortSyntax) {
+      """
+        $shadowJar {
+          ${fromJar(buildJarFoo(), buildJarBar())}
+          mergeGroovyExtensionModules()
+        }
+      """.trimIndent()
+    } else {
       transform<GroovyExtensionModuleTransformer>(
         shadowJarBlock = fromJar(buildJarFoo(), buildJarBar()),
-      ),
-    )
+      )
+    }
+    projectScriptPath.appendText(config)
 
     run(shadowJarTask)
 
@@ -43,22 +54,6 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     commonAssertions(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
-  }
-
-  @Test
-  fun groovyExtensionModuleTransformerShortSyntax() {
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          ${fromJar(buildJarFoo(), buildJarBar())}
-          mergeGroovyExtensionModules()
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
   }
 
   private fun buildJarFoo(
