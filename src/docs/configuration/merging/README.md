@@ -1,11 +1,11 @@
 # Controlling JAR Content Merging
 
 Shadow allows for customizing the process by which the output JAR is generated through the
-[`Transformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.html) interface.
+[`Transformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-transformer/index.html) interface.
 This is a concept that has been carried over from the original Maven Shade implementation.
-A [`Transformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.html) is invoked for each 
+A [`Transformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-transformer/index.html) is invoked for each 
 entry in the JAR before being written to the final output JAR.
-This allows a [`Transformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/Transformer.html) to 
+This allows a [`Transformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-transformer/index.html) to 
 determine if it should process a particular entry and apply any modifications before writing the stream to the output.
 
 ```groovy
@@ -111,7 +111,7 @@ At runtime, this file is read and used to configure library or application behav
 
 Multiple dependencies may use the same service descriptor file name.
 In this case, it is generally desired to merge the content of each instance of the file into a single output file.
-The [`ServiceFileTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer.html) 
+The [`ServiceFileTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html) 
 class is used to perform this merging. By default, it will merge each copy of a file under `META-INF/services` into a 
 single file in the output JAR.
 
@@ -123,17 +123,17 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 ```
 
 The above code snippet is a convenience syntax for calling
-[`transform(ServiceFileTransformer.class)`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#transform(Class<?%20extends%20Transformer>)).
+[`transform(ServiceFileTransformer.class)`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html#transform(Class<?%20extends%20Transformer>)).
 
 > Groovy Extension Module descriptor files (located at `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`)
-are ignored by the [`ServiceFileTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer.html).
+are ignored by the [`ServiceFileTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html).
 This is due to these files having a different syntax than standard service descriptor files.
-Use the [`mergeGroovyExtensionModules()`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#mergeGroovyExtensionModules()) method to merge
+Use the [`mergeGroovyExtensionModules()`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html#mergeGroovyExtensionModules()) method to merge
 these files if your dependencies contain them.
 
 ### Configuring the Location of Service Descriptor Files
 
-By default the [`ServiceFileTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer.html) 
+By default the [`ServiceFileTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html) 
 is configured to merge files in `META-INF/services`.
 This directory can be overridden to merge descriptor files in a different location.
 
@@ -148,7 +148,7 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 
 #### Excluding/Including Specific Service Descriptor Files From Merging
 
-The [`ServiceFileTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer.html) 
+The [`ServiceFileTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html) 
 class supports specifying specific files to include or exclude from merging.
 
 ```groovy
@@ -164,9 +164,9 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 
 Shadow provides a specific transformer for dealing with Groovy extension module files.
 This is due to their special syntax and how they need to be merged together.
-The [`GroovyExtensionModuleTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer.html) 
+The [`GroovyExtensionModuleTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-groovy-extension-module-transformer/) 
 will handle these files.
-The [`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task also provides a short syntax 
+The [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task also provides a short syntax 
 method to add this transformer.
 
 ```groovy
@@ -179,11 +179,11 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 ## Appending Text Files
 
 Generic text files can be appended together using the
-[`AppendingTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer.html).
+[`AppendingTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/).
 Each file is appended using separators (defaults to `\n`) to separate content.
-The [`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task provides a short syntax 
+The [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task provides a short syntax 
 method of
-[`append(String)`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#append(java.lang.String)) to 
+[`append(String)`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html#append(java.lang.String)) to 
 configure this transformer.
 
 ```groovy
@@ -210,10 +210,10 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 ## Appending XML Files
 
 XML files require a special transformer for merging.
-The [`XmlAppendingTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer.html) 
+The [`XmlAppendingTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/) 
 reads each XML document and merges each root element into a single document.
-There is no short syntax method for the [`XmlAppendingTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer.html).
-It must be added using the [`transform`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow//tasks/ShadowJar.html#transform(Class<?%20Fextends%20Transformer>)) methods.
+There is no short syntax method for the [`XmlAppendingTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/).
+It must be added using the [`transform`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.htmltransform.html)) methods.
 
 ```groovy
 // Appending a XML File

@@ -6,7 +6,7 @@
 export default {
   data () {
     return {
-        absolutePath: "https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/" + this.path
+        absolutePath: "https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow/" + this.path
     }
   }
 }
