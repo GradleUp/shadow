@@ -27,6 +27,12 @@ kotlin {
       "-Xjvm-default=all",
     )
   }
+  afterEvaluate {
+    // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
+    target.compilations {
+      getByName("functionalTest").associateWith(getByName("main"))
+    }
+  }
 }
 
 lint {
