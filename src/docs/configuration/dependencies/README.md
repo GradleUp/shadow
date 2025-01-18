@@ -135,7 +135,7 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 ### Programmatically Selecting Dependencies to Filter
 
 If more complex decisions are needed to select the dependencies to be included, the
-[`dependencies`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html#dependencies(Action<DependencyFilter>))
+[`dependencies`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html)
 block provides a method that accepts a `Closure` for selecting dependencies.
 
 ```groovy
