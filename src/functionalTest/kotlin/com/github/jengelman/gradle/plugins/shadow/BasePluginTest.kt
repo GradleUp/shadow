@@ -229,7 +229,7 @@ abstract class BasePluginTest {
       gradlePluginBlock = """
         gradlePlugin {
           plugins {
-            create("myPlugin") {
+            create('myPlugin') {
               id = '$pluginId'
               implementationClass = '$pluginClass'
             }

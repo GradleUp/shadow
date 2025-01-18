@@ -117,8 +117,7 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     val artifactRoot = "my/plugin/my-gradle-plugin/1.0"
-    val jars = repoPath(artifactRoot).listDirectoryEntries("*.jar").map(Path::name)
-    assertThat(jars).containsOnly(
+    assertThat(repoPath(artifactRoot).listDirectoryEntries("*.jar").map(Path::name)).containsOnly(
       "my-gradle-plugin-1.0.jar",
       "my-gradle-plugin-1.0-javadoc.jar",
       "my-gradle-plugin-1.0-sources.jar",
