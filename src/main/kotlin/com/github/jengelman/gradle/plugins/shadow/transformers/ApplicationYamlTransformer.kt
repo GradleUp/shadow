@@ -9,11 +9,11 @@ public class ApplicationYamlTransformer : Transformer {
   private val parts = mutableListOf<String>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return APPLICATION_YML == element.name
+    return element.name.equals(APPLICATION_YML, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
-    parts += context.inputStream.bufferedReader().use { it.readText() }
+    parts += context.inputStream.bufferedReader().use { it.readText() }.trim()
   }
 
   override fun hasTransformedResource(): Boolean {
@@ -28,8 +28,8 @@ public class ApplicationYamlTransformer : Transformer {
     os.closeEntry()
   }
 
-  private companion object {
-    private const val APPLICATION_YML = "application.yml"
-    private const val DOCUMENT_SEPARATOR = "---\n"
+  public companion object {
+    public const val APPLICATION_YML: String = "application.yml"
+    private const val DOCUMENT_SEPARATOR = "\n---\n"
   }
 }
