@@ -102,9 +102,8 @@ class PublishingTest : BasePluginTest() {
         projectBlock = """
           group = 'my.plugin'
           version = '1.0'
-          // Workaround for overriding the jar task output by shadowJar.
-          tasks.named('jar') {
-            archiveExtension = 'ignored'
+          gradlePlugin {
+            automatedPublishing = false
           }
         """.trimIndent(),
         shadowBlock = """
