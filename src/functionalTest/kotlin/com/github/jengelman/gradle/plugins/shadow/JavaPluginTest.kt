@@ -12,7 +12,7 @@ import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.util.BooleanValueSource
+import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
@@ -29,7 +29,6 @@ import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
-import org.junit.jupiter.params.ParameterizedTest
 
 class JavaPluginTest : BasePluginTest() {
   @Test
@@ -448,8 +447,7 @@ class JavaPluginTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/459",
     "https://github.com/GradleUp/shadow/issues/852",
   )
-  @ParameterizedTest
-  @BooleanValueSource
+  @BooleanParameterizedTest
   fun excludeGradleApiByDefault(legacy: Boolean) {
     writeGradlePluginModule(legacy)
     projectScriptPath.appendText(

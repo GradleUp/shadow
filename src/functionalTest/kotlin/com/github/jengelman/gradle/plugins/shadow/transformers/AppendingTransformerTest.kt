@@ -2,14 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.util.BooleanValueSource
+import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
-import org.junit.jupiter.params.ParameterizedTest
 
 class AppendingTransformerTest : BaseTransformerTest() {
-  @ParameterizedTest
-  @BooleanValueSource
+  @BooleanParameterizedTest
   fun appendTestProperties(shortSyntax: Boolean) {
     val one = buildJarOne {
       insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE)
@@ -40,8 +38,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
-  @ParameterizedTest
-  @BooleanValueSource
+  @BooleanParameterizedTest
   fun appendApplicationYaml(shortSyntax: Boolean) {
     val one = buildJarOne {
       insert("resources/$APPLICATION_YML_FILE", CONTENT_ONE)
