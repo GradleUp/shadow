@@ -45,6 +45,8 @@ public interface ShadowSpec : CopySpec {
 
   public fun append(resourcePath: String): ShadowSpec
 
+  public fun append(resourcePath: String, separator: String): ShadowSpec
+
   public fun relocate(pattern: String, destination: String): ShadowSpec
 
   public fun relocate(pattern: String, destination: String, action: Action<SimpleRelocator>?): ShadowSpec

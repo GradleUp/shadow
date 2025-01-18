@@ -27,11 +27,14 @@ public open class AppendingTransformer @Inject constructor(
    * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
    */
   private var _data: ByteArrayOutputStream? = null
-  private inline val data get() = if (_data == null) ByteArrayOutputStream().also { _data = it } else _data!!
+  private inline val data get() = _data ?: ByteArrayOutputStream().also { _data = it }
 
   @get:Optional
   @get:Input
   public open val resource: Property<String> = objectFactory.property()
+
+  @get:Input
+  public open val separator: Property<String> = objectFactory.property(DEFAULT_SEPARATOR)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.orNull.equals(element.relativePath.pathString, ignoreCase = true)
@@ -39,8 +42,11 @@ public open class AppendingTransformer @Inject constructor(
 
   override fun transform(context: TransformerContext) {
     context.inputStream.use {
+      if (data.size() > 0) {
+        // Append the separator before the new content to ensure the separator is not at the end of the file.
+        data.write(separator.get().toByteArray())
+      }
       it.copyTo(data)
-      data.write('\n'.code)
     }
   }
 
@@ -56,5 +62,9 @@ public open class AppendingTransformer @Inject constructor(
     // Closing a ByteArrayOutputStream has no effect, so we don't use a use block here.
     data.toByteArray().inputStream().copyTo(os)
     data.reset()
+  }
+
+  public companion object {
+    public const val DEFAULT_SEPARATOR: String = "\n"
   }
 }

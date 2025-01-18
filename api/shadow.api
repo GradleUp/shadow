@@ -297,6 +297,8 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun <init> ()V
 	public fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun append (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun append (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	protected fun copy ()V
 	protected fun createCopyAction ()Lorg/gradle/api/internal/file/copy/CopyAction;
 	public fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
@@ -349,6 +351,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec : org/gradle/api/file/CopySpec {
 	public abstract fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun append (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public abstract fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
@@ -397,13 +400,19 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNotic
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer$Companion;
+	public static final field DEFAULT_SEPARATOR Ljava/lang/String;
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getResource ()Lorg/gradle/api/provider/Property;
+	public fun getSeparator ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer$Companion {
 }
 
 public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/transformers/CacheableTransformer : java/lang/annotation/Annotation {

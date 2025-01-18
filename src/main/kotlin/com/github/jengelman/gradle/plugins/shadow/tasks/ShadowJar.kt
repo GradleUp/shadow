@@ -209,9 +209,23 @@ public abstract class ShadowJar :
   }
 
   override fun append(resourcePath: String): ShadowJar {
+    return append(resourcePath, AppendingTransformer.DEFAULT_SEPARATOR)
+  }
+
+  /**
+   * Append contents to a resource in the jar.
+   *
+   * e.g. `append("resources/application.yml", "\n---\n")` for merging `resources/application.yml` files.
+   *
+   * @param resourcePath The path to the resource in the jar.
+   * @param separator The separator to use between the original content and the appended content,
+   * defaults to `\n` ([AppendingTransformer.DEFAULT_SEPARATOR]).
+   */
+  override fun append(resourcePath: String, separator: String): ShadowJar {
     return runCatching {
       transform(AppendingTransformer::class.java) {
         it.resource.set(resourcePath)
+        it.separator.set(separator)
       }
     }.getOrDefault(this)
   }

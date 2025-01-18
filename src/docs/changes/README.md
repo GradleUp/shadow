@@ -12,6 +12,8 @@
 - **BREAKING CHANGE:** Migrate all `ListProperty` usages to `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
   Some public `List` parameters are also changed to `Set`.
 - Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
+- Support configuring `separator` in `AppendingTransformer`. ([#1169](https://github.com/GradleUp/shadow/pull/1169))  
+  This is useful for handling files like `resources/application.yml`.  
 
 **Fixed**
 

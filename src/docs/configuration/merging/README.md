@@ -180,7 +180,7 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 
 Generic text files can be appended together using the
 [`AppendingTransformer`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTransformer.html).
-Each file is appended using new lines to separate content.
+Each file is appended using separators (defaults to `\n`) to separate content.
 The [`ShadowJar`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html) task provides a short syntax 
 method of
 [`append(String)`](https://gradleup.com/shadow/api/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.html#append(java.lang.String)) to 
@@ -192,6 +192,20 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
   append 'test.properties'
 }
 ```
+
+```groovy
+// Appending application.yml files
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+  // short syntax
+  append('resources/application.yml', '\n---\n')
+  // full syntax
+  transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer.class) {
+    resource = 'resources/custom-config/application.yml'
+    separator = '\n---\n'
+  }
+}
+```
+
 
 ## Appending XML Files
 
