@@ -5,7 +5,8 @@
 
 **Added**
 
-- Sync `SimpleRelocator` changes from maven-shade-plugin. ([#1076](https://github.com/GradleUp/shadow/pull/1076))
+- Sync `SimpleRelocator` changes from maven-shade-plugin. ([#1076](https://github.com/GradleUp/shadow/pull/1076))  
+- Add `ApplicationYamlTransformer` for merging `application.yml` files. ([#1168](https://github.com/GradleUp/shadow/pull/1168))  
 
 **Changed**
 
