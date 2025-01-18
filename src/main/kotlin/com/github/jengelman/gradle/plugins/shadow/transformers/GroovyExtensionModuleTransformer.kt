@@ -87,17 +87,17 @@ public open class GroovyExtensionModuleTransformer : Transformer {
   }
 
   internal companion object {
-    const val PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
+    internal const val PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
       "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
-    const val PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
+    internal const val PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
       "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
 
-    const val KEY_MODULE_NAME: String = "moduleName"
-    const val KEY_MODULE_VERSION: String = "moduleVersion"
-    const val KEY_EXTENSION_CLASSES: String = "extensionClasses"
-    const val KEY_STATIC_EXTENSION_CLASSES: String = "staticExtensionClasses"
+    internal const val KEY_MODULE_NAME: String = "moduleName"
+    internal const val KEY_MODULE_VERSION: String = "moduleVersion"
+    internal const val KEY_EXTENSION_CLASSES: String = "extensionClasses"
+    internal const val KEY_STATIC_EXTENSION_CLASSES: String = "staticExtensionClasses"
 
-    const val MERGED_MODULE_NAME: String = "MergedByShadowJar"
-    const val MERGED_MODULE_VERSION: String = "1.0.0"
+    internal const val MERGED_MODULE_NAME: String = "MergedByShadowJar"
+    internal const val MERGED_MODULE_VERSION: String = "1.0.0"
   }
 }

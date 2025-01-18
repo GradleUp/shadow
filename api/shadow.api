@@ -443,14 +443,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/DontInclude
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field KEY_EXTENSION_CLASSES Ljava/lang/String;
-	public static final field KEY_MODULE_NAME Ljava/lang/String;
-	public static final field KEY_MODULE_VERSION Ljava/lang/String;
-	public static final field KEY_STATIC_EXTENSION_CLASSES Ljava/lang/String;
-	public static final field MERGED_MODULE_NAME Ljava/lang/String;
-	public static final field MERGED_MODULE_VERSION Ljava/lang/String;
-	public static final field PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR Ljava/lang/String;
-	public static final field PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
