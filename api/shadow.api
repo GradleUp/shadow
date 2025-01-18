@@ -443,7 +443,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/DontInclude
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer$Companion;
 	public static final field KEY_EXTENSION_CLASSES Ljava/lang/String;
 	public static final field KEY_MODULE_NAME Ljava/lang/String;
 	public static final field KEY_MODULE_VERSION Ljava/lang/String;
@@ -457,9 +456,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExten
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer$Companion {
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
