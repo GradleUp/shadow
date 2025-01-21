@@ -14,7 +14,7 @@ import kotlin.io.path.outputStream
 import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginEntry
-import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor
+import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -39,7 +39,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
   private var stats: ShadowStats? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return PluginProcessor.PLUGIN_CACHE_FILE == element.name
+    return PLUGIN_CACHE_FILE == element.relativePath.pathString
   }
 
   override fun transform(context: TransformerContext) {
@@ -69,7 +69,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
       val aggregator = PluginCache()
       aggregator.loadCacheFiles(urlEnumeration)
       relocatePlugin(tempRelocators, aggregator.allCategories)
-      val entry = ZipEntry(PluginProcessor.PLUGIN_CACHE_FILE)
+      val entry = ZipEntry(PLUGIN_CACHE_FILE)
       entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
       // prevent the aggregator to close the jar output.
