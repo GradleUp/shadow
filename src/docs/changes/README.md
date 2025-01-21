@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v9.0.0-beta5] (2025-01-21)
+
 **Added**
 
 - Sync `SimpleRelocator` changes from maven-shade-plugin. ([#1076](https://github.com/GradleUp/shadow/pull/1076))
@@ -475,7 +478,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta4...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta5...HEAD
+[v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
 [v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
 [v9.0.0-beta3]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta3
 [v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
