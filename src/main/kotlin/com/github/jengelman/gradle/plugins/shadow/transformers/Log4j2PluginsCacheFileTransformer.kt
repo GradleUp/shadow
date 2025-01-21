@@ -60,7 +60,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
   }
 
   /**
-   * @return true if any dat file collected
+   * @return `true` if any dat file collected.
    */
   override fun hasTransformedResource(): Boolean {
     return tempFiles.isNotEmpty()
@@ -74,6 +74,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
       val entry = ZipEntry(PluginProcessor.PLUGIN_CACHE_FILE)
       entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
+      // prevent the aggregator to close the jar output.
       aggregator.writeCache(CloseShieldOutputStream.wrap(os))
     } finally {
       deleteTempFiles()
@@ -84,7 +85,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
    * Applies the given `relocators` to the `aggregator`.
    *
    * @param relocators           relocators.
-   * @param aggregatorCategories all categories of the aggregator
+   * @param aggregatorCategories all categories of the aggregator.
    */
   private fun relocatePlugin(
     relocators: List<Relocator>,
@@ -96,20 +97,11 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
         val originalClassName = pluginEntry.className
         val relocateClassContext = RelocateClassContext(originalClassName, requireNotNull(stats))
 
-        findFirstMatchingRelocator(originalClassName, relocators)?.let {
+        relocators.firstOrNull { it.canRelocateClass(originalClassName) }?.let {
           pluginEntry.className = it.relocateClass(relocateClassContext)
         }
       }
     }
-  }
-
-  private fun findFirstMatchingRelocator(originalClassName: String, relocators: List<Relocator>): Relocator? {
-    for (relocator in relocators) {
-      if (relocator.canRelocateClass(originalClassName)) {
-        return relocator
-      }
-    }
-    return null
   }
 
   private fun deleteTempFiles() {
