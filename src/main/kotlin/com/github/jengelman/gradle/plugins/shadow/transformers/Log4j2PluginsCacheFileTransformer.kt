@@ -20,8 +20,6 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 /**
- * Modified from the maven equivalent to work with gradle
- *
  * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java).
  *
  * @author Paul Nelson Baker
@@ -87,7 +85,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
    * @param relocators           relocators.
    * @param aggregatorCategories all categories of the aggregator.
    */
-  private fun relocatePlugin(
+  internal fun relocatePlugin(
     relocators: List<Relocator>,
     aggregatorCategories: Map<String, Map<String, PluginEntry>>,
   ) {

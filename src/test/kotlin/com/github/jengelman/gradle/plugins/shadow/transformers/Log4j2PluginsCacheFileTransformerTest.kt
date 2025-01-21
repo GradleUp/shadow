@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -10,10 +11,24 @@ import java.io.File
 import java.net.URI
 import java.util.Collections
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
+import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
 
+/**
+ * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformerTest.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/test/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformerTest.java).
+ */
 class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
+  @Test
+  fun canTransformResource() {
+    assertThat(transformer.canTransformResource("")).isFalse()
+    assertThat(transformer.canTransformResource(".")).isFalse()
+    assertThat(transformer.canTransformResource("tmp.dat")).isFalse()
+    assertThat(transformer.canTransformResource("$PLUGIN_CACHE_FILE.tmp")).isFalse()
+    assertThat(transformer.canTransformResource("tmp/$PLUGIN_CACHE_FILE")).isFalse()
+    assertThat(transformer.canTransformResource(PLUGIN_CACHE_FILE)).isTrue()
+  }
+
   @Test
   fun shouldTransform() {
     transformer.transform(context(SimpleRelocator()))
@@ -50,9 +65,5 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
 
   private fun context(vararg relocator: SimpleRelocator): TransformerContext {
     return TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocator.toSet())
-  }
-
-  private companion object {
-    const val PLUGIN_CACHE_FILE = "META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat"
   }
 }
