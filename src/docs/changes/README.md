@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Exclude `module-info.class` in Multi-Release folders by default. ([#1177](https://github.com/GradleUp/shadow/pull/1177))
+
 **Fixed**
 
 - Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1175](https://github.com/GradleUp/shadow/pull/1175))  

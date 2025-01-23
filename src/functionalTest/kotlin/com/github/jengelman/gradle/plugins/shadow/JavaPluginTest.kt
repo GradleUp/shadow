@@ -207,6 +207,8 @@ class JavaPluginTest : BasePluginTest() {
         insert("META-INF/a.DSA", "DSA Signature Block")
         insert("META-INF/a.RSA", "RSA Signature Block")
         insert("META-INF/a.properties", "key=value")
+        insert("META-INF/versions/9/module-info.class", "module myModuleName {}")
+        insert("META-INF/versions/16/module-info.class", "module myModuleName {}")
         insert("module-info.class", "module myModuleName {}")
       }
     }.publish()
@@ -238,6 +240,8 @@ class JavaPluginTest : BasePluginTest() {
         "META-INF/a.SF",
         "META-INF/a.DSA",
         "META-INF/a.RSA",
+        "META-INF/versions/9/module-info.class",
+        "META-INF/versions/16/module-info.class",
         "module-info.class",
       )
     }
