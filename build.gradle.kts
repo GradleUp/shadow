@@ -110,6 +110,7 @@ testing.suites {
       implementation(libs.apache.maven.modelBuilder)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
+      implementation(libs.apache.log4j)
     }
   }
 

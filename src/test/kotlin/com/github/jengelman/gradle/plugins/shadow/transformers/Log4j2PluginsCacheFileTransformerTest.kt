@@ -1,29 +1,41 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
+import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URI
+import java.net.URL
 import java.util.Collections
+import java.util.jar.JarInputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
+import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
+/**
+ * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformerTest.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/test/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformerTest.java).
+ */
 class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
   @Test
-  fun shouldTransform() {
-    transformer.transform(context(SimpleRelocator()))
-    assertThat(transformer.hasTransformedResource()).isTrue()
-  }
-
-  @Test
-  fun shouldTransformForSingleFile() {
-    transformer.transform(context())
-    assertThat(transformer.hasTransformedResource()).isTrue()
+  fun canTransformResource() {
+    assertThat(transformer.canTransformResource("")).isFalse()
+    assertThat(transformer.canTransformResource(".")).isFalse()
+    assertThat(transformer.canTransformResource("tmp.dat")).isFalse()
+    assertThat(transformer.canTransformResource("$PLUGIN_CACHE_FILE.tmp")).isFalse()
+    assertThat(transformer.canTransformResource("tmp/$PLUGIN_CACHE_FILE")).isFalse()
+    assertThat(transformer.canTransformResource(PLUGIN_CACHE_FILE)).isTrue()
   }
 
   @Test
@@ -48,11 +60,67 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
       .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
   }
 
+  @Test
+  fun transformAndModifyOutputStream() {
+    assertThat(transformer.hasTransformedResource()).isFalse()
+
+    transformer.transform(context())
+    assertThat(transformer.hasTransformedResource()).isTrue()
+    transformer.transform(context())
+    assertThat(transformer.hasTransformedResource()).isTrue()
+
+    val jarBuff = ByteArrayOutputStream()
+    ZipOutputStream(jarBuff).use {
+      transformer.modifyOutputStream(it, false)
+    }
+    JarInputStream(jarBuff.toByteArray().inputStream()).use { inputStream ->
+      while (true) {
+        val jarEntry = inputStream.nextJarEntry
+        if (jarEntry == null) {
+          fail("No expected resource in the output jar.")
+        } else if (jarEntry.name == PLUGIN_CACHE_FILE) {
+          @Suppress("Since15")
+          assertThat(inputStream.readAllBytes().contentHashCode()).all {
+            // Hash of the original plugin cache file.
+            isNotEqualTo(-2114104185)
+            isEqualTo(1911442937)
+          }
+          break
+        }
+      }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("relocationParameters")
+  fun relocations(pattern: String, shadedPattern: String, target: String) {
+    val aggregator = PluginCache().apply {
+      val resources = Collections.enumeration(listOf(pluginCacheUrl))
+      loadCacheFiles(resources)
+    }
+    transformer.transform(context(SimpleRelocator(pattern, shadedPattern)))
+    transformer.relocatePlugins(aggregator)
+
+    for (pluginEntryMap in aggregator.allCategories.values) {
+      for (entry in pluginEntryMap.values) {
+        assertThat(entry.className.startsWith(target)).isTrue()
+      }
+    }
+  }
+
   private fun context(vararg relocator: SimpleRelocator): TransformerContext {
     return TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocator.toSet())
   }
 
   private companion object {
-    const val PLUGIN_CACHE_FILE = "META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat"
+    val pluginCacheUrl: URL = requireNotNull(this::class.java.classLoader.getResource(PLUGIN_CACHE_FILE))
+
+    @JvmStatic
+    fun relocationParameters() = listOf(
+      // test with matching relocator
+      Arguments.of("org.apache.logging", "new.location.org.apache.logging", "new.location.org.apache.logging"),
+      // test without matching relocator
+      Arguments.of("com.apache.logging", "new.location.com.apache.logging", "org.apache.logging"),
+    )
   }
 }

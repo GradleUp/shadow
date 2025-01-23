@@ -334,7 +334,7 @@ abstract class BasePluginTest {
       return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)
     }
 
-    private fun requireResourceAsPath(name: String): Path {
+    fun requireResourceAsPath(name: String): Path {
       val resource = this::class.java.classLoader.getResource(name)
         ?: throw NoSuchFileException("Resource $name not found.")
       return resource.toURI().toPath()
