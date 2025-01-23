@@ -8,6 +8,7 @@ import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
@@ -108,6 +109,9 @@ class ApplicationPluginTest : BasePluginTest() {
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/613",
+  )
   @Test
   fun canOverrideMainClassAttrInManifestBlock() {
     writeMainClass(className = "Main2")
