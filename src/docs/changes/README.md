@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Support overriding `mainClass` provided by `JavaApplication`. ([#1182](https://github.com/GradleUp/shadow/pull/1182))
+
 
 ## [v9.0.0-beta6] (2025-01-23)
 
