@@ -1,8 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
@@ -78,7 +80,11 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
           fail("No expected resource in the output jar.")
         } else if (jarEntry.name == PLUGIN_CACHE_FILE) {
           @Suppress("Since15")
-          assertThat(1911442937L).isEqualTo(inputStream.readAllBytes().contentHashCode().toLong())
+          assertThat(inputStream.readAllBytes().contentHashCode()).all {
+            // Hash of the original plugin cache file.
+            isNotEqualTo(-2114104185)
+            isEqualTo(1911442937)
+          }
           break
         }
       }

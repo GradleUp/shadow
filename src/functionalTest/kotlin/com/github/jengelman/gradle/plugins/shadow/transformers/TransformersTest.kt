@@ -70,6 +70,9 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(mf.mainAttributes.getValue("New-Entry")).isNull()
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/427",
+  )
   @Test
   fun canMergeLog4j2PluginCacheFiles() {
     val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
@@ -91,9 +94,9 @@ class TransformersTest : BaseTransformerTest() {
       @Suppress("Since15")
       jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
     }
-    val singleContentBytes = content.toByteArray()
     assertThat(actualFileBytes.contentHashCode()).all {
-      isNotEqualTo(singleContentBytes.contentHashCode())
+      // Hash of the original plugin cache file.
+      isNotEqualTo(-2114104185)
       isEqualTo(1911442937)
     }
   }
