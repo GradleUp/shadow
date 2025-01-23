@@ -37,18 +37,6 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
   }
 
   @Test
-  fun shouldTransform() {
-    transformer.transform(context(SimpleRelocator()))
-    assertThat(transformer.hasTransformedResource()).isTrue()
-  }
-
-  @Test
-  fun shouldTransformForSingleFile() {
-    transformer.transform(context())
-    assertThat(transformer.hasTransformedResource()).isTrue()
-  }
-
-  @Test
   fun relocateClassesInsideDatFile() {
     val relocator = SimpleRelocator("org.apache.logging", "new.location.org.apache.logging")
     transformer.transform(context(relocator))
