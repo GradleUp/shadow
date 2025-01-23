@@ -164,7 +164,8 @@ abstract class BasePluginTest {
         $imports
         public class Main {
           public static void main(String[] args) {
-            System.out.println("Hello, World!");
+            String content = String.format("Hello, World! (%s)", args);
+            System.out.println(content);
           }
         }
       """.trimIndent(),
