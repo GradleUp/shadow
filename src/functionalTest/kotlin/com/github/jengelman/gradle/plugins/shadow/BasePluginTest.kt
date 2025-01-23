@@ -155,16 +155,17 @@ abstract class BasePluginTest {
 
   fun writeMainClass(
     withImports: Boolean = false,
+    className: String = "Main",
   ) {
     val imports = if (withImports) "import junit.framework.Test;" else ""
 
-    path("src/main/java/shadow/Main.java").writeText(
+    path("src/main/java/shadow/$className.java").writeText(
       """
         package shadow;
         $imports
-        public class Main {
+        public class $className {
           public static void main(String[] args) {
-            String content = String.format("Hello, World! (%s)", args);
+            String content = String.format("Hello, World! (%s) from $className", args);
             System.out.println(content);
           }
         }

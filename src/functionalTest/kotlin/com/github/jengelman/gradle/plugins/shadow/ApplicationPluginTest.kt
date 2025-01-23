@@ -45,7 +45,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     assertThat(result.output).contains(
       "Running application with JDK 17",
-      "Hello, World! (foo)",
+      "Hello, World! (foo) from Main",
     )
 
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
@@ -108,6 +108,30 @@ class ApplicationPluginTest : BasePluginTest() {
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
+  @Test
+  fun canOverrideMainClassAttrInManifestBlock() {
+    writeMainClass(className = "Main2")
+    prepare(
+      projectBlock = """
+        shadowJar {
+          manifest {
+            attributes 'Main-Class': 'shadow.Main2'
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(SHADOW_RUN_TASK_NAME)
+
+    assertThat(result.output).contains(
+      "Hello, World! (foo) from Main2",
+    )
+    commonAssertions(
+      jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
+      mainClassAttr = "shadow.Main2",
+    )
+  }
+
   private fun prepare(
     projectBlock: String = "",
     settingsBlock: String = "",
@@ -142,10 +166,11 @@ class ApplicationPluginTest : BasePluginTest() {
   private fun commonAssertions(
     jarPath: JarPath,
     entriesContained: Array<String> = arrayOf("a.properties", "a2.properties", "shadow/Main.class"),
+    mainClassAttr: String = "shadow.Main",
   ) {
     assertThat(jarPath).useAll {
       containsEntries(*entriesContained)
-      getMainAttr("Main-Class").isEqualTo("shadow.Main")
+      getMainAttr("Main-Class").isEqualTo(mainClassAttr)
     }
   }
 
