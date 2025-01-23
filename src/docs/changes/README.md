@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v9.0.0-beta6] (2025-01-23)
+
 **Added**
 
 - Exclude `module-info.class` in Multi-Release folders by default. ([#1177](https://github.com/GradleUp/shadow/pull/1177))
@@ -486,7 +489,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta5...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta6...HEAD
+[v9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
 [v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
 [v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
 [v9.0.0-beta3]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta3
