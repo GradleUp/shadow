@@ -253,7 +253,7 @@ abstract class BasePluginTest {
         import org.gradle.api.Project;
         public class MyPlugin implements Plugin<Project> {
           public void apply(Project project) {
-            System.out.println("MyPlugin: Hello World!");
+            System.out.println("MyPlugin: Hello, World!");
           }
         }
       """.trimIndent(),
