@@ -53,7 +53,9 @@ class TransformersTest : BaseTransformerTest() {
     commonAssertions()
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/82")
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/82",
+  )
   @Test
   fun shadowManifestLeaksToJarManifest() {
     writeMainClass()

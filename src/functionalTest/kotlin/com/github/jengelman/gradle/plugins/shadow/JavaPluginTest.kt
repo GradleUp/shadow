@@ -197,6 +197,10 @@ class JavaPluginTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/352",
+    "https://github.com/GradleUp/shadow/issues/729",
+  )
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
     localRepo.module("shadow", "a", "1.0") {
