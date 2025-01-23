@@ -176,6 +176,18 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 }
 ```
 
+## Merging Log2j2 Plugin Cache Files (`META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat`)
+
+`Log4j2PluginsCacheFileTransformer` is a `Transformer` that merges `Log4j2Plugins.dat` plugin caches from all the jars
+containing Log4j 2.x Core components. It's a Gradle equivalent of [Log4j Plugin Descriptor Transformer](https://github.com/apache/logging-log4j-transform/blob/main/src/site/antora/modules/ROOT/pages/log4j-transform-maven-shade-plugin-extensions.adoc).
+
+```groovy
+// Merging Log4j2 Plugin Cache Files
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+  transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer.class)
+}
+```
+
 ## Appending Text Files
 
 Generic text files can be appended together using the
