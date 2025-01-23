@@ -96,6 +96,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         "META-INF/*.SF",
         "META-INF/*.DSA",
         "META-INF/*.RSA",
+        // module-info.class in Multi-Release folders.
+        "META-INF/versions/**/module-info.class",
         "module-info.class",
       )
     }
