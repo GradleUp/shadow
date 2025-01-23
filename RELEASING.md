@@ -12,28 +12,28 @@
 
 4. Commit
 
-   ```
-   $ git commit -am "Prepare version X.Y.Z"
+   ```sh
+   git commit -am "Prepare version X.Y.Z"
    ```
 
 5. Tag
 
-   ```
-   $ git tag -am "Version X.Y.Z" X.Y.Z
+   ```sh
+   git tag -am "Version X.Y.Z" X.Y.Z
    ```
 
 6. Update the `VERSION_NAME` in `gradle.properties` to the next "SNAPSHOT" version.
 
 7. Commit
 
-   ```
-   $ git commit -am "Prepare next development version"
+   ```sh
+   git commit -am "Prepare next development version"
    ```
 
 8. Push!
 
-   ```
-   $ git push && git push --tags
+   ```sh
+   git push && git push --tags
    ```
 
    This will trigger a GitHub Action workflow which will create a GitHub release and upload the
