@@ -36,7 +36,10 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     shadowJar.configure { jar ->
       jar.inputs.property("mainClassName", classNameProvider)
       jar.doFirst {
-        jar.manifest.attributes["Main-Class"] = classNameProvider.get()
+        // Inject the Main-Class attribute if it is not already present.
+        if (!jar.manifest.attributes.contains("Main-Class")) {
+          jar.manifest.attributes["Main-Class"] = classNameProvider.get()
+        }
       }
     }
   }
