@@ -13,7 +13,6 @@ import kotlin.io.path.deleteIfExists
 import kotlin.io.path.outputStream
 import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
-import org.apache.logging.log4j.core.config.plugins.processor.PluginEntry
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -68,7 +67,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     try {
       val aggregator = PluginCache()
       aggregator.loadCacheFiles(urlEnumeration)
-      relocatePlugin(tempRelocators, aggregator.allCategories)
+      relocatePlugins(aggregator)
       val entry = ZipEntry(PLUGIN_CACHE_FILE)
       entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
@@ -79,24 +78,14 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     }
   }
 
-  /**
-   * Applies the given `relocators` to the `aggregator`.
-   *
-   * @param relocators           relocators.
-   * @param aggregatorCategories all categories of the aggregator.
-   */
-  internal fun relocatePlugin(
-    relocators: List<Relocator>,
-    aggregatorCategories: Map<String, Map<String, PluginEntry>>,
-  ) {
-    for (categoryEntry in aggregatorCategories.entries) {
-      for (pluginMapEntry in categoryEntry.value.entries) {
-        val pluginEntry = pluginMapEntry.value
-        val originalClassName = pluginEntry.className
-        val relocateClassContext = RelocateClassContext(originalClassName, requireNotNull(stats))
-
-        relocators.firstOrNull { it.canRelocateClass(originalClassName) }?.let {
-          pluginEntry.className = it.relocateClass(relocateClassContext)
+  internal fun relocatePlugins(pluginCache: PluginCache) {
+    pluginCache.allCategories.values.forEach { currentMap ->
+      currentMap.values.forEach { currentPluginEntry ->
+        val className = currentPluginEntry.className
+        val relocateClassContext = RelocateClassContext(className, requireNotNull(stats))
+        tempRelocators.firstOrNull { it.canRelocateClass(className) }?.let { relocator ->
+          // Then we perform that relocation and update the plugin entry to reflect the new value.
+          currentPluginEntry.className = relocator.relocateClass(relocateClassContext)
         }
       }
     }
