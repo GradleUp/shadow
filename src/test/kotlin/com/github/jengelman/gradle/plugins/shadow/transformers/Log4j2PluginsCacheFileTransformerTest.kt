@@ -90,7 +90,8 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
   fun relocations(pattern: String, shadedPattern: String, target: String) {
     val log4jRelocator = SimpleRelocator(pattern, shadedPattern)
     val aggregator = PluginCache().apply {
-      loadCacheFiles(Collections.enumeration<URL>(listOf(pluginCacheUrl)))
+      val resources = Collections.enumeration(listOf(pluginCacheUrl))
+      loadCacheFiles(resources)
     }
     // Init stats to avoid NPE.
     transformer.transform(context())
