@@ -45,7 +45,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     assertThat(result.output).contains(
       "Running application with JDK 17",
-      "TestApp: Hello World! (foo)",
+      "Hello, World! (foo)",
     )
 
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
@@ -86,7 +86,7 @@ class ApplicationPluginTest : BasePluginTest() {
       val extractedJar = path("extracted/myapp-1.0-all.jar")
       zip.getStream("myapp-shadow-1.0/lib/myapp-1.0-all.jar")
         .use { it.copyTo(extractedJar.outputStream()) }
-      commonAssertions(JarPath(extractedJar), entriesContained = arrayOf("myapp/Main.class"))
+      commonAssertions(JarPath(extractedJar), entriesContained = arrayOf("shadow/Main.class"))
 
       assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp")).contains(
         "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
@@ -114,22 +114,13 @@ class ApplicationPluginTest : BasePluginTest() {
     dependenciesBlock: String = "implementation 'shadow:a:1.0'",
     runShadowBlock: String = "",
   ) {
-    path("src/main/java/myapp/Main.java").appendText(
-      """
-        package myapp;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("TestApp: Hello World! (" + args[0] + ")");
-          }
-        }
-      """.trimIndent(),
-    )
+    writeMainClass()
     projectScriptPath.appendText(
       """
         apply plugin: 'application'
         $projectBlock
         application {
-          mainClass = 'myapp.Main'
+          mainClass = 'shadow.Main'
         }
         dependencies {
           $dependenciesBlock
@@ -150,11 +141,11 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private fun commonAssertions(
     jarPath: JarPath,
-    entriesContained: Array<String> = arrayOf("a.properties", "a2.properties", "myapp/Main.class"),
+    entriesContained: Array<String> = arrayOf("a.properties", "a2.properties", "shadow/Main.class"),
   ) {
     assertThat(jarPath).useAll {
       containsEntries(*entriesContained)
-      getMainAttr("Main-Class").isEqualTo("myapp.Main")
+      getMainAttr("Main-Class").isEqualTo("shadow.Main")
     }
   }
 

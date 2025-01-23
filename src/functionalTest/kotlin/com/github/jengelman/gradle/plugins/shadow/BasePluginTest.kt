@@ -164,7 +164,8 @@ abstract class BasePluginTest {
         $imports
         public class Main {
           public static void main(String[] args) {
-            System.out.println("Hello, World!");
+            String content = String.format("Hello, World! (%s)", args);
+            System.out.println(content);
           }
         }
       """.trimIndent(),
@@ -252,7 +253,7 @@ abstract class BasePluginTest {
         import org.gradle.api.Project;
         public class MyPlugin implements Plugin<Project> {
           public void apply(Project project) {
-            System.out.println("MyPlugin: Hello World!");
+            System.out.println("MyPlugin: Hello, World!");
           }
         }
       """.trimIndent(),
