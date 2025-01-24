@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
+
 **Fixed**
 
 - Support overriding `mainClass` provided by `JavaApplication`. ([#1182](https://github.com/GradleUp/shadow/pull/1182))
