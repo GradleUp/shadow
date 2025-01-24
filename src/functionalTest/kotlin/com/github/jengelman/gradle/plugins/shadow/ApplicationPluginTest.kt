@@ -14,14 +14,17 @@ import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.FileSystems
 import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermission
 import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
+import kotlin.io.path.getPosixFilePermissions
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
+import kotlin.io.path.setPosixFilePermissions
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -130,7 +133,16 @@ class ApplicationPluginTest : BasePluginTest() {
       classPathAttr = "junit-3.8.2.jar",
     )
 
-    val unixScript = path("myapp-shadow-1.0/bin/myapp", extractedPath)
+    val unixScript = path("myapp-shadow-1.0/bin/myapp", extractedPath).apply {
+      // Make the extracted script executable.
+      setPosixFilePermissions(
+        getPosixFilePermissions() + setOf(
+          PosixFilePermission.OWNER_EXECUTE,
+          PosixFilePermission.GROUP_EXECUTE,
+          PosixFilePermission.OTHERS_EXECUTE,
+        ),
+      )
+    }
     val winScript = path("myapp-shadow-1.0/bin/myapp.bat", extractedPath)
 
     assertThat(unixScript.readText()).contains(
