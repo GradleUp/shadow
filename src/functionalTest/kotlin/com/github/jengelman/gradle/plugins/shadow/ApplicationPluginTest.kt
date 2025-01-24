@@ -93,8 +93,12 @@ class ApplicationPluginTest : BasePluginTest() {
       "myapp-shadow-1.0/lib/a-1.0.jar",
     )
 
-    val extractedJar = extractedPath.resolve("myapp-shadow-1.0/lib/myapp-1.0-all.jar")
-    commonAssertions(JarPath(extractedJar), entriesContained = arrayOf("shadow/Main.class"))
+    val extractedJarPath = jarPath("myapp-shadow-1.0/lib/a-1.0.jar", extractedPath)
+    val extractedShadowJarPath = jarPath("myapp-shadow-1.0/lib/myapp-1.0-all.jar", extractedPath)
+    assertThat(extractedJarPath).useAll {
+      containsEntries("a.properties", "a2.properties")
+    }
+    commonAssertions(extractedShadowJarPath, entriesContained = arrayOf("shadow/Main.class"))
 
     assertThat(extractedPath.resolve("myapp-shadow-1.0/bin/myapp").readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
