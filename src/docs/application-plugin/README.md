@@ -55,3 +55,28 @@ the application.
 
 Additionally, the plugin will create the `installShadowDist` and `startShadowScripts` tasks which stages the necessary
 files for a distribution to `build/install/<project name>-shadow/`.
+
+You can also add more files into the distribution like:
+
+```groovy
+// Add extra files to the distribution
+plugins {
+  id 'java'
+  id 'application'
+  id 'com.gradleup.shadow'
+}
+
+application {
+  mainClass = 'myapp.Main'
+}
+
+// `shadow` is the name of the distribution created by Shadow plugin
+distributions.named('shadow') {
+  contents.into('extra') {
+    from project.file('extra/echo.sh')
+  }
+}
+```
+
+View [the official doc described](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin)
+for more information about configuring distributions.

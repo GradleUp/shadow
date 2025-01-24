@@ -6,9 +6,11 @@ import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.DISTRIBUTION_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
@@ -188,6 +190,35 @@ class ApplicationPluginTest : BasePluginTest() {
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
       mainClassAttr = "shadow.Main2",
     )
+  }
+
+  @Test
+  fun canAddExtraFilesIntoDistribution() {
+    path("extra/echo.sh").writeText("echo 'Hello, World!'")
+    prepare(
+      projectBlock = """
+        distributions.named('$DISTRIBUTION_NAME') {
+          contents.into('extra') {
+            from project.file('extra/echo.sh')
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run("shadowDistZip")
+
+    val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
+    ZipFile(zipPath.toFile()).use { zip ->
+      val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
+      assertThat(entries).containsOnly(
+        "myapp-shadow-1.0/bin/myapp",
+        "myapp-shadow-1.0/bin/myapp.bat",
+        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+        "myapp-shadow-1.0/extra/echo.sh",
+      )
+      assertThat(zip.getContent("myapp-shadow-1.0/extra/echo.sh"))
+        .isEqualTo("echo 'Hello, World!'")
+    }
   }
 
   private fun prepare(
