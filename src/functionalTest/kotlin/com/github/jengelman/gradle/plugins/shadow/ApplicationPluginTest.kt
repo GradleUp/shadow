@@ -1,23 +1,23 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsOnly
-import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import java.util.zip.ZipFile
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
+import kotlin.io.path.createDirectories
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
@@ -51,22 +51,17 @@ class ApplicationPluginTest : BasePluginTest() {
 
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
 
-    assertThat(path("build/install/myapp-shadow/bin/myapp")).all {
-      exists()
-      transform { it.readText() }.contains(
-        "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-        "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
-        "exec \"\$JAVACMD\" \"\$@\"",
-      )
-    }
-    assertThat(path("build/install/myapp-shadow/bin/myapp.bat")).all {
-      exists()
-      transform { it.readText() }.contains(
-        "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
-      )
-    }
+    assertThat(path("build/install/myapp-shadow/bin/myapp").readText()).contains(
+      "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
+      "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
+      "exec \"\$JAVACMD\" \"\$@\"",
+    )
+    assertThat(path("build/install/myapp-shadow/bin/myapp.bat").readText()).contains(
+      "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+    )
   }
 
+  @ExperimentalPathApi
   @Test
   fun shadowApplicationDistributionsShouldUseShadowJar() {
     prepare(
@@ -75,29 +70,40 @@ class ApplicationPluginTest : BasePluginTest() {
 
     run("shadowDistZip")
 
-    ZipFile(path("build/distributions/myapp-shadow-1.0.zip").toFile()).use { zip ->
-      val fileEntries = zip.entries().toList().map { it.name }.filter { !it.endsWith("/") }
-      assertThat(fileEntries).containsOnly(
-        "myapp-shadow-1.0/bin/myapp",
-        "myapp-shadow-1.0/bin/myapp.bat",
-        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
-        "myapp-shadow-1.0/lib/a-1.0.jar",
-      )
+    val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
+    val extractedPath = path("build/distributions/extracted/")
 
-      val extractedJar = path("extracted/myapp-1.0-all.jar")
-      zip.getStream("myapp-shadow-1.0/lib/myapp-1.0-all.jar")
-        .use { it.copyTo(extractedJar.outputStream()) }
-      commonAssertions(JarPath(extractedJar), entriesContained = arrayOf("shadow/Main.class"))
-
-      assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp")).contains(
-        "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-        "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
-        "exec \"\$JAVACMD\" \"\$@\"",
-      )
-      assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp.bat")).contains(
-        "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
-      )
+    // Unzip the whole file.
+    ZipFile(zipPath.toFile()).use { zip ->
+      zip.entries().toList().forEach { entry ->
+        val entryDest = extractedPath.resolve(entry.name)
+        if (entry.isDirectory) {
+          entryDest.createDirectories()
+        } else {
+          zip.getInputStream(entry).use { it.copyTo(entryDest.outputStream()) }
+        }
+      }
     }
+
+    val extractedEntries = extractedPath.walk().map { it.relativeTo(extractedPath).toString() }.toList()
+    assertThat(extractedEntries).containsOnly(
+      "myapp-shadow-1.0/bin/myapp",
+      "myapp-shadow-1.0/bin/myapp.bat",
+      "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+      "myapp-shadow-1.0/lib/a-1.0.jar",
+    )
+
+    val extractedJar = extractedPath.resolve("myapp-shadow-1.0/lib/myapp-1.0-all.jar")
+    commonAssertions(JarPath(extractedJar), entriesContained = arrayOf("shadow/Main.class"))
+
+    assertThat(extractedPath.resolve("myapp-shadow-1.0/bin/myapp").readText()).contains(
+      "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
+      "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
+      "exec \"\$JAVACMD\" \"\$@\"",
+    )
+    assertThat(extractedPath.resolve("myapp-shadow-1.0/bin/myapp.bat").readText()).contains(
+      "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+    )
   }
 
   @Test
