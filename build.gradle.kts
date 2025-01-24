@@ -153,7 +153,11 @@ tasks.register<Copy>("downloadStartScripts") {
   from(resources.text.fromUri("$urlPrefix/windowsStartScript.txt")) {
     rename { "windowsStartScript.txt" }
   }
-  into("src/main/resources/com/github/jengelman/gradle/plugins/shadow/internal")
+  val destDir = file("src/main/resources/com/github/jengelman/gradle/plugins/shadow/internal")
+  if (!destDir.exists() || !destDir.isDirectory || destDir.listFiles().isNullOrEmpty()) {
+    error("Download destination dir $destDir does not exist or is empty.")
+  }
+  into(destDir)
 }
 
 tasks.clean {
