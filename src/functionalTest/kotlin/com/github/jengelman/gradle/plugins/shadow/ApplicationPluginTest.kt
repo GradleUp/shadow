@@ -145,9 +145,9 @@ class ApplicationPluginTest : BasePluginTest() {
     val runningOutput = if (isWindows) {
       runProcess(winScript.toString(), "bar")
     } else {
-      // Mark the script as executable explicitly as it's extracted from a Zip.
-      runProcess("chmod", "+x", unixScript.toString())
-      runProcess(unixScript.toString(), "bar")
+      // Use `sh` explicitly since the extracted script is non-executable.
+      // Avoid `chmod +x` to prevent `Text file busy` errors on Linux.
+      runProcess("sh", unixScript.toString(), "bar")
     }
     assertThat(runningOutput).contains(
       "Hello, World! (bar) from Main",
