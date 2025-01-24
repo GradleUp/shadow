@@ -20,6 +20,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
+import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -134,8 +135,12 @@ abstract class BasePluginTest {
     return parent.resolve(relative).also {
       if (it.exists()) return@also
       it.parent.createDirectories()
-      // We should create text file only if it doesn't exist.
-      it.createFile()
+      if (relative.endsWith("/")) {
+        it.createDirectory()
+      } else {
+        // We should create text file only if it doesn't exist.
+        it.createFile()
+      }
     }
   }
 
@@ -158,6 +163,7 @@ abstract class BasePluginTest {
     className: String = "Main",
   ) {
     val imports = if (withImports) "import junit.framework.Test;" else ""
+    val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
 
     path("src/main/java/shadow/$className.java").writeText(
       """
@@ -167,6 +173,7 @@ abstract class BasePluginTest {
           public static void main(String[] args) {
             String content = String.format("Hello, World! (%s) from $className", args);
             System.out.println(content);
+            System.out.println($classRef);
           }
         }
       """.trimIndent(),
