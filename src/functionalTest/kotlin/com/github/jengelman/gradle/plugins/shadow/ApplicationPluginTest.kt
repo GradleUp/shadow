@@ -22,10 +22,13 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
+@ExperimentalPathApi
 class ApplicationPluginTest : BasePluginTest() {
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
+      mainClassWithImports = true,
+      dependenciesBlock = "implementation 'junit:junit:3.8.2'",
       projectBlock = """
         java {
           toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -50,7 +53,20 @@ class ApplicationPluginTest : BasePluginTest() {
       "Hello, World! (foo) from Main",
     )
 
-    commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
+    val installPath = path("build/install/")
+    val installEntries = installPath.walk()
+      .map { it.relativeTo(installPath).toString() }
+      .map { it.replace(FileSystems.getDefault().separator, "/") }
+    assertThat(installEntries).containsOnly(
+      "myapp-shadow/bin/myapp",
+      "myapp-shadow/bin/myapp.bat",
+      "myapp-shadow/lib/myapp-1.0-all.jar",
+    )
+
+    commonAssertions(
+      jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
+      entriesContained = arrayOf("shadow/Main.class", "junit/framework/Test.class"),
+    )
 
     assertThat(path("build/install/myapp-shadow/bin/myapp").readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
@@ -62,11 +78,11 @@ class ApplicationPluginTest : BasePluginTest() {
     )
   }
 
-  @ExperimentalPathApi
   @Test
   fun shadowApplicationDistributionsShouldUseShadowJar() {
     prepare(
-      dependenciesBlock = "shadow 'shadow:a:1.0'",
+      mainClassWithImports = true,
+      dependenciesBlock = "shadow 'junit:junit:3.8.2'",
     )
 
     run("shadowDistZip")
@@ -93,15 +109,14 @@ class ApplicationPluginTest : BasePluginTest() {
       "myapp-shadow-1.0/bin/myapp",
       "myapp-shadow-1.0/bin/myapp.bat",
       "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
-      "myapp-shadow-1.0/lib/a-1.0.jar",
+      "myapp-shadow-1.0/lib/junit-3.8.2.jar",
     )
 
-    val extractedJarPath = jarPath("myapp-shadow-1.0/lib/a-1.0.jar", extractedPath)
     val extractedShadowJarPath = jarPath("myapp-shadow-1.0/lib/myapp-1.0-all.jar", extractedPath)
-    assertThat(extractedJarPath).useAll {
-      containsEntries("a.properties", "a2.properties")
-    }
-    commonAssertions(extractedShadowJarPath, entriesContained = arrayOf("shadow/Main.class"))
+    commonAssertions(
+      extractedShadowJarPath,
+      entriesContained = arrayOf("shadow/Main.class"),
+    )
 
     assertThat(extractedPath.resolve("myapp-shadow-1.0/bin/myapp").readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
@@ -150,12 +165,13 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private fun prepare(
+    mainClassWithImports: Boolean = false,
     projectBlock: String = "",
     settingsBlock: String = "",
     dependenciesBlock: String = "implementation 'shadow:a:1.0'",
     runShadowBlock: String = "",
   ) {
-    writeMainClass()
+    writeMainClass(withImports = mainClassWithImports)
     projectScriptPath.appendText(
       """
         apply plugin: 'application'

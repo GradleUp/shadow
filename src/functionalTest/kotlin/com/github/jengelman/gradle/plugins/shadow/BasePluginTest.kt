@@ -163,6 +163,7 @@ abstract class BasePluginTest {
     className: String = "Main",
   ) {
     val imports = if (withImports) "import junit.framework.Test;" else ""
+    val classRefs = if (withImports) "Refs: Test.class.getName()" else "Refs: null"
 
     path("src/main/java/shadow/$className.java").writeText(
       """
@@ -172,6 +173,7 @@ abstract class BasePluginTest {
           public static void main(String[] args) {
             String content = String.format("Hello, World! (%s) from $className", args);
             System.out.println(content);
+            System.out.println("$classRefs");
           }
         }
       """.trimIndent(),
