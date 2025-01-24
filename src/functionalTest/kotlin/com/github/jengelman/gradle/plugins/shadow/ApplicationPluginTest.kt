@@ -19,7 +19,6 @@ import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
-import kotlin.io.path.getPosixFilePermissions
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
@@ -136,10 +135,13 @@ class ApplicationPluginTest : BasePluginTest() {
     val unixScript = path("myapp-shadow-1.0/bin/myapp", extractedPath).apply {
       // Make the extracted script executable.
       setPosixFilePermissions(
-        getPosixFilePermissions() + setOf(
+        setOf(
           PosixFilePermission.OWNER_EXECUTE,
+          PosixFilePermission.OWNER_READ,
           PosixFilePermission.GROUP_EXECUTE,
+          PosixFilePermission.GROUP_READ,
           PosixFilePermission.OTHERS_EXECUTE,
+          PosixFilePermission.OTHERS_READ,
         ),
       )
     }
