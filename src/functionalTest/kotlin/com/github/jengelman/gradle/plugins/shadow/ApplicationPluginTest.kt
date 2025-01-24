@@ -11,10 +11,12 @@ import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import java.nio.file.FileSystems
+import java.nio.file.Path
 import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
@@ -53,11 +55,7 @@ class ApplicationPluginTest : BasePluginTest() {
       "Hello, World! (foo) from Main",
     )
 
-    val installPath = path("build/install/")
-    val installEntries = installPath.walk()
-      .map { it.relativeTo(installPath).toString() }
-      .map { it.replace(FileSystems.getDefault().separator, "/") }
-    assertThat(installEntries).containsOnly(
+    assertThat(path("build/install/").walkEntries()).containsOnly(
       "myapp-shadow/bin/myapp",
       "myapp-shadow/bin/myapp.bat",
       "myapp-shadow/lib/myapp-1.0-all.jar",
@@ -102,10 +100,7 @@ class ApplicationPluginTest : BasePluginTest() {
       }
     }
 
-    val extractedEntries = extractedPath.walk()
-      .map { it.relativeTo(extractedPath).toString() }
-      .map { it.replace(FileSystems.getDefault().separator, "/") }
-    assertThat(extractedEntries).containsOnly(
+    assertThat(extractedPath.walkEntries()).containsOnly(
       "myapp-shadow-1.0/bin/myapp",
       "myapp-shadow-1.0/bin/myapp.bat",
       "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
@@ -209,5 +204,12 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private companion object {
     val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME')".trim()
+
+    fun Path.walkEntries(): Sequence<String> {
+      return walk()
+        .filter { it.isRegularFile() }
+        .map { it.relativeTo(this) }
+        .map { it.toString().replace(FileSystems.getDefault().separator, "/") }
+    }
   }
 }
