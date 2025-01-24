@@ -127,6 +127,7 @@ class ApplicationPluginTest : BasePluginTest() {
     commonAssertions(
       extractedShadowJarPath,
       entriesContained = arrayOf("shadow/Main.class"),
+      classPathAttr = "junit-3.8.2.jar",
     )
 
     val unixScript = path("myapp-shadow-1.0/bin/myapp", extractedPath)
@@ -224,10 +225,12 @@ class ApplicationPluginTest : BasePluginTest() {
     jarPath: JarPath,
     entriesContained: Array<String> = arrayOf("a.properties", "a2.properties", "shadow/Main.class"),
     mainClassAttr: String = "shadow.Main",
+    classPathAttr: String? = null,
   ) {
     assertThat(jarPath).useAll {
       containsEntries(*entriesContained)
       getMainAttr("Main-Class").isEqualTo(mainClassAttr)
+      getMainAttr("Class-Path").isEqualTo(classPathAttr)
     }
   }
 
