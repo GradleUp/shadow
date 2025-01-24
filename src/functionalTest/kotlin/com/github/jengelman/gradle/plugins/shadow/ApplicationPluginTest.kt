@@ -143,7 +143,8 @@ class ApplicationPluginTest : BasePluginTest() {
     )
 
     val runningOutput = if (isWindows) {
-      runProcess(winScript.toString(), "bar")
+      // Use `cmd` and `/c` explicitly to prevent `The process cannot access the file because it is being used by another process` errors.
+      runProcess("cmd", "/c", winScript.toString(), "bar")
     } else {
       // Use `sh` explicitly since the extracted script is non-executable.
       // Avoid `chmod +x` to prevent `Text file busy` errors on Linux.
