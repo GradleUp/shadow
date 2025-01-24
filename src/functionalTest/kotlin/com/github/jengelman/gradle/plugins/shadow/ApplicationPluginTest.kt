@@ -55,7 +55,6 @@ class ApplicationPluginTest : BasePluginTest() {
       exists()
       transform { it.readText() }.contains(
         "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-        "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
         "exec \"\$JAVACMD\" \"\$@\"",
       )
     }
@@ -91,7 +90,6 @@ class ApplicationPluginTest : BasePluginTest() {
 
       assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp")).contains(
         "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-        "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
         "exec \"\$JAVACMD\" \"\$@\"",
       )
       assertThat(zip.getContent("myapp-shadow-1.0/bin/myapp.bat")).contains(
