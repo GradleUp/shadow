@@ -147,6 +147,8 @@ class ApplicationPluginTest : BasePluginTest() {
     } else {
       // Mark the extracted script as executable.
       runProcess("chmod", "+x", unixScript.toString())
+      // Avoid `Text file busy` error on Linux.
+      Thread.sleep(1000)
       runProcess(unixScript.toString(), "bar")
     }
     assertThat(runningOutput).contains(
