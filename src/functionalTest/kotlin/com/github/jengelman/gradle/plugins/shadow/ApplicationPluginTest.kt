@@ -10,6 +10,8 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.util.isWindows
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.zip.ZipFile
@@ -53,6 +55,7 @@ class ApplicationPluginTest : BasePluginTest() {
     assertThat(result.output).contains(
       "Running application with JDK 17",
       "Hello, World! (foo) from Main",
+      "Refs: junit.framework.Test",
     )
 
     assertThat(path("build/install/").walkEntries()).containsOnly(
@@ -66,13 +69,26 @@ class ApplicationPluginTest : BasePluginTest() {
       entriesContained = arrayOf("shadow/Main.class", "junit/framework/Test.class"),
     )
 
-    assertThat(path("build/install/myapp-shadow/bin/myapp").readText()).contains(
+    val unixScript = path("build/install/myapp-shadow/bin/myapp")
+    val winScript = path("build/install/myapp-shadow/bin/myapp.bat")
+
+    assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
       "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
       "exec \"\$JAVACMD\" \"\$@\"",
     )
-    assertThat(path("build/install/myapp-shadow/bin/myapp.bat").readText()).contains(
+    assertThat(winScript.readText()).contains(
       "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+    )
+
+    val runningOutput = if (isWindows) {
+      runProcess(winScript.toString(), "bar")
+    } else {
+      runProcess(unixScript.toString(), "bar")
+    }
+    assertThat(runningOutput).contains(
+      "Hello, World! (bar) from Main",
+      "Refs: junit.framework.Test",
     )
   }
 
@@ -113,13 +129,26 @@ class ApplicationPluginTest : BasePluginTest() {
       entriesContained = arrayOf("shadow/Main.class"),
     )
 
-    assertThat(extractedPath.resolve("myapp-shadow-1.0/bin/myapp").readText()).contains(
+    val unixScript = path("myapp-shadow-1.0/bin/myapp", extractedPath)
+    val winScript = path("myapp-shadow-1.0/bin/myapp.bat", extractedPath)
+
+    assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
       "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
       "exec \"\$JAVACMD\" \"\$@\"",
     )
-    assertThat(extractedPath.resolve("myapp-shadow-1.0/bin/myapp.bat").readText()).contains(
+    assertThat(winScript.readText()).contains(
       "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+    )
+
+    val runningOutput = if (isWindows) {
+      runProcess(winScript.toString(), "bar")
+    } else {
+      runProcess(unixScript.toString(), "bar")
+    }
+    assertThat(runningOutput).contains(
+      "Hello, World! (bar) from Main",
+      "Refs: junit.framework.Test",
     )
   }
 

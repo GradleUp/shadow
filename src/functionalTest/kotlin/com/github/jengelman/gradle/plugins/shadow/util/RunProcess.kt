@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 fun runProcess(vararg args: String): String {
-  val process = ProcessBuilder(*args).start()
+  val process = ProcessBuilder(preCommands + args).start()
   val exitCode = process.waitFor()
 
   val err = process.errorStream.readBytes().toString(Charsets.UTF_8)
@@ -13,3 +13,6 @@ fun runProcess(vararg args: String): String {
 
   return out
 }
+
+val isWindows = System.getProperty("os.name").startsWith("Windows")
+private val preCommands = if (isWindows) listOf("cmd", "/c") else listOf("sh")
