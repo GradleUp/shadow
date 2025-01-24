@@ -70,8 +70,8 @@ class ApplicationPluginTest : BasePluginTest() {
       entriesContained = arrayOf("shadow/Main.class", "junit/framework/Test.class"),
     )
 
-    val unixScript = path("build/install/myapp-shadow/bin/myapp")
-    val winScript = path("build/install/myapp-shadow/bin/myapp.bat")
+    val unixScript = path("myapp-shadow/bin/myapp", installPath)
+    val winScript = path("myapp-shadow/bin/myapp.bat", installPath)
 
     assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
