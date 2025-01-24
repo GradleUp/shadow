@@ -66,6 +66,10 @@ plugins {
   id 'com.gradleup.shadow'
 }
 
+application {
+  mainClass = 'myapp.Main'
+}
+
 // `shadow` is the name of the distribution created by Shadow plugin
 distributions.named('shadow') {
   contents.into('extra') {
