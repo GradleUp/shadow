@@ -58,14 +58,15 @@ class ApplicationPluginTest : BasePluginTest() {
       "Refs: junit.framework.Test",
     )
 
-    assertThat(path("build/install/").walkEntries()).containsOnly(
+    val installPath = path("build/install/")
+    assertThat(installPath.walkEntries()).containsOnly(
       "myapp-shadow/bin/myapp",
       "myapp-shadow/bin/myapp.bat",
       "myapp-shadow/lib/myapp-1.0-all.jar",
     )
 
     commonAssertions(
-      jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
+      jarPath("myapp-shadow/lib/myapp-1.0-all.jar", installPath),
       entriesContained = arrayOf("shadow/Main.class", "junit/framework/Test.class"),
     )
 
@@ -123,9 +124,8 @@ class ApplicationPluginTest : BasePluginTest() {
       "myapp-shadow-1.0/lib/junit-3.8.2.jar",
     )
 
-    val extractedShadowJarPath = jarPath("myapp-shadow-1.0/lib/myapp-1.0-all.jar", extractedPath)
     commonAssertions(
-      extractedShadowJarPath,
+      jarPath("myapp-shadow-1.0/lib/myapp-1.0-all.jar", extractedPath),
       entriesContained = arrayOf("shadow/Main.class"),
       classPathAttr = "junit-3.8.2.jar",
     )
