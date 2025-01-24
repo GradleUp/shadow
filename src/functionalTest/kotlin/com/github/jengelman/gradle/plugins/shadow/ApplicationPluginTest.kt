@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
+import java.nio.file.FileSystems
 import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
@@ -85,7 +86,9 @@ class ApplicationPluginTest : BasePluginTest() {
       }
     }
 
-    val extractedEntries = extractedPath.walk().map { it.relativeTo(extractedPath).toString() }.toList()
+    val extractedEntries = extractedPath.walk()
+      .map { it.relativeTo(extractedPath).toString() }
+      .map { it.replace(FileSystems.getDefault().separator, "/") }
     assertThat(extractedEntries).containsOnly(
       "myapp-shadow-1.0/bin/myapp",
       "myapp-shadow-1.0/bin/myapp.bat",
