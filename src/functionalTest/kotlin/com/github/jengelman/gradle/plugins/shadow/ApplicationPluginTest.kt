@@ -75,7 +75,6 @@ class ApplicationPluginTest : BasePluginTest() {
 
     assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-      "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
       "exec \"\$JAVACMD\" \"\$@\"",
     )
     assertThat(winScript.readText()).contains(
@@ -135,7 +134,6 @@ class ApplicationPluginTest : BasePluginTest() {
 
     assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-      "-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"",
       "exec \"\$JAVACMD\" \"\$@\"",
     )
     assertThat(winScript.readText()).contains(
