@@ -145,6 +145,17 @@ tasks.check {
   dependsOn(tasks.withType<Test>())
 }
 
+tasks.register<Copy>("downloadStartScripts") {
+  val urlPrefix = "https://raw.githubusercontent.com/gradle/gradle/refs/heads/master/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins"
+  from(resources.text.fromUri("$urlPrefix/unixStartScript.txt")) {
+    rename { "unixStartScript.txt" }
+  }
+  from(resources.text.fromUri("$urlPrefix/windowsStartScript.txt")) {
+    rename { "windowsStartScript.txt" }
+  }
+  into("src/main/resources/com/github/jengelman/gradle/plugins/shadow/internal")
+}
+
 tasks.clean {
   val includedBuilds = gradle.includedBuilds
   dependsOn(includedBuilds.map { it.task(path) })
