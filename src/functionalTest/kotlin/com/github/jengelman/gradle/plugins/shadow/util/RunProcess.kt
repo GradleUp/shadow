@@ -6,8 +6,8 @@ fun runProcess(
   val process = ProcessBuilder(commands.toList()).start()
   val exitCode = process.waitFor()
 
-  val err = process.errorStream.readBytes().toString(Charsets.UTF_8)
-  val out = process.inputStream.readBytes().toString(Charsets.UTF_8)
+  val err = process.errorStream.bufferedReader().use { it.readText() }
+  val out = process.inputStream.bufferedReader().use { it.readText() }
 
   if (exitCode != 0 || err.isNotEmpty()) {
     error("Error occurred when running command line: $err")
