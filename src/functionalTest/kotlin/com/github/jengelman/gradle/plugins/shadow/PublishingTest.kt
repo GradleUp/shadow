@@ -40,10 +40,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
 class PublishingTest : BasePluginTest() {
-  private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-  private val gmmAdapter = moshi.adapter(GradleModuleMetadata::class.java)
-  private val pomReader = MavenXpp3Reader()
-
   @TempDir
   lateinit var remoteRepoPath: Path
 
@@ -444,6 +440,10 @@ class PublishingTest : BasePluginTest() {
   }
 
   private companion object {
+    private val gmmAdapter = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+      .adapter(GradleModuleMetadata::class.java)
+    private val pomReader = MavenXpp3Reader()
+
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
     fun <T : Any> JsonAdapter<T>.fromJson(path: Path): T = requireNotNull(fromJson(path.readText()))
