@@ -208,40 +208,24 @@ class PublishingTest : BasePluginTest() {
   fun publishJarThatDependsOnShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
     path("client/build.gradle").appendText(
-      """
-        apply plugin: 'maven-publish'
-        group = 'example'
-        publishing {
-          publications {
-            shadow(MavenPublication) {
-              from components.shadow
-            }
+      publishingBlock(
+        projectBlock = "group = 'example'",
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            from components.shadow
           }
-          repositories {
-            maven {
-              url = '${remoteRepoPath.toUri()}'
-            }
-          }
-        }
-      """.trimIndent(),
+        """.trimIndent(),
+      ),
     )
     path("server/build.gradle").appendText(
-      """
-        apply plugin: 'maven-publish'
-        group = 'example'
-        publishing {
-          publications {
-            java(MavenPublication) {
-              from components.java
-            }
+      publishingBlock(
+        projectBlock = "group = 'example'",
+        publicationsBlock = """
+          java(MavenPublication) {
+            from components.java
           }
-          repositories {
-            maven {
-              url = '${remoteRepoPath.toUri()}'
-            }
-          }
-        }
-      """.trimIndent(),
+        """.trimIndent(),
+      ),
     )
 
     publish()
@@ -370,24 +354,33 @@ class PublishingTest : BasePluginTest() {
     """.trimIndent(),
   ): String {
     return """
-        apply plugin: 'maven-publish'
-        $projectBlock
         dependencies {
           $dependenciesBlock
         }
         $shadowJar {
           $shadowBlock
         }
-        publishing {
-          publications {
-            $publicationsBlock
-          }
-          repositories {
-            maven {
-              url = '${remoteRepoPath.toUri()}'
-            }
+        ${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
+    """.trimIndent()
+  }
+
+  private fun publishingBlock(
+    projectBlock: String,
+    publicationsBlock: String,
+  ): String {
+    return """
+      apply plugin: 'maven-publish'
+      $projectBlock
+      publishing {
+        publications {
+          $publicationsBlock
+        }
+        repositories {
+          maven {
+            url = '${remoteRepoPath.toUri()}'
           }
         }
+      }
     """.trimIndent()
   }
 
