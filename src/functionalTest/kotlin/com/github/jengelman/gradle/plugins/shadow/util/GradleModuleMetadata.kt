@@ -9,8 +9,8 @@ data class GradleModuleMetadata(
   data class Variant(
     val name: String,
     val attributes: Map<String, String>,
-    val dependencies: List<Dependency> = emptyList(),
-    val files: List<File> = emptyList(),
+    private val dependencies: List<Dependency> = emptyList(),
+    private val files: List<File> = emptyList(),
   ) {
     val depStrings: List<String> get() = dependencies.map { it.coordinate }
     val fileNames: List<String> get() = files.map { it.name }

@@ -330,7 +330,7 @@ class PublishingTest : BasePluginTest() {
           contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
           contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_API)
         }
-        transform { it.dependencies }.isEmpty()
+        transform { it.depStrings }.isEmpty()
       }
       assertThat(gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
         transform { it.attributes }.all {
