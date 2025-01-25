@@ -10,9 +10,22 @@ data class GradleModuleMetadata(
     val name: String,
     val attributes: Map<String, String>,
     val dependencies: List<Dependency> = emptyList(),
+    val files: List<File> = emptyList(),
   ) {
+    val coordinates: List<String> get() = dependencies.map { it.coordinate }
+
     data class Dependency(
+      val group: String,
       val module: String,
+      val version: Version,
+    ) {
+      val coordinate: String get() = "$group:$module:${version.requires}"
+
+      data class Version(val requires: String)
+    }
+
+    data class File(
+      val name: String,
     )
   }
 }
