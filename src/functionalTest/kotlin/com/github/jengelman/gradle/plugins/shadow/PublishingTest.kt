@@ -15,6 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.gavs
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -301,19 +302,7 @@ class PublishingTest : BasePluginTest() {
       containsEntries(*entries)
     }
 
-    pomReader.read(repoPath("com/acme/maven/1.0/maven-1.0.pom")).let { pom ->
-      assertThat(pom.dependencies.size).isEqualTo(2)
-      pom.dependencies[0].let { dependency ->
-        assertThat(dependency.groupId).isEqualTo("shadow")
-        assertThat(dependency.artifactId).isEqualTo("a")
-        assertThat(dependency.version).isEqualTo("1.0")
-      }
-      pom.dependencies[1].let { dependency ->
-        assertThat(dependency.groupId).isEqualTo("shadow")
-        assertThat(dependency.artifactId).isEqualTo("b")
-        assertThat(dependency.version).isEqualTo("1.0")
-      }
-    }
+    assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("shadow:a:1.0", "shadow:b:1.0"))
     gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmm ->
       // apiElements, runtimeElements, shadowRuntimeElements
       assertThat(gmm.variantNames).containsOnly(
@@ -402,12 +391,11 @@ class PublishingTest : BasePluginTest() {
     """.trimIndent()
   }
 
-  private fun assertPomCommon(pomPath: Path) {
-    val pom = pomReader.read(pomPath)
-    val dependency = pom.dependencies.single()
-    assertThat(dependency.groupId).isEqualTo("shadow")
-    assertThat(dependency.artifactId).isEqualTo("b")
-    assertThat(dependency.version).isEqualTo("1.0")
+  private fun assertPomCommon(
+    pomPath: Path,
+    gavs: Array<String> = arrayOf("shadow:b:1.0"),
+  ) {
+    assertThat(pomReader.read(pomPath).gavs).containsOnly(*gavs)
   }
 
   private fun assertShadowVariantCommon(

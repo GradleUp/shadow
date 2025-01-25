@@ -10,6 +10,7 @@ import kotlin.io.path.name
 import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
+import org.apache.maven.model.ModelBase
 import org.gradle.testkit.runner.GradleRunner
 
 class AppendableMavenRepository(
@@ -131,3 +132,8 @@ class AppendableMavenRepository(
     }
   }
 }
+
+val Dependency.gav: String get() = "$groupId:$artifactId:$version"
+
+@Suppress("SpellCheckingInspection")
+val ModelBase.gavs: List<String> get() = dependencies.map { it.gav }
