@@ -12,7 +12,8 @@ data class GradleModuleMetadata(
     val dependencies: List<Dependency> = emptyList(),
     val files: List<File> = emptyList(),
   ) {
-    val coordinates: List<String> get() = dependencies.map { it.coordinate }
+    val depStrings: List<String> get() = dependencies.map { it.coordinate }
+    val fileNames: List<String> get() = files.map { it.name }
 
     data class Dependency(
       val group: String,

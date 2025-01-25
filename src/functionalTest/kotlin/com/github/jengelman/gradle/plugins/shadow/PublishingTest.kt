@@ -254,11 +254,11 @@ class PublishingTest : BasePluginTest() {
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      val runtimeDependencies = gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }.coordinates
+      val runtimeDependencies = gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }.depStrings
       assertThat(runtimeDependencies).containsOnly(
         "example:client:1.0",
       )
-      val shadowDependencies = gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }.coordinates
+      val shadowDependencies = gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }.depStrings
       assertThat(shadowDependencies).isEmpty()
     }
     gmmAdapter.fromJson(repoPath("example/client/1.0/client-1.0.module")).let { gmm ->
@@ -272,7 +272,7 @@ class PublishingTest : BasePluginTest() {
           contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
           contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
         }
-        transform { it.files.single().name }.isEqualTo("client-1.0-all.jar")
+        transform { it.fileNames }.single().isEqualTo("client-1.0-all.jar")
       }
     }
   }
