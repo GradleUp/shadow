@@ -18,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -491,6 +492,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun canRegisterCustomShadowJarTask() {
+    writeMainClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScriptPath.appendText(
       """
@@ -503,6 +505,9 @@ class JavaPluginTest : BasePluginTest() {
           archiveClassifier = "tests"
           from sourceSets.test.output
           configurations = [project.configurations.testRuntimeClasspath]
+          manifest {
+            attributes 'Main-Class': 'shadow.Main'
+          }
         }
       """.trimIndent(),
     )
@@ -510,8 +515,20 @@ class JavaPluginTest : BasePluginTest() {
     val result = run(testShadowJarTask)
 
     assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
-    val junitEntry = jarPath("build/libs/shadow-1.0-tests.jar").use { it.getEntry("junit") }
-    assertThat(junitEntry).isNotNull()
+    assertThat(jarPath("build/libs/shadow-1.0-tests.jar")).useAll {
+      containsEntries(
+        "junit/framework/Test.class",
+        "shadow/Main.class",
+      )
+      getMainAttr("Main-Class").isNotNull()
+    }
+
+    val pathString = path("build/libs/shadow-1.0-tests.jar").toString()
+    val runningOutput = runProcess("java", "-jar", pathString, "foo")
+    assertThat(runningOutput).contains(
+      "Hello, World! (foo) from Main",
+      "Refs: junit.framework.Test",
+    )
   }
 
   @Test
