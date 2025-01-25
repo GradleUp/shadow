@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.Assert
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
@@ -261,13 +262,7 @@ class PublishingTest : BasePluginTest() {
       assertThat(gmm.variants.map { it.name }).containsOnly(
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      assertThat(gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
-        transform { it.attributes }.all {
-          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
-          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.SHADOWED)
-          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
-          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
-        }
+      assertShadowVariantCommon(gmm, depStrings = emptyArray()) {
         transform { it.fileNames }.single().isEqualTo("client-1.0-all.jar")
       }
     }
@@ -344,7 +339,10 @@ class PublishingTest : BasePluginTest() {
           contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
           contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
         }
-        transform { it.dependencies.map { dep -> dep.module } }.containsOnly("a", "b")
+        transform { it.depStrings }.containsOnly(
+          "shadow:a:1.0",
+          "shadow:b:1.0",
+        )
       }
       assertShadowVariantCommon(gmm)
     }
@@ -414,7 +412,11 @@ class PublishingTest : BasePluginTest() {
     assertThat(dependency.version).isEqualTo("1.0")
   }
 
-  private fun assertShadowVariantCommon(gmm: GradleModuleMetadata) {
+  private fun assertShadowVariantCommon(
+    gmm: GradleModuleMetadata,
+    depStrings: Array<String> = arrayOf("shadow:b:1.0"),
+    body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
+  ) {
     assertThat(gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
       transform { it.attributes }.all {
         contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
@@ -422,7 +424,8 @@ class PublishingTest : BasePluginTest() {
         contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
         contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
       }
-      transform { it.dependencies.map { dep -> dep.module } }.containsOnly("b")
+      transform { it.depStrings }.containsOnly(*depStrings)
+      body()
     }
   }
 
