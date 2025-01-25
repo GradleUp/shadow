@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.contains
+import assertk.assertions.containsAtLeast
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -295,21 +295,21 @@ class PublishingTest : BasePluginTest() {
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
       assertThat(gmm.apiElementsVariant).all {
-        transform { it.attributes }.all {
-          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
-          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
-          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
-          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_API)
-        }
+        transform { it.attributes }.containsAtLeast(
+          Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
+          Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
+          LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
+          Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
+        )
         transform { it.gavs }.isEmpty()
       }
       assertThat(gmm.runtimeElementsVariant).all {
-        transform { it.attributes }.all {
-          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
-          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
-          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
-          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
-        }
+        transform { it.attributes }.containsAtLeast(
+          Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
+          Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
+          LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
+          Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+        )
         transform { it.gavs }.containsOnly(
           "shadow:a:1.0",
           "shadow:b:1.0",
@@ -397,12 +397,12 @@ class PublishingTest : BasePluginTest() {
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {
-      transform { it.attributes }.all {
-        contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
-        contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.SHADOWED)
-        contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
-        contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
-      }
+      transform { it.attributes }.containsAtLeast(
+        Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
+        Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
+        LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
+        Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+      )
       transform { it.gavs }.containsOnly(*gavs)
       body()
     }
