@@ -266,7 +266,7 @@ class PublishingTest : BasePluginTest() {
           group = 'com.acme'
           version = '1.0'
           java {
-            sourceCompatibility = JavaVersion.VERSION_1_8
+            // This is necessary for `org.gradle.jvm.version` to be pinned on Java 8 for `components.java` MavenPublication.
             targetCompatibility = JavaVersion.VERSION_1_8
           }
         """.trimIndent(),
