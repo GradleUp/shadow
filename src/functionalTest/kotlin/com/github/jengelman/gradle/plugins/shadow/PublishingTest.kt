@@ -259,6 +259,10 @@ class PublishingTest : BasePluginTest() {
         projectBlock = """
           group = 'com.acme'
           version = '1.0'
+          java {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+          }
         """.trimIndent(),
         dependenciesBlock = """
           implementation 'shadow:a:1.0'
@@ -295,16 +299,12 @@ class PublishingTest : BasePluginTest() {
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-
-      // TODO: need to investigate why the this is present in the apiElementsVariant and runtimeElementsVariant.
-      val targetJvmAttr = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion
-
       assertThat(gmm.apiElementsVariant).all {
         transform { it.attributes }.containsOnly(
           *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
-          targetJvmAttr,
+          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.VERSION_1_8.majorVersion,
         )
         transform { it.gavs }.isEmpty()
       }
@@ -313,7 +313,7 @@ class PublishingTest : BasePluginTest() {
           *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
-          targetJvmAttr,
+          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.VERSION_1_8.majorVersion,
         )
         transform { it.gavs }.containsOnly(
           "shadow:a:1.0",
