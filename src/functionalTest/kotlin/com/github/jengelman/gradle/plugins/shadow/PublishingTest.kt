@@ -296,18 +296,16 @@ class PublishingTest : BasePluginTest() {
       )
       assertThat(gmm.apiElementsVariant).all {
         transform { it.attributes }.containsAtLeast(
-          Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
+          *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
-          LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
         )
         transform { it.gavs }.isEmpty()
       }
       assertThat(gmm.runtimeElementsVariant).all {
         transform { it.attributes }.containsAtLeast(
-          Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
+          *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
-          LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
         )
         transform { it.gavs }.containsOnly(
@@ -398,9 +396,8 @@ class PublishingTest : BasePluginTest() {
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {
       transform { it.attributes }.containsAtLeast(
-        Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
+        *commonVariantAttrs,
         Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
-        LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
         Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
       )
       transform { it.gavs }.containsOnly(*gavs)
@@ -425,6 +422,11 @@ class PublishingTest : BasePluginTest() {
     val gmmAdapter: JsonAdapter<GradleModuleMetadata> = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
       .adapter(GradleModuleMetadata::class.java)
     val pomReader = MavenXpp3Reader()
+
+    val commonVariantAttrs = arrayOf(
+      Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
+      LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
+    )
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
