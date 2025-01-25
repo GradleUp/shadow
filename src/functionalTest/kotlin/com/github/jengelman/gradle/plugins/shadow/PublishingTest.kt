@@ -422,9 +422,9 @@ class PublishingTest : BasePluginTest() {
   }
 
   private companion object {
-    private val gmmAdapter = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    val gmmAdapter: JsonAdapter<GradleModuleMetadata> = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
       .adapter(GradleModuleMetadata::class.java)
-    private val pomReader = MavenXpp3Reader()
+    val pomReader = MavenXpp3Reader()
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
