@@ -184,6 +184,7 @@ abstract class BasePluginTest {
   }
 
   fun writeClientAndServerModules(
+    clientShadowed: Boolean = false,
     serverShadowBlock: String = "",
   ) {
     settingsScriptPath.appendText(
@@ -201,7 +202,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java")}
+        ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
@@ -226,6 +227,26 @@ abstract class BasePluginTest {
         }
       """.trimIndent() + System.lineSeparator(),
     )
+
+    if (!clientShadowed) return
+    path("client/build.gradle").appendText(
+      """
+        $shadowJar {
+          relocate 'junit.framework', 'client.junit.framework'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    path("server/src/main/java/server/Server.java").writeText(
+      """
+        package server;
+        import client.Client;
+        import client.junit.framework.Test;
+        public class Server {}
+      """.trimIndent(),
+    )
+    val replaced = path("server/build.gradle").readText()
+      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
+    path("server/build.gradle").writeText(replaced)
   }
 
   fun writeGradlePluginModule(legacy: Boolean) {

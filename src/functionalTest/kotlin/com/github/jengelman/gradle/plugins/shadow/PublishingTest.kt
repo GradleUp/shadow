@@ -6,6 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
@@ -203,6 +204,77 @@ class PublishingTest : BasePluginTest() {
       )
     }
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+  }
+
+  @Test
+  fun publishJarThatDependsOnShadowJar() {
+    writeClientAndServerModules(clientShadowed = true)
+    path("client/build.gradle").appendText(
+      """
+        apply plugin: 'maven-publish'
+        group = 'example'
+        publishing {
+          publications {
+            shadow(MavenPublication) {
+              from components.shadow
+            }
+          }
+          repositories {
+            maven {
+              url = '${remoteRepoPath.toUri()}'
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+    path("server/build.gradle").appendText(
+      """
+        apply plugin: 'maven-publish'
+        group = 'example'
+        publishing {
+          publications {
+            java(MavenPublication) {
+              from components.java
+            }
+          }
+          repositories {
+            maven {
+              url = '${remoteRepoPath.toUri()}'
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    publish()
+
+    gmmAdapter.fromJson(repoPath("example/server/1.0/server-1.0.module")).let { gmm ->
+      assertThat(gmm.variants.map { it.name }).containsOnly(
+        API_ELEMENTS_CONFIGURATION_NAME,
+        RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+      )
+      val runtimeDependencies = gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }.depStrings
+      assertThat(runtimeDependencies).containsOnly(
+        "example:client:1.0",
+      )
+      val shadowDependencies = gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }.depStrings
+      assertThat(shadowDependencies).isEmpty()
+    }
+    gmmAdapter.fromJson(repoPath("example/client/1.0/client-1.0.module")).let { gmm ->
+      assertThat(gmm.variants.map { it.name }).containsOnly(
+        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+      )
+      assertThat(gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
+        transform { it.attributes }.all {
+          contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
+          contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.SHADOWED)
+          contains(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name, LibraryElements.JAR)
+          contains(Usage.USAGE_ATTRIBUTE.name, Usage.JAVA_RUNTIME)
+        }
+        transform { it.fileNames }.single().isEqualTo("client-1.0-all.jar")
+      }
+    }
   }
 
   @Test
