@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - yarn.lock
   pull_request:
+    paths-ignore:
+      - yarn.lock
   workflow_dispatch:
 
 jobs:
