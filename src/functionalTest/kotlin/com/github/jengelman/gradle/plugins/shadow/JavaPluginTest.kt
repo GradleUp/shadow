@@ -165,7 +165,7 @@ class JavaPluginTest : BasePluginTest() {
         "client/junit/framework/Test.class",
       )
     }
-    assertThat(jarPath("client/build/libs/client-all.jar")).useAll {
+    assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsEntries(
         "client/Client.class",
         "client/junit/framework/Test.class",
@@ -189,7 +189,7 @@ class JavaPluginTest : BasePluginTest() {
         "junit/framework/Test.class",
       )
     }
-    assertThat(jarPath("client/build/libs/client-all.jar")).useAll {
+    assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsEntries(
         "client/Client.class",
         "client/junit/framework/Test.class",

@@ -202,7 +202,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java")}
+        ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
