@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsAtLeast
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -30,10 +29,12 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
+import org.gradle.api.JavaVersion
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.testkit.runner.BuildResult
@@ -294,19 +295,25 @@ class PublishingTest : BasePluginTest() {
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
+
+      // TODO: need to investigate why the this is present in the apiElementsVariant and runtimeElementsVariant.
+      val targetJvmAttr = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion
+
       assertThat(gmm.apiElementsVariant).all {
-        transform { it.attributes }.containsAtLeast(
+        transform { it.attributes }.containsOnly(
           *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
+          targetJvmAttr,
         )
         transform { it.gavs }.isEmpty()
       }
       assertThat(gmm.runtimeElementsVariant).all {
-        transform { it.attributes }.containsAtLeast(
+        transform { it.attributes }.containsOnly(
           *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+          targetJvmAttr,
         )
         transform { it.gavs }.containsOnly(
           "shadow:a:1.0",
@@ -395,7 +402,7 @@ class PublishingTest : BasePluginTest() {
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {
-      transform { it.attributes }.containsAtLeast(
+      transform { it.attributes }.containsOnly(
         *commonVariantAttrs,
         Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
         Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
