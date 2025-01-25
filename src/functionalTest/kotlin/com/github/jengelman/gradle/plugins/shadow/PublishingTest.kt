@@ -67,6 +67,7 @@ class PublishingTest : BasePluginTest() {
 
     assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
   }
 
   @Test
@@ -147,6 +148,7 @@ class PublishingTest : BasePluginTest() {
 
     assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext"))
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
   }
 
   @Test
@@ -203,6 +205,7 @@ class PublishingTest : BasePluginTest() {
       )
     }
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
   }
 
   @Test
@@ -241,6 +244,9 @@ class PublishingTest : BasePluginTest() {
         "example:client:1.0",
       )
       assertThat(gmm.shadowRuntimeElementsVariant.gavs).isEmpty()
+      assertShadowVariantCommon(gmm, gavs = emptyArray()) {
+        transform { it.fileNames }.single().isEqualTo("server-1.0-all.jar")
+      }
     }
     gmmAdapter.fromJson(repoPath("example/client/1.0/client-1.0.module")).let { gmm ->
       assertThat(gmm.variantNames).containsOnly(
