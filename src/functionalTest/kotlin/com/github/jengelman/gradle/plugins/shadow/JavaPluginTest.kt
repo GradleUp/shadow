@@ -20,7 +20,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -152,7 +151,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun dependOnProjectShadowJar() {
-    writeShadowedClientAndServerModules()
+    writeClientAndServerModules(clientShadowed = true)
 
     run(":server:jar")
 
@@ -176,7 +175,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun shadowProjectShadowJar() {
-    writeShadowedClientAndServerModules()
+    writeClientAndServerModules(clientShadowed = true)
 
     run(serverShadowJarTask)
 
@@ -615,27 +614,5 @@ class JavaPluginTest : BasePluginTest() {
         "junit/framework/Test.class",
       )
     }
-  }
-
-  private fun writeShadowedClientAndServerModules() {
-    writeClientAndServerModules()
-    path("client/build.gradle").appendText(
-      """
-        $shadowJar {
-          relocate 'junit.framework', 'client.junit.framework'
-        }
-      """.trimIndent(),
-    )
-    path("server/src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        import client.Client;
-        import client.junit.framework.Test;
-        public class Server {}
-      """.trimIndent(),
-    )
-    val replaced = path("server/build.gradle").readText()
-      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
-    path("server/build.gradle").writeText(replaced)
   }
 }
