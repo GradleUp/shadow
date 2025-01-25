@@ -165,14 +165,16 @@ abstract class BasePluginTest {
   ) {
     val imports = if (withImports) "import junit.framework.Test;" else ""
     val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-
     path("src/$sourceSet/java/shadow/$className.java").writeText(
       """
         package shadow;
         $imports
         public class $className {
           public static void main(String[] args) {
-            String content = String.format("Hello, World! (%s) from $className", args);
+            if (args.length == 0) {
+              throw new IllegalArgumentException("No arguments provided.");
+            }
+            String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
             System.out.println(content);
             System.out.println($classRef);
           }
