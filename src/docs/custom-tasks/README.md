@@ -14,9 +14,15 @@ def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.
   archiveClassifier = "tests"
   from sourceSets.test.output
   configurations = [project.configurations.testRuntimeClasspath]
+
+  manifest {
+    // Optionally, set the main class for the JAR.
+    attributes 'Main-Class': 'test.Main'
+    // You can also set other attributes here.
+  }
 }
 
-// Optionally, make the `assemble` task depend on the new task
+// Optionally, make the `assemble` task depend on the new task.
 tasks.named('assemble') {
   dependsOn testShadowJar
 }
