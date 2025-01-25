@@ -246,20 +246,18 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     gmmAdapter.fromJson(repoPath("example/server/1.0/server-1.0.module")).let { gmm ->
-      assertThat(gmm.variants.map { it.name }).containsOnly(
+      assertThat(gmm.variantNames).containsOnly(
         API_ELEMENTS_CONFIGURATION_NAME,
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      val runtimeDependencies = gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }.gavs
-      assertThat(runtimeDependencies).containsOnly(
+      assertThat(gmm.runtimeElementsVariant.gavs).containsOnly(
         "example:client:1.0",
       )
-      val shadowDependencies = gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }.gavs
-      assertThat(shadowDependencies).isEmpty()
+      assertThat(gmm.shadowRuntimeElementsVariant.gavs).isEmpty()
     }
     gmmAdapter.fromJson(repoPath("example/client/1.0/client-1.0.module")).let { gmm ->
-      assertThat(gmm.variants.map { it.name }).containsOnly(
+      assertThat(gmm.variantNames).containsOnly(
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
       assertShadowVariantCommon(gmm, gavs = emptyArray()) {
@@ -318,12 +316,12 @@ class PublishingTest : BasePluginTest() {
     }
     gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmm ->
       // apiElements, runtimeElements, shadowRuntimeElements
-      assertThat(gmm.variants.map { it.name }).containsOnly(
+      assertThat(gmm.variantNames).containsOnly(
         API_ELEMENTS_CONFIGURATION_NAME,
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      assertThat(gmm.variants.single { it.name == API_ELEMENTS_CONFIGURATION_NAME }).all {
+      assertThat(gmm.apiElementsVariant).all {
         transform { it.attributes }.all {
           contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
           contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
@@ -332,7 +330,7 @@ class PublishingTest : BasePluginTest() {
         }
         transform { it.gavs }.isEmpty()
       }
-      assertThat(gmm.variants.single { it.name == RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
+      assertThat(gmm.runtimeElementsVariant).all {
         transform { it.attributes }.all {
           contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
           contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.EXTERNAL)
@@ -349,7 +347,7 @@ class PublishingTest : BasePluginTest() {
 
     assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
     gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
-      assertThat(gmm.variants.map { it.name }).containsOnly(
+      assertThat(gmm.variantNames).containsOnly(
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
       assertShadowVariantCommon(gmm)
@@ -417,7 +415,7 @@ class PublishingTest : BasePluginTest() {
     gavs: Array<String> = arrayOf("shadow:b:1.0"),
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
-    assertThat(gmm.variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }).all {
+    assertThat(gmm.shadowRuntimeElementsVariant).all {
       transform { it.attributes }.all {
         contains(Category.CATEGORY_ATTRIBUTE.name, Category.LIBRARY)
         contains(Bundling.BUNDLING_ATTRIBUTE.name, Bundling.SHADOWED)
