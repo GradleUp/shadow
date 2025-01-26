@@ -279,7 +279,7 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private companion object {
-    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME')".trim()
+    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)".trim()
 
     fun Path.walkEntries(): Sequence<String> {
       return walk()

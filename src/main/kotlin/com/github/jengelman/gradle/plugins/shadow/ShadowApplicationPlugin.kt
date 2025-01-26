@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
-import com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -10,6 +9,7 @@ import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
@@ -45,22 +45,25 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun addRunTask() {
-    project.tasks.register(SHADOW_RUN_TASK_NAME, JavaJarExec::class.java) {
+    project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) {
       val install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
       it.dependsOn(install)
       it.mainClass.set("-jar")
       it.description = "Runs this project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.conventionMapping.map("jvmArgs") { javaApplication.applicationDefaultJvmArgs }
-      it.jarFile.fileProvider(
-        install.zip(shadowJar) { i, s ->
-          project.file("${i.destinationDir.path}/lib/${s.archiveFile.get().asFile.name}")
-        },
-      )
       val toolchain = project.extensions.getByType(JavaPluginExtension::class.java).toolchain
       val defaultLauncher = project.extensions.getByType(JavaToolchainService::class.java)
         .launcherFor(toolchain)
       it.javaLauncher.set(defaultLauncher)
+
+      it.doFirst { _ ->
+        @Suppress("EagerGradleConfiguration")
+        val jarPath = install.get().destinationDir
+          .resolve("lib/${shadowJar.get().archiveFile.get().asFile.name}").path
+        // Prepend the shadow jar to the args.
+        it.args = listOf(jarPath) + (it.args as List<String>)
+      }
     }
   }
 
