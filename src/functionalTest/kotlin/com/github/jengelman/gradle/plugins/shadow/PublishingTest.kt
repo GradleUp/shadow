@@ -65,9 +65,18 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
-    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
+    val assertions = { variantAttrs: Array<Pair<String, String>>? ->
+      assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
+      assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+      val gmm = gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module"))
+      if (variantAttrs == null) {
+        assertShadowVariantCommon(gmm)
+      } else {
+        assertShadowVariantCommon(gmm, variantAttrs = variantAttrs)
+      }
+    }
+
+    assertions(null)
 
     val attrsWithoutTargetJvm = shadowVariantAttrs.filterNot { (name, _) ->
       name == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
@@ -82,15 +91,8 @@ class PublishingTest : BasePluginTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-
     publish()
-
-    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
-    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(
-      gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")),
-      variantAttrs = attrsWithoutTargetJvm + targetJvmAttr17,
-    )
+    assertions(attrsWithoutTargetJvm + targetJvmAttr17)
 
     projectScriptPath.appendText(
       """
@@ -99,15 +101,19 @@ class PublishingTest : BasePluginTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-
     publish()
+    assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
-    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
-    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(
-      gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")),
-      variantAttrs = attrsWithoutTargetJvm + targetJvmAttr11,
+    projectScriptPath.appendText(
+      """
+        java {
+          sourceCompatibility = JavaVersion.VERSION_1_8
+        }
+      """.trimIndent() + System.lineSeparator(),
     )
+    publish()
+    // sourceCompatibility doesn't affect the target JVM version.
+    assertions(attrsWithoutTargetJvm + targetJvmAttr11)
   }
 
   @Test
