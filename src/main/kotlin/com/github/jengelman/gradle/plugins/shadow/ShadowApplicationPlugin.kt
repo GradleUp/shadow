@@ -52,8 +52,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       }
 
       it.dependsOn(install)
-      it.inputs.file(jarFile)
-      it.mainClass.set("-jar")
+      it.classpath(jarFile)
+      it.mainClass.set(javaApplication.mainClass)
       it.description = "Runs this project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
       it.conventionMapping.map("jvmArgs") { javaApplication.applicationDefaultJvmArgs }
@@ -61,11 +61,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       val defaultLauncher = project.extensions.getByType(JavaToolchainService::class.java)
         .launcherFor(toolchain)
       it.javaLauncher.set(defaultLauncher)
-
-      it.doFirst { _ ->
-        // Prepend the shadow jar to the args.
-        it.args = listOf(jarFile.get().path) + (it.args as List<String>)
-      }
     }
   }
 

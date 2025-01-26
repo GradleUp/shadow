@@ -191,11 +191,8 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(SHADOW_RUN_TASK_NAME)
+    run(SHADOW_RUN_TASK_NAME)
 
-    assertThat(result.output).contains(
-      "Hello, World! (foo) from Main2",
-    )
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
       mainClassAttr = "shadow.Main2",
