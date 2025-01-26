@@ -68,6 +68,8 @@ plugins {
 
 application {
   mainClass = 'myapp.Main'
+  // Optionally, you can add default JVM arguments to the start scripts like this:
+  applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
 }
 
 // `shadow` is the name of the distribution created by Shadow plugin

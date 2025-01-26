@@ -40,6 +40,9 @@ class ApplicationPluginTest : BasePluginTest() {
           toolchain.languageVersion = JavaLanguageVersion.of(17)
         }
       """.trimIndent(),
+      applicationBlock = """
+        applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
+      """.trimIndent(),
       settingsBlock = """
         plugins {
           id 'org.gradle.toolchains.foojay-resolver-convention'
@@ -78,9 +81,11 @@ class ApplicationPluginTest : BasePluginTest() {
     assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
       "exec \"\$JAVACMD\" \"\$@\"",
+      "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
     )
     assertThat(winScript.readText()).contains(
       "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+      "set DEFAULT_JVM_OPTS=\"--add-opens=java.base/java.lang=ALL-UNNAMED\"",
     )
 
     val runningOutput = if (isWindows) {
@@ -98,6 +103,9 @@ class ApplicationPluginTest : BasePluginTest() {
   fun shadowApplicationDistributionsShouldUseShadowJar() {
     prepare(
       mainClassWithImports = true,
+      applicationBlock = """
+        applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
+      """.trimIndent(),
       dependenciesBlock = "shadow 'junit:junit:3.8.2'",
     )
 
@@ -137,9 +145,11 @@ class ApplicationPluginTest : BasePluginTest() {
     assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
       "exec \"\$JAVACMD\" \"\$@\"",
+      "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
     )
     assertThat(winScript.readText()).contains(
       "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+      "set DEFAULT_JVM_OPTS=\"--add-opens=java.base/java.lang=ALL-UNNAMED\"",
     )
 
     val runningOutput = if (isWindows) {
@@ -224,6 +234,7 @@ class ApplicationPluginTest : BasePluginTest() {
   private fun prepare(
     mainClassWithImports: Boolean = false,
     projectBlock: String = "",
+    applicationBlock: String = "",
     settingsBlock: String = "",
     dependenciesBlock: String = "implementation 'shadow:a:1.0'",
     runShadowBlock: String = "",
@@ -235,6 +246,7 @@ class ApplicationPluginTest : BasePluginTest() {
         $projectBlock
         application {
           mainClass = 'shadow.Main'
+          $applicationBlock
         }
         dependencies {
           $dependenciesBlock
