@@ -46,12 +46,11 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun addRunTask() {
     project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) {
-      val install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
-      val jarFile = install.zip(shadowJar) { i, s ->
+      val jarFile = installShadowDist.zip(shadowJar) { i, s ->
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
 
-      it.dependsOn(install)
+      it.dependsOn(installShadowDist)
       it.classpath(jarFile)
       it.mainClass.set(javaApplication.mainClass)
       it.description = "Runs this project as a JVM application using the shadow jar"
@@ -87,7 +86,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun configureInstallTask() {
-    project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java).configure { task ->
+    installShadowDist.configure { task ->
       val applicationName = project.providers.provider { javaApplication.applicationName }
 
       task.doFirst {
@@ -134,6 +133,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected val shadowJar: TaskProvider<ShadowJar>
     get() = project.tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
+
+  private val installShadowDist: TaskProvider<Sync>
+    get() = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
 
   public companion object {
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
