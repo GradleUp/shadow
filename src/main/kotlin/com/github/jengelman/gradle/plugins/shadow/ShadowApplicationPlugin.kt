@@ -47,6 +47,10 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   protected open fun addRunTask() {
     project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) {
       val install = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
+      val jarFile = install.zip(shadowJar) { i, s ->
+        i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
+      }
+
       it.dependsOn(install)
       it.mainClass.set("-jar")
       it.description = "Runs this project as a JVM application using the shadow jar"
@@ -58,11 +62,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       it.javaLauncher.set(defaultLauncher)
 
       it.doFirst { _ ->
-        @Suppress("EagerGradleConfiguration")
-        val jarPath = install.get().destinationDir
-          .resolve("lib/${shadowJar.get().archiveFile.get().asFile.name}").path
         // Prepend the shadow jar to the args.
-        it.args = listOf(jarPath) + (it.args as List<String>)
+        it.args = listOf(jarFile.get().path) + (it.args as List<String>)
       }
     }
   }
