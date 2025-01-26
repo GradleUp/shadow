@@ -11,6 +11,10 @@
 
 - Support overriding `mainClass` provided by `JavaApplication`. ([#1182](https://github.com/GradleUp/shadow/pull/1182))
 
+**Removed**
+
+- **BREAKING CHANGE:** Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow` task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
+
 
 ## [v9.0.0-beta6] (2025-01-23)
 
