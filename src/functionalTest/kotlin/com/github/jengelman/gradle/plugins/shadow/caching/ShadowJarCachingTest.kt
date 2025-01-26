@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
@@ -56,71 +57,59 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/717",
+  )
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
+    writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation 'shadow:a:1.0'
+          implementation 'shadow:b:1.0'
         }
-        $shadowJar {
-          exclude 'junit/*'
-        }
-      """.trimIndent(),
-    )
-
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        import junit.framework.Test;
-        public class Server {}
-      """.trimIndent(),
-    )
-    path("src/main/java/server/Util.java").writeText(
-      """
-        package server;
-        import junit.framework.Test;
-        public class Util {}
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
 
     assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
-        "server/Util.class",
+        "shadow/Main.class",
+        "a.properties",
+        "a2.properties",
+        "b.properties",
       )
     }
 
-    val replaced = projectScriptPath.readText().lines().dropLast(3).joinToString(System.lineSeparator())
-    projectScriptPath.writeText(
+    projectScriptPath.appendText(
       """
-        $replaced
         $shadowJar {
-          include 'server/*'
-          exclude '*/Util.*'
+          exclude 'b.properties'
         }
       """.trimIndent(),
     )
     assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
+        "a.properties",
+        "a2.properties",
       )
       doesNotContainEntries(
-        "server/Util.class",
-        "junit/framework/Test.class",
+        "b.properties",
       )
     }
 
     assertExecutionsAreCachedAndUpToDate()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
+        "a.properties",
+        "a2.properties",
       )
       doesNotContainEntries(
-        "server/Util.class",
-        "junit/framework/Test.class",
+        "b.properties",
       )
     }
   }
