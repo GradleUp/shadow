@@ -52,6 +52,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       }
 
       it.dependsOn(install)
+      it.inputs.file(jarFile)
       it.mainClass.set("-jar")
       it.description = "Runs this project as a JVM application using the shadow jar"
       it.group = ApplicationPlugin.APPLICATION_GROUP
