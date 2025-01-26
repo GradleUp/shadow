@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
+
 **Changed**
 
 - Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
