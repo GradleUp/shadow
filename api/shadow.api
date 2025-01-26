@@ -303,6 +303,12 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	protected fun createCopyAction ()Lorg/gradle/api/internal/file/copy/CopyAction;
 	public fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public synthetic fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/file/CopySpec;
+	public fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/AbstractCopyTask;
+	public synthetic fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public synthetic fun exclude ([Ljava/lang/String;)Lorg/gradle/api/file/CopySpec;
+	public fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/AbstractCopyTask;
+	public synthetic fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
@@ -319,6 +325,12 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
+	public synthetic fun include (Ljava/lang/Iterable;)Lorg/gradle/api/file/CopySpec;
+	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/AbstractCopyTask;
+	public synthetic fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public synthetic fun include ([Ljava/lang/String;)Lorg/gradle/api/file/CopySpec;
+	public fun include ([Ljava/lang/String;)Lorg/gradle/api/tasks/AbstractCopyTask;
+	public synthetic fun include ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
@@ -341,6 +353,12 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public synthetic fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/file/CopySpec;
+	public fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/AbstractCopyTask;
+	public synthetic fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public synthetic fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/file/CopySpec;
+	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/AbstractCopyTask;
+	public synthetic fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun transform (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;

@@ -34,6 +34,7 @@ import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.DefaultCopySpec
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
@@ -47,6 +48,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 
 @CacheableTask
@@ -153,6 +155,22 @@ public abstract class ShadowJar :
    */
   @get:Input
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
+
+  /**
+   * Lazy property patch for [PatternFilterable.getIncludes].
+   *
+   * You should not use this property directly, use [include] functions instead.
+   */
+  @get:Input
+  internal abstract val internalIncludes: SetProperty<String>
+
+  /**
+   * Lazy property patch for [PatternFilterable.getExcludes].
+   *
+   * You should not use this property directly, use [exclude] functions instead.
+   */
+  @get:Input
+  internal abstract val internalExcludes: SetProperty<String>
 
   @Internal
   override fun getManifest(): InheritManifest = super.manifest as InheritManifest
@@ -320,4 +338,34 @@ public abstract class ShadowJar :
         }
       }
     }
+
+  override fun setIncludes(includes: Iterable<String>): AbstractCopyTask {
+    internalIncludes.addAll(includes)
+    return super.setIncludes(includes)
+  }
+
+  override fun setExcludes(excludes: Iterable<String>): AbstractCopyTask {
+    internalExcludes.addAll(excludes)
+    return super.setExcludes(excludes)
+  }
+
+  override fun include(vararg includes: String): AbstractCopyTask {
+    internalIncludes.addAll(*includes)
+    return super.include(*includes)
+  }
+
+  override fun include(includes: Iterable<String>): AbstractCopyTask {
+    internalIncludes.addAll(includes)
+    return super.include(includes)
+  }
+
+  override fun exclude(vararg excludes: String): AbstractCopyTask {
+    internalExcludes.addAll(*excludes)
+    return super.exclude(*excludes)
+  }
+
+  override fun exclude(excludes: Iterable<String>): AbstractCopyTask {
+    internalExcludes.addAll(excludes)
+    return super.exclude(excludes)
+  }
 }
