@@ -265,10 +265,6 @@ class PublishingTest : BasePluginTest() {
         projectBlock = """
           group = 'com.acme'
           version = '1.0'
-          java {
-            // This is necessary for `org.gradle.jvm.version` to be pinned on Java 8 for `components.java` MavenPublication.
-            targetCompatibility = JavaVersion.VERSION_1_8
-          }
         """.trimIndent(),
         dependenciesBlock = """
           implementation 'shadow:a:1.0'
@@ -310,7 +306,6 @@ class PublishingTest : BasePluginTest() {
           *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
-          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.VERSION_1_8.majorVersion,
         )
         transform { it.gavs }.isEmpty()
       }
@@ -319,7 +314,6 @@ class PublishingTest : BasePluginTest() {
           *commonVariantAttrs,
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
-          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.VERSION_1_8.majorVersion,
         )
         transform { it.gavs }.containsOnly(
           "shadow:a:1.0",
@@ -439,6 +433,7 @@ class PublishingTest : BasePluginTest() {
     val commonVariantAttrs = arrayOf(
       Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
       LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
+      TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion,
     )
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
