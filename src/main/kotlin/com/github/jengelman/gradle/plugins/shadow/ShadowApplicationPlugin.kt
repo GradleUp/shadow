@@ -118,7 +118,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     project.extensions.getByType(DistributionContainer::class.java)
       .register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
         distributions.contents { contents ->
-          contents.from(project.file("src/dist"))
           contents.into("lib") { lib ->
             lib.from(shadowJar)
             lib.from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
