@@ -2,6 +2,7 @@ module.exports = {
   base: "/shadow/",
   dest: "build/site",
   ga: "UA-321220-4",
+  title: 'Gradle Shadow Plugin',
   themeConfig: {
     repo: "GradleUp/shadow",
     docsBranch: 'main',
@@ -9,7 +10,6 @@ module.exports = {
     editLinkText: 'Help improve these docs!',
     logo: '/logo+type.svg',
     docsDir: 'src/docs',
-    title: 'Gradle Shadow Plugin',
     nav: [
       { text: 'User Guide', link: '/introduction/' }
     ],
