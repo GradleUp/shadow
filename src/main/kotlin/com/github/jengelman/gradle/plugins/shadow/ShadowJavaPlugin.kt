@@ -44,9 +44,11 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           project.objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
         attr.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling::class.java, Bundling.SHADOWED))
-        val targetJvmVersion = project.extensions.getByType(JavaPluginExtension::class.java)
-          .targetCompatibility.majorVersion.toInt()
-        attr.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+        val targetJvmVersion = project.provider {
+          project.extensions.getByType(JavaPluginExtension::class.java).targetCompatibility.majorVersion.toInt()
+        }
+        // Track JavaPluginExtension to update targetJvmVersion when it changes.
+        attr.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
       }
       it.outgoing.artifact(shadowTaskProvider)
     }
