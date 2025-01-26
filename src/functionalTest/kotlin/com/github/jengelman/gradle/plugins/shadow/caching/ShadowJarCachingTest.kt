@@ -62,7 +62,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
   )
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
-    writeMainClass()
+    writeMainClass(className = "Main")
+    writeMainClass(className = "Main2")
     projectScriptPath.appendText(
       """
         dependencies {
@@ -72,10 +73,12 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
+    // First run successful with all files.
     assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
+        "shadow/Main2.class",
         "a.properties",
         "a2.properties",
         "b.properties",
@@ -85,33 +88,68 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          exclude 'b.properties'
+          exclude '**.properties'
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
+    // Second run successful after excludes changed.
     assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
-        "a.properties",
-        "a2.properties",
+        "shadow/Main2.class",
       )
       doesNotContainEntries(
+        "a.properties",
+        "a2.properties",
         "b.properties",
       )
     }
 
-    assertExecutionsAreCachedAndUpToDate()
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          include 'shadow/Main.class'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    // Third run successful after includes changed.
+    assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
-        "a.properties",
-        "a2.properties",
       )
       doesNotContainEntries(
+        "shadow/Main2.class",
+        "a.properties",
+        "a2.properties",
         "b.properties",
       )
     }
+
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          include 'shadow/Main2.class'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    // Forth run successful after includes changed again.
+    assertFirstExecutionSuccess()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+        "shadow/Main2.class",
+      )
+      doesNotContainEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+      )
+    }
+
+    // Clean and run 2 more times to ensure the states are cached and up-to-date.
+    assertExecutionsAreCachedAndUpToDate()
   }
 
   @Test
