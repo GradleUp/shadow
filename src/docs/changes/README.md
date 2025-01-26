@@ -14,7 +14,7 @@
 **Fixed**
 
 - Support overriding `mainClass` provided by `JavaApplication`. ([#1182](https://github.com/GradleUp/shadow/pull/1182))
-- Fix `ShadowJar` not being success after `includes` or `excludes` are changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
+- Fix `ShadowJar` not being successful after `includes` or `excludes` are changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
 
 
 ## [v9.0.0-beta6] (2025-01-23)
