@@ -68,7 +68,7 @@ plugins {
 
 application {
   mainClass = 'myapp.Main'
-  // Optionally, you can add extra JVM arguments to the start scripts.
+  // Optionally, you can add default JVM arguments to the start scripts like this:
   applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
 }
 
