@@ -60,7 +60,7 @@ class PublishingTest : BasePluginTest() {
           archiveClassifier = ''
           archiveBaseName = 'maven-all'
         """.trimIndent(),
-      ),
+      ) + System.lineSeparator(),
     )
 
     publish()
@@ -68,6 +68,46 @@ class PublishingTest : BasePluginTest() {
     assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
+
+    val shadowVariantAttrsWithoutTargetJvm = shadowVariantAttrs.filterNot {
+      it.first == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
+    }
+    val targetJvmAttr17 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "17"
+    val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
+
+    projectScriptPath.appendText(
+      """
+        java {
+          toolchain.languageVersion = JavaLanguageVersion.of(17)
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    publish()
+
+    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
+    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+    assertShadowVariantCommon(
+      gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")),
+      variantAttrs = shadowVariantAttrsWithoutTargetJvm + targetJvmAttr17,
+    )
+
+    projectScriptPath.appendText(
+      """
+        java {
+          targetCompatibility = JavaVersion.VERSION_11
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    publish()
+
+    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
+    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
+    assertShadowVariantCommon(
+      gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")),
+      variantAttrs = shadowVariantAttrsWithoutTargetJvm + targetJvmAttr11,
+    )
   }
 
   @Test
@@ -398,15 +438,12 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertShadowVariantCommon(
     gmm: GradleModuleMetadata,
+    variantAttrs: List<Pair<String, String>> = shadowVariantAttrs,
     gavs: Array<String> = arrayOf("shadow:b:1.0"),
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {
-      transform { it.attributes }.containsOnly(
-        *commonVariantAttrs,
-        Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
-        Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
-      )
+      transform { it.attributes }.containsOnly(*variantAttrs.toTypedArray())
       transform { it.gavs }.containsOnly(*gavs)
       body()
     }
@@ -435,6 +472,11 @@ class PublishingTest : BasePluginTest() {
       LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
       TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion,
     )
+
+    val shadowVariantAttrs = listOf(
+      Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
+      Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+    ) + commonVariantAttrs
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
