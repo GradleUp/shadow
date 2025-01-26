@@ -53,7 +53,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
-  fun publishShadowJarWithMavenPublishPlugin() {
+  fun publishShadowJar() {
     projectScriptPath.appendText(
       publishConfiguration(
         shadowBlock = """
@@ -71,7 +71,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
-  fun publishShadowJarInsteadOfJarWithMavenPublishPlugin() {
+  fun publishShadowJarInsteadOfJar() {
     projectScriptPath.appendText(
       publishConfiguration(
         shadowBlock = """
@@ -93,7 +93,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   @BooleanParameterizedTest
-  fun publishShadowedGradlePluginWithMavenPublishPlugin(legacy: Boolean) {
+  fun publishShadowedGradlePlugin(legacy: Boolean) {
     writeGradlePluginModule(legacy)
     projectScriptPath.appendText(
       publishConfiguration(
@@ -152,7 +152,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
-  fun publishMultiProjectShadowJarWithMavenPublishPlugin() {
+  fun publishMultiProjectShadowJar() {
     settingsScriptPath.appendText(
       """
         include 'a', 'b', 'c'
