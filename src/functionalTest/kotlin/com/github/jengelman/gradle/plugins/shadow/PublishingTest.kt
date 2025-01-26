@@ -69,9 +69,9 @@ class PublishingTest : BasePluginTest() {
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
 
-    val shadowVariantAttrsWithoutTargetJvm = shadowVariantAttrs.filterNot {
-      it.first == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
-    }
+    val attrsWithoutTargetJvm = shadowVariantAttrs.filterNot { (name, _) ->
+      name == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
+    }.toTypedArray()
     val targetJvmAttr17 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "17"
     val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
 
@@ -89,7 +89,7 @@ class PublishingTest : BasePluginTest() {
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
     assertShadowVariantCommon(
       gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")),
-      variantAttrs = shadowVariantAttrsWithoutTargetJvm + targetJvmAttr17,
+      variantAttrs = attrsWithoutTargetJvm + targetJvmAttr17,
     )
 
     projectScriptPath.appendText(
@@ -106,7 +106,7 @@ class PublishingTest : BasePluginTest() {
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
     assertShadowVariantCommon(
       gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")),
-      variantAttrs = shadowVariantAttrsWithoutTargetJvm + targetJvmAttr11,
+      variantAttrs = attrsWithoutTargetJvm + targetJvmAttr11,
     )
   }
 
@@ -438,12 +438,12 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertShadowVariantCommon(
     gmm: GradleModuleMetadata,
-    variantAttrs: List<Pair<String, String>> = shadowVariantAttrs,
+    variantAttrs: Array<Pair<String, String>> = shadowVariantAttrs,
     gavs: Array<String> = arrayOf("shadow:b:1.0"),
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {
-      transform { it.attributes }.containsOnly(*variantAttrs.toTypedArray())
+      transform { it.attributes }.containsOnly(*variantAttrs)
       transform { it.gavs }.containsOnly(*gavs)
       body()
     }
@@ -473,10 +473,10 @@ class PublishingTest : BasePluginTest() {
       TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion,
     )
 
-    val shadowVariantAttrs = listOf(
+    val shadowVariantAttrs = commonVariantAttrs + arrayOf(
       Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
       Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
-    ) + commonVariantAttrs
+    )
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
