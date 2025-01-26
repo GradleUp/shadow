@@ -33,55 +33,55 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun configureJarMainClass() {
     val classNameProvider = javaApplication.mainClass
-    shadowJar.configure { jar ->
-      jar.inputs.property("mainClassName", classNameProvider)
-      jar.doFirst {
+    shadowJar.configure { task ->
+      task.inputs.property("mainClassName", classNameProvider)
+      task.doFirst {
         // Inject the Main-Class attribute if it is not already present.
-        if (!jar.manifest.attributes.contains("Main-Class")) {
-          jar.manifest.attributes["Main-Class"] = classNameProvider.get()
+        if (!task.manifest.attributes.contains("Main-Class")) {
+          task.manifest.attributes["Main-Class"] = classNameProvider.get()
         }
       }
     }
   }
 
   protected open fun addRunTask() {
-    project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) {
+    project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
+      task.description = "Runs this project as a JVM application using the shadow jar"
+      task.group = ApplicationPlugin.APPLICATION_GROUP
+      task.dependsOn(installShadowDist)
+
       val jarFile = installShadowDist.zip(shadowJar) { i, s ->
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
-
-      it.dependsOn(installShadowDist)
-      it.classpath(jarFile)
-      it.mainClass.set(javaApplication.mainClass)
-      it.description = "Runs this project as a JVM application using the shadow jar"
-      it.group = ApplicationPlugin.APPLICATION_GROUP
-      it.conventionMapping.map("jvmArgs") { javaApplication.applicationDefaultJvmArgs }
+      task.classpath(jarFile)
+      task.mainClass.set(javaApplication.mainClass)
+      task.conventionMapping.map("jvmArgs", javaApplication::getApplicationDefaultJvmArgs)
       val toolchain = project.extensions.getByType(JavaPluginExtension::class.java).toolchain
-      val defaultLauncher = project.extensions.getByType(JavaToolchainService::class.java)
-        .launcherFor(toolchain)
-      it.javaLauncher.set(defaultLauncher)
+      val defaultLauncher = project.extensions.getByType(JavaToolchainService::class.java).launcherFor(toolchain)
+      task.javaLauncher.set(defaultLauncher)
     }
   }
 
   protected open fun addCreateScriptsTask() {
-    project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) {
+    project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
+      task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
+      task.group = ApplicationPlugin.APPLICATION_GROUP
+
       val unixStartScript =
         requireResourceAsText("com/github/jengelman/gradle/plugins/shadow/internal/unixStartScript.txt")
       val windowsStartScript =
         requireResourceAsText("com/github/jengelman/gradle/plugins/shadow/internal/windowsStartScript.txt")
-
-      (it.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
+      (task.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
         project.resources.text.fromString(unixStartScript)
-      (it.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
+      (task.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
         project.resources.text.fromString(windowsStartScript)
-      it.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
-      it.group = ApplicationPlugin.APPLICATION_GROUP
-      it.classpath = project.files(shadowJar)
-      it.mainClass.set(javaApplication.mainClass)
-      it.conventionMapping.map("applicationName") { javaApplication.applicationName }
-      it.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
-      it.conventionMapping.map("defaultJvmOpts") { javaApplication.applicationDefaultJvmArgs }
-      it.inputs.files(project.files(shadowJar))
+
+      task.classpath = project.files(shadowJar)
+      task.inputs.files(project.files(shadowJar))
+      task.mainClass.set(javaApplication.mainClass)
+      task.conventionMapping.map("applicationName", javaApplication::getApplicationName)
+      task.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
+      task.conventionMapping.map("defaultJvmOpts", javaApplication::getApplicationDefaultJvmArgs)
     }
   }
 
