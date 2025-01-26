@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
@@ -56,73 +57,99 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/717",
+  )
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
+    writeMainClass(className = "Main")
+    writeMainClass(className = "Main2")
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation 'shadow:a:1.0'
+          implementation 'shadow:b:1.0'
         }
-        $shadowJar {
-          exclude 'junit/*'
-        }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
 
-    path("src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        import junit.framework.Test;
-        public class Server {}
-      """.trimIndent(),
-    )
-    path("src/main/java/server/Util.java").writeText(
-      """
-        package server;
-        import junit.framework.Test;
-        public class Util {}
-      """.trimIndent(),
-    )
-
+    // First run successful with all files.
     assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
-        "server/Util.class",
+        "shadow/Main.class",
+        "shadow/Main2.class",
+        "a.properties",
+        "a2.properties",
+        "b.properties",
       )
     }
 
-    val replaced = projectScriptPath.readText().lines().dropLast(3).joinToString(System.lineSeparator())
-    projectScriptPath.writeText(
+    projectScriptPath.appendText(
       """
-        $replaced
         $shadowJar {
-          include 'server/*'
-          exclude '*/Util.*'
+          exclude '**.properties'
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
+    // Second run successful after excludes changed.
     assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "server/Server.class",
+        "shadow/Main.class",
+        "shadow/Main2.class",
       )
       doesNotContainEntries(
-        "server/Util.class",
-        "junit/framework/Test.class",
+        "a.properties",
+        "a2.properties",
+        "b.properties",
       )
     }
 
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          include 'shadow/Main.class'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    // Third run successful after includes changed.
+    assertFirstExecutionSuccess()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+      )
+      doesNotContainEntries(
+        "shadow/Main2.class",
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+      )
+    }
+
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          include 'shadow/Main2.class'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    // Forth run successful after includes changed again.
+    assertFirstExecutionSuccess()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+        "shadow/Main2.class",
+      )
+      doesNotContainEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+      )
+    }
+
+    // Clean and run 2 more times to ensure the states are cached and up-to-date.
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "server/Server.class",
-      )
-      doesNotContainEntries(
-        "server/Util.class",
-        "junit/framework/Test.class",
-      )
-    }
   }
 
   @Test
