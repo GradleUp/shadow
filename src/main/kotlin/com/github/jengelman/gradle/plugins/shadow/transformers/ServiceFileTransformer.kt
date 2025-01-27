@@ -79,16 +79,10 @@ public open class ServiceFileTransformer(
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Input
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
   override fun getIncludes(): Set<String> = patternSet.includes
 
-  /**
-   * {@inheritDoc}
-   */
-  @Input
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
   override fun getExcludes(): Set<String> = patternSet.excludes
 
   public open fun setPath(path: String): PatternFilterable = apply {
