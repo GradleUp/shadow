@@ -29,27 +29,27 @@ public interface DependencyFilter {
   public fun include(spec: Spec<ResolvedDependency>): DependencyFilter
 
   /**
-   * Create a spec that matches the provided project [notation].
+   * Create a [Spec] that matches the provided project [notation].
    */
   public fun project(notation: Map<String, *>): Spec<ResolvedDependency>
 
   /**
-   * Create a spec that matches the default configuration for the provided project [path].
+   * Create a [Spec] that matches the provided project [path].
    */
   public fun project(path: String): Spec<ResolvedDependency>
 
   /**
-   * Create a spec that matches the provided [dependencyNotation].
+   * Create a [Spec] that matches the provided [dependencyNotation].
    */
   public fun dependency(dependencyNotation: Any): Spec<ResolvedDependency>
 
   /**
-   * Create a spec that matches the provided [dependency].
+   * Create a [Spec] that matches the provided [dependency].
    */
   public fun dependency(dependency: Dependency): Spec<ResolvedDependency>
 
   /**
-   * Create a spec that matches the provided [closure].
+   * Create a [Spec] that matches the provided [closure].
    */
   public fun dependency(closure: Closure<*>): Spec<ResolvedDependency>
 }
