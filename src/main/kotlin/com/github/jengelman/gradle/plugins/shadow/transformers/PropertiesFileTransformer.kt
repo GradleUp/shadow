@@ -9,7 +9,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTra
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
-import java.util.function.Function as JavaFunction
 import javax.inject.Inject
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -123,7 +122,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
   @get:Internal
-  public open val keyTransformer: Property<JavaFunction<String, String>> = objectFactory.property(IDENTITY)
+  public open var keyTransformer: (String) -> String = IDENTITY
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
@@ -173,14 +172,12 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   private fun transformKeys(properties: Properties): CleanProperties {
-    val keyTransformer = keyTransformer.get()
-
     if (keyTransformer == IDENTITY) {
       return properties as CleanProperties
     }
     val result = CleanProperties()
     properties.forEach { (key, value) ->
-      result[keyTransformer.apply(key as String)] = value
+      result[keyTransformer(key as String)] = value
     }
     return result
   }
@@ -252,6 +249,6 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   private companion object {
     private const val PROPERTIES_SUFFIX = ".properties"
-    private val IDENTITY = JavaFunction.identity<String>()
+    private val IDENTITY = { key: String -> key }
   }
 }
