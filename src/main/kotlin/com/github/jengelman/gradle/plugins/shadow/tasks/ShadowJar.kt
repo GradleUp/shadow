@@ -60,11 +60,6 @@ public abstract class ShadowJar :
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
-    // Ensure includes and excludes are considered as inputs.
-    // TODO: workaround for https://github.com/gradle/gradle/blob/236bdeb129e4d16c100667b677d4315448bc9ede/subprojects/core-api/src/main/java/org/gradle/api/tasks/util/PatternFilterable.java#L70-L84.
-    inputs.property("includes", includes)
-    inputs.property("excludes", excludes)
-
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       // TODO: this has been called but the cache is still working fine, need to investigate why.
       transformers.get().any { !isCacheableTransform(it::class.java) } ||
@@ -160,7 +155,13 @@ public abstract class ShadowJar :
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   @Internal
-  override fun getManifest(): InheritManifest = super.manifest as InheritManifest
+  override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
+
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  override fun getIncludes(): MutableSet<String> = super.getIncludes()
+
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
   override fun minimize(): ShadowJar = apply {
     minimizeJar.set(true)

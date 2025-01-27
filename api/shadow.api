@@ -307,7 +307,9 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getEnableRelocation ()Lorg/gradle/api/provider/Property;
+	public fun getExcludes ()Ljava/util/Set;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public fun getIncludes ()Ljava/util/Set;
 	protected fun getInternalCompressor ()Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
