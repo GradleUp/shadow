@@ -129,7 +129,7 @@ public abstract class ShadowJar :
   @get:Optional
   public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
 
-  @get:Internal
+  @get:Input
   public open val dependencyFilter: Property<DependencyFilter> =
     objectFactory.property(DefaultDependencyFilter(project))
 
