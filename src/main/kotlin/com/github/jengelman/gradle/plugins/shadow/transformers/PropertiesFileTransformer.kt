@@ -174,12 +174,14 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   private fun transformKeys(properties: Properties): CleanProperties {
+    val keyTransformer = keyTransformer.get()
+
     if (keyTransformer == IDENTITY) {
       return properties as CleanProperties
     }
     val result = CleanProperties()
     properties.forEach { (key, value) ->
-      result[keyTransformer.get().call(key as String)] = value
+      result[keyTransformer.call(key as String)] = value
     }
     return result
   }
