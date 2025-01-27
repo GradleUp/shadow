@@ -60,10 +60,6 @@ public abstract class ShadowJar :
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
-    // TODO: https://github.com/GradleUp/shadow/issues/1202
-    inputs.property("includes", includes)
-    inputs.property("excludes", excludes)
-
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       // TODO: this has been called but the cache is still working fine, need to investigate why.
       transformers.get().any { !isCacheableTransform(it::class.java) } ||
@@ -160,6 +156,12 @@ public abstract class ShadowJar :
 
   @Internal
   override fun getManifest(): InheritManifest = super.manifest as InheritManifest
+
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  override fun getIncludes(): Set<String> = super.getIncludes()
+
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  override fun getExcludes(): Set<String> = super.getExcludes()
 
   override fun minimize(): ShadowJar = apply {
     minimizeJar.set(true)
