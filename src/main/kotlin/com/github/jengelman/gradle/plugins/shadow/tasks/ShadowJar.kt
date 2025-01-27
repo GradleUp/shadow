@@ -67,9 +67,6 @@ public abstract class ShadowJar :
     }
   }
 
-  @get:Internal
-  override val stats: ShadowStats = ShadowStats()
-
   /**
    * Minimize the jar by removing unused classes.
    *
@@ -104,6 +101,9 @@ public abstract class ShadowJar :
       }
     }
   }
+
+  @get:Internal
+  internal val stats: ShadowStats = ShadowStats()
 
   @get:Internal
   protected open val rootPatternSet: PatternSet

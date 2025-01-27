@@ -317,7 +317,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
 	protected fun getRootPatternSet ()Lorg/gradle/api/tasks/util/PatternSet;
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
 	public fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
@@ -354,7 +353,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun append (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public abstract fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public abstract fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun mergeServiceFiles ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun mergeServiceFiles (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
