@@ -92,9 +92,9 @@ public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper :
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter {
-	public abstract fun dependency (Lgroovy/lang/Closure;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
+	public abstract fun dependency (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/specs/Spec;
 	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
 	public abstract fun include (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
 	public abstract fun project (Ljava/lang/String;)Lorg/gradle/api/specs/Spec;
