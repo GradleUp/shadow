@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -8,7 +7,6 @@ import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.specs.Spec
-import org.gradle.api.specs.Specs
 
 internal sealed class AbstractDependencyFilter(
   @Transient private val project: Project,
@@ -62,10 +60,6 @@ internal sealed class AbstractDependencyFilter(
         resolvedDependency.moduleName.matches(dependency.name.toRegex()) &&
         (dependency.version == null || resolvedDependency.moduleVersion.matches(dependency.version!!.toRegex()))
     }
-  }
-
-  override fun dependency(closure: Closure<*>): Spec<ResolvedDependency> {
-    return Specs.convertClosureToSpec(closure)
   }
 
   protected fun ResolvedDependency.isIncluded(): Boolean {

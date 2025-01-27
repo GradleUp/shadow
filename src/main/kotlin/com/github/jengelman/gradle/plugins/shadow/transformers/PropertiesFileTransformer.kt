@@ -6,8 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
-import groovy.lang.Closure
-import groovy.lang.Closure.IDENTITY
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
@@ -124,7 +122,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
   @get:Internal
-  public open val keyTransformer: Property<Closure<String>> = objectFactory.property(IDENTITY)
+  public open var keyTransformer: (String) -> String = IDENTITY
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
@@ -174,14 +172,12 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   private fun transformKeys(properties: Properties): CleanProperties {
-    val keyTransformer = keyTransformer.get()
-
     if (keyTransformer == IDENTITY) {
       return properties as CleanProperties
     }
     val result = CleanProperties()
     properties.forEach { (key, value) ->
-      result[keyTransformer.call(key as String)] = value
+      result[keyTransformer(key as String)] = value
     }
     return result
   }
@@ -253,5 +249,6 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   private companion object {
     private const val PROPERTIES_SUFFIX = ".properties"
+    private val IDENTITY = { key: String -> key }
   }
 }

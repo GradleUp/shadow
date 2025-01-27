@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import groovy.lang.Closure
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
@@ -47,9 +46,4 @@ public interface DependencyFilter {
    * Create a [Spec] that matches the provided [dependency].
    */
   public fun dependency(dependency: Dependency): Spec<ResolvedDependency>
-
-  /**
-   * Create a [Spec] that matches the provided [closure].
-   */
-  public fun dependency(closure: Closure<*>): Spec<ResolvedDependency>
 }

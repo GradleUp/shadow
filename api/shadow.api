@@ -92,7 +92,6 @@ public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper :
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter {
-	public abstract fun dependency (Lgroovy/lang/Closure;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
 	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
@@ -519,7 +518,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesF
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getCharsetName ()Lorg/gradle/api/provider/Property;
-	public fun getKeyTransformer ()Lorg/gradle/api/provider/Property;
+	public fun getKeyTransformer ()Lkotlin/jvm/functions/Function1;
 	public fun getMappings ()Lorg/gradle/api/provider/MapProperty;
 	public fun getMergeSeparator ()Lorg/gradle/api/provider/Property;
 	public fun getMergeStrategy ()Lorg/gradle/api/provider/Property;
@@ -527,6 +526,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesF
 	public fun getPaths ()Lorg/gradle/api/provider/SetProperty;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun setKeyTransformer (Lkotlin/jvm/functions/Function1;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 

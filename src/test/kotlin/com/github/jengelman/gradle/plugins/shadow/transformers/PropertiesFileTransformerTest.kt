@@ -8,7 +8,6 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
-import groovy.lang.Closure
 import java.nio.charset.Charset
 import java.util.Properties
 import org.junit.jupiter.api.Test
@@ -132,11 +131,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     expectedOutput: Map<String, String>,
   ) {
     transformer.mergeStrategy.set(MergeStrategy.Append)
-    transformer.keyTransformer.set(object : Closure<String>(null) {
-      override fun call(vararg arguments: Any?): String {
-        return keyTransformer.invoke(arguments.first() as String)
-      }
-    })
+    transformer.keyTransformer = keyTransformer
 
     if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
