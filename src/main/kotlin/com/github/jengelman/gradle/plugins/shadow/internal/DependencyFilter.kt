@@ -1,12 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import java.io.Serializable
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.specs.Spec
 
-public interface DependencyFilter {
+// DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
+public interface DependencyFilter : Serializable {
   /**
    * Resolve a [configuration] against the [include]/[exclude] rules in the filter.
    */
