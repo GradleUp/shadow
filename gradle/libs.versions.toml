@@ -30,7 +30,7 @@ junit-bom = "org.junit:junit-bom:5.11.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
-kotlin-jvm = "org.jetbrains.kotlin.jvm:2.1.0"
+kotlin-jvm = "org.jetbrains.kotlin.jvm:2.1.10"
 android-lint = "com.android.lint:8.8.0"
 jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.17.0"
 spotless = "com.diffplug.spotless:7.0.2"
