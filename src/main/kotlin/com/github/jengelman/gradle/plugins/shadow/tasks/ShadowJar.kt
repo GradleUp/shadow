@@ -155,7 +155,7 @@ public abstract class ShadowJar :
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   @Internal
-  override fun getManifest(): InheritManifest = super.manifest as InheritManifest
+  override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
   @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
   override fun getIncludes(): Set<String> = super.getIncludes()
