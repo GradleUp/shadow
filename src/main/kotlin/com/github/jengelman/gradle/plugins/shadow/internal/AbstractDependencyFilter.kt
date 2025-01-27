@@ -49,7 +49,7 @@ internal sealed class AbstractDependencyFilter(
   }
 
   override fun project(path: String): Spec<ResolvedDependency> {
-    return dependency(project.dependencies.project(mapOf("path" to path, "configuration" to "default")))
+    return dependency(project.dependencies.project(mapOf("path" to path)))
   }
 
   override fun dependency(dependencyNotation: Any): Spec<ResolvedDependency> {
