@@ -23,11 +23,11 @@ internal sealed class AbstractDependencyFilter(
   )
 
   override fun resolve(configuration: Configuration): FileCollection {
-    val includedDeps = mutableSetOf<ResolvedDependency>()
-    val excludedDeps = mutableSetOf<ResolvedDependency>()
-    resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, includedDeps, excludedDeps)
+    val included = mutableSetOf<ResolvedDependency>()
+    val excluded = mutableSetOf<ResolvedDependency>()
+    resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, included, excluded)
     return project.files(configuration.files) -
-      project.files(excludedDeps.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
+      project.files(excluded.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
   }
 
   override fun resolve(configurations: Collection<Configuration>): FileCollection {
@@ -45,22 +45,15 @@ internal sealed class AbstractDependencyFilter(
   }
 
   override fun project(notation: Map<String, *>): Spec<ResolvedDependency> {
-    return dependency(dependency = project.dependencies.project(notation))
+    return dependency(project.dependencies.project(notation))
   }
 
   override fun project(path: String): Spec<ResolvedDependency> {
-    return dependency(
-      dependency = project.dependencies.project(
-        mapOf(
-          "path" to path,
-          "configuration" to "default",
-        ),
-      ),
-    )
+    return dependency(project.dependencies.project(mapOf("path" to path, "configuration" to "default")))
   }
 
   override fun dependency(dependencyNotation: Any): Spec<ResolvedDependency> {
-    return dependency(dependency = project.dependencies.create(dependencyNotation))
+    return dependency(project.dependencies.create(dependencyNotation))
   }
 
   override fun dependency(dependency: Dependency): Spec<ResolvedDependency> {
