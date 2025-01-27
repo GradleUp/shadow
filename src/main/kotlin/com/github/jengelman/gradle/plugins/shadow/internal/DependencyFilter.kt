@@ -46,9 +46,4 @@ public interface DependencyFilter {
    * Create a [Spec] that matches the provided [dependency].
    */
   public fun dependency(dependency: Dependency): Spec<ResolvedDependency>
-
-  /**
-   * Create a [Spec] that uses the provided [spec] to match dependencies.
-   */
-  public fun dependency(spec: Spec<ResolvedDependency>): Spec<ResolvedDependency>
 }

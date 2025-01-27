@@ -62,10 +62,6 @@ internal sealed class AbstractDependencyFilter(
     }
   }
 
-  override fun dependency(spec: Spec<ResolvedDependency>): Spec<ResolvedDependency> {
-    return spec
-  }
-
   protected fun ResolvedDependency.isIncluded(): Boolean {
     val include = includeSpecs.isEmpty() || includeSpecs.any { it.isSatisfiedBy(this) }
     val exclude = excludeSpecs.isNotEmpty() && excludeSpecs.any { it.isSatisfiedBy(this) }
