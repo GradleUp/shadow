@@ -215,7 +215,7 @@ class FilteringTest : BasePluginTest() {
     writeClientAndServerModules(
       serverShadowBlock = """
         dependencies {
-          exclude(dependency { it.moduleGroup == 'junit' })
+          exclude { it.moduleGroup == 'junit' }
         }
       """.trimIndent(),
     )
