@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
+import assertk.assertions.startsWith
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -92,8 +93,8 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
   }
 
   @ParameterizedTest
-  @MethodSource("relocationParameters")
-  fun relocations(pattern: String, shadedPattern: String, target: String) {
+  @MethodSource("relocationProvider")
+  fun relocations(pattern: String, shadedPattern: String, expected: String) {
     val aggregator = PluginCache().apply {
       val resources = Collections.enumeration(listOf(pluginCacheUrl))
       loadCacheFiles(resources)
@@ -103,7 +104,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
 
     for (pluginEntryMap in aggregator.allCategories.values) {
       for (entry in pluginEntryMap.values) {
-        assertThat(entry.className.startsWith(target)).isTrue()
+        assertThat(entry.className).startsWith(expected)
       }
     }
   }
@@ -116,7 +117,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
     val pluginCacheUrl: URL = requireNotNull(this::class.java.classLoader.getResource(PLUGIN_CACHE_FILE))
 
     @JvmStatic
-    fun relocationParameters() = listOf(
+    fun relocationProvider() = listOf(
       // test with matching relocator
       Arguments.of("org.apache.logging", "new.location.org.apache.logging", "new.location.org.apache.logging"),
       // test without matching relocator
