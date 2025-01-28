@@ -296,20 +296,4 @@ class FilteringTest : BasePluginTest() {
       )
     }
   }
-
-  private fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.module("shadow", "c", "1.0") {
-      buildJar {
-        insert("c.properties", "c")
-      }
-      if (circular) {
-        addDependency("shadow", "d", "1.0")
-      }
-    }.module("shadow", "d", "1.0") {
-      buildJar {
-        insert("d.properties", "d")
-      }
-      addDependency("shadow", "c", "1.0")
-    }.publish()
-  }
 }

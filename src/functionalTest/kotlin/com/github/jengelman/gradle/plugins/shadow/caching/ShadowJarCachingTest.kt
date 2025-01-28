@@ -200,4 +200,42 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertExecutionsAreCachedAndUpToDate()
     assertions()
   }
+
+  @Test
+  fun shadowJarIsCachedCorrectlyAfterDependencyFilterChanged() {
+    publishArtifactCD()
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'shadow:d:1.0'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries(
+          "c.properties",
+          "d.properties",
+        )
+      }
+    }
+
+    assertFirstExecutionSuccess()
+    assertions()
+    assertExecutionsAreCachedAndUpToDate()
+    assertions()
+
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          dependencyFilter = new com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter(project)
+        }
+      """.trimIndent(),
+    )
+
+    assertFirstExecutionSuccess()
+    assertions()
+    assertExecutionsAreCachedAndUpToDate()
+    assertions()
+  }
 }
