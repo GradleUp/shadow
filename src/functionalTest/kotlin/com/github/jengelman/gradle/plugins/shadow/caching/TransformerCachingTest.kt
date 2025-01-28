@@ -145,6 +145,40 @@ class TransformerCachingTest : BaseCachingTest() {
     assertions("baz")
   }
 
+  @Test
+  fun shadowJarIsCachedCorrectlyWhenUsingPropertiesFileTransformer() {
+    projectScriptPath.appendText(
+      transform<PropertiesFileTransformer>(
+        transformerBlock = """
+          keyTransformer = { it.toUpperCase() }
+        """.trimIndent(),
+      ),
+    )
+    path("src/main/resources/foo/bar.properties").writeText("foo=bar")
+    val assertions = { key: String ->
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class", "foo/bar.properties")
+        getContent("foo/bar.properties").contains("$key=bar")
+      }
+    }
+
+    assertFirstExecutionSuccess()
+    assertions("FOO")
+    assertExecutionsAreCachedAndUpToDate()
+    assertions("FOO")
+
+    val replaced = projectScriptPath.readText().replace(
+      "keyTransformer = { it.toUpperCase() }",
+      "keyTransformer = { 'prefix.' + it }",
+    )
+    projectScriptPath.writeText(replaced)
+
+    assertFirstExecutionSuccess()
+    assertions("prefix.foo")
+    assertExecutionsAreCachedAndUpToDate()
+    assertions("prefix.foo")
+  }
+
   @ParameterizedTest
   @MethodSource("transformerConfigProvider")
   fun shadowJarIsCachedCorrectlyWhenUsingOtherTransformers(pair: Pair<String, KClass<*>>) {
@@ -187,7 +221,6 @@ class TransformerCachingTest : BaseCachingTest() {
       "" to Log4j2PluginsCacheFileTransformer::class,
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
-      "{ keyTransformer = { it.toLowerCase() } }" to PropertiesFileTransformer::class,
     )
   }
 }
