@@ -25,7 +25,10 @@ apply plugin: 'com.gradleup.shadow'
 ```
 
 <details>
-<summary>Snapshots of the development version are available in Sonatype's snapshots repository.</summary>
+<summary>Snapshots of the development version are available in 
+<a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+Sonatype's snapshots repository</a>.
+</summary>
 <p>
 
 ```groovy no-run
@@ -35,7 +38,7 @@ buildscript {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-    classpath 'com.gradleup.shadow:shadow-gradle-plugin:@snapshot-version@'
+    classpath 'com.gradleup.shadow:shadow-gradle-plugin:<snapshot-version>'
   }
 }
 

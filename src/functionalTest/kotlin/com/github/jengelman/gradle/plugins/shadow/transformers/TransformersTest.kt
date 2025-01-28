@@ -1,15 +1,20 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import java.util.jar.Attributes
 import kotlin.io.path.appendText
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
+import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -48,7 +53,9 @@ class TransformersTest : BaseTransformerTest() {
     commonAssertions()
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/82")
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/82",
+  )
   @Test
   fun shadowManifestLeaksToJarManifest() {
     writeMainClass()
@@ -63,6 +70,37 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
     assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
     assertThat(mf.mainAttributes.getValue("New-Entry")).isNull()
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/427",
+  )
+  @Test
+  fun canMergeLog4j2PluginCacheFiles() {
+    val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
+    val one = buildJarOne {
+      insert(PLUGIN_CACHE_FILE, content)
+    }
+    val two = buildJarOne {
+      insert(PLUGIN_CACHE_FILE, content)
+    }
+    projectScriptPath.appendText(
+      transform<Log4j2PluginsCacheFileTransformer>(
+        shadowJarBlock = fromJar(one, two),
+      ),
+    )
+
+    run(shadowJarTask)
+
+    val actualFileBytes = outputShadowJar.use { jar ->
+      @Suppress("Since15")
+      jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
+    }
+    assertThat(actualFileBytes.contentHashCode()).all {
+      // Hash of the original plugin cache file.
+      isNotEqualTo(-2114104185)
+      isEqualTo(1911442937)
+    }
   }
 
   @Test
@@ -83,7 +121,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @ParameterizedTest
-  @MethodSource("transformerConfigurations")
+  @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
     if (configuration.contains("test/some.file")) {
@@ -131,13 +169,12 @@ class TransformersTest : BaseTransformerTest() {
     """.trimIndent()
 
     @JvmStatic
-    fun transformerConfigurations() = listOf(
+    fun transformerConfigProvider() = listOf(
       "" to ApacheLicenseResourceTransformer::class,
       "" to ApacheNoticeResourceTransformer::class,
       "" to ComponentsXmlResourceTransformer::class,
       "" to DontIncludeResourceTransformer::class,
       "{ resource.set(\"test.file\"); file.fileValue(file(\"test/some.file\")) }" to IncludeResourceTransformer::class,
-      "" to Log4j2PluginsCacheFileTransformer::class,
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
       "{ keyTransformer = { it.toLowerCase() } }" to PropertiesFileTransformer::class,

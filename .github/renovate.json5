@@ -3,4 +3,7 @@
   extends: [
     'config:recommended',
   ],
+  "labels": [
+    "dependencies",
+  ],
 }

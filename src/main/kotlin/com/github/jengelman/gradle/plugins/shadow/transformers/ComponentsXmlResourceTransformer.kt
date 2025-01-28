@@ -22,6 +22,7 @@ import org.gradle.api.tasks.Internal
  *
  * @author John Engelman
  */
+@CacheableTransformer
 public open class ComponentsXmlResourceTransformer : Transformer {
   private val components = mutableMapOf<String, Xpp3Dom>()
 

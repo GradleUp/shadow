@@ -20,6 +20,7 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
+@CacheableTransformer
 public open class IncludeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer by NoOpTransformer {

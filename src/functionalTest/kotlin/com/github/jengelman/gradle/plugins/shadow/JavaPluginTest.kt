@@ -18,8 +18,8 @@ import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -151,7 +151,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun dependOnProjectShadowJar() {
-    writeShadowedClientAndServerModules()
+    writeClientAndServerModules(clientShadowed = true)
 
     run(":server:jar")
 
@@ -165,7 +165,7 @@ class JavaPluginTest : BasePluginTest() {
         "client/junit/framework/Test.class",
       )
     }
-    assertThat(jarPath("client/build/libs/client-all.jar")).useAll {
+    assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsEntries(
         "client/Client.class",
         "client/junit/framework/Test.class",
@@ -175,7 +175,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun shadowProjectShadowJar() {
-    writeShadowedClientAndServerModules()
+    writeClientAndServerModules(clientShadowed = true)
 
     run(serverShadowJarTask)
 
@@ -189,7 +189,7 @@ class JavaPluginTest : BasePluginTest() {
         "junit/framework/Test.class",
       )
     }
-    assertThat(jarPath("client/build/libs/client-all.jar")).useAll {
+    assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsEntries(
         "client/Client.class",
         "client/junit/framework/Test.class",
@@ -197,6 +197,10 @@ class JavaPluginTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/352",
+    "https://github.com/GradleUp/shadow/issues/729",
+  )
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
     localRepo.module("shadow", "a", "1.0") {
@@ -207,6 +211,8 @@ class JavaPluginTest : BasePluginTest() {
         insert("META-INF/a.DSA", "DSA Signature Block")
         insert("META-INF/a.RSA", "RSA Signature Block")
         insert("META-INF/a.properties", "key=value")
+        insert("META-INF/versions/9/module-info.class", "module myModuleName {}")
+        insert("META-INF/versions/16/module-info.class", "module myModuleName {}")
         insert("module-info.class", "module myModuleName {}")
       }
     }.publish()
@@ -238,6 +244,8 @@ class JavaPluginTest : BasePluginTest() {
         "META-INF/a.SF",
         "META-INF/a.DSA",
         "META-INF/a.RSA",
+        "META-INF/versions/9/module-info.class",
+        "META-INF/versions/16/module-info.class",
         "module-info.class",
       )
     }
@@ -483,6 +491,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun canRegisterCustomShadowJarTask() {
+    writeMainClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScriptPath.appendText(
       """
@@ -495,6 +504,9 @@ class JavaPluginTest : BasePluginTest() {
           archiveClassifier = "tests"
           from sourceSets.test.output
           configurations = [project.configurations.testRuntimeClasspath]
+          manifest {
+            attributes 'Main-Class': 'shadow.Main'
+          }
         }
       """.trimIndent(),
     )
@@ -502,8 +514,20 @@ class JavaPluginTest : BasePluginTest() {
     val result = run(testShadowJarTask)
 
     assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
-    val junitEntry = jarPath("build/libs/shadow-1.0-tests.jar").use { it.getEntry("junit") }
-    assertThat(junitEntry).isNotNull()
+    assertThat(jarPath("build/libs/shadow-1.0-tests.jar")).useAll {
+      containsEntries(
+        "junit/framework/Test.class",
+        "shadow/Main.class",
+      )
+      getMainAttr("Main-Class").isNotNull()
+    }
+
+    val pathString = path("build/libs/shadow-1.0-tests.jar").toString()
+    val runningOutput = runProcess("java", "-jar", pathString, "foo")
+    assertThat(runningOutput).contains(
+      "Hello, World! (foo) from Main",
+      "Refs: junit.framework.Test",
+    )
   }
 
   @Test
@@ -590,27 +614,5 @@ class JavaPluginTest : BasePluginTest() {
         "junit/framework/Test.class",
       )
     }
-  }
-
-  private fun writeShadowedClientAndServerModules() {
-    writeClientAndServerModules()
-    path("client/build.gradle").appendText(
-      """
-        $shadowJar {
-          relocate 'junit.framework', 'client.junit.framework'
-        }
-      """.trimIndent(),
-    )
-    path("server/src/main/java/server/Server.java").writeText(
-      """
-        package server;
-        import client.Client;
-        import client.junit.framework.Test;
-        public class Server {}
-      """.trimIndent(),
-    )
-    val replaced = path("server/build.gradle").readText()
-      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
-    path("server/build.gradle").writeText(replaced)
   }
 }

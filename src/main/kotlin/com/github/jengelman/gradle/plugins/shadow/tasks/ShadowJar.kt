@@ -67,9 +67,6 @@ public abstract class ShadowJar :
     }
   }
 
-  @get:Internal
-  override val stats: ShadowStats = ShadowStats()
-
   /**
    * Minimize the jar by removing unused classes.
    *
@@ -106,6 +103,9 @@ public abstract class ShadowJar :
   }
 
   @get:Internal
+  internal val stats: ShadowStats = ShadowStats()
+
+  @get:Internal
   protected open val rootPatternSet: PatternSet
     get() = (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
 
@@ -129,7 +129,7 @@ public abstract class ShadowJar :
   @get:Optional
   public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
 
-  @get:Internal
+  @get:Input
   public open val dependencyFilter: Property<DependencyFilter> =
     objectFactory.property(DefaultDependencyFilter(project))
 
@@ -155,7 +155,13 @@ public abstract class ShadowJar :
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   @Internal
-  override fun getManifest(): InheritManifest = super.manifest as InheritManifest
+  override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
+
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  override fun getIncludes(): MutableSet<String> = super.getIncludes()
+
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
   override fun minimize(): ShadowJar = apply {
     minimizeJar.set(true)

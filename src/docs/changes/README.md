@@ -5,6 +5,36 @@
 
 **Added**
 
+- Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
+
+**Changed**
+
+- Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
+- Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
+- Mark `ShadowJar.dependencyFilter` as `@Input`. ([#1206](https://github.com/GradleUp/shadow/pull/1206))  
+  `ShadowSpec.stats` is removed and `ShadowJar.stats` is `internal` for now.
+
+**Fixed**
+
+- Support overriding `mainClass` provided by `JavaApplication`. ([#1182](https://github.com/GradleUp/shadow/pull/1182))
+- Fix `ShadowJar` not being successful after `includes` or `excludes` are changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
+
+
+## [v9.0.0-beta6] (2025-01-23)
+
+**Added**
+
+- Exclude `module-info.class` in Multi-Release folders by default. ([#1177](https://github.com/GradleUp/shadow/pull/1177))
+
+**Fixed**
+
+- Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1175](https://github.com/GradleUp/shadow/pull/1175))  
+
+
+## [v9.0.0-beta5] (2025-01-21)
+
+**Added**
+
 - Sync `SimpleRelocator` changes from maven-shade-plugin. ([#1076](https://github.com/GradleUp/shadow/pull/1076))
 
 **Changed**
@@ -475,7 +505,9 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta4...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta6...HEAD
+[v9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
+[v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
 [v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
 [v9.0.0-beta3]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta3
 [v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2

@@ -10,9 +10,11 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
@@ -42,6 +44,11 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           project.objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
         attr.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling::class.java, Bundling.SHADOWED))
+        val targetJvmVersion = project.provider {
+          project.extensions.getByType(JavaPluginExtension::class.java).targetCompatibility.majorVersion.toInt()
+        }
+        // Track JavaPluginExtension to update targetJvmVersion when it changes.
+        attr.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
       }
       it.outgoing.artifact(shadowTaskProvider)
     }
@@ -96,6 +103,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         "META-INF/*.SF",
         "META-INF/*.DSA",
         "META-INF/*.RSA",
+        // module-info.class in Multi-Release folders.
+        "META-INF/versions/**/module-info.class",
         "module-info.class",
       )
     }

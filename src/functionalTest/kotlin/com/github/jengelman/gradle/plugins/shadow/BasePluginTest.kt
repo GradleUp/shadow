@@ -20,6 +20,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
+import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -134,8 +135,12 @@ abstract class BasePluginTest {
     return parent.resolve(relative).also {
       if (it.exists()) return@also
       it.parent.createDirectories()
-      // We should create text file only if it doesn't exist.
-      it.createFile()
+      if (relative.endsWith("/")) {
+        it.createDirectory()
+      } else {
+        // We should create text file only if it doesn't exist.
+        it.createFile()
+      }
     }
   }
 
@@ -153,18 +158,41 @@ abstract class BasePluginTest {
     return runnerBlock(runner(tasks.toList())).buildAndFail().assertNoDeprecationWarnings()
   }
 
+  fun publishArtifactCD(circular: Boolean = false) {
+    localRepo.module("shadow", "c", "1.0") {
+      buildJar {
+        insert("c.properties", "c")
+      }
+      if (circular) {
+        addDependency("shadow", "d", "1.0")
+      }
+    }.module("shadow", "d", "1.0") {
+      buildJar {
+        insert("d.properties", "d")
+      }
+      addDependency("shadow", "c", "1.0")
+    }.publish()
+  }
+
   fun writeMainClass(
+    sourceSet: String = "main",
     withImports: Boolean = false,
+    className: String = "Main",
   ) {
     val imports = if (withImports) "import junit.framework.Test;" else ""
-
-    path("src/main/java/shadow/Main.java").writeText(
+    val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
+    path("src/$sourceSet/java/shadow/$className.java").writeText(
       """
         package shadow;
         $imports
-        public class Main {
+        public class $className {
           public static void main(String[] args) {
-            System.out.println("Hello, World!");
+            if (args.length == 0) {
+              throw new IllegalArgumentException("No arguments provided.");
+            }
+            String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
+            System.out.println(content);
+            System.out.println($classRef);
           }
         }
       """.trimIndent(),
@@ -172,6 +200,7 @@ abstract class BasePluginTest {
   }
 
   fun writeClientAndServerModules(
+    clientShadowed: Boolean = false,
     serverShadowBlock: String = "",
   ) {
     settingsScriptPath.appendText(
@@ -189,7 +218,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java")}
+        ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
@@ -214,6 +243,26 @@ abstract class BasePluginTest {
         }
       """.trimIndent() + System.lineSeparator(),
     )
+
+    if (!clientShadowed) return
+    path("client/build.gradle").appendText(
+      """
+        $shadowJar {
+          relocate 'junit.framework', 'client.junit.framework'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    path("server/src/main/java/server/Server.java").writeText(
+      """
+        package server;
+        import client.Client;
+        import client.junit.framework.Test;
+        public class Server {}
+      """.trimIndent(),
+    )
+    val replaced = path("server/build.gradle").readText()
+      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
+    path("server/build.gradle").writeText(replaced)
   }
 
   fun writeGradlePluginModule(legacy: Boolean) {
@@ -252,7 +301,7 @@ abstract class BasePluginTest {
         import org.gradle.api.Project;
         public class MyPlugin implements Plugin<Project> {
           public void apply(Project project) {
-            System.out.println("MyPlugin: Hello World!");
+            System.out.println("MyPlugin: Hello, World!");
           }
         }
       """.trimIndent(),
@@ -334,7 +383,7 @@ abstract class BasePluginTest {
       return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)
     }
 
-    private fun requireResourceAsPath(name: String): Path {
+    fun requireResourceAsPath(name: String): Path {
       val resource = this::class.java.classLoader.getResource(name)
         ?: throw NoSuchFileException("Resource $name not found.")
       return resource.toURI().toPath()
