@@ -122,7 +122,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
-  @get:Internal
+  @get:Internal // TODO: should be @Input, but it can't be serialized, see https://github.com/GradleUp/shadow/pull/1208.
   public open var keyTransformer: (String) -> String = IDENTITY
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
