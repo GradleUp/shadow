@@ -132,24 +132,22 @@ class TransformCachingTest : BaseCachingTest() {
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingGroovyExtensionModuleTransformer() {
     writeMainClass()
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     projectScriptPath.appendText(
       transform<GroovyExtensionModuleTransformer>(),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
   }
 }
