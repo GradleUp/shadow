@@ -16,11 +16,14 @@ class TransformCachingTest : BaseCachingTest() {
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
     writeMainClass()
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     projectScriptPath.appendText(
       transform<ServiceFileTransformer>(
@@ -29,29 +32,20 @@ class TransformCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     val replaced = projectScriptPath.readText().replace("META-INF/foo", "META-INF/bar")
     projectScriptPath.writeText(replaced)
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
   }
 
   @Test
