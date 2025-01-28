@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
@@ -228,7 +229,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          dependencyFilter = new com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter(project)
+          dependencyFilter = new ${MinimizeDependencyFilter::class.java.name}(project)
         }
       """.trimIndent(),
     )
