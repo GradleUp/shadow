@@ -19,7 +19,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
 
 /**
  * Resources transformer that merges Properties files.
@@ -123,10 +122,8 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
-  @Transient // Input property should be Serializable, but we don't want to serialize the lambda.
-  @get:Optional
-  @get:Input
-  public open var keyTransformer: ((String) -> String)? = null
+  @get:Internal
+  public open var keyTransformer: (String) -> String = IDENTITY
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
@@ -176,12 +173,12 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   private fun transformKeys(properties: Properties): CleanProperties {
-    if (keyTransformer == null) {
+    if (keyTransformer == IDENTITY) {
       return properties as CleanProperties
     }
     val result = CleanProperties()
     properties.forEach { (key, value) ->
-      result[keyTransformer!!(key as String)] = value
+      result[keyTransformer(key as String)] = value
     }
     return result
   }
@@ -253,5 +250,6 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   private companion object {
     private const val PROPERTIES_SUFFIX = ".properties"
+    private val IDENTITY = { key: String -> key }
   }
 }
