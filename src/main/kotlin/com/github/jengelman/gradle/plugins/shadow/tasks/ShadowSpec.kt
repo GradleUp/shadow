@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -68,6 +67,4 @@ public interface ShadowSpec : CopySpec {
     InvocationTargetException::class,
   )
   public fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowSpec
-
-  public val stats: ShadowStats
 }
