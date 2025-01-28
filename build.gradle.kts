@@ -105,8 +105,6 @@ testing.suites {
       }
     }
     dependencies {
-      // Seems we can't ref project() here due to some limitations of rootProject.
-      implementation(sourceSets.main.get().output)
       implementation(libs.apache.maven.modelBuilder)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
