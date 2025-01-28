@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import kotlin.io.path.appendText
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -81,7 +82,7 @@ class TransformCachingTest : BaseCachingTest() {
       containsEntries("shadow/Main.class", "foo/bar.properties")
     }
 
-    path("src/main/resources/foo/bar.properties").toFile().delete()
+    path("src/main/resources/foo/bar.properties").deleteExisting()
     path("src/main/resources/foo/baz.properties").writeText("foo=baz")
     val replaced = projectScriptPath.readText().replace("foo/bar.properties", "foo/baz.properties")
     projectScriptPath.writeText(replaced)
@@ -125,7 +126,7 @@ class TransformCachingTest : BaseCachingTest() {
       containsEntries("shadow/Main.class", "foo/bar.xml")
     }
 
-    path("src/main/resources/foo/bar.xml").toFile().delete()
+    path("src/main/resources/foo/bar.xml").deleteExisting()
     path("src/main/resources/foo/baz.xml").writeText("<foo>baz</foo>")
     val replaced = projectScriptPath.readText().replace("foo/bar.xml", "foo/baz.xml")
     projectScriptPath.writeText(replaced)
