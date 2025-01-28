@@ -36,27 +36,21 @@ class RelocationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries(
+          "shadow/Main.class",
+          "foo/junit/framework/Test.class",
+        )
+        doesNotContainEntries(
+          "junit/framework/Test.class",
+        )
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "shadow/Main.class",
-        "foo/junit/framework/Test.class",
-      )
-      doesNotContainEntries(
-        "junit/framework/Test.class",
-      )
-    }
-
+    assertions()
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "shadow/Main.class",
-        "foo/junit/framework/Test.class",
-      )
-      doesNotContainEntries(
-        "junit/framework/Test.class",
-      )
-    }
+    assertions()
   }
 }
