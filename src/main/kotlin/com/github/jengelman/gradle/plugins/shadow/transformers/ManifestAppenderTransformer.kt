@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory
  * Modified from [ManifestResourceTransformer].
  * @author Chris Rankin
  */
+@CacheableTransformer
 public open class ManifestAppenderTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer {

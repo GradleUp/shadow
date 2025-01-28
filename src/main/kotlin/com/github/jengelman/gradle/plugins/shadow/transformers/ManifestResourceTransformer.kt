@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory
  * @author Jason van Zyl
  * @author John Engelman
  */
+@CacheableTransformer
 public open class ManifestResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer {

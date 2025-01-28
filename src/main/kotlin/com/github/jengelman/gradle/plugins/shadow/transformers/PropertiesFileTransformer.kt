@@ -98,6 +98,7 @@ import org.gradle.api.tasks.Internal
  * @author Andres Almiray
  * @author Marc Philipp
  */
+@CacheableTransformer
 public open class PropertiesFileTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer {
