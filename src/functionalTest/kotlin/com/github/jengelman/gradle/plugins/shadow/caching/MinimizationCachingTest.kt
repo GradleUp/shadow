@@ -40,27 +40,21 @@ class MinimizationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries(
+          "server/Server.class",
+          "junit/framework/Test.class",
+        )
+        doesNotContainEntries(
+          "client/Client.class",
+        )
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "server/Server.class",
-        "junit/framework/Test.class",
-      )
-      doesNotContainEntries(
-        "client/Client.class",
-      )
-    }
-
+    assertions()
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "server/Server.class",
-        "junit/framework/Test.class",
-      )
-      doesNotContainEntries(
-        "client/Client.class",
-      )
-    }
+    assertions()
   }
 }
