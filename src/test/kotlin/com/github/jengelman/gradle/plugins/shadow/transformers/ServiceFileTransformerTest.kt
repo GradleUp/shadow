@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource
 
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
   @ParameterizedTest
-  @MethodSource("canTransformResourceData")
+  @MethodSource("resourceProvider")
   fun canTransformResource(path: String, exclude: Boolean, expected: Boolean) {
     if (exclude) {
       transformer.exclude(path)
@@ -20,7 +20,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   }
 
   @ParameterizedTest
-  @MethodSource("transformsServiceFileData")
+  @MethodSource("serviceFileProvider")
   fun transformServiceFile(path: String, input1: String, input2: String, output: String) {
     if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))
@@ -44,7 +44,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     }
 
     @JvmStatic
-    fun canTransformResourceData() = listOf(
+    fun resourceProvider() = listOf(
       // path, exclude, expected
       Arguments.of("META-INF/services/java.sql.Driver", false, true),
       Arguments.of("META-INF/services/io.dropwizard.logging.AppenderFactory", false, true),
@@ -55,7 +55,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     )
 
     @JvmStatic
-    fun transformsServiceFileData() = listOf(
+    fun serviceFileProvider() = listOf(
       // path, input1, input2, output
       Arguments.of("META-INF/services/com.acme.Foo", "foo", "bar", "foo\nbar"),
       Arguments.of("META-INF/services/com.acme.Bar", "foo\nbar", "zoo", "foo\nbar\nzoo"),

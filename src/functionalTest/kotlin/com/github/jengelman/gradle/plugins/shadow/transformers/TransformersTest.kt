@@ -121,7 +121,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @ParameterizedTest
-  @MethodSource("transformerConfigurations")
+  @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
     if (configuration.contains("test/some.file")) {
@@ -169,7 +169,7 @@ class TransformersTest : BaseTransformerTest() {
     """.trimIndent()
 
     @JvmStatic
-    fun transformerConfigurations() = listOf(
+    fun transformerConfigProvider() = listOf(
       "" to ApacheLicenseResourceTransformer::class,
       "" to ApacheNoticeResourceTransformer::class,
       "" to ComponentsXmlResourceTransformer::class,

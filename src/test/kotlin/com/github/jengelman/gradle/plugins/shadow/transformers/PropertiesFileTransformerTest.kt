@@ -61,7 +61,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   @ParameterizedTest
-  @MethodSource("transformConfigurationsProvider")
+  @MethodSource("transformConfigProvider")
   fun exerciseAllTransformConfigurations(
     path: String,
     mergeStrategy: String,
@@ -82,7 +82,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   @ParameterizedTest
-  @MethodSource("transformConfigurationsWithPathsProvider")
+  @MethodSource("transformConfigWithPathsProvider")
   fun exerciseAllTransformConfigurationsWithPaths(
     path: String,
     paths: List<String>,
@@ -102,7 +102,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   @ParameterizedTest
-  @MethodSource("transformConfigurationsWithMappingsProvider")
+  @MethodSource("transformConfigWithMappingsProvider")
   fun exerciseAllTransformConfigurationsWithMappings(
     path: String,
     mappings: Map<String, Map<String, String>>,
@@ -122,7 +122,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   @ParameterizedTest
-  @MethodSource("appliesKeyTransformerProvider")
+  @MethodSource("keyTransformerProvider")
   fun appliesKeyTransformer(
     path: String,
     keyTransformer: (String) -> String,
@@ -142,7 +142,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   @ParameterizedTest
-  @MethodSource("appliesCharsetProvider")
+  @MethodSource("charsetProvider")
   fun appliesCharset(
     path: String,
     charset: String,
@@ -172,7 +172,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     )
 
     @JvmStatic
-    fun appliesCharsetProvider() = listOf(
+    fun charsetProvider() = listOf(
       Arguments.of(
         "utf8.properties",
         "utf-8",
@@ -182,7 +182,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     )
 
     @JvmStatic
-    fun transformConfigurationsWithPathsProvider() = listOf(
+    fun transformConfigWithPathsProvider() = listOf(
       Arguments.of(
         "f.properties",
         listOf("f.properties"),
@@ -214,7 +214,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     )
 
     @JvmStatic
-    fun transformConfigurationsWithMappingsProvider() = listOf(
+    fun transformConfigWithMappingsProvider() = listOf(
       Arguments.of(
         "f.properties",
         mapOf("f.properties" to mapOf("mergeStrategy" to "first")),
@@ -260,7 +260,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     )
 
     @JvmStatic
-    fun transformConfigurationsProvider() = listOf(
+    fun transformConfigProvider() = listOf(
       Arguments.of(
         "f.properties",
         "first",
@@ -296,7 +296,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     )
 
     @JvmStatic
-    fun appliesKeyTransformerProvider() = listOf(
+    fun keyTransformerProvider() = listOf(
       Arguments.of(
         "foo.properties",
         { key: String -> key },
