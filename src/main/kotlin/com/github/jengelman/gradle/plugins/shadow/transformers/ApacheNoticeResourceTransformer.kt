@@ -23,6 +23,7 @@ import org.gradle.api.tasks.Optional
  *
  * @author John Engelman
  */
+@CacheableTransformer
 public open class ApacheNoticeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : Transformer {

@@ -3,13 +3,21 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
+
 **Changed**
 
 - Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
+- Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
+- Mark `ShadowJar.dependencyFilter` as `@Input`. ([#1206](https://github.com/GradleUp/shadow/pull/1206))  
+  `ShadowSpec.stats` is removed and `ShadowJar.stats` is `internal` for now.
 
 **Fixed**
 
 - Support overriding `mainClass` provided by `JavaApplication`. ([#1182](https://github.com/GradleUp/shadow/pull/1182))
+- Fix `ShadowJar` not being successful after `includes` or `excludes` are changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
 
 **Removed**
 

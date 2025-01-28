@@ -6,12 +6,12 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import java.util.jar.Attributes
 import kotlin.io.path.appendText
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
@@ -77,7 +77,7 @@ class TransformersTest : BaseTransformerTest() {
   )
   @Test
   fun canMergeLog4j2PluginCacheFiles() {
-    val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
+    val content = requireResourceAsText(PLUGIN_CACHE_FILE)
     val one = buildJarOne {
       insert(PLUGIN_CACHE_FILE, content)
     }
@@ -121,7 +121,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @ParameterizedTest
-  @MethodSource("transformerConfigurations")
+  @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
     if (configuration.contains("test/some.file")) {
@@ -169,7 +169,7 @@ class TransformersTest : BaseTransformerTest() {
     """.trimIndent()
 
     @JvmStatic
-    fun transformerConfigurations() = listOf(
+    fun transformerConfigProvider() = listOf(
       "" to ApacheLicenseResourceTransformer::class,
       "" to ApacheNoticeResourceTransformer::class,
       "" to ComponentsXmlResourceTransformer::class,

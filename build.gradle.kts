@@ -105,8 +105,6 @@ testing.suites {
       }
     }
     dependencies {
-      // Seems we can't ref project() here due to some limitations of rootProject.
-      implementation(sourceSets.main.get().output)
       implementation(libs.apache.maven.modelBuilder)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
@@ -124,6 +122,15 @@ testing.suites {
         maxParallelForks = Runtime.getRuntime().availableProcessors()
       }
     }
+  }
+}
+
+// This part should be placed after testing.suites to ensure the test sourceSets are created.
+kotlin.target.compilations {
+  val main by getting
+  val functionalTest by getting {
+    // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
+    associateWith(main)
   }
 }
 

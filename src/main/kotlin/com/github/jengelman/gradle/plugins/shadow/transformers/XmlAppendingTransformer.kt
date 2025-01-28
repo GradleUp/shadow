@@ -81,8 +81,4 @@ public open class XmlAppendingTransformer @Inject constructor(
     XMLOutputter(Format.getPrettyFormat()).output(doc, os)
     doc = null
   }
-
-  public companion object {
-    public const val XSI_NS: String = "http://www.w3.org/2001/XMLSchema-instance"
-  }
 }

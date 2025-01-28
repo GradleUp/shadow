@@ -215,7 +215,7 @@ class FilteringTest : BasePluginTest() {
     writeClientAndServerModules(
       serverShadowBlock = """
         dependencies {
-          exclude(dependency { it.moduleGroup == 'junit' })
+          exclude { it.moduleGroup == 'junit' }
         }
       """.trimIndent(),
     )
@@ -295,21 +295,5 @@ class FilteringTest : BasePluginTest() {
         "d.properties",
       )
     }
-  }
-
-  private fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.module("shadow", "c", "1.0") {
-      buildJar {
-        insert("c.properties", "c")
-      }
-      if (circular) {
-        addDependency("shadow", "d", "1.0")
-      }
-    }.module("shadow", "d", "1.0") {
-      buildJar {
-        insert("d.properties", "d")
-      }
-      addDependency("shadow", "c", "1.0")
-    }.publish()
   }
 }
