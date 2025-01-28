@@ -13,12 +13,18 @@ import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class TransformerCachingTest : BaseCachingTest() {
+  @BeforeEach
+  override fun setup() {
+    super.setup()
+    writeMainClass()
+  }
+
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
-    writeMainClass()
     val assertions = {
       assertThat(outputShadowJar).useAll {
         containsEntries("shadow/Main.class")
@@ -53,7 +59,6 @@ class TransformerCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
-    writeMainClass()
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     val assertions = { name: String ->
       assertThat(outputShadowJar).useAll {
@@ -92,7 +97,6 @@ class TransformerCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
-    writeMainClass()
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     val assertions = { name: String ->
       assertThat(outputShadowJar).useAll {
@@ -131,7 +135,6 @@ class TransformerCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingGroovyExtensionModuleTransformer() {
-    writeMainClass()
     val assertions = {
       assertThat(outputShadowJar).useAll {
         containsEntries("shadow/Main.class")
