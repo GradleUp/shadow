@@ -131,7 +131,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     expectedOutput: Map<String, String>,
   ) {
     transformer.mergeStrategy.set(MergeStrategy.Append)
-    transformer.keyTransformer = keyTransformer
+    transformer.keyTransformer.set(KeyTransformer { keyTransformer(it) })
 
     if (transformer.canTransformResource(path)) {
       transformer.transform(context(path, input1))

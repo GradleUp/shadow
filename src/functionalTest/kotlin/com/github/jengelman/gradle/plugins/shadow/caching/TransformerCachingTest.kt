@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlReso
 import com.github.jengelman.gradle.plugins.shadow.transformers.DontIncludeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.IncludeResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.KeyTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
@@ -147,10 +148,11 @@ class TransformerCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingPropertiesFileTransformer() {
+    val uppercaseTrans = keyTransformer("key.toUpperCase()")
     projectScriptPath.appendText(
       transform<PropertiesFileTransformer>(
         transformerBlock = """
-          keyTransformer = { it.toUpperCase() }
+          keyTransformer = $uppercaseTrans
         """.trimIndent(),
       ),
     )
@@ -167,10 +169,9 @@ class TransformerCachingTest : BaseCachingTest() {
     assertExecutionsAreCachedAndUpToDate()
     assertions("FOO")
 
-    val replaced = projectScriptPath.readText().replace(
-      "keyTransformer = { it.toUpperCase() }",
-      "keyTransformer = { 'prefix.' + it }",
-    )
+    val prefixTrans = keyTransformer("'prefix.' + key")
+
+    val replaced = projectScriptPath.readText().replace(uppercaseTrans, prefixTrans)
     projectScriptPath.writeText(replaced)
 
     assertFirstExecutionSuccess()
@@ -222,5 +223,16 @@ class TransformerCachingTest : BaseCachingTest() {
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
     )
+
+    fun keyTransformer(trans: String): String {
+      return """
+        new ${KeyTransformer::class.java.name}() {
+          @Override
+          public String transform(String key) {
+            return $trans
+          }
+        }
+      """.trimIndent()
+    }
   }
 }

@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import java.io.InputStream
+import java.io.Serializable
 import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
@@ -123,10 +124,9 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
-  @Transient // Input property should be Serializable, but we don't want to serialize the lambda.
   @get:Optional
   @get:Input
-  public open var keyTransformer: ((String) -> String)? = null
+  public open val keyTransformer: Property<KeyTransformer> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
@@ -176,12 +176,10 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   private fun transformKeys(properties: Properties): CleanProperties {
-    if (keyTransformer == null) {
-      return properties as CleanProperties
-    }
+    val keyTransformer = keyTransformer.orNull ?: return properties as CleanProperties
     val result = CleanProperties()
     properties.forEach { (key, value) ->
-      result[keyTransformer!!(key as String)] = value
+      result[keyTransformer.transform(key as String)] = value
     }
     return result
   }
@@ -254,4 +252,8 @@ public open class PropertiesFileTransformer @Inject constructor(
   private companion object {
     private const val PROPERTIES_SUFFIX = ".properties"
   }
+}
+
+public fun interface KeyTransformer : Serializable {
+  public fun transform(key: String): String
 }
