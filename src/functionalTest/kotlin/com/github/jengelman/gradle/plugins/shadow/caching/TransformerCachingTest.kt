@@ -3,8 +3,17 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.DontIncludeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.IncludeResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
@@ -13,8 +22,11 @@ import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.reflect.KClass
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
 class TransformerCachingTest : BaseCachingTest() {
   @BeforeEach
@@ -133,8 +145,13 @@ class TransformerCachingTest : BaseCachingTest() {
     assertions("baz")
   }
 
-  @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingGroovyExtensionModuleTransformer() {
+  @ParameterizedTest
+  @MethodSource("transformerConfigProvider")
+  fun shadowJarIsCachedCorrectlyWhenUsingOtherTransformers(pair: Pair<String, KClass<*>>) {
+    val (configuration, transformer) = pair
+    if (configuration.contains("test/some.file")) {
+      path("test/some.file").writeText("some content")
+    }
     val assertions = {
       assertThat(outputShadowJar).useAll {
         containsEntries("shadow/Main.class")
@@ -145,12 +162,32 @@ class TransformerCachingTest : BaseCachingTest() {
     assertions()
 
     projectScriptPath.appendText(
-      transform<GroovyExtensionModuleTransformer>(),
+      """
+        $shadowJar {
+          transform(${transformer.java.name}) $configuration
+        }
+      """.trimIndent(),
     )
     assertFirstExecutionSuccess()
     assertions()
 
     assertExecutionsAreCachedAndUpToDate()
     assertions()
+  }
+
+  private companion object {
+    @JvmStatic
+    fun transformerConfigProvider() = listOf(
+      "" to ApacheLicenseResourceTransformer::class,
+      "" to ApacheNoticeResourceTransformer::class,
+      "" to ComponentsXmlResourceTransformer::class,
+      "" to DontIncludeResourceTransformer::class,
+      "" to GroovyExtensionModuleTransformer::class,
+      "{ resource.set(\"test.file\"); file.fileValue(file(\"test/some.file\")) }" to IncludeResourceTransformer::class,
+      "" to Log4j2PluginsCacheFileTransformer::class,
+      "" to ManifestAppenderTransformer::class,
+      "" to ManifestResourceTransformer::class,
+      "{ keyTransformer = { it.toLowerCase() } }" to PropertiesFileTransformer::class,
+    )
   }
 }
