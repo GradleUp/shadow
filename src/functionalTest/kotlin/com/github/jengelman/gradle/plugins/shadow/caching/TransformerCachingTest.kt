@@ -1,25 +1,38 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class TransformCachingTest : BaseCachingTest() {
+class TransformerCachingTest : BaseCachingTest() {
+  @BeforeEach
+  override fun setup() {
+    super.setup()
+    writeMainClass()
+  }
+
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
-    writeMainClass()
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     projectScriptPath.appendText(
       transform<ServiceFileTransformer>(
@@ -28,40 +41,34 @@ class TransformCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     val replaced = projectScriptPath.readText().replace("META-INF/foo", "META-INF/bar")
     projectScriptPath.writeText(replaced)
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
-    writeMainClass()
+    val assertions = { name: String ->
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class", "foo/$name.properties")
+        getContent("foo/$name.properties").isEqualTo("foo=$name")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions("bar")
 
     projectScriptPath.appendText(
       transform<AppendingTransformer>(
@@ -70,42 +77,36 @@ class TransformCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.properties")
-    }
+    assertions("bar")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.properties")
-    }
+    assertions("bar")
 
-    path("src/main/resources/foo/bar.properties").toFile().delete()
+    path("src/main/resources/foo/bar.properties").deleteExisting()
     path("src/main/resources/foo/baz.properties").writeText("foo=baz")
     val replaced = projectScriptPath.readText().replace("foo/bar.properties", "foo/baz.properties")
     projectScriptPath.writeText(replaced)
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.properties")
-    }
+    assertions("baz")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.properties")
-    }
+    assertions("baz")
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
-    writeMainClass()
+    val assertions = { name: String ->
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class", "foo/$name.xml")
+        getContent("foo/$name.xml").contains("<foo>$name</foo>")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions("bar")
 
     projectScriptPath.appendText(
       transform<XmlAppendingTransformer>(
@@ -114,54 +115,42 @@ class TransformCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.xml")
-    }
+    assertions("bar")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.xml")
-    }
+    assertions("bar")
 
-    path("src/main/resources/foo/bar.xml").toFile().delete()
+    path("src/main/resources/foo/bar.xml").deleteExisting()
     path("src/main/resources/foo/baz.xml").writeText("<foo>baz</foo>")
     val replaced = projectScriptPath.readText().replace("foo/bar.xml", "foo/baz.xml")
     projectScriptPath.writeText(replaced)
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.xml")
-    }
+    assertions("baz")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.xml")
-    }
+    assertions("baz")
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingGroovyExtensionModuleTransformer() {
-    writeMainClass()
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     projectScriptPath.appendText(
       transform<GroovyExtensionModuleTransformer>(),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions()
   }
 }
