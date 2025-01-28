@@ -107,10 +107,10 @@ public open class ComponentsXmlResourceTransformer : Transformer {
       return os.toByteArray()
     }
 
-  private companion object {
-    private const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
+  public companion object {
+    public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
 
-    fun getRelocatedClass(className: String?, context: TransformerContext): String? {
+    private fun getRelocatedClass(className: String?, context: TransformerContext): String? {
       val stats = context.stats
       if (!className.isNullOrEmpty()) {
         for (relocator in context.relocators) {
@@ -123,11 +123,11 @@ public open class ComponentsXmlResourceTransformer : Transformer {
       return className
     }
 
-    fun getValue(dom: Xpp3Dom, element: String): String {
+    private fun getValue(dom: Xpp3Dom, element: String): String {
       return dom.getChild(element).value.orEmpty()
     }
 
-    fun setValue(dom: Xpp3Dom, element: String, value: String?) {
+    private fun setValue(dom: Xpp3Dom, element: String, value: String?) {
       val child = dom.getChild(element)
       if (child == null || value.isNullOrEmpty()) return
       child.value = value

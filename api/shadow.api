@@ -418,11 +418,16 @@ public abstract interface annotation class com/github/jengelman/gradle/plugins/s
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public static final field COMPONENTS_XML_PATH Ljava/lang/String;
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion {
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/DontIncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
@@ -437,11 +442,23 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/DontInclude
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer$Companion;
+	public static final field KEY_EXTENSION_CLASSES Ljava/lang/String;
+	public static final field KEY_MODULE_NAME Ljava/lang/String;
+	public static final field KEY_MODULE_VERSION Ljava/lang/String;
+	public static final field KEY_STATIC_EXTENSION_CLASSES Ljava/lang/String;
+	public static final field MERGED_MODULE_NAME Ljava/lang/String;
+	public static final field MERGED_MODULE_VERSION Ljava/lang/String;
+	public static final field PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR Ljava/lang/String;
+	public static final field PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR Ljava/lang/String;
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer$Companion {
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
