@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
-  @ParameterizedTest(name = "{index} => path={0}, exclude={1}, expected={2}")
+  @ParameterizedTest
   @MethodSource("canTransformResourceData")
   fun canTransformResource(path: String, exclude: Boolean, expected: Boolean) {
     if (exclude) {
@@ -19,7 +19,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
-  @ParameterizedTest(name = "{index} => path={0}")
+  @ParameterizedTest
   @MethodSource("transformsServiceFileData")
   fun transformServiceFile(path: String, input1: String, input2: String, output: String) {
     if (transformer.canTransformResource(path)) {

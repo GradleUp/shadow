@@ -54,13 +54,13 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
   }
 
-  @ParameterizedTest(name = "Path {0} {2} transformed")
+  @ParameterizedTest
   @MethodSource("pathProvider")
-  fun canTransformResourceWithPaths(path: String, expected: Boolean, transform: String) {
+  fun canTransformResourceWithPaths(path: String, expected: Boolean) {
     assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
-  @ParameterizedTest(name = "mergeStrategy={1}, mergeSeparator='{2}'")
+  @ParameterizedTest
   @MethodSource("transformConfigurationsProvider")
   fun exerciseAllTransformConfigurations(
     path: String,
@@ -81,7 +81,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
   }
 
-  @ParameterizedTest(name = "Paths={1}")
+  @ParameterizedTest
   @MethodSource("transformConfigurationsWithPathsProvider")
   fun exerciseAllTransformConfigurationsWithPaths(
     path: String,
@@ -101,7 +101,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
   }
 
-  @ParameterizedTest(name = "Mappings={1}")
+  @ParameterizedTest
   @MethodSource("transformConfigurationsWithMappingsProvider")
   fun exerciseAllTransformConfigurationsWithMappings(
     path: String,
@@ -121,7 +121,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
   }
 
-  @ParameterizedTest(name = "KeyTransformer: {1}")
+  @ParameterizedTest
   @MethodSource("appliesKeyTransformerProvider")
   fun appliesKeyTransformer(
     path: String,
@@ -141,7 +141,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
   }
 
-  @ParameterizedTest(name = "Charset: {1}")
+  @ParameterizedTest
   @MethodSource("appliesCharsetProvider")
   fun appliesCharset(
     path: String,
@@ -166,9 +166,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
     @JvmStatic
     fun pathProvider() = listOf(
-      Arguments.of("foo.properties", true, "can be"),
-      Arguments.of("foo/bar.properties", true, "can be"),
-      Arguments.of("foo.props", false, "can not be"),
+      Arguments.of("foo.properties", true),
+      Arguments.of("foo/bar.properties", true),
+      Arguments.of("foo.props", false),
     )
 
     @JvmStatic
