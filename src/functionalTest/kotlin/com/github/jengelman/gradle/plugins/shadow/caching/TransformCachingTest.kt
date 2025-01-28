@@ -1,11 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.readText
@@ -50,13 +52,17 @@ class TransformCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
-    path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     writeMainClass()
+    path("src/main/resources/foo/bar.properties").writeText("foo=bar")
+    val assertions = { name: String ->
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class", "foo/$name.properties")
+        getContent("foo/$name.properties").isEqualTo("foo=$name")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions("bar")
 
     projectScriptPath.appendText(
       transform<AppendingTransformer>(
@@ -65,16 +71,11 @@ class TransformCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.properties")
-    }
+    assertions("bar")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.properties")
-    }
+    assertions("bar")
 
     path("src/main/resources/foo/bar.properties").deleteExisting()
     path("src/main/resources/foo/baz.properties").writeText("foo=baz")
@@ -82,14 +83,10 @@ class TransformCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.properties")
-    }
+    assertions("baz")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.properties")
-    }
+    assertions("baz")
   }
 
   @Test
