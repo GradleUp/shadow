@@ -27,12 +27,6 @@ kotlin {
       "-Xjvm-default=all",
     )
   }
-  afterEvaluate {
-    // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
-    target.compilations {
-      getByName("functionalTest").associateWith(getByName("main"))
-    }
-  }
 }
 
 lint {
@@ -130,6 +124,15 @@ testing.suites {
         maxParallelForks = Runtime.getRuntime().availableProcessors()
       }
     }
+  }
+}
+
+// This part should be placed after testing.suites to ensure the test sourceSets are created.
+kotlin.target.compilations {
+  val main by getting
+  val functionalTest by getting {
+    // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
+    associateWith(main)
   }
 }
 
