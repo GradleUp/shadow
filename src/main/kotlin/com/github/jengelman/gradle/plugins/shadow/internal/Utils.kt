@@ -6,7 +6,10 @@ import java.io.File
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.NoSuchFileException
+import java.nio.file.Path
 import java.util.Properties
+import kotlin.io.path.inputStream
+import kotlin.io.path.toPath
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.internal.file.Chmod
@@ -44,6 +47,12 @@ internal fun requireResourceAsText(name: String): String {
 internal fun requireResourceAsStream(name: String): InputStream {
   return Utils::class.java.classLoader.getResourceAsStream(name)
     ?: throw NoSuchFileException("Resource $name not found.")
+}
+
+internal fun requireResourceAsPath(name: String): Path {
+  val resource = Utils::class.java.classLoader.getResource(name)
+    ?: throw NoSuchFileException("Resource $name not found.")
+  return resource.toURI().toPath()
 }
 
 private val DummyFile = File("dummy")
