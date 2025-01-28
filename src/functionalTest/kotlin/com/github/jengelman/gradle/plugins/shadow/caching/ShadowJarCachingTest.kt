@@ -27,11 +27,13 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertFirstExecutionSuccess()
     assertExecutionsAreCachedAndUpToDate()
 
-    val replaced = projectScriptPath.readText().lines().filter {
-      it != fromJar(projectJar)
-    }.joinToString(System.lineSeparator())
+    val replaced = projectScriptPath.readText().lines()
+      .filterNot { it == fromJar(projectJar) }
+      .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
+
     assertFirstExecutionSuccess()
+    assertExecutionsAreCachedAndUpToDate()
   }
 
   @Test
@@ -45,6 +47,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertFirstExecutionSuccess()
+    assertThat(outputShadowJar).isRegular()
 
     projectScriptPath.appendText(
       """
@@ -53,6 +56,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+
     assertExecutionsAreCachedAndUpToDate()
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
   }
@@ -154,6 +158,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingDependencyIncludesExcludes() {
+    writeMainClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
@@ -161,8 +166,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-
-    writeMainClass(withImports = true)
 
     assertFirstExecutionSuccess()
     assertThat(outputShadowJar).useAll {
@@ -181,24 +184,20 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "shadow/Main.class",
-      )
-      doesNotContainEntries(
-        "junit/framework/Test.class",
-      )
+    val assertions = {
+      assertThat(outputShadowJar).useAll {
+        containsEntries(
+          "shadow/Main.class",
+        )
+        doesNotContainEntries(
+          "junit/framework/Test.class",
+        )
+      }
     }
 
+    assertFirstExecutionSuccess()
+    assertions()
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "shadow/Main.class",
-      )
-      doesNotContainEntries(
-        "junit/framework/Test.class",
-      )
-    }
+    assertions()
   }
 }
