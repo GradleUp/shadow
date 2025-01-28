@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
@@ -91,13 +92,17 @@ class TransformCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
-    path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     writeMainClass()
+    path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
+    val assertions = { name: String ->
+      assertThat(outputShadowJar).useAll {
+        containsEntries("shadow/Main.class", "foo/$name.xml")
+        getContent("foo/$name.xml").contains("<foo>$name</foo>")
+      }
+    }
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class")
-    }
+    assertions("bar")
 
     projectScriptPath.appendText(
       transform<XmlAppendingTransformer>(
@@ -106,16 +111,11 @@ class TransformCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.xml")
-    }
+    assertions("bar")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/bar.xml")
-    }
+    assertions("bar")
 
     path("src/main/resources/foo/bar.xml").deleteExisting()
     path("src/main/resources/foo/baz.xml").writeText("<foo>baz</foo>")
@@ -123,14 +123,10 @@ class TransformCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertFirstExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.xml")
-    }
+    assertions("baz")
 
     assertExecutionsAreCachedAndUpToDate()
-    assertThat(outputShadowJar).useAll {
-      containsEntries("shadow/Main.class", "foo/baz.xml")
-    }
+    assertions("baz")
   }
 
   @Test
