@@ -10,6 +10,7 @@
 **Changed**
 
 - Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
+- Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
 
 **Fixed**
 
