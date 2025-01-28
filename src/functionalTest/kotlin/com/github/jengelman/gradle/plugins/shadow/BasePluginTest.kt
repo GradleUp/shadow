@@ -7,12 +7,12 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.io.Closeable
-import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.ExperimentalPathApi
@@ -26,7 +26,6 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.readText
-import kotlin.io.path.toPath
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -381,12 +380,6 @@ abstract class BasePluginTest {
 
     fun Assert<BuildResult>.taskOutcomeEquals(taskPath: String, expectedOutcome: TaskOutcome) {
       return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)
-    }
-
-    fun requireResourceAsPath(name: String): Path {
-      val resource = this::class.java.classLoader.getResource(name)
-        ?: throw NoSuchFileException("Resource $name not found.")
-      return resource.toURI().toPath()
     }
   }
 }
