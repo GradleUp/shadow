@@ -15,7 +15,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
-class TransformCachingTest : BaseCachingTest() {
+class TransformerCachingTest : BaseCachingTest() {
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
     writeMainClass()
