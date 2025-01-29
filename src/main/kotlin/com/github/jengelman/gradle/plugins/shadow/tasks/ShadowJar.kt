@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
+import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -43,7 +44,6 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
@@ -94,8 +94,7 @@ public abstract class ShadowJar :
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.map {
       if (it) {
-        project.extensions.getByType(SourceSetContainer::class.java)
-          .map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
+        project.sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
       } else {
         emptySet()
       }

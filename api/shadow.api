@@ -4,17 +4,18 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicati
 	public static final field SHADOW_RUN_TASK_NAME Ljava/lang/String;
 	public static final field SHADOW_SCRIPTS_TASK_NAME Ljava/lang/String;
 	public fun <init> ()V
-	protected fun addCreateScriptsTask ()V
-	protected fun addRunTask ()V
+	protected fun addCreateScriptsTask (Lorg/gradle/api/Project;)V
+	protected fun addRunTask (Lorg/gradle/api/Project;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
-	protected fun configureDistSpec ()V
-	protected fun configureInstallTask ()V
-	protected fun configureJarMainClass ()V
-	protected final fun getShadowJar ()Lorg/gradle/api/tasks/TaskProvider;
+	protected fun configureDistSpec (Lorg/gradle/api/Project;)V
+	protected fun configureInstallTask (Lorg/gradle/api/Project;)V
+	protected fun configureJarMainClass (Lorg/gradle/api/Project;)V
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion {
+	public final fun getInstallShadowDist (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final fun getStartShadowScripts (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin : org/gradle/api/Plugin {
@@ -31,6 +32,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugi
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion {
+	public final fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
@@ -45,9 +47,15 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugi
 	public fun <init> (Lorg/gradle/api/component/SoftwareComponentFactory;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
+	protected fun configureComponents (Lorg/gradle/api/Project;)V
+	protected fun configureConfigurations (Lorg/gradle/api/Project;)V
+	protected fun configureJavaGradlePlugin (Lorg/gradle/api/Project;)V
+	protected fun configureShadowJar (Lorg/gradle/api/Project;)V
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {
+	public final fun getShadowJar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final fun getShadowRuntimeElements (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : org/gradle/api/Plugin {
