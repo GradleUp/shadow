@@ -11,26 +11,15 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
-import org.gradle.api.plugins.JavaApplication
-import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
-import org.gradle.jvm.toolchain.JavaToolchainService
 
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
-  private lateinit var javaApplication: JavaApplication
-  private lateinit var javaPluginExtension: JavaPluginExtension
-  private lateinit var javaToolchainService: JavaToolchainService
-
   override fun apply(project: Project) {
-    this.javaApplication = project.applicationExtension
-    this.javaPluginExtension = project.javaPluginExtension
-    this.javaToolchainService = project.javaToolchainService
-
     project.addRunTask()
     project.addCreateScriptsTask()
     project.configureDistSpec()
@@ -39,19 +28,20 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureJarMainClass() {
-    val classNameProvider = javaApplication.mainClass
+    val mainClassName = applicationExtension.mainClass
     tasks.shadowJar.configure { task ->
-      task.inputs.property("mainClassName", classNameProvider)
+      task.inputs.property("mainClassName", mainClassName)
       task.doFirst {
         // Inject the Main-Class attribute if it is not already present.
         if (!task.manifest.attributes.contains("Main-Class")) {
-          task.manifest.attributes["Main-Class"] = classNameProvider.get()
+          task.manifest.attributes["Main-Class"] = mainClassName.get()
         }
       }
     }
   }
 
   protected open fun Project.addRunTask() {
+    val extension = applicationExtension
     tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
@@ -60,8 +50,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
       task.classpath(jarFile)
-      task.mainClass.set(javaApplication.mainClass)
-      task.conventionMapping.map("jvmArgs", javaApplication::getApplicationDefaultJvmArgs)
+      task.mainClass.set(extension.mainClass)
+      task.conventionMapping.map("jvmArgs", extension::getApplicationDefaultJvmArgs)
       task.javaLauncher.set(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
     }
   }
@@ -70,33 +60,31 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
    * Syncs with [ApplicationPlugin.addCreateScriptsTask](https://github.com/gradle/gradle/blob/bcecbb416f19438c7532e309456e3c3ed287f8f5/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java#L184-L203).
    */
   protected open fun Project.addCreateScriptsTask() {
+    val extension = applicationExtension
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
       task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
-      val unixStartScript =
-        requireResourceAsText("com/github/jengelman/gradle/plugins/shadow/internal/unixStartScript.txt")
-      val windowsStartScript =
-        requireResourceAsText("com/github/jengelman/gradle/plugins/shadow/internal/windowsStartScript.txt")
+      val dir = "com/github/jengelman/gradle/plugins/shadow/internal"
       (task.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        resources.text.fromString(unixStartScript)
+        resources.text.fromString(requireResourceAsText("$dir/unixStartScript.txt"))
       (task.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        resources.text.fromString(windowsStartScript)
+        resources.text.fromString(requireResourceAsText("$dir/windowsStartScript.txt"))
 
       task.classpath = files(tasks.shadowJar)
-      task.mainModule.set(javaApplication.mainModule)
-      task.mainClass.set(javaApplication.mainClass)
-      task.conventionMapping.map("applicationName", javaApplication::getApplicationName)
+      task.mainModule.set(extension.mainModule)
+      task.mainClass.set(extension.mainClass)
+      task.conventionMapping.map("applicationName", extension::getApplicationName)
       task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
-      task.conventionMapping.map("executableDir", javaApplication::getExecutableDir)
-      task.conventionMapping.map("defaultJvmOpts", javaApplication::getApplicationDefaultJvmArgs)
+      task.conventionMapping.map("executableDir", extension::getExecutableDir)
+      task.conventionMapping.map("defaultJvmOpts", extension::getApplicationDefaultJvmArgs)
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
 
   protected open fun Project.configureInstallTask() {
     tasks.installShadowDist.configure { task ->
-      val applicationName = providers.provider { javaApplication.applicationName }
+      val applicationName = providers.provider { applicationExtension.applicationName }
 
       task.doFirst {
         if (

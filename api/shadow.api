@@ -50,7 +50,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugi
 	protected fun configureComponents (Lorg/gradle/api/Project;)V
 	protected fun configureConfigurations (Lorg/gradle/api/Project;)V
 	protected fun configureJavaGradlePlugin (Lorg/gradle/api/Project;)V
-	protected fun configureShadowTask (Lorg/gradle/api/Project;)Lorg/gradle/api/tasks/TaskProvider;
+	protected fun configureShadowJar (Lorg/gradle/api/Project;)V
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {

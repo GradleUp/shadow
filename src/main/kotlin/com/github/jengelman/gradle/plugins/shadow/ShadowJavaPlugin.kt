@@ -29,31 +29,31 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 ) : Plugin<Project> {
 
   override fun apply(project: Project) {
-    project.configureShadowTask()
+    project.configureShadowJar()
     project.configureConfigurations()
     project.configureComponents()
     project.configureJavaGradlePlugin()
   }
 
-  protected open fun Project.configureShadowTask(): TaskProvider<ShadowJar> {
+  protected open fun Project.configureShadowJar() {
     val jarTask = tasks.jar
-    val taskProvider = tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { shadow ->
-      shadow.group = ShadowBasePlugin.GROUP_NAME
-      shadow.description = "Create a combined JAR of project and runtime dependencies"
-      shadow.archiveClassifier.set("all")
+    val taskProvider = tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
+      task.group = ShadowBasePlugin.GROUP_NAME
+      task.description = "Create a combined JAR of project and runtime dependencies"
+      task.archiveClassifier.set("all")
       @Suppress("EagerGradleConfiguration")
-      shadow.manifest.inheritFrom(jarTask.get().manifest)
+      task.manifest.inheritFrom(jarTask.get().manifest)
       val attrProvider = jarTask.map { it.manifest.attributes["Class-Path"]?.toString().orEmpty() }
       val files = files(configurations.shadow)
-      shadow.doFirst {
+      task.doFirst {
         if (!files.isEmpty) {
           val attrs = listOf(attrProvider.getOrElse("")) + files.map { it.name }
-          shadow.manifest.attributes["Class-Path"] = attrs.joinToString(" ").trim()
+          task.manifest.attributes["Class-Path"] = attrs.joinToString(" ").trim()
         }
       }
-      shadow.from(sourceSets.named("main").map { it.output })
-      shadow.configurations.convention(listOf(runtimeConfiguration))
-      shadow.exclude(
+      task.from(sourceSets.named("main").map { it.output })
+      task.configurations.convention(listOf(runtimeConfiguration))
+      task.exclude(
         "META-INF/INDEX.LIST",
         "META-INF/*.SF",
         "META-INF/*.DSA",
@@ -64,7 +64,6 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       )
     }
     artifacts.add(configurations.shadow.name, taskProvider)
-    return taskProvider
   }
 
   protected open fun Project.configureConfigurations() {
