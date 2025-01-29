@@ -13,6 +13,7 @@
 - Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
 - Mark `ShadowJar.dependencyFilter` as `@Input`. ([#1206](https://github.com/GradleUp/shadow/pull/1206))  
   `ShadowSpec.stats` is removed and `ShadowJar.stats` is `internal` for now.
+- Polish `startShadowScripts` task registering. ([#1216](https://github.com/GradleUp/shadow/pull/1216))
 
 **Fixed**
 
