@@ -21,7 +21,7 @@ class RelocationCachingTest : BaseCachingTest() {
     )
     writeMainClass(withImports = true)
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -48,9 +48,9 @@ class RelocationCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 }
