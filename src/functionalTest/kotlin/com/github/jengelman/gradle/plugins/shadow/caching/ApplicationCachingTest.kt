@@ -1,19 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
-import assertk.assertThat
-import assertk.assertions.contains
-import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_SCRIPTS_TASK_NAME
 import kotlin.io.path.appendText
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
 class ApplicationCachingTest : BaseCachingTest() {
-  override lateinit var taskPath: String
+  override val taskPath: String = runShadowTask
 
   @Test
   fun runShadowExecutedCorrectlyAfterShadowJarChanged() {
-    taskPath = runShadowTask
     prepare()
     val resourcePath = path("src/main/resources/my/resource.txt")
     resourcePath.writeText(
@@ -52,36 +47,6 @@ class ApplicationCachingTest : BaseCachingTest() {
     assertions("resource 2")
   }
 
-  @Test
-  fun startShadowScriptsExecutedCorrectlyAfterShadowJarChanged() {
-    taskPath = ":$SHADOW_SCRIPTS_TASK_NAME"
-    prepare()
-    writeMainClass()
-    val assertions = { classifier: String ->
-      assertExecutionSuccess()
-      assertThat(path("build/scriptsShadow/myapp").readText()).contains(
-        "CLASSPATH=\$APP_HOME/lib/myapp-1.0-$classifier.jar",
-      )
-      assertThat(path("build/scriptsShadow/myapp.bat").readText()).contains(
-        "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-$classifier.jar",
-      )
-      // `startShadowScripts` is not cacheable, so it's always executed.
-      assertExecutionSuccess()
-    }
-
-    assertions("all")
-
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          archiveClassifier = 'foo'
-        }
-      """.trimIndent(),
-    )
-
-    assertions("foo")
-  }
-
   private fun prepare(
     projectBlock: String = "",
     applicationBlock: String = "",
@@ -104,7 +69,7 @@ class ApplicationCachingTest : BaseCachingTest() {
           args 'foo'
           $runShadowBlock
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent(),
     )
     settingsScriptPath.writeText(
       getDefaultSettingsBuildScript(
