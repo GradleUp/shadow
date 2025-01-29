@@ -6,6 +6,7 @@ import assertk.assertThat
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -78,8 +79,9 @@ abstract class BasePluginTest {
     localRepo.root.deleteRecursively()
   }
 
-  open val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
+  val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
   val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
+  val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
 
   val projectScriptPath: Path get() = path("build.gradle")
   val settingsScriptPath: Path get() = path("settings.gradle")
@@ -337,6 +339,8 @@ abstract class BasePluginTest {
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
     """.trimIndent()
+
+    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)".trim()
 
     val commonArguments = listOf(
       "--warning-mode=fail",

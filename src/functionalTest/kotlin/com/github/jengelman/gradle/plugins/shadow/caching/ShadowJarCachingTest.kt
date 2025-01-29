@@ -25,16 +25,16 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertFirstExecutionSuccess()
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionSuccess()
+    assertExecutionsFromCacheAndUpToDate()
 
     val replaced = projectScriptPath.readText().lines()
       .filterNot { it == fromJar(projectJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
 
-    assertFirstExecutionSuccess()
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionSuccess()
+    assertExecutionsFromCacheAndUpToDate()
   }
 
   @Test
@@ -47,7 +47,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).isRegular()
 
     projectScriptPath.appendText(
@@ -58,7 +58,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
   }
 
@@ -79,7 +79,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     // First run successful with all files.
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -98,7 +98,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
     // Second run successful after excludes changed.
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -119,7 +119,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
     // Third run successful after includes changed.
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -140,7 +140,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
     // Forth run successful after includes changed again.
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -154,7 +154,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     }
 
     // Clean and run 2 more times to ensure the states are cached and up-to-date.
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
   }
 
   @Test
@@ -168,7 +168,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
@@ -196,9 +196,9 @@ class ShadowJarCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 
@@ -221,9 +221,9 @@ class ShadowJarCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
 
     projectScriptPath.appendText(
@@ -234,9 +234,9 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 }
