@@ -110,7 +110,7 @@ class ApplicationPluginTest : BasePluginTest() {
       dependenciesBlock = "shadow 'junit:junit:3.8.2'",
     )
 
-    run("shadowDistZip")
+    run(shadowDistZipTask)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     val extractedPath = path("build/distributions/extracted/")
@@ -219,7 +219,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("shadowDistZip")
+    run(shadowDistZipTask)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
@@ -240,7 +240,7 @@ class ApplicationPluginTest : BasePluginTest() {
     path("src/dist/echo.sh").writeText("echo 'Hello, World!'")
     prepare()
 
-    run("shadowDistZip")
+    run(shadowDistZipTask)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->

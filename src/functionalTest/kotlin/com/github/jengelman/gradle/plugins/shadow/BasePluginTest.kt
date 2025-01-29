@@ -82,6 +82,7 @@ abstract class BasePluginTest {
   val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
   val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
   val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
+  val shadowDistZipTask = ":shadowDistZip"
 
   val projectScriptPath: Path get() = path("build.gradle")
   val settingsScriptPath: Path get() = path("settings.gradle")
