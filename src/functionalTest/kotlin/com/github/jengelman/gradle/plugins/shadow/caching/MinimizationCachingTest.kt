@@ -9,7 +9,7 @@ import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
 class MinimizationCachingTest : BaseCachingTest() {
-  override val shadowJarTask: String = serverShadowJarTask
+  override val taskPath: String = serverShadowJarTask
   override val outputShadowJar: JarPath get() = outputServerShadowJar
 
   @Test
@@ -22,7 +22,7 @@ class MinimizationCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "server/Server.class",
@@ -52,9 +52,9 @@ class MinimizationCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 }

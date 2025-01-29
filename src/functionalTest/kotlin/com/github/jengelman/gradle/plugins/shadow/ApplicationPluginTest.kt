@@ -5,7 +5,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
-import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.DISTRIBUTION_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
@@ -55,7 +54,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(SHADOW_RUN_TASK_NAME)
+    val result = run(runShadowTask)
 
     assertThat(result.output).contains(
       "Running application with JDK 17",
@@ -191,7 +190,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(SHADOW_RUN_TASK_NAME)
+    val result = run(runShadowTask)
 
     assertThat(result.output).contains(
       "Hello, World! (foo) from Main2",
@@ -279,8 +278,6 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private companion object {
-    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME')".trim()
-
     fun Path.walkEntries(): Sequence<String> {
       return walk()
         .filter { it.isRegularFile() }

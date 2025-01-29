@@ -43,7 +43,7 @@ class TransformerCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
 
     projectScriptPath.appendText(
@@ -53,19 +53,19 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
 
     val replaced = projectScriptPath.readText().replace("META-INF/foo", "META-INF/bar")
     projectScriptPath.writeText(replaced)
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 
@@ -79,7 +79,7 @@ class TransformerCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions("bar")
 
     projectScriptPath.appendText(
@@ -89,10 +89,10 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions("bar")
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions("bar")
 
     path("src/main/resources/foo/bar.properties").deleteExisting()
@@ -100,10 +100,10 @@ class TransformerCachingTest : BaseCachingTest() {
     val replaced = projectScriptPath.readText().replace("foo/bar.properties", "foo/baz.properties")
     projectScriptPath.writeText(replaced)
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions("baz")
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions("baz")
   }
 
@@ -117,7 +117,7 @@ class TransformerCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions("bar")
 
     projectScriptPath.appendText(
@@ -127,10 +127,10 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions("bar")
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions("bar")
 
     path("src/main/resources/foo/bar.xml").deleteExisting()
@@ -138,10 +138,10 @@ class TransformerCachingTest : BaseCachingTest() {
     val replaced = projectScriptPath.readText().replace("foo/bar.xml", "foo/baz.xml")
     projectScriptPath.writeText(replaced)
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions("baz")
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions("baz")
   }
 
@@ -158,7 +158,7 @@ class TransformerCachingTest : BaseCachingTest() {
       }
     }
 
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
 
     projectScriptPath.appendText(
@@ -168,10 +168,10 @@ class TransformerCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertFirstExecutionSuccess()
+    assertExecutionSuccess()
     assertions()
 
-    assertExecutionsAreCachedAndUpToDate()
+    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 

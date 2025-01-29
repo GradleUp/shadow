@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
@@ -16,15 +17,17 @@ import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 abstract class BaseCachingTest : BasePluginTest() {
-  fun assertFirstExecutionSuccess() {
+  open val taskPath = shadowJarTask
+
+  fun assertExecutionSuccess(vararg outputs: String) {
     // task was executed and not pulled from cache
-    assertRunWithOutcome(SUCCESS)
+    assertRunWithResult(SUCCESS, outputs = outputs)
   }
 
   /**
-   * This should be called after [assertFirstExecutionSuccess] to ensure that the shadowJar task is cached.
+   * This should be called after [assertExecutionSuccess] to ensure that the shadowJar task is cached.
    */
-  fun assertExecutionsAreCachedAndUpToDate() {
+  fun assertExecutionsFromCacheAndUpToDate(vararg outputs: String) {
     run("clean")
     // Make sure the output shadow jar has been deleted.
     assertFailure { outputShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
@@ -33,14 +36,15 @@ abstract class BaseCachingTest : BasePluginTest() {
     // Make sure build folders are deleted by clean task.
     assertThat(buildDirs).isEmpty()
 
-    // check that shadowJar pulls from cache in the original directory
-    assertRunWithOutcome(FROM_CACHE)
-    // check that shadowJar pulls from cache in a different directory
-    assertRunWithOutcome(UP_TO_DATE)
+    // Run the task again to ensure it is pulled from cache.
+    assertRunWithResult(FROM_CACHE, outputs = outputs)
+    // Run the task again to ensure it is up-to-date.
+    assertRunWithResult(UP_TO_DATE, outputs = outputs)
   }
 
-  private fun assertRunWithOutcome(expectedOutcome: TaskOutcome) {
-    val result = run(shadowJarTask)
-    assertThat(result).taskOutcomeEquals(shadowJarTask, expectedOutcome)
+  private fun assertRunWithResult(expectedOutcome: TaskOutcome, vararg outputs: String) {
+    val result = run(taskPath)
+    assertThat(result).taskOutcomeEquals(taskPath, expectedOutcome)
+    assertThat(result.output).contains(*outputs)
   }
 }
