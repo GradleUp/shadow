@@ -16,6 +16,11 @@ class ApplicationCachingTest : BaseCachingTest() {
         Hello, World! %s from resource 1
       """.trimIndent(),
     )
+    val assertions = { resName: String ->
+      assertExecutionSuccess("Hello, World! foo from $resName")
+      assertExecutionsFromCacheAndUpToDate("Hello, World! foo from $resName")
+    }
+
     path("src/main/java/my/App.java").writeText(
       """
         package my;
@@ -31,18 +36,14 @@ class ApplicationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-
-    assertExecutionSuccess("Hello, World! foo from resource 1")
-    assertExecutionsFromCacheAndUpToDate("Hello, World! foo from resource 1")
+    assertions("resource 1")
 
     resourcePath.writeText(
       """
         Hello, World! %s from resource 2
       """.trimIndent(),
     )
-
-    assertExecutionSuccess("Hello, World! foo from resource 2")
-    assertExecutionsFromCacheAndUpToDate("Hello, World! foo from resource 2")
+    assertions("resource 2")
   }
 
   private fun prepare(
