@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.shadowJar
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
@@ -21,27 +22,25 @@ import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 import org.gradle.jvm.toolchain.JavaToolchainService
 
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
-  private lateinit var project: Project
   private lateinit var javaApplication: JavaApplication
   private lateinit var javaPluginExtension: JavaPluginExtension
   private lateinit var javaToolchainService: JavaToolchainService
 
   override fun apply(project: Project) {
-    this.project = project
     this.javaApplication = project.applicationExtension
     this.javaPluginExtension = project.javaPluginExtension
     this.javaToolchainService = project.javaToolchainService
 
-    addRunTask()
-    addCreateScriptsTask()
-    configureDistSpec()
-    configureJarMainClass()
-    configureInstallTask()
+    project.addRunTask()
+    project.addCreateScriptsTask()
+    project.configureDistSpec()
+    project.configureJarMainClass()
+    project.configureInstallTask()
   }
 
-  protected open fun configureJarMainClass() {
+  protected open fun Project.configureJarMainClass() {
     val classNameProvider = javaApplication.mainClass
-    project.tasks.shadowJar.configure { task ->
+    tasks.shadowJar.configure { task ->
       task.inputs.property("mainClassName", classNameProvider)
       task.doFirst {
         // Inject the Main-Class attribute if it is not already present.
@@ -52,12 +51,12 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  protected open fun addRunTask() {
-    project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
+  protected open fun Project.addRunTask() {
+    tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
-      val jarFile = project.tasks.installShadowDist.zip(project.tasks.shadowJar) { i, s ->
+      val jarFile = tasks.installShadowDist.zip(tasks.shadowJar) { i, s ->
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
       task.classpath(jarFile)
@@ -70,8 +69,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   /**
    * Syncs with [ApplicationPlugin.addCreateScriptsTask](https://github.com/gradle/gradle/blob/bcecbb416f19438c7532e309456e3c3ed287f8f5/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java#L184-L203).
    */
-  protected open fun addCreateScriptsTask() {
-    project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
+  protected open fun Project.addCreateScriptsTask() {
+    tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
       task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
@@ -80,24 +79,24 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       val windowsStartScript =
         requireResourceAsText("com/github/jengelman/gradle/plugins/shadow/internal/windowsStartScript.txt")
       (task.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        project.resources.text.fromString(unixStartScript)
+        resources.text.fromString(unixStartScript)
       (task.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        project.resources.text.fromString(windowsStartScript)
+        resources.text.fromString(windowsStartScript)
 
-      task.classpath = project.files(project.tasks.shadowJar)
+      task.classpath = files(tasks.shadowJar)
       task.mainModule.set(javaApplication.mainModule)
       task.mainClass.set(javaApplication.mainClass)
       task.conventionMapping.map("applicationName", javaApplication::getApplicationName)
-      task.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
+      task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
       task.conventionMapping.map("executableDir", javaApplication::getExecutableDir)
       task.conventionMapping.map("defaultJvmOpts", javaApplication::getApplicationDefaultJvmArgs)
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
 
-  protected open fun configureInstallTask() {
-    project.tasks.installShadowDist.configure { task ->
-      val applicationName = project.providers.provider { javaApplication.applicationName }
+  protected open fun Project.configureInstallTask() {
+    tasks.installShadowDist.configure { task ->
+      val applicationName = providers.provider { javaApplication.applicationName }
 
       task.doFirst {
         if (
@@ -124,16 +123,16 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  protected open fun configureDistSpec() {
-    project.distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
+  protected open fun Project.configureDistSpec() {
+    distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
       distributions.contents { contents ->
-        contents.from(project.file("src/dist"))
+        contents.from(file("src/dist"))
         contents.into("lib") { lib ->
-          lib.from(project.tasks.shadowJar)
-          lib.from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
+          lib.from(tasks.shadowJar)
+          lib.from(configurations.shadow)
         }
         contents.into("bin") { bin ->
-          bin.from(project.tasks.startShadowScripts)
+          bin.from(tasks.startShadowScripts)
           bin.filePermissions { it.unix(493) }
         }
       }

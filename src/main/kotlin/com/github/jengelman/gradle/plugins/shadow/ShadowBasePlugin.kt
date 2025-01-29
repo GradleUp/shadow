@@ -2,8 +2,11 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.KnowsTask
 import org.gradle.api.GradleException
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.util.GradleVersion
 
 public abstract class ShadowBasePlugin : Plugin<Project> {
@@ -27,5 +30,8 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     public const val CONFIGURATION_NAME: String = SHADOW
     public const val COMPONENT_NAME: String = SHADOW
     public const val DISTRIBUTION_NAME: String = SHADOW
+
+    public inline val ConfigurationContainer.shadow: NamedDomainObjectProvider<Configuration>
+      get() = named(CONFIGURATION_NAME)
   }
 }
