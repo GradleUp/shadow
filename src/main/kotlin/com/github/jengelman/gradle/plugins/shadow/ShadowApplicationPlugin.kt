@@ -77,11 +77,14 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         project.resources.text.fromString(windowsStartScript)
 
       task.classpath = project.files(shadowJar)
-      task.inputs.files(project.files(shadowJar))
+      task.mainModule.set(javaApplication.mainModule)
       task.mainClass.set(javaApplication.mainClass)
       task.conventionMapping.map("applicationName", javaApplication::getApplicationName)
       task.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
+      task.conventionMapping.map("executableDir", javaApplication::getExecutableDir)
       task.conventionMapping.map("defaultJvmOpts", javaApplication::getApplicationDefaultJvmArgs)
+      val javaPluginExtension = project.extensions.getByType(JavaPluginExtension::class.java)
+      task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
 
