@@ -4,9 +4,10 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContex
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import kotlin.io.path.Path
+import kotlin.io.path.name
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -47,7 +48,7 @@ public open class ServiceFileTransformer(
     val lines = context.inputStream.bufferedReader().readLines().toMutableList()
     var targetPath = context.path
     context.relocators.forEach { rel ->
-      if (rel.canRelocateClass(File(targetPath).name)) {
+      if (rel.canRelocateClass(Path(targetPath).name)) {
         val classContext = RelocateClassContext.builder().className(targetPath).stats(context.stats).build()
         targetPath = rel.relocateClass(classContext)
       }
