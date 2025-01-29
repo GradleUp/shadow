@@ -18,7 +18,8 @@ class ApplicationCachingTest : BaseCachingTest() {
     )
     val assertions = { resName: String ->
       assertExecutionSuccess("Hello, World! foo from $resName")
-      assertExecutionsFromCacheAndUpToDate("Hello, World! foo from $resName")
+      // `runTask` is not cacheable, so it's always executed.
+      assertExecutionSuccess("Hello, World! foo from $resName")
     }
 
     path("src/main/java/my/App.java").writeText(
