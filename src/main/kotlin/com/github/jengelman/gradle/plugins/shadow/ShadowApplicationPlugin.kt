@@ -1,11 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.distributions
+import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPluginExtension
@@ -19,10 +22,14 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
   private lateinit var project: Project
   private lateinit var javaApplication: JavaApplication
+  private lateinit var javaPluginExtension: JavaPluginExtension
+  private lateinit var javaToolchainService: JavaToolchainService
 
   override fun apply(project: Project) {
     this.project = project
-    this.javaApplication = project.extensions.getByType(JavaApplication::class.java)
+    this.javaApplication = project.applicationExtension
+    this.javaPluginExtension = project.javaPluginExtension
+    this.javaToolchainService = project.javaToolchainService
 
     addRunTask()
     addCreateScriptsTask()
@@ -56,9 +63,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.classpath(jarFile)
       task.mainClass.set(javaApplication.mainClass)
       task.conventionMapping.map("jvmArgs", javaApplication::getApplicationDefaultJvmArgs)
-      val toolchain = project.extensions.getByType(JavaPluginExtension::class.java).toolchain
-      val defaultLauncher = project.extensions.getByType(JavaToolchainService::class.java).launcherFor(toolchain)
-      task.javaLauncher.set(defaultLauncher)
+      task.javaLauncher.set(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
     }
   }
 
@@ -86,7 +91,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
       task.conventionMapping.map("executableDir", javaApplication::getExecutableDir)
       task.conventionMapping.map("defaultJvmOpts", javaApplication::getApplicationDefaultJvmArgs)
-      val javaPluginExtension = project.extensions.getByType(JavaPluginExtension::class.java)
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
@@ -121,20 +125,19 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun configureDistSpec() {
-    project.extensions.getByType(DistributionContainer::class.java)
-      .register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
-        distributions.contents { contents ->
-          contents.from(project.file("src/dist"))
-          contents.into("lib") { lib ->
-            lib.from(shadowJar)
-            lib.from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
-          }
-          contents.into("bin") { bin ->
-            bin.from(project.tasks.named(SHADOW_SCRIPTS_TASK_NAME))
-            bin.filePermissions { it.unix(493) }
-          }
+    project.distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
+      distributions.contents { contents ->
+        contents.from(project.file("src/dist"))
+        contents.into("lib") { lib ->
+          lib.from(shadowJar)
+          lib.from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
+        }
+        contents.into("bin") { bin ->
+          bin.from(project.tasks.named(SHADOW_SCRIPTS_TASK_NAME))
+          bin.filePermissions { it.unix(493) }
         }
       }
+    }
   }
 
   protected val shadowJar: TaskProvider<ShadowJar>
