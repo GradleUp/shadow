@@ -56,7 +56,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
-      task.dependsOn(project.tasks.installShadowDist)
 
       val jarFile = project.tasks.installShadowDist.zip(project.tasks.shadowJar) { i, s ->
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
