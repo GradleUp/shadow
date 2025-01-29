@@ -77,6 +77,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         project.resources.text.fromString(windowsStartScript)
 
       task.classpath = project.files(shadowJar)
+      task.inputs.files(project.files(shadowJar))
       task.mainClass.set(javaApplication.mainClass)
       task.conventionMapping.map("applicationName", javaApplication::getApplicationName)
       task.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
