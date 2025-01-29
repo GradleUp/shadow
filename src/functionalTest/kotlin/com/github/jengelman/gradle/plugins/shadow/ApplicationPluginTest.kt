@@ -191,19 +191,29 @@ class ApplicationPluginTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-
-    val result = run(runShadowTask)
-
-    assertThat(result.output).all {
-      // Prefer main class from `application.main` over the one in manifest attributes.
-      contains("Hello, World! (foo) from Main")
-      doesNotContain("Hello, World! (foo) from Main2")
+    val assertions = { output: String, arg: String ->
+      assertThat(output).all {
+        // Prefer main class from `application.main` over the one in manifest attributes.
+        contains("Hello, World! ($arg) from Main")
+        doesNotContain("Hello, World! ($arg) from Main2")
+      }
     }
+
+    assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
       entriesContained = arrayOf("a.properties", "a2.properties", "shadow/Main.class", "shadow/Main2.class"),
       mainClassAttr = "shadow.Main2",
     )
+
+    projectScriptPath.appendText(
+      """
+        run {
+          args 'bar'
+        }
+      """.trimIndent(),
+    )
+    assertions(run(":run").output, "bar")
   }
 
   @Test
@@ -280,7 +290,7 @@ class ApplicationPluginTest : BasePluginTest() {
           args 'foo'
           $runShadowBlock
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
     settingsScriptPath.writeText(
       getDefaultSettingsBuildScript(
