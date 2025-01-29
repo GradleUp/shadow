@@ -235,6 +235,27 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun canIncludeSrcDistByDefault() {
+    path("src/dist/echo.sh").writeText("echo 'Hello, World!'")
+    prepare()
+
+    run("shadowDistZip")
+
+    val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
+    ZipFile(zipPath.toFile()).use { zip ->
+      val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
+      assertThat(entries).containsOnly(
+        "myapp-shadow-1.0/bin/myapp",
+        "myapp-shadow-1.0/bin/myapp.bat",
+        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+        "myapp-shadow-1.0/echo.sh",
+      )
+      assertThat(zip.getContent("myapp-shadow-1.0/echo.sh"))
+        .isEqualTo("echo 'Hello, World!'")
+    }
+  }
+
   private fun prepare(
     mainClassWithImports: Boolean = false,
     projectBlock: String = "",
