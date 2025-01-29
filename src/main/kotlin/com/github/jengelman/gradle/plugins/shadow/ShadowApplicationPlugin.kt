@@ -62,6 +62,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
+  /**
+   * Syncs with [ApplicationPlugin.addCreateScriptsTask](https://github.com/gradle/gradle/blob/bcecbb416f19438c7532e309456e3c3ed287f8f5/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java#L184-L203).
+   */
   protected open fun addCreateScriptsTask() {
     project.tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
       task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
@@ -77,11 +80,14 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         project.resources.text.fromString(windowsStartScript)
 
       task.classpath = project.files(shadowJar)
-      task.inputs.files(project.files(shadowJar))
+      task.mainModule.set(javaApplication.mainModule)
       task.mainClass.set(javaApplication.mainClass)
       task.conventionMapping.map("applicationName", javaApplication::getApplicationName)
       task.conventionMapping.map("outputDir") { project.layout.buildDirectory.dir("scriptsShadow").get().asFile }
+      task.conventionMapping.map("executableDir", javaApplication::getExecutableDir)
       task.conventionMapping.map("defaultJvmOpts", javaApplication::getApplicationDefaultJvmArgs)
+      val javaPluginExtension = project.extensions.getByType(JavaPluginExtension::class.java)
+      task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
 
