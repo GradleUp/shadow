@@ -1,8 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsOnly
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.DISTRIBUTION_NAME
@@ -192,11 +194,14 @@ class ApplicationPluginTest : BasePluginTest() {
 
     val result = run(runShadowTask)
 
-    assertThat(result.output).contains(
-      "Hello, World! (foo) from Main2",
-    )
+    assertThat(result.output).all {
+      // Prefer main class from `application.main` over the one in manifest attributes.
+      contains("Hello, World! (foo) from Main")
+      doesNotContain("Hello, World! (foo) from Main2")
+    }
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
+      entriesContained = arrayOf("a.properties", "a2.properties", "shadow/Main.class", "shadow/Main2.class"),
       mainClassAttr = "shadow.Main2",
     )
   }

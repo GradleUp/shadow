@@ -40,7 +40,7 @@ application {
   mainClass = 'myapp.Main'
 }
 
-tasks.named('runShadow', com.github.jengelman.gradle.plugins.shadow.tasks.JavaJarExec) {
+tasks.named('runShadow', JavaExec) {
   args 'foo'
 }
 ```
