@@ -14,6 +14,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.util.GradleVersion
 
@@ -40,6 +43,9 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
+
+internal inline val TaskContainer.jar: TaskProvider<Jar>
+  get() = named("jar", Jar::class.java)
 
 internal inline fun <reified V : Any> ObjectFactory.property(
   defaultValue: Any? = null,

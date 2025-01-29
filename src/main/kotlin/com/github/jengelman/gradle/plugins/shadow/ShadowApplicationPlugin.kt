@@ -1,11 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.shadowJar
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -14,6 +14,7 @@ import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
@@ -40,7 +41,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun configureJarMainClass() {
     val classNameProvider = javaApplication.mainClass
-    shadowJar.configure { task ->
+    project.tasks.shadowJar.configure { task ->
       task.inputs.property("mainClassName", classNameProvider)
       task.doFirst {
         // Inject the Main-Class attribute if it is not already present.
@@ -55,9 +56,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     project.tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
-      task.dependsOn(installShadowDist)
+      task.dependsOn(project.tasks.installShadowDist)
 
-      val jarFile = installShadowDist.zip(shadowJar) { i, s ->
+      val jarFile = project.tasks.installShadowDist.zip(project.tasks.shadowJar) { i, s ->
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
       task.classpath(jarFile)
@@ -84,7 +85,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       (task.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
         project.resources.text.fromString(windowsStartScript)
 
-      task.classpath = project.files(shadowJar)
+      task.classpath = project.files(project.tasks.shadowJar)
       task.mainModule.set(javaApplication.mainModule)
       task.mainClass.set(javaApplication.mainClass)
       task.conventionMapping.map("applicationName", javaApplication::getApplicationName)
@@ -96,7 +97,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun configureInstallTask() {
-    installShadowDist.configure { task ->
+    project.tasks.installShadowDist.configure { task ->
       val applicationName = project.providers.provider { javaApplication.applicationName }
 
       task.doFirst {
@@ -129,26 +130,26 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       distributions.contents { contents ->
         contents.from(project.file("src/dist"))
         contents.into("lib") { lib ->
-          lib.from(shadowJar)
+          lib.from(project.tasks.shadowJar)
           lib.from(project.configurations.named(ShadowBasePlugin.CONFIGURATION_NAME))
         }
         contents.into("bin") { bin ->
-          bin.from(project.tasks.named(SHADOW_SCRIPTS_TASK_NAME))
+          bin.from(project.tasks.startShadowScripts)
           bin.filePermissions { it.unix(493) }
         }
       }
     }
   }
 
-  protected val shadowJar: TaskProvider<ShadowJar>
-    get() = project.tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
-
-  private val installShadowDist: TaskProvider<Sync>
-    get() = project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
-
   public companion object {
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
     public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"
     public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
+
+    public inline val TaskContainer.startShadowScripts: TaskProvider<CreateStartScripts>
+      get() = named(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java)
+
+    public inline val TaskContainer.installShadowDist: TaskProvider<Sync>
+      get() = named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
   }
 }

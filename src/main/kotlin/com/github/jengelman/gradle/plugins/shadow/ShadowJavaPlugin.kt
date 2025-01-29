@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.internal.jar
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
@@ -16,8 +17,8 @@ import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.jvm.tasks.Jar
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 public abstract class ShadowJavaPlugin @Inject constructor(
@@ -80,7 +81,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   }
 
   private fun configureShadowTask(project: Project, shadowConfiguration: Configuration): TaskProvider<ShadowJar> {
-    val jarTask = project.tasks.named(JavaPlugin.JAR_TASK_NAME, Jar::class.java)
+    val jarTask = project.tasks.jar
     val taskProvider = project.tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { shadow ->
       shadow.group = ShadowBasePlugin.GROUP_NAME
       shadow.description = "Create a combined JAR of project and runtime dependencies"
@@ -114,5 +115,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   public companion object {
     public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
     public const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
+
+    public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>
+      get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
   }
 }

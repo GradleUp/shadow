@@ -11,10 +11,11 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicati
 	protected fun configureDistSpec ()V
 	protected fun configureInstallTask ()V
 	protected fun configureJarMainClass ()V
-	protected final fun getShadowJar ()Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion {
+	public final fun getInstallShadowDist (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final fun getStartShadowScripts (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin : org/gradle/api/Plugin {
@@ -48,6 +49,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugi
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {
+	public final fun getShadowJar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : org/gradle/api/Plugin {
