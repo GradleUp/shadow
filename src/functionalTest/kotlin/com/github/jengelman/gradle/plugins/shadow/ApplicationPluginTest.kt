@@ -110,7 +110,7 @@ class ApplicationPluginTest : BasePluginTest() {
       dependenciesBlock = "shadow 'junit:junit:3.8.2'",
     )
 
-    run("shadowDistZip")
+    run(shadowDistZipTask)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     val extractedPath = path("build/distributions/extracted/")
@@ -191,19 +191,29 @@ class ApplicationPluginTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-
-    val result = run(runShadowTask)
-
-    assertThat(result.output).all {
-      // Prefer main class from `application.main` over the one in manifest attributes.
-      contains("Hello, World! (foo) from Main")
-      doesNotContain("Hello, World! (foo) from Main2")
+    val assertions = { output: String, arg: String ->
+      assertThat(output).all {
+        // Prefer main class from `application.main` over the one in manifest attributes.
+        contains("Hello, World! ($arg) from Main")
+        doesNotContain("Hello, World! ($arg) from Main2")
+      }
     }
+
+    assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
       entriesContained = arrayOf("a.properties", "a2.properties", "shadow/Main.class", "shadow/Main2.class"),
       mainClassAttr = "shadow.Main2",
     )
+
+    projectScriptPath.appendText(
+      """
+        run {
+          args 'bar'
+        }
+      """.trimIndent(),
+    )
+    assertions(run(":run").output, "bar")
   }
 
   @Test
@@ -219,7 +229,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("shadowDistZip")
+    run(shadowDistZipTask)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
@@ -231,6 +241,27 @@ class ApplicationPluginTest : BasePluginTest() {
         "myapp-shadow-1.0/extra/echo.sh",
       )
       assertThat(zip.getContent("myapp-shadow-1.0/extra/echo.sh"))
+        .isEqualTo("echo 'Hello, World!'")
+    }
+  }
+
+  @Test
+  fun canIncludeSrcDistByDefault() {
+    path("src/dist/echo.sh").writeText("echo 'Hello, World!'")
+    prepare()
+
+    run(shadowDistZipTask)
+
+    val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
+    ZipFile(zipPath.toFile()).use { zip ->
+      val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
+      assertThat(entries).containsOnly(
+        "myapp-shadow-1.0/bin/myapp",
+        "myapp-shadow-1.0/bin/myapp.bat",
+        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+        "myapp-shadow-1.0/echo.sh",
+      )
+      assertThat(zip.getContent("myapp-shadow-1.0/echo.sh"))
         .isEqualTo("echo 'Hello, World!'")
     }
   }
@@ -259,7 +290,7 @@ class ApplicationPluginTest : BasePluginTest() {
           args 'foo'
           $runShadowBlock
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
     settingsScriptPath.writeText(
       getDefaultSettingsBuildScript(
