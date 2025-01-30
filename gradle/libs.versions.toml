@@ -16,7 +16,7 @@ moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:0.9.0"
 
-pluginPublish = "com.gradle.publish:plugin-publish-plugin:1.3.0"
+pluginPublish = "com.gradle.publish:plugin-publish-plugin:1.3.1"
 mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.30.0"
 gitPublish = "org.ajoberstar.git-publish:gradle-git-publish:5.1.0"
 jetbrains-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.0.0"
