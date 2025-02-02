@@ -76,6 +76,5 @@ tasks.register("release") {
   dependsOn(
     tasks.publish,
     tasks.publishPlugins,
-    tasks.gitPublishPush,
   )
 }
