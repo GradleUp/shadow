@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v9.0.0-beta7] (2025-02-02)
+
 **Added**
 
 - Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
@@ -522,7 +525,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta6...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta7...HEAD
+[v9.0.0-beta7]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7
 [v9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
 [v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
 [v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
