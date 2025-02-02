@@ -4,6 +4,17 @@
 ## [Unreleased]
 
 
+## [v8.3.6] (2025-02-02)
+
+**Added**
+
+- Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
+
+**Changed**
+
+- Exclude kotlin-stdlib from plugin dependencies. ([#1093](https://github.com/GradleUp/shadow/pull/1093))
+
+
 ## [v8.3.5] (2024-11-03)
 
 **Fixed**
@@ -415,7 +426,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.5...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.6...HEAD
+[v8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
 [v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
 [v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
 [v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
