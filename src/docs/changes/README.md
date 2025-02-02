@@ -6,6 +6,7 @@
 **Added**
 
 - Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
+- Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
 
 **Changed**
 
@@ -97,6 +98,17 @@
 **Fixed**
 
 - Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039))  
+
+
+## [v8.3.6] (2025-02-02)
+
+**Added**
+
+- Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
+
+**Changed**
+
+- Exclude kotlin-stdlib from plugin dependencies. ([#1093](https://github.com/GradleUp/shadow/pull/1093))
 
 
 ## [v8.3.5] (2024-11-03)
@@ -517,6 +529,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 [v9.0.0-beta3]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta3
 [v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
 [v9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
+[v8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
 [v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
 [v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
 [v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
