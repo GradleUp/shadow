@@ -3,8 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - 8.x
   pull_request:
+    branches:
+      - 8.x
   workflow_dispatch:
 
 jobs:
@@ -27,7 +29,7 @@ jobs:
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
-    if: github.repository == 'GradleUp/shadow' && github.ref == 'refs/heads/main'
+    if: github.repository == 'GradleUp/shadow' && github.ref == 'refs/heads/8.x'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
