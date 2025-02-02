@@ -25,6 +25,33 @@ class ShadowPlugin implements Plugin<Project> {
             //   etc. if the user applies shadow before those plugins. However, this is fine, because this was also
             //   the behavior with the old plugin when applying in that order.
             plugins.apply(LegacyShadowPlugin)
+
+            boolean enableDevelocityIntegration = providers.gradleProperty(
+                "com.gradleup.shadow.enableDevelocityIntegration"
+            ).map { it.toBoolean() }.getOrElse(false)
+            if (enableDevelocityIntegration) {
+                // Legacy build scan support for Gradle Enterprise, users should migrate to develocity plugin.
+                rootProject.plugins.withId('com.gradle.enterprise') {
+                    configureBuildScan(rootProject)
+                }
+                rootProject.plugins.withId('com.gradle.develocity') {
+                    configureBuildScan(rootProject)
+                }
+            }
+        }
+    }
+
+    private void configureBuildScan(Project rootProject) {
+        rootProject.buildScan.buildFinished {
+            def shadowTasks = tasks.withType(ShadowJar)
+            shadowTasks.each { task ->
+                if (task.didWork) {
+                    task.stats.buildScanData.each { k, v ->
+                        rootProject.buildScan.value "shadow.${task.path}.${k}", v.toString()
+                    }
+                    rootProject.buildScan.value "shadow.${task.path}.configurations", task.configurations*.name.join(", ")
+                }
+            }
         }
     }
 }
