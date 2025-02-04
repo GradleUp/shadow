@@ -10,10 +10,6 @@
 
 - Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
 
-**Changed**
-
-- Exclude kotlin-stdlib from plugin dependencies. ([#1093](https://github.com/GradleUp/shadow/pull/1093))
-
 
 ## [v8.3.5] (2024-11-03)
 
