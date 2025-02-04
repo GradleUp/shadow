@@ -48,6 +48,7 @@
 
 **Changed**
 
+- Exclude kotlin-stdlib from plugin dependencies. ([#1093](https://github.com/GradleUp/shadow/pull/1093))
 - **BREAKING CHANGE:** Migrate all `ListProperty` usages to `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
   Some public `List` parameters are also changed to `Set`.
 - Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
@@ -108,10 +109,6 @@
 **Added**
 
 - Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
-
-**Changed**
-
-- Exclude kotlin-stdlib from plugin dependencies. ([#1093](https://github.com/GradleUp/shadow/pull/1093))
 
 
 ## [v8.3.5] (2024-11-03)
