@@ -40,6 +40,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
+  /**
+   * Syncs with [ApplicationPlugin.addRunTask](https://github.com/gradle/gradle/blob/bcecbb416f19438c7532e309456e3c3ed287f8f5/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java#L145-L169).
+   */
   protected open fun Project.addRunTask() {
     val extension = applicationExtension
     tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
@@ -50,9 +53,12 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
       task.classpath(jarFile)
+      task.mainModule.set(extension.mainModule)
       task.mainClass.set(extension.mainClass)
-      task.conventionMapping.map("jvmArgs", extension::getApplicationDefaultJvmArgs)
-      task.javaLauncher.set(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
+      task.jvmArguments.convention(provider { extension.applicationDefaultJvmArgs })
+
+      task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
+      task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
     }
   }
 
