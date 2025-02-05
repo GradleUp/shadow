@@ -27,22 +27,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     project.addRunTask()
     project.addCreateScriptsTask()
-    project.configureDistSpec()
-    project.configureJarMainClass()
+    project.configureDistribution()
+    project.configureShadowJarMainClass()
     project.configureInstallTask()
-  }
-
-  protected open fun Project.configureJarMainClass() {
-    val mainClassName = applicationExtension.mainClass
-    tasks.shadowJar.configure { task ->
-      task.inputs.property("mainClassName", mainClassName)
-      task.doFirst {
-        // Inject the Main-Class attribute if it is not already present.
-        if (!task.manifest.attributes.contains("Main-Class")) {
-          task.manifest.attributes["Main-Class"] = mainClassName.get()
-        }
-      }
-    }
   }
 
   protected open fun Project.addRunTask() {
@@ -109,30 +96,46 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.doLast {
         task.eachFile {
           if (it.path == "bin/${applicationName.get()}") {
-            it.permissions { permissions -> permissions.unix(755) }
+            it.permissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
           }
         }
       }
     }
   }
 
-  protected open fun Project.configureDistSpec() {
+  protected open fun Project.configureDistribution() {
     distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
-      distributions.contents { contents ->
-        contents.from(file("src/dist"))
-        contents.into("lib") { lib ->
+      distributions.contents { distSpec ->
+        distSpec.from(file("src/dist"))
+        distSpec.into("lib") { lib ->
           lib.from(tasks.shadowJar)
           lib.from(configurations.shadow)
         }
-        contents.into("bin") { bin ->
+        distSpec.into("bin") { bin ->
           bin.from(tasks.startShadowScripts)
-          bin.filePermissions { it.unix(493) }
+          bin.filePermissions { it.unix(UNIX_SCRIPT_PERMISSIONS) }
+        }
+        distSpec.with(applicationExtension.applicationDistribution)
+      }
+    }
+  }
+
+  protected open fun Project.configureShadowJarMainClass() {
+    val mainClassName = applicationExtension.mainClass
+    tasks.shadowJar.configure { task ->
+      task.inputs.property("mainClassName", mainClassName)
+      task.doFirst {
+        // Inject the Main-Class attribute if it is not already present.
+        if (!task.manifest.attributes.contains("Main-Class")) {
+          task.manifest.attributes["Main-Class"] = mainClassName.get()
         }
       }
     }
   }
 
   public companion object {
+    private const val UNIX_SCRIPT_PERMISSIONS = "rwxr-xr-x"
+
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
     public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"
     public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
