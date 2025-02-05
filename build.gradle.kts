@@ -54,7 +54,6 @@ dependencies {
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
-  implementation(libs.asm)
   implementation(libs.jdependency)
   implementation(libs.jdom2)
   implementation(libs.plexus.utils)

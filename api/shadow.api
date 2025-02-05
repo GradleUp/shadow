@@ -90,7 +90,7 @@ public class com/github/jengelman/gradle/plugins/shadow/ShadowStats {
 	public fun toString ()Ljava/lang/String;
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper : org/objectweb/asm/commons/Remapper {
+public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper : org/vafer/jdeb/shaded/objectweb/asm/commons/Remapper {
 	public fun <init> (Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
 	public fun hasRelocators ()Z
 	public fun map (Ljava/lang/String;)Ljava/lang/String;
