@@ -219,12 +219,18 @@ class ApplicationPluginTest : BasePluginTest() {
   @Test
   fun canAddExtraFilesIntoDistribution() {
     path("extra/echo.sh").writeText("echo 'Hello, World!'")
+    path("some/dir/hello.txt").writeText("'Hello, World!'")
     prepare(
       projectBlock = """
         distributions.named('$DISTRIBUTION_NAME') {
           contents.into('extra') {
             from project.file('extra/echo.sh')
           }
+        }
+      """.trimIndent(),
+      applicationBlock = """
+        applicationDistribution.from('some/dir') {
+          include '*.txt'
         }
       """.trimIndent(),
     )
@@ -239,9 +245,12 @@ class ApplicationPluginTest : BasePluginTest() {
         "myapp-shadow-1.0/bin/myapp.bat",
         "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
         "myapp-shadow-1.0/extra/echo.sh",
+        "myapp-shadow-1.0/hello.txt",
       )
       assertThat(zip.getContent("myapp-shadow-1.0/extra/echo.sh"))
         .isEqualTo("echo 'Hello, World!'")
+      assertThat(zip.getContent("myapp-shadow-1.0/hello.txt"))
+        .isEqualTo("'Hello, World!'")
     }
   }
 

@@ -38,6 +38,8 @@ plugins {
 
 application {
   mainClass = 'myapp.Main'
+  // Optionally, you can add default JVM arguments to the start scripts like this:
+  applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
 }
 
 tasks.named('runShadow', JavaExec) {
@@ -68,12 +70,15 @@ plugins {
 
 application {
   mainClass = 'myapp.Main'
-  // Optionally, you can add default JVM arguments to the start scripts like this:
-  applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
+  // Optionally, you can include `some/dir` files in the distribution like this:
+  applicationDistribution.from('some/dir') {
+    include '*.txt'
+  }
 }
 
 // `shadow` is the name of the distribution created by Shadow plugin
 distributions.named('shadow') {
+  // Optionally, you can add more files into extra directory in the distribution like this:
   contents.into('extra') {
     from project.file('extra/echo.sh')
   }
