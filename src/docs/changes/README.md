@@ -7,6 +7,10 @@
 
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
 
+**Changed**
+
+- **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
+
 
 ## [v9.0.0-beta7] (2025-02-02)
 

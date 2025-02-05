@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.impl
+package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
@@ -14,13 +14,13 @@ import org.objectweb.asm.commons.Remapper
  *
  * @author John Engelman
  */
-public open class RelocatorRemapper(
+internal class RelocatorRemapper(
   private val relocators: Set<Relocator>,
   private val stats: ShadowStats,
 ) : Remapper() {
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
-  public open fun hasRelocators(): Boolean = relocators.isNotEmpty()
+  fun hasRelocators(): Boolean = relocators.isNotEmpty()
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
@@ -55,11 +55,11 @@ public open class RelocatorRemapper(
     return name
   }
 
-  public open fun mapPath(path: String): String {
+  fun mapPath(path: String): String {
     return map(path.substring(0, path.indexOf('.')))
   }
 
-  public open fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
+  fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
     return mapPath(path.pathString)
   }
 }
