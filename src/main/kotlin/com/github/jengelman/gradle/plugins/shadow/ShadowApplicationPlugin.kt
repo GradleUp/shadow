@@ -134,6 +134,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   public companion object {
+    /**
+     * Reflects the number of 755.
+     */
     private const val UNIX_SCRIPT_PERMISSIONS = "rwxr-xr-x"
 
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
