@@ -8,9 +8,9 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicati
 	protected fun addRunTask (Lorg/gradle/api/Project;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
-	protected fun configureDistSpec (Lorg/gradle/api/Project;)V
+	protected fun configureDistribution (Lorg/gradle/api/Project;)V
 	protected fun configureInstallTask (Lorg/gradle/api/Project;)V
-	protected fun configureJarMainClass (Lorg/gradle/api/Project;)V
+	protected fun configureShadowJarMainClass (Lorg/gradle/api/Project;)V
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion {

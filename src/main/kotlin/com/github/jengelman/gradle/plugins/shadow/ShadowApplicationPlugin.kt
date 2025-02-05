@@ -18,26 +18,18 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 
+/**
+ * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
+ *
+ * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
+ */
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     project.addRunTask()
     project.addCreateScriptsTask()
-    project.configureDistSpec()
-    project.configureJarMainClass()
+    project.configureDistribution()
+    project.configureShadowJarMainClass()
     project.configureInstallTask()
-  }
-
-  protected open fun Project.configureJarMainClass() {
-    val mainClassName = applicationExtension.mainClass
-    tasks.shadowJar.configure { task ->
-      task.inputs.property("mainClassName", mainClassName)
-      task.doFirst {
-        // Inject the Main-Class attribute if it is not already present.
-        if (!task.manifest.attributes.contains("Main-Class")) {
-          task.manifest.attributes["Main-Class"] = mainClassName.get()
-        }
-      }
-    }
   }
 
   protected open fun Project.addRunTask() {
@@ -50,15 +42,15 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
       task.classpath(jarFile)
+      task.mainModule.set(extension.mainModule)
       task.mainClass.set(extension.mainClass)
-      task.conventionMapping.map("jvmArgs", extension::getApplicationDefaultJvmArgs)
-      task.javaLauncher.set(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
+      task.jvmArguments.convention(provider { extension.applicationDefaultJvmArgs })
+
+      task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
+      task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
     }
   }
 
-  /**
-   * Syncs with [ApplicationPlugin.addCreateScriptsTask](https://github.com/gradle/gradle/blob/bcecbb416f19438c7532e309456e3c3ed287f8f5/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java#L184-L203).
-   */
   protected open fun Project.addCreateScriptsTask() {
     val extension = applicationExtension
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
@@ -104,30 +96,49 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.doLast {
         task.eachFile {
           if (it.path == "bin/${applicationName.get()}") {
-            it.permissions { permissions -> permissions.unix(755) }
+            it.permissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
           }
         }
       }
     }
   }
 
-  protected open fun Project.configureDistSpec() {
+  protected open fun Project.configureDistribution() {
     distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
-      distributions.contents { contents ->
-        contents.from(file("src/dist"))
-        contents.into("lib") { lib ->
+      distributions.contents { distSpec ->
+        distSpec.from(file("src/dist"))
+        distSpec.into("lib") { lib ->
           lib.from(tasks.shadowJar)
           lib.from(configurations.shadow)
         }
-        contents.into("bin") { bin ->
+        distSpec.into("bin") { bin ->
           bin.from(tasks.startShadowScripts)
-          bin.filePermissions { it.unix(493) }
+          bin.filePermissions { it.unix(UNIX_SCRIPT_PERMISSIONS) }
+        }
+        distSpec.with(applicationExtension.applicationDistribution)
+      }
+    }
+  }
+
+  protected open fun Project.configureShadowJarMainClass() {
+    val mainClassName = applicationExtension.mainClass
+    tasks.shadowJar.configure { task ->
+      task.inputs.property("mainClassName", mainClassName)
+      task.doFirst {
+        // Inject the Main-Class attribute if it is not already present.
+        if (!task.manifest.attributes.contains("Main-Class")) {
+          task.manifest.attributes["Main-Class"] = mainClassName.get()
         }
       }
     }
   }
 
   public companion object {
+    /**
+     * Reflects the number of 755.
+     */
+    private const val UNIX_SCRIPT_PERMISSIONS = "rwxr-xr-x"
+
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
     public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"
     public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"

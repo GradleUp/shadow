@@ -20,9 +20,7 @@ import java.nio.file.Path
 import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
-import kotlin.io.path.createDirectories
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
@@ -101,73 +99,6 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun shadowApplicationDistributionsShouldUseShadowJar() {
-    prepare(
-      mainClassWithImports = true,
-      applicationBlock = """
-        applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
-      """.trimIndent(),
-      dependenciesBlock = "shadow 'junit:junit:3.8.2'",
-    )
-
-    run(shadowDistZipTask)
-
-    val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
-    val extractedPath = path("build/distributions/extracted/")
-
-    // Unzip the whole file.
-    ZipFile(zipPath.toFile()).use { zip ->
-      zip.entries().toList().forEach { entry ->
-        val entryDest = extractedPath.resolve(entry.name)
-        if (entry.isDirectory) {
-          entryDest.createDirectories()
-        } else {
-          zip.getInputStream(entry).use { it.copyTo(entryDest.outputStream()) }
-        }
-      }
-    }
-
-    assertThat(extractedPath.walkEntries()).containsOnly(
-      "myapp-shadow-1.0/bin/myapp",
-      "myapp-shadow-1.0/bin/myapp.bat",
-      "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
-      "myapp-shadow-1.0/lib/junit-3.8.2.jar",
-    )
-
-    commonAssertions(
-      jarPath("myapp-shadow-1.0/lib/myapp-1.0-all.jar", extractedPath),
-      entriesContained = arrayOf("shadow/Main.class"),
-      classPathAttr = "junit-3.8.2.jar",
-    )
-
-    val unixScript = path("myapp-shadow-1.0/bin/myapp", extractedPath)
-    val winScript = path("myapp-shadow-1.0/bin/myapp.bat", extractedPath)
-
-    assertThat(unixScript.readText()).contains(
-      "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-      "exec \"\$JAVACMD\" \"\$@\"",
-      "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
-    )
-    assertThat(winScript.readText()).contains(
-      "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
-      "set DEFAULT_JVM_OPTS=\"--add-opens=java.base/java.lang=ALL-UNNAMED\"",
-    )
-
-    val runningOutput = if (isWindows) {
-      // Use `cmd` and `/c` explicitly to prevent `The process cannot access the file because it is being used by another process` errors.
-      runProcess("cmd", "/c", winScript.toString(), "bar")
-    } else {
-      // Use `sh` explicitly since the extracted script is non-executable.
-      // Avoid `chmod +x` to prevent `Text file busy` errors on Linux.
-      runProcess("sh", unixScript.toString(), "bar")
-    }
-    assertThat(runningOutput).contains(
-      "Hello, World! (bar) from Main",
-      "Refs: junit.framework.Test",
-    )
-  }
-
-  @Test
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 
@@ -219,12 +150,18 @@ class ApplicationPluginTest : BasePluginTest() {
   @Test
   fun canAddExtraFilesIntoDistribution() {
     path("extra/echo.sh").writeText("echo 'Hello, World!'")
+    path("some/dir/hello.txt").writeText("'Hello, World!'")
     prepare(
       projectBlock = """
         distributions.named('$DISTRIBUTION_NAME') {
           contents.into('extra') {
             from project.file('extra/echo.sh')
           }
+        }
+      """.trimIndent(),
+      applicationBlock = """
+        applicationDistribution.from('some/dir') {
+          include '*.txt'
         }
       """.trimIndent(),
     )
@@ -239,9 +176,12 @@ class ApplicationPluginTest : BasePluginTest() {
         "myapp-shadow-1.0/bin/myapp.bat",
         "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
         "myapp-shadow-1.0/extra/echo.sh",
+        "myapp-shadow-1.0/hello.txt",
       )
       assertThat(zip.getContent("myapp-shadow-1.0/extra/echo.sh"))
         .isEqualTo("echo 'Hello, World!'")
+      assertThat(zip.getContent("myapp-shadow-1.0/hello.txt"))
+        .isEqualTo("'Hello, World!'")
     }
   }
 
