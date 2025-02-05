@@ -18,6 +18,11 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 
+/**
+ * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
+ *
+ * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
+ */
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     project.addRunTask()
@@ -40,9 +45,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  /**
-   * Syncs with [ApplicationPlugin.addRunTask](https://github.com/gradle/gradle/blob/bcecbb416f19438c7532e309456e3c3ed287f8f5/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java#L145-L169).
-   */
   protected open fun Project.addRunTask() {
     val extension = applicationExtension
     tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
@@ -62,9 +64,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     }
   }
 
-  /**
-   * Syncs with [ApplicationPlugin.addCreateScriptsTask](https://github.com/gradle/gradle/blob/bcecbb416f19438c7532e309456e3c3ed287f8f5/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java#L184-L203).
-   */
   protected open fun Project.addCreateScriptsTask() {
     val extension = applicationExtension
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
