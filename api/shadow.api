@@ -90,15 +90,6 @@ public class com/github/jengelman/gradle/plugins/shadow/ShadowStats {
 	public fun toString ()Ljava/lang/String;
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/impl/RelocatorRemapper : org/objectweb/asm/commons/Remapper {
-	public fun <init> (Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
-	public fun hasRelocators ()Z
-	public fun map (Ljava/lang/String;)Ljava/lang/String;
-	public fun mapPath (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;)Ljava/lang/String;
-	public fun mapPath (Ljava/lang/String;)Ljava/lang/String;
-	public fun mapValue (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter : java/io/Serializable {
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
