@@ -133,7 +133,7 @@ class ApplicationPluginTest : BasePluginTest() {
     assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
-      entriesContained = arrayOf("a.properties", "a2.properties", "shadow/Main.class", "shadow/Main2.class"),
+      entriesContained = entriesInA + arrayOf("shadow/Main.class", "shadow/Main2.class"),
       mainClassAttr = "shadow.Main2",
     )
 
@@ -242,7 +242,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private fun commonAssertions(
     jarPath: JarPath,
-    entriesContained: Array<String> = arrayOf("a.properties", "a2.properties", "shadow/Main.class"),
+    entriesContained: Array<String> = entriesInA + "shadow/Main.class",
     mainClassAttr: String = "shadow.Main",
     classPathAttr: String? = null,
   ) {

@@ -84,13 +84,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
-        "shadow/Main.class",
-        "shadow/Main2.class",
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      val entries = entriesInAB + arrayOf("shadow/Main.class", "shadow/Main2.class")
+      containsEntries(*entries)
     }
 
     projectScriptPath.appendText(

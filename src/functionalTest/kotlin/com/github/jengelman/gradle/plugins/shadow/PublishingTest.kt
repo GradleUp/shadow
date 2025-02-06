@@ -243,12 +243,8 @@ class PublishingTest : BasePluginTest() {
         "aa.properties",
         "aa2.properties",
       )
-      doesNotContainEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-        "bb.properties",
-      )
+      val entries = entriesInAB + "bb.properties"
+      doesNotContainEntries(*entries)
     }
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
