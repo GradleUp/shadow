@@ -47,7 +47,7 @@ public open class ServiceFileTransformer(
   }
 
   override fun transform(context: TransformerContext) {
-    var resource = context.path.substring(path.length + 1)
+    var resource = context.path.substringAfter("$path/")
     context.relocators.forEach { relocator ->
       if (relocator.canRelocateClass(resource)) {
         val classContext = RelocateClassContext(className = resource, stats = context.stats)
