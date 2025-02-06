@@ -21,6 +21,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
+/**
+ * Modified from [org.apache.maven.plugins.shade.resource.ServiceResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ServiceResourceTransformerTest.java).
+ */
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
   private lateinit var tempJar: Path
 
