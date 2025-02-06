@@ -196,7 +196,7 @@ public abstract class ShadowJar :
   override fun mergeServiceFiles(rootPath: String): ShadowJar {
     return runCatching {
       transform(ServiceFileTransformer::class.java) {
-        it.setPath(rootPath)
+        it.path = rootPath
       }
     }.getOrDefault(this)
   }

@@ -3,8 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-import java.nio.charset.StandardCharsets
-import java.util.Scanner
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -33,10 +31,15 @@ public open class ServiceFileTransformer(
     .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
 ) : Transformer,
   PatternFilterable by patternSet {
-  private var servicesPath = SERVICES_PATH
-
   @get:Internal
   internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
+
+  @get:Internal
+  public open var path: String = SERVICES_PATH
+    set(value) {
+      field = value
+      patternSet.setIncludes(listOf("$value/**"))
+    }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element
@@ -44,7 +47,7 @@ public open class ServiceFileTransformer(
   }
 
   override fun transform(context: TransformerContext) {
-    var resource = context.path.substring(servicesPath.length + 1)
+    var resource = context.path.substring(path.length + 1)
     context.relocators.forEach { relocator ->
       if (relocator.canRelocateClass(resource)) {
         val classContext = RelocateClassContext(className = resource, stats = context.stats)
@@ -52,21 +55,18 @@ public open class ServiceFileTransformer(
         return@forEach
       }
     }
-    resource = "$servicesPath/$resource"
+    resource = "$path/$resource"
+    val out = serviceEntries.getOrPut(resource) { mutableSetOf() }
 
-    val out = serviceEntries.computeIfAbsent(resource) { mutableSetOf() }
-
-    Scanner(context.inputStream, StandardCharsets.UTF_8.name()).use { scanner ->
-      while (scanner.hasNextLine()) {
-        var line = scanner.nextLine()
-        context.relocators.forEach { relocator ->
-          if (relocator.canRelocateClass(line)) {
-            val lineContext = RelocateClassContext(className = line, stats = context.stats)
-            line = relocator.relocateClass(lineContext)
-          }
+    context.inputStream.bufferedReader().use { it.readLines() }.forEach {
+      var line = it
+      context.relocators.forEach { relocator ->
+        if (relocator.canRelocateClass(line)) {
+          val lineContext = RelocateClassContext(className = line, stats = context.stats)
+          line = relocator.relocateClass(lineContext)
         }
-        out.add(line)
       }
+      out.add(line)
     }
   }
 
@@ -87,11 +87,6 @@ public open class ServiceFileTransformer(
 
   @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
   override fun getExcludes(): MutableSet<String> = patternSet.excludes
-
-  public open fun setPath(path: String): PatternFilterable = apply {
-    servicesPath = path
-    patternSet.setIncludes(listOf("$path/**"))
-  }
 
   private companion object {
     private const val SERVICES_PATH = "META-INF/services"
