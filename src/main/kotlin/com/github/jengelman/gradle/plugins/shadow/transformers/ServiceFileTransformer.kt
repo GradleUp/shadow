@@ -33,6 +33,8 @@ public open class ServiceFileTransformer(
     .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
 ) : Transformer,
   PatternFilterable by patternSet {
+  private var servicesPath = SERVICES_PATH
+
   @get:Internal
   internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 
@@ -42,7 +44,7 @@ public open class ServiceFileTransformer(
   }
 
   override fun transform(context: TransformerContext) {
-    var resource = context.path.substring(SERVICES_PATH.length + 1)
+    var resource = context.path.substring(servicesPath.length + 1)
     context.relocators.forEach { relocator ->
       if (relocator.canRelocateClass(resource)) {
         val classContext = RelocateClassContext(className = resource, stats = context.stats)
@@ -50,7 +52,7 @@ public open class ServiceFileTransformer(
         return@forEach
       }
     }
-    resource = "$SERVICES_PATH/$resource"
+    resource = "$servicesPath/$resource"
 
     val out = serviceEntries.computeIfAbsent(resource) { mutableSetOf() }
 
@@ -75,10 +77,7 @@ public open class ServiceFileTransformer(
       val entry = ZipEntry(path)
       entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
-      data.forEach { line ->
-        os.write(line.toByteArray())
-        os.write("\n".toByteArray())
-      }
+      os.write(data.joinToString("\n").toByteArray())
       os.closeEntry()
     }
   }
@@ -90,6 +89,7 @@ public open class ServiceFileTransformer(
   override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
   public open fun setPath(path: String): PatternFilterable = apply {
+    servicesPath = path
     patternSet.setIncludes(listOf("$path/**"))
   }
 
