@@ -23,7 +23,7 @@ abstract class BaseTransformerTest<T : Transformer> {
     get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
 
   @BeforeEach
-  fun setup() {
+  open fun setup() {
     @Suppress("UNCHECKED_CAST")
     val clazz = (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.first() as Class<T>
     transformer = clazz.create(testObjectFactory)
