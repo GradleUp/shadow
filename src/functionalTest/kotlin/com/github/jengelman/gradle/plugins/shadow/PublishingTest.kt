@@ -332,10 +332,10 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).useAll {
-      doesNotContainEntries(*artifactABEntries)
+      doesNotContainEntries(*entriesInAB)
     }
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
-      containsEntries(*artifactABEntries)
+      containsEntries(*entriesInAB)
     }
 
     assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("shadow:a:1.0", "shadow:b:1.0"))
@@ -456,8 +456,8 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
     assertThat(jarPath).useAll {
-      containsEntries(*artifactAEntries)
-      doesNotContainEntries(*artifactBEntries)
+      containsEntries(*entriesInA)
+      doesNotContainEntries(*entriesInB)
       getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
     }
   }

@@ -35,7 +35,7 @@ class FilteringTest : BasePluginTest() {
   fun includeAllDependencies() {
     run(shadowJarTask)
     assertThat(outputShadowJar).useAll {
-      containsEntries(*artifactABEntries)
+      containsEntries(*entriesInAB)
     }
   }
 
