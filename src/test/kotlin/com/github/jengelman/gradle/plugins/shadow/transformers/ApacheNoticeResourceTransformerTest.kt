@@ -63,10 +63,10 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   private fun processAndFailOnNullPointer(noticeText: String) {
     try {
       transformer.transform(
-        TransformerContext.builder()
-          .path(NOTICE_RESOURCE)
-          .inputStream(noticeText.byteInputStream())
-          .build(),
+        TransformerContext(
+          path = NOTICE_RESOURCE,
+          inputStream = noticeText.byteInputStream(),
+        ),
       )
     } catch (ignored: NullPointerException) {
       fail("Null pointer should not be thrown when no parameters are set.")

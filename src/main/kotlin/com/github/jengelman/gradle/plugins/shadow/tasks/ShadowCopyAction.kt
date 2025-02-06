@@ -374,12 +374,12 @@ public open class ShadowCopyAction internal constructor(
         transformers.find {
           it.canTransformResource(element)
         }?.transform(
-          TransformerContext.builder()
-            .path(mappedPath)
-            .inputStream(steam)
-            .relocators(relocators)
-            .stats(stats)
-            .build(),
+          TransformerContext(
+            path = mappedPath,
+            inputStream = steam,
+            relocators = relocators,
+            stats = stats,
+          ),
         )
       }
     }

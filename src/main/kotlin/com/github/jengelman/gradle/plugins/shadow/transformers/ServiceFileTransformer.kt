@@ -48,12 +48,12 @@ public open class ServiceFileTransformer(
     var targetPath = context.path
     context.relocators.forEach { rel ->
       if (rel.canRelocateClass(File(targetPath).name)) {
-        val classContext = RelocateClassContext.builder().className(targetPath).stats(context.stats).build()
+        val classContext = RelocateClassContext(className = targetPath, stats = context.stats)
         targetPath = rel.relocateClass(classContext)
       }
       lines.forEachIndexed { i, line ->
         if (rel.canRelocateClass(line)) {
-          val lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
+          val lineContext = RelocateClassContext(className = line, stats = context.stats)
           lines[i] = rel.relocateClass(lineContext)
         }
       }

@@ -15,16 +15,16 @@ class ComponentsXmlResourceTransformerTest : BaseTransformerTest<ComponentsXmlRe
     XMLUnit.setNormalizeWhitespace(true)
 
     transformer.transform(
-      TransformerContext.builder()
-        .path("components-1.xml")
-        .inputStream(requireResourceAsStream("components-1.xml"))
-        .build(),
+      TransformerContext(
+        path = "components-1.xml",
+        inputStream = requireResourceAsStream("components-1.xml"),
+      ),
     )
     transformer.transform(
-      TransformerContext.builder()
-        .path("components-1.xml")
-        .inputStream(requireResourceAsStream("components-2.xml"))
-        .build(),
+      TransformerContext(
+        path = "components-1.xml",
+        inputStream = requireResourceAsStream("components-2.xml"),
+      ),
     )
     val diff = XMLUnit.compareXML(
       requireResourceAsStream("components-expected.xml").bufferedReader().readText(),
