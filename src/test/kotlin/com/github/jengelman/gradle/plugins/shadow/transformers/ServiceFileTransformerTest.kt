@@ -8,9 +8,13 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
 import java.io.ByteArrayInputStream
-import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
+import java.util.zip.ZipFile
+import kotlin.io.path.createTempFile
+import kotlin.io.path.deleteExisting
+import kotlin.io.path.outputStream
 import org.apache.commons.io.IOUtils
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.AfterEach
@@ -21,17 +25,17 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
-  private lateinit var tempJar: File
+  private lateinit var tempJar: Path
 
   @BeforeEach
   override fun setup() {
     super.setup()
-    tempJar = File.createTempFile("shade.", ".jar")
+    tempJar = createTempFile("shade.", ".jar")
   }
 
   @AfterEach
   fun cleanup() {
-    tempJar.delete()
+    tempJar.deleteExisting()
   }
 
   @ParameterizedTest
@@ -87,7 +91,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
     }
 
-    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarFile = ZipFile(tempJar.toFile())
     val jarEntry = jarFile.getEntry(contentResourceShaded)
     assertThat(jarEntry).isNotNull()
     jarFile.getInputStream(jarEntry).use { entryStream ->
@@ -114,7 +118,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
     }
 
-    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarFile = ZipFile(tempJar.toFile())
     val jarEntry = jarFile.getEntry(contentResourceShaded)
     assertThat(jarEntry).isNotNull()
     jarFile.getInputStream(jarEntry).use { entryStream ->
@@ -139,7 +143,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
     }
 
-    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarFile = ZipFile(tempJar.toFile())
     val jarEntry = jarFile.getEntry(contentResource)
     assertThat(jarEntry).isNotNull()
     jarFile.getInputStream(jarEntry).use { entryStream ->
@@ -170,7 +174,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
     }
 
-    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarFile = ZipFile(tempJar.toFile())
     val jarEntry = jarFile.getEntry(contentResource)
     assertThat(jarEntry).isNotNull()
     jarFile.getInputStream(jarEntry).use { entryStream ->
