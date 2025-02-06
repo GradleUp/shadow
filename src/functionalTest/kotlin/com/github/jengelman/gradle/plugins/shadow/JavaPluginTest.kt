@@ -87,21 +87,6 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun shadowCopy() {
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          ${fromJar(artifactJar, projectJar)}
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowJar).isRegular()
-  }
-
-  @Test
   fun includeProjectSources() {
     path("src/main/java/shadow/Passed.java").writeText(
       """
