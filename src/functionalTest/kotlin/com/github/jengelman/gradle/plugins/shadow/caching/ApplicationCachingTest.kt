@@ -37,6 +37,7 @@ class ApplicationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+
     assertions("resource 1")
 
     resourcePath.writeText(
@@ -44,6 +45,7 @@ class ApplicationCachingTest : BaseCachingTest() {
         Hello, World! %s from resource 2
       """.trimIndent(),
     )
+
     assertions("resource 2")
   }
 

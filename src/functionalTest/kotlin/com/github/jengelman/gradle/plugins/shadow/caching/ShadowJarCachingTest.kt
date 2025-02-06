@@ -25,16 +25,18 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertExecutionSuccess()
-    assertExecutionsFromCacheAndUpToDate()
+    assertCompositeExecutions {
+      isRegular()
+    }
 
     val replaced = projectScriptPath.readText().lines()
       .filterNot { it == fromJar(projectJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
 
-    assertExecutionSuccess()
-    assertExecutionsFromCacheAndUpToDate()
+    assertCompositeExecutions {
+      isRegular()
+    }
   }
 
   @Test
@@ -47,8 +49,9 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionSuccess()
-    assertThat(outputShadowJar).isRegular()
+    assertCompositeExecutions {
+      isRegular()
+    }
 
     projectScriptPath.appendText(
       """
@@ -78,9 +81,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    // First run successful with all files.
-    assertExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "shadow/Main2.class",
@@ -97,9 +98,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-    // Second run successful after excludes changed.
-    assertExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
+
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "shadow/Main2.class",
@@ -118,9 +118,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-    // Third run successful after includes changed.
-    assertExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
+
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
       )
@@ -139,9 +138,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-    // Forth run successful after includes changed again.
-    assertExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
+
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "shadow/Main2.class",
@@ -152,9 +150,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
         "b.properties",
       )
     }
-
-    // Clean and run 2 more times to ensure the states are cached and up-to-date.
-    assertExecutionsFromCacheAndUpToDate()
   }
 
   @Test
@@ -168,8 +163,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionSuccess()
-    assertThat(outputShadowJar).useAll {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "junit/framework/Test.class",
@@ -185,21 +179,15 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    val assertions = {
-      assertThat(outputShadowJar).useAll {
-        containsEntries(
-          "shadow/Main.class",
-        )
-        doesNotContainEntries(
-          "junit/framework/Test.class",
-        )
-      }
-    }
 
-    assertExecutionSuccess()
-    assertions()
-    assertExecutionsFromCacheAndUpToDate()
-    assertions()
+    assertCompositeExecutions {
+      containsEntries(
+        "shadow/Main.class",
+      )
+      doesNotContainEntries(
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   @Test
@@ -213,7 +201,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
     val assertions = {
-      assertThat(outputShadowJar).useAll {
+      assertCompositeExecutions {
         containsEntries(
           "c.properties",
           "d.properties",
@@ -221,9 +209,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
       }
     }
 
-    assertExecutionSuccess()
-    assertions()
-    assertExecutionsFromCacheAndUpToDate()
     assertions()
 
     projectScriptPath.appendText(
@@ -234,9 +219,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertExecutionSuccess()
-    assertions()
-    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 }
