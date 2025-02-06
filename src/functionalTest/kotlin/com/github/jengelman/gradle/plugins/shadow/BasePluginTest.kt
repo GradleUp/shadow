@@ -43,8 +43,8 @@ abstract class BasePluginTest {
   lateinit var projectRoot: Path
   lateinit var localRepo: AppendableMavenRepository
 
-  lateinit var shadowAJar: JarPath
-  lateinit var shadowBJar: JarPath
+  lateinit var artifactAJar: JarPath
+  lateinit var artifactBJar: JarPath
 
   @BeforeAll
   open fun doFirst() {
@@ -65,8 +65,8 @@ abstract class BasePluginTest {
       }
     }.publish()
 
-    shadowAJar = jarPath("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
-    shadowBJar = jarPath("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactAJar = jarPath("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
+    artifactBJar = jarPath("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
   }
 
   @BeforeEach

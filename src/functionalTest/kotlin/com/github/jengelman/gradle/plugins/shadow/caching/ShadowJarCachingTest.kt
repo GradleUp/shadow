@@ -19,7 +19,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          ${fromJar(shadowAJar, shadowBJar)}
+          ${fromJar(artifactAJar, artifactBJar)}
         }
       """.trimIndent(),
     )
@@ -36,7 +36,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertions()
 
     val replaced = projectScriptPath.readText().lines()
-      .filterNot { it == fromJar(shadowBJar) }
+      .filterNot { it == fromJar(artifactBJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
 
@@ -48,7 +48,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          ${fromJar(shadowAJar, shadowBJar)}
+          ${fromJar(artifactAJar, artifactBJar)}
         }
       """.trimIndent() + System.lineSeparator(),
     )
