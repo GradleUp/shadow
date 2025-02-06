@@ -38,12 +38,12 @@ class TransformerCachingTest : BaseCachingTest() {
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
     val assertions = {
+      assertExecutionSuccess()
       assertThat(outputShadowJar).useAll {
         containsEntries("shadow/Main.class")
       }
+      assertExecutionsFromCacheAndUpToDate()
     }
-
-    assertExecutionSuccess()
     assertions()
 
     projectScriptPath.appendText(
@@ -53,19 +53,10 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-    assertExecutionSuccess()
-    assertions()
-
-    assertExecutionsFromCacheAndUpToDate()
     assertions()
 
     val replaced = projectScriptPath.readText().replace("META-INF/foo", "META-INF/bar")
     projectScriptPath.writeText(replaced)
-
-    assertExecutionSuccess()
-    assertions()
-
-    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 
@@ -73,13 +64,13 @@ class TransformerCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     val assertions = { name: String ->
+      assertExecutionSuccess()
       assertThat(outputShadowJar).useAll {
         containsEntries("shadow/Main.class", "foo/$name.properties")
         getContent("foo/$name.properties").isEqualTo("foo=$name")
       }
+      assertExecutionsFromCacheAndUpToDate()
     }
-
-    assertExecutionSuccess()
     assertions("bar")
 
     projectScriptPath.appendText(
@@ -89,21 +80,12 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-    assertExecutionSuccess()
-    assertions("bar")
-
-    assertExecutionsFromCacheAndUpToDate()
     assertions("bar")
 
     path("src/main/resources/foo/bar.properties").deleteExisting()
     path("src/main/resources/foo/baz.properties").writeText("foo=baz")
     val replaced = projectScriptPath.readText().replace("foo/bar.properties", "foo/baz.properties")
     projectScriptPath.writeText(replaced)
-
-    assertExecutionSuccess()
-    assertions("baz")
-
-    assertExecutionsFromCacheAndUpToDate()
     assertions("baz")
   }
 
@@ -111,13 +93,13 @@ class TransformerCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     val assertions = { name: String ->
+      assertExecutionSuccess()
       assertThat(outputShadowJar).useAll {
         containsEntries("shadow/Main.class", "foo/$name.xml")
         getContent("foo/$name.xml").contains("<foo>$name</foo>")
       }
+      assertExecutionsFromCacheAndUpToDate()
     }
-
-    assertExecutionSuccess()
     assertions("bar")
 
     projectScriptPath.appendText(
@@ -127,21 +109,12 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
-    assertExecutionSuccess()
-    assertions("bar")
-
-    assertExecutionsFromCacheAndUpToDate()
     assertions("bar")
 
     path("src/main/resources/foo/bar.xml").deleteExisting()
     path("src/main/resources/foo/baz.xml").writeText("<foo>baz</foo>")
     val replaced = projectScriptPath.readText().replace("foo/bar.xml", "foo/baz.xml")
     projectScriptPath.writeText(replaced)
-
-    assertExecutionSuccess()
-    assertions("baz")
-
-    assertExecutionsFromCacheAndUpToDate()
     assertions("baz")
   }
 
@@ -153,12 +126,12 @@ class TransformerCachingTest : BaseCachingTest() {
       path("test/some.file").writeText("some content")
     }
     val assertions = {
+      assertExecutionSuccess()
       assertThat(outputShadowJar).useAll {
         containsEntries("shadow/Main.class")
       }
+      assertExecutionsFromCacheAndUpToDate()
     }
-
-    assertExecutionSuccess()
     assertions()
 
     projectScriptPath.appendText(
@@ -168,10 +141,6 @@ class TransformerCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertExecutionSuccess()
-    assertions()
-
-    assertExecutionsFromCacheAndUpToDate()
     assertions()
   }
 
