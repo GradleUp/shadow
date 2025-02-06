@@ -46,10 +46,11 @@ abstract class BaseCachingTest : BasePluginTest() {
 
   fun assertExecutionStates(
     vararg outputs: String,
-    jarAssertions: Assert<JarPath>.() -> Unit = {},
+    jarPathProvider: () -> JarPath = { outputShadowJar },
+    jarPathAssertions: Assert<JarPath>.() -> Unit = {},
   ) {
     assertExecutionSuccess()
-    assertThat(outputShadowJar).useAll(jarAssertions)
+    assertThat(jarPathProvider()).useAll(jarPathAssertions)
     assertExecutionsFromCacheAndUpToDate(outputs = outputs)
   }
 
