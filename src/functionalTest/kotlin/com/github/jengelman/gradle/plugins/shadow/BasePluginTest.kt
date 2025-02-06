@@ -68,8 +68,8 @@ abstract class BasePluginTest {
       }
     }.publish()
 
-    artifactAJar = jarPath("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
-    artifactBJar = jarPath("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactAJar = path("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
+    artifactBJar = path("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
     entriesInA = arrayOf("a.properties", "a2.properties")
     entriesInB = arrayOf("b.properties")
     entriesInAB = entriesInA + entriesInB

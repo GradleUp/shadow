@@ -63,7 +63,7 @@ class JavaPluginTest : BasePluginTest() {
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
-    writeMainClass()
+    writeMainClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
