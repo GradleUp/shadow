@@ -87,7 +87,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).getContent(contentResourceShaded)
+    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResourceShaded) }
     assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
   }
 
@@ -106,7 +106,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).getContent(contentResourceShaded)
+    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResourceShaded) }
     assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
   }
 
@@ -123,7 +123,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).getContent(contentResource)
+    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResource) }
     assertThat(transformedContent).isEqualTo("org.eclipse1234.osgi.launch.EquinoxFactory")
   }
 
@@ -145,7 +145,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).getContent(contentResource)
+    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResource) }
     assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.blah.Service")
   }
 
