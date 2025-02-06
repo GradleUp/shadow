@@ -24,6 +24,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+
     assertCompositeExecutions {
       isRegular()
     }
@@ -32,6 +33,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       .filterNot { it == fromJar(projectJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
+
     assertCompositeExecutions {
       isRegular()
     }
@@ -148,8 +150,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
         "b.properties",
       )
     }
-    // Clean and run 2 more times to ensure the states are cached and up-to-date.
-    assertExecutionsFromCacheAndUpToDate()
   }
 
   @Test
@@ -208,6 +208,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         )
       }
     }
+
     assertions()
 
     projectScriptPath.appendText(
@@ -217,6 +218,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+
     assertions()
   }
 }

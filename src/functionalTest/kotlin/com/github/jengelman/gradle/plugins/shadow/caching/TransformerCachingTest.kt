@@ -41,6 +41,7 @@ class TransformerCachingTest : BaseCachingTest() {
         containsEntries("shadow/Main.class")
       }
     }
+
     assertions()
 
     projectScriptPath.appendText(
@@ -50,10 +51,12 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
+
     assertions()
 
     val replaced = projectScriptPath.readText().replace("META-INF/foo", "META-INF/bar")
     projectScriptPath.writeText(replaced)
+
     assertions()
   }
 
@@ -66,6 +69,7 @@ class TransformerCachingTest : BaseCachingTest() {
         getContent("foo/$name.properties").isEqualTo("foo=$name")
       }
     }
+
     assertions("bar")
 
     projectScriptPath.appendText(
@@ -75,12 +79,14 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
+
     assertions("bar")
 
     path("src/main/resources/foo/bar.properties").deleteExisting()
     path("src/main/resources/foo/baz.properties").writeText("foo=baz")
     val replaced = projectScriptPath.readText().replace("foo/bar.properties", "foo/baz.properties")
     projectScriptPath.writeText(replaced)
+
     assertions("baz")
   }
 
@@ -93,6 +99,7 @@ class TransformerCachingTest : BaseCachingTest() {
         getContent("foo/$name.xml").contains("<foo>$name</foo>")
       }
     }
+
     assertions("bar")
 
     projectScriptPath.appendText(
@@ -102,12 +109,14 @@ class TransformerCachingTest : BaseCachingTest() {
         """.trimIndent(),
       ),
     )
+
     assertions("bar")
 
     path("src/main/resources/foo/bar.xml").deleteExisting()
     path("src/main/resources/foo/baz.xml").writeText("<foo>baz</foo>")
     val replaced = projectScriptPath.readText().replace("foo/bar.xml", "foo/baz.xml")
     projectScriptPath.writeText(replaced)
+
     assertions("baz")
   }
 
@@ -123,6 +132,7 @@ class TransformerCachingTest : BaseCachingTest() {
         containsEntries("shadow/Main.class")
       }
     }
+
     assertions()
 
     projectScriptPath.appendText(
@@ -132,6 +142,7 @@ class TransformerCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+
     assertions()
   }
 

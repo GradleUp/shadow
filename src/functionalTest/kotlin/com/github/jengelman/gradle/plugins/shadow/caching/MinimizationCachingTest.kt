@@ -20,6 +20,7 @@ class MinimizationCachingTest : BaseCachingTest() {
         public class Server {}
       """.trimIndent(),
     )
+
     assertCompositeExecutions {
       containsEntries(
         "server/Server.class",
@@ -37,6 +38,7 @@ class MinimizationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+
     assertCompositeExecutions {
       containsEntries(
         "server/Server.class",

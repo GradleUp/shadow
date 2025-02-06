@@ -44,13 +44,18 @@ abstract class BaseCachingTest : BasePluginTest() {
     assertRunWithResult(UP_TO_DATE, outputs = outputs)
   }
 
+  /**
+   * Combines [assertExecutionSuccess] and [assertExecutionsFromCacheAndUpToDate] for simplifying assertions.
+   */
   fun assertCompositeExecutions(
     vararg outputs: String,
     jarPathProvider: () -> JarPath = { outputShadowJar },
     jarPathAssertions: Assert<JarPath>.() -> Unit = {},
   ) {
+    // First run should execute.
     assertExecutionSuccess()
     assertThat(jarPathProvider()).useAll(jarPathAssertions)
+    // Subsequent runs should be from cache and up-to-date after configurations changed.
     assertExecutionsFromCacheAndUpToDate(outputs = outputs)
   }
 
