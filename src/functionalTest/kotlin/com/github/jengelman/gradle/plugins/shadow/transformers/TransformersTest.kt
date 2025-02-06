@@ -105,9 +105,12 @@ class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun canUseCustomTransformer() {
-    writeMainClass()
     projectScriptPath.appendText(
       """
+        dependencies {
+          implementation 'shadow:a:1.0'
+          implementation 'shadow:b:1.0'
+        }
         $shadowJar {
           // Use NoOpTransformer to mock a custom transformer here.
           transform(${NoOpTransformer::class.java.name}.INSTANCE)
@@ -118,9 +121,7 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "shadow/Main.class",
-      )
+      containsEntries(*entriesInAB)
     }
   }
 
@@ -131,10 +132,12 @@ class TransformersTest : BaseTransformerTest() {
     if (configuration.contains("test/some.file")) {
       path("test/some.file").writeText("some content")
     }
-
-    writeMainClass()
     projectScriptPath.appendText(
       """
+        dependencies {
+          implementation 'shadow:a:1.0'
+          implementation 'shadow:b:1.0'
+        }
         $shadowJar {
           transform(${transformer.java.name}) $configuration
         }
@@ -144,9 +147,7 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "shadow/Main.class",
-      )
+      containsEntries(*entriesInAB)
     }
   }
 

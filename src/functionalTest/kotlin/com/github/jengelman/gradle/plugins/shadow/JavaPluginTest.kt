@@ -414,11 +414,11 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun supportZipCompressionStored() {
-    writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
-          shadow 'junit:junit:3.8.2'
+          implementation 'shadow:a:1.0'
+          implementation 'shadow:b:1.0'
         }
         $shadowJar {
           zip64 = true
@@ -430,9 +430,7 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "shadow/Main.class",
-      )
+      containsEntries(*entriesInAB)
     }
   }
 
