@@ -23,20 +23,20 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    val assertions = {
-      assertCompositeExecutions {
-        containsEntries(*artifactABEntries)
-      }
-    }
 
-    assertions()
+    assertCompositeExecutions {
+      containsEntries(*artifactABEntries)
+    }
 
     val replaced = projectScriptPath.readText().lines()
       .filterNot { it == fromJar(artifactBJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
 
-    assertions()
+    assertCompositeExecutions {
+      containsEntries(*artifactAEntries)
+      doesNotContainEntries(*artifactBEntries)
+    }
   }
 
   @Test

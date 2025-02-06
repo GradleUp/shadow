@@ -52,8 +52,13 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(*artifactAEntries)
-      doesNotContainEntries(*artifactBEntries)
+      containsEntries(
+        "a.properties",
+        "b.properties",
+      )
+      doesNotContainEntries(
+        "a2.properties",
+      )
     }
   }
 

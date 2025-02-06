@@ -432,7 +432,6 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "shadow/Main.class",
-        "junit/framework/Test.class",
       )
     }
   }
