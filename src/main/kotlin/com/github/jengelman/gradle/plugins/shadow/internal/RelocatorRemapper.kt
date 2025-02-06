@@ -44,10 +44,10 @@ internal class RelocatorRemapper(
 
     for (relocator in relocators) {
       if (relocator.canRelocateClass(newName)) {
-        val classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
+        val classContext = RelocateClassContext(className = newName, stats = stats)
         return prefix + relocator.relocateClass(classContext) + suffix
       } else if (relocator.canRelocatePath(newName)) {
-        val pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
+        val pathContext = RelocatePathContext(path = newName, stats = stats)
         return prefix + relocator.relocatePath(pathContext) + suffix
       }
     }
