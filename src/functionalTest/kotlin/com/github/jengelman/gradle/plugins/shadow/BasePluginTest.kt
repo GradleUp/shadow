@@ -45,6 +45,9 @@ abstract class BasePluginTest {
 
   lateinit var artifactAJar: JarPath
   lateinit var artifactBJar: JarPath
+  lateinit var artifactAEntries: Array<String>
+  lateinit var artifactBEntries: Array<String>
+  lateinit var artifactABEntries: Array<String>
 
   @BeforeAll
   open fun doFirst() {
@@ -67,6 +70,9 @@ abstract class BasePluginTest {
 
     artifactAJar = jarPath("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = jarPath("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactAEntries = arrayOf("a.properties", "a2.properties")
+    artifactBEntries = arrayOf("b.properties")
+    artifactABEntries = artifactAEntries + artifactBEntries
   }
 
   @BeforeEach

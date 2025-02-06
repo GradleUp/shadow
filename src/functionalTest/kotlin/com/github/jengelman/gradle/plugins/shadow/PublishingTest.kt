@@ -331,12 +331,11 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    val entries = arrayOf("a.properties", "a2.properties", "b.properties")
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).useAll {
-      doesNotContainEntries(*entries)
+      doesNotContainEntries(*artifactABEntries)
     }
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
-      containsEntries(*entries)
+      containsEntries(*artifactABEntries)
     }
 
     assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("shadow:a:1.0", "shadow:b:1.0"))
@@ -457,13 +456,8 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
     assertThat(jarPath).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*artifactAEntries)
+      doesNotContainEntries(*artifactBEntries)
       getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
     }
   }

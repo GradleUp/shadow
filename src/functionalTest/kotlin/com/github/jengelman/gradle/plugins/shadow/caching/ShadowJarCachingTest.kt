@@ -25,11 +25,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
     val assertions = {
       assertCompositeExecutions {
-        containsEntries(
-          "a.properties",
-          "a2.properties",
-          "b.properties",
-        )
+        containsEntries(*artifactABEntries)
       }
     }
 
@@ -54,11 +50,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      containsEntries(*artifactABEntries)
     }
 
     projectScriptPath.appendText(
@@ -71,11 +63,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertExecutionsFromCacheAndUpToDate()
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      containsEntries(*artifactABEntries)
     }
   }
 
@@ -118,11 +106,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         "shadow/Main.class",
         "shadow/Main2.class",
       )
-      doesNotContainEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      doesNotContainEntries(*artifactABEntries)
     }
 
     projectScriptPath.appendText(
@@ -158,11 +142,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         "shadow/Main.class",
         "shadow/Main2.class",
       )
-      doesNotContainEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      doesNotContainEntries(*artifactABEntries)
     }
   }
 

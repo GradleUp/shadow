@@ -35,11 +35,7 @@ class FilteringTest : BasePluginTest() {
   fun includeAllDependencies() {
     run(shadowJarTask)
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      containsEntries(*artifactABEntries)
     }
   }
 
@@ -56,13 +52,8 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "b.properties",
-      )
-      doesNotContainEntries(
-        "a2.properties",
-      )
+      containsEntries(*artifactAEntries)
+      doesNotContainEntries(*artifactBEntries)
     }
   }
 

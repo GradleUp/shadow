@@ -255,13 +255,8 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*artifactAEntries)
+      doesNotContainEntries(*artifactBEntries)
     }
   }
 
@@ -323,13 +318,8 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*artifactAEntries)
+      doesNotContainEntries(*artifactBEntries)
     }
   }
 
@@ -472,13 +462,8 @@ class JavaPluginTest : BasePluginTest() {
       // Doesn't contain Gradle classes.
       getMainAttr("Class-Path").isNull()
 
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*artifactAEntries)
+      doesNotContainEntries(*artifactBEntries)
     }
   }
 
