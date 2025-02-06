@@ -243,12 +243,8 @@ class PublishingTest : BasePluginTest() {
         "aa.properties",
         "aa2.properties",
       )
-      doesNotContainEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-        "bb.properties",
-      )
+      val entries = entriesInAB + "bb.properties"
+      doesNotContainEntries(*entries)
     }
     assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
@@ -331,12 +327,11 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    val entries = arrayOf("a.properties", "a2.properties", "b.properties")
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).useAll {
-      doesNotContainEntries(*entries)
+      doesNotContainEntries(*entriesInAB)
     }
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
-      containsEntries(*entries)
+      containsEntries(*entriesInAB)
     }
 
     assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("shadow:a:1.0", "shadow:b:1.0"))
@@ -457,13 +452,8 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
     assertThat(jarPath).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*entriesInA)
+      doesNotContainEntries(*entriesInB)
       getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
     }
   }

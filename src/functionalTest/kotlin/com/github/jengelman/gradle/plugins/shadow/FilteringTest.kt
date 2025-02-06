@@ -35,11 +35,7 @@ class FilteringTest : BasePluginTest() {
   fun includeAllDependencies() {
     run(shadowJarTask)
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      containsEntries(*entriesInAB)
     }
   }
 
@@ -110,12 +106,8 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-        "d.properties",
-      )
+      val entries = entriesInAB + "d.properties"
+      containsEntries(*entries)
       doesNotContainEntries(
         "c.properties",
       )
@@ -178,12 +170,8 @@ class FilteringTest : BasePluginTest() {
         "d.properties",
         "shadow/Passed.class",
       )
-      doesNotContainEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-        "c.properties",
-      )
+      val entries = entriesInAB + "c.properties"
+      doesNotContainEntries(*entries)
     }
   }
 
@@ -285,12 +273,8 @@ class FilteringTest : BasePluginTest() {
 
   private fun commonAssertions() {
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-        "c.properties",
-      )
+      val entries = entriesInAB + "c.properties"
+      containsEntries(*entries)
       doesNotContainEntries(
         "d.properties",
       )

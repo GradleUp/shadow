@@ -17,7 +17,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -64,6 +63,7 @@ class JavaPluginTest : BasePluginTest() {
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
+    writeMainClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
@@ -76,7 +76,12 @@ class JavaPluginTest : BasePluginTest() {
       it.withGradleVersion("8.3")
     }
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   @Test
@@ -84,21 +89,6 @@ class JavaPluginTest : BasePluginTest() {
     runWithFailure(shadowJarTask) {
       it.withGradleVersion("8.2")
     }
-  }
-
-  @Test
-  fun shadowCopy() {
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          ${fromJar(artifactJar, projectJar)}
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowJar).isRegular()
   }
 
   @Test
@@ -265,13 +255,8 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*entriesInA)
+      doesNotContainEntries(*entriesInB)
     }
   }
 
@@ -333,13 +318,8 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*entriesInA)
+      doesNotContainEntries(*entriesInB)
     }
   }
 
@@ -448,7 +428,9 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      transform { it.entries().toList() }.isNotEmpty()
+    }
   }
 
   @Issue(
@@ -476,13 +458,8 @@ class JavaPluginTest : BasePluginTest() {
       // Doesn't contain Gradle classes.
       getMainAttr("Class-Path").isNull()
 
-      containsEntries(
-        "a.properties",
-        "a2.properties",
-      )
-      doesNotContainEntries(
-        "b.properties",
-      )
+      containsEntries(*entriesInA)
+      doesNotContainEntries(*entriesInB)
     }
   }
 

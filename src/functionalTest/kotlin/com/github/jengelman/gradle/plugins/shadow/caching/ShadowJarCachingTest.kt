@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -20,22 +19,23 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          ${fromJar(artifactJar, projectJar)}
+          ${fromJar(artifactAJar, artifactBJar)}
         }
       """.trimIndent(),
     )
 
     assertCompositeExecutions {
-      isRegular()
+      containsEntries(*entriesInAB)
     }
 
     val replaced = projectScriptPath.readText().lines()
-      .filterNot { it == fromJar(projectJar) }
+      .filterNot { it == fromJar(artifactBJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      isRegular()
+      containsEntries(*entriesInA)
+      doesNotContainEntries(*entriesInB)
     }
   }
 
@@ -44,13 +44,13 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          ${fromJar(artifactJar, projectJar)}
+          ${fromJar(artifactAJar, artifactBJar)}
         }
       """.trimIndent() + System.lineSeparator(),
     )
 
     assertCompositeExecutions {
-      isRegular()
+      containsEntries(*entriesInAB)
     }
 
     projectScriptPath.appendText(
@@ -62,7 +62,9 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertExecutionsFromCacheAndUpToDate()
-    assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
+    assertThat(jarPath("build/libs/foo-1.0-all.jar")).useAll {
+      containsEntries(*entriesInAB)
+    }
   }
 
   @Issue(
@@ -82,13 +84,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
-        "shadow/Main.class",
-        "shadow/Main2.class",
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      val entries = entriesInAB + arrayOf("shadow/Main.class", "shadow/Main2.class")
+      containsEntries(*entries)
     }
 
     projectScriptPath.appendText(
@@ -104,11 +101,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         "shadow/Main.class",
         "shadow/Main2.class",
       )
-      doesNotContainEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      doesNotContainEntries(*entriesInAB)
     }
 
     projectScriptPath.appendText(
@@ -144,11 +137,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         "shadow/Main.class",
         "shadow/Main2.class",
       )
-      doesNotContainEntries(
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
+      doesNotContainEntries(*entriesInAB)
     }
   }
 

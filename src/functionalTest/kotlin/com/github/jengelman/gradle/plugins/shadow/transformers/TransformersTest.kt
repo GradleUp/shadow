@@ -8,8 +8,8 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import java.util.jar.Attributes
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -105,9 +105,12 @@ class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun canUseCustomTransformer() {
-    writeMainClass()
     projectScriptPath.appendText(
       """
+        dependencies {
+          implementation 'shadow:a:1.0'
+          implementation 'shadow:b:1.0'
+        }
         $shadowJar {
           // Use NoOpTransformer to mock a custom transformer here.
           transform(${NoOpTransformer::class.java.name}.INSTANCE)
@@ -117,7 +120,9 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(*entriesInAB)
+    }
   }
 
   @ParameterizedTest
@@ -129,6 +134,10 @@ class TransformersTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(
       """
+        dependencies {
+          implementation 'shadow:a:1.0'
+          implementation 'shadow:b:1.0'
+        }
         $shadowJar {
           transform(${transformer.java.name}) $configuration
         }
@@ -137,7 +146,9 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(*entriesInAB)
+    }
   }
 
   private fun commonAssertions(
