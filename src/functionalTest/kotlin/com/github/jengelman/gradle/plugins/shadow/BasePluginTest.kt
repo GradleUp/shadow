@@ -43,6 +43,9 @@ abstract class BasePluginTest {
   lateinit var projectRoot: Path
   lateinit var localRepo: AppendableMavenRepository
 
+  lateinit var shadowAJar: JarPath
+  lateinit var shadowBJar: JarPath
+
   @BeforeAll
   open fun doFirst() {
     localRepo = AppendableMavenRepository(
@@ -50,7 +53,7 @@ abstract class BasePluginTest {
       runner(projectDir = null),
     )
     localRepo.module("junit", "junit", "3.8.2") {
-      useJar(testJar)
+      useJar(junitJar)
     }.module("shadow", "a", "1.0") {
       buildJar {
         insert("a.properties", "a")
@@ -61,6 +64,9 @@ abstract class BasePluginTest {
         insert("b.properties", "b")
       }
     }.publish()
+
+    shadowAJar = jarPath("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
+    shadowBJar = jarPath("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
   }
 
   @BeforeEach
@@ -333,9 +339,7 @@ abstract class BasePluginTest {
       Path(gradleUserHome, "testkit")
     }
 
-    val testJar: Path = requireResourceAsPath("junit-3.8.2.jar")
-    val artifactJar: Path = requireResourceAsPath("test-artifact-1.0-SNAPSHOT.jar")
-    val projectJar: Path = requireResourceAsPath("test-project-1.0-SNAPSHOT.jar")
+    val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
