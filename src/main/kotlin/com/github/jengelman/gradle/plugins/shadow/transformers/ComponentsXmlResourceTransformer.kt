@@ -82,10 +82,7 @@ public open class ComponentsXmlResourceTransformer : Transformer {
     val entry = ZipEntry(COMPONENTS_XML_PATH)
     entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
-
-    transformedResource.inputStream().use {
-      it.copyTo(os)
-    }
+    os.write(transformedResource)
     components.clear()
   }
 
