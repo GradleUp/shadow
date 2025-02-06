@@ -37,13 +37,14 @@ fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name)
 
 fun Assert<JarPath>.containsEntries(vararg entries: String) = given { actual ->
   entries.forEach { entry ->
-    actual.getEntry(entry) ?: fail("Jar file ${actual.path} does not contain entry $entry")
+    actual.getEntry(entry)
+      ?: fail("Jar file ${actual.path} does not contain entry $entry in entries: ${actual.entries().toList()}")
   }
 }
 
 fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = given { actual ->
   entries.forEach { entry ->
     actual.getEntry(entry) ?: return@forEach
-    fail("Jar file ${actual.path} contains entry $entry")
+    fail("Jar file ${actual.path} contains entry $entry in entries: ${actual.entries().toList()}")
   }
 }
