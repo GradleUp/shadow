@@ -6,4 +6,14 @@
   "labels": [
     "dependencies",
   ],
+  "packageRules": [
+    {
+      // https://github.com/tcurdt/jdependency/issues/325
+      "groupName": "ASM and jdependency",
+      "matchPackageNames": [
+        "org.vafer:jdependency",
+        "org.ow2.asm:asm-commons"
+      ]
+    }
+  ]
 }
