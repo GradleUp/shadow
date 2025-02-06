@@ -74,7 +74,15 @@ class AppendingTransformerTest : BaseTransformerTest() {
       block1 + System.lineSeparator() + block2
     }
 
-    projectScriptPath.appendText(config)
+    projectScriptPath.appendText(config + System.lineSeparator())
+    projectScriptPath.appendText(
+      """
+      $shadowJar {
+        // This should fail the build because of the duplicates.
+        duplicatesStrategy = DuplicatesStrategy.FAIL
+      }
+      """.trimIndent(),
+    )
 
     run(shadowJarTask)
 
