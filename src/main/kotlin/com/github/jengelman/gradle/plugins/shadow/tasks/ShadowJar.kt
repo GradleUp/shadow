@@ -61,7 +61,6 @@ public abstract class ShadowJar :
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
-      // TODO: this has been called but the cache is still working fine, need to investigate why.
       transformers.get().any { !isCacheableTransform(it::class.java) } ||
         relocators.get().any { !isCacheableRelocator(it::class.java) }
     }
