@@ -38,6 +38,13 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     assertThat(transformer.canTransformResource(element)).isFalse()
   }
 
+  @Test
+  fun canTransformAlternateResource() {
+    transformer.path = "foo/bar"
+    assertThat(transformer.canTransformResource("foo/bar/moo/goo/Zoo")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/services/Zoo")).isFalse()
+  }
+
   private companion object {
     fun context(path: String, input: String): TransformerContext {
       return TransformerContext(path, input.byteInputStream(), stats = sharedStats)
