@@ -37,7 +37,7 @@ class TransformerCachingTest : BaseCachingTest() {
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
     val assertions = {
-      assertExecutionStates {
+      assertCompositeExecutions {
         containsEntries("shadow/Main.class")
       }
     }
@@ -61,7 +61,7 @@ class TransformerCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     val assertions = { name: String ->
-      assertExecutionStates {
+      assertCompositeExecutions {
         containsEntries("shadow/Main.class", "foo/$name.properties")
         getContent("foo/$name.properties").isEqualTo("foo=$name")
       }
@@ -88,7 +88,7 @@ class TransformerCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     val assertions = { name: String ->
-      assertExecutionStates {
+      assertCompositeExecutions {
         containsEntries("shadow/Main.class", "foo/$name.xml")
         getContent("foo/$name.xml").contains("<foo>$name</foo>")
       }
@@ -119,7 +119,7 @@ class TransformerCachingTest : BaseCachingTest() {
       path("test/some.file").writeText("some content")
     }
     val assertions = {
-      assertExecutionStates {
+      assertCompositeExecutions {
         containsEntries("shadow/Main.class")
       }
     }

@@ -24,7 +24,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertExecutionStates {
+    assertCompositeExecutions {
       isRegular()
     }
 
@@ -32,7 +32,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       .filterNot { it == fromJar(projectJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
-    assertExecutionStates {
+    assertCompositeExecutions {
       isRegular()
     }
   }
@@ -47,7 +47,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionStates {
+    assertCompositeExecutions {
       isRegular()
     }
 
@@ -79,7 +79,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "shadow/Main2.class",
@@ -97,7 +97,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "shadow/Main2.class",
@@ -117,7 +117,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
       )
@@ -137,7 +137,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "shadow/Main2.class",
@@ -163,7 +163,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
 
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "junit/framework/Test.class",
@@ -180,7 +180,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
       )
@@ -201,7 +201,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
     val assertions = {
-      assertExecutionStates {
+      assertCompositeExecutions {
         containsEntries(
           "c.properties",
           "d.properties",

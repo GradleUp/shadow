@@ -19,7 +19,7 @@ class RelocationCachingTest : BaseCachingTest() {
       """.trimIndent() + System.lineSeparator(),
     )
     writeMainClass(withImports = true)
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "junit/framework/Test.class",
@@ -33,7 +33,7 @@ class RelocationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    assertExecutionStates {
+    assertCompositeExecutions {
       containsEntries(
         "shadow/Main.class",
         "foo/junit/framework/Test.class",
