@@ -17,7 +17,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -64,6 +63,7 @@ class JavaPluginTest : BasePluginTest() {
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
+    writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -76,7 +76,12 @@ class JavaPluginTest : BasePluginTest() {
       it.withGradleVersion("8.3")
     }
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   @Test
@@ -419,6 +424,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun supportZipCompressionStored() {
+    writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -433,7 +439,12 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+        "junit/framework/Test.class",
+      )
+    }
   }
 
   @Issue(

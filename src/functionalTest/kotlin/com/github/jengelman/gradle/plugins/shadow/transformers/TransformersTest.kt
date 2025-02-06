@@ -8,8 +8,8 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import java.util.jar.Attributes
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -117,7 +117,11 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+      )
+    }
   }
 
   @ParameterizedTest
@@ -127,6 +131,8 @@ class TransformersTest : BaseTransformerTest() {
     if (configuration.contains("test/some.file")) {
       path("test/some.file").writeText("some content")
     }
+
+    writeMainClass()
     projectScriptPath.appendText(
       """
         $shadowJar {
@@ -137,7 +143,11 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).isRegular()
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+      )
+    }
   }
 
   private fun commonAssertions(

@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.isRegular
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -24,19 +23,24 @@ class ShadowJarCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-
-    assertCompositeExecutions {
-      isRegular()
+    val assertions = {
+      assertCompositeExecutions {
+        containsEntries(
+          "a.properties",
+          "a2.properties",
+          "b.properties",
+        )
+      }
     }
+
+    assertions()
 
     val replaced = projectScriptPath.readText().lines()
       .filterNot { it == fromJar(shadowBJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
 
-    assertCompositeExecutions {
-      isRegular()
-    }
+    assertions()
   }
 
   @Test
@@ -50,7 +54,11 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      isRegular()
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+      )
     }
 
     projectScriptPath.appendText(
@@ -62,7 +70,13 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertExecutionsFromCacheAndUpToDate()
-    assertThat(jarPath("build/libs/foo-1.0-all.jar")).isRegular()
+    assertThat(jarPath("build/libs/foo-1.0-all.jar")).useAll {
+      containsEntries(
+        "a.properties",
+        "a2.properties",
+        "b.properties",
+      )
+    }
   }
 
   @Issue(

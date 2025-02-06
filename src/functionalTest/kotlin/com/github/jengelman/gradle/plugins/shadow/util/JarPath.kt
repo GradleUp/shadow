@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
-import assertk.all
-import assertk.assertions.isNotEmpty
 import assertk.fail
 import java.io.InputStream
 import java.nio.file.Path
@@ -31,15 +29,6 @@ fun ZipFile.getContent(entryName: String): String {
 fun ZipFile.getStream(entryName: String): InputStream {
   val entry = getEntry(entryName) ?: error("Entry $entryName not found in all entries: ${entries().toList()}")
   return getInputStream(entry)
-}
-
-/**
- * Common regular assertions for [JarPath].
- */
-fun Assert<JarPath>.isRegular() = all {
-  transform { it.entries().toList() }.isNotEmpty()
-  // Close the resource after all assertions are done.
-  given { it.use(block = {}) }
 }
 
 fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
