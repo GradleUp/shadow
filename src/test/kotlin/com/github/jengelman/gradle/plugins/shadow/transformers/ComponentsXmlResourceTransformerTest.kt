@@ -28,7 +28,7 @@ class ComponentsXmlResourceTransformerTest : BaseTransformerTest<ComponentsXmlRe
     )
     val diff = XMLUnit.compareXML(
       requireResourceAsStream("components-expected.xml").bufferedReader().readText(),
-      transformer.transformedResource.decodeToString(),
+      transformer.getTransformedResource().decodeToString(),
     )
     assertThat(diff.identical()).isTrue()
   }

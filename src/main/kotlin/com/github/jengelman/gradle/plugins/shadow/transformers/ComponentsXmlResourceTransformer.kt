@@ -13,7 +13,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
 import org.gradle.api.file.FileTreeElement
-import org.gradle.api.tasks.Internal
 
 /**
  * A resource processor that aggregates plexus `components.xml` files.
@@ -82,30 +81,25 @@ public open class ComponentsXmlResourceTransformer : Transformer {
     val entry = ZipEntry(COMPONENTS_XML_PATH)
     entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
     os.putNextEntry(entry)
-
-    transformedResource.inputStream().use {
-      it.copyTo(os)
-    }
+    os.write(getTransformedResource())
     components.clear()
   }
 
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()
 
-  @get:Internal
-  internal val transformedResource: ByteArray
-    get() {
-      val os = ByteArrayOutputStream(1024 * 4)
-      XmlStreamWriter(os).use { writer ->
-        val dom = Xpp3Dom("component-set")
-        val componentDom = Xpp3Dom("components")
-        dom.addChild(componentDom)
-        for (component in components.values) {
-          componentDom.addChild(component)
-        }
-        Xpp3DomWriter.write(writer, dom)
+  internal fun getTransformedResource(): ByteArray {
+    val os = ByteArrayOutputStream(1024 * 4)
+    XmlStreamWriter(os).use { writer ->
+      val dom = Xpp3Dom("component-set")
+      val componentDom = Xpp3Dom("components")
+      dom.addChild(componentDom)
+      for (component in components.values) {
+        componentDom.addChild(component)
       }
-      return os.toByteArray()
+      Xpp3DomWriter.write(writer, dom)
     }
+    return os.toByteArray()
+  }
 
   public companion object {
     public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
