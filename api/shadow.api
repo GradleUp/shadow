@@ -547,6 +547,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 	public fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun getExcludes ()Ljava/util/Set;
 	public fun getIncludes ()Ljava/util/Set;
+	public fun getPath ()Ljava/lang/String;
 	public fun hasTransformedResource ()Z
 	public fun include (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
@@ -555,14 +556,8 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
-	public fun setPath (Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setPath (Ljava/lang/String;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
-public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer$ServiceStream : java/io/ByteArrayOutputStream {
-	public fun <init> ()V
-	public fun append (Ljava/io/InputStream;)V
-	public fun toInputStream ()Ljava/io/InputStream;
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer : org/gradle/api/Named {

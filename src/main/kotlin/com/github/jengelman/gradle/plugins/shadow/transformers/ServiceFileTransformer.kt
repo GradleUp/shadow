@@ -2,11 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -32,11 +28,18 @@ import org.gradle.api.tasks.util.PatternSet
 public open class ServiceFileTransformer(
   private val patternSet: PatternSet = PatternSet()
     .include(SERVICES_PATTERN)
-    .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
+    .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
 ) : Transformer,
   PatternFilterable by patternSet {
   @get:Internal
-  internal val serviceEntries = mutableMapOf<String, ServiceStream>()
+  internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
+
+  @get:Internal // No need to mark this as an input as `getIncludes` is already marked as `@Input`.
+  public open var path: String = SERVICES_PATH
+    set(value) {
+      field = value
+      patternSet.setIncludes(listOf("$value/**"))
+    }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element
@@ -44,37 +47,37 @@ public open class ServiceFileTransformer(
   }
 
   override fun transform(context: TransformerContext) {
-    val lines = context.inputStream.bufferedReader().readLines().toMutableList()
-    var targetPath = context.path
-    context.relocators.forEach { rel ->
-      if (rel.canRelocateClass(File(targetPath).name)) {
-        val classContext = RelocateClassContext(className = targetPath, stats = context.stats)
-        targetPath = rel.relocateClass(classContext)
-      }
-      lines.forEachIndexed { i, line ->
-        if (rel.canRelocateClass(line)) {
-          val lineContext = RelocateClassContext(className = line, stats = context.stats)
-          lines[i] = rel.relocateClass(lineContext)
-        }
+    var resource = context.path.substringAfter("$path/")
+    context.relocators.forEach { relocator ->
+      if (relocator.canRelocateClass(resource)) {
+        val classContext = RelocateClassContext(className = resource, stats = context.stats)
+        resource = relocator.relocateClass(classContext)
+        return@forEach
       }
     }
-    lines.forEach { line ->
-      serviceEntries[targetPath] = serviceEntries.getOrDefault(targetPath, ServiceStream()).apply {
-        append(ByteArrayInputStream(line.toByteArray()))
+    resource = "$path/$resource"
+    val out = serviceEntries.getOrPut(resource) { mutableSetOf() }
+
+    context.inputStream.bufferedReader().use { it.readLines() }.forEach {
+      var line = it
+      context.relocators.forEach { relocator ->
+        if (relocator.canRelocateClass(line)) {
+          val lineContext = RelocateClassContext(className = line, stats = context.stats)
+          line = relocator.relocateClass(lineContext)
+        }
       }
+      out.add(line)
     }
   }
 
   override fun hasTransformedResource(): Boolean = serviceEntries.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    serviceEntries.forEach { (path, stream) ->
+    serviceEntries.forEach { (path, data) ->
       val entry = ZipEntry(path)
       entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
-      stream.toInputStream().use {
-        it.copyTo(os)
-      }
+      os.write(data.joinToString("\n").toByteArray())
       os.closeEntry()
     }
   }
@@ -85,28 +88,8 @@ public open class ServiceFileTransformer(
   @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
   override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
-  public open fun setPath(path: String): PatternFilterable = apply {
-    patternSet.setIncludes(listOf("$path/**"))
-  }
-
-  public open class ServiceStream : ByteArrayOutputStream(1024) {
-    @Throws(IOException::class)
-    public open fun append(inputStream: InputStream) {
-      if (count > 0 && buf[count - 1] != '\n'.code.toByte() && buf[count - 1] != '\r'.code.toByte()) {
-        val newline = "\n".toByteArray()
-        write(newline, 0, newline.size)
-      }
-      inputStream.use {
-        it.copyTo(this)
-      }
-    }
-
-    public open fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
-  }
-
   private companion object {
-    private const val SERVICES_PATTERN = "META-INF/services/**"
-    private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
-      "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+    private const val SERVICES_PATH = "META-INF/services"
+    private const val SERVICES_PATTERN = "$SERVICES_PATH/**"
   }
 }

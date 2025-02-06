@@ -29,7 +29,7 @@ fun ZipFile.getContent(entryName: String): String {
 }
 
 fun ZipFile.getStream(entryName: String): InputStream {
-  val entry = getEntry(entryName) ?: error("Entry not found: $entryName")
+  val entry = getEntry(entryName) ?: error("Entry $entryName not found in all entries: ${entries().toList()}")
   return getInputStream(entry)
 }
 
