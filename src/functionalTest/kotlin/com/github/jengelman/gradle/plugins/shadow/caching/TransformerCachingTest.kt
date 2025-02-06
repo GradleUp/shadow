@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
-import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer
@@ -38,11 +37,9 @@ class TransformerCachingTest : BaseCachingTest() {
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
     val assertions = {
-      assertExecutionSuccess()
-      assertThat(outputShadowJar).useAll {
+      assertExecutionStates {
         containsEntries("shadow/Main.class")
       }
-      assertExecutionsFromCacheAndUpToDate()
     }
     assertions()
 
@@ -64,12 +61,10 @@ class TransformerCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     val assertions = { name: String ->
-      assertExecutionSuccess()
-      assertThat(outputShadowJar).useAll {
+      assertExecutionStates {
         containsEntries("shadow/Main.class", "foo/$name.properties")
         getContent("foo/$name.properties").isEqualTo("foo=$name")
       }
-      assertExecutionsFromCacheAndUpToDate()
     }
     assertions("bar")
 
@@ -93,12 +88,10 @@ class TransformerCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     val assertions = { name: String ->
-      assertExecutionSuccess()
-      assertThat(outputShadowJar).useAll {
+      assertExecutionStates {
         containsEntries("shadow/Main.class", "foo/$name.xml")
         getContent("foo/$name.xml").contains("<foo>$name</foo>")
       }
-      assertExecutionsFromCacheAndUpToDate()
     }
     assertions("bar")
 
@@ -126,11 +119,9 @@ class TransformerCachingTest : BaseCachingTest() {
       path("test/some.file").writeText("some content")
     }
     val assertions = {
-      assertExecutionSuccess()
-      assertThat(outputShadowJar).useAll {
+      assertExecutionStates {
         containsEntries("shadow/Main.class")
       }
-      assertExecutionsFromCacheAndUpToDate()
     }
     assertions()
 

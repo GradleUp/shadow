@@ -1,11 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
+import assertk.Assert
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.nio.file.NoSuchFileException
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isDirectory
@@ -40,6 +42,15 @@ abstract class BaseCachingTest : BasePluginTest() {
     assertRunWithResult(FROM_CACHE, outputs = outputs)
     // Run the task again to ensure it is up-to-date.
     assertRunWithResult(UP_TO_DATE, outputs = outputs)
+  }
+
+  fun assertExecutionStates(
+    vararg outputs: String,
+    jarAssertions: Assert<JarPath>.() -> Unit = {},
+  ) {
+    assertExecutionSuccess()
+    assertThat(outputShadowJar).useAll(jarAssertions)
+    assertExecutionsFromCacheAndUpToDate(outputs = outputs)
   }
 
   private fun assertRunWithResult(expectedOutcome: TaskOutcome, vararg outputs: String) {
