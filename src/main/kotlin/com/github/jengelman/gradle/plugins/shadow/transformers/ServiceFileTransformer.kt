@@ -34,7 +34,7 @@ public open class ServiceFileTransformer(
   @get:Internal
   internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 
-  @get:Internal
+  @get:Internal // No need to mark this as an input as `getIncludes` is already marked as `@Input`.
   public open var path: String = SERVICES_PATH
     set(value) {
       field = value
