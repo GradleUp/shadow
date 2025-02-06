@@ -350,11 +350,6 @@ abstract class BasePluginTest {
       "--stacktrace",
     )
 
-    val artifactAndProjectEntries = arrayOf(
-      "org/apache/maven/plugins/shade/Lib.class",
-      "org/codehaus/mojo/shade/App.class",
-    )
-
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun fromJar(vararg paths: Path): String {

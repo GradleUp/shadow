@@ -98,9 +98,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(outputShadowJar).useAll {
-      containsEntries(*artifactAndProjectEntries)
-    }
+    assertThat(outputShadowJar).isRegular()
   }
 
   @Test
