@@ -1,208 +1,148 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-package org.apache.maven.plugins.shade.resource;
+package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.JarOutputStream;
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import org.apache.commons.io.IOUtils
+import org.apache.tools.zip.ZipOutputStream
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugins.shade.relocation.SimpleRelocator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+class ServiceResourceTransformerTest {
+  private lateinit var tempJar: File
 
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+  @BeforeEach
+  fun setup() {
+    tempJar = File.createTempFile("shade.", ".jar")
+  }
 
-/**
- * Test for handling META-INF/service/...
- */
-public class ServiceResourceTransformerTest {
-    private final String NEWLINE = "\n";
-    private File tempJar;
+  @AfterEach
+  fun cleanup() {
+    tempJar.delete()
+  }
 
-    @Before
-    public void setup() throws IOException {
-        tempJar = File.createTempFile("shade.", ".jar");
+  @Test
+  fun relocatedClasses() {
+    val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
+    val content = "org.foo.Service\norg.foo.exclude.OtherService\n"
+    val contentBytes = content.toByteArray(StandardCharsets.UTF_8)
+    val contentStream = ByteArrayInputStream(contentBytes)
+    val contentResource = "META-INF/services/org.foo.something.another"
+    val contentResourceShaded = "META-INF/services/borg.foo.something.another"
+
+    val transformer = ServiceFileTransformer()
+    transformer.transform(context(contentResource, contentStream, setOf(relocator)))
+
+    FileOutputStream(tempJar).use { fos ->
+      ZipOutputStream(fos).use { zos ->
+        transformer.modifyOutputStream(zos, false)
+      }
     }
 
-    @After
-    public void cleanup() {
-        //noinspection ResultOfMethodCallIgnored
-        tempJar.delete();
+    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarEntry = jarFile.getEntry(contentResourceShaded)
+    assertThat(jarEntry).isNotNull()
+    jarFile.getInputStream(jarEntry).use { entryStream ->
+      val xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8)
+      assertThat(xformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
+    }
+  }
+
+  @Test
+  fun mergeRelocatedFiles() {
+    val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
+    val content = "org.foo.Service\norg.foo.exclude.OtherService\n"
+    val contentBytes = content.toByteArray(StandardCharsets.UTF_8)
+    val contentResource = "META-INF/services/org.foo.something.another"
+    val contentResourceShaded = "META-INF/services/borg.foo.something.another"
+
+    val transformer = ServiceFileTransformer()
+    transformer.transform(context(contentResource, ByteArrayInputStream(contentBytes), setOf(relocator)))
+    transformer.transform(context(contentResourceShaded, ByteArrayInputStream(contentBytes), setOf(relocator)))
+
+    FileOutputStream(tempJar).use { fos ->
+      ZipOutputStream(fos).use { zos ->
+        transformer.modifyOutputStream(zos, false)
+      }
     }
 
-    @Test
-    public void relocatedClasses() throws Exception {
-        SimpleRelocator relocator =
-                new SimpleRelocator("org.foo", "borg.foo", null, singletonList("org.foo.exclude.*"));
+    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarEntry = jarFile.getEntry(contentResourceShaded)
+    assertThat(jarEntry).isNotNull()
+    jarFile.getInputStream(jarEntry).use { entryStream ->
+      val xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8)
+      assertThat(xformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
+    }
+  }
 
-        String content = "org.foo.Service\norg.foo.exclude.OtherService\n";
-        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        InputStream contentStream = new ByteArrayInputStream(contentBytes);
-        String contentResource = "META-INF/services/org.foo.something.another";
-        String contentResourceShaded = "META-INF/services/borg.foo.something.another";
+  @Test
+  fun concatenationAppliedMultipleTimes() {
+    val relocator = SimpleRelocator("org.eclipse", "org.eclipse1234")
+    val content = "org.eclipse.osgi.launch.EquinoxFactory\n"
+    val contentBytes = content.toByteArray(StandardCharsets.UTF_8)
+    val contentResource = "META-INF/services/org.osgi.framework.launch.FrameworkFactory"
 
-        ServicesResourceTransformer xformer = new ServicesResourceTransformer();
-        xformer.processResource(contentResource, contentStream, singletonList(relocator), 0);
-        contentStream.close();
+    val transformer = ServiceFileTransformer()
+    transformer.transform(context(contentResource, ByteArrayInputStream(contentBytes), setOf(relocator)))
 
-        try (FileOutputStream fos = new FileOutputStream(tempJar)) {
-            JarOutputStream jos = new JarOutputStream(fos);
-            xformer.modifyOutputStream(jos);
-            jos.close();
-
-            JarFile jarFile = new JarFile(tempJar);
-            JarEntry jarEntry = jarFile.getJarEntry(contentResourceShaded);
-            assertNotNull(jarEntry);
-            try (InputStream entryStream = jarFile.getInputStream(jarEntry)) {
-                String xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8);
-                assertEquals("borg.foo.Service" + NEWLINE + "org.foo.exclude.OtherService" + NEWLINE, xformedContent);
-            } finally {
-                jarFile.close();
-            }
-        }
+    FileOutputStream(tempJar).use { fos ->
+      ZipOutputStream(fos).use { zos ->
+        transformer.modifyOutputStream(zos, false)
+      }
     }
 
-    @Test
-    public void mergeRelocatedFiles() throws Exception {
-        SimpleRelocator relocator =
-                new SimpleRelocator("org.foo", "borg.foo", null, singletonList("org.foo.exclude.*"));
+    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarEntry = jarFile.getEntry(contentResource)
+    assertThat(jarEntry).isNotNull()
+    jarFile.getInputStream(jarEntry).use { entryStream ->
+      val xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8)
+      assertThat(xformedContent).isEqualTo("org.eclipse1234.osgi.launch.EquinoxFactory")
+    }
+  }
 
-        String content = "org.foo.Service" + NEWLINE + "org.foo.exclude.OtherService" + NEWLINE;
-        String contentShaded = "borg.foo.Service" + NEWLINE + "org.foo.exclude.OtherService" + NEWLINE;
-        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        String contentResource = "META-INF/services/org.foo.something.another";
-        String contentResourceShaded = "META-INF/services/borg.foo.something.another";
+  @Test
+  fun concatenation() {
+    val relocator = SimpleRelocator("org.foo", "borg.foo")
+    var content = "org.foo.Service\n"
+    var contentBytes = content.toByteArray(StandardCharsets.UTF_8)
+    var contentResource = "META-INF/services/org.something.another"
 
-        ServicesResourceTransformer xformer = new ServicesResourceTransformer();
+    val transformer = ServiceFileTransformer()
+    transformer.transform(context(contentResource, ByteArrayInputStream(contentBytes), setOf(relocator)))
 
-        try (InputStream contentStream = new ByteArrayInputStream(contentBytes)) {
-            xformer.processResource(contentResource, contentStream, singletonList(relocator), 0);
-        }
+    content = "org.blah.Service\n"
+    contentBytes = content.toByteArray(StandardCharsets.UTF_8)
+    contentResource = "META-INF/services/org.something.another"
 
-        try (InputStream contentStream = new ByteArrayInputStream(contentBytes)) {
-            xformer.processResource(contentResourceShaded, contentStream, singletonList(relocator), 0);
-        }
+    transformer.transform(context(contentResource, ByteArrayInputStream(contentBytes), setOf(relocator)))
 
-        try (FileOutputStream fos = new FileOutputStream(tempJar)) {
-            JarOutputStream jos = new JarOutputStream(fos);
-            xformer.modifyOutputStream(jos);
-            jos.close();
-
-            JarFile jarFile = new JarFile(tempJar);
-            JarEntry jarEntry = jarFile.getJarEntry(contentResourceShaded);
-            assertNotNull(jarEntry);
-            try (InputStream entryStream = jarFile.getInputStream(jarEntry)) {
-                String xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8);
-                assertEquals(contentShaded, xformedContent);
-            } finally {
-                jarFile.close();
-            }
-        }
+    FileOutputStream(tempJar).use { fos ->
+      ZipOutputStream(fos).use { zos ->
+        transformer.modifyOutputStream(zos, false)
+      }
     }
 
-    @Test
-    public void concatanationAppliedMultipleTimes() throws Exception {
-        SimpleRelocator relocator = new SimpleRelocator("org.eclipse", "org.eclipse1234", null, null);
-
-        String content = "org.eclipse.osgi.launch.EquinoxFactory\n";
-        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        InputStream contentStream = new ByteArrayInputStream(contentBytes);
-        String contentResource = "META-INF/services/org.osgi.framework.launch.FrameworkFactory";
-
-        ServicesResourceTransformer xformer = new ServicesResourceTransformer();
-        xformer.processResource(contentResource, contentStream, singletonList(relocator), 0);
-        contentStream.close();
-
-        try (FileOutputStream fos = new FileOutputStream(tempJar)) {
-            JarOutputStream jos = new JarOutputStream(fos);
-            xformer.modifyOutputStream(jos);
-            jos.close();
-
-            JarFile jarFile = new JarFile(tempJar);
-            JarEntry jarEntry = jarFile.getJarEntry(contentResource);
-            assertNotNull(jarEntry);
-            try (InputStream entryStream = jarFile.getInputStream(jarEntry)) {
-                String xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8);
-                assertEquals("org.eclipse1234.osgi.launch.EquinoxFactory" + NEWLINE, xformedContent);
-            } finally {
-                jarFile.close();
-            }
-        }
+    val jarFile = java.util.zip.ZipFile(tempJar)
+    val jarEntry = jarFile.getEntry(contentResource)
+    assertThat(jarEntry).isNotNull()
+    jarFile.getInputStream(jarEntry).use { entryStream ->
+      val xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8)
+      val classes = xformedContent.split("\n")
+      assertThat(classes.contains("org.blah.Service")).isTrue()
+      assertThat(classes.contains("borg.foo.Service")).isTrue()
     }
+  }
 
-    @Test
-    public void concatenation() throws Exception {
-        SimpleRelocator relocator = new SimpleRelocator("org.foo", "borg.foo", null, null);
-
-        String content = "org.foo.Service\n";
-        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        InputStream contentStream = new ByteArrayInputStream(contentBytes);
-        String contentResource = "META-INF/services/org.something.another";
-
-        ServicesResourceTransformer xformer = new ServicesResourceTransformer();
-        xformer.processResource(contentResource, contentStream, singletonList(relocator), 0);
-        contentStream.close();
-
-        content = "org.blah.Service\n";
-        contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        contentStream = new ByteArrayInputStream(contentBytes);
-        contentResource = "META-INF/services/org.something.another";
-
-        xformer.processResource(contentResource, contentStream, singletonList(relocator), 0);
-        contentStream.close();
-
-        try (FileOutputStream fos = new FileOutputStream(tempJar)) {
-            JarOutputStream jos = new JarOutputStream(fos);
-            xformer.modifyOutputStream(jos);
-            jos.close();
-
-            JarFile jarFile = new JarFile(tempJar);
-            JarEntry jarEntry = jarFile.getJarEntry(contentResource);
-            assertNotNull(jarEntry);
-            try (InputStream entryStream = jarFile.getInputStream(jarEntry)) {
-                String xformedContent = IOUtils.toString(entryStream, StandardCharsets.UTF_8);
-                // must be two lines, with our two classes.
-                String[] classes = xformedContent.split("\r?\n");
-                boolean h1 = false;
-                boolean h2 = false;
-                for (String name : classes) {
-                    if ("org.blah.Service".equals(name)) {
-                        h1 = true;
-                    } else if ("borg.foo.Service".equals(name)) {
-                        h2 = true;
-                    }
-                }
-                assertTrue(h1 && h2);
-            } finally {
-                jarFile.close();
-            }
-        }
-    }
+  private fun context(path: String, inputStream: InputStream, relocators: Set<Relocator>): TransformerContext {
+    return TransformerContext(path, inputStream, relocators)
+  }
 }
