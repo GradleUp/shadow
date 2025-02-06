@@ -2,12 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
-import kotlin.io.path.Path
-import kotlin.io.path.name
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+import java.nio.charset.StandardCharsets
+import java.util.Scanner
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -33,11 +30,11 @@ import org.gradle.api.tasks.util.PatternSet
 public open class ServiceFileTransformer(
   private val patternSet: PatternSet = PatternSet()
     .include(SERVICES_PATTERN)
-    .exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN),
+    .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
 ) : Transformer,
   PatternFilterable by patternSet {
   @get:Internal
-  internal val serviceEntries = mutableMapOf<String, ServiceStream>()
+  internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element
@@ -45,23 +42,28 @@ public open class ServiceFileTransformer(
   }
 
   override fun transform(context: TransformerContext) {
-    val lines = context.inputStream.bufferedReader().readLines().toMutableList()
-    var targetPath = context.path
-    context.relocators.forEach { rel ->
-      if (rel.canRelocateClass(Path(targetPath).name)) {
-        val classContext = RelocateClassContext.builder().className(targetPath).stats(context.stats).build()
-        targetPath = rel.relocateClass(classContext)
-      }
-      lines.forEachIndexed { i, line ->
-        if (rel.canRelocateClass(line)) {
-          val lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
-          lines[i] = rel.relocateClass(lineContext)
-        }
+    var resource = context.path.substring(SERVICES_PATH.length + 1)
+    context.relocators.forEach { relocator ->
+      if (relocator.canRelocateClass(resource)) {
+        val classContext = RelocateClassContext.builder().className(resource).stats(context.stats).build()
+        resource = relocator.relocateClass(classContext)
+        return@forEach
       }
     }
-    lines.forEach { line ->
-      serviceEntries[targetPath] = serviceEntries.getOrDefault(targetPath, ServiceStream()).apply {
-        append(ByteArrayInputStream(line.toByteArray()))
+    resource = "$SERVICES_PATH/$resource"
+
+    val out = serviceEntries.computeIfAbsent(resource) { mutableSetOf() }
+
+    Scanner(context.inputStream, StandardCharsets.UTF_8.name()).use { scanner ->
+      while (scanner.hasNextLine()) {
+        var line = scanner.nextLine()
+        context.relocators.forEach { relocator ->
+          if (relocator.canRelocateClass(line)) {
+            val lineContext = RelocateClassContext.builder().className(line).stats(context.stats).build()
+            line = relocator.relocateClass(lineContext)
+          }
+        }
+        out.add(line)
       }
     }
   }
@@ -69,12 +71,13 @@ public open class ServiceFileTransformer(
   override fun hasTransformedResource(): Boolean = serviceEntries.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    serviceEntries.forEach { (path, stream) ->
+    serviceEntries.forEach { (path, data) ->
       val entry = ZipEntry(path)
       entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
-      stream.toInputStream().use {
-        it.copyTo(os)
+      data.forEach { line ->
+        os.write(line.toByteArray())
+        os.write("\n".toByteArray())
       }
       os.closeEntry()
     }
@@ -90,24 +93,8 @@ public open class ServiceFileTransformer(
     patternSet.setIncludes(listOf("$path/**"))
   }
 
-  public open class ServiceStream : ByteArrayOutputStream(1024) {
-    @Throws(IOException::class)
-    public open fun append(inputStream: InputStream) {
-      if (count > 0 && buf[count - 1] != '\n'.code.toByte() && buf[count - 1] != '\r'.code.toByte()) {
-        val newline = "\n".toByteArray()
-        write(newline, 0, newline.size)
-      }
-      inputStream.use {
-        it.copyTo(this)
-      }
-    }
-
-    public open fun toInputStream(): InputStream = ByteArrayInputStream(buf, 0, count)
-  }
-
   private companion object {
-    private const val SERVICES_PATTERN = "META-INF/services/**"
-    private const val GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
-      "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+    private const val SERVICES_PATH = "META-INF/services"
+    private const val SERVICES_PATTERN = "$SERVICES_PATH/**"
   }
 }

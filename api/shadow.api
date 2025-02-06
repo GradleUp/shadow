@@ -559,12 +559,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFileTransformer$ServiceStream : java/io/ByteArrayOutputStream {
-	public fun <init> ()V
-	public fun append (Ljava/io/InputStream;)V
-	public fun toInputStream ()Ljava/io/InputStream;
-}
-
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer : org/gradle/api/Named {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer$Companion;
 	public abstract fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
