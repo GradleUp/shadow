@@ -11,6 +11,10 @@
 
 - **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
 
+**Removed**
+
+- **BREAKING CHANGE:** `ServiceFileTransformer.ServiceStream` has been removed. ([#1218](https://github.com/GradleUp/shadow/pull/1218))
+
 
 ## [v9.0.0-beta7] (2025-02-02)
 
