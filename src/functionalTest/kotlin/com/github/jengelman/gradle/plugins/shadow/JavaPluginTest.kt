@@ -190,6 +190,30 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Issue(
+    "https://github.com/GradleUp/shadow/issues/449",
+  )
+  @Test
+  fun containsMultiReleaseAttrIfAnyDependencyContains() {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        jar {
+          manifest {
+            attributes 'Multi-Release': 'true'
+          }
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    run(serverShadowJarTask)
+
+    assertThat(outputServerShadowJar).useAll {
+      transform { it.manifest.mainAttributes }.isNotEmpty()
+      getMainAttr("Multi-Release").isEqualTo("true")
+    }
+  }
+
+  @Issue(
     "https://github.com/GradleUp/shadow/issues/352",
     "https://github.com/GradleUp/shadow/issues/729",
   )
