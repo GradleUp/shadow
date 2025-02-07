@@ -224,17 +224,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 }
 
-public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask : org/gradle/api/DefaultTask {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Companion;
-	public static final field DESC Ljava/lang/String;
-	public static final field NAME Ljava/lang/String;
-	public fun <init> ()V
-	public final fun knows ()V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/tasks/KnowsTask$Companion {
-}
-
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
 	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZZ)V

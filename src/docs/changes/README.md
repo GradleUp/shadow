@@ -14,6 +14,7 @@
 **Removed**
 
 - **BREAKING CHANGE:** `ServiceFileTransformer.ServiceStream` has been removed. ([#1218](https://github.com/GradleUp/shadow/pull/1218))
+- **BREAKING CHANGE:** Remove `KnowsTask` as it's useless. ([#1236](https://github.com/GradleUp/shadow/pull/1236))
 
 
 ## [v9.0.0-beta7] (2025-02-02)

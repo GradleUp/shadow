@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.KnowsTask
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
@@ -17,10 +16,6 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     }
     project.extensions.create(EXTENSION_NAME, ShadowExtension::class.java, project)
     project.configurations.create(CONFIGURATION_NAME)
-    project.tasks.register(KnowsTask.NAME, KnowsTask::class.java) { knows ->
-      knows.group = GROUP_NAME
-      knows.description = KnowsTask.DESC
-    }
   }
 
   public companion object {
