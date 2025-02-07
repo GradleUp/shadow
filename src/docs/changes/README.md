@@ -6,7 +6,7 @@
 **Added**
 
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
-- Inject `Multi-Release` attribute if any dependency contains it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
+- Inject `Multi-Release` manifest attribute if any dependency contains it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
 
 **Changed**
 

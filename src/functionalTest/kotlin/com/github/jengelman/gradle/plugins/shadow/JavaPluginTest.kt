@@ -12,6 +12,7 @@ import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
@@ -193,13 +194,13 @@ class JavaPluginTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/449",
   )
   @Test
-  fun containsMultiReleaseAttrIfAnyDependencyContains() {
+  fun containsMultiReleaseAttrIfAnyDependencyContainsIt() {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
       """
         jar {
           manifest {
-            attributes 'Multi-Release': 'true'
+            attributes '$multiReleaseAttributeKey': 'true'
           }
         }
       """.trimIndent() + System.lineSeparator(),
@@ -209,7 +210,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputServerShadowJar).useAll {
       transform { it.manifest.mainAttributes }.isNotEmpty()
-      getMainAttr("Multi-Release").isEqualTo("true")
+      getMainAttr(multiReleaseAttributeKey).isEqualTo("true")
     }
   }
 

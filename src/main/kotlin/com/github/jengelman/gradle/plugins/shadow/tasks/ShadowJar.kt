@@ -265,7 +265,7 @@ public abstract class ShadowJar :
   @TaskAction
   override fun copy() {
     from(includedDependencies)
-    findAndAppendMultiReleaseAttr()
+    injectMultiReleaseAttrIfPresent()
     super.copy()
     logger.info(stats.toString())
   }
@@ -328,7 +328,8 @@ public abstract class ShadowJar :
       }
     }
 
-  private fun findAndAppendMultiReleaseAttr() {
+  private fun injectMultiReleaseAttrIfPresent() {
+    // TODO: https://github.com/GradleUp/shadow/pull/1239#discussion_r1946064032.
     val includeMultiReleaseAttr = includedDependencies.files.filter { it.extension == "jar" }
       .any {
         try {
