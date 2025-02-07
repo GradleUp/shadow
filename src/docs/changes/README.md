@@ -10,6 +10,7 @@
 **Changed**
 
 - **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
+- Bump min Java requirement to 11. ([#1242](https://github.com/GradleUp/shadow/pull/1242))
 
 **Removed**
 

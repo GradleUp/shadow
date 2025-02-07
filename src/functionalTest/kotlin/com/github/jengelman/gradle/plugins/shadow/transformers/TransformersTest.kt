@@ -94,7 +94,6 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     val actualFileBytes = outputShadowJar.use { jar ->
-      @Suppress("Since15")
       jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
     }
     assertThat(actualFileBytes.contentHashCode()).all {

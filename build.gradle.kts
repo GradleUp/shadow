@@ -13,8 +13,8 @@ plugins {
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
 
 kotlin {
@@ -22,7 +22,7 @@ kotlin {
   compilerOptions {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_1_8
-    jvmTarget = JvmTarget.JVM_1_8
+    jvmTarget = JvmTarget.JVM_11
     freeCompilerArgs.addAll(
       "-Xjvm-default=all",
     )
