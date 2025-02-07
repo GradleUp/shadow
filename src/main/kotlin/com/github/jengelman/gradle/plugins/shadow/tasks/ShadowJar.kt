@@ -23,6 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import java.io.File
+import java.io.IOException
 import java.util.jar.JarFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
@@ -330,10 +331,14 @@ public abstract class ShadowJar :
   private fun findAndAppendMultiReleaseAttr() {
     val includeMultiReleaseAttr = includedDependencies.files.filter { it.extension == "jar" }
       .any {
-        JarFile(it).use { jarFile ->
-          // Manifest might be null or the attribute name is invalid, or any other case.
-          val value = runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }.getOrNull()
-          value == "true"
+        try {
+          JarFile(it).use { jarFile ->
+            // Manifest might be null or the attribute name is invalid, or any other case.
+            runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }.getOrNull()
+          } == "true"
+        } catch (_: IOException) {
+          // If the jar file is not valid, ignore it.
+          false
         }
       }
     if (includeMultiReleaseAttr) {
