@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
@@ -263,6 +264,7 @@ public abstract class ShadowJar :
   @TaskAction
   override fun copy() {
     from(includedDependencies)
+    findAndAppendMultiReleaseAttr()
     super.copy()
     logger.info(stats.toString())
   }
@@ -324,4 +326,18 @@ public abstract class ShadowJar :
         }
       }
     }
+
+  private fun findAndAppendMultiReleaseAttr() {
+    val includeMultiReleaseAttr = includedDependencies.files.filter { it.extension == "jar" }
+      .any {
+        JarFile(it).use { jarFile ->
+          // Manifest might be null or the attribute name is invalid, or any other case.
+          val value = runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }.getOrNull()
+          value == "true"
+        }
+      }
+    if (includeMultiReleaseAttr) {
+      manifest.attributes[multiReleaseAttributeKey] = true
+    }
+  }
 }
