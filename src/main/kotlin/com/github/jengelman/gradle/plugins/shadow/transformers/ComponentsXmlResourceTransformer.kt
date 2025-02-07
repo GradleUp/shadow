@@ -35,7 +35,7 @@ public open class ComponentsXmlResourceTransformer : Transformer {
       val bis = object : BufferedInputStream(context.inputStream) {
         @Throws(IOException::class)
         override fun close() {
-          // leave ZIP open
+          // Leave ZIP open.
         }
       }
       Xpp3DomBuilder.build(XmlStreamReader(bis))
@@ -43,7 +43,7 @@ public open class ComponentsXmlResourceTransformer : Transformer {
       throw IOException("Error parsing components.xml in ${context.inputStream}", e)
     }
 
-    // Only try to merge in components if there are some elements in the component-set
+    // Only try to merge in components if there are some elements in the component-set.
     if (newDom.getChild("components") == null) return
 
     val children = newDom.getChild("components").getChildren("component")
@@ -59,8 +59,8 @@ public open class ComponentsXmlResourceTransformer : Transformer {
       setValue(component, "implementation", impl)
 
       val key = "$role:$roleHint"
-      // TODO: use the tools in Plexus to merge these properly. For now, I just need an all-or-nothing
-      // configuration carry over
+      // TODO: use the tools in Plexus to merge these properly. For now, I just need an all-or-nothing.
+      // Configuration carry over.
       components[key]?.getChild("configuration")?.let {
         component.addChild(it)
       }

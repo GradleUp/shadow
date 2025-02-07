@@ -71,7 +71,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
       val entry = ZipEntry(PLUGIN_CACHE_FILE)
       entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
       os.putNextEntry(entry)
-      // prevent the aggregator to close the jar output.
+      // Prevent the aggregator to close the jar output.
       aggregator.writeCache(CloseShieldOutputStream.wrap(os))
     } finally {
       deleteTempFiles()

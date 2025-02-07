@@ -94,13 +94,13 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
       val year = SimpleDateFormat("yyyy", Locale.US).format(Date()).let {
         if (inceptionYear != it) "$inceptionYear-$it" else it
       }
-      // add headers
+      // Add headers.
       if (addHeader) {
         entries.add("$preamble1$projectName$preamble2")
       } else {
         entries.add("")
       }
-      // fake second entry, we'll look for a real one later
+      // Fake second entry, we'll look for a real one later.
       entries.add("$projectName\nCopyright $year $organizationName\n")
       entries.add("$preamble3$organizationName ($organizationURL).\n")
     }
@@ -115,7 +115,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
       if (!trimmedLine.startsWith("//")) {
         if (trimmedLine.isNotEmpty()) {
           if (trimmedLine.startsWith("- ")) {
-            // resource-bundle 1.3 mode
+            // resource-bundle 1.3 mode.
             if (lineCount == 1 && sb.toString().contains("This product includes/uses software(s) developed by")) {
               currentOrg = organizationEntries.getOrPut(sb.toString().trim()) { TreeSet() }
               sb.setLength(0)
@@ -176,7 +176,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
         writer.print('\n')
       }
       if (count == 3) {
-        // do org stuff
+        // Do org stuff.
         for ((key, value) in organizationEntries) {
           writer.print(key)
           writer.print('\n')

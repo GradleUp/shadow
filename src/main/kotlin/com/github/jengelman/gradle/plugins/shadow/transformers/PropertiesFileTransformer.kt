@@ -218,7 +218,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    // cannot close the writer as the OutputStream needs to remain open
+    // Cannot close the writer as the OutputStream needs to remain open.
     val zipWriter = os.writer(charset)
     propertiesEntries.forEach { (path, props) ->
       val entry = ZipEntry(path)

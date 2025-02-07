@@ -40,8 +40,8 @@ public open class SimpleRelocator @JvmOverloads constructor(
     if (rawString) {
       this.pathPattern = pattern.orEmpty()
       this.shadedPathPattern = shadedPattern.orEmpty()
-      this.pattern = "" // not used for raw string relocator
-      this.shadedPattern = "" // not used for raw string relocator
+      this.pattern = "" // Not used for raw string relocator.
+      this.shadedPattern = "" // Not used for raw string relocator.
     } else {
       if (pattern == null) {
         this.pattern = ""
@@ -70,15 +70,15 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
 
     if (!rawString) {
-      // Create exclude pattern sets for sources
+      // Create exclude pattern sets for sources.
       for (exclude in this.excludes.get()) {
-        // Excludes should be subpackages of the global pattern
+        // Excludes should be subpackages of the global pattern.
         if (exclude.startsWith(this.pattern)) {
           sourcePackageExcludes.add(
             exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), ""),
           )
         }
-        // Excludes should be subpackages of the global pattern
+        // Excludes should be subpackages of the global pattern.
         if (exclude.startsWith(pathPattern)) {
           sourcePathExcludes.add(
             exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), ""),
@@ -98,10 +98,10 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun canRelocatePath(path: String): Boolean {
     if (rawString) return Pattern.compile(pathPattern).matcher(path).find()
-    // If string is too short - no need to perform expensive string operations
+    // If string is too short - no need to perform expensive string operations.
     if (path.length < pathPattern.length) return false
     var adjustedPath = path.removeSuffix(".class")
-    // Safeguard against strings containing only ".class"
+    // Safeguard against strings containing only ".class".
     if (adjustedPath.isEmpty()) return false
     // Allow for annoying option of an extra / on the front of a path. See MSHADE-119;
     // comes from getClass().getResource("/a/b/c.properties").
@@ -172,7 +172,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {
-        // Regex patterns don't need to be normalized and stay as is
+        // Regex patterns don't need to be normalized and stay as is.
         if (pattern.startsWith(SelectorUtils.REGEX_HANDLER_PREFIX)) {
           add(pattern)
           continue
@@ -195,9 +195,9 @@ public open class SimpleRelocator @JvmOverloads constructor(
       patternTo: String,
       excludedPatterns: Set<String>,
     ): String {
-      // Usually shading makes package names a bit longer, so make buffer 10% bigger than original source
+      // Usually shading makes package names a bit longer, so make buffer 10% bigger than original source.
       val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
-      // Make sure that search pattern starts at word boundary and that we look for literal ".", not regex jokers
+      // Make sure that search pattern starts at word boundary and that we look for literal ".", not regex jokers.
       val snippets = sourceContent.split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
         .filter(CharSequence::isNotEmpty)
       snippets.forEachIndexed { i, snippet ->

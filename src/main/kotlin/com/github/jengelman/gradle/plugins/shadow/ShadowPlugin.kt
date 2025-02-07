@@ -19,7 +19,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
       withType(ApplicationPlugin::class.java) {
         apply(ShadowApplicationPlugin::class.java)
       }
-      // Apply the legacy plugin last
+      // Apply the legacy plugin last.
       // Because we apply the ShadowJavaPlugin/ShadowApplication plugin in a withType callback for the
       // respective JavaPlugin/ApplicationPlugin, it may still apply before the shadowJar task is created etc.
       // If the user applies shadow before those plugins. However, this is fine, because this was also
