@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
@@ -72,5 +73,45 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
 
     val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
     assertThat(content).isEqualTo(xmlContent)
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/168",
+  )
+  @Test
+  fun canMergeNestedLevels() {
+    val xmlEntry = "META-INF/nested.xml"
+    val xmlContent = """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <a>%s</a>
+    """.trimIndent()
+    val one = buildJarOne {
+      insert(xmlEntry, xmlContent.format("<b />"))
+    }
+    val two = buildJarTwo {
+      insert(xmlEntry, xmlContent.format("<c />"))
+    }
+
+    projectScriptPath.appendText(
+      transform<XmlAppendingTransformer>(
+        shadowJarBlock = fromJar(one, two),
+        transformerBlock = """
+          resource = '$xmlEntry'
+        """.trimIndent(),
+      ),
+    )
+
+    run(shadowJarTask)
+
+    val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
+    assertThat(content).isEqualTo(
+      """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <a>
+          <b />
+          <c />
+        </a>
+      """.trimIndent(),
+    )
   }
 }
