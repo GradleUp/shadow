@@ -12,6 +12,7 @@ import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
@@ -186,6 +187,30 @@ class JavaPluginTest : BasePluginTest() {
         "client/Client.class",
         "client/junit/framework/Test.class",
       )
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/449",
+  )
+  @Test
+  fun containsMultiReleaseAttrIfAnyDependencyContainsIt() {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        jar {
+          manifest {
+            attributes '$multiReleaseAttributeKey': 'true'
+          }
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    run(serverShadowJarTask)
+
+    assertThat(outputServerShadowJar).useAll {
+      transform { it.manifest.mainAttributes }.isNotEmpty()
+      getMainAttr(multiReleaseAttributeKey).isEqualTo("true")
     }
   }
 

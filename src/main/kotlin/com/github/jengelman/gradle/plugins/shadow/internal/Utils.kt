@@ -28,6 +28,11 @@ internal val mainClassAttributeKey = JarAttributeName.MAIN_CLASS.toString()
 internal val classPathAttributeKey = JarAttributeName.CLASS_PATH.toString()
 
 /**
+ * Known as `Multi-Release` in the manifest file.
+ */
+internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString()
+
+/**
  * This is used for creating a [DefaultFileTreeElement] with default values.
  * [file], [chmod], and [stat] should be non-null, so they are set to dummy values here.
  */

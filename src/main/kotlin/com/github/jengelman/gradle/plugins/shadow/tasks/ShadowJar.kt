@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
@@ -22,6 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import java.io.File
+import java.io.IOException
 import java.util.jar.JarFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
@@ -263,6 +265,7 @@ public abstract class ShadowJar :
   @TaskAction
   override fun copy() {
     from(includedDependencies)
+    injectMultiReleaseAttrIfPresent()
     super.copy()
     logger.info(stats.toString())
   }
@@ -324,4 +327,23 @@ public abstract class ShadowJar :
         }
       }
     }
+
+  private fun injectMultiReleaseAttrIfPresent() {
+    // TODO: https://github.com/GradleUp/shadow/pull/1239#discussion_r1946064032.
+    val includeMultiReleaseAttr = includedDependencies.files.filter { it.extension == "jar" }
+      .any {
+        try {
+          JarFile(it).use { jarFile ->
+            // Manifest might be null or the attribute name is invalid, or any other case.
+            runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }.getOrNull()
+          } == "true"
+        } catch (_: IOException) {
+          // If the jar file is not valid, ignore it.
+          false
+        }
+      }
+    if (includeMultiReleaseAttr) {
+      manifest.attributes[multiReleaseAttributeKey] = true
+    }
+  }
 }
