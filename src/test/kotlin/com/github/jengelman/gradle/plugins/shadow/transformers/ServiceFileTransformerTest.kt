@@ -6,14 +6,13 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.InputStream
-import java.io.OutputStream
 import java.nio.file.Path
 import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
-import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -152,10 +151,6 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   private companion object {
     fun context(path: String, input: String, vararg relocators: Relocator): TransformerContext {
       return TransformerContext(path, input.byteInputStream(), relocators = relocators.toSet(), stats = sharedStats)
-    }
-
-    fun OutputStream.zipOutputStream(): ZipOutputStream {
-      return if (this is ZipOutputStream) this else ZipOutputStream(this)
     }
 
     fun ZipFile.getContent(entryName: String): String {

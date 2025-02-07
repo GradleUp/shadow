@@ -9,14 +9,16 @@ import assertk.assertions.isTrue
 import assertk.assertions.startsWith
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
-import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.net.URI
 import java.net.URL
 import java.util.Collections
 import java.util.jar.JarInputStream
+import kotlin.io.path.createTempFile
+import kotlin.io.path.outputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
@@ -45,15 +47,14 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
     transformer.transform(context(relocator))
     assertThat(transformer.hasTransformedResource()).isTrue()
 
-    // Write out to a fake jar file
-    val testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
-    ZipOutputStream(testableZipFile.outputStream().buffered()).use { zipOutputStream ->
-      transformer.modifyOutputStream(zipOutputStream, true)
+    val tempJar = createTempFile("testable-zip-file-", ".jar")
+    tempJar.outputStream().zipOutputStream().use { zos ->
+      transformer.modifyOutputStream(zos, true)
     }
 
     // Pull the data back out and make sure it was transformed
     val cache = PluginCache()
-    val url = URI("jar:" + testableZipFile.toURI().toURL() + "!/" + PLUGIN_CACHE_FILE).toURL()
+    val url = URI("jar:" + tempJar.toUri().toURL() + "!/" + PLUGIN_CACHE_FILE).toURL()
     val resources = Collections.enumeration(listOf(url))
     cache.loadCacheFiles(resources)
 
@@ -108,12 +109,12 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
     }
   }
 
-  private fun context(vararg relocator: SimpleRelocator): TransformerContext {
-    return TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocator.toSet())
-  }
-
   private companion object {
     val pluginCacheUrl: URL = requireNotNull(this::class.java.classLoader.getResource(PLUGIN_CACHE_FILE))
+
+    fun context(vararg relocators: Relocator): TransformerContext {
+      return TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocators.toSet())
+    }
 
     @JvmStatic
     fun relocationProvider() = listOf(
