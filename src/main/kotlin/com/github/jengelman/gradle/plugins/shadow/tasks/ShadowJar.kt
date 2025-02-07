@@ -56,7 +56,7 @@ public abstract class ShadowJar :
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
   init {
-    // shadow filters out files later. This was the default behavior in  Gradle < 6.x
+    // Shadow filters out files later. This was the default behavior in Gradle < 6.x
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
@@ -155,10 +155,10 @@ public abstract class ShadowJar :
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
-  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202.
   override fun getIncludes(): MutableSet<String> = super.getIncludes()
 
-  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202
+  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
   override fun minimize(): ShadowJar = apply {

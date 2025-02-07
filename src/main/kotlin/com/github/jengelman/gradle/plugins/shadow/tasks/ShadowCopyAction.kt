@@ -83,8 +83,7 @@ public open class ShadowCopyAction internal constructor(
       stream.process(
         object : BaseStreamAction() {
           override fun visitFile(fileDetails: FileCopyDetails) {
-            // All project sources are already present, we just need
-            // to deal with JAR dependencies.
+            // All project sources are already present, we just need to deal with JAR dependencies.
             if (isArchive(fileDetails)) {
               unusedTracker.addDependency(fileDetails.file)
             }
@@ -301,7 +300,7 @@ public open class ShadowCopyAction internal constructor(
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
       // to the original class names. This is not a problem at runtime (because these entries in the
-      // constant pool are never used), but confuses some tools such as Felix' maven-bundle-plugin
+      // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
       val cw = ClassWriter(0)
       val cr = ClassReader(classInputStream)
@@ -347,7 +346,7 @@ public open class ShadowCopyAction internal constructor(
 
     override fun visitDir(dirDetails: FileCopyDetails) {
       try {
-        // Trailing slash in name indicates that entry is a directory
+        // Trailing slash in name indicates that entry is a directory.
         val path = dirDetails.relativePath.pathString + "/"
         val archiveEntry = ZipEntry(path)
         archiveEntry.time = getArchiveTimeFor(dirDetails.lastModified)
@@ -402,7 +401,7 @@ public open class ShadowCopyAction internal constructor(
       return if (segments.size <= 1) {
         null
       } else {
-        // Parent is always a directory so add / to the end of the path
+        // Parent is always a directory so add / to the end of the path.
         val parentPath = segments.dropLast(1).joinToString("/") + "/"
         val entry = setArchiveTimes(ZipEntry(parentPath))
         RelativeArchivePath(entry)
