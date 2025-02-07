@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.jar
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
@@ -43,12 +44,12 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       task.archiveClassifier.set("all")
       @Suppress("EagerGradleConfiguration")
       task.manifest.inheritFrom(jarTask.get().manifest)
-      val attrProvider = jarTask.map { it.manifest.attributes["Class-Path"]?.toString().orEmpty() }
+      val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
       val files = files(configurations.shadow)
       task.doFirst {
         if (!files.isEmpty) {
           val attrs = listOf(attrProvider.getOrElse("")) + files.map { it.name }
-          task.manifest.attributes["Class-Path"] = attrs.joinToString(" ").trim()
+          task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
         }
       }
       task.from(sourceSets.named("main").map { it.output })
