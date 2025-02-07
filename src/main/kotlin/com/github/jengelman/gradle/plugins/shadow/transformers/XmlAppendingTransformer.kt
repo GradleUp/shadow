@@ -52,7 +52,7 @@ public open class XmlAppendingTransformer @Inject constructor(
         }
       }.build(context.inputStream)
     } catch (e: JDOMException) {
-      throw RuntimeException("Error processing resource $resource: ${e.message}", e)
+      throw RuntimeException("Error processing resource ${resource.get()}: ${e.message}", e)
     }
 
     if (doc == null) {
