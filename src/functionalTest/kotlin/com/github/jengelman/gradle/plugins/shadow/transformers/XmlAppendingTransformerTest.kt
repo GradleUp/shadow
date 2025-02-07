@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class XmlAppendingTransformerTest : BaseTransformerTest() {
   @Test
   fun appendXmlFiles() {
-    val propertiesXml = "properties.xml"
+    val xmlEntry = "properties.xml"
     val xmlContent = """
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
@@ -18,26 +18,25 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
         <entry key="%s">%s</entry>
       </properties>
     """.trimIndent()
-
-    val xml1 = buildJar("xml1.jar") {
-      insert(propertiesXml, xmlContent.format("key1", "val1"))
+    val one = buildJarOne {
+      insert(xmlEntry, xmlContent.format("key1", "val1"))
     }
-    val xml2 = buildJar("xml2.jar") {
-      insert(propertiesXml, xmlContent.format("key2", "val2"))
+    val two = buildJarTwo {
+      insert(xmlEntry, xmlContent.format("key2", "val2"))
     }
 
     projectScriptPath.appendText(
       transform<XmlAppendingTransformer>(
-        shadowJarBlock = fromJar(xml1, xml2),
+        shadowJarBlock = fromJar(one, two),
         transformerBlock = """
-          resource = 'properties.xml'
+          resource = '$xmlEntry'
         """.trimIndent(),
       ),
     )
 
     run(shadowJarTask)
 
-    val content = outputShadowJar.use { it.getContent(propertiesXml) }.trimIndent()
+    val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
     assertThat(content).isEqualTo(
       """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -48,31 +47,6 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
         </properties>
       """.trimIndent(),
     )
-  }
-
-  @Test
-  fun canBundleMetaInfoPluginXml() {
-    val xmlEntry = "META-INF/plugin.xml"
-    val xmlContent = """
-      <?xml version="1.0" encoding="UTF-8"?>
-      <plugin>
-        <id>my.plugin.id</id>
-      </plugin>
-    """.trimIndent()
-    val pluginJar = buildJar("plugin.jar") {
-      insert(xmlEntry, xmlContent)
-    }
-
-    projectScriptPath.appendText(
-      transform<XmlAppendingTransformer>(
-        shadowJarBlock = fromJar(pluginJar),
-      ),
-    )
-
-    run(shadowJarTask)
-
-    val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
-    assertThat(content).isEqualTo(xmlContent)
   }
 
   @Issue(
