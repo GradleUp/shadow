@@ -18,9 +18,9 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 ```
 
 The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`.
-For example, the class `junit.textui.TestRunner` becomes `shadow.junit.TestRunner`.
-In the resulting JAR, the class file is relocated from `junit/textui/TestRunner.class` to
-`shadow/junit/TestRunner.class`.
+For example, the class `junit.framework.TestCase` becomes `shadow.junit.TestCase`.
+In the resulting JAR, the class file is relocated from `junit/framework/TestCase.class` to
+`shadow/junit/TestCase.class`.
 
 > Relocation operates at a package level.
 It is not necessary to specify any patterns for matching, it will operate simply on the prefix
