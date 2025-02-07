@@ -397,6 +397,7 @@ public open class ShadowCopyAction internal constructor(
   ) {
     public open val isClassFile: Boolean get() = lastName.endsWith(".class")
 
+    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE") // It could return null in super.getParent().
     override fun getParent(): RelativeArchivePath? {
       return if (segments.size <= 1) {
         null
