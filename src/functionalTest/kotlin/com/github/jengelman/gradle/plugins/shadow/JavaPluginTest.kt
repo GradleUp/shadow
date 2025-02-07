@@ -10,6 +10,8 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
@@ -362,7 +364,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val value = outputShadowJar.use { it.getMainAttr("Class-Path") }
+    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isNull()
   }
 
@@ -378,7 +380,7 @@ class JavaPluginTest : BasePluginTest() {
         }
         jar {
           manifest {
-            attributes 'Class-Path': '/libs/a.jar'
+            attributes '$classPathAttributeKey': '/libs/a.jar'
           }
         }
       """.trimIndent(),
@@ -386,7 +388,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val value = outputShadowJar.use { it.getMainAttr("Class-Path") }
+    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
@@ -405,7 +407,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    val value = outputShadowJar.use { it.getMainAttr("Class-Path") }
+    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 
@@ -456,7 +458,7 @@ class JavaPluginTest : BasePluginTest() {
         .single().isEqualTo("my/plugin/MyPlugin.class")
       transform { it.manifest.mainAttributes }.isNotEmpty()
       // Doesn't contain Gradle classes.
-      getMainAttr("Class-Path").isNull()
+      getMainAttr(classPathAttributeKey).isNull()
 
       containsEntries(*entriesInA)
       doesNotContainEntries(*entriesInB)
@@ -482,7 +484,7 @@ class JavaPluginTest : BasePluginTest() {
           from sourceSets.test.output
           configurations = [project.configurations.testRuntimeClasspath]
           manifest {
-            attributes 'Main-Class': 'shadow.Main'
+            attributes '$mainClassAttributeKey': 'shadow.Main'
           }
         }
       """.trimIndent(),
@@ -496,7 +498,7 @@ class JavaPluginTest : BasePluginTest() {
         "junit/framework/Test.class",
         "shadow/Main.class",
       )
-      getMainAttr("Main-Class").isNotNull()
+      getMainAttr(mainClassAttributeKey).isNotNull()
     }
 
     val pathString = path("build/libs/shadow-1.0-tests.jar").toString()

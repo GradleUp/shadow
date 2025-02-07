@@ -8,6 +8,7 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
+import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -454,7 +455,7 @@ class PublishingTest : BasePluginTest() {
     assertThat(jarPath).useAll {
       containsEntries(*entriesInA)
       doesNotContainEntries(*entriesInB)
-      getMainAttr("Class-Path").isEqualTo("b-1.0.jar")
+      getMainAttr(classPathAttributeKey).isEqualTo("b-1.0.jar")
     }
   }
 

@@ -8,6 +8,8 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.DISTRIBUTION_NAME
+import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
@@ -117,7 +119,7 @@ class ApplicationPluginTest : BasePluginTest() {
       projectBlock = """
         shadowJar {
           manifest {
-            attributes 'Main-Class': 'shadow.Main2'
+            attributes '$mainClassAttributeKey': 'shadow.Main2'
           }
         }
       """.trimIndent(),
@@ -248,8 +250,8 @@ class ApplicationPluginTest : BasePluginTest() {
   ) {
     assertThat(jarPath).useAll {
       containsEntries(*entriesContained)
-      getMainAttr("Main-Class").isEqualTo(mainClassAttr)
-      getMainAttr("Class-Path").isEqualTo(classPathAttr)
+      getMainAttr(mainClassAttributeKey).isEqualTo(mainClassAttr)
+      getMainAttr(classPathAttributeKey).isEqualTo(classPathAttr)
     }
   }
 

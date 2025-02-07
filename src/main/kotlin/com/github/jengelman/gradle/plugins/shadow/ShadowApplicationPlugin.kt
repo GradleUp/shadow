@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -125,9 +126,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     tasks.shadowJar.configure { task ->
       task.inputs.property("mainClassName", mainClassName)
       task.doFirst {
-        // Inject the Main-Class attribute if it is not already present.
-        if (!task.manifest.attributes.contains("Main-Class")) {
-          task.manifest.attributes["Main-Class"] = mainClassName.get()
+        // Inject the attribute if it is not already present.
+        if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
+          task.manifest.attributes[mainClassAttributeKey] = mainClassName.get()
         }
       }
     }

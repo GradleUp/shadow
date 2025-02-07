@@ -8,6 +8,7 @@ import java.nio.charset.Charset
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.util.Properties
+import java.util.jar.Attributes.Name as JarAttributeName
 import kotlin.io.path.inputStream
 import kotlin.io.path.toPath
 import org.gradle.api.file.RelativePath
@@ -15,6 +16,16 @@ import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.internal.file.Chmod
 import org.gradle.internal.file.FileMetadata
 import org.gradle.internal.file.Stat
+
+/**
+ * Known as `Main-Class` in the manifest file.
+ */
+internal val mainClassAttributeKey = JarAttributeName.MAIN_CLASS.toString()
+
+/**
+ * Known as `Class-Path` in the manifest file.
+ */
+internal val classPathAttributeKey = JarAttributeName.CLASS_PATH.toString()
 
 /**
  * This is used for creating a [DefaultFileTreeElement] with default values.

@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
@@ -27,8 +28,8 @@ class TransformersTest : BaseTransformerTest() {
       """
         jar {
           manifest {
-            attributes 'Main-Class': 'shadow.Main'
-            attributes 'Test-Entry': 'PASSED'
+            attributes '$mainClassAttributeKey': 'shadow.Main'
+            attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
           }
         }
       """.trimIndent(),
@@ -37,8 +38,8 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     commonAssertions {
-      assertThat(getValue("Test-Entry")).isEqualTo("PASSED")
-      assertThat(getValue("Main-Class")).isEqualTo("shadow.Main")
+      assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
+      assertThat(getValue(mainClassAttributeKey)).isEqualTo("shadow.Main")
     }
   }
 
@@ -67,9 +68,9 @@ class TransformersTest : BaseTransformerTest() {
 
     val mf = jarPath("build/libs/shadow-1.0.jar").use { it.manifest }
     assertThat(mf).isNotNull()
-    assertThat(mf.mainAttributes.getValue("Test-Entry")).isEqualTo("FAILED")
-    assertThat(mf.mainAttributes.getValue("Main-Class")).isEqualTo("shadow.Main")
-    assertThat(mf.mainAttributes.getValue("New-Entry")).isNull()
+    assertThat(mf.mainAttributes.getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("FAILED")
+    assertThat(mf.mainAttributes.getValue(mainClassAttributeKey)).isEqualTo("shadow.Main")
+    assertThat(mf.mainAttributes.getValue(NEW_ENTRY_ATTR_KEY)).isNull()
   }
 
   @Issue(
@@ -153,9 +154,9 @@ class TransformersTest : BaseTransformerTest() {
 
   private fun commonAssertions(
     mainAttributesBlock: Attributes.() -> Unit = {
-      assertThat(getValue("Test-Entry")).isEqualTo("PASSED")
-      assertThat(getValue("Main-Class")).isEqualTo("shadow.Main")
-      assertThat(getValue("New-Entry")).isEqualTo("NEW")
+      assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
+      assertThat(getValue(mainClassAttributeKey)).isEqualTo("shadow.Main")
+      assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
     },
   ) {
     val mf = outputShadowJar.use { it.manifest }
@@ -164,17 +165,20 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   private companion object {
+    const val NEW_ENTRY_ATTR_KEY = "New-Entry"
+    const val TEST_ENTRY_ATTR_KEY = "Test-Entry"
+
     val MANIFEST_ATTRS = """
         jar {
           manifest {
-            attributes 'Main-Class': 'shadow.Main'
-            attributes 'Test-Entry': 'FAILED'
+            attributes '$mainClassAttributeKey': 'shadow.Main'
+            attributes '$TEST_ENTRY_ATTR_KEY': 'FAILED'
           }
         }
         $shadowJar {
           manifest {
-            attributes 'New-Entry': 'NEW'
-            attributes 'Test-Entry': 'PASSED'
+            attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
+            attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
           }
         }
     """.trimIndent()
