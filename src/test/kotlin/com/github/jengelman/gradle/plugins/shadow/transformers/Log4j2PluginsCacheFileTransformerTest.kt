@@ -80,7 +80,6 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
         if (jarEntry == null) {
           fail("No expected resource in the output jar.")
         } else if (jarEntry.name == PLUGIN_CACHE_FILE) {
-          @Suppress("Since15")
           assertThat(inputStream.readAllBytes().contentHashCode()).all {
             // Hash of the original plugin cache file.
             isNotEqualTo(-2114104185)
