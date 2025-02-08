@@ -84,7 +84,7 @@ public open class ShadowCopyAction internal constructor(
         object : BaseStreamAction() {
           override fun visitFile(fileDetails: FileCopyDetails) {
             // All project sources are already present, we just need to deal with JAR dependencies.
-            if (isArchive(fileDetails)) {
+            if (fileDetails.isJar()) {
               unusedTracker.addDependency(fileDetails.file)
             }
           }
@@ -167,11 +167,11 @@ public open class ShadowCopyAction internal constructor(
     }
 
     override fun visitFile(fileDetails: FileCopyDetails) {
-      if (isArchive(fileDetails)) {
+      if (fileDetails.isJar()) {
         processArchive(fileDetails)
       } else {
         try {
-          val isClass = isClass(fileDetails)
+          val isClass = fileDetails.isClass()
           if (!remapper.hasRelocators() || !isClass) {
             if (isTransformable(fileDetails)) {
               transform(fileDetails)
@@ -371,14 +371,6 @@ public open class ShadowCopyAction internal constructor(
   }
 
   public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
-    protected fun isArchive(fileDetails: FileCopyDetails): Boolean {
-      return fileDetails.relativePath.pathString.endsWith(".jar")
-    }
-
-    protected fun isClass(fileDetails: FileCopyDetails): Boolean {
-      return fileDetails.path.endsWith(".class")
-    }
-
     override fun processFile(details: FileCopyDetailsInternal) {
       if (details.isDirectory) visitDir(details) else visitFile(details)
     }
@@ -386,6 +378,14 @@ public open class ShadowCopyAction internal constructor(
     protected open fun visitDir(dirDetails: FileCopyDetails) {}
 
     protected abstract fun visitFile(fileDetails: FileCopyDetails)
+
+    protected fun FileCopyDetails.isClass(): Boolean {
+      return relativePath.pathString.endsWith(".class")
+    }
+
+    protected fun FileCopyDetails.isJar(): Boolean {
+      return relativePath.pathString.endsWith(".jar")
+    }
   }
 
   public open inner class RelativeArchivePath(
