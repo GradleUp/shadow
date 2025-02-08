@@ -20,9 +20,6 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
-import org.gradle.api.InvalidUserCodeException
-import org.gradle.api.file.DuplicateFileCopyingException
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
@@ -152,8 +149,6 @@ public open class ShadowCopyAction internal constructor(
   }
 
   public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
-    private val visitedFiles = mutableMapOf<RelativePath, String>()
-
     protected fun isArchive(fileDetails: FileCopyDetails): Boolean {
       return fileDetails.relativePath.pathString.endsWith(".jar")
     }
@@ -163,55 +158,12 @@ public open class ShadowCopyAction internal constructor(
     }
 
     override fun processFile(details: FileCopyDetailsInternal) {
-      if (details.isDirectory) {
-        visitDir(details)
-      } else {
-        val strategy = details.duplicatesStrategy
-        val relativePath = details.relativePath
-        if (visitedFiles.containsKey(relativePath)) {
-          if (details.isDefaultDuplicatesStrategy) {
-            failWithIncorrectDuplicatesStrategySetup(relativePath)
-          }
-          when (strategy) {
-            DuplicatesStrategy.EXCLUDE -> return
-            DuplicatesStrategy.FAIL -> {
-              throw DuplicateFileCopyingException(
-                String.format(
-                  "Cannot copy %s to '%s' because it has already been copied there.",
-                  details.displayName,
-                  visitedFiles[relativePath],
-                ),
-              )
-            }
-            DuplicatesStrategy.WARN -> {
-              logger.warn(
-                "{} will be copied to it, overwriting {}, which has already been copied there.",
-                details.displayName,
-                visitedFiles[relativePath],
-              )
-            }
-            else -> Unit
-          }
-        } else {
-          visitedFiles.put(relativePath, details.displayName)
-        }
-
-        visitFile(details)
-      }
+      if (details.isDirectory) visitDir(details) else visitFile(details)
     }
 
     protected open fun visitDir(dirDetails: FileCopyDetails) {}
 
     protected abstract fun visitFile(fileDetails: FileCopyDetails)
-
-    private companion object {
-      fun failWithIncorrectDuplicatesStrategySetup(relativePath: RelativePath) {
-        throw InvalidUserCodeException(
-          "Entry " + relativePath.getPathString() + " is a duplicate but no duplicate handling strategy has been set. " +
-            "Please refer to " + "https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html" + " for details.",
-        )
-      }
-    }
   }
 
   private inner class StreamAction(
