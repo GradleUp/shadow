@@ -1,11 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
 import javax.inject.Inject
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
@@ -51,9 +51,7 @@ public open class ManifestAppenderTransformer @Inject constructor(
   override fun hasTransformedResource(): Boolean = attributes.get().isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(MANIFEST_NAME)
-    entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    os.putNextEntry(zipEntry(MANIFEST_NAME, preserveFileTimestamps))
     os.write(manifestContents)
 
     if (attributes.get().isNotEmpty()) {

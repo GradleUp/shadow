@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.PrintWriter
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
@@ -8,7 +9,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.TreeSet
 import javax.inject.Inject
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
@@ -158,9 +158,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val copyright = copyright.orNull
 
-    val zipEntry = ZipEntry(NOTICE_PATH)
-    zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)
-    os.putNextEntry(zipEntry)
+    os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
 
     val writer = PrintWriter(os.writer(charset))
 

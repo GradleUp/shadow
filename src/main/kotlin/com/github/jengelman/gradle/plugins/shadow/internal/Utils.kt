@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -9,8 +10,8 @@ import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.Attributes.Name as JarAttributeName
-import kotlin.io.path.inputStream
 import kotlin.io.path.toPath
+import org.apache.tools.zip.ZipEntry
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.DefaultFileTreeElement
 import org.gradle.internal.file.Chmod
@@ -31,6 +32,17 @@ internal val classPathAttributeKey = JarAttributeName.CLASS_PATH.toString()
  * Known as `Multi-Release` in the manifest file.
  */
 internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString()
+
+internal inline fun zipEntry(
+  name: String,
+  preserveLastModified: Boolean = true,
+  block: ZipEntry.() -> Unit = {},
+): ZipEntry = ZipEntry(name).apply {
+  if (!preserveLastModified) {
+    time = ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
+  }
+  block()
+}
 
 /**
  * This is used for creating a [DefaultFileTreeElement] with default values.

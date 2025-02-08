@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
@@ -55,9 +55,7 @@ public open class AppendingTransformer @Inject constructor(
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(resource.get())
-    entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
 
     // Closing a ByteArrayOutputStream has no effect, so we don't use a use block here.
     data.toByteArray().inputStream().copyTo(os)
