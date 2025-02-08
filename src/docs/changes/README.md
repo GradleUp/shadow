@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v9.0.0-beta8] (2025-02-08)
+
 **Added**
 
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
@@ -537,7 +540,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta7...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta8...HEAD
+[v9.0.0-beta8]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8
 [v9.0.0-beta7]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7
 [v9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
 [v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
