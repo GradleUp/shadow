@@ -104,7 +104,7 @@ public open class ShadowCopyAction internal constructor(
     try {
       zipOutStream.use { outputStream ->
         stream.process(
-          StreamAction(
+          InnerStreamAction(
             outputStream,
             encoding,
             transformers,
@@ -148,25 +148,7 @@ public open class ShadowCopyAction internal constructor(
     return zipEntry
   }
 
-  public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
-    protected fun isArchive(fileDetails: FileCopyDetails): Boolean {
-      return fileDetails.relativePath.pathString.endsWith(".jar")
-    }
-
-    protected fun isClass(fileDetails: FileCopyDetails): Boolean {
-      return fileDetails.path.endsWith(".class")
-    }
-
-    override fun processFile(details: FileCopyDetailsInternal) {
-      if (details.isDirectory) visitDir(details) else visitFile(details)
-    }
-
-    protected open fun visitDir(dirDetails: FileCopyDetails) {}
-
-    protected abstract fun visitFile(fileDetails: FileCopyDetails)
-  }
-
-  private inner class StreamAction(
+  private inner class InnerStreamAction(
     private val zipOutStr: ZipOutputStream,
     encoding: String?,
     private val transformers: Set<Transformer>,
@@ -386,6 +368,24 @@ public open class ShadowCopyAction internal constructor(
     private fun isTransformable(element: FileTreeElement): Boolean {
       return transformers.any { it.canTransformResource(element) }
     }
+  }
+
+  public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
+    protected fun isArchive(fileDetails: FileCopyDetails): Boolean {
+      return fileDetails.relativePath.pathString.endsWith(".jar")
+    }
+
+    protected fun isClass(fileDetails: FileCopyDetails): Boolean {
+      return fileDetails.path.endsWith(".class")
+    }
+
+    override fun processFile(details: FileCopyDetailsInternal) {
+      if (details.isDirectory) visitDir(details) else visitFile(details)
+    }
+
+    protected open fun visitDir(dirDetails: FileCopyDetails) {}
+
+    protected abstract fun visitFile(fileDetails: FileCopyDetails)
   }
 
   public open inner class RelativeArchivePath(
