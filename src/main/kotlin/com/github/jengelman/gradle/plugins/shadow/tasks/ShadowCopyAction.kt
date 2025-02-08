@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
@@ -137,10 +138,6 @@ public open class ShadowCopyAction internal constructor(
     }
   }
 
-  private fun getArchiveTimeFor(timestamp: Long): Long {
-    return if (preserveFileTimestamps) timestamp else CONSTANT_TIME_FOR_ZIP_ENTRIES
-  }
-
   private inner class InnerStreamAction(
     private val zipOutStr: ZipOutputStream,
     encoding: String?,
@@ -170,8 +167,7 @@ public open class ShadowCopyAction internal constructor(
               transform(fileDetails)
             } else {
               val mappedPath = remapper.map(fileDetails.relativePath.pathString)
-              val entry = ZipEntry(mappedPath).apply {
-                time = getArchiveTimeFor(fileDetails.lastModified)
+              val entry = zipEntry(mappedPath, preserveFileTimestamps, fileDetails.lastModified) {
                 unixMode = UnixStat.FILE_FLAG or fileDetails.permissions.toUnixNumeric()
               }
               zipOutStr.putNextEntry(entry)
@@ -192,8 +188,7 @@ public open class ShadowCopyAction internal constructor(
       try {
         // Trailing slash in name indicates that entry is a directory.
         val path = dirDetails.relativePath.pathString + "/"
-        val entry = ZipEntry(path).apply {
-          time = getArchiveTimeFor(dirDetails.lastModified)
+        val entry = zipEntry(path, preserveFileTimestamps, dirDetails.lastModified) {
           unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
         }
         zipOutStr.putNextEntry(entry)
@@ -269,9 +264,7 @@ public open class ShadowCopyAction internal constructor(
 
     private fun remapClass(file: RelativeArchivePath, archive: ZipFile) {
       if (file.isClassFile) {
-        val entry = ZipEntry(remapper.mapPath(file) + ".class").apply {
-          time = getArchiveTimeFor(file.entry.time)
-        }
+        val entry = zipEntry(remapper.mapPath(file) + ".class", preserveFileTimestamps)
         addParentDirectories(RelativeArchivePath(entry))
         remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
       }
@@ -313,9 +306,7 @@ public open class ShadowCopyAction internal constructor(
       val mappedName = multiReleasePrefix + remapper.mapPath(newPath)
       try {
         // Now we put it back on so the class file is written out with the right extension.
-        val entry = ZipEntry("$mappedName.class").apply {
-          time = getArchiveTimeFor(lastModified)
-        }
+        val entry = zipEntry("$mappedName.class", preserveFileTimestamps, lastModified)
         zipOutStr.putNextEntry(entry)
         renamedClass.inputStream().use {
           it.copyTo(zipOutStr)
@@ -328,9 +319,7 @@ public open class ShadowCopyAction internal constructor(
 
     private fun copyArchiveEntry(archiveFile: RelativeArchivePath, archive: ZipFile) {
       val mappedPath = remapper.map(archiveFile.entry.name)
-      val entry = ZipEntry(mappedPath).apply {
-        time = getArchiveTimeFor(archiveFile.entry.time)
-      }
+      val entry = zipEntry(mappedPath, preserveFileTimestamps, archiveFile.entry.time)
       val mappedFile = RelativeArchivePath(entry)
       addParentDirectories(mappedFile)
       zipOutStr.putNextEntry(mappedFile.entry)
@@ -403,9 +392,7 @@ public open class ShadowCopyAction internal constructor(
       } else {
         // Parent is always a directory so add / to the end of the path.
         val parentPath = segments.dropLast(1).joinToString("/") + "/"
-        val entry = ZipEntry(parentPath).apply {
-          getArchiveTimeFor(entry.time)
-        }
+        val entry = zipEntry(parentPath, preserveFileTimestamps)
         RelativeArchivePath(entry)
       }
     }

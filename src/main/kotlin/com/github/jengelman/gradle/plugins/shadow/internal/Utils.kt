@@ -36,9 +36,14 @@ internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString(
 internal inline fun zipEntry(
   name: String,
   preserveLastModified: Boolean = true,
+  lastModified: Long = -1,
   block: ZipEntry.() -> Unit = {},
 ): ZipEntry = ZipEntry(name).apply {
-  if (!preserveLastModified) {
+  if (preserveLastModified) {
+    if (lastModified >= 0) {
+      time = lastModified
+    }
+  } else {
     time = ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
   }
   block()
