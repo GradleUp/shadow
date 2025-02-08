@@ -2,13 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.IOException
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.jar.Manifest
 import javax.inject.Inject
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
@@ -78,9 +77,7 @@ public open class ManifestResourceTransformer @Inject constructor(
       attributes[Attributes.Name(key)] = value
     }
 
-    val entry = ZipEntry(JarFile.MANIFEST_NAME)
-    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    os.putNextEntry(zipEntry(JarFile.MANIFEST_NAME, preserveFileTimestamps))
     manifest!!.write(os)
   }
 

@@ -5,12 +5,12 @@ import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
@@ -221,9 +221,7 @@ public open class PropertiesFileTransformer @Inject constructor(
     // Cannot close the writer as the OutputStream needs to remain open.
     val zipWriter = os.writer(charset)
     propertiesEntries.forEach { (path, props) ->
-      val entry = ZipEntry(path)
-      entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-      os.putNextEntry(entry)
+      os.putNextEntry(zipEntry(path, preserveFileTimestamps))
       props.inputStream(charset).bufferedReader(charset).use {
         it.copyTo(zipWriter)
       }

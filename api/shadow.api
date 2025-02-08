@@ -251,8 +251,8 @@ public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$A
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$BaseStreamAction : org/gradle/api/internal/file/CopyActionProcessingStreamAction {
 	public fun <init> ()V
-	protected final fun isArchive (Lorg/gradle/api/file/FileCopyDetails;)Z
 	protected final fun isClass (Lorg/gradle/api/file/FileCopyDetails;)Z
+	protected final fun isJar (Lorg/gradle/api/file/FileCopyDetails;)Z
 	public fun processFile (Lorg/gradle/api/internal/file/copy/FileCopyDetailsInternal;)V
 	protected fun visitDir (Lorg/gradle/api/file/FileCopyDetails;)V
 	protected abstract fun visitFile (Lorg/gradle/api/file/FileCopyDetails;)V
@@ -263,7 +263,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath : org/gradle/api/file/RelativePath {
-	public fun <init> (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction;Lorg/apache/tools/zip/ZipEntry;)V
+	public fun <init> (Lorg/apache/tools/zip/ZipEntry;Z)V
 	public final fun charAt (I)C
 	public fun get (I)C
 	public fun getEntry ()Lorg/apache/tools/zip/ZipEntry;
@@ -583,7 +583,6 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 	public final fun copy (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
 	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
 	public fun equals (Ljava/lang/Object;)Z
-	public static final fun getEntryTimestamp (ZJ)J
 	public final fun getInputStream ()Ljava/io/InputStream;
 	public final fun getPath ()Ljava/lang/String;
 	public final fun getRelocators ()Ljava/util/Set;
@@ -603,7 +602,6 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion {
 	public final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
-	public final fun getEntryTimestamp (ZJ)J
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {

@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
@@ -84,7 +85,7 @@ public open class ShadowCopyAction internal constructor(
         object : BaseStreamAction() {
           override fun visitFile(fileDetails: FileCopyDetails) {
             // All project sources are already present, we just need to deal with JAR dependencies.
-            if (isArchive(fileDetails)) {
+            if (fileDetails.isJar()) {
               unusedTracker.addDependency(fileDetails.file)
             }
           }
@@ -104,7 +105,7 @@ public open class ShadowCopyAction internal constructor(
     try {
       zipOutStream.use { outputStream ->
         stream.process(
-          StreamAction(
+          RealStreamAction(
             outputStream,
             encoding,
             transformers,
@@ -112,6 +113,8 @@ public open class ShadowCopyAction internal constructor(
             patternSet,
             unusedClasses,
             stats,
+            zipFile,
+            preserveFileTimestamps,
           ),
         )
         processTransformers(outputStream)
@@ -137,36 +140,7 @@ public open class ShadowCopyAction internal constructor(
     }
   }
 
-  private fun getArchiveTimeFor(timestamp: Long): Long {
-    return if (preserveFileTimestamps) timestamp else CONSTANT_TIME_FOR_ZIP_ENTRIES
-  }
-
-  private fun setArchiveTimes(zipEntry: ZipEntry): ZipEntry {
-    if (!preserveFileTimestamps) {
-      zipEntry.time = CONSTANT_TIME_FOR_ZIP_ENTRIES
-    }
-    return zipEntry
-  }
-
-  public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
-    protected fun isArchive(fileDetails: FileCopyDetails): Boolean {
-      return fileDetails.relativePath.pathString.endsWith(".jar")
-    }
-
-    protected fun isClass(fileDetails: FileCopyDetails): Boolean {
-      return fileDetails.path.endsWith(".class")
-    }
-
-    override fun processFile(details: FileCopyDetailsInternal) {
-      if (details.isDirectory) visitDir(details) else visitFile(details)
-    }
-
-    protected open fun visitDir(dirDetails: FileCopyDetails) {}
-
-    protected abstract fun visitFile(fileDetails: FileCopyDetails)
-  }
-
-  private inner class StreamAction(
+  private class RealStreamAction(
     private val zipOutStr: ZipOutputStream,
     encoding: String?,
     private val transformers: Set<Transformer>,
@@ -174,6 +148,8 @@ public open class ShadowCopyAction internal constructor(
     private val patternSet: PatternSet,
     private val unused: Set<String>,
     private val stats: ShadowStats,
+    private val zipFile: File,
+    private val preserveFileTimestamps: Boolean,
   ) : BaseStreamAction() {
     private val remapper = RelocatorRemapper(relocators, stats)
     private val visitedFiles = mutableSetOf<String>()
@@ -185,20 +161,22 @@ public open class ShadowCopyAction internal constructor(
     }
 
     override fun visitFile(fileDetails: FileCopyDetails) {
-      if (!isArchive(fileDetails)) {
+      if (fileDetails.isJar()) {
+        processArchive(fileDetails)
+      } else {
         try {
-          val isClass = isClass(fileDetails)
+          val isClass = fileDetails.isClass()
           if (!remapper.hasRelocators() || !isClass) {
-            if (!isTransformable(fileDetails)) {
+            if (isTransformable(fileDetails)) {
+              transform(fileDetails)
+            } else {
               val mappedPath = remapper.map(fileDetails.relativePath.pathString)
-              val archiveEntry = ZipEntry(mappedPath)
-              archiveEntry.time = getArchiveTimeFor(fileDetails.lastModified)
-              archiveEntry.unixMode = UnixStat.FILE_FLAG or fileDetails.permissions.toUnixNumeric()
-              zipOutStr.putNextEntry(archiveEntry)
+              val entry = zipEntry(mappedPath, preserveFileTimestamps, fileDetails.lastModified) {
+                unixMode = UnixStat.FILE_FLAG or fileDetails.permissions.toUnixNumeric()
+              }
+              zipOutStr.putNextEntry(entry)
               fileDetails.copyTo(zipOutStr)
               zipOutStr.closeEntry()
-            } else {
-              transform(fileDetails)
             }
           } else if (isClass && !isUnused(fileDetails.path)) {
             remapClass(fileDetails)
@@ -207,8 +185,21 @@ public open class ShadowCopyAction internal constructor(
         } catch (e: Exception) {
           throw GradleException("Could not add $fileDetails to ZIP '$zipFile'.", e)
         }
-      } else {
-        processArchive(fileDetails)
+      }
+    }
+
+    override fun visitDir(dirDetails: FileCopyDetails) {
+      try {
+        // Trailing slash in name indicates that entry is a directory.
+        val path = dirDetails.relativePath.pathString + "/"
+        val entry = zipEntry(path, preserveFileTimestamps, dirDetails.lastModified) {
+          unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
+        }
+        zipOutStr.putNextEntry(entry)
+        zipOutStr.closeEntry()
+        recordVisit(dirDetails.relativePath)
+      } catch (e: Exception) {
+        throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
       }
     }
 
@@ -221,7 +212,7 @@ public open class ShadowCopyAction internal constructor(
       ZipFile(fileDetails.file).use { archive ->
         archive.entries.asSequence()
           .map {
-            ArchiveFileTreeElement(RelativeArchivePath(it))
+            ArchiveFileTreeElement(RelativeArchivePath(it, preserveFileTimestamps))
           }
           .filter {
             patternSet.asSpec.isSatisfiedBy(it.asFileTreeElement())
@@ -277,8 +268,8 @@ public open class ShadowCopyAction internal constructor(
 
     private fun remapClass(file: RelativeArchivePath, archive: ZipFile) {
       if (file.isClassFile) {
-        val zipEntry = setArchiveTimes(ZipEntry(remapper.mapPath(file) + ".class"))
-        addParentDirectories(RelativeArchivePath(zipEntry))
+        val entry = zipEntry(remapper.mapPath(file) + ".class", preserveFileTimestamps)
+        addParentDirectories(RelativeArchivePath(entry, preserveFileTimestamps))
         remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
       }
     }
@@ -319,44 +310,26 @@ public open class ShadowCopyAction internal constructor(
       val mappedName = multiReleasePrefix + remapper.mapPath(newPath)
       try {
         // Now we put it back on so the class file is written out with the right extension.
-        val archiveEntry = ZipEntry("$mappedName.class")
-        archiveEntry.time = getArchiveTimeFor(lastModified)
-        zipOutStr.putNextEntry(archiveEntry)
+        zipOutStr.putNextEntry(zipEntry("$mappedName.class", preserveFileTimestamps, lastModified))
         renamedClass.inputStream().use {
           it.copyTo(zipOutStr)
         }
         zipOutStr.closeEntry()
-      } catch (ignored: ZipException) {
+      } catch (_: ZipException) {
         logger.warn("We have a duplicate $mappedName in source project")
       }
     }
 
     private fun copyArchiveEntry(archiveFile: RelativeArchivePath, archive: ZipFile) {
       val mappedPath = remapper.map(archiveFile.entry.name)
-      val entry = ZipEntry(mappedPath)
-      entry.time = getArchiveTimeFor(archiveFile.entry.time)
-      val mappedFile = RelativeArchivePath(entry)
+      val entry = zipEntry(mappedPath, preserveFileTimestamps, archiveFile.entry.time)
+      val mappedFile = RelativeArchivePath(entry, preserveFileTimestamps)
       addParentDirectories(mappedFile)
       zipOutStr.putNextEntry(mappedFile.entry)
       archive.getInputStream(archiveFile.entry).use {
         it.copyTo(zipOutStr)
       }
       zipOutStr.closeEntry()
-    }
-
-    override fun visitDir(dirDetails: FileCopyDetails) {
-      try {
-        // Trailing slash in name indicates that entry is a directory.
-        val path = dirDetails.relativePath.pathString + "/"
-        val archiveEntry = ZipEntry(path)
-        archiveEntry.time = getArchiveTimeFor(dirDetails.lastModified)
-        archiveEntry.unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
-        zipOutStr.putNextEntry(archiveEntry)
-        zipOutStr.closeEntry()
-        recordVisit(dirDetails.relativePath)
-      } catch (e: Exception) {
-        throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
-      }
     }
 
     private fun transform(element: ArchiveFileTreeElement, archive: ZipFile) {
@@ -388,8 +361,27 @@ public open class ShadowCopyAction internal constructor(
     }
   }
 
-  public open inner class RelativeArchivePath(
+  public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
+    override fun processFile(details: FileCopyDetailsInternal) {
+      if (details.isDirectory) visitDir(details) else visitFile(details)
+    }
+
+    protected open fun visitDir(dirDetails: FileCopyDetails) {}
+
+    protected abstract fun visitFile(fileDetails: FileCopyDetails)
+
+    protected fun FileCopyDetails.isClass(): Boolean {
+      return relativePath.pathString.endsWith(".class")
+    }
+
+    protected fun FileCopyDetails.isJar(): Boolean {
+      return relativePath.pathString.endsWith(".jar")
+    }
+  }
+
+  public open class RelativeArchivePath(
     public open val entry: ZipEntry,
+    private val preserveFileTimestamps: Boolean,
   ) : RelativePath(
     !entry.isDirectory,
     // `dir/` will be split into ["dir", ""], we have to trim empty segments here.
@@ -404,8 +396,7 @@ public open class ShadowCopyAction internal constructor(
       } else {
         // Parent is always a directory so add / to the end of the path.
         val parentPath = segments.dropLast(1).joinToString("/") + "/"
-        val entry = setArchiveTimes(ZipEntry(parentPath))
-        RelativeArchivePath(entry)
+        RelativeArchivePath(zipEntry(parentPath, preserveFileTimestamps), preserveFileTimestamps)
       }
     }
   }

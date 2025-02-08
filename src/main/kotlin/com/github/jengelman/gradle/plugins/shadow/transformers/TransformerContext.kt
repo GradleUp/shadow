@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.InputStream
 
 public data class TransformerContext @JvmOverloads constructor(
@@ -32,10 +31,5 @@ public data class TransformerContext @JvmOverloads constructor(
   public companion object {
     @JvmStatic
     public fun builder(): Builder = Builder()
-
-    @JvmStatic
-    public fun getEntryTimestamp(preserveFileTimestamps: Boolean, entryTime: Long): Long {
-      return if (preserveFileTimestamps) entryTime else ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
-    }
   }
 }

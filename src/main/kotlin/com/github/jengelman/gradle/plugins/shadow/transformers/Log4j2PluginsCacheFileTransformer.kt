@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
 import java.net.URL
 import java.nio.file.Path
 import java.util.Collections
@@ -14,7 +14,6 @@ import kotlin.io.path.outputStream
 import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
@@ -68,9 +67,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
       val aggregator = PluginCache()
       aggregator.loadCacheFiles(urlEnumeration)
       relocatePlugins(aggregator)
-      val entry = ZipEntry(PLUGIN_CACHE_FILE)
-      entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-      os.putNextEntry(entry)
+      os.putNextEntry(zipEntry(PLUGIN_CACHE_FILE, preserveFileTimestamps))
       // Prevent the aggregator to close the jar output.
       aggregator.writeCache(CloseShieldOutputStream.wrap(os))
     } finally {

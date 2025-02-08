@@ -1,11 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.xml.XmlStreamReader
 import org.codehaus.plexus.util.xml.XmlStreamWriter
@@ -79,9 +78,7 @@ public open class ComponentsXmlResourceTransformer : Transformer {
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(COMPONENTS_XML_PATH)
-    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    os.putNextEntry(zipEntry(COMPONENTS_XML_PATH, preserveFileTimestamps))
     os.write(transformedResource)
     components.clear()
   }

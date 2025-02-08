@@ -1,9 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import javax.inject.Inject
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
@@ -34,9 +33,7 @@ public open class IncludeResourceTransformer @Inject constructor(
   override fun hasTransformedResource(): Boolean = file.get().asFile.exists()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val entry = ZipEntry(resource.get())
-    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
 
     file.get().asFile.inputStream().use { inputStream ->
       inputStream.copyTo(os)

@@ -1,9 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext.Companion.getEntryTimestamp
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.util.Properties
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
@@ -77,9 +76,7 @@ public open class GroovyExtensionModuleTransformer : Transformer {
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val name = if (legacy) PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR else PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-    val entry = ZipEntry(name)
-    entry.time = getEntryTimestamp(preserveFileTimestamps, entry.time)
-    os.putNextEntry(entry)
+    os.putNextEntry(zipEntry(name, preserveFileTimestamps))
     module.inputStream().use {
       it.copyTo(os)
     }
