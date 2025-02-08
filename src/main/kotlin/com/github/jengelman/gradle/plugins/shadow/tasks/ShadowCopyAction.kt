@@ -185,11 +185,15 @@ public open class ShadowCopyAction internal constructor(
     }
 
     override fun visitFile(fileDetails: FileCopyDetails) {
-      if (!isArchive(fileDetails)) {
+      if (isArchive(fileDetails)) {
+        processArchive(fileDetails)
+      } else {
         try {
           val isClass = isClass(fileDetails)
           if (!remapper.hasRelocators() || !isClass) {
-            if (!isTransformable(fileDetails)) {
+            if (isTransformable(fileDetails)) {
+              transform(fileDetails)
+            } else {
               val mappedPath = remapper.map(fileDetails.relativePath.pathString)
               val archiveEntry = ZipEntry(mappedPath)
               archiveEntry.time = getArchiveTimeFor(fileDetails.lastModified)
@@ -197,8 +201,6 @@ public open class ShadowCopyAction internal constructor(
               zipOutStr.putNextEntry(archiveEntry)
               fileDetails.copyTo(zipOutStr)
               zipOutStr.closeEntry()
-            } else {
-              transform(fileDetails)
             }
           } else if (isClass && !isUnused(fileDetails.path)) {
             remapClass(fileDetails)
@@ -207,8 +209,6 @@ public open class ShadowCopyAction internal constructor(
         } catch (e: Exception) {
           throw GradleException("Could not add $fileDetails to ZIP '$zipFile'.", e)
         }
-      } else {
-        processArchive(fileDetails)
       }
     }
 
