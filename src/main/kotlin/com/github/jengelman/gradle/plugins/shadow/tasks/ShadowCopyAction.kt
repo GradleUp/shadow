@@ -326,7 +326,7 @@ public open class ShadowCopyAction internal constructor(
           it.copyTo(zipOutStr)
         }
         zipOutStr.closeEntry()
-      } catch (ignored: ZipException) {
+      } catch (_: ZipException) {
         logger.warn("We have a duplicate $mappedName in source project")
       }
     }

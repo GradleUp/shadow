@@ -68,7 +68,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
           inputStream = noticeText.byteInputStream(),
         ),
       )
-    } catch (ignored: NullPointerException) {
+    } catch (_: NullPointerException) {
       fail("Null pointer should not be thrown when no parameters are set.")
     }
   }
