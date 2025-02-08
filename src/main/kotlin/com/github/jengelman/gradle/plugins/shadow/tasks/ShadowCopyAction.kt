@@ -105,7 +105,7 @@ public open class ShadowCopyAction internal constructor(
     try {
       zipOutStream.use { outputStream ->
         stream.process(
-          InnerStreamAction(
+          RealStreamAction(
             outputStream,
             encoding,
             transformers,
@@ -113,6 +113,8 @@ public open class ShadowCopyAction internal constructor(
             patternSet,
             unusedClasses,
             stats,
+            zipFile,
+            preserveFileTimestamps,
           ),
         )
         processTransformers(outputStream)
@@ -138,7 +140,7 @@ public open class ShadowCopyAction internal constructor(
     }
   }
 
-  private inner class InnerStreamAction(
+  private class RealStreamAction(
     private val zipOutStr: ZipOutputStream,
     encoding: String?,
     private val transformers: Set<Transformer>,
@@ -146,6 +148,8 @@ public open class ShadowCopyAction internal constructor(
     private val patternSet: PatternSet,
     private val unused: Set<String>,
     private val stats: ShadowStats,
+    private val zipFile: File,
+    private val preserveFileTimestamps: Boolean,
   ) : BaseStreamAction() {
     private val remapper = RelocatorRemapper(relocators, stats)
     private val visitedFiles = mutableSetOf<String>()
@@ -208,7 +212,7 @@ public open class ShadowCopyAction internal constructor(
       ZipFile(fileDetails.file).use { archive ->
         archive.entries.asSequence()
           .map {
-            ArchiveFileTreeElement(RelativeArchivePath(it))
+            ArchiveFileTreeElement(RelativeArchivePath(it, preserveFileTimestamps))
           }
           .filter {
             patternSet.asSpec.isSatisfiedBy(it.asFileTreeElement())
@@ -265,7 +269,7 @@ public open class ShadowCopyAction internal constructor(
     private fun remapClass(file: RelativeArchivePath, archive: ZipFile) {
       if (file.isClassFile) {
         val entry = zipEntry(remapper.mapPath(file) + ".class", preserveFileTimestamps)
-        addParentDirectories(RelativeArchivePath(entry))
+        addParentDirectories(RelativeArchivePath(entry, preserveFileTimestamps))
         remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
       }
     }
@@ -306,8 +310,7 @@ public open class ShadowCopyAction internal constructor(
       val mappedName = multiReleasePrefix + remapper.mapPath(newPath)
       try {
         // Now we put it back on so the class file is written out with the right extension.
-        val entry = zipEntry("$mappedName.class", preserveFileTimestamps, lastModified)
-        zipOutStr.putNextEntry(entry)
+        zipOutStr.putNextEntry(zipEntry("$mappedName.class", preserveFileTimestamps, lastModified))
         renamedClass.inputStream().use {
           it.copyTo(zipOutStr)
         }
@@ -320,7 +323,7 @@ public open class ShadowCopyAction internal constructor(
     private fun copyArchiveEntry(archiveFile: RelativeArchivePath, archive: ZipFile) {
       val mappedPath = remapper.map(archiveFile.entry.name)
       val entry = zipEntry(mappedPath, preserveFileTimestamps, archiveFile.entry.time)
-      val mappedFile = RelativeArchivePath(entry)
+      val mappedFile = RelativeArchivePath(entry, preserveFileTimestamps)
       addParentDirectories(mappedFile)
       zipOutStr.putNextEntry(mappedFile.entry)
       archive.getInputStream(archiveFile.entry).use {
@@ -376,8 +379,9 @@ public open class ShadowCopyAction internal constructor(
     }
   }
 
-  public open inner class RelativeArchivePath(
+  public open class RelativeArchivePath(
     public open val entry: ZipEntry,
+    private val preserveFileTimestamps: Boolean,
   ) : RelativePath(
     !entry.isDirectory,
     // `dir/` will be split into ["dir", ""], we have to trim empty segments here.
@@ -392,8 +396,7 @@ public open class ShadowCopyAction internal constructor(
       } else {
         // Parent is always a directory so add / to the end of the path.
         val parentPath = segments.dropLast(1).joinToString("/") + "/"
-        val entry = zipEntry(parentPath, preserveFileTimestamps)
-        RelativeArchivePath(entry)
+        RelativeArchivePath(zipEntry(parentPath, preserveFileTimestamps), preserveFileTimestamps)
       }
     }
   }
