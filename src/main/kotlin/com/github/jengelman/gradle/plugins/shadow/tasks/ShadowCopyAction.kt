@@ -194,6 +194,21 @@ public open class ShadowCopyAction internal constructor(
       }
     }
 
+    override fun visitDir(dirDetails: FileCopyDetails) {
+      try {
+        // Trailing slash in name indicates that entry is a directory.
+        val path = dirDetails.relativePath.pathString + "/"
+        val archiveEntry = ZipEntry(path)
+        archiveEntry.time = getArchiveTimeFor(dirDetails.lastModified)
+        archiveEntry.unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
+        zipOutStr.putNextEntry(archiveEntry)
+        zipOutStr.closeEntry()
+        recordVisit(dirDetails.relativePath)
+      } catch (e: Exception) {
+        throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
+      }
+    }
+
     private fun recordVisit(path: RelativePath): Boolean {
       return visitedFiles.add(path.pathString)
     }
@@ -324,21 +339,6 @@ public open class ShadowCopyAction internal constructor(
         it.copyTo(zipOutStr)
       }
       zipOutStr.closeEntry()
-    }
-
-    override fun visitDir(dirDetails: FileCopyDetails) {
-      try {
-        // Trailing slash in name indicates that entry is a directory.
-        val path = dirDetails.relativePath.pathString + "/"
-        val archiveEntry = ZipEntry(path)
-        archiveEntry.time = getArchiveTimeFor(dirDetails.lastModified)
-        archiveEntry.unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
-        zipOutStr.putNextEntry(archiveEntry)
-        zipOutStr.closeEntry()
-        recordVisit(dirDetails.relativePath)
-      } catch (e: Exception) {
-        throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
-      }
     }
 
     private fun transform(element: ArchiveFileTreeElement, archive: ZipFile) {
