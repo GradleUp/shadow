@@ -244,15 +244,15 @@ public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$A
 	public fun getRelativePath ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;
 	public synthetic fun getRelativePath ()Lorg/gradle/api/file/RelativePath;
 	public fun getSize ()J
-	public fun isClassFile ()Z
+	public fun isClass ()Z
 	public fun isDirectory ()Z
 	public fun open ()Ljava/io/InputStream;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$BaseStreamAction : org/gradle/api/internal/file/CopyActionProcessingStreamAction {
 	public fun <init> ()V
-	protected final fun isClass (Lorg/gradle/api/file/FileCopyDetails;)Z
-	protected final fun isJar (Lorg/gradle/api/file/FileCopyDetails;)Z
+	protected fun isClass (Lorg/gradle/api/file/FileCopyDetails;)Z
+	protected fun isJar (Lorg/gradle/api/file/FileCopyDetails;)Z
 	public fun processFile (Lorg/gradle/api/internal/file/copy/FileCopyDetailsInternal;)V
 	protected fun visitDir (Lorg/gradle/api/file/FileCopyDetails;)V
 	protected abstract fun visitFile (Lorg/gradle/api/file/FileCopyDetails;)V
@@ -270,7 +270,7 @@ public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$R
 	public fun getLength ()I
 	public fun getParent ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;
 	public synthetic fun getParent ()Lorg/gradle/api/file/RelativePath;
-	public fun isClassFile ()Z
+	public fun isClass ()Z
 	public final fun length ()I
 }
 

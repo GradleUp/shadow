@@ -85,7 +85,7 @@ public open class ShadowCopyAction internal constructor(
         object : BaseStreamAction() {
           override fun visitFile(fileDetails: FileCopyDetails) {
             // All project sources are already present, we just need to deal with JAR dependencies.
-            if (fileDetails.isJar()) {
+            if (fileDetails.isJar) {
               unusedTracker.addDependency(fileDetails.file)
             }
           }
@@ -157,11 +157,11 @@ public open class ShadowCopyAction internal constructor(
     }
 
     override fun visitFile(fileDetails: FileCopyDetails) {
-      if (fileDetails.isJar()) {
+      if (fileDetails.isJar) {
         processArchive(fileDetails)
       } else {
         try {
-          val isClass = fileDetails.isClass()
+          val isClass = fileDetails.isClass
           if (!remapper.hasRelocators() || !isClass) {
             if (isTransformable(fileDetails)) {
               transform(fileDetails)
@@ -230,9 +230,9 @@ public open class ShadowCopyAction internal constructor(
 
     private fun visitArchiveFile(archiveFile: ArchiveFileTreeElement, archive: ZipFile) {
       val archiveFilePath = archiveFile.relativePath
-      if (archiveFile.isClassFile || !isTransformable(archiveFile)) {
+      if (archiveFile.isClass || !isTransformable(archiveFile)) {
         if (recordVisit(archiveFilePath) && !isUnused(archiveFilePath.entry.name)) {
-          if (!remapper.hasRelocators() || !archiveFile.isClassFile) {
+          if (!remapper.hasRelocators() || !archiveFile.isClass) {
             copyArchiveEntry(archiveFilePath, archive)
           } else {
             remapClass(archiveFilePath, archive)
@@ -263,15 +263,15 @@ public open class ShadowCopyAction internal constructor(
     }
 
     private fun remapClass(file: RelativeArchivePath, archive: ZipFile) {
-      if (file.isClassFile) {
-        val entry = zipEntry(remapper.mapPath(file) + ".class", preserveFileTimestamps)
+      if (file.isClass) {
+        val entry = zipEntry(remapper.mapPath(file) + CLASS_SUFFIX, preserveFileTimestamps)
         addParentDirectories(RelativeArchivePath(entry))
         remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
       }
     }
 
     private fun remapClass(fileCopyDetails: FileCopyDetails) {
-      if (fileCopyDetails.name.endsWith(".class")) {
+      if (fileCopyDetails.isClass) {
         fileCopyDetails.file.inputStream().use {
           remapClass(it, fileCopyDetails.path, fileCopyDetails.lastModified)
         }
@@ -366,13 +366,8 @@ public open class ShadowCopyAction internal constructor(
 
     protected abstract fun visitFile(fileDetails: FileCopyDetails)
 
-    protected fun FileCopyDetails.isClass(): Boolean {
-      return relativePath.pathString.endsWith(".class")
-    }
-
-    protected fun FileCopyDetails.isJar(): Boolean {
-      return relativePath.pathString.endsWith(".jar")
-    }
+    protected open val FileCopyDetails.isClass: Boolean get() = relativePath.pathString.endsWith(CLASS_SUFFIX)
+    protected open val FileCopyDetails.isJar: Boolean get() = relativePath.pathString.endsWith(".jar")
   }
 
   public open inner class RelativeArchivePath(
@@ -382,7 +377,7 @@ public open class ShadowCopyAction internal constructor(
     // `dir/` will be split into ["dir", ""], we have to trim empty segments here.
     *entry.name.split('/').filter(CharSequence::isNotEmpty).toTypedArray(),
   ) {
-    public open val isClassFile: Boolean get() = lastName.endsWith(".class")
+    public open val isClass: Boolean get() = lastName.endsWith(CLASS_SUFFIX)
 
     @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE") // It could return null in super.getParent().
     override fun getParent(): RelativeArchivePath? {
@@ -399,7 +394,7 @@ public open class ShadowCopyAction internal constructor(
   public open class ArchiveFileTreeElement(
     private val archivePath: RelativeArchivePath,
   ) : FileTreeElement {
-    public open val isClassFile: Boolean get() = archivePath.isClassFile
+    public open val isClass: Boolean get() = archivePath.isClass
 
     override fun isDirectory(): Boolean = archivePath.entry.isDirectory
 
@@ -432,6 +427,8 @@ public open class ShadowCopyAction internal constructor(
   }
 
   public companion object {
+    private const val CLASS_SUFFIX = ".class"
+
     private val logger = LoggerFactory.getLogger(ShadowCopyAction::class.java)
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }
