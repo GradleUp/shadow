@@ -33,10 +33,11 @@ internal val classPathAttributeKey = JarAttributeName.CLASS_PATH.toString()
  */
 internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString()
 
-internal fun zipEntry(
+internal inline fun zipEntry(
   name: String,
   preserveLastModified: Boolean = true,
   lastModified: Long = -1,
+  block: ZipEntry.() -> Unit = {},
 ): ZipEntry = ZipEntry(name).apply {
   if (preserveLastModified) {
     if (lastModified >= 0) {
@@ -45,6 +46,7 @@ internal fun zipEntry(
   } else {
     time = ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
   }
+  block()
 }
 
 /**
