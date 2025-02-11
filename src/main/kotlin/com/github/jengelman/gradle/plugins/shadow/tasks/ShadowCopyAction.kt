@@ -167,7 +167,7 @@ public open class ShadowCopyAction internal constructor(
               transform(fileDetails)
             } else {
               val mappedPath = remapper.map(fileDetails.relativePath.pathString)
-              val entry = zipEntry(mappedPath, preserveFileTimestamps, fileDetails.lastModified) {
+              val entry = zipEntry(mappedPath, preserveFileTimestamps, fileDetails.lastModified).apply {
                 unixMode = UnixStat.FILE_FLAG or fileDetails.permissions.toUnixNumeric()
               }
               zipOutStr.putNextEntry(entry)
@@ -188,7 +188,7 @@ public open class ShadowCopyAction internal constructor(
       try {
         // Trailing slash in name indicates that entry is a directory.
         val path = dirDetails.relativePath.pathString + "/"
-        val entry = zipEntry(path, preserveFileTimestamps, dirDetails.lastModified) {
+        val entry = zipEntry(path, preserveFileTimestamps, dirDetails.lastModified).apply {
           unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
         }
         zipOutStr.putNextEntry(entry)
