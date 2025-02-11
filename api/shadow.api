@@ -263,7 +263,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath : org/gradle/api/file/RelativePath {
-	public fun <init> (Lorg/apache/tools/zip/ZipEntry;Z)V
+	public fun <init> (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction;Lorg/apache/tools/zip/ZipEntry;)V
 	public final fun charAt (I)C
 	public fun get (I)C
 	public fun getEntry ()Lorg/apache/tools/zip/ZipEntry;
