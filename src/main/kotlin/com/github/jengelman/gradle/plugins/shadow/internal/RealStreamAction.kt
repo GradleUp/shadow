@@ -17,11 +17,11 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.util.PatternSet
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
-import org.slf4j.Logger
 
 internal class RealStreamAction(
   private val zipOutStr: ZipOutputStream,

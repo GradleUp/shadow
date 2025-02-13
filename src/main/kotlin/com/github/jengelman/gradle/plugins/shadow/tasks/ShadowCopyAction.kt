@@ -28,11 +28,11 @@ import org.gradle.api.internal.file.DefaultFilePermissions
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.util.PatternSet
-import org.slf4j.LoggerFactory
 
 public open class ShadowCopyAction internal constructor(
   private val zipFile: File,
@@ -205,7 +205,7 @@ public open class ShadowCopyAction internal constructor(
   }
 
   public companion object {
-    private val logger = LoggerFactory.getLogger(ShadowCopyAction::class.java)
+    private val logger = Logging.getLogger(ShadowCopyAction::class.java)
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }
 }
