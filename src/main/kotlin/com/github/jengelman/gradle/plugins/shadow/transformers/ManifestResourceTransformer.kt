@@ -10,12 +10,12 @@ import java.util.jar.Manifest
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
-import org.slf4j.LoggerFactory
 
 /**
  * A resource processor that allows the arbitrary addition of attributes to
@@ -86,6 +86,6 @@ public open class ManifestResourceTransformer @Inject constructor(
   }
 
   private companion object {
-    private val logger = LoggerFactory.getLogger(ManifestResourceTransformer::class.java)
+    private val logger = Logging.getLogger(ManifestResourceTransformer::class.java)
   }
 }
