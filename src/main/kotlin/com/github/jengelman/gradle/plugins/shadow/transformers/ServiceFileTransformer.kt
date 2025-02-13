@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
@@ -74,9 +74,7 @@ public open class ServiceFileTransformer(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     serviceEntries.forEach { (path, data) ->
-      val entry = ZipEntry(path)
-      entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-      os.putNextEntry(entry)
+      os.putNextEntry(zipEntry(path, preserveFileTimestamps))
       os.write(data.joinToString("\n").toByteArray())
       os.closeEntry()
     }
