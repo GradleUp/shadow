@@ -93,7 +93,7 @@ public open class ShadowCopyAction internal constructor(
     }
 
     val zipOutStream = try {
-      compressor.createArchiveOutputStream(zipFile) as ZipOutputStream
+      compressor.createArchiveOutputStream(zipFile)
     } catch (e: Exception) {
       throw GradleException("Could not create ZIP '$zipFile'.", e)
     }

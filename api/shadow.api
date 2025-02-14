@@ -101,7 +101,8 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/inter
 	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor : org/gradle/api/internal/file/archive/compression/ArchiveOutputStreamFactory {
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor {
+	public abstract fun createArchiveOutputStream (Ljava/io/File;)Lorg/apache/tools/zip/ZipOutputStream;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/legacy/LegacyShadowPlugin : org/gradle/api/Plugin {
