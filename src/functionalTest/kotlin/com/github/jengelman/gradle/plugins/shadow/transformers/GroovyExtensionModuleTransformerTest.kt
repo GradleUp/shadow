@@ -21,14 +21,16 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   fun groovyExtensionModuleTransformer(shortSyntax: Boolean) {
     val config = if (shortSyntax) {
       """
+        dependencies {
+          ${implementationFiles(buildJarFoo(), buildJarBar())}
+        }
         $shadowJar {
-          ${fromJar(buildJarFoo(), buildJarBar())}
           mergeGroovyExtensionModules()
         }
       """.trimIndent()
     } else {
       transform<GroovyExtensionModuleTransformer>(
-        shadowJarBlock = fromJar(buildJarFoo(), buildJarBar()),
+        dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar()),
       )
     }
     projectScriptPath.appendText(config)
@@ -42,7 +44,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   fun groovyExtensionModuleTransformerWorksForLegacyGroovy() {
     projectScriptPath.appendText(
       transform<GroovyExtensionModuleTransformer>(
-        shadowJarBlock = fromJar(
+        dependenciesBlock = implementationFiles(
           buildJarFoo(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
           buildJarBar(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
         ),

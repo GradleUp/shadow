@@ -27,7 +27,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
 
     projectScriptPath.appendText(
       transform<XmlAppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
+        dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           resource = '$xmlEntry'
         """.trimIndent(),
@@ -68,7 +68,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
 
     projectScriptPath.appendText(
       transform<XmlAppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
+        dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           resource = '$xmlEntry'
         """.trimIndent(),

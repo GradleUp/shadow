@@ -18,8 +18,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenCopying() {
     projectScriptPath.appendText(
       """
-        $shadowJar {
-          ${fromJar(artifactAJar, artifactBJar)}
+        dependencies {
+          ${implementationFiles(artifactAJar, artifactBJar)}
         }
       """.trimIndent(),
     )
@@ -29,7 +29,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     }
 
     val replaced = projectScriptPath.readText().lines()
-      .filterNot { it == fromJar(artifactBJar) }
+      .filterNot { it == implementationFiles(artifactBJar) }
       .joinToString(System.lineSeparator())
     projectScriptPath.writeText(replaced)
 
@@ -43,8 +43,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenOutputFileIsChanged() {
     projectScriptPath.appendText(
       """
-        $shadowJar {
-          ${fromJar(artifactAJar, artifactBJar)}
+        dependencies {
+          ${implementationFiles(artifactAJar, artifactBJar)}
         }
       """.trimIndent() + System.lineSeparator(),
     )

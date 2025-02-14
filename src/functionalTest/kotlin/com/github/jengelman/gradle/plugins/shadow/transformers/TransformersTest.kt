@@ -87,7 +87,7 @@ class TransformersTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(
       transform<Log4j2PluginsCacheFileTransformer>(
-        shadowJarBlock = fromJar(one, two),
+        dependenciesBlock = implementationFiles(one, two),
       ),
     )
 
