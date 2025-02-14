@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import java.io.IOException
 import java.io.StringReader
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
@@ -52,7 +53,7 @@ public open class XmlAppendingTransformer @Inject constructor(
         }
       }.build(context.inputStream)
     } catch (e: JDOMException) {
-      throw RuntimeException("Error processing resource ${resource.get()}: ${e.message}", e)
+      throw IOException("Error processing resource ${resource.get()}: ${e.message}", e)
     }
 
     if (doc == null) {

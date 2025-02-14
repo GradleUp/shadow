@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import java.io.IOException
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Named
 import org.gradle.api.file.FileTreeElement
@@ -17,10 +18,12 @@ import org.gradle.api.tasks.Internal
 public interface Transformer : Named {
   public fun canTransformResource(element: FileTreeElement): Boolean
 
+  @Throws(IOException::class)
   public fun transform(context: TransformerContext)
 
   public fun hasTransformedResource(): Boolean
 
+  @Throws(IOException::class)
   public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
 
   @Internal
