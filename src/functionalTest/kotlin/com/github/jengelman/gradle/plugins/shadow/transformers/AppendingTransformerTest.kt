@@ -1,10 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
+import org.gradle.testkit.runner.TaskOutcome.FAILED
+import org.junit.jupiter.api.Test
 
 class AppendingTransformerTest : BaseTransformerTest() {
   @BooleanParameterizedTest
@@ -98,6 +102,31 @@ class AppendingTransformerTest : BaseTransformerTest() {
       $CONTENT_THREE
       """.trimIndent(),
     )
+  }
+
+  @Test
+  fun duplicatesStrategyFailShouldFailBuildForDuplicatedEntries() {
+    writeMainClass()
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(buildJarOne(), buildJarTwo())}
+        }
+        $shadowJar {
+          // This should fail the build because of the duplicates.
+          duplicatesStrategy = DuplicatesStrategy.FAIL
+        }
+      """.trimIndent(),
+    )
+
+    val result = runWithFailure(shadowJarTask)
+
+    assertThat(result).all {
+      taskOutcomeEquals(shadowJarTask, FAILED)
+      transform { it.output }.contains(
+        "Cannot copy",
+      )
+    }
   }
 
   private companion object {
