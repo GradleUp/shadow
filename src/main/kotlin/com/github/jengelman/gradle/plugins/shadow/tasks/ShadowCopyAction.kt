@@ -10,7 +10,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import java.io.File
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.GregorianCalendar
@@ -34,6 +33,9 @@ import org.gradle.api.tasks.WorkResults
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.util.PatternSet
 
+/**
+ * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
+ */
 public open class ShadowCopyAction internal constructor(
   private val zipFile: File,
   private val compressor: ZipCompressor,
@@ -91,16 +93,16 @@ public open class ShadowCopyAction internal constructor(
     }
 
     val zipOutStream = try {
-      compressor.createArchiveOutputStream(zipFile) as ZipOutputStream
+      compressor.createArchiveOutputStream(zipFile)
     } catch (e: Exception) {
-      throw GradleException("Could not create ZIP '$zipFile'", e)
+      throw GradleException("Could not create ZIP '$zipFile'.", e)
     }
 
     try {
-      zipOutStream.use { outputStream ->
+      zipOutStream.use { zos ->
         stream.process(
           RealStreamAction(
-            outputStream,
+            zos,
             encoding,
             transformers,
             relocators,
@@ -112,25 +114,26 @@ public open class ShadowCopyAction internal constructor(
             logger,
           ),
         )
-        processTransformers(outputStream)
+        processTransformers(zos)
       }
-    } catch (e: IOException) {
+    } catch (e: Exception) {
       if (e.cause is Zip64RequiredException) {
         throw Zip64RequiredException(
           "${e.cause?.message}\n\nTo build this archive, please enable the zip64 extension.\n" +
             "See: ${documentationRegistry.getDslRefForProperty(Zip::class.java, "zip64")}",
         )
       }
+      zipFile.delete()
       // Rethrow the exception like `java.util.zip.ZipException: archive is not a ZIP archive`.
       throw e
     }
     return WorkResults.didWork(true)
   }
 
-  private fun processTransformers(stream: ZipOutputStream) {
+  private fun processTransformers(zos: ZipOutputStream) {
     transformers.forEach { transformer ->
       if (transformer.hasTransformedResource()) {
-        transformer.modifyOutputStream(stream, preserveFileTimestamps)
+        transformer.modifyOutputStream(zos, preserveFileTimestamps)
       }
     }
   }
