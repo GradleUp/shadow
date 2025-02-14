@@ -17,14 +17,16 @@ class AppendingTransformerTest : BaseTransformerTest() {
     }
     val config = if (shortSyntax) {
       """
+        dependencies {
+          ${implementationFiles(one, two)}
+        }
         $shadowJar {
-          ${fromJar(one, two)}
           append('$ENTRY_TEST_PROPERTIES')
         }
       """.trimIndent()
     } else {
       transform<AppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
+        dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           resource = '$ENTRY_TEST_PROPERTIES'
         """.trimIndent(),
@@ -50,22 +52,24 @@ class AppendingTransformerTest : BaseTransformerTest() {
     }
     val config = if (shortSyntax) {
       """
+        dependencies {
+          ${implementationFiles(one, two)}
+        }
         $shadowJar {
-          ${fromJar(one, two)}
           append('resources/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
           append('resources/config/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
         }
       """.trimIndent()
     } else {
       val block1 = transform<AppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
+        dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           resource = 'resources/$APPLICATION_YML_FILE'
           separator = '$APPLICATION_YML_SEPARATOR'
         """.trimIndent(),
       )
       val block2 = transform<AppendingTransformer>(
-        shadowJarBlock = fromJar(one, two),
+        dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           resource = 'resources/config/$APPLICATION_YML_FILE'
           separator = '$APPLICATION_YML_SEPARATOR'

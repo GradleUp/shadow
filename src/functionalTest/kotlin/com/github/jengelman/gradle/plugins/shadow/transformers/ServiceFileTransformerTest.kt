@@ -14,8 +14,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   fun serviceResourceTransformer(shortSyntax: Boolean) {
     val config = if (shortSyntax) {
       """
+        dependencies {
+          ${implementationFiles(buildJarOne(), buildJarTwo())}
+        }
         $shadowJar {
-          ${fromJar(buildJarOne(), buildJarTwo())}
           mergeServiceFiles {
             exclude 'META-INF/services/com.acme.*'
           }
@@ -23,7 +25,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent()
     } else {
       transform<ServiceFileTransformer>(
-        shadowJarBlock = fromJar(buildJarOne(), buildJarTwo()),
+        dependenciesBlock = implementationFiles(buildJarOne(), buildJarTwo()),
         transformerBlock = """
           exclude 'META-INF/services/com.acme.*'
         """.trimIndent(),
@@ -49,14 +51,16 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
     val config = if (shortSyntax) {
       """
+        dependencies {
+          ${implementationFiles(one, two)}
+        }
         $shadowJar {
-          ${fromJar(one, two)}
           mergeServiceFiles("META-INF/foo")
         }
       """.trimIndent()
     } else {
       transform<ServiceFileTransformer>(
-        shadowJarBlock = fromJar(one, two),
+        dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           path = 'META-INF/foo'
         """.trimIndent(),
@@ -109,8 +113,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     projectScriptPath.appendText(
       """
+        dependencies {
+          ${implementationFiles(one, two)}
+        }
         $shadowJar {
-          ${fromJar(one, two)}
           mergeServiceFiles()
           relocate("org.apache", "myapache") {
             exclude 'org.apache.axis.components.compiler.Jikes'

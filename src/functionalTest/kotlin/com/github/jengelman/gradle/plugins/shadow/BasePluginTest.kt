@@ -362,21 +362,23 @@ abstract class BasePluginTest {
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
-    fun fromJar(vararg paths: Path): String {
-      return paths.joinToString(System.lineSeparator()) { "from('${it.toUri().toURL().path}')" }
+    fun implementationFiles(vararg paths: Path): String {
+      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.toUri().toURL().path}')" }
     }
 
     inline fun <reified T : Transformer> transform(
-      shadowJarBlock: String = "",
+      dependenciesBlock: String = "",
       transformerBlock: String = "",
     ): String {
       return """
-      $shadowJar {
-        $shadowJarBlock
-        transform(${T::class.java.name}) {
-          $transformerBlock
+        dependencies {
+          $dependenciesBlock
         }
-      }
+        $shadowJar {
+          transform(${T::class.java.name}) {
+            $transformerBlock
+          }
+        }
       """.trimIndent()
     }
 
