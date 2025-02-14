@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Mark `Transformer` as throwing `IOException`. ([#1248](https://github.com/GradleUp/shadow/pull/1248))
+
 
 ## [v9.0.0-beta8] (2025-02-08)
 
@@ -10,7 +14,6 @@
 
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
 - Inject `Multi-Release` manifest attribute if any dependency contains it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
-- Mark `Transformer` as throwing `IOException`. ([#1248](https://github.com/GradleUp/shadow/pull/1248))
 
 **Changed**
 
