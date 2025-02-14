@@ -46,7 +46,7 @@ spotless {
   }
 }
 
-val testPluginClasspath: Configuration by configurations.creating {
+val testPluginClasspath by configurations.registering {
   isCanBeResolved = true
 }
 
