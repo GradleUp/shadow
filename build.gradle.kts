@@ -66,6 +66,14 @@ dependencies {
   lintChecks(libs.androidx.gradlePluginLints)
 }
 
+val fatJar by tasks.registering(Jar::class) {
+  archiveClassifier = "fat"
+  duplicatesStrategy = DuplicatesStrategy.FAIL
+
+  from(sourceSets.main.map { it.output })
+  from(testPluginClasspath.map { it.asFileTree.files.map(::zipTree) })
+}
+
 testing.suites {
   getByName<JvmTestSuite>("test") {
     dependencies {
