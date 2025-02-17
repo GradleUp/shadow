@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import java.io.IOException
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Named
@@ -53,6 +54,17 @@ public interface Transformer : Named {
     }
   }
 }
+
+/**
+ * Marks that a given instance of [Transformer] is compatible with the Gradle build cache.
+ * In other words, it has its appropriate inputs annotated so that Gradle can consider them when
+ * determining the cache key.
+ *
+ * @see CacheableRelocator
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+public annotation class CacheableTransformer
 
 public object NoOpTransformer : Transformer {
   public override fun canTransformResource(element: FileTreeElement): Boolean = false
