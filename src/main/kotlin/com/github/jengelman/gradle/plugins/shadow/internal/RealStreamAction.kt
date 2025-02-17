@@ -32,7 +32,7 @@ internal class RealStreamAction(
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
   private val patternSet: PatternSet,
-  private val unused: Set<String>,
+  private val unusedClasses: Set<String>,
   private val stats: ShadowStats,
   private val zipFile: File,
   private val preserveFileTimestamps: Boolean,
@@ -146,7 +146,7 @@ internal class RealStreamAction(
   private fun isUnused(classPath: String): Boolean {
     val classPathWithoutExtension = classPath.substringBeforeLast(".")
     val className = classPathWithoutExtension.replace('/', '.')
-    val result = unused.contains(className)
+    val result = unusedClasses.contains(className)
     if (result) {
       logger.debug("Dropping unused class: $className")
     }

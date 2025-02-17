@@ -7,6 +7,10 @@
 
 - Mark `Transformer` as throwing `IOException`. ([#1248](https://github.com/GradleUp/shadow/pull/1248))
 
+**Changed**
+
+- **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
+
 
 ## [v9.0.0-beta8] (2025-02-08)
 
