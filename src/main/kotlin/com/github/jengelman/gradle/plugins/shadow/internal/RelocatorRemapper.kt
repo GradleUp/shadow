@@ -4,7 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.util.regex.Pattern
 import org.objectweb.asm.commons.Remapper
 
@@ -59,7 +58,7 @@ internal class RelocatorRemapper(
     return map(path.substring(0, path.indexOf('.')))
   }
 
-  fun mapPath(path: ShadowCopyAction.RelativeArchivePath): String {
+  fun mapPath(path: RealStreamAction.RelativeArchivePath): String {
     return mapPath(path.pathString)
   }
 }

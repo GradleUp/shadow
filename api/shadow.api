@@ -231,39 +231,8 @@ public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction :
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$ArchiveFileTreeElement : org/gradle/api/file/FileTreeElement {
-	public fun <init> (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;)V
-	public fun asFileTreeElement ()Lorg/gradle/api/file/FileTreeElement;
-	public fun copyTo (Ljava/io/File;)Z
-	public fun copyTo (Ljava/io/OutputStream;)V
-	public fun getFile ()Ljava/io/File;
-	public fun getLastModified ()J
-	public fun getMode ()I
-	public fun getName ()Ljava/lang/String;
-	public fun getPath ()Ljava/lang/String;
-	public fun getPermissions ()Lorg/gradle/api/file/FilePermissions;
-	public fun getRelativePath ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;
-	public synthetic fun getRelativePath ()Lorg/gradle/api/file/RelativePath;
-	public fun getSize ()J
-	public fun isClass ()Z
-	public fun isDirectory ()Z
-	public fun open ()Ljava/io/InputStream;
-}
-
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion {
 	public final fun getCONSTANT_TIME_FOR_ZIP_ENTRIES ()J
-}
-
-public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath : org/gradle/api/file/RelativePath {
-	public fun <init> (Lorg/apache/tools/zip/ZipEntry;Z)V
-	public final fun charAt (I)C
-	public fun get (I)C
-	public fun getEntry ()Lorg/apache/tools/zip/ZipEntry;
-	public fun getLength ()I
-	public fun getParent ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$RelativeArchivePath;
-	public synthetic fun getParent ()Lorg/gradle/api/file/RelativePath;
-	public fun isClass ()Z
-	public final fun length ()I
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar, com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec {
