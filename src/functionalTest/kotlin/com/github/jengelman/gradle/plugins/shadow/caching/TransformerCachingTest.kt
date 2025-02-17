@@ -143,7 +143,7 @@ class TransformerCachingTest : BaseCachingTest() {
     )
 
     assertExecutionSuccess()
-    clean()
+    cleanOutputs()
     // The shadowJar task should be executed again as the cache is disabled.
     assertExecutionSuccess()
   }

@@ -21,12 +21,18 @@ import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 abstract class BaseCachingTest : BasePluginTest() {
   open val taskPath: String = shadowJarTask
 
-  fun clean() {
+  fun cleanOutputs() {
     run("clean")
+    // Make sure the output shadow jar has been deleted.
+    assertFailure { outputShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
+    @OptIn(ExperimentalPathApi::class)
+    val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
+    // Make sure build folders are deleted by clean task.
+    assertThat(buildDirs).isEmpty()
   }
 
   fun assertExecutionSuccess(vararg outputs: String) {
-    // task was executed and not pulled from cache
+    // The task was executed and not pulled from cache.
     assertRunWithResult(SUCCESS, outputs = outputs)
   }
 
@@ -34,14 +40,7 @@ abstract class BaseCachingTest : BasePluginTest() {
    * This should be called after [assertExecutionSuccess] to ensure that the [taskPath] is cached.
    */
   fun assertExecutionsFromCacheAndUpToDate(vararg outputs: String) {
-    clean()
-    // Make sure the output shadow jar has been deleted.
-    assertFailure { outputShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
-    @OptIn(ExperimentalPathApi::class)
-    val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
-    // Make sure build folders are deleted by clean task.
-    assertThat(buildDirs).isEmpty()
-
+    cleanOutputs()
     // Run the task again to ensure it is pulled from cache.
     assertRunWithResult(FROM_CACHE, outputs = outputs)
     // Run the task again to ensure it is up-to-date.
