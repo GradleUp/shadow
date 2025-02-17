@@ -136,6 +136,16 @@ class TransformerCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
+          mergeGroovyExtensionModules()
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    assertCompositeExecutions()
+
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
           // Use NoOpTransformer to mock a custom transformer here, it's not cacheable.
           transform(${NoOpTransformer::class.java.name}.INSTANCE)
         }
