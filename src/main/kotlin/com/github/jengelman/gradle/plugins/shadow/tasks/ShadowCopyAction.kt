@@ -16,16 +16,13 @@ import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
-import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.DocumentationRegistry
-import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.DefaultFilePermissions
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
-import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
@@ -93,18 +90,6 @@ public open class ShadowCopyAction(
         transformer.modifyOutputStream(zos, preserveFileTimestamps)
       }
     }
-  }
-
-  public abstract class BaseStreamAction : CopyActionProcessingStreamAction {
-    override fun processFile(details: FileCopyDetailsInternal) {
-      if (details.isDirectory) visitDir(details) else visitFile(details)
-    }
-
-    protected open fun visitDir(dirDetails: FileCopyDetails) {}
-    protected abstract fun visitFile(fileDetails: FileCopyDetails)
-
-    protected open val FileCopyDetails.isClass: Boolean get() = relativePath.pathString.endsWith(CLASS_SUFFIX)
-    protected open val FileCopyDetails.isJar: Boolean get() = relativePath.pathString.endsWith(".jar")
   }
 
   public open class RelativeArchivePath(
