@@ -21,6 +21,10 @@ import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 abstract class BaseCachingTest : BasePluginTest() {
   open val taskPath: String = shadowJarTask
 
+  fun clean() {
+    run("clean")
+  }
+
   fun assertExecutionSuccess(vararg outputs: String) {
     // task was executed and not pulled from cache
     assertRunWithResult(SUCCESS, outputs = outputs)
@@ -30,7 +34,7 @@ abstract class BaseCachingTest : BasePluginTest() {
    * This should be called after [assertExecutionSuccess] to ensure that the [taskPath] is cached.
    */
   fun assertExecutionsFromCacheAndUpToDate(vararg outputs: String) {
-    run("clean")
+    clean()
     // Make sure the output shadow jar has been deleted.
     assertFailure { outputShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
     @OptIn(ExperimentalPathApi::class)
