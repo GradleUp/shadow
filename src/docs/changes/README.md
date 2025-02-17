@@ -11,6 +11,10 @@
 
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
 
+**Removed**
+
+- **BREAKING CHANGE:** Remove `BaseStreamAction`. ([#1258](https://github.com/GradleUp/shadow/pull/1258))
+
 
 ## [v9.0.0-beta8] (2025-02-08)
 

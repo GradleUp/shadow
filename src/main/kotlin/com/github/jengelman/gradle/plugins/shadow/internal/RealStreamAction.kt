@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.ArchiveFileTreeElement
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.BaseStreamAction
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.RelativeArchivePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
@@ -17,6 +16,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
+import org.gradle.api.internal.file.CopyActionProcessingStreamAction
+import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.util.PatternSet
 import org.objectweb.asm.ClassReader
@@ -37,7 +38,7 @@ internal class RealStreamAction(
   private val zipFile: File,
   private val preserveFileTimestamps: Boolean,
   private val logger: Logger,
-) : BaseStreamAction() {
+) : CopyActionProcessingStreamAction {
   private val remapper = RelocatorRemapper(relocators, stats)
   private val visitedFiles = mutableSetOf<String>()
 
@@ -47,7 +48,11 @@ internal class RealStreamAction(
     }
   }
 
-  override fun visitFile(fileDetails: FileCopyDetails) {
+  override fun processFile(details: FileCopyDetailsInternal) {
+    if (details.isDirectory) visitDir(details) else visitFile(details)
+  }
+
+  private fun visitFile(fileDetails: FileCopyDetails) {
     if (fileDetails.isJar) {
       processArchive(fileDetails)
     } else {
@@ -75,7 +80,7 @@ internal class RealStreamAction(
     }
   }
 
-  override fun visitDir(dirDetails: FileCopyDetails) {
+  private fun visitDir(dirDetails: FileCopyDetails) {
     try {
       // Trailing slash in name indicates that entry is a directory.
       val path = dirDetails.relativePath.pathString + "/"
@@ -249,5 +254,8 @@ internal class RealStreamAction(
 
   companion object {
     const val CLASS_SUFFIX = ".class"
+
+    private val FileCopyDetails.isClass: Boolean get() = relativePath.pathString.endsWith(CLASS_SUFFIX)
+    private val FileCopyDetails.isJar: Boolean get() = relativePath.pathString.endsWith(".jar")
   }
 }

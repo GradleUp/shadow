@@ -250,15 +250,6 @@ public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$A
 	public fun open ()Ljava/io/InputStream;
 }
 
-public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$BaseStreamAction : org/gradle/api/internal/file/CopyActionProcessingStreamAction {
-	public fun <init> ()V
-	protected fun isClass (Lorg/gradle/api/file/FileCopyDetails;)Z
-	protected fun isJar (Lorg/gradle/api/file/FileCopyDetails;)Z
-	public fun processFile (Lorg/gradle/api/internal/file/copy/FileCopyDetailsInternal;)V
-	protected fun visitDir (Lorg/gradle/api/file/FileCopyDetails;)V
-	protected abstract fun visitFile (Lorg/gradle/api/file/FileCopyDetails;)V
-}
-
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion {
 	public final fun getCONSTANT_TIME_FOR_ZIP_ENTRIES ()J
 }
