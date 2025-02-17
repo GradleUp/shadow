@@ -102,7 +102,7 @@ internal class RealStreamAction(
   private fun processArchive(fileDetails: FileCopyDetails) {
     stats.startJar()
     ZipFile(fileDetails.file).use { archive ->
-      archive.entries.asSequence()
+      archive.entries.toList()
         .map {
           ArchiveFileTreeElement(RelativeArchivePath(it, preserveFileTimestamps))
         }
@@ -151,11 +151,11 @@ internal class RealStreamAction(
   private fun isUnused(classPath: String): Boolean {
     val classPathWithoutExtension = classPath.substringBeforeLast(".")
     val className = classPathWithoutExtension.replace('/', '.')
-    val result = unusedClasses.contains(className)
-    if (result) {
-      logger.debug("Dropping unused class: $className")
+    return unusedClasses.contains(className).also {
+      if (it) {
+        logger.debug("Dropping unused class: $className")
+      }
     }
-    return result
   }
 
   private fun remapClass(file: RelativeArchivePath, archive: ZipFile) {
