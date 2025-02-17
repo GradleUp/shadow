@@ -25,6 +25,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Compa
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
+import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.artifacts.Configuration
@@ -63,8 +64,8 @@ public abstract class ShadowJar :
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
-      transformers.get().any { !isCacheableTransform(it::class.java) } ||
-        relocators.get().any { !isCacheableRelocator(it::class.java) }
+      transformers.get().any { !it::class.hasAnnotation<CacheableTransformer>() } ||
+        relocators.get().any { !it::class.hasAnnotation<CacheableRelocator>() }
     }
   }
 
@@ -300,14 +301,6 @@ public abstract class ShadowJar :
   private fun <T : Transformer> addTransform(transformer: T, action: Action<T>?) {
     action?.execute(transformer)
     transformers.add(transformer)
-  }
-
-  private fun isCacheableRelocator(clazz: Class<out Relocator>): Boolean {
-    return clazz.isAnnotationPresent(CacheableRelocator::class.java)
-  }
-
-  private fun isCacheableTransform(clazz: Class<out Transformer>): Boolean {
-    return clazz.isAnnotationPresent(CacheableTransformer::class.java)
   }
 
   private val packageRelocators: List<SimpleRelocator>
