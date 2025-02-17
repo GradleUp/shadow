@@ -124,7 +124,8 @@ class AppendingTransformerTest : BaseTransformerTest() {
     assertThat(result).all {
       taskOutcomeEquals(shadowJarTask, FAILED)
       transform { it.output }.contains(
-        "Cannot copy",
+        "Cannot copy zip entry",
+        "has already been copied there",
       )
     }
   }
