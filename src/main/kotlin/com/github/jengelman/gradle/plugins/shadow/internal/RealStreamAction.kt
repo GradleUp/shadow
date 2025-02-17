@@ -19,7 +19,6 @@ import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logger
-import org.gradle.api.tasks.util.PatternSet
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
@@ -32,7 +31,6 @@ internal class RealStreamAction(
   encoding: String?,
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
-  private val patternSet: PatternSet,
   private val unusedClasses: Set<String>,
   private val stats: ShadowStats,
   private val zipFile: File,
@@ -106,9 +104,7 @@ internal class RealStreamAction(
         .map {
           ArchiveFileTreeElement(RelativeArchivePath(it, preserveFileTimestamps))
         }
-        .filter {
-          patternSet.asSpec.isSatisfiedBy(it.asFileTreeElement())
-        }.forEach { archiveElement ->
+        .forEach { archiveElement ->
           if (archiveElement.relativePath.isFile) {
             visitArchiveFile(archiveElement, archive)
           }

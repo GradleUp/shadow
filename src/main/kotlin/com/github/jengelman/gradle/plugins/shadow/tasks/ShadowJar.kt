@@ -35,7 +35,6 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
-import org.gradle.api.internal.file.copy.DefaultCopySpec
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -50,7 +49,6 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
-import org.gradle.api.tasks.util.PatternSet
 
 @CacheableTask
 public abstract class ShadowJar :
@@ -105,10 +103,6 @@ public abstract class ShadowJar :
 
   @get:Internal
   internal val stats: ShadowStats = ShadowStats()
-
-  @get:Internal
-  protected open val rootPatternSet: PatternSet
-    get() = (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
 
   @get:Internal
   protected open val internalCompressor: ZipCompressor
@@ -289,7 +283,6 @@ public abstract class ShadowJar :
       metadataCharset,
       transformers.get(),
       relocators.get() + packageRelocators,
-      rootPatternSet,
       stats,
       isPreserveFileTimestamps,
       unusedClasses,

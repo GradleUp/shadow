@@ -27,7 +27,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
@@ -39,7 +38,6 @@ public open class ShadowCopyAction(
   private val encoding: String?,
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
-  private val patternSet: PatternSet,
   private val stats: ShadowStats,
   private val preserveFileTimestamps: Boolean,
   private val unusedClasses: Set<String>,
@@ -60,7 +58,6 @@ public open class ShadowCopyAction(
             encoding,
             transformers,
             relocators,
-            patternSet,
             unusedClasses,
             stats,
             zipFile,

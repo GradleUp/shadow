@@ -227,7 +227,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
-	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZLjava/util/Set;)V
+	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZLjava/util/Set;)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 
@@ -289,7 +289,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
 	public fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
 	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
-	protected fun getRootPatternSet ()Lorg/gradle/api/tasks/util/PatternSet;
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
