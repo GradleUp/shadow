@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.RealStreamAction
 import com.github.jengelman.gradle.plugins.shadow.internal.RealStreamAction.Companion.CLASS_SUFFIX
-import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
@@ -36,7 +35,7 @@ import org.gradle.api.tasks.util.PatternSet
 /**
  * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
-public open class ShadowCopyAction internal constructor(
+public open class ShadowCopyAction(
   private val zipFile: File,
   private val compressor: ZipCompressor,
   private val documentationRegistry: DocumentationRegistry,
@@ -46,52 +45,10 @@ public open class ShadowCopyAction internal constructor(
   private val patternSet: PatternSet,
   private val stats: ShadowStats,
   private val preserveFileTimestamps: Boolean,
-  private val minimizeJar: Boolean,
-  private val unusedTracker: UnusedTracker?,
+  private val unusedClasses: Set<String>,
 ) : CopyAction {
 
-  public constructor(
-    zipFile: File,
-    compressor: ZipCompressor,
-    documentationRegistry: DocumentationRegistry,
-    encoding: String?,
-    transformers: Set<Transformer>,
-    relocators: Set<Relocator>,
-    patternSet: PatternSet,
-    stats: ShadowStats,
-    preserveFileTimestamps: Boolean,
-    minimizeJar: Boolean,
-  ) : this(
-    zipFile,
-    compressor,
-    documentationRegistry,
-    encoding,
-    transformers,
-    relocators,
-    patternSet,
-    stats,
-    preserveFileTimestamps,
-    minimizeJar,
-    null,
-  )
-
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
-    val unusedClasses = if (minimizeJar && unusedTracker != null) {
-      stream.process(
-        object : BaseStreamAction() {
-          override fun visitFile(fileDetails: FileCopyDetails) {
-            // All project sources are already present, we just need to deal with JAR dependencies.
-            if (fileDetails.isJar) {
-              unusedTracker.addDependency(fileDetails.file)
-            }
-          }
-        },
-      )
-      unusedTracker.findUnused()
-    } else {
-      emptySet()
-    }
-
     val zipOutStream = try {
       compressor.createArchiveOutputStream(zipFile)
     } catch (e: Exception) {

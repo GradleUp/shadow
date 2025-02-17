@@ -273,10 +273,14 @@ public abstract class ShadowJar :
 
   override fun createCopyAction(): CopyAction {
     val documentationRegistry = services.get(DocumentationRegistry::class.java)
-    val unusedTracker = if (minimizeJar.get()) {
-      UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+    val unusedClasses = if (minimizeJar.get()) {
+      val unusedTracker = UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+      includedDependencies.files.forEach {
+        unusedTracker.addDependency(it)
+      }
+      unusedTracker.findUnused()
     } else {
-      null
+      emptySet()
     }
     return ShadowCopyAction(
       archiveFile.get().asFile,
@@ -288,8 +292,7 @@ public abstract class ShadowJar :
       rootPatternSet,
       stats,
       isPreserveFileTimestamps,
-      minimizeJar.get(),
-      unusedTracker,
+      unusedClasses,
     )
   }
 
