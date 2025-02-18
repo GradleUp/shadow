@@ -79,8 +79,8 @@ application {
 // `shadow` is the name of the distribution created by Shadow plugin
 distributions.named('shadow') {
   // Optionally, you can add more files into extra directory in the distribution like this:
-  contents.into('extra') {
-    from project.file('extra/echo.sh')
+  contents.from('extra/echo.sh') {
+    into 'extra'
   }
 }
 ```
