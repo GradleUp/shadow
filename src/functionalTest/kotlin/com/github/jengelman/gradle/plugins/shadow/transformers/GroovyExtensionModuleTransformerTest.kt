@@ -10,14 +10,16 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_VERSION
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
-  @BooleanParameterizedTest
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
   fun groovyExtensionModuleTransformer(shortSyntax: Boolean) {
     val config = if (shortSyntax) {
       """
