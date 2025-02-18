@@ -22,8 +22,11 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
+import kotlin.io.path.name
+import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -648,6 +651,40 @@ class JavaPluginTest : BasePluginTest() {
       transform { it.mainAttrSize }.isGreaterThan(2)
       getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
       getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
+    }
+  }
+
+  @Test
+  fun canAddExtraFilesIntoShadowJar() {
+    writeMainClass()
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          from(files('${artifactAJar.toUri().toURL().path}')) {
+            into('META-INF')
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/Main.class",
+        "META-INF/a-1.0.jar",
+      )
+      doesNotContainEntries(*entriesInA)
+    }
+    val unzipped = path("unzipped")
+    outputShadowJar.use {
+      it.getStream("META-INF/a-1.0.jar").use { inputStream ->
+        inputStream.copyTo(unzipped.outputStream())
+      }
+    }
+    assertThat(jarPath(unzipped.name)).useAll {
+      containsEntries(*entriesInA)
+      doesNotContainEntries("shadow/Main.class")
     }
   }
 }
