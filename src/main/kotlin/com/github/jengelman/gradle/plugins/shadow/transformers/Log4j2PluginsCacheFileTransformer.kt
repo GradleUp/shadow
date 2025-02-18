@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -34,7 +33,6 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
    * [Relocator] instances to share across the transformation stages.
    */
   private val tempRelocators = mutableListOf<Relocator>()
-  private var stats: ShadowStats? = null
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return PLUGIN_CACHE_FILE == element.relativePath.pathString
@@ -49,10 +47,6 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     }
 
     tempRelocators.addAll(context.relocators)
-
-    if (stats == null) {
-      stats = context.stats
-    }
   }
 
   /**
@@ -79,7 +73,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
     pluginCache.allCategories.values.forEach { currentMap ->
       currentMap.values.forEach { currentPluginEntry ->
         val className = currentPluginEntry.className
-        val relocateClassContext = RelocateClassContext(className, requireNotNull(stats))
+        val relocateClassContext = RelocateClassContext(className)
         tempRelocators.firstOrNull { it.canRelocateClass(className) }?.let { relocator ->
           // Then we perform that relocation and update the plugin entry to reflect the new value.
           currentPluginEntry.className = relocator.relocateClass(relocateClassContext)

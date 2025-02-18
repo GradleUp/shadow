@@ -64,32 +64,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : 
 	public fun apply (Lorg/gradle/api/Project;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/ShadowStats {
-	public fun <init> ()V
-	public fun finishJar ()V
-	public fun getAverageTimePerJar ()D
-	public fun getAverageTimeSecsPerJar ()D
-	public fun getBuildScanData ()Ljava/util/Map;
-	public fun getJarCount ()I
-	public fun getJarEndTime ()J
-	public fun getJarStartTime ()J
-	public fun getJarTiming ()J
-	public fun getProcessingJar ()Z
-	public fun getRelocationString ()Ljava/lang/String;
-	public fun getRelocations ()Ljava/util/Map;
-	public fun getTotalTime ()J
-	public fun getTotalTimeSecs ()D
-	public fun printStats ()V
-	public fun relocate (Ljava/lang/String;Ljava/lang/String;)V
-	public fun setJarCount (I)V
-	public fun setJarEndTime (J)V
-	public fun setJarStartTime (J)V
-	public fun setProcessingJar (Z)V
-	public fun setTotalTime (J)V
-	public fun startJar ()V
-	public fun toString ()Ljava/lang/String;
-}
-
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter : java/io/Serializable {
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
@@ -115,59 +89,25 @@ public abstract interface annotation class com/github/jengelman/gradle/plugins/s
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Companion;
 	public fun <init> (Ljava/lang/String;)V
-	public fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
-	public synthetic fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
 	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
-	public final fun copy (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
-	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
+	public final fun copy (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;Ljava/lang/String;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getClassName ()Ljava/lang/String;
-	public final fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder {
-	public fun <init> ()V
-	public final fun build ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
-	public final fun className (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
-	public final fun stats (Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Companion {
-	public final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext$Builder;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext {
-	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Companion;
 	public fun <init> (Ljava/lang/String;)V
-	public fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
-	public synthetic fun <init> (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
 	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
-	public final fun copy (Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
-	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;Ljava/lang/String;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
+	public final fun copy (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;Ljava/lang/String;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getPath ()Ljava/lang/String;
-	public final fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder {
-	public fun <init> ()V
-	public final fun build ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
-	public final fun path (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
-	public final fun stats (Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Companion {
-	public final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext$Builder;
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
@@ -227,7 +167,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
-	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ZLjava/util/Set;)V
+	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/lang/String;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;ZLjava/util/Set;)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 
@@ -565,20 +505,17 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;)V
 	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;)V
-	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public static final fun builder ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/io/InputStream;
 	public final fun component3 ()Ljava/util/Set;
-	public final fun component4 ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
-	public final fun copy (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
-	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
+	public final fun copy (Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;Ljava/lang/String;Ljava/io/InputStream;Ljava/util/Set;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getInputStream ()Ljava/io/InputStream;
 	public final fun getPath ()Ljava/lang/String;
 	public final fun getRelocators ()Ljava/util/Set;
-	public final fun getStats ()Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -589,7 +526,6 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Trans
 	public final fun inputStream (Ljava/io/InputStream;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 	public final fun path (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 	public final fun relocators (Ljava/util/Set;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
-	public final fun stats (Lcom/github/jengelman/gradle/plugins/shadow/ShadowStats;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Builder;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion {

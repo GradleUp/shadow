@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
@@ -31,7 +30,6 @@ abstract class BaseTransformerTest<T : Transformer> {
 
   protected companion object {
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
-    val sharedStats = ShadowStats()
 
     fun Transformer.canTransformResource(path: String): Boolean {
       val element = createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))

@@ -150,7 +150,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
   private companion object {
     fun context(path: String, input: String, vararg relocators: Relocator): TransformerContext {
-      return TransformerContext(path, input.byteInputStream(), relocators = relocators.toSet(), stats = sharedStats)
+      return TransformerContext(path, input.byteInputStream(), relocators = relocators.toSet())
     }
 
     fun ZipFile.getContent(entryName: String): String {

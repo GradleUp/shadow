@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.RealStreamAction
 import com.github.jengelman.gradle.plugins.shadow.internal.RealStreamAction.Companion.CLASS_SUFFIX
 import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
@@ -40,7 +39,6 @@ public open class ShadowCopyAction(
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
   private val patternSet: PatternSet,
-  private val stats: ShadowStats,
   private val preserveFileTimestamps: Boolean,
   private val unusedClasses: Set<String>,
 ) : CopyAction {
@@ -62,7 +60,6 @@ public open class ShadowCopyAction(
             relocators,
             patternSet,
             unusedClasses,
-            stats,
             zipFile,
             preserveFileTimestamps,
             logger,
