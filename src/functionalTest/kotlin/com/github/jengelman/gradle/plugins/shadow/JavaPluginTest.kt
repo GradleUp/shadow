@@ -593,7 +593,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(result).all {
       taskOutcomeEquals(shadowJarTask, FAILED)
       transform { it.output }.containsMatch(
-        "Cannot expand ZIP '.*bad\\.jar'\\.".toRegex(),
+        "Cannot expand ZIP '.*bad\\.jar'".toRegex(),
       )
     }
   }

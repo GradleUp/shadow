@@ -1,13 +1,20 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.all
 import assertk.assertThat
+import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
   @BooleanParameterizedTest
@@ -185,5 +192,77 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     val content = outputShadowJar.use { it.getContent(servicesShadowEntry) }
     assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
+  }
+
+  /**
+   * See https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L54-L65.
+   */
+  @ParameterizedTest
+  @MethodSource("withThrowingProvider")
+  fun honorDuplicatesStrategyWithThrowing(
+    strategy: DuplicatesStrategy,
+    outputRegex: String,
+  ) {
+    writeDuplicateStrategy(strategy)
+
+    assertThat(runWithFailure(shadowJarTask)).all {
+      taskOutcomeEquals(shadowJarTask, FAILED)
+      transform { it.output }.containsMatch(outputRegex.toRegex())
+    }
+  }
+
+  /**
+   * See https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L54-L65.
+   */
+  @ParameterizedTest
+  @MethodSource("withoutThrowingProvider")
+  fun honorDuplicatesStrategyWithoutThrowing(
+    strategy: DuplicatesStrategy,
+    firstValue: String,
+    secondValue: String,
+  ) {
+    writeDuplicateStrategy(strategy)
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(firstValue)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo(secondValue)
+    }
+  }
+
+  private fun writeDuplicateStrategy(strategy: DuplicatesStrategy) {
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(buildJarOne(), buildJarTwo())}
+        }
+        $shadowJar {
+          duplicatesStrategy = DuplicatesStrategy.$strategy
+          mergeServiceFiles()
+        }
+      """.trimIndent(),
+    )
+  }
+
+  private companion object {
+    @JvmStatic
+    fun withThrowingProvider() = listOf(
+      Arguments.of(
+        DuplicatesStrategy.FAIL,
+        "Cannot copy zip entry .* to .* because zip entry .* has already been copied there",
+      ),
+      Arguments.of(
+        DuplicatesStrategy.INHERIT,
+        "Entry .* is a duplicate but no duplicate handling strategy has been set",
+      ),
+    )
+
+    @JvmStatic
+    fun withoutThrowingProvider() = listOf(
+      Arguments.of(DuplicatesStrategy.INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
+      Arguments.of(DuplicatesStrategy.WARN, CONTENT_ONE_TWO, "one\ntwo"),
+      Arguments.of(DuplicatesStrategy.EXCLUDE, CONTENT_ONE, "one"),
+    )
   }
 }
