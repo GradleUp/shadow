@@ -58,6 +58,10 @@ public abstract class ShadowJar :
   ShadowSpec {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
+  private val includedZipTrees = project.provider {
+    includedDependencies.files.map { project.zipTree(it) }
+  }
+
   init {
     // Shadow filters out files later. This was the default behavior in Gradle < 6.x
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
@@ -265,7 +269,7 @@ public abstract class ShadowJar :
 
   @TaskAction
   override fun copy() {
-    from(includedDependencies)
+    from(includedZipTrees.get())
     injectMultiReleaseAttrIfPresent()
     super.copy()
     logger.info(stats.toString())
