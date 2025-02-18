@@ -17,6 +17,8 @@ class JarPath(val path: Path) :
   JarFile(path.toFile()),
   Path by path {
 
+  val mainAttrSize: Int get() = manifest.mainAttributes.size
+
   fun getMainAttr(name: String): String? {
     return manifest.mainAttributes.getValue(name)
   }
