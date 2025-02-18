@@ -13,6 +13,7 @@ import java.util.zip.ZipFile
  * We must declare some functions like [kotlin.io.path.deleteExisting] explicitly as they could not
  * be delegated to [JarPath] type.
  */
+@Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
 class JarPath(val path: Path) :
   JarFile(path.toFile()),
   Path by path {
