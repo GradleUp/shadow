@@ -36,7 +36,6 @@ internal class RealStreamAction(
   private val logger: Logger,
 ) : CopyActionProcessingStreamAction {
   private val remapper = RelocatorRemapper(relocators, stats)
-  private val visitedFiles = mutableSetOf<String>()
 
   init {
     if (encoding != null) {
@@ -69,7 +68,6 @@ internal class RealStreamAction(
           remapClass(stream, fileDetails.path, fileDetails.lastModified)
         }
       }
-      recordVisit(fileDetails.relativePath)
     } catch (e: Exception) {
       throw GradleException("Could not add $fileDetails to ZIP '$zipFile'.", e)
     }
@@ -84,14 +82,9 @@ internal class RealStreamAction(
       }
       zipOutStr.putNextEntry(entry)
       zipOutStr.closeEntry()
-      recordVisit(dirDetails.relativePath)
     } catch (e: Exception) {
       throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
     }
-  }
-
-  private fun recordVisit(path: RelativePath): Boolean {
-    return visitedFiles.add(path.pathString)
   }
 
   private fun isUnused(classPath: String): Boolean {
