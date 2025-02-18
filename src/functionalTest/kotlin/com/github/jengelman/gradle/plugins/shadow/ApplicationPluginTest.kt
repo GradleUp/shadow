@@ -156,8 +156,8 @@ class ApplicationPluginTest : BasePluginTest() {
     prepare(
       projectBlock = """
         distributions.named('$DISTRIBUTION_NAME') {
-          contents.into('extra') {
-            from project.file('extra/echo.sh')
+          contents.from('extra/echo.sh') {
+            into 'extra'
           }
         }
       """.trimIndent(),
