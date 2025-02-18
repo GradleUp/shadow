@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-public data class RelocatePathContext(
-  val path: String,
+@JvmInline
+public value class RelocatePathContext(
+  public val path: String,
 )
