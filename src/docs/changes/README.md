@@ -10,11 +10,18 @@
 **Changed**
 
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
+- Handle file unzipping via `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+
+**Fixed**
+
+- Honor `DuplicatesStrategy`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- Honor unzipped jars via `from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 **Removed**
 
 - **BREAKING CHANGE:** Remove `BaseStreamAction`. ([#1258](https://github.com/GradleUp/shadow/pull/1258))
 - **BREAKING CHANGE:** Remove `ShadowStats`. ([#1264](https://github.com/GradleUp/shadow/pull/1264))
+- **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 
 ## [v9.0.0-beta8] (2025-02-08)
