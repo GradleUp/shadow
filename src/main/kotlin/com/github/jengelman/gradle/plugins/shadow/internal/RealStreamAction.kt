@@ -7,13 +7,11 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContex
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipException
+import kotlin.io.inputStream
 import org.apache.tools.zip.UnixStat
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.file.FileTreeElement
-import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logger
@@ -42,7 +40,7 @@ internal class RealStreamAction(
 
   init {
     if (encoding != null) {
-      this.zipOutStr.setEncoding(encoding)
+      zipOutStr.setEncoding(encoding)
     }
   }
 
@@ -53,9 +51,9 @@ internal class RealStreamAction(
 
   private fun visitFile(fileDetails: FileCopyDetails) {
     try {
-      val isClass = fileDetails.isClass
+      val isClass = fileDetails.relativePath.pathString.endsWith(".class")
       if (!remapper.hasRelocators() || !isClass) {
-        if (isTransformable(fileDetails)) {
+        if (transformers.any { it.canTransformResource(fileDetails) }) {
           transform(fileDetails)
         } else {
           val mappedPath = remapper.map(fileDetails.relativePath.pathString)
@@ -67,7 +65,9 @@ internal class RealStreamAction(
           zipOutStr.closeEntry()
         }
       } else if (isClass && !isUnused(fileDetails.path)) {
-        remapClass(fileDetails)
+        fileDetails.file.inputStream().use { stream ->
+          remapClass(stream, fileDetails.path, fileDetails.lastModified)
+        }
       }
       recordVisit(fileDetails.relativePath)
     } catch (e: Exception) {
@@ -94,22 +94,6 @@ internal class RealStreamAction(
     return visitedFiles.add(path.pathString)
   }
 
-  private fun visitArchiveDirectory(archiveDir: RelativeArchivePath) {
-    if (recordVisit(archiveDir)) {
-      zipOutStr.putNextEntry(archiveDir.entry)
-      zipOutStr.closeEntry()
-    }
-  }
-
-  private fun addParentDirectories(file: RelativeArchivePath?) {
-    file?.let {
-      addParentDirectories(it.parent)
-      if (!it.isFile) {
-        visitArchiveDirectory(it)
-      }
-    }
-  }
-
   private fun isUnused(classPath: String): Boolean {
     val classPathWithoutExtension = classPath.substringBeforeLast(".")
     val className = classPathWithoutExtension.replace('/', '.')
@@ -120,18 +104,11 @@ internal class RealStreamAction(
     }
   }
 
-  private fun remapClass(fileCopyDetails: FileCopyDetails) {
-    if (fileCopyDetails.isClass) {
-      fileCopyDetails.file.inputStream().use {
-        remapClass(it, fileCopyDetails.path, fileCopyDetails.lastModified)
-      }
-    }
-  }
-
   /**
    * Applies remapping to the given class with the specified relocation path. The remapped class is then written
    * to the zip file. [classInputStream] is closed automatically to prevent future file leaks.
-   * See #364 and #408.
+   *
+   * See [issue 364](https://github.com/GradleUp/shadow/issues/364) and [issue 408](https://github.com/GradleUp/shadow/issues/408).
    */
   private fun remapClass(classInputStream: InputStream, path: String, lastModified: Long) {
     // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
@@ -157,24 +134,18 @@ internal class RealStreamAction(
     try {
       // Now we put it back on so the class file is written out with the right extension.
       zipOutStr.putNextEntry(zipEntry("$mappedName.class", preserveFileTimestamps, lastModified))
-      renamedClass.inputStream().use {
-        it.copyTo(zipOutStr)
-      }
+      zipOutStr.write(renamedClass)
       zipOutStr.closeEntry()
     } catch (_: ZipException) {
       logger.warn("We have a duplicate $mappedName in source project")
     }
   }
 
-  private fun transform(details: FileCopyDetails) {
-    transformAndClose(details, details.file.inputStream())
-  }
-
-  private fun transformAndClose(element: FileTreeElement, inputStream: InputStream) {
-    inputStream.use { steam ->
-      val mappedPath = remapper.map(element.relativePath.pathString)
+  private fun transform(fileDetails: FileCopyDetails) {
+    fileDetails.file.inputStream().use { steam ->
+      val mappedPath = remapper.map(fileDetails.relativePath.pathString)
       transformers.find {
-        it.canTransformResource(element)
+        it.canTransformResource(fileDetails)
       }?.transform(
         TransformerContext(
           path = mappedPath,
@@ -184,35 +155,5 @@ internal class RealStreamAction(
         ),
       )
     }
-  }
-
-  private fun isTransformable(element: FileTreeElement): Boolean {
-    return transformers.any { it.canTransformResource(element) }
-  }
-
-  internal inner class RelativeArchivePath(
-    val entry: ZipEntry,
-  ) : RelativePath(
-    !entry.isDirectory,
-    // `dir/` will be split into ["dir", ""], we have to trim empty segments here.
-    *entry.name.split('/').filter(CharSequence::isNotEmpty).toTypedArray(),
-  ) {
-    val isClass: Boolean get() = lastName.endsWith(CLASS_SUFFIX)
-
-    @Suppress("WRONG_NULLABILITY_FOR_JAVA_OVERRIDE") // It could return null in super.getParent().
-    override fun getParent(): RelativeArchivePath? {
-      return if (segments.size <= 1) {
-        null
-      } else {
-        // Parent is always a directory so add / to the end of the path.
-        val parentPath = segments.dropLast(1).joinToString("/") + "/"
-        RelativeArchivePath(zipEntry(parentPath, preserveFileTimestamps))
-      }
-    }
-  }
-
-  private companion object {
-    const val CLASS_SUFFIX = ".class"
-    val FileCopyDetails.isClass: Boolean get() = relativePath.pathString.endsWith(CLASS_SUFFIX)
   }
 }

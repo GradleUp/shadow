@@ -57,8 +57,4 @@ internal class RelocatorRemapper(
   fun mapPath(path: String): String {
     return map(path.substring(0, path.indexOf('.')))
   }
-
-  fun mapPath(path: RealStreamAction.RelativeArchivePath): String {
-    return mapPath(path.pathString)
-  }
 }
