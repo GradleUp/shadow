@@ -323,19 +323,17 @@ public abstract class ShadowJar :
     }
 
   private fun injectMultiReleaseAttrIfPresent() {
-    // TODO: https://github.com/GradleUp/shadow/pull/1239#discussion_r1946064032.
-    val includeMultiReleaseAttr = includedDependencies.files.filter { it.extension == "jar" }
-      .any {
-        try {
-          JarFile(it).use { jarFile ->
-            // Manifest might be null or the attribute name is invalid, or any other case.
-            runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }.getOrNull()
-          } == "true"
-        } catch (_: IOException) {
-          // If the jar file is not valid, ignore it.
-          false
-        }
+    val includeMultiReleaseAttr = includedDependencies.files.any {
+      try {
+        JarFile(it).use { jarFile ->
+          // Manifest might be null or the attribute name is invalid, or any other case.
+          runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }.getOrNull()
+        } == "true"
+      } catch (_: IOException) {
+        // If the jar file is not valid, ignore it.
+        false
       }
+    }
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
     }
