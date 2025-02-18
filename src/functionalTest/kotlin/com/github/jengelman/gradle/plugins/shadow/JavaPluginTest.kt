@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
@@ -591,8 +592,8 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(result).all {
       taskOutcomeEquals(shadowJarTask, FAILED)
-      transform { it.output }.contains(
-        "java.util.zip.ZipException: archive is not a ZIP archive",
+      transform { it.output }.containsMatch(
+        "Cannot expand ZIP '.*bad\\.jar'\\.".toRegex(),
       )
     }
   }
