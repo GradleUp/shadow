@@ -115,7 +115,6 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun relocatePath(context: RelocatePathContext): String {
     val path = context.path
-    context.stats.relocate(pathPattern, shadedPathPattern)
     return if (rawString) {
       path.replace(pathPattern.toRegex(), shadedPathPattern)
     } else {
@@ -124,7 +123,6 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   override fun relocateClass(context: RelocateClassContext): String {
-    context.stats.relocate(pathPattern, shadedPathPattern)
     val clazz = context.className
     return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
   }

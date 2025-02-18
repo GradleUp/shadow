@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
@@ -106,9 +105,6 @@ public abstract class ShadowJar :
       }
     }
   }
-
-  @get:Internal
-  internal val stats: ShadowStats = ShadowStats()
 
   @get:Internal
   protected open val rootPatternSet: PatternSet
@@ -272,7 +268,6 @@ public abstract class ShadowJar :
     from(includedZipTrees.get())
     injectMultiReleaseAttrIfPresent()
     super.copy()
-    logger.info(stats.toString())
   }
 
   override fun createCopyAction(): CopyAction {
@@ -294,7 +289,6 @@ public abstract class ShadowJar :
       transformers.get(),
       relocators.get() + packageRelocators,
       rootPatternSet,
-      stats,
       isPreserveFileTimestamps,
       unusedClasses,
     )

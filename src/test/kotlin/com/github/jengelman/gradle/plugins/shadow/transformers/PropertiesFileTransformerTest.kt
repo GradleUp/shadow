@@ -161,7 +161,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   private companion object {
     fun context(path: String, input: Map<String, String>, charset: Charset = Charsets.ISO_8859_1): TransformerContext {
       val properties = Properties().apply { putAll(input) }
-      return TransformerContext(path, properties.inputStream(charset), stats = sharedStats)
+      return TransformerContext(path, properties.inputStream(charset))
     }
 
     @JvmStatic
