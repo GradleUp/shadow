@@ -2,8 +2,14 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
 import assertk.fail
+import java.io.File
 import java.io.InputStream
 import java.nio.file.Path
+import java.nio.file.WatchEvent
+import java.nio.file.WatchKey
+import java.nio.file.WatchService
+import java.util.Spliterator
+import java.util.function.Consumer
 import java.util.jar.JarFile
 import java.util.zip.ZipFile
 
@@ -19,6 +25,49 @@ class JarPath(val path: Path) :
 
   fun getMainAttr(name: String): String? {
     return manifest.mainAttributes.getValue(name)
+  }
+
+  override fun startsWith(other: String): Boolean {
+    return path.startsWith(other)
+  }
+
+  override fun endsWith(other: String): Boolean {
+    return path.endsWith(other)
+  }
+
+  override fun resolve(other: String): Path {
+    return path.resolve(other)
+  }
+
+  override fun resolveSibling(other: Path): Path {
+    return path.resolveSibling(other)
+  }
+
+  override fun resolveSibling(other: String): Path {
+    return path.resolveSibling(other)
+  }
+
+  override fun toFile(): File {
+    return path.toFile()
+  }
+
+  override fun register(
+    watcher: WatchService,
+    vararg events: WatchEvent.Kind<*>,
+  ): WatchKey {
+    return path.register(watcher, *events)
+  }
+
+  override fun iterator(): MutableIterator<Path> {
+    return path.iterator()
+  }
+
+  override fun forEach(action: Consumer<in Path>?) {
+    path.forEach(action)
+  }
+
+  override fun spliterator(): Spliterator<Path?> {
+    return path.spliterator()
   }
 }
 
