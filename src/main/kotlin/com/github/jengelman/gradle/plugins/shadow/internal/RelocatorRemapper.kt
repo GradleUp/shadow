@@ -17,8 +17,6 @@ internal class RelocatorRemapper(
 ) : Remapper() {
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
-  fun hasRelocators(): Boolean = relocators.isNotEmpty()
-
   override fun mapValue(value: Any): Any {
     return if (value is String) {
       map(value)

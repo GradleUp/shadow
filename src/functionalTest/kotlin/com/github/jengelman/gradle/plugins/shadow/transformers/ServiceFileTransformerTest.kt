@@ -44,7 +44,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("two")
     }
   }
 

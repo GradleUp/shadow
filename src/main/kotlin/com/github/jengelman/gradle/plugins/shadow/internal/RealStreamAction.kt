@@ -48,22 +48,19 @@ internal class RealStreamAction(
 
   private fun visitFile(fileDetails: FileCopyDetails) {
     try {
-      val isClass = fileDetails.relativePath.pathString.endsWith(".class")
-      if (!remapper.hasRelocators() || !isClass) {
-        if (transformers.any { it.canTransformResource(fileDetails) }) {
-          transform(fileDetails)
-        } else {
-          val mappedPath = remapper.map(fileDetails.relativePath.pathString)
-          val entry = zipEntry(mappedPath, preserveFileTimestamps, fileDetails.lastModified) {
-            unixMode = UnixStat.FILE_FLAG or fileDetails.permissions.toUnixNumeric()
-          }
-          zipOutStr.putNextEntry(entry)
-          fileDetails.copyTo(zipOutStr)
-          zipOutStr.closeEntry()
+      val relativePath = fileDetails.relativePath.pathString
+      if (relativePath.endsWith(".class")) {
+        if (isUnused(fileDetails.path)) return
+        if (relocators.isEmpty()) {
+          fileDetails.writeToZip()
+          return
         }
-      } else if (isClass && !isUnused(fileDetails.path)) {
         fileDetails.file.inputStream().use { stream ->
           remapClass(stream, fileDetails.path, fileDetails.lastModified)
+        }
+      } else {
+        if (!transform(fileDetails)) {
+          fileDetails.writeToZip(remapper.map(relativePath))
         }
       }
     } catch (e: Exception) {
@@ -73,13 +70,12 @@ internal class RealStreamAction(
 
   private fun visitDir(dirDetails: FileCopyDetails) {
     try {
-      // Trailing slash in name indicates that entry is a directory.
-      val path = dirDetails.relativePath.pathString + "/"
-      val entry = zipEntry(path, preserveFileTimestamps, dirDetails.lastModified) {
-        unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
+      val mappedPath = if (relocators.isEmpty()) {
+        dirDetails.relativePath.pathString
+      } else {
+        remapper.map(dirDetails.relativePath.pathString)
       }
-      zipOutStr.putNextEntry(entry)
-      zipOutStr.closeEntry()
+      dirDetails.writeToZip("$mappedPath/")
     } catch (e: Exception) {
       throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
     }
@@ -117,7 +113,6 @@ internal class RealStreamAction(
       throw GradleException("Error in ASM processing class $path", t)
     }
 
-    val renamedClass = cw.toByteArray()
     // Temporarily remove the multi-release prefix.
     val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
     val newPath = path.replace(multiReleasePrefix, "")
@@ -125,25 +120,39 @@ internal class RealStreamAction(
     try {
       // Now we put it back on so the class file is written out with the right extension.
       zipOutStr.putNextEntry(zipEntry("$mappedName.class", preserveFileTimestamps, lastModified))
-      zipOutStr.write(renamedClass)
+      zipOutStr.write(cw.toByteArray())
       zipOutStr.closeEntry()
     } catch (_: ZipException) {
       logger.warn("We have a duplicate $mappedName in source project")
     }
   }
 
-  private fun transform(fileDetails: FileCopyDetails) {
+  private fun transform(fileDetails: FileCopyDetails): Boolean {
+    val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
     fileDetails.file.inputStream().use { steam ->
-      val mappedPath = remapper.map(fileDetails.relativePath.pathString)
-      transformers.find {
-        it.canTransformResource(fileDetails)
-      }?.transform(
+      transformer.transform(
         TransformerContext(
-          path = mappedPath,
+          path = remapper.map(fileDetails.relativePath.pathString),
           inputStream = steam,
           relocators = relocators,
         ),
       )
     }
+    return true
+  }
+
+  private fun FileCopyDetails.writeToZip(
+    // Trailing slash in name indicates that entry is a directory.
+    entryName: String = if (isDirectory) relativePath.pathString + "/" else relativePath.pathString,
+  ) {
+    val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
+      val flag = if (isDirectory) UnixStat.DIR_FLAG else UnixStat.FILE_FLAG
+      unixMode = flag or permissions.toUnixNumeric()
+    }
+    zipOutStr.putNextEntry(entry)
+    if (!isDirectory) {
+      copyTo(zipOutStr)
+    }
+    zipOutStr.closeEntry()
   }
 }
