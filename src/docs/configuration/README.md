@@ -89,15 +89,13 @@ If it is desired to inherit a manifest from a JAR task other than the standard `
 on the `shadowJar.manifest` object can be used to configure the upstream.
 
 ```groovy
-tasks.register('testJar', Jar) {
+def testJar = tasks.register('testJar', Jar) {
   manifest {
     attributes 'Description': 'This is an application JAR'
   }
 }
 
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  manifest {
-    inheritFrom(project.tasks.testJar.manifest)
-  }
+  manifest.inheritFrom(testJar.get().manifest)
 }
 ```
