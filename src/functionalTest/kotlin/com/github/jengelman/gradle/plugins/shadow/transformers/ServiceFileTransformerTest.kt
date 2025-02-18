@@ -2,15 +2,17 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.util.BooleanParameterizedTest
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
-  @BooleanParameterizedTest
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
   fun serviceResourceTransformer(shortSyntax: Boolean) {
     val config = if (shortSyntax) {
       """
@@ -41,7 +43,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @BooleanParameterizedTest
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
   fun serviceResourceTransformerAlternatePath(shortSyntax: Boolean) {
     val one = buildJarOne {
       insert(ENTRY_FOO_SHADE, CONTENT_ONE)
