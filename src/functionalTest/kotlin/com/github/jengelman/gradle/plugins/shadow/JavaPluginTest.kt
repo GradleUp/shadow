@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
@@ -209,7 +210,7 @@ class JavaPluginTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      transform { it.manifest.mainAttributes }.isNotEmpty()
+      transform { it.mainAttrSize }.isGreaterThan(1)
       getMainAttr(multiReleaseAttributeKey).isEqualTo("true")
     }
   }
@@ -481,7 +482,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
-      transform { it.manifest.mainAttributes }.isNotEmpty()
+      transform { it.mainAttrSize }.isGreaterThan(0)
       // Doesn't contain Gradle classes.
       getMainAttr(classPathAttributeKey).isNull()
 
@@ -643,7 +644,7 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      transform { it.manifest.mainAttributes }.isNotEmpty()
+      transform { it.mainAttrSize }.isGreaterThan(2)
       getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
       getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
     }
