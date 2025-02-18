@@ -96,6 +96,6 @@ def testJar = tasks.register('testJar', Jar) {
 }
 
 tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  manifest.inheritFrom(testJar.map { it.manifest })
+  manifest.inheritFrom(testJar.get().manifest)
 }
 ```
