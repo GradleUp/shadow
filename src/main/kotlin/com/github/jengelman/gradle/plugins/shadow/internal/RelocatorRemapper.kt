@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -16,7 +15,6 @@ import org.objectweb.asm.commons.Remapper
  */
 internal class RelocatorRemapper(
   private val relocators: Set<Relocator>,
-  private val stats: ShadowStats,
 ) : Remapper() {
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
@@ -44,10 +42,10 @@ internal class RelocatorRemapper(
 
     for (relocator in relocators) {
       if (relocator.canRelocateClass(newName)) {
-        val classContext = RelocateClassContext(className = newName, stats = stats)
+        val classContext = RelocateClassContext(newName)
         return prefix + relocator.relocateClass(classContext) + suffix
       } else if (relocator.canRelocatePath(newName)) {
-        val pathContext = RelocatePathContext(path = newName, stats = stats)
+        val pathContext = RelocatePathContext(newName)
         return prefix + relocator.relocatePath(pathContext) + suffix
       }
     }

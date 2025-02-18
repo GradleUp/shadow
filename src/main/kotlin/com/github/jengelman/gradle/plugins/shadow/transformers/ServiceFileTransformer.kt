@@ -50,7 +50,7 @@ public open class ServiceFileTransformer(
     var resource = context.path.substringAfter("$path/")
     context.relocators.forEach { relocator ->
       if (relocator.canRelocateClass(resource)) {
-        val classContext = RelocateClassContext(className = resource, stats = context.stats)
+        val classContext = RelocateClassContext(className = resource)
         resource = relocator.relocateClass(classContext)
         return@forEach
       }
@@ -62,7 +62,7 @@ public open class ServiceFileTransformer(
       var line = it
       context.relocators.forEach { relocator ->
         if (relocator.canRelocateClass(line)) {
-          val lineContext = RelocateClassContext(className = line, stats = context.stats)
+          val lineContext = RelocateClassContext(line)
           line = relocator.relocateClass(lineContext)
         }
       }

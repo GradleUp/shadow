@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.ArchiveFileTreeElement
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.RelativeArchivePath
@@ -34,12 +33,11 @@ internal class RealStreamAction(
   private val relocators: Set<Relocator>,
   private val patternSet: PatternSet,
   private val unusedClasses: Set<String>,
-  private val stats: ShadowStats,
   private val zipFile: File,
   private val preserveFileTimestamps: Boolean,
   private val logger: Logger,
 ) : CopyActionProcessingStreamAction {
-  private val remapper = RelocatorRemapper(relocators, stats)
+  private val remapper = RelocatorRemapper(relocators)
   private val visitedFiles = mutableSetOf<String>()
 
   init {
@@ -100,7 +98,6 @@ internal class RealStreamAction(
   }
 
   private fun processArchive(fileDetails: FileCopyDetails) {
-    stats.startJar()
     ZipFile(fileDetails.file).use { archive ->
       archive.entries.asSequence()
         .map {
@@ -114,7 +111,6 @@ internal class RealStreamAction(
           }
         }
     }
-    stats.finishJar()
   }
 
   private fun visitArchiveDirectory(archiveDir: RelativeArchivePath) {
@@ -242,7 +238,6 @@ internal class RealStreamAction(
           path = mappedPath,
           inputStream = steam,
           relocators = relocators,
-          stats = stats,
         ),
       )
     }

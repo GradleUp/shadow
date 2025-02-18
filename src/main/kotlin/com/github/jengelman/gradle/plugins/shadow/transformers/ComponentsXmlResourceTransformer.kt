@@ -105,11 +105,10 @@ public open class ComponentsXmlResourceTransformer : Transformer {
     public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
 
     private fun getRelocatedClass(className: String?, context: TransformerContext): String? {
-      val stats = context.stats
       if (!className.isNullOrEmpty()) {
         for (relocator in context.relocators) {
           if (relocator.canRelocateClass(className)) {
-            val relocateClassContext = RelocateClassContext(className, stats)
+            val relocateClassContext = RelocateClassContext(className)
             return relocator.relocateClass(relocateClassContext)
           }
         }
