@@ -203,7 +203,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     strategy: DuplicatesStrategy,
     outputRegex: String,
   ) {
-    writeDuplicateStrategy(strategy)
+    writeDuplicatesStrategy(strategy)
 
     assertThat(runWithFailure(shadowJarTask)).all {
       taskOutcomeEquals(shadowJarTask, FAILED)
@@ -221,7 +221,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     firstValue: String,
     secondValue: String,
   ) {
-    writeDuplicateStrategy(strategy)
+    writeDuplicatesStrategy(strategy)
 
     run(shadowJarTask)
 
@@ -231,7 +231,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  private fun writeDuplicateStrategy(strategy: DuplicatesStrategy) {
+  private fun writeDuplicatesStrategy(strategy: DuplicatesStrategy) {
     projectScriptPath.appendText(
       """
         dependencies {
@@ -260,9 +260,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     @JvmStatic
     fun withoutThrowingProvider() = listOf(
+      Arguments.of(DuplicatesStrategy.EXCLUDE, CONTENT_ONE, "one"),
       Arguments.of(DuplicatesStrategy.INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
       Arguments.of(DuplicatesStrategy.WARN, CONTENT_ONE_TWO, "one\ntwo"),
-      Arguments.of(DuplicatesStrategy.EXCLUDE, CONTENT_ONE, "one"),
     )
   }
 }
