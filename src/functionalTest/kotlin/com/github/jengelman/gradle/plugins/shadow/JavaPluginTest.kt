@@ -88,7 +88,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "my/Main.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
   }
@@ -127,7 +127,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(jarPath("build/libs/fat.jar")).useAll {
       containsEntries(
         "my/Passed.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
       doesNotContainEntries("/")
     }
@@ -143,7 +143,7 @@ class JavaPluginTest : BasePluginTest() {
       containsEntries(
         "client/Client.class",
         "server/Server.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
   }
@@ -160,7 +160,7 @@ class JavaPluginTest : BasePluginTest() {
       )
       doesNotContainEntries(
         "client/Client.class",
-        "junit/framework/Test.class",
+        *junitEntries,
         "client/junit/framework/Test.class",
       )
     }
@@ -175,17 +175,19 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun shadowProjectShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
+    val shadowedEntries = junitEntries
+      .map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
       containsEntries(
         "client/Client.class",
-        "client/junit/framework/Test.class",
         "server/Server.class",
+        *shadowedEntries,
       )
       doesNotContainEntries(
-        "junit/framework/Test.class",
+        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
@@ -527,8 +529,8 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
       containsEntries(
-        "junit/framework/Test.class",
         "my/Main.class",
+        *junitEntries,
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
@@ -620,7 +622,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
       containsEntries(
         "my/Main.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
   }

@@ -156,7 +156,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsEntries(
         "my/Main.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
 
@@ -175,7 +175,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         "my/Main.class",
       )
       doesNotContainEntries(
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
   }

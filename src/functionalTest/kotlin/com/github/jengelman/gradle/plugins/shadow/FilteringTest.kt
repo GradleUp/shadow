@@ -190,7 +190,7 @@ class FilteringTest : BasePluginTest() {
     assertThat(outputServerShadowJar).useAll {
       containsEntries(
         "server/Server.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
       doesNotContainEntries(
         "client/Client.class",
@@ -216,7 +216,7 @@ class FilteringTest : BasePluginTest() {
         "server/Server.class",
       )
       doesNotContainEntries(
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
   }

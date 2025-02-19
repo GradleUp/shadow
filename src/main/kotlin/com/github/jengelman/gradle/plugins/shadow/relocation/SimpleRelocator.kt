@@ -1,10 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 
 /**
@@ -16,7 +13,6 @@ import org.gradle.api.tasks.Input
  */
 @CacheableRelocator
 public open class SimpleRelocator @JvmOverloads constructor(
-  objectFactory: ObjectFactory,
   pattern: String? = null,
   shadedPattern: String? = null,
   includes: List<String>? = null,
@@ -31,10 +27,10 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input
-  public val includes: SetProperty<String> = objectFactory.setProperty()
+  public val includes: MutableSet<String> = mutableSetOf()
 
   @get:Input
-  public val excludes: SetProperty<String> = objectFactory.setProperty()
+  public val excludes: MutableSet<String> = mutableSetOf()
 
   init {
     if (rawString) {
@@ -71,7 +67,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
     if (!rawString) {
       // Create exclude pattern sets for sources.
-      for (exclude in this.excludes.get()) {
+      for (exclude in this.excludes) {
         // Excludes should be subpackages of the global pattern.
         if (exclude.startsWith(this.pattern)) {
           sourcePackageExcludes.add(
@@ -136,12 +132,39 @@ public open class SimpleRelocator @JvmOverloads constructor(
     return shadeSourceWithExcludes(content, pathPattern, shadedPathPattern, sourcePathExcludes)
   }
 
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is SimpleRelocator) return false
+    return rawString == other.rawString &&
+      pattern == other.pattern &&
+      pathPattern == other.pathPattern &&
+      shadedPattern == other.shadedPattern &&
+      shadedPathPattern == other.shadedPathPattern &&
+      sourcePackageExcludes == other.sourcePackageExcludes &&
+      sourcePathExcludes == other.sourcePathExcludes &&
+      includes == other.includes &&
+      excludes == other.excludes
+  }
+
+  override fun hashCode(): Int {
+    var result = rawString.hashCode()
+    result = 31 * result + pattern.hashCode()
+    result = 31 * result + pathPattern.hashCode()
+    result = 31 * result + shadedPattern.hashCode()
+    result = 31 * result + shadedPathPattern.hashCode()
+    result = 31 * result + sourcePackageExcludes.hashCode()
+    result = 31 * result + sourcePathExcludes.hashCode()
+    result = 31 * result + includes.hashCode()
+    result = 31 * result + excludes.hashCode()
+    return result
+  }
+
   private fun isIncluded(path: String): Boolean {
-    return includes.get().isEmpty() || includes.get().any { SelectorUtils.matchPath(it, path, "/", true) }
+    return includes.isEmpty() || includes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
   private fun isExcluded(path: String): Boolean {
-    return excludes.get().any { SelectorUtils.matchPath(it, path, "/", true) }
+    return excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
   private companion object {

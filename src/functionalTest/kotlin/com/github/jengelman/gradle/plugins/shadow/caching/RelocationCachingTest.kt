@@ -23,7 +23,7 @@ class RelocationCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsEntries(
         "my/Main.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
 
@@ -34,14 +34,16 @@ class RelocationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
+    val shadowedEntries = junitEntries
+      .map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
 
     assertCompositeExecutions {
       containsEntries(
         "my/Main.class",
-        "foo/junit/framework/Test.class",
+        *shadowedEntries,
       )
       doesNotContainEntries(
-        "junit/framework/Test.class",
+        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
   }

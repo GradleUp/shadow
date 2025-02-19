@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.util.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.InputStream
 import java.nio.file.Path

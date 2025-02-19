@@ -84,6 +84,7 @@ public open class ShadowCopyAction(
     private val remapper = RelocatorRemapper(relocators)
 
     init {
+      logger.info("Relocator count: ${relocators.size}.")
       if (encoding != null) {
         zipOutStr.setEncoding(encoding)
       }

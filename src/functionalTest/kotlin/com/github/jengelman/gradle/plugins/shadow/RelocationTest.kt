@@ -2,23 +2,29 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.isEqualTo
+import assertk.assertions.contains
+import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
-  @Test
-  fun defaultEnableRelocation() {
+  @ParameterizedTest
+  @MethodSource("prefixProvider")
+  fun autoRelocation(relocationPrefix: String) {
+    val mainClass = writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -26,32 +32,28 @@ class RelocationTest : BasePluginTest() {
         }
         $shadowJar {
           enableRelocation = true
+          relocationPrefix = '$relocationPrefix'
         }
       """.trimIndent(),
     )
+    val entryPrefix = relocationPrefix.replace('.', '/')
 
-    run(shadowJarTask)
+    val result = run(shadowJarTask, "--info")
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "META-INF/MANIFEST.MF",
-        "shadow/junit/textui/ResultPrinter.class",
-        "shadow/junit/textui/TestRunner.class",
-        "shadow/junit/framework/Assert.class",
-        "shadow/junit/framework/AssertionFailedError.class",
-        "shadow/junit/framework/ComparisonCompactor.class",
-        "shadow/junit/framework/ComparisonFailure.class",
-        "shadow/junit/framework/Protectable.class",
-        "shadow/junit/framework/Test.class",
-        "shadow/junit/framework/TestCase.class",
-        "shadow/junit/framework/TestFailure.class",
-        "shadow/junit/framework/TestListener.class",
-        "shadow/junit/framework/TestResult$1.class",
-        "shadow/junit/framework/TestResult.class",
-        "shadow/junit/framework/TestSuite$1.class",
-        "shadow/junit/framework/TestSuite.class",
+        mainClass,
+        *junitEntries.map { "$entryPrefix/$it" }.toTypedArray(),
+      )
+      doesNotContainEntries(
+        "$entryPrefix/$mainClass",
+        *junitEntries,
       )
     }
+    // Make sure the relocator count is aligned with the number of unique packages in junit jar.
+    assertThat(result.output).contains(
+      "Relocator count: 6.",
+    )
   }
 
   @Issue(
@@ -59,73 +61,56 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateDependencyFiles() {
+    val mainClass = writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
         $shadowJar {
-          relocate 'junit.textui', 'a'
+          relocate 'junit.runner', 'a'
           relocate 'junit.framework', 'b'
-          manifest {
-            attributes 'TEST-VALUE': 'FOO'
-          }
         }
       """.trimIndent(),
     )
+    val runnerFilter = { it: String -> it.startsWith("junit/runner/") }
+    val frameworkFilter = { it: String -> it.startsWith("junit/framework/") }
+    val runnerEntries = junitEntries
+      .filter(runnerFilter)
+      .map { it.replace("junit/runner/", "a/") }.toTypedArray()
+    val frameworkEntries = junitEntries
+      .filter(frameworkFilter)
+      .map { it.replace("junit/framework/", "b/") }.toTypedArray()
+    val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "META-INF/MANIFEST.MF",
-        "a/ResultPrinter.class",
-        "a/TestRunner.class",
-        "b/Assert.class",
-        "b/AssertionFailedError.class",
-        "b/ComparisonCompactor.class",
-        "b/ComparisonFailure.class",
-        "b/Protectable.class",
-        "b/Test.class",
-        "b/TestCase.class",
-        "b/TestFailure.class",
-        "b/TestListener.class",
-        "b/TestResult\$1.class",
-        "b/TestResult.class",
-        "b/TestSuite\$1.class",
-        "b/TestSuite.class",
+        mainClass,
+        *runnerEntries,
+        *frameworkEntries,
+        *otherJunitEntries,
       )
       doesNotContainEntries(
-        "junit/textui/ResultPrinter.class",
-        "junit/textui/TestRunner.class",
-        "junit/framework/Assert.class",
-        "junit/framework/AssertionFailedError.class",
-        "junit/framework/ComparisonCompactor.class",
-        "junit/framework/ComparisonFailure.class",
-        "junit/framework/Protectable.class",
-        "junit/framework/Test.class",
-        "junit/framework/TestCase.class",
-        "junit/framework/TestFailure.class",
-        "junit/framework/TestListener.class",
-        "junit/framework/TestResult\$1.class",
-        "junit/framework/TestResult.class",
-        "junit/framework/TestSuite\$1.class",
-        "junit/framework/TestSuite.class",
+        *junitEntries.filter { it !in otherJunitEntries }.toTypedArray(),
+        *otherJunitEntries.map { "a/$it" }.toTypedArray(),
+        *otherJunitEntries.map { "b/$it" }.toTypedArray(),
       )
-      getMainAttr("TEST-VALUE").isEqualTo("FOO")
     }
   }
 
   @Test
   fun relocateDependencyFilesWithFiltering() {
+    val mainClass = writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
         $shadowJar {
-          relocate('junit.textui', 'a') {
-            exclude 'junit.textui.TestRunner'
+          relocate('junit.runner', 'a') {
+            exclude 'junit.runner.BaseTestRunner'
           }
           relocate('junit.framework', 'b') {
             include 'junit.framework.Test*'
@@ -133,34 +118,28 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+    val runnerFilter = { it: String -> it.startsWith("junit/runner/") && it != "junit/runner/BaseTestRunner.class" }
+    val frameworkFilter = { it: String -> it.startsWith("junit/framework/Test") }
+    val runnerEntries = junitEntries
+      .filter(runnerFilter)
+      .map { it.replace("junit/runner/", "a/") }.toTypedArray()
+    val frameworkEntries = junitEntries
+      .filter(frameworkFilter)
+      .map { it.replace("junit/framework/", "b/") }.toTypedArray()
+    val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "a/ResultPrinter.class",
-        "b/Test.class",
-        "b/TestCase.class",
-        "b/TestFailure.class",
-        "b/TestListener.class",
-        "b/TestResult\$1.class",
-        "b/TestResult.class",
-        "b/TestSuite\$1.class",
-        "b/TestSuite.class",
-        "junit/textui/TestRunner.class",
-        "junit/framework/Assert.class",
-        "junit/framework/AssertionFailedError.class",
-        "junit/framework/ComparisonCompactor.class",
-        "junit/framework/ComparisonFailure.class",
-        "junit/framework/Protectable.class",
+        mainClass,
+        *runnerEntries,
+        *frameworkEntries,
+        *otherJunitEntries,
       )
       doesNotContainEntries(
-        "a/TestRunner.class",
-        "b/Assert.class",
-        "b/AssertionFailedError.class",
-        "b/ComparisonCompactor.class",
-        "b/ComparisonFailure.class",
-        "b/Protectable.class",
+        *otherJunitEntries.map { "a/$it" }.toTypedArray(),
+        *otherJunitEntries.map { "b/$it" }.toTypedArray(),
       )
     }
   }
@@ -181,14 +160,14 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+    val shadowedEntries = junitEntries
+      .map { it.replace("junit/framework/", "shadow/junit/") }.toTypedArray()
 
     path("src/main/java/my/MyTest.java").writeText(
       """
         package my;
-
         import junit.framework.Test;
         import junit.framework.TestResult;
-
         public class MyTest implements Test {
           public int countTestCases() { return 0; }
           public void run(TestResult result) { }
@@ -201,12 +180,10 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "my/MyTest.class",
-        "shadow/junit/Test.class",
-        "shadow/junit",
+        *shadowedEntries,
       )
       doesNotContainEntries(
-        "junit/framework",
-        "junit/framework/Test.class",
+        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
 
@@ -223,6 +200,11 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun relocateDoesNotDropDependencyResources() {
+    settingsScriptPath.appendText(
+      """
+        include 'core', 'app'
+      """.trimIndent(),
+    )
     path("core/build.gradle").writeText(
       """
         plugins {
@@ -239,9 +221,7 @@ class RelocationTest : BasePluginTest() {
     path("core/src/main/java/core/Core.java").writeText(
       """
         package core;
-
         import junit.framework.Test;
-
         public class Core {}
       """.trimIndent(),
     )
@@ -262,19 +242,13 @@ class RelocationTest : BasePluginTest() {
     path("app/src/main/java/app/App.java").writeText(
       """
         package app;
-
         import core.Core;
         import junit.framework.Test;
-
         public class App {}
       """.trimIndent(),
     )
-
-    settingsScriptPath.appendText(
-      """
-        include 'core', 'app'
-      """.trimIndent(),
-    )
+    val shadowedEntries = junitEntries
+      .map { it.replace("junit/framework/", "app/junit/framework/") }.toTypedArray()
 
     run(":app:$SHADOW_JAR_TASK_NAME")
 
@@ -285,7 +259,10 @@ class RelocationTest : BasePluginTest() {
         "test.properties",
         "app/core/Core.class",
         "app/App.class",
-        "app/junit/framework/Test.class",
+        *shadowedEntries,
+      )
+      doesNotContainEntries(
+        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
   }
@@ -358,6 +335,25 @@ class RelocationTest : BasePluginTest() {
     )
 
     run(shadowJarTask)
-    // No exception should be thrown
+
+    val entries = outputShadowJar.use { it.entries().toList() }
+    val included = entries.filter { entry ->
+      entry.name.startsWith("shaded/com/google/protobuf") || entry.name.startsWith("shaded/io/netty")
+    }
+    val excluded = entries.filter { entry ->
+      entry.name.startsWith("com/google/protobuf") || entry.name.startsWith("io/netty")
+    }
+    assertThat(included).isNotEmpty()
+    assertThat(excluded).isEmpty()
+  }
+
+  private companion object {
+    @JvmStatic
+    fun prefixProvider() = listOf(
+      // The default values.
+      Arguments.of(ShadowBasePlugin.SHADOW),
+      Arguments.of("new.pkg"),
+      Arguments.of("new/path"),
+    )
   }
 }

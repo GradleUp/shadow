@@ -73,7 +73,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     commonAssertions(
       jarPath("myapp-shadow/lib/myapp-1.0-all.jar", installPath),
-      entriesContained = arrayOf("my/Main.class", "junit/framework/Test.class"),
+      entriesContained = arrayOf("my/Main.class", *junitEntries),
     )
 
     val unixScript = path("myapp-shadow/bin/myapp", installPath)
