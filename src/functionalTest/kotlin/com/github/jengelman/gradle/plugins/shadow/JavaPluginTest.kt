@@ -83,7 +83,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "junit/framework/Test.class",
       )
     }
@@ -98,9 +98,9 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun includeProjectSources() {
-    path("src/main/java/shadow/Passed.java").writeText(
+    path("src/main/java/my/Passed.java").writeText(
       """
-        package shadow;
+        package my;
         public class Passed {}
       """.trimIndent(),
     )
@@ -111,7 +111,7 @@ class JavaPluginTest : BasePluginTest() {
          implementation 'junit:junit:3.8.2'
         }
         $shadowJar {
-          archiveBaseName = 'shadow'
+          archiveBaseName = 'fat'
           archiveClassifier = ''
           archiveVersion = ''
         }
@@ -120,9 +120,9 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(jarPath("build/libs/shadow.jar")).useAll {
+    assertThat(jarPath("build/libs/fat.jar")).useAll {
       containsEntries(
-        "shadow/Passed.class",
+        "my/Passed.class",
         "junit/framework/Test.class",
       )
       doesNotContainEntries("/")
@@ -222,7 +222,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
-    localRepo.module("shadow", "a", "1.0") {
+    localRepo.module("my", "a", "1.0") {
       buildJar {
         insert("a.properties", "a")
         insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
@@ -236,16 +236,16 @@ class JavaPluginTest : BasePluginTest() {
       }
     }.publish()
 
-    path("src/main/java/shadow/Passed.java").writeText(
+    path("src/main/java/my/Passed.java").writeText(
       """
-        package shadow;
+        package my;
         public class Passed {}
       """.trimIndent(),
     )
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
+          implementation 'my:a:1.0'
         }
       """.trimIndent(),
     )
@@ -254,7 +254,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "shadow/Passed.class",
+        "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
       )
@@ -275,8 +275,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          runtimeOnly 'shadow:a:1.0'
-          shadow 'shadow:b:1.0'
+          runtimeOnly 'my:a:1.0'
+          shadow 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -291,20 +291,20 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
-    localRepo.module("shadow", "api", "1.0") {
+    localRepo.module("my", "api", "1.0") {
       buildJar {
         insert("api.properties", "api")
       }
-    }.module("shadow", "implementation-dep", "1.0") {
+    }.module("my", "implementation-dep", "1.0") {
       buildJar {
         insert("implementation-dep.properties", "implementation-dep")
       }
-    }.module("shadow", "implementation", "1.0") {
+    }.module("my", "implementation", "1.0") {
       buildJar {
         insert("implementation.properties", "implementation")
       }
-      addDependency("shadow", "implementation-dep", "1.0")
-    }.module("shadow", "runtimeOnly", "1.0") {
+      addDependency("my", "implementation-dep", "1.0")
+    }.module("my", "runtimeOnly", "1.0") {
       buildJar {
         insert("runtimeOnly.properties", "runtimeOnly")
       }
@@ -314,9 +314,9 @@ class JavaPluginTest : BasePluginTest() {
       """
         ${getDefaultProjectBuildScript("java-library", withGroup = true, withVersion = true)}
         dependencies {
-          api 'shadow:api:1.0'
-          implementation 'shadow:implementation:1.0'
-          runtimeOnly 'shadow:runtimeOnly:1.0'
+          api 'my:api:1.0'
+          implementation 'my:implementation:1.0'
+          runtimeOnly 'my:runtimeOnly:1.0'
         }
       """.trimIndent(),
     )
@@ -338,8 +338,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          runtimeOnly 'shadow:a:1.0'
-          compileOnly 'shadow:b:1.0'
+          runtimeOnly 'my:a:1.0'
+          compileOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -354,11 +354,11 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun defaultCopyingStrategy() {
-    localRepo.module("shadow", "a", "1.0") {
+    localRepo.module("my", "a", "1.0") {
       buildJar {
         insert("META-INF/MANIFEST.MF", "MANIFEST A")
       }
-    }.module("shadow", "b", "1.0") {
+    }.module("my", "b", "1.0") {
       buildJar {
         insert("META-INF/MANIFEST.MF", "MANIFEST B")
       }
@@ -367,8 +367,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          runtimeOnly 'shadow:a:1.0'
-          runtimeOnly 'shadow:b:1.0'
+          runtimeOnly 'my:a:1.0'
+          runtimeOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -473,8 +473,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          compileOnly 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          compileOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -512,7 +512,7 @@ class JavaPluginTest : BasePluginTest() {
           from sourceSets.test.output
           configurations = [project.configurations.testRuntimeClasspath]
           manifest {
-            attributes '$mainClassAttributeKey': 'shadow.Main'
+            attributes '$mainClassAttributeKey': 'my.Main'
           }
         }
       """.trimIndent(),
@@ -521,15 +521,15 @@ class JavaPluginTest : BasePluginTest() {
     val result = run(testShadowJarTask)
 
     assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
-    assertThat(jarPath("build/libs/shadow-1.0-tests.jar")).useAll {
+    assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
       containsEntries(
         "junit/framework/Test.class",
-        "shadow/Main.class",
+        "my/Main.class",
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
 
-    val pathString = path("build/libs/shadow-1.0-tests.jar").toString()
+    val pathString = path("build/libs/my-1.0-tests.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
     assertThat(runningOutput).contains(
       "Hello, World! (foo) from Main",
@@ -617,7 +617,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "junit/framework/Test.class",
       )
     }

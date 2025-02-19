@@ -161,20 +161,20 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   )
   @Test
   fun applyTransformersToProjectResources() {
-    val servicesShadowEntry = "META-INF/services/shadow.Shadow"
+    val servicesBarEntry = "META-INF/services/foo.Bar"
     val one = buildJarOne {
-      insert(servicesShadowEntry, CONTENT_ONE)
+      insert(servicesBarEntry, CONTENT_ONE)
     }.toUri().toURL().path
-    localRepo.module("shadow", "two", "1.0") {
+    localRepo.module("foo", "bar", "1.0") {
       buildJar {
-        insert(servicesShadowEntry, CONTENT_TWO)
+        insert(servicesBarEntry, CONTENT_TWO)
       }
     }.publish()
 
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:two:1.0'
+          implementation 'foo:bar:1.0'
           implementation files('$one')
         }
         $shadowJar {
@@ -182,11 +182,11 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         }
       """.trimIndent(),
     )
-    path("src/main/resources/$servicesShadowEntry").writeText(CONTENT_THREE)
+    path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
     run(shadowJarTask)
 
-    val content = outputShadowJar.use { it.getContent(servicesShadowEntry) }
+    val content = outputShadowJar.use { it.getContent(servicesBarEntry) }
     assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
   }
 }
