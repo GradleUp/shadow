@@ -222,7 +222,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
-    localRepo.module("shadow", "a", "1.0") {
+    localRepo.module("my", "a", "1.0") {
       buildJar {
         insert("a.properties", "a")
         insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
@@ -245,7 +245,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
+          implementation 'my:a:1.0'
         }
       """.trimIndent(),
     )
@@ -275,8 +275,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          runtimeOnly 'shadow:a:1.0'
-          shadow 'shadow:b:1.0'
+          runtimeOnly 'my:a:1.0'
+          shadow 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -291,20 +291,20 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
-    localRepo.module("shadow", "api", "1.0") {
+    localRepo.module("my", "api", "1.0") {
       buildJar {
         insert("api.properties", "api")
       }
-    }.module("shadow", "implementation-dep", "1.0") {
+    }.module("my", "implementation-dep", "1.0") {
       buildJar {
         insert("implementation-dep.properties", "implementation-dep")
       }
-    }.module("shadow", "implementation", "1.0") {
+    }.module("my", "implementation", "1.0") {
       buildJar {
         insert("implementation.properties", "implementation")
       }
-      addDependency("shadow", "implementation-dep", "1.0")
-    }.module("shadow", "runtimeOnly", "1.0") {
+      addDependency("my", "implementation-dep", "1.0")
+    }.module("my", "runtimeOnly", "1.0") {
       buildJar {
         insert("runtimeOnly.properties", "runtimeOnly")
       }
@@ -314,9 +314,9 @@ class JavaPluginTest : BasePluginTest() {
       """
         ${getDefaultProjectBuildScript("java-library", withGroup = true, withVersion = true)}
         dependencies {
-          api 'shadow:api:1.0'
-          implementation 'shadow:implementation:1.0'
-          runtimeOnly 'shadow:runtimeOnly:1.0'
+          api 'my:api:1.0'
+          implementation 'my:implementation:1.0'
+          runtimeOnly 'my:runtimeOnly:1.0'
         }
       """.trimIndent(),
     )
@@ -338,8 +338,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          runtimeOnly 'shadow:a:1.0'
-          compileOnly 'shadow:b:1.0'
+          runtimeOnly 'my:a:1.0'
+          compileOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -354,11 +354,11 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun defaultCopyingStrategy() {
-    localRepo.module("shadow", "a", "1.0") {
+    localRepo.module("my", "a", "1.0") {
       buildJar {
         insert("META-INF/MANIFEST.MF", "MANIFEST A")
       }
-    }.module("shadow", "b", "1.0") {
+    }.module("my", "b", "1.0") {
       buildJar {
         insert("META-INF/MANIFEST.MF", "MANIFEST B")
       }
@@ -367,8 +367,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          runtimeOnly 'shadow:a:1.0'
-          runtimeOnly 'shadow:b:1.0'
+          runtimeOnly 'my:a:1.0'
+          runtimeOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -473,8 +473,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          compileOnly 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          compileOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )

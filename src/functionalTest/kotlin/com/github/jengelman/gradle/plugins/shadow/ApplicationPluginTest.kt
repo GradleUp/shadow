@@ -213,7 +213,7 @@ class ApplicationPluginTest : BasePluginTest() {
     projectBlock: String = "",
     applicationBlock: String = "",
     settingsBlock: String = "",
-    dependenciesBlock: String = "implementation 'shadow:a:1.0'",
+    dependenciesBlock: String = "implementation 'my:a:1.0'",
     runShadowBlock: String = "",
   ) {
     writeMainClass(withImports = mainClassWithImports)

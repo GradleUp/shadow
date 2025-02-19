@@ -77,8 +77,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          implementation 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
       """.trimIndent() + System.lineSeparator(),
     )
@@ -185,7 +185,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:d:1.0'
+          implementation 'my:d:1.0'
         }
       """.trimIndent() + System.lineSeparator(),
     )

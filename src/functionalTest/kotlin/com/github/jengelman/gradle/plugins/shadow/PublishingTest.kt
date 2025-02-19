@@ -213,7 +213,7 @@ class PublishingTest : BasePluginTest() {
           apply plugin: 'java'
           apply plugin: 'maven-publish'
           version = '1.0'
-          group = 'shadow'
+          group = 'my'
         }
       """.trimIndent(),
     )
@@ -312,9 +312,9 @@ class PublishingTest : BasePluginTest() {
           version = '1.0'
         """.trimIndent(),
         dependenciesBlock = """
-          implementation 'shadow:a:1.0'
-          implementation 'shadow:b:1.0'
-          shadow 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
+          shadow 'my:b:1.0'
         """.trimIndent(),
         publicationsBlock = """
           java(MavenPublication) {
@@ -337,7 +337,7 @@ class PublishingTest : BasePluginTest() {
       containsEntries(*entriesInAB)
     }
 
-    assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("shadow:a:1.0", "shadow:b:1.0"))
+    assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("my:a:1.0", "my:b:1.0"))
     gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmm ->
       // apiElements, runtimeElements, shadowRuntimeElements
       assertThat(gmm.variantNames).containsOnly(
@@ -360,8 +360,8 @@ class PublishingTest : BasePluginTest() {
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
         )
         transform { it.gavs }.containsOnly(
-          "shadow:a:1.0",
-          "shadow:b:1.0",
+          "my:a:1.0",
+          "my:b:1.0",
         )
       }
       assertShadowVariantCommon(gmm)
@@ -391,8 +391,8 @@ class PublishingTest : BasePluginTest() {
   private fun publishConfiguration(
     projectBlock: String = "",
     dependenciesBlock: String = """
-      implementation 'shadow:a:1.0'
-      shadow 'shadow:b:1.0'
+      implementation 'my:a:1.0'
+      shadow 'my:b:1.0'
     """.trimIndent(),
     shadowBlock: String = "",
     publicationsBlock: String = """
@@ -435,7 +435,7 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertPomCommon(
     pomPath: Path,
-    gavs: Array<String> = arrayOf("shadow:b:1.0"),
+    gavs: Array<String> = arrayOf("my:b:1.0"),
   ) {
     assertThat(pomReader.read(pomPath).gavs).containsOnly(*gavs)
   }
@@ -443,7 +443,7 @@ class PublishingTest : BasePluginTest() {
   private fun assertShadowVariantCommon(
     gmm: GradleModuleMetadata,
     variantAttrs: Array<Pair<String, String>> = shadowVariantAttrs,
-    gavs: Array<String> = arrayOf("shadow:b:1.0"),
+    gavs: Array<String> = arrayOf("my:b:1.0"),
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {

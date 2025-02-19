@@ -108,8 +108,8 @@ class TransformersTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          implementation 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
         $shadowJar {
           // Use NoOpTransformer to mock a custom transformer here.
@@ -135,8 +135,8 @@ class TransformersTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          implementation 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
         $shadowJar {
           transform(${transformer.java.name}) $configuration

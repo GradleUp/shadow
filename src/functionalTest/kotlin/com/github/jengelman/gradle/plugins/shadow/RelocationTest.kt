@@ -296,7 +296,7 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateResourceFiles() {
-    localRepo.module("shadow", "dep", "1.0") {
+    localRepo.module("my", "dep", "1.0") {
       buildJar {
         insert("foo/dep.properties", "c")
       }
@@ -304,7 +304,6 @@ class RelocationTest : BasePluginTest() {
     path("src/main/java/foo/Foo.java").writeText(
       """
         package foo;
-
         class Foo {}
       """.trimIndent(),
     )
@@ -313,7 +312,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:dep:1.0'
+          implementation 'my:dep:1.0'
         }
         $shadowJar {
           relocate 'foo', 'bar'

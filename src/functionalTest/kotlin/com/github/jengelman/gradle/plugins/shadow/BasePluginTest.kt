@@ -57,19 +57,19 @@ abstract class BasePluginTest {
     )
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(junitJar)
-    }.module("shadow", "a", "1.0") {
+    }.module("my", "a", "1.0") {
       buildJar {
         insert("a.properties", "a")
         insert("a2.properties", "a2")
       }
-    }.module("shadow", "b", "1.0") {
+    }.module("my", "b", "1.0") {
       buildJar {
         insert("b.properties", "b")
       }
     }.publish()
 
-    artifactAJar = path("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
-    artifactBJar = path("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
+    artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
     entriesInA = arrayOf("a.properties", "a2.properties")
     entriesInB = arrayOf("b.properties")
     entriesInAB = entriesInA + entriesInB
@@ -173,18 +173,18 @@ abstract class BasePluginTest {
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.module("shadow", "c", "1.0") {
+    localRepo.module("my", "c", "1.0") {
       buildJar {
         insert("c.properties", "c")
       }
       if (circular) {
-        addDependency("shadow", "d", "1.0")
+        addDependency("my", "d", "1.0")
       }
-    }.module("shadow", "d", "1.0") {
+    }.module("my", "d", "1.0") {
       buildJar {
         insert("d.properties", "d")
       }
-      addDependency("shadow", "c", "1.0")
+      addDependency("my", "c", "1.0")
     }.publish()
   }
 
