@@ -36,7 +36,9 @@ class RelocationTest : BasePluginTest() {
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
 
-    run(shadowJarTask)
+    run(shadowJarTask) {
+      it.withDebug(true)
+    }
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
