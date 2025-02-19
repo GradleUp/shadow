@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -36,7 +37,7 @@ class RelocationTest : BasePluginTest() {
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
 
-    run(shadowJarTask)
+    val result = run(shadowJarTask, "--info")
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
@@ -48,6 +49,10 @@ class RelocationTest : BasePluginTest() {
         *junitEntries,
       )
     }
+    // Make sure the relocator count is aligned with the number of unique packages in junit jar.
+    assertThat(result.output).contains(
+      "Relocator count: 6.",
+    )
   }
 
   @Issue(

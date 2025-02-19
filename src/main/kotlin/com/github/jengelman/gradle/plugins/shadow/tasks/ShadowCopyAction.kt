@@ -172,6 +172,7 @@ public open class ShadowCopyAction(
     private val visitedFiles = mutableSetOf<String>()
 
     init {
+      logger.info("Relocator count: ${relocators.size}.")
       if (encoding != null) {
         this.zipOutStr.setEncoding(encoding)
       }
