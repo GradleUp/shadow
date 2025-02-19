@@ -2,7 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -359,7 +361,16 @@ class RelocationTest : BasePluginTest() {
     )
 
     run(shadowJarTask)
-    // No exception should be thrown
+
+    val entries = outputShadowJar.use { it.entries().toList() }
+    val included = entries.filter { entry ->
+      entry.name.startsWith("shaded/com/google/protobuf") || entry.name.startsWith("shaded/io/netty")
+    }
+    val excluded = entries.filter { entry ->
+      entry.name.startsWith("com/google/protobuf") || entry.name.startsWith("io/netty")
+    }
+    assertThat(included).isNotEmpty()
+    assertThat(excluded).isEmpty()
   }
 
   private companion object {
