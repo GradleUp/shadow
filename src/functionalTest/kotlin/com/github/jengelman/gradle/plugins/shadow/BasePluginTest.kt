@@ -193,7 +193,7 @@ abstract class BasePluginTest {
     packageName: String = "my",
     withImports: Boolean = false,
     className: String = "Main",
-  ) {
+  ): String {
     val imports = if (withImports) "import junit.framework.Test;" else ""
     val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
     path("src/$sourceSet/java/$packageName/$className.java").writeText(
@@ -212,6 +212,7 @@ abstract class BasePluginTest {
         }
       """.trimIndent(),
     )
+    return packageName.replace('.', '/') + "/$className.class"
   }
 
   fun writeClientAndServerModules(
@@ -347,23 +348,11 @@ abstract class BasePluginTest {
     }
 
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
-    val junitEntries: Array<String> = arrayOf(
-      "junit/awtui",
-      "junit/awtui/TestRunner.class",
-      "junit/extensions",
-      "junit/extensions/TestSetup.class",
-      "junit/framework",
-      "junit/framework/TestResult\$1.class",
-      "junit/framework/TestResult.class",
-      "junit/framework/TestSuite\$1.class",
-      "junit/framework/TestSuite.class",
-      "junit/runner",
-      "junit/runner/BaseTestRunner.class",
-      "junit/swingui",
-      "junit/swingui/TestRunner.class",
-      "junit/textui",
-      "junit/textui/TestRunner.class",
-    )
+    val junitEntries: Array<String> = JarPath(junitJar)
+      .use { it.entries().toList() }
+      .map { entry -> entry.name }
+      .filterNot { it == "junit3.8.2/" || it.startsWith("META-INF/") }
+      .toTypedArray()
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})

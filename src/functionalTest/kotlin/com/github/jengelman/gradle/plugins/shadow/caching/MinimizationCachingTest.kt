@@ -24,8 +24,8 @@ class MinimizationCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsEntries(
         "server/Server.class",
-        "junit/framework/Test.class",
         "client/Client.class",
+        *junitEntries,
       )
     }
 
@@ -42,7 +42,7 @@ class MinimizationCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsEntries(
         "server/Server.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
       doesNotContainEntries(
         "client/Client.class",
