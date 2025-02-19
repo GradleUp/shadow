@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 
 /**
@@ -14,7 +13,6 @@ import org.gradle.api.tasks.Input
  */
 @CacheableRelocator
 public open class SimpleRelocator @JvmOverloads constructor(
-  objectFactory: ObjectFactory,
   pattern: String? = null,
   shadedPattern: String? = null,
   includes: List<String>? = null,

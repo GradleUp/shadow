@@ -241,7 +241,7 @@ public abstract class ShadowJar :
     destination: String,
     action: Action<SimpleRelocator>?,
   ): ShadowJar = apply {
-    val relocator = SimpleRelocator(objectFactory, pattern, destination)
+    val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
   }
 
@@ -309,7 +309,7 @@ public abstract class ShadowJar :
             .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
             .map { it.name.substringBeforeLast('/').replace('/', '.') }
             .toSet()
-            .map { SimpleRelocator(objectFactory, it, "$prefix.$it") }
+            .map { SimpleRelocator(it, "$prefix.$it") }
         }
       }
     }

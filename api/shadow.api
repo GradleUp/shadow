@@ -130,13 +130,13 @@ public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocat
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator : com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;)V
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;)V
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
-	public synthetic fun <init> (Lorg/gradle/api/model/ObjectFactory;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public fun canRelocateClass (Ljava/lang/String;)Z
 	public fun canRelocatePath (Ljava/lang/String;)Z
