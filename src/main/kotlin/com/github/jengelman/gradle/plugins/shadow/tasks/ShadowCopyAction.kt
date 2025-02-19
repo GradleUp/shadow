@@ -92,47 +92,42 @@ public open class ShadowCopyAction(
 
     override fun processFile(details: FileCopyDetailsInternal) {
       if (!patternSet.asSpec.isSatisfiedBy(details)) return
-      if (details.isDirectory) visitDir(details) else visitFile(details)
+      try {
+        if (details.isDirectory) visitDir(details) else visitFile(details)
+      } catch (e: Exception) {
+        throw GradleException("Could not add $details to ZIP '$zipFile'.", e)
+      }
     }
 
     private fun visitFile(fileDetails: FileCopyDetails) {
-      try {
-        val relativePath = fileDetails.relativePath.pathString
-        if (relativePath.endsWith(".class")) {
-          if (isUnused(fileDetails.path)) return
-          if (relocators.isEmpty()) {
-            fileDetails.writeToZip()
-            return
-          }
-          fileDetails.file.inputStream().use { stream ->
-            remapClass(stream, fileDetails.path, fileDetails.lastModified)
-          }
-        } else {
-          if (!transform(fileDetails)) {
-            fileDetails.writeToZip(remapper.map(relativePath))
-          }
+      val relativePath = fileDetails.relativePath.pathString
+      if (relativePath.endsWith(".class")) {
+        if (isUnused(fileDetails.path)) return
+        if (relocators.isEmpty()) {
+          fileDetails.writeToZip()
+          return
         }
-      } catch (e: Exception) {
-        throw GradleException("Could not add $fileDetails to ZIP '$zipFile'.", e)
+        fileDetails.file.inputStream().use { stream ->
+          remapClass(stream, fileDetails.path, fileDetails.lastModified)
+        }
+      } else {
+        val mapped = remapper.map(relativePath)
+        if (transform(fileDetails, mapped)) return
+        fileDetails.writeToZip(mapped)
       }
     }
 
     private fun visitDir(dirDetails: FileCopyDetails) {
-      try {
-        val mappedPath = if (relocators.isEmpty()) {
-          dirDetails.relativePath.pathString
-        } else {
-          remapper.map(dirDetails.relativePath.pathString)
-        }
-        dirDetails.writeToZip("$mappedPath/")
-      } catch (e: Exception) {
-        throw GradleException("Could not add $dirDetails to ZIP '$zipFile'.", e)
+      val mapped = if (relocators.isEmpty()) {
+        dirDetails.relativePath.pathString
+      } else {
+        remapper.map(dirDetails.relativePath.pathString)
       }
+      dirDetails.writeToZip("$mapped/")
     }
 
     private fun isUnused(classPath: String): Boolean {
-      val classPathWithoutExtension = classPath.substringBeforeLast(".")
-      val className = classPathWithoutExtension.replace('/', '.')
+      val className = classPath.substringBeforeLast(".").replace('/', '.')
       return unusedClasses.contains(className).also {
         if (it) {
           logger.debug("Dropping unused class: $className")
@@ -176,12 +171,12 @@ public open class ShadowCopyAction(
       }
     }
 
-    private fun transform(fileDetails: FileCopyDetails): Boolean {
+    private fun transform(fileDetails: FileCopyDetails, mapped: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
       fileDetails.file.inputStream().use { steam ->
         transformer.transform(
           TransformerContext(
-            path = remapper.map(fileDetails.relativePath.pathString),
+            path = mapped,
             inputStream = steam,
             relocators = relocators,
           ),

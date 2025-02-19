@@ -1,7 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import java.util.regex.Pattern
 import org.objectweb.asm.commons.Remapper
@@ -39,11 +37,9 @@ internal class RelocatorRemapper(
 
     for (relocator in relocators) {
       if (relocator.canRelocateClass(newName)) {
-        val classContext = RelocateClassContext(newName)
-        return prefix + relocator.relocateClass(classContext) + suffix
+        return prefix + relocator.relocateClass(newName) + suffix
       } else if (relocator.canRelocatePath(newName)) {
-        val pathContext = RelocatePathContext(newName)
-        return prefix + relocator.relocatePath(pathContext) + suffix
+        return prefix + relocator.relocatePath(newName) + suffix
       }
     }
 
