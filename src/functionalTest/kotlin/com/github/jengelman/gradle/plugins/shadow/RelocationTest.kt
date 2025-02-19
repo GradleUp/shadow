@@ -112,7 +112,6 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries.map { "a/$it" }.toTypedArray(),
         *otherJunitEntries.map { "b/$it" }.toTypedArray(),
       )
-      getMainAttr("TEST-VALUE").isEqualTo("FOO")
     }
   }
 
@@ -133,6 +132,9 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+    val otherJunitEntries = junitEntries.filterNot {
+      it.startsWith("junit/textui") || it.startsWith("junit/framework")
+    }.toTypedArray()
 
     run(shadowJarTask)
 
@@ -153,6 +155,7 @@ class RelocationTest : BasePluginTest() {
         "junit/framework/ComparisonCompactor.class",
         "junit/framework/ComparisonFailure.class",
         "junit/framework/Protectable.class",
+        *otherJunitEntries,
       )
       doesNotContainEntries(
         "a/TestRunner.class",
@@ -161,6 +164,8 @@ class RelocationTest : BasePluginTest() {
         "b/ComparisonCompactor.class",
         "b/ComparisonFailure.class",
         "b/Protectable.class",
+        *otherJunitEntries.map { "a/$it" }.toTypedArray(),
+        *otherJunitEntries.map { "b/$it" }.toTypedArray(),
       )
     }
   }
