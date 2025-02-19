@@ -671,7 +671,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "META-INF/a-1.0.jar",
       )
       doesNotContainEntries(*entriesInA)
@@ -684,7 +684,7 @@ class JavaPluginTest : BasePluginTest() {
     }
     assertThat(jarPath(unzipped.name)).useAll {
       containsEntries(*entriesInA)
-      doesNotContainEntries("shadow/Main.class")
+      doesNotContainEntries("my/Main.class")
     }
   }
 }
