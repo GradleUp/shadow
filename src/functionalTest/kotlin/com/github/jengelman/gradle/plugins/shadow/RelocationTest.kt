@@ -2,14 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
-import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -186,10 +184,9 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    val mappedJunitEntries = junitEntries
-      .map {
-        it.replace("junit/framework", "shadow/junit")
-      }.toTypedArray()
+    val mappedJunitEntries = junitEntries.map {
+      it.replace("junit/framework", "shadow/junit")
+    }.toTypedArray()
 
     path("src/main/java/my/MyTest.java").writeText(
       """
@@ -229,6 +226,11 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun relocateDoesNotDropDependencyResources() {
+    settingsScriptPath.appendText(
+      """
+        include 'core', 'app'
+      """.trimIndent(),
+    )
     path("core/build.gradle").writeText(
       """
         plugins {
@@ -245,9 +247,7 @@ class RelocationTest : BasePluginTest() {
     path("core/src/main/java/core/Core.java").writeText(
       """
         package core;
-
         import junit.framework.Test;
-
         public class Core {}
       """.trimIndent(),
     )
@@ -268,19 +268,14 @@ class RelocationTest : BasePluginTest() {
     path("app/src/main/java/app/App.java").writeText(
       """
         package app;
-
         import core.Core;
         import junit.framework.Test;
-
         public class App {}
       """.trimIndent(),
     )
-
-    settingsScriptPath.appendText(
-      """
-        include 'core', 'app'
-      """.trimIndent(),
-    )
+    val mappedJunitEntries = junitEntries.map {
+      it.replace("junit/framework", "app/junit/framework")
+    }.toTypedArray()
 
     run(":app:$SHADOW_JAR_TASK_NAME")
 
@@ -291,7 +286,7 @@ class RelocationTest : BasePluginTest() {
         "test.properties",
         "app/core/Core.class",
         "app/App.class",
-        "app/junit/framework/Test.class",
+        *mappedJunitEntries,
       )
     }
   }
