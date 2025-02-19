@@ -98,9 +98,9 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun includeProjectSources() {
-    path("src/main/java/shadow/Passed.java").writeText(
+    path("src/main/java/my/Passed.java").writeText(
       """
-        package shadow;
+        package my;
         public class Passed {}
       """.trimIndent(),
     )
@@ -122,7 +122,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("build/libs/shadow.jar")).useAll {
       containsEntries(
-        "shadow/Passed.class",
+        "my/Passed.class",
         "junit/framework/Test.class",
       )
       doesNotContainEntries("/")
@@ -236,9 +236,9 @@ class JavaPluginTest : BasePluginTest() {
       }
     }.publish()
 
-    path("src/main/java/shadow/Passed.java").writeText(
+    path("src/main/java/my/Passed.java").writeText(
       """
-        package shadow;
+        package my;
         public class Passed {}
       """.trimIndent(),
     )
@@ -254,7 +254,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "shadow/Passed.class",
+        "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
       )

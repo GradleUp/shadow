@@ -182,14 +182,14 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    path("src/main/java/shadow/ShadowTest.java").writeText(
+    path("src/main/java/my/MyTest.java").writeText(
       """
-        package shadow;
+        package my;
 
         import junit.framework.Test;
         import junit.framework.TestResult;
 
-        public class ShadowTest implements Test {
+        public class MyTest implements Test {
           public int countTestCases() { return 0; }
           public void run(TestResult result) { }
         }
@@ -200,7 +200,7 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "shadow/ShadowTest.class",
+        "my/MyTest.class",
         "shadow/junit/Test.class",
         "shadow/junit",
       )
@@ -215,7 +215,7 @@ class RelocationTest : BasePluginTest() {
       assertFailure {
         // check that the class can be loaded. If the file was not relocated properly, we should get a NoDefClassFound
         // Isolated class loader with only the JVM system jars and the output jar from the test project
-        classLoader.loadClass("shadow.ShadowTest")
+        classLoader.loadClass("my.MyTest")
         fail("Should not reach here.")
       }.isInstanceOf(AssertionFailedError::class)
     }

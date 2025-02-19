@@ -156,9 +156,9 @@ class FilteringTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    path("src/main/java/shadow/Passed.java").writeText(
+    path("src/main/java/my/Passed.java").writeText(
       """
-        package shadow;
+        package my;
         public class Passed {}
       """.trimIndent(),
     )
@@ -168,7 +168,7 @@ class FilteringTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "d.properties",
-        "shadow/Passed.class",
+        "my/Passed.class",
       )
       val entries = entriesInAB + "c.properties"
       doesNotContainEntries(*entries)
