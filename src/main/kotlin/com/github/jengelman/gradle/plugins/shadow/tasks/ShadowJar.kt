@@ -30,7 +30,6 @@ import org.gradle.api.Action
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
@@ -242,7 +241,7 @@ public abstract class ShadowJar :
     destination: String,
     action: Action<SimpleRelocator>?,
   ): ShadowJar = apply {
-    val relocator = SimpleRelocator(objectFactory, pattern, destination)
+    val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
   }
 
@@ -303,17 +302,14 @@ public abstract class ShadowJar :
   private val packageRelocators: List<SimpleRelocator>
     get() {
       if (!enableRelocation.get()) return emptyList()
-
       val prefix = relocationPrefix.get()
-      // Must cast configurations to Set<FileCollection> to fix type mismatch in runtime.
-      return (configurations.get() as Set<FileCollection>).flatMap { configuration ->
-        configuration.files.flatMap { file ->
-          JarFile(file).use { jarFile ->
-            jarFile.entries().toList()
-              .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
-              .map { it.name.substringBeforeLast('/').replace('/', '.') }
-              .map { SimpleRelocator(objectFactory, it, "$prefix.$it") }
-          }
+      return includedDependencies.files.flatMap { file ->
+        JarFile(file).use { jarFile ->
+          jarFile.entries().toList()
+            .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
+            .map { it.name.substringBeforeLast('/').replace('/', '.') }
+            .toSet()
+            .map { SimpleRelocator(it, "$prefix.$it") }
         }
       }
     }

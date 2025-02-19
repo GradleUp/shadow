@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -15,6 +16,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.opentest4j.AssertionFailedError
 
@@ -36,7 +38,7 @@ class RelocationTest : BasePluginTest() {
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
 
-    run(shadowJarTask)
+    val result = run(shadowJarTask, "--info")
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
@@ -48,6 +50,10 @@ class RelocationTest : BasePluginTest() {
         *junitEntries,
       )
     }
+    // Make sure the relocator count is aligned with the number of unique packages in junit jar.
+    assertThat(result.output).contains(
+      "Relocator count: 6.",
+    )
   }
 
   @Issue(
@@ -345,9 +351,9 @@ class RelocationTest : BasePluginTest() {
     @JvmStatic
     fun prefixProvider() = listOf(
       // The default values.
-      arrayOf(ShadowBasePlugin.SHADOW),
-      arrayOf("new.pkg"),
-      arrayOf("new/path"),
+      Arguments.of(ShadowBasePlugin.SHADOW),
+      Arguments.of("new.pkg"),
+      Arguments.of("new/path"),
     )
   }
 }

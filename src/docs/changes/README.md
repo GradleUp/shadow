@@ -10,6 +10,7 @@
 **Changed**
 
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
+- Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 
 **Removed**
 
