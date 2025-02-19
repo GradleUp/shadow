@@ -20,7 +20,6 @@ import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
-import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
@@ -54,18 +53,7 @@ public open class ShadowCopyAction(
 
     try {
       zipOutStream.use { zos ->
-        stream.process(
-          StreamAction(
-            zos,
-            encoding,
-            transformers,
-            relocators,
-            patternSet,
-            unusedClasses,
-            zipFile,
-            logger,
-          ),
-        )
+        stream.process(StreamAction(zos))
         processTransformers(zos)
       }
     } catch (e: Exception) {
@@ -92,13 +80,6 @@ public open class ShadowCopyAction(
 
   private inner class StreamAction(
     private val zipOutStr: ZipOutputStream,
-    encoding: String?,
-    private val transformers: Set<Transformer>,
-    private val relocators: Set<Relocator>,
-    private val patternSet: PatternSet,
-    private val unusedClasses: Set<String>,
-    private val zipFile: File,
-    private val logger: Logger,
   ) : CopyActionProcessingStreamAction {
     private val remapper = RelocatorRemapper(relocators)
 

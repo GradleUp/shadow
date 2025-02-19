@@ -207,7 +207,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    assertThat(runWithFailure(shadowJarTask)).all {
+    val result = runWithFailure(shadowJarTask)
+
+    assertThat(result).all {
       taskOutcomeEquals(shadowJarTask, FAILED)
       transform { it.output }.containsMatch(outputRegex.toRegex())
     }
