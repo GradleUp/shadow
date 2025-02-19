@@ -68,9 +68,9 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     val assertions = { variantAttrs: Array<Pair<String, String>>? ->
-      assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar"))
-      assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-      val gmm = gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module"))
+      assertShadowJarCommon(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar"))
+      assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
+      val gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module"))
       if (variantAttrs == null) {
         assertShadowVariantCommon(gmm)
       } else {
@@ -135,9 +135,9 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("shadow/maven/1.0/maven-1.0.jar"))
-    assertPomCommon(repoPath("shadow/maven/1.0/maven-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven/1.0/maven-1.0.module")))
+    assertShadowJarCommon(repoJarPath("my/maven/1.0/maven-1.0.jar"))
+    assertPomCommon(repoPath("my/maven/1.0/maven-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")))
   }
 
   @ParameterizedTest
@@ -195,9 +195,9 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext"))
-    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
+    assertShadowJarCommon(repoJarPath("my/maven-all/1.0/maven-all-1.0-my-classifier.my-ext"))
+    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")))
   }
 
   @Test
@@ -241,7 +241,7 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertThat(repoJarPath("shadow/maven-all/1.0/maven-all-1.0.jar")).useAll {
+    assertThat(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar")).useAll {
       containsEntries(
         "aa.properties",
         "aa2.properties",
@@ -249,8 +249,8 @@ class PublishingTest : BasePluginTest() {
       val entries = entriesInAB + "bb.properties"
       doesNotContainEntries(*entries)
     }
-    assertPomCommon(repoPath("shadow/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("shadow/maven-all/1.0/maven-all-1.0.module")))
+    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")))
   }
 
   @Test

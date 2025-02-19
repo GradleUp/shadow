@@ -111,7 +111,7 @@ class JavaPluginTest : BasePluginTest() {
          implementation 'junit:junit:3.8.2'
         }
         $shadowJar {
-          archiveBaseName = 'shadow'
+          archiveBaseName = 'fat'
           archiveClassifier = ''
           archiveVersion = ''
         }
@@ -120,7 +120,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    assertThat(jarPath("build/libs/shadow.jar")).useAll {
+    assertThat(jarPath("build/libs/fat.jar")).useAll {
       containsEntries(
         "my/Passed.class",
         "junit/framework/Test.class",
@@ -521,7 +521,7 @@ class JavaPluginTest : BasePluginTest() {
     val result = run(testShadowJarTask)
 
     assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
-    assertThat(jarPath("build/libs/shadow-1.0-tests.jar")).useAll {
+    assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
       containsEntries(
         "junit/framework/Test.class",
         "my/Main.class",
@@ -529,7 +529,7 @@ class JavaPluginTest : BasePluginTest() {
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
 
-    val pathString = path("build/libs/shadow-1.0-tests.jar").toString()
+    val pathString = path("build/libs/my-1.0-tests.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
     assertThat(runningOutput).contains(
       "Hello, World! (foo) from Main",

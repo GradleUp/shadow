@@ -98,7 +98,7 @@ abstract class BasePluginTest {
 
   val projectScriptPath: Path get() = path("build.gradle")
   val settingsScriptPath: Path get() = path("settings.gradle")
-  open val outputShadowJar: JarPath get() = jarPath("build/libs/shadow-1.0-all.jar")
+  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
   val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   fun getDefaultProjectBuildScript(
@@ -106,7 +106,7 @@ abstract class BasePluginTest {
     withGroup: Boolean = false,
     withVersion: Boolean = false,
   ): String {
-    val groupInfo = if (withGroup) "group = 'shadow'" else ""
+    val groupInfo = if (withGroup) "group = 'my'" else ""
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
@@ -124,7 +124,7 @@ abstract class BasePluginTest {
     // this test, and we won't accidentally use cached outputs from a different test or a different build.
     // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
     buildCacheBlock: String = "local { directory = file('build-cache') }",
-    endBlock: String = "rootProject.name = 'shadow'",
+    endBlock: String = "rootProject.name = 'my'",
   ): String {
     return """
       $startBlock

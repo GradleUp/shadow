@@ -66,7 +66,7 @@ class TransformersTest : BaseTransformerTest() {
 
     commonAssertions()
 
-    val mf = jarPath("build/libs/shadow-1.0.jar").use { it.manifest }
+    val mf = jarPath("build/libs/my-1.0.jar").use { it.manifest }
     assertThat(mf).isNotNull()
     assertThat(mf.mainAttributes.getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("FAILED")
     assertThat(mf.mainAttributes.getValue(mainClassAttributeKey)).isEqualTo("my.Main")
