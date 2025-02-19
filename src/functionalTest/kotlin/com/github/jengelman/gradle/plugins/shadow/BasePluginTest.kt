@@ -57,19 +57,19 @@ abstract class BasePluginTest {
     )
     localRepo.module("junit", "junit", "3.8.2") {
       useJar(junitJar)
-    }.module("shadow", "a", "1.0") {
+    }.module("my", "a", "1.0") {
       buildJar {
         insert("a.properties", "a")
         insert("a2.properties", "a2")
       }
-    }.module("shadow", "b", "1.0") {
+    }.module("my", "b", "1.0") {
       buildJar {
         insert("b.properties", "b")
       }
     }.publish()
 
-    artifactAJar = path("shadow/a/1.0/a-1.0.jar", parent = localRepo.root)
-    artifactBJar = path("shadow/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
+    artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
     entriesInA = arrayOf("a.properties", "a2.properties")
     entriesInB = arrayOf("b.properties")
     entriesInAB = entriesInA + entriesInB
@@ -98,7 +98,7 @@ abstract class BasePluginTest {
 
   val projectScriptPath: Path get() = path("build.gradle")
   val settingsScriptPath: Path get() = path("settings.gradle")
-  open val outputShadowJar: JarPath get() = jarPath("build/libs/shadow-1.0-all.jar")
+  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
   val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   fun getDefaultProjectBuildScript(
@@ -106,7 +106,7 @@ abstract class BasePluginTest {
     withGroup: Boolean = false,
     withVersion: Boolean = false,
   ): String {
-    val groupInfo = if (withGroup) "group = 'shadow'" else ""
+    val groupInfo = if (withGroup) "group = 'my'" else ""
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
@@ -124,7 +124,7 @@ abstract class BasePluginTest {
     // this test, and we won't accidentally use cached outputs from a different test or a different build.
     // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
     buildCacheBlock: String = "local { directory = file('build-cache') }",
-    endBlock: String = "rootProject.name = 'shadow'",
+    endBlock: String = "rootProject.name = 'my'",
   ): String {
     return """
       $startBlock
@@ -173,31 +173,32 @@ abstract class BasePluginTest {
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.module("shadow", "c", "1.0") {
+    localRepo.module("my", "c", "1.0") {
       buildJar {
         insert("c.properties", "c")
       }
       if (circular) {
-        addDependency("shadow", "d", "1.0")
+        addDependency("my", "d", "1.0")
       }
-    }.module("shadow", "d", "1.0") {
+    }.module("my", "d", "1.0") {
       buildJar {
         insert("d.properties", "d")
       }
-      addDependency("shadow", "c", "1.0")
+      addDependency("my", "c", "1.0")
     }.publish()
   }
 
   fun writeMainClass(
     sourceSet: String = "main",
+    packageName: String = "my",
     withImports: Boolean = false,
     className: String = "Main",
   ) {
     val imports = if (withImports) "import junit.framework.Test;" else ""
     val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-    path("src/$sourceSet/java/shadow/$className.java").writeText(
+    path("src/$sourceSet/java/$packageName/$className.java").writeText(
       """
-        package shadow;
+        package $packageName;
         $imports
         public class $className {
           public static void main(String[] args) {

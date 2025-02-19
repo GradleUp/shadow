@@ -22,7 +22,7 @@ class RelocationCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "junit/framework/Test.class",
       )
     }
@@ -37,7 +37,7 @@ class RelocationCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "foo/junit/framework/Test.class",
       )
       doesNotContainEntries(

@@ -24,8 +24,8 @@ class FilteringTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          implementation 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
       """.trimIndent() + System.lineSeparator(),
     )
@@ -76,11 +76,11 @@ class FilteringTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:d:1.0'
+          implementation 'my:d:1.0'
         }
         $shadowJar {
           dependencies {
-            exclude(dependency('shadow:d:.*'))
+            exclude(dependency('my:d:.*'))
           }
         }
       """.trimIndent(),
@@ -100,7 +100,7 @@ class FilteringTest : BasePluginTest() {
     commonAssertions()
 
     val replaced = projectScriptPath.readText()
-      .replace("exclude(dependency('shadow:d:1.0'))", "exclude(dependency('shadow:c:1.0'))")
+      .replace("exclude(dependency('my:d:1.0'))", "exclude(dependency('my:c:1.0'))")
     projectScriptPath.writeText(replaced)
     val result = run(shadowJarTask)
 
@@ -123,7 +123,7 @@ class FilteringTest : BasePluginTest() {
     commonAssertions()
 
     val replaced = projectScriptPath.readText()
-      .replace("exclude(dependency('shadow:d:1.0'))", "exclude 'a.properties'")
+      .replace("exclude(dependency('my:d:1.0'))", "exclude 'a.properties'")
     projectScriptPath.writeText(replaced)
 
     val result = run(shadowJarTask)
@@ -147,18 +147,18 @@ class FilteringTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:d:1.0'
+          implementation 'my:d:1.0'
         }
         $shadowJar {
           dependencies {
-            include(dependency('shadow:d:1.0'))
+            include(dependency('my:d:1.0'))
           }
         }
       """.trimIndent(),
     )
-    path("src/main/java/shadow/Passed.java").writeText(
+    path("src/main/java/my/Passed.java").writeText(
       """
-        package shadow;
+        package my;
         public class Passed {}
       """.trimIndent(),
     )
@@ -168,7 +168,7 @@ class FilteringTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "d.properties",
-        "shadow/Passed.class",
+        "my/Passed.class",
       )
       val entries = entriesInAB + "c.properties"
       doesNotContainEntries(*entries)
@@ -260,11 +260,11 @@ class FilteringTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:d:1.0'
+          implementation 'my:d:1.0'
         }
         $shadowJar {
           dependencies {
-            exclude(dependency('shadow:d:1.0'))
+            exclude(dependency('my:d:1.0'))
           }
         }
       """.trimIndent(),

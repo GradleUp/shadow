@@ -28,7 +28,7 @@ class TransformersTest : BaseTransformerTest() {
       """
         jar {
           manifest {
-            attributes '$mainClassAttributeKey': 'shadow.Main'
+            attributes '$mainClassAttributeKey': 'my.Main'
             attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
           }
         }
@@ -39,7 +39,7 @@ class TransformersTest : BaseTransformerTest() {
 
     commonAssertions {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
-      assertThat(getValue(mainClassAttributeKey)).isEqualTo("shadow.Main")
+      assertThat(getValue(mainClassAttributeKey)).isEqualTo("my.Main")
     }
   }
 
@@ -66,10 +66,10 @@ class TransformersTest : BaseTransformerTest() {
 
     commonAssertions()
 
-    val mf = jarPath("build/libs/shadow-1.0.jar").use { it.manifest }
+    val mf = jarPath("build/libs/my-1.0.jar").use { it.manifest }
     assertThat(mf).isNotNull()
     assertThat(mf.mainAttributes.getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("FAILED")
-    assertThat(mf.mainAttributes.getValue(mainClassAttributeKey)).isEqualTo("shadow.Main")
+    assertThat(mf.mainAttributes.getValue(mainClassAttributeKey)).isEqualTo("my.Main")
     assertThat(mf.mainAttributes.getValue(NEW_ENTRY_ATTR_KEY)).isNull()
   }
 
@@ -108,8 +108,8 @@ class TransformersTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          implementation 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
         $shadowJar {
           // Use NoOpTransformer to mock a custom transformer here.
@@ -135,8 +135,8 @@ class TransformersTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'shadow:a:1.0'
-          implementation 'shadow:b:1.0'
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
         $shadowJar {
           transform(${transformer.java.name}) $configuration
@@ -154,7 +154,7 @@ class TransformersTest : BaseTransformerTest() {
   private fun commonAssertions(
     mainAttributesBlock: Attributes.() -> Unit = {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
-      assertThat(getValue(mainClassAttributeKey)).isEqualTo("shadow.Main")
+      assertThat(getValue(mainClassAttributeKey)).isEqualTo("my.Main")
       assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
     },
   ) {
@@ -170,7 +170,7 @@ class TransformersTest : BaseTransformerTest() {
     val MANIFEST_ATTRS = """
         jar {
           manifest {
-            attributes '$mainClassAttributeKey': 'shadow.Main'
+            attributes '$mainClassAttributeKey': 'my.Main'
             attributes '$TEST_ENTRY_ATTR_KEY': 'FAILED'
           }
         }
