@@ -84,7 +84,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      val entries = entriesInAB + arrayOf("shadow/Main.class", "shadow/Main2.class")
+      val entries = entriesInAB + arrayOf("my/Main.class", "my/Main2.class")
       containsEntries(*entries)
     }
 
@@ -98,8 +98,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "shadow/Main.class",
-        "shadow/Main2.class",
+        "my/Main.class",
+        "my/Main2.class",
       )
       doesNotContainEntries(*entriesInAB)
     }
@@ -107,17 +107,17 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          include 'shadow/Main.class'
+          include 'my/Main.class'
         }
       """.trimIndent() + System.lineSeparator(),
     )
 
     assertCompositeExecutions {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
       )
       doesNotContainEntries(
-        "shadow/Main2.class",
+        "my/Main2.class",
         "a.properties",
         "a2.properties",
         "b.properties",
@@ -127,15 +127,15 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          include 'shadow/Main2.class'
+          include 'my/Main2.class'
         }
       """.trimIndent() + System.lineSeparator(),
     )
 
     assertCompositeExecutions {
       containsEntries(
-        "shadow/Main.class",
-        "shadow/Main2.class",
+        "my/Main.class",
+        "my/Main2.class",
       )
       doesNotContainEntries(*entriesInAB)
     }
@@ -154,7 +154,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "junit/framework/Test.class",
       )
     }
@@ -171,7 +171,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
       )
       doesNotContainEntries(
         "junit/framework/Test.class",

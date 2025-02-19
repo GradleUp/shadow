@@ -83,7 +83,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "junit/framework/Test.class",
       )
     }
@@ -512,7 +512,7 @@ class JavaPluginTest : BasePluginTest() {
           from sourceSets.test.output
           configurations = [project.configurations.testRuntimeClasspath]
           manifest {
-            attributes '$mainClassAttributeKey': 'shadow.Main'
+            attributes '$mainClassAttributeKey': 'my.Main'
           }
         }
       """.trimIndent(),
@@ -524,7 +524,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(jarPath("build/libs/shadow-1.0-tests.jar")).useAll {
       containsEntries(
         "junit/framework/Test.class",
-        "shadow/Main.class",
+        "my/Main.class",
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
@@ -617,7 +617,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
       containsEntries(
-        "shadow/Main.class",
+        "my/Main.class",
         "junit/framework/Test.class",
       )
     }

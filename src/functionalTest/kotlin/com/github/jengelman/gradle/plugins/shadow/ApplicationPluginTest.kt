@@ -73,7 +73,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     commonAssertions(
       jarPath("myapp-shadow/lib/myapp-1.0-all.jar", installPath),
-      entriesContained = arrayOf("shadow/Main.class", "junit/framework/Test.class"),
+      entriesContained = arrayOf("my/Main.class", "junit/framework/Test.class"),
     )
 
     val unixScript = path("myapp-shadow/bin/myapp", installPath)
@@ -119,7 +119,7 @@ class ApplicationPluginTest : BasePluginTest() {
       projectBlock = """
         shadowJar {
           manifest {
-            attributes '$mainClassAttributeKey': 'shadow.Main2'
+            attributes '$mainClassAttributeKey': 'my.Main2'
           }
         }
       """.trimIndent(),
@@ -135,8 +135,8 @@ class ApplicationPluginTest : BasePluginTest() {
     assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
-      entriesContained = entriesInA + arrayOf("shadow/Main.class", "shadow/Main2.class"),
-      mainClassAttr = "shadow.Main2",
+      entriesContained = entriesInA + arrayOf("my/Main.class", "my/Main2.class"),
+      mainClassAttr = "my.Main2",
     )
 
     projectScriptPath.appendText(
@@ -222,7 +222,7 @@ class ApplicationPluginTest : BasePluginTest() {
         apply plugin: 'application'
         $projectBlock
         application {
-          mainClass = 'shadow.Main'
+          mainClass = 'my.Main'
           $applicationBlock
         }
         dependencies {
@@ -244,8 +244,8 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private fun commonAssertions(
     jarPath: JarPath,
-    entriesContained: Array<String> = entriesInA + "shadow/Main.class",
-    mainClassAttr: String = "shadow.Main",
+    entriesContained: Array<String> = entriesInA + "my/Main.class",
+    mainClassAttr: String = "my.Main",
     classPathAttr: String? = null,
   ) {
     assertThat(jarPath).useAll {
