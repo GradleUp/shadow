@@ -41,13 +41,11 @@ public open class AppendingTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    context.inputStream.use {
-      if (data.size() > 0) {
-        // Append the separator before the new content to ensure the separator is not at the end of the file.
-        data.write(separator.get().toByteArray())
-      }
-      it.copyTo(data)
+    if (data.size() > 0) {
+      // Append the separator before the new content to ensure the separator is not at the end of the file.
+      data.write(separator.get().toByteArray())
     }
+    context.inputStream.copyTo(data)
   }
 
   override fun hasTransformedResource(): Boolean {

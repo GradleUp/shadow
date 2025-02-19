@@ -37,11 +37,9 @@ public open class ManifestAppenderTransformer @Inject constructor(
   override fun transform(context: TransformerContext) {
     if (manifestContents.isEmpty()) {
       try {
-        context.inputStream.use { inputStream ->
-          val outputStream = ByteArrayOutputStream()
-          inputStream.copyTo(outputStream)
-          manifestContents = outputStream.toByteArray()
-        }
+        val outputStream = ByteArrayOutputStream()
+        context.inputStream.copyTo(outputStream)
+        manifestContents = outputStream.toByteArray()
       } catch (e: IOException) {
         logger.warn("Failed to read MANIFEST.MF", e)
       }

@@ -41,11 +41,7 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
   override fun transform(context: TransformerContext) {
     val temporaryFile = createTempFile("Log4j2Plugins", ".dat")
     tempFiles.add(temporaryFile)
-    val fos = temporaryFile.outputStream()
-    context.inputStream.use {
-      it.copyTo(fos)
-    }
-
+    context.inputStream.copyTo(temporaryFile.outputStream())
     tempRelocators.addAll(context.relocators)
   }
 
