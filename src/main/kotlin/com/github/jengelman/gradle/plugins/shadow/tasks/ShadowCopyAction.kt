@@ -36,12 +36,12 @@ public open class ShadowCopyAction(
   private val zipFile: File,
   private val compressor: ZipCompressor,
   private val documentationRegistry: DocumentationRegistry,
-  private val encoding: String?,
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
+  private val unusedClasses: Set<String>,
   private val patternSet: PatternSet,
   private val preserveFileTimestamps: Boolean,
-  private val unusedClasses: Set<String>,
+  private val encoding: String?,
 ) : CopyAction {
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {

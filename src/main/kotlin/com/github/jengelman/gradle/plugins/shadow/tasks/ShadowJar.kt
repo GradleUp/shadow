@@ -285,12 +285,12 @@ public abstract class ShadowJar :
       archiveFile.get().asFile,
       internalCompressor,
       documentationRegistry,
-      metadataCharset,
       transformers.get(),
       relocators.get() + packageRelocators,
+      unusedClasses,
       rootPatternSet,
       isPreserveFileTimestamps,
-      unusedClasses,
+      metadataCharset,
     )
   }
 
