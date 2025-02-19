@@ -347,6 +347,17 @@ abstract class BasePluginTest {
     }
 
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
+    val junitEntries: Array<String> = arrayOf(
+      "junit/awtui/TestRunner.class",
+      "junit/extensions/TestSetup.class",
+      "junit/framework/TestResult\$1.class",
+      "junit/framework/TestResult.class",
+      "junit/framework/TestSuite\$1.class",
+      "junit/framework/TestSuite.class",
+      "junit/runner/BaseTestRunner.class",
+      "junit/swingui/TestRunner.class",
+      "junit/textui/TestRunner.class",
+    )
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})

@@ -34,21 +34,6 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    val junitEntries = arrayOf(
-      "junit/textui/ResultPrinter.class",
-      "junit/textui/TestRunner.class",
-      "junit/framework/Assert.class",
-      "junit/framework/AssertionFailedError.class",
-      "junit/framework/ComparisonCompactor.class",
-      "junit/framework/ComparisonFailure.class",
-      "junit/framework/Protectable.class",
-      "junit/framework/Test.class",
-      "junit/framework/TestCase.class",
-      "junit/framework/TestFailure.class",
-      "junit/framework/TestListener.class",
-      "junit/framework/TestResult.class",
-      "junit/framework/TestSuite.class",
-    )
     val entryPrefix = relocationPrefix.replace('.', '/')
 
     run(shadowJarTask)
@@ -79,12 +64,12 @@ class RelocationTest : BasePluginTest() {
         $shadowJar {
           relocate 'junit.textui', 'a'
           relocate 'junit.framework', 'b'
-          manifest {
-            attributes 'TEST-VALUE': 'FOO'
-          }
         }
       """.trimIndent(),
     )
+    val otherJunitEntries = junitEntries.filterNot {
+      it.startsWith("junit/textui") || it.startsWith("junit/framework")
+    }.toTypedArray()
 
     run(shadowJarTask)
 
@@ -106,6 +91,7 @@ class RelocationTest : BasePluginTest() {
         "b/TestResult.class",
         "b/TestSuite\$1.class",
         "b/TestSuite.class",
+        *otherJunitEntries,
       )
       doesNotContainEntries(
         "junit/textui/ResultPrinter.class",
@@ -123,6 +109,8 @@ class RelocationTest : BasePluginTest() {
         "junit/framework/TestResult.class",
         "junit/framework/TestSuite\$1.class",
         "junit/framework/TestSuite.class",
+        *otherJunitEntries.map { "a/$it" }.toTypedArray(),
+        *otherJunitEntries.map { "b/$it" }.toTypedArray(),
       )
       getMainAttr("TEST-VALUE").isEqualTo("FOO")
     }
