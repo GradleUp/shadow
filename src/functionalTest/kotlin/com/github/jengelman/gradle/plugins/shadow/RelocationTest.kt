@@ -14,11 +14,15 @@ import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
-  @Test
-  fun defaultEnableRelocation() {
+  @ParameterizedTest
+  @MethodSource("prefixProvider")
+  fun defaultEnableRelocation(relocationPrefix: String) {
+    writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -26,30 +30,38 @@ class RelocationTest : BasePluginTest() {
         }
         $shadowJar {
           enableRelocation = true
+          relocationPrefix = '$relocationPrefix'
         }
       """.trimIndent(),
     )
+    val junitEntries = arrayOf(
+      "junit/textui/ResultPrinter.class",
+      "junit/textui/TestRunner.class",
+      "junit/framework/Assert.class",
+      "junit/framework/AssertionFailedError.class",
+      "junit/framework/ComparisonCompactor.class",
+      "junit/framework/ComparisonFailure.class",
+      "junit/framework/Protectable.class",
+      "junit/framework/Test.class",
+      "junit/framework/TestCase.class",
+      "junit/framework/TestFailure.class",
+      "junit/framework/TestListener.class",
+      "junit/framework/TestResult.class",
+      "junit/framework/TestSuite.class",
+    )
+    val entryPrefix = relocationPrefix.replace('.', '/')
 
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "META-INF/MANIFEST.MF",
-        "shadow/junit/textui/ResultPrinter.class",
-        "shadow/junit/textui/TestRunner.class",
-        "shadow/junit/framework/Assert.class",
-        "shadow/junit/framework/AssertionFailedError.class",
-        "shadow/junit/framework/ComparisonCompactor.class",
-        "shadow/junit/framework/ComparisonFailure.class",
-        "shadow/junit/framework/Protectable.class",
-        "shadow/junit/framework/Test.class",
-        "shadow/junit/framework/TestCase.class",
-        "shadow/junit/framework/TestFailure.class",
-        "shadow/junit/framework/TestListener.class",
-        "shadow/junit/framework/TestResult$1.class",
-        "shadow/junit/framework/TestResult.class",
-        "shadow/junit/framework/TestSuite$1.class",
-        "shadow/junit/framework/TestSuite.class",
+        "my/Main.class",
+        *junitEntries.map { "$entryPrefix/$it" }.toTypedArray(),
+      )
+      doesNotContainEntries(
+        "$entryPrefix/my/Main.class",
+        *junitEntries,
       )
     }
   }
@@ -359,5 +371,15 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
     // No exception should be thrown
+  }
+
+  private companion object {
+    @JvmStatic
+    fun prefixProvider() = listOf(
+      // The default values.
+      arrayOf(ShadowBasePlugin.SHADOW),
+      arrayOf("new.pkg"),
+      arrayOf("new/path"),
+    )
   }
 }
