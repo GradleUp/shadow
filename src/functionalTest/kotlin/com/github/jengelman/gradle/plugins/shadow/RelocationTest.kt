@@ -16,6 +16,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.opentest4j.AssertionFailedError
 
@@ -350,9 +351,9 @@ class RelocationTest : BasePluginTest() {
     @JvmStatic
     fun prefixProvider() = listOf(
       // The default values.
-      arrayOf(ShadowBasePlugin.SHADOW),
-      arrayOf("new.pkg"),
-      arrayOf("new/path"),
+      Arguments.of(ShadowBasePlugin.SHADOW),
+      Arguments.of("new.pkg"),
+      Arguments.of("new/path"),
     )
   }
 }
