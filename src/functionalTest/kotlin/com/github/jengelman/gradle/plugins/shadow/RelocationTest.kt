@@ -186,14 +186,16 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+    val mappedJunitEntries = junitEntries
+      .map {
+        it.replace("junit/framework", "shadow/junit")
+      }.toTypedArray()
 
     path("src/main/java/my/MyTest.java").writeText(
       """
         package my;
-
         import junit.framework.Test;
         import junit.framework.TestResult;
-
         public class MyTest implements Test {
           public int countTestCases() { return 0; }
           public void run(TestResult result) { }
@@ -206,12 +208,11 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsEntries(
         "my/MyTest.class",
-        "shadow/junit/Test.class",
-        "shadow/junit",
+        *mappedJunitEntries,
       )
       doesNotContainEntries(
         "junit/framework",
-        "junit/framework/Test.class",
+        *junitEntries.filter { it.startsWith("junit/framework") }.toTypedArray(),
       )
     }
 

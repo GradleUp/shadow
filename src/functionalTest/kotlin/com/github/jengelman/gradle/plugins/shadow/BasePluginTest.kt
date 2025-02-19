@@ -348,14 +348,20 @@ abstract class BasePluginTest {
 
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
     val junitEntries: Array<String> = arrayOf(
+      "junit/awtui",
       "junit/awtui/TestRunner.class",
+      "junit/extensions",
       "junit/extensions/TestSetup.class",
+      "junit/framework",
       "junit/framework/TestResult\$1.class",
       "junit/framework/TestResult.class",
       "junit/framework/TestSuite\$1.class",
       "junit/framework/TestSuite.class",
+      "junit/runner",
       "junit/runner/BaseTestRunner.class",
+      "junit/swingui",
       "junit/swingui/TestRunner.class",
+      "junit/textui",
       "junit/textui/TestRunner.class",
     )
 
