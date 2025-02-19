@@ -63,7 +63,7 @@ class MinimizeTest : BasePluginTest() {
         "lib/UnusedLibEntity.class",
       )
       doesNotContainEntries(
-        "junit/framework/Test.class",
+        *junitEntries,
       )
     }
   }
@@ -123,7 +123,7 @@ class MinimizeTest : BasePluginTest() {
     assertThat(outputServerShadowJar).useAll {
       containsEntries(
         "server/Server.class",
-        "junit/framework/Test.class",
+        *junitEntries,
       )
       doesNotContainEntries(
         "client/Client.class",
@@ -184,7 +184,7 @@ class MinimizeTest : BasePluginTest() {
       containsEntries(
         "client/Client.class",
         "server/Server.class",
-        "junit/framework/TestCase.class",
+        *junitEntries,
       )
     }
 
@@ -200,7 +200,7 @@ class MinimizeTest : BasePluginTest() {
       containsEntries(
         "client/Client.class",
         "server/Server.class",
-        "junit/framework/TestCase.class",
+        *junitEntries,
       )
     }
   }
