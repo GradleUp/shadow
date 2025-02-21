@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Proxy
 import java.nio.charset.Charset
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
@@ -32,6 +34,13 @@ internal val classPathAttributeKey = JarAttributeName.CLASS_PATH.toString()
  * Known as `Multi-Release` in the manifest file.
  */
 internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString()
+
+internal val noOpHandler = InvocationHandler { _, _, _ -> }
+
+internal inline fun <reified T : Any> noOpDelegate(): T {
+  val javaClass = T::class.java
+  return Proxy.newProxyInstance(javaClass.classLoader, arrayOf(javaClass), noOpHandler) as T
+}
 
 internal inline fun zipEntry(
   name: String,

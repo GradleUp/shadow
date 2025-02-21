@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.noOpDelegate
 import org.gradle.api.file.FileTreeElement
 
 /**
@@ -10,7 +11,7 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ApacheLicenseResourceTransformer : Transformer by NoOpTransformer {
+public open class ApacheLicenseResourceTransformer : Transformer by noOpDelegate() {
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.relativePath.pathString
     return LICENSE_PATH.equals(path, ignoreCase = true) ||

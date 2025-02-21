@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import javax.inject.Inject
 import org.gradle.api.file.FileTreeElement
@@ -18,7 +19,7 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 public open class DontIncludeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer by NoOpTransformer {
+) : Transformer by noOpDelegate() {
   @get:Optional
   @get:Input
   public open val resource: Property<String> = objectFactory.property()
