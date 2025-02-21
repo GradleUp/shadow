@@ -11,6 +11,7 @@
 
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
 - Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
+- **BREAKING CHANGE:** Move `DependencyFilter` from `com.github.jengelman.gradle.plugins.shadow.internal` into `com.github.jengelman.gradle.plugins.shadow.tasks`. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - Handle file unzipping via `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 **Fixed**

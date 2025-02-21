@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.internal
+package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import java.io.Serializable
 import org.gradle.api.artifacts.Configuration
