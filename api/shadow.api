@@ -64,17 +64,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : 
 	public fun apply (Lorg/gradle/api/Project;)V
 }
 
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter : java/io/Serializable {
-	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
-	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
-	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
-	public abstract fun include (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/internal/DependencyFilter;
-	public abstract fun project (Ljava/lang/String;)Lorg/gradle/api/specs/Spec;
-	public abstract fun project (Ljava/util/Map;)Lorg/gradle/api/specs/Spec;
-	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
-	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
-}
-
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor {
 	public abstract fun createArchiveOutputStream (Ljava/io/File;)Lorg/apache/tools/zip/ZipOutputStream;
 }
@@ -166,6 +155,17 @@ public class com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritMani
 	public fun inheritFrom ([Ljava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public fun writeTo (Ljava/lang/Object;)Lorg/gradle/api/java/archives/Manifest;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
+	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
+	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
+	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter;
+	public abstract fun include (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter;
+	public abstract fun project (Ljava/lang/String;)Lorg/gradle/api/specs/Spec;
+	public abstract fun project (Ljava/util/Map;)Lorg/gradle/api/specs/Spec;
+	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
+	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest : org/gradle/api/java/archives/Manifest {
