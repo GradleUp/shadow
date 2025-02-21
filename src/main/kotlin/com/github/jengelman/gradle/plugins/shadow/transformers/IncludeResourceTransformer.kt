@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import javax.inject.Inject
@@ -22,7 +23,7 @@ import org.gradle.api.tasks.PathSensitivity
 @CacheableTransformer
 public open class IncludeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer by NoOpTransformer {
+) : Transformer by noOpDelegate() {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
   public open val file: RegularFileProperty = objectFactory.fileProperty()

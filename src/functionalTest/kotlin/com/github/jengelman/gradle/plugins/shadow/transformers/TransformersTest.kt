@@ -6,10 +6,12 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import com.github.jengelman.gradle.plugins.shadow.internal.CustomTransformer
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import java.util.jar.Attributes
 import kotlin.io.path.appendText
@@ -112,8 +114,7 @@ class TransformersTest : BaseTransformerTest() {
           implementation 'my:b:1.0'
         }
         $shadowJar {
-          // Use NoOpTransformer to mock a custom transformer here.
-          transform(${NoOpTransformer::class.java.name}.INSTANCE)
+          transform(${CustomTransformer::class.java.name}.INSTANCE)
         }
       """.trimIndent(),
     )
@@ -121,7 +122,7 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(*entriesInAB)
+      doesNotContainEntries(*entriesInAB)
     }
   }
 
