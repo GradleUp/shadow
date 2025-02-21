@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
@@ -34,7 +33,7 @@ import org.objectweb.asm.commons.ClassRemapper
  */
 public open class ShadowCopyAction(
   private val zipFile: File,
-  private val compressor: ZipCompressor,
+  private val zosProvider: (File) -> ZipOutputStream,
   private val documentationRegistry: DocumentationRegistry,
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
@@ -46,7 +45,7 @@ public open class ShadowCopyAction(
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
     val zipOutStream = try {
-      compressor.createArchiveOutputStream(zipFile)
+      zosProvider(zipFile)
     } catch (e: Exception) {
       throw GradleException("Could not create ZIP '$zipFile'.", e)
     }

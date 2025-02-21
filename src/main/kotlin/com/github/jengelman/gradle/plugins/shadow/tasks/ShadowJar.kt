@@ -2,11 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
-import com.github.jengelman.gradle.plugins.shadow.internal.DefaultZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
-import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
@@ -25,8 +23,10 @@ import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
 import kotlin.reflect.full.hasAnnotation
+import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
+import org.gradle.api.UncheckedIOException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DuplicatesStrategy
@@ -108,16 +108,6 @@ public abstract class ShadowJar :
   @get:Internal
   protected open val rootPatternSet: PatternSet
     get() = (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
-
-  @get:Internal
-  protected open val internalCompressor: ZipCompressor
-    get() {
-      return when (entryCompression) {
-        ZipEntryCompression.DEFLATED -> DefaultZipCompressor(isZip64, ZipOutputStream.DEFLATED)
-        ZipEntryCompression.STORED -> DefaultZipCompressor(isZip64, ZipOutputStream.STORED)
-        else -> throw IllegalArgumentException("Unknown Compression type $entryCompression")
-      }
-    }
 
   @get:Nested
   public open val transformers: SetProperty<Transformer> = objectFactory.setProperty()
@@ -270,6 +260,21 @@ public abstract class ShadowJar :
   }
 
   override fun createCopyAction(): CopyAction {
+    val zosProvider = { destination: File ->
+      try {
+        val entryCompressionMethod = when (entryCompression) {
+          ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
+          ZipEntryCompression.STORED -> ZipOutputStream.STORED
+          else -> throw IllegalArgumentException("Unknown Compression type $entryCompression.")
+        }
+        ZipOutputStream(destination).apply {
+          setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
+          setMethod(entryCompressionMethod)
+        }
+      } catch (e: Exception) {
+        throw UncheckedIOException("Unable to create ZIP output stream for file $destination.", e)
+      }
+    }
     val documentationRegistry = services.get(DocumentationRegistry::class.java)
     val unusedClasses = if (minimizeJar.get()) {
       val unusedTracker = UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
@@ -282,7 +287,7 @@ public abstract class ShadowJar :
     }
     return ShadowCopyAction(
       archiveFile.get().asFile,
-      internalCompressor,
+      zosProvider,
       documentationRegistry,
       transformers.get(),
       relocators.get() + packageRelocators,

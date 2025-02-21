@@ -75,10 +75,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/inter
 	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor {
-	public abstract fun createArchiveOutputStream (Ljava/io/File;)Lorg/apache/tools/zip/ZipOutputStream;
-}
-
 public abstract class com/github/jengelman/gradle/plugins/shadow/legacy/LegacyShadowPlugin : org/gradle/api/Plugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -175,7 +171,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
-	public fun <init> (Ljava/io/File;Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;ZLjava/lang/String;)V
+	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;ZLjava/lang/String;)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 
@@ -200,7 +196,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getExcludes ()Ljava/util/Set;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludes ()Ljava/util/Set;
-	protected fun getInternalCompressor ()Lcom/github/jengelman/gradle/plugins/shadow/internal/ZipCompressor;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
