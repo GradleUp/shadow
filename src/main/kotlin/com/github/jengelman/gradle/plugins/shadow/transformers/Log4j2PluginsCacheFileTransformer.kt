@@ -14,7 +14,6 @@ import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 
 /**
  * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java).
@@ -23,7 +22,7 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 @CacheableTransformer
-public open class Log4j2PluginsCacheFileTransformer : Transformer {
+public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
   /**
    * Log4j config files to share across the transformation stages.
    */
@@ -34,8 +33,8 @@ public open class Log4j2PluginsCacheFileTransformer : Transformer {
    */
   private val tempRelocators = mutableListOf<Relocator>()
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return PLUGIN_CACHE_FILE == element.relativePath.pathString
+  override fun canTransformResource(relativePath: String): Boolean {
+    return PLUGIN_CACHE_FILE == relativePath
   }
 
   override fun transform(context: TransformerContext) {

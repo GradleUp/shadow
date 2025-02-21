@@ -7,7 +7,6 @@ import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
@@ -24,14 +23,14 @@ import org.gradle.api.tasks.Input
 @CacheableTransformer
 public open class ManifestAppenderTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private var manifestContents = ByteArray(0)
 
   @get:Input
   public open val attributes: SetProperty<Pair<String, Comparable<*>>> = objectFactory.setProperty()
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
+  override fun canTransformResource(relativePath: String): Boolean {
+    return MANIFEST_NAME.equals(relativePath, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {

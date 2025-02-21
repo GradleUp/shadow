@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.gradle.api.file.FileTreeElement
+import com.github.jengelman.gradle.plugins.shadow.internal.noOpDelegate
 
 /**
  * Prevents duplicate copies of the license.
@@ -10,12 +10,11 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ApacheLicenseResourceTransformer : Transformer by NoOpTransformer {
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
-    return LICENSE_PATH.equals(path, ignoreCase = true) ||
-      LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true) ||
-      LICENSE_MD_PATH.regionMatches(0, path, 0, LICENSE_MD_PATH.length, ignoreCase = true)
+public open class ApacheLicenseResourceTransformer : ResourceTransformer by noOpDelegate() {
+  override fun canTransformResource(relativePath: String): Boolean {
+    return LICENSE_PATH.equals(relativePath, ignoreCase = true) ||
+      LICENSE_TXT_PATH.regionMatches(0, relativePath, 0, LICENSE_TXT_PATH.length, ignoreCase = true) ||
+      LICENSE_MD_PATH.regionMatches(0, relativePath, 0, LICENSE_MD_PATH.length, ignoreCase = true)
   }
 
   private companion object {

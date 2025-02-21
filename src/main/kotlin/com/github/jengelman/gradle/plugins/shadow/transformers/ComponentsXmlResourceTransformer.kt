@@ -11,7 +11,6 @@ import org.codehaus.plexus.util.xml.XmlStreamWriter
 import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
 
 /**
@@ -22,11 +21,11 @@ import org.gradle.api.tasks.Internal
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ComponentsXmlResourceTransformer : Transformer {
+public open class ComponentsXmlResourceTransformer : ResourceTransformer {
   private val components = mutableMapOf<String, Xpp3Dom>()
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return COMPONENTS_XML_PATH == element.relativePath.pathString
+  override fun canTransformResource(relativePath: String): Boolean {
+    return COMPONENTS_XML_PATH == relativePath
   }
 
   override fun transform(context: TransformerContext) {

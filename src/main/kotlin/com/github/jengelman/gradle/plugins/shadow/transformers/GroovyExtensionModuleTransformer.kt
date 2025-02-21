@@ -4,7 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.util.Properties
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 
 /**
  * Aggregate Apache Groovy extension modules descriptors.
@@ -25,7 +24,7 @@ import org.gradle.api.file.FileTreeElement
  * Related to [org.apache.maven.plugins.shade.resource.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
  */
 @CacheableTransformer
-public open class GroovyExtensionModuleTransformer : Transformer {
+public open class GroovyExtensionModuleTransformer : ResourceTransformer {
   private val module = Properties()
 
   /**
@@ -33,14 +32,13 @@ public open class GroovyExtensionModuleTransformer : Transformer {
    */
   private var legacy = true
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
-    if (path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) {
+  override fun canTransformResource(relativePath: String): Boolean {
+    if (relativePath == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) {
       // Groovy 2.5+
       legacy = false
       return true
     }
-    return path == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+    return relativePath == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
   }
 
   override fun transform(context: TransformerContext) {

@@ -367,6 +367,15 @@ abstract class BasePluginTest {
       "--stacktrace",
     )
 
+    val customTransformer = """
+      class CustomTransformer : ${Transformer::class.java.name} {
+        boolean canTransformResource(FileTreeElement element) { return true }
+        void transform(TransformerContext context) {}
+        boolean hasTransformedResource() { return true }
+        void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {}
+      }
+    """.trimIndent()
+
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
