@@ -145,9 +145,9 @@ class TransformerCachingTest : BaseCachingTest() {
 
     projectScriptPath.appendText(
       """
+        $customTransformer
         $shadowJar {
-          // Use NoOpTransformer to mock a custom transformer here, it's not cacheable.
-          transform(${NoOpTransformer::class.java.name}.INSTANCE)
+          transform(CustomTransformer)
         }
       """.trimIndent(),
     )
