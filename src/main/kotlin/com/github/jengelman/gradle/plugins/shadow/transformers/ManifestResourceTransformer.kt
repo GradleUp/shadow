@@ -9,7 +9,6 @@ import java.util.jar.JarFile
 import java.util.jar.Manifest
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -30,7 +29,7 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 public open class ManifestResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
@@ -42,9 +41,8 @@ public open class ManifestResourceTransformer @Inject constructor(
   @get:Input
   public open val manifestEntries: MapProperty<String, Attributes> = objectFactory.mapProperty()
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
-    return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
+  override fun canTransformResource(relativePath: String): Boolean {
+    return JarFile.MANIFEST_NAME.equals(relativePath, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {

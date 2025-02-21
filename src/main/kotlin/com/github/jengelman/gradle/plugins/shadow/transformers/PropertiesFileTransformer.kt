@@ -12,7 +12,6 @@ import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -101,7 +100,7 @@ import org.gradle.api.tasks.Internal
 @CacheableTransformer
 public open class PropertiesFileTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private inline val charset get() = Charset.forName(charsetName.get())
 
   @get:Internal
@@ -125,20 +124,19 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Internal // TODO: should be @Input, but it can't be serialized, see https://github.com/GradleUp/shadow/pull/1208.
   public open var keyTransformer: (String) -> String = IDENTITY
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
+  override fun canTransformResource(relativePath: String): Boolean {
     val mappings = mappings.get()
     val paths = paths.get()
 
-    val path = element.relativePath.pathString
-    if (path in mappings) return true
+    if (relativePath in mappings) return true
     for (key in mappings.keys) {
-      if (key.toRegex().containsMatchIn(path)) return true
+      if (key.toRegex().containsMatchIn(relativePath)) return true
     }
-    if (path in paths) return true
+    if (relativePath in paths) return true
     for (p in paths) {
-      if (p.toRegex().containsMatchIn(path)) return true
+      if (p.toRegex().containsMatchIn(relativePath)) return true
     }
-    return mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
+    return mappings.isEmpty() && paths.isEmpty() && relativePath.endsWith(PROPERTIES_SUFFIX)
   }
 
   override fun transform(context: TransformerContext) {

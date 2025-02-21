@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -22,7 +21,7 @@ import org.gradle.api.tasks.Optional
 @Suppress("ktlint:standard:backing-property-naming")
 public open class AppendingTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   /**
    * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
    */
@@ -36,8 +35,8 @@ public open class AppendingTransformer @Inject constructor(
   @get:Input
   public open val separator: Property<String> = objectFactory.property(DEFAULT_SEPARATOR)
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.orNull.equals(element.relativePath.pathString, ignoreCase = true)
+  override fun canTransformResource(relativePath: String): Boolean {
+    return resource.orNull.equals(relativePath, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {

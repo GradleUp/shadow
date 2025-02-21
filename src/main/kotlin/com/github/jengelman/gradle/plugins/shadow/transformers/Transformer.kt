@@ -55,6 +55,14 @@ public interface Transformer : Named {
   }
 }
 
+public interface ResourceTransformer : Transformer {
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return canTransformResource(element.relativePath.pathString)
+  }
+
+  public fun canTransformResource(relativePath: String): Boolean
+}
+
 /**
  * Marks that a given instance of [Transformer] is compatible with the Gradle build cache.
  * In other words, it has its appropriate inputs annotated so that Gradle can consider them when
@@ -65,10 +73,3 @@ public interface Transformer : Named {
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 public annotation class CacheableTransformer
-
-public object NoOpTransformer : Transformer {
-  public override fun canTransformResource(element: FileTreeElement): Boolean = false
-  public override fun transform(context: TransformerContext): Unit = Unit
-  public override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean): Unit = Unit
-  public override fun hasTransformedResource(): Boolean = false
-}

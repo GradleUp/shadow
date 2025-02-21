@@ -6,7 +6,6 @@ import java.io.IOException
 import java.io.StringReader
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -30,7 +29,7 @@ import org.xml.sax.InputSource
 @CacheableTransformer
 public open class XmlAppendingTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private var doc: Document? = null
 
   @get:Input
@@ -40,8 +39,8 @@ public open class XmlAppendingTransformer @Inject constructor(
   @get:Input
   public open val resource: Property<String> = objectFactory.property()
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.orNull?.equals(element.relativePath.pathString, ignoreCase = true) == true
+  override fun canTransformResource(relativePath: String): Boolean {
+    return resource.orNull?.equals(relativePath, ignoreCase = true) == true
   }
 
   override fun transform(context: TransformerContext) {
