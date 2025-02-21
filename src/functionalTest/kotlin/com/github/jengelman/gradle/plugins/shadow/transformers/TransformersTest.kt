@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import com.github.jengelman.gradle.plugins.shadow.internal.CustomTransformer
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -111,9 +112,8 @@ class TransformersTest : BaseTransformerTest() {
           implementation 'my:a:1.0'
           implementation 'my:b:1.0'
         }
-        $customTransformer
         $shadowJar {
-          transform(CustomTransformer)
+          transform(${CustomTransformer::class.java.name}.INSTANCE)
         }
       """.trimIndent(),
     )

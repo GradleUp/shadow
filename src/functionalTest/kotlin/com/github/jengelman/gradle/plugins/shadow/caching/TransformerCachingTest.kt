@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.internal.CustomTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
@@ -144,9 +145,8 @@ class TransformerCachingTest : BaseCachingTest() {
 
     projectScriptPath.appendText(
       """
-        $customTransformer
         $shadowJar {
-          transform(CustomTransformer)
+          transform(${CustomTransformer::class.java.name}.INSTANCE)
         }
       """.trimIndent(),
     )

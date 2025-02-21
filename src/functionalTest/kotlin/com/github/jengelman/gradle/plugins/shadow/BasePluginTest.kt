@@ -11,7 +11,6 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.io.Closeable
@@ -29,8 +28,6 @@ import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
@@ -369,15 +366,6 @@ abstract class BasePluginTest {
       "--build-cache",
       "--stacktrace",
     )
-
-    val customTransformer = """
-      class CustomTransformer implements ${Transformer::class.java.name} {
-        boolean canTransformResource(${FileTreeElement::class.java.name} element) { return true }
-        void transform(${TransformerContext::class.java.name} context) {}
-        boolean hasTransformedResource() { return true }
-        void modifyOutputStream(${ZipOutputStream::class.java.name} os, boolean preserveFileTimestamps) {}
-      }
-    """.trimIndent()
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
