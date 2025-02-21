@@ -48,7 +48,6 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
-import org.gradle.api.tasks.util.PatternSet
 
 @CacheableTask
 public abstract class ShadowJar :
@@ -104,10 +103,6 @@ public abstract class ShadowJar :
       }
     }
   }
-
-  @get:Internal
-  protected open val rootPatternSet: PatternSet
-    get() = (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet
 
   @get:Nested
   public open val transformers: SetProperty<Transformer> = objectFactory.setProperty()
@@ -292,7 +287,7 @@ public abstract class ShadowJar :
       transformers.get(),
       relocators.get() + packageRelocators,
       unusedClasses,
-      rootPatternSet,
+      (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet,
       isPreserveFileTimestamps,
       metadataCharset,
     )
