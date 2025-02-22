@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -42,8 +41,7 @@ public open class ServiceFileTransformer(
     }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val target = if (element is ShadowCopyAction.ArchiveFileTreeElement) element.asFileTreeElement() else element
-    return patternSet.asSpec.isSatisfiedBy(target)
+    return patternSet.asSpec.isSatisfiedBy(element)
   }
 
   override fun transform(context: TransformerContext) {

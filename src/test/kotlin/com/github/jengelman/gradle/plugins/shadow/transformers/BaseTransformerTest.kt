@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.createDefaultFileTreeElement
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
+import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
@@ -11,6 +11,7 @@ import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
 
@@ -31,8 +32,10 @@ abstract class BaseTransformerTest<T : Transformer> {
   protected companion object {
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
 
-    fun Transformer.canTransformResource(path: String): Boolean {
-      val element = createDefaultFileTreeElement(relativePath = RelativePath.parse(true, path))
+    fun Transformer.canTransformResource(path: String, isFile: Boolean = true): Boolean {
+      val element = object : FileTreeElement by noOpDelegate() {
+        override fun getRelativePath(): RelativePath = RelativePath.parse(isFile, path)
+      }
       return canTransformResource(element)
     }
 
