@@ -6,7 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import java.io.InputStream
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
 import org.apache.tools.zip.UnixStat
@@ -100,12 +99,10 @@ public open class ShadowCopyAction(
       if (path.endsWith(".class")) {
         if (isUnused(path)) return
         if (relocators.isEmpty()) {
-          fileDetails.writeToZip()
+          fileDetails.writeToZip(path)
           return
         }
-        fileDetails.file.inputStream().use { stream ->
-          remapClass(stream, fileDetails.path, fileDetails.lastModified)
-        }
+        fileDetails.remapClass()
       } else {
         val mapped = remapper.map(path)
         if (transform(fileDetails, mapped)) return
@@ -114,11 +111,8 @@ public open class ShadowCopyAction(
     }
 
     private fun visitDir(dirDetails: FileCopyDetails) {
-      val mapped = if (relocators.isEmpty()) {
-        dirDetails.path
-      } else {
-        remapper.map(dirDetails.path)
-      }
+      val path = dirDetails.path
+      val mapped = if (relocators.isEmpty()) path else remapper.map(path)
       dirDetails.writeToZip("$mapped/")
     }
 
@@ -133,18 +127,18 @@ public open class ShadowCopyAction(
 
     /**
      * Applies remapping to the given class with the specified relocation path. The remapped class is then written
-     * to the zip file. [classInputStream] is closed automatically to prevent future file leaks.
+     * to the zip file.
      *
      * See [issue 364](https://github.com/GradleUp/shadow/issues/364) and [issue 408](https://github.com/GradleUp/shadow/issues/408).
      */
-    private fun remapClass(classInputStream: InputStream, path: String, lastModified: Long) {
+    private fun FileCopyDetails.remapClass() = file.inputStream().use { inputStream ->
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
       // to the original class names. This is not a problem at runtime (because these entries in the
       // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
       val cw = ClassWriter(0)
-      val cr = ClassReader(classInputStream)
+      val cr = ClassReader(inputStream)
       val cv = ClassRemapper(cw, remapper)
 
       try {
@@ -158,8 +152,11 @@ public open class ShadowCopyAction(
       val newPath = path.replace(multiReleasePrefix, "")
       val mappedName = multiReleasePrefix + remapper.mapPath(newPath)
       try {
+        val entry = zipEntry("$mappedName.class", preserveFileTimestamps, lastModified) {
+          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+        }
         // Now we put it back on so the class file is written out with the right extension.
-        zipOutStr.putNextEntry(zipEntry("$mappedName.class", preserveFileTimestamps, lastModified))
+        zipOutStr.putNextEntry(entry)
         zipOutStr.write(cw.toByteArray())
         zipOutStr.closeEntry()
       } catch (_: ZipException) {
@@ -169,11 +166,11 @@ public open class ShadowCopyAction(
 
     private fun transform(fileDetails: FileCopyDetails, mapped: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      fileDetails.file.inputStream().use { steam ->
+      fileDetails.file.inputStream().use { inputStream ->
         transformer.transform(
           TransformerContext(
             path = mapped,
-            inputStream = steam,
+            inputStream = inputStream,
             relocators = relocators,
           ),
         )
@@ -181,10 +178,7 @@ public open class ShadowCopyAction(
       return true
     }
 
-    private fun FileCopyDetails.writeToZip(
-      // Trailing slash in name indicates that entry is a directory.
-      entryName: String = if (isDirectory) "$path/" else path,
-    ) {
+    private fun FileCopyDetails.writeToZip(entryName: String) {
       val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
         val flag = if (isDirectory) UnixStat.DIR_FLAG else UnixStat.FILE_FLAG
         unixMode = flag or permissions.toUnixNumeric()
