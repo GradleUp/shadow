@@ -192,7 +192,7 @@ public open class ShadowCopyAction(
             if (isTransformable(fileDetails)) {
               transform(fileDetails)
             } else {
-              val mappedPath = remapper.map(fileDetails.relativePath.pathString)
+              val mappedPath = remapper.map(fileDetails.path)
               val entry = zipEntry(mappedPath, preserveFileTimestamps, fileDetails.lastModified) {
                 unixMode = UnixStat.FILE_FLAG or fileDetails.permissions.toUnixNumeric()
               }
@@ -213,7 +213,7 @@ public open class ShadowCopyAction(
     private fun visitDir(dirDetails: FileCopyDetails) {
       try {
         // Trailing slash in name indicates that entry is a directory.
-        val path = dirDetails.relativePath.pathString + "/"
+        val path = dirDetails.path + "/"
         val entry = zipEntry(path, preserveFileTimestamps, dirDetails.lastModified) {
           unixMode = UnixStat.DIR_FLAG or dirDetails.permissions.toUnixNumeric()
         }
@@ -362,7 +362,7 @@ public open class ShadowCopyAction(
 
     private fun transformAndClose(element: FileTreeElement, inputStream: InputStream) {
       inputStream.use { steam ->
-        val mappedPath = remapper.map(element.relativePath.pathString)
+        val mappedPath = remapper.map(element.path)
         transformers.find {
           it.canTransformResource(element)
         }?.transform(
@@ -380,8 +380,8 @@ public open class ShadowCopyAction(
     }
 
     companion object {
-      private val FileCopyDetails.isClass: Boolean get() = relativePath.pathString.endsWith(CLASS_SUFFIX)
-      private val FileCopyDetails.isJar: Boolean get() = relativePath.pathString.endsWith(".jar")
+      private val FileCopyDetails.isClass: Boolean get() = path.endsWith(CLASS_SUFFIX)
+      private val FileCopyDetails.isJar: Boolean get() = path.endsWith(".jar")
     }
   }
 

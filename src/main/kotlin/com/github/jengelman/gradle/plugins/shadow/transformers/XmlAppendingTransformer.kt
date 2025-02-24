@@ -41,7 +41,7 @@ public open class XmlAppendingTransformer @Inject constructor(
   public open val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.orNull?.equals(element.relativePath.pathString, ignoreCase = true) == true
+    return resource.orNull?.equals(element.path, ignoreCase = true) == true
   }
 
   override fun transform(context: TransformerContext) {

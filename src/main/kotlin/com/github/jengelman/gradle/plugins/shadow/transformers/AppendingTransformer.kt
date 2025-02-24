@@ -37,7 +37,7 @@ public open class AppendingTransformer @Inject constructor(
   public open val separator: Property<String> = objectFactory.property(DEFAULT_SEPARATOR)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.orNull.equals(element.relativePath.pathString, ignoreCase = true)
+    return resource.orNull.equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
