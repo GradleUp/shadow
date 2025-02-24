@@ -34,7 +34,9 @@ abstract class BaseTransformerTest<T : Transformer> {
 
     fun Transformer.canTransformResource(path: String, isFile: Boolean = true): Boolean {
       val element = object : FileTreeElement by noOpDelegate() {
-        override fun getRelativePath(): RelativePath = RelativePath.parse(isFile, path)
+        private val _relativePath = RelativePath.parse(isFile, path)
+        override fun getPath(): String = _relativePath.pathString
+        override fun getRelativePath(): RelativePath = _relativePath
       }
       return canTransformResource(element)
     }

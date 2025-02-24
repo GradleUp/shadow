@@ -24,7 +24,6 @@ public open class DontIncludeResourceTransformer @Inject constructor(
   public open val resource: Property<String> = objectFactory.property()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return !resource.orNull.isNullOrEmpty() && path.endsWith(resource.get())
+    return !resource.orNull.isNullOrEmpty() && element.path.endsWith(resource.get())
   }
 }

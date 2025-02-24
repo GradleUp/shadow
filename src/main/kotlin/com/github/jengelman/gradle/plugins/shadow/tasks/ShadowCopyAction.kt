@@ -99,9 +99,9 @@ public open class ShadowCopyAction(
     }
 
     private fun visitFile(fileDetails: FileCopyDetails) {
-      val relativePath = fileDetails.relativePath.pathString
-      if (relativePath.endsWith(".class")) {
-        if (isUnused(fileDetails.path)) return
+      val path = fileDetails.path
+      if (path.endsWith(".class")) {
+        if (isUnused(path)) return
         if (relocators.isEmpty()) {
           fileDetails.writeToZip()
           return
@@ -110,7 +110,7 @@ public open class ShadowCopyAction(
           remapClass(stream, fileDetails.path, fileDetails.lastModified)
         }
       } else {
-        val mapped = remapper.map(relativePath)
+        val mapped = remapper.map(path)
         if (transform(fileDetails, mapped)) return
         fileDetails.writeToZip(mapped)
       }
@@ -118,9 +118,9 @@ public open class ShadowCopyAction(
 
     private fun visitDir(dirDetails: FileCopyDetails) {
       val mapped = if (relocators.isEmpty()) {
-        dirDetails.relativePath.pathString
+        dirDetails.path
       } else {
-        remapper.map(dirDetails.relativePath.pathString)
+        remapper.map(dirDetails.path)
       }
       dirDetails.writeToZip("$mapped/")
     }
@@ -186,7 +186,7 @@ public open class ShadowCopyAction(
 
     private fun FileCopyDetails.writeToZip(
       // Trailing slash in name indicates that entry is a directory.
-      entryName: String = if (isDirectory) relativePath.pathString + "/" else relativePath.pathString,
+      entryName: String = if (isDirectory) "$path/" else path,
     ) {
       val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
         val flag = if (isDirectory) UnixStat.DIR_FLAG else UnixStat.FILE_FLAG

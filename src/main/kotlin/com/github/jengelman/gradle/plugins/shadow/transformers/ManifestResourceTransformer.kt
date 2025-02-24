@@ -43,8 +43,7 @@ public open class ManifestResourceTransformer @Inject constructor(
   public open val manifestEntries: MapProperty<String, Attributes> = objectFactory.mapProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return JarFile.MANIFEST_NAME.equals(path, ignoreCase = true)
+    return JarFile.MANIFEST_NAME.equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
