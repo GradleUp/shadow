@@ -74,7 +74,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   public open val charsetName: Property<String> = objectFactory.property(Charsets.UTF_8.name())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
+    val path = element.path
     return NOTICE_PATH.equals(path, ignoreCase = true) ||
       NOTICE_TXT_PATH.equals(path, ignoreCase = true) ||
       NOTICE_MD_PATH.equals(path, ignoreCase = true)

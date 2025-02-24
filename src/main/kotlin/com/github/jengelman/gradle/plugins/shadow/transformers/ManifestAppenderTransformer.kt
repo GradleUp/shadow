@@ -31,7 +31,7 @@ public open class ManifestAppenderTransformer @Inject constructor(
   public open val attributes: SetProperty<Pair<String, Comparable<*>>> = objectFactory.setProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
+    return MANIFEST_NAME.equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {

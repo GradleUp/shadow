@@ -26,7 +26,7 @@ public open class ComponentsXmlResourceTransformer : Transformer {
   private val components = mutableMapOf<String, Xpp3Dom>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return COMPONENTS_XML_PATH == element.relativePath.pathString
+    return COMPONENTS_XML_PATH == element.path
   }
 
   override fun transform(context: TransformerContext) {
