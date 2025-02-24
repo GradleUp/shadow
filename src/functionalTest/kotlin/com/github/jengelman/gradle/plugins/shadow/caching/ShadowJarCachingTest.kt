@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.gradle.api.file.DuplicatesStrategy
 import org.junit.jupiter.api.Test
 
 class ShadowJarCachingTest : BaseCachingTest() {
@@ -209,5 +210,24 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertions()
+  }
+
+  @Test
+  fun shadowJarIsCachedCorrectlyAfterDuplicatesStrategyChanged() {
+    listOf(
+      DuplicatesStrategy.EXCLUDE,
+      DuplicatesStrategy.INCLUDE,
+      DuplicatesStrategy.WARN,
+    ).forEach { strategy ->
+      projectScriptPath.appendText(
+        """
+          $shadowJar {
+            duplicatesStrategy = DuplicatesStrategy.$strategy
+          }
+        """.trimIndent() + System.lineSeparator(),
+      )
+
+      assertCompositeExecutions()
+    }
   }
 }

@@ -12,7 +12,7 @@ import org.gradle.api.file.FileTreeElement
 @CacheableTransformer
 public open class ApacheLicenseResourceTransformer : Transformer by NoOpTransformer {
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
+    val path = element.path
     return LICENSE_PATH.equals(path, ignoreCase = true) ||
       LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true) ||
       LICENSE_MD_PATH.regionMatches(0, path, 0, LICENSE_MD_PATH.length, ignoreCase = true)

@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.internal.relocateClass
+import com.github.jengelman.gradle.plugins.shadow.internal.relocatePath
 import org.junit.jupiter.api.Test
 
 /**
@@ -383,13 +385,5 @@ class SimpleRelocatorTest {
         }
       }
     """.trimIndent()
-
-    fun SimpleRelocator.relocatePath(path: String): String {
-      return relocatePath(RelocatePathContext(path))
-    }
-
-    fun SimpleRelocator.relocateClass(className: String): String {
-      return relocateClass(RelocateClassContext(className))
-    }
   }
 }

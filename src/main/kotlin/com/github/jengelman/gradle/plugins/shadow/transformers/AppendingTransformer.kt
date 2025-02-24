@@ -37,17 +37,15 @@ public open class AppendingTransformer @Inject constructor(
   public open val separator: Property<String> = objectFactory.property(DEFAULT_SEPARATOR)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.orNull.equals(element.relativePath.pathString, ignoreCase = true)
+    return resource.orNull.equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
-    context.inputStream.use {
-      if (data.size() > 0) {
-        // Append the separator before the new content to ensure the separator is not at the end of the file.
-        data.write(separator.get().toByteArray())
-      }
-      it.copyTo(data)
+    if (data.size() > 0) {
+      // Append the separator before the new content to ensure the separator is not at the end of the file.
+      data.write(separator.get().toByteArray())
     }
+    context.inputStream.copyTo(data)
   }
 
   override fun hasTransformedResource(): Boolean {

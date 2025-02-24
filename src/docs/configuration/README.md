@@ -99,3 +99,18 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
   manifest.inheritFrom(testJar.get().manifest)
 }
 ```
+
+## Adding Extra Files
+
+The `shadowJar` task is a subclass of the `Jar` task, which means that the 
+[from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20groovy.lang.Closure)) 
+method can be used to add extra files.
+
+```groovy
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+  from('extra.jar') {
+    // Copy the contents of the extra.jar file into META-INF/ in the shadowed JAR.
+    into('META-INF')
+  }
+}
+```

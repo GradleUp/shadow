@@ -129,7 +129,7 @@ public open class PropertiesFileTransformer @Inject constructor(
     val mappings = mappings.get()
     val paths = paths.get()
 
-    val path = element.relativePath.pathString
+    val path = element.path
     if (path in mappings) return true
     for (key in mappings.keys) {
       if (key.toRegex().containsMatchIn(path)) return true

@@ -1,9 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.NoSuchFileException
@@ -12,11 +14,6 @@ import java.util.Properties
 import java.util.jar.Attributes.Name as JarAttributeName
 import kotlin.io.path.toPath
 import org.apache.tools.zip.ZipEntry
-import org.gradle.api.file.RelativePath
-import org.gradle.api.internal.file.DefaultFileTreeElement
-import org.gradle.internal.file.Chmod
-import org.gradle.internal.file.FileMetadata
-import org.gradle.internal.file.Stat
 
 /**
  * Known as `Main-Class` in the manifest file.
@@ -32,6 +29,12 @@ internal val classPathAttributeKey = JarAttributeName.CLASS_PATH.toString()
  * Known as `Multi-Release` in the manifest file.
  */
 internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString()
+
+/**
+ * Unsafe cast, copied from
+ * https://github.com/JetBrains/kotlin/blob/d3200b2c65b829b85244c4ec4cb19f6e479b06ba/core/util.runtime/src/org/jetbrains/kotlin/utils/addToStdlib.kt#L111
+ */
+internal inline fun <reified T : Any> Any?.cast(): T = this as T
 
 internal inline fun zipEntry(
   name: String,
@@ -49,17 +52,12 @@ internal inline fun zipEntry(
   block()
 }
 
-/**
- * This is used for creating a [DefaultFileTreeElement] with default values.
- * [file], [chmod], and [stat] should be non-null, so they are set to dummy values here.
- */
-internal fun createDefaultFileTreeElement(
-  file: File = DummyFile,
-  relativePath: RelativePath,
-  chmod: Chmod = DummyChmod,
-  stat: Stat = DummyStat,
-): DefaultFileTreeElement {
-  return DefaultFileTreeElement(file, relativePath, chmod, stat)
+internal fun Relocator.relocatePath(path: String): String {
+  return relocatePath(RelocatePathContext(path))
+}
+
+internal fun Relocator.relocateClass(className: String): String {
+  return relocateClass(RelocateClassContext(className))
 }
 
 internal fun Properties.inputStream(
@@ -86,13 +84,6 @@ internal fun requireResourceAsPath(name: String): Path {
   val resource = Utils::class.java.classLoader.getResource(name)
     ?: throw NoSuchFileException("Resource $name not found.")
   return resource.toURI().toPath()
-}
-
-private val DummyFile = File("dummy")
-private val DummyChmod = Chmod { _, _ -> error("This is a dummy implementation.") }
-private val DummyStat = object : Stat {
-  override fun getUnixMode(f: File): Int = error("This is a dummy implementation.")
-  override fun stat(f: File): FileMetadata = error("This is a dummy implementation.")
 }
 
 private object Utils

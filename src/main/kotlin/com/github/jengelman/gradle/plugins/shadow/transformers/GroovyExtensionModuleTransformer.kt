@@ -34,7 +34,7 @@ public open class GroovyExtensionModuleTransformer : Transformer {
   private var legacy = true
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.relativePath.pathString
+    val path = element.path
     if (path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) {
       // Groovy 2.5+
       legacy = false

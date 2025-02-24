@@ -31,17 +31,15 @@ public open class ManifestAppenderTransformer @Inject constructor(
   public open val attributes: SetProperty<Pair<String, Comparable<*>>> = objectFactory.setProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return MANIFEST_NAME.equals(element.relativePath.pathString, ignoreCase = true)
+    return MANIFEST_NAME.equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
     if (manifestContents.isEmpty()) {
       try {
-        context.inputStream.use { inputStream ->
-          val outputStream = ByteArrayOutputStream()
-          inputStream.copyTo(outputStream)
-          manifestContents = outputStream.toByteArray()
-        }
+        val outputStream = ByteArrayOutputStream()
+        context.inputStream.copyTo(outputStream)
+        manifestContents = outputStream.toByteArray()
       } catch (e: IOException) {
         logger.warn("Failed to read MANIFEST.MF", e)
       }
