@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
+import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
@@ -10,6 +11,7 @@ import java.util.GregorianCalendar
 import java.util.zip.ZipException
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
+import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
@@ -39,6 +41,7 @@ public open class ShadowCopyAction(
   private val preserveFileTimestamps: Boolean,
   private val encoding: String?,
 ) : CopyAction {
+  private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
     val zipOutStream = try {
@@ -51,6 +54,8 @@ public open class ShadowCopyAction(
       zipOutStream.use { zos ->
         stream.process(StreamAction(zos))
         processTransformers(zos)
+        // This must be called as the last step to ensure that directories are added after all files.
+        addDirs(zos)
       }
     } catch (e: Exception) {
       if (e.cause is Zip64RequiredException) {
@@ -74,6 +79,39 @@ public open class ShadowCopyAction(
     }
   }
 
+  /**
+   * Handles cases like [issue 53](https://github.com/GradleUp/shadow/issues/53).
+   */
+  private fun addDirs(zos: ZipOutputStream) {
+    @Suppress("UNCHECKED_CAST")
+    val entries = zos::class.java.getDeclaredField("entries").apply { isAccessible = true }
+      .get(zos).cast<List<ZipEntry>>().map { it.name }
+    val added = entries.toMutableSet()
+
+    fun addParent(name: String) {
+      val parent = name.substringBeforeLast('/', "")
+      val entryName = "$parent/"
+      if (parent.isNotEmpty() && added.add(entryName)) {
+        val details = visitedDirs[entryName]
+        val (lastModified, flag) = if (details == null) {
+          CONSTANT_TIME_FOR_ZIP_ENTRIES to UnixStat.DEFAULT_DIR_PERM
+        } else {
+          details.lastModified to details.permissions.toUnixNumeric()
+        }
+        val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
+          unixMode = UnixStat.DIR_FLAG or flag
+        }
+        zos.putNextEntry(entry)
+        zos.closeEntry()
+        addParent(parent)
+      }
+    }
+
+    entries.forEach {
+      addParent(it)
+    }
+  }
+
   private inner class StreamAction(
     private val zipOutStr: ZipOutputStream,
   ) : CopyActionProcessingStreamAction {
@@ -88,7 +126,11 @@ public open class ShadowCopyAction(
 
     override fun processFile(details: FileCopyDetailsInternal) {
       try {
-        if (details.isDirectory) visitDir(details) else visitFile(details)
+        if (details.isDirectory) {
+          visitedDirs[details.path] = details
+        } else {
+          visitFile(details)
+        }
       } catch (e: Exception) {
         throw GradleException("Could not add $details to ZIP '$zipFile'.", e)
       }
@@ -108,12 +150,6 @@ public open class ShadowCopyAction(
         if (transform(fileDetails, mapped)) return
         fileDetails.writeToZip(mapped)
       }
-    }
-
-    private fun visitDir(dirDetails: FileCopyDetails) {
-      val path = dirDetails.path
-      val mapped = if (relocators.isEmpty()) path else remapper.map(path)
-      dirDetails.writeToZip("$mapped/")
     }
 
     private fun isUnused(classPath: String): Boolean {
@@ -180,13 +216,10 @@ public open class ShadowCopyAction(
 
     private fun FileCopyDetails.writeToZip(entryName: String) {
       val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
-        val flag = if (isDirectory) UnixStat.DIR_FLAG else UnixStat.FILE_FLAG
-        unixMode = flag or permissions.toUnixNumeric()
+        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
       }
       zipOutStr.putNextEntry(entry)
-      if (!isDirectory) {
-        copyTo(zipOutStr)
-      }
+      copyTo(zipOutStr)
       zipOutStr.closeEntry()
     }
   }
