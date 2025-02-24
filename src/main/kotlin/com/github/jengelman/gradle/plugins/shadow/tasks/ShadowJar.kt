@@ -33,7 +33,6 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
-import org.gradle.api.internal.file.copy.DefaultCopySpec
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -287,7 +286,6 @@ public abstract class ShadowJar :
       transformers.get(),
       relocators.get() + packageRelocators,
       unusedClasses,
-      (mainSpec.buildRootResolver() as DefaultCopySpec.DefaultCopySpecResolver).patternSet,
       isPreserveFileTimestamps,
       metadataCharset,
     )

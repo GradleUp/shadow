@@ -171,7 +171,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
-	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Lorg/gradle/api/tasks/util/PatternSet;ZLjava/lang/String;)V
+	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Lorg/gradle/api/internal/DocumentationRegistry;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ZLjava/lang/String;)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 

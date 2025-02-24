@@ -23,7 +23,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.api.tasks.util.PatternSet
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
@@ -38,7 +37,6 @@ public open class ShadowCopyAction(
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
-  private val patternSet: PatternSet,
   private val preserveFileTimestamps: Boolean,
   private val encoding: String?,
 ) : CopyAction {
@@ -90,7 +88,6 @@ public open class ShadowCopyAction(
     }
 
     override fun processFile(details: FileCopyDetailsInternal) {
-      if (!patternSet.asSpec.isSatisfiedBy(details)) return
       try {
         if (details.isDirectory) visitDir(details) else visitFile(details)
       } catch (e: Exception) {
