@@ -141,10 +141,10 @@ public abstract class ShadowJar :
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
-  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202.
+  @Input // Trigger task executions after includes changed.
   override fun getIncludes(): MutableSet<String> = super.getIncludes()
 
-  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202.
+  @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
   override fun minimize(): ShadowJar = apply {
