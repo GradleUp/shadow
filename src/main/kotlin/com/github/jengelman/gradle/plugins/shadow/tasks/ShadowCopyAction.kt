@@ -92,7 +92,7 @@ public open class ShadowCopyAction(
       val parent = name.substringBeforeLast('/', "")
       val entryName = "$parent/"
       if (parent.isNotEmpty() && added.add(entryName)) {
-        val details = visitedDirs[entryName]
+        val details = visitedDirs[parent]
         val (lastModified, flag) = if (details == null) {
           CONSTANT_TIME_FOR_ZIP_ENTRIES to UnixStat.DEFAULT_DIR_PERM
         } else {
