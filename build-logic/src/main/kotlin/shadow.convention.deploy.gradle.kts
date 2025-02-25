@@ -7,8 +7,8 @@ plugins {
 
 val yarnBuild = tasks.named("yarn_build") {
   dependsOn(tasks.yarn)
-  inputs.files(fileTree("src/docs"))
-  outputs.dir(file("build/site"))
+  inputs.dir("src/docs")
+  outputs.dir("build/site")
 }
 
 gitPublish {
