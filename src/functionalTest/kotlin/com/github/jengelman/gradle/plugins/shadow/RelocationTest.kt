@@ -15,10 +15,12 @@ import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
+import kotlin.time.Duration.Companion.minutes
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
@@ -348,10 +350,11 @@ class RelocationTest : BasePluginTest() {
     assertThat(excluded).isEmpty()
   }
 
-  @Test
-  fun preserveLastModifiedCorrectly() {
-    val currentTimeMillis = System.currentTimeMillis()
-    writeMainClass(withImports = true)
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun preserveLastModifiedCorrectly(preserveFileTimestamps: Boolean) {
+    // Minus 1 minute to avoid the time difference between the file system and the JVM.
+    val currentTimeMillis = System.currentTimeMillis() - 1.minutes.inWholeMilliseconds
     projectScriptPath.appendText(
       """
         dependencies {
@@ -359,6 +362,7 @@ class RelocationTest : BasePluginTest() {
         }
         $shadowJar {
           enableRelocation = true
+          preserveFileTimestamps = $preserveFileTimestamps
         }
       """.trimIndent(),
     )
@@ -374,22 +378,31 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedDirs).isNotEmpty()
     assertThat(relocatedClasses).isNotEmpty()
 
-    relocatedClasses.forEach { entry ->
-      // Relocated classes should preserve the last modified time of the original classes, about in 2006.
-      if (entry.time > currentTimeMillis || entry.time <= CONSTANT_TIME_FOR_ZIP_ENTRIES) {
-        fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
+    if (preserveFileTimestamps) {
+      relocatedClasses.forEach { entry ->
+        // Relocated classes should preserve the last modified time of the original classes, about in 2006.
+        if (entry.time > currentTimeMillis || entry.time <= CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+          fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
+        }
       }
-    }
-    relocatedDirs.forEach { entry ->
-      // Relocated directories are newly created, so they should be in now time.
-      if (entry.time < currentTimeMillis) {
-        fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
+      relocatedDirs.forEach { entry ->
+        // Relocated directories are newly created, defaults to CONSTANT_TIME_FOR_ZIP_ENTRIES.
+        if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+          fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
+        }
       }
-    }
-    otherEntries.forEach { entry ->
-      // Other entries are newly created, so they should be in now time.
-      if (entry.time < currentTimeMillis) {
-        fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+      otherEntries.forEach { entry ->
+        // Other entries are newly created, so they should be in now time.
+        if (entry.time < currentTimeMillis) {
+          fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+        }
+      }
+    } else {
+      (relocatedEntries + otherEntries).forEach { entry ->
+        // All entries should be newly modified, defaults to CONSTANT_TIME_FOR_ZIP_ENTRIES.
+        if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+          fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+        }
       }
     }
   }

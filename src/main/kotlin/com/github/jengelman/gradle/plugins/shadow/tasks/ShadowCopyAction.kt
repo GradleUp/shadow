@@ -95,7 +95,7 @@ public open class ShadowCopyAction(
         val details = visitedDirs[parent]
         val (lastModified, flag) = if (details == null) {
           // -1 means the default timestamp in zipEntry.
-          -1L to UnixStat.DEFAULT_DIR_PERM
+          CONSTANT_TIME_FOR_ZIP_ENTRIES to UnixStat.DEFAULT_DIR_PERM
         } else {
           details.lastModified to details.permissions.toUnixNumeric()
         }
