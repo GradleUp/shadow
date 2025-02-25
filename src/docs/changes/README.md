@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Fix the last modified time of shadowed directories. ([#1277](https://github.com/GradleUp/shadow/pull/1277))
+
 
 ## [v9.0.0-beta9] (2025-02-24)
 
