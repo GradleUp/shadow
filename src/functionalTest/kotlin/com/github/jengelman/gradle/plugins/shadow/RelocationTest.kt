@@ -8,12 +8,14 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
+import kotlin.time.Duration.Companion.seconds
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -347,6 +349,89 @@ class RelocationTest : BasePluginTest() {
     assertThat(excluded).isEmpty()
   }
 
+  @ParameterizedTest
+  @MethodSource("preserveLastModifiedProvider")
+  fun preserveLastModifiedCorrectly(enableRelocation: Boolean, preserveFileTimestamps: Boolean) {
+    // Minus 3 sec to avoid the time difference between the file system and the JVM.
+    val currentTimeMillis = System.currentTimeMillis() - 3.seconds.inWholeMilliseconds
+    val junitEntryTimeRange = junitRawEntries.map { it.time }.let { it.min()..it.max() }
+    writeMainClass(withImports = true)
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        $shadowJar {
+          enableRelocation = $enableRelocation
+          preserveFileTimestamps = $preserveFileTimestamps
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    if (enableRelocation) {
+      val (relocatedEntries, otherEntries) = outputShadowJar.use {
+        it.entries().toList().partition { entry -> entry.name.startsWith("shadow/") }
+      }
+      assertThat(relocatedEntries).isNotEmpty()
+      assertThat(otherEntries).isNotEmpty()
+      val (relocatedDirs, relocatedClasses) = relocatedEntries.partition { it.isDirectory }
+      assertThat(relocatedDirs).isNotEmpty()
+      assertThat(relocatedClasses).isNotEmpty()
+
+      if (preserveFileTimestamps) {
+        relocatedClasses.forEach { entry ->
+          // Relocated files should preserve the last modified time of the original files.
+          if (entry.time !in junitEntryTimeRange) {
+            fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
+        }
+        (relocatedDirs + otherEntries).forEach { entry ->
+          // Relocated directories and other entries are newly created, so they should be in now time.
+          if (entry.time < currentTimeMillis) {
+            fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
+        }
+      } else {
+        (relocatedEntries + otherEntries).forEach { entry ->
+          // All entries should be newly modified, that default to CONSTANT_TIME_FOR_ZIP_ENTRIES.
+          if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
+        }
+      }
+    } else {
+      val (shadowedEntries, otherEntries) = outputShadowJar.use {
+        it.entries().toList().partition { entry -> entry.name.startsWith("junit/") }
+      }
+      assertThat(shadowedEntries).isNotEmpty()
+      assertThat(otherEntries).isNotEmpty()
+
+      if (preserveFileTimestamps) {
+        shadowedEntries.forEach { entry ->
+          // Shadowed entries should preserve the last modified time of the original entries.
+          if (entry.time !in junitEntryTimeRange) {
+            fail("Shadowed entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
+        }
+        otherEntries.forEach { entry ->
+          // Other entries are newly created, so they should be in now time.
+          if (entry.time < currentTimeMillis) {
+            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
+        }
+      } else {
+        (shadowedEntries + otherEntries).forEach { entry ->
+          // All entries should be newly modified, defaults to CONSTANT_TIME_FOR_ZIP_ENTRIES.
+          if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
+        }
+      }
+    }
+  }
+
   private companion object {
     @JvmStatic
     fun prefixProvider() = listOf(
@@ -354,6 +439,14 @@ class RelocationTest : BasePluginTest() {
       Arguments.of(ShadowBasePlugin.SHADOW),
       Arguments.of("new.pkg"),
       Arguments.of("new/path"),
+    )
+
+    @JvmStatic
+    fun preserveLastModifiedProvider() = listOf(
+      Arguments.of(false, false),
+      Arguments.of(true, false),
+      Arguments.of(false, true),
+      Arguments.of(true, true),
     )
   }
 }
