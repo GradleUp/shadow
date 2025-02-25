@@ -8,6 +8,7 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
@@ -345,6 +346,38 @@ class RelocationTest : BasePluginTest() {
     }
     assertThat(included).isNotEmpty()
     assertThat(excluded).isEmpty()
+  }
+
+  @Test
+  fun preserveLastModifiedCorrectly() {
+    writeMainClass(withImports = true)
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        $shadowJar {
+          enableRelocation = true
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    val (relocatedEntries, otherEntries) = outputShadowJar.use {
+      it.entries().toList().partition { entry -> entry.name.startsWith("shadow/") }
+    }
+    assertThat(relocatedEntries).isNotEmpty()
+    assertThat(otherEntries).isNotEmpty()
+    relocatedEntries.forEach { entry ->
+      // 1740465258976 (2025-02-25 14:34:18) is the time I added the test.
+      if (entry.time > 1740465258976) return@forEach
+      fail("The relocated entry ${entry.name} has an invalid last modified time: ${entry.time}")
+    }
+    otherEntries.forEach { entry ->
+      if (entry.time > CONSTANT_TIME_FOR_ZIP_ENTRIES) return@forEach
+      fail("The entry ${entry.name} has an invalid last modified time: ${entry.time}")
+    }
   }
 
   private companion object {
