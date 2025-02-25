@@ -94,7 +94,8 @@ public open class ShadowCopyAction(
       if (parent.isNotEmpty() && added.add(entryName)) {
         val details = visitedDirs[parent]
         val (lastModified, flag) = if (details == null) {
-          CONSTANT_TIME_FOR_ZIP_ENTRIES to UnixStat.DEFAULT_DIR_PERM
+          // -1 means the default timestamp in zipEntry.
+          -1L to UnixStat.DEFAULT_DIR_PERM
         } else {
           details.lastModified to details.permissions.toUnixNumeric()
         }
@@ -226,6 +227,12 @@ public open class ShadowCopyAction(
 
   public companion object {
     private val logger = Logging.getLogger(ShadowCopyAction::class.java)
+
+    /**
+     * A copy of [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
+     *
+     * 1980-02-01 00:00:00 (318182400000).
+     */
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }
 }

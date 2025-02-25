@@ -350,6 +350,7 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun preserveLastModifiedCorrectly() {
+    val currentTimeMillis = System.currentTimeMillis()
     writeMainClass(withImports = true)
     projectScriptPath.appendText(
       """
@@ -369,14 +370,27 @@ class RelocationTest : BasePluginTest() {
     }
     assertThat(relocatedEntries).isNotEmpty()
     assertThat(otherEntries).isNotEmpty()
-    relocatedEntries.forEach { entry ->
-      // 1740465258976 (2025-02-25 14:34:18) is the time I added the test.
-      if (entry.time > 1740465258976) return@forEach
-      fail("The relocated entry ${entry.name} has an invalid last modified time: ${entry.time}")
+    val (relocatedDirs, relocatedClasses) = relocatedEntries.partition { it.isDirectory }
+    assertThat(relocatedDirs).isNotEmpty()
+    assertThat(relocatedClasses).isNotEmpty()
+
+    relocatedClasses.forEach { entry ->
+      // Relocated classes should preserve the last modified time of the original classes, about in 2006.
+      if (entry.time > currentTimeMillis || entry.time <= CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+        fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
+      }
+    }
+    relocatedDirs.forEach { entry ->
+      // Relocated directories are newly created, so they should be in now time.
+      if (entry.time < currentTimeMillis) {
+        fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
+      }
     }
     otherEntries.forEach { entry ->
-      if (entry.time > CONSTANT_TIME_FOR_ZIP_ENTRIES) return@forEach
-      fail("The entry ${entry.name} has an invalid last modified time: ${entry.time}")
+      // Other entries are newly created, so they should be in now time.
+      if (entry.time < currentTimeMillis) {
+        fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+      }
     }
   }
 
