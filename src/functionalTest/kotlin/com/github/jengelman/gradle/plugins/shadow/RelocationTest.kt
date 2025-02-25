@@ -15,7 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -352,8 +352,8 @@ class RelocationTest : BasePluginTest() {
   @ParameterizedTest
   @MethodSource("preserveLastModifiedProvider")
   fun preserveLastModifiedCorrectly(enableRelocation: Boolean, preserveFileTimestamps: Boolean) {
-    // Minus 1 minute to avoid the time difference between the file system and the JVM.
-    val currentTimeMillis = System.currentTimeMillis() - 1.minutes.inWholeMilliseconds
+    // Minus 3 sec to avoid the time difference between the file system and the JVM.
+    val currentTimeMillis = System.currentTimeMillis() - 3.seconds.inWholeMilliseconds
     writeMainClass(withImports = true)
     projectScriptPath.appendText(
       """
