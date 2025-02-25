@@ -196,9 +196,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
   }
 
-  /**
-   * See https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L54-L65.
-   */
   @ParameterizedTest
   @MethodSource("withThrowingProvider")
   fun honorDuplicatesStrategyWithThrowing(
@@ -215,9 +212,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  /**
-   * See https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L54-L65.
-   */
   @ParameterizedTest
   @MethodSource("withoutThrowingProvider")
   fun honorDuplicatesStrategyWithoutThrowing(
