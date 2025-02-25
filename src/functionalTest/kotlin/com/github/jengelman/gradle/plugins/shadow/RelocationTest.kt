@@ -386,21 +386,15 @@ class RelocationTest : BasePluginTest() {
             fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
           }
         }
-        relocatedDirs.forEach { entry ->
-          // Relocated directories are newly created, defaults to CONSTANT_TIME_FOR_ZIP_ENTRIES.
-          if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
-            fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
-          }
-        }
-        otherEntries.forEach { entry ->
-          // Other entries are newly created, so they should be in now time.
+        (relocatedDirs + otherEntries).forEach { entry ->
+          // Relocated directories and other entries are newly created, so they should be in now time.
           if (entry.time < currentTimeMillis) {
-            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+            fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
           }
         }
       } else {
         (relocatedEntries + otherEntries).forEach { entry ->
-          // All entries should be newly modified, defaults to CONSTANT_TIME_FOR_ZIP_ENTRIES.
+          // All entries should be newly modified, that default to CONSTANT_TIME_FOR_ZIP_ENTRIES.
           if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
             fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
           }

@@ -87,6 +87,7 @@ public open class ShadowCopyAction(
     val entries = zos::class.java.getDeclaredField("entries").apply { isAccessible = true }
       .get(zos).cast<List<ZipEntry>>().map { it.name }
     val added = entries.toMutableSet()
+    val currentTimeMillis = System.currentTimeMillis()
 
     fun addParent(name: String) {
       val parent = name.substringBeforeLast('/', "")
@@ -94,7 +95,7 @@ public open class ShadowCopyAction(
       if (parent.isNotEmpty() && added.add(entryName)) {
         val details = visitedDirs[parent]
         val (lastModified, flag) = if (details == null) {
-          CONSTANT_TIME_FOR_ZIP_ENTRIES to UnixStat.DEFAULT_DIR_PERM
+          currentTimeMillis to UnixStat.DEFAULT_DIR_PERM
         } else {
           details.lastModified to details.permissions.toUnixNumeric()
         }
