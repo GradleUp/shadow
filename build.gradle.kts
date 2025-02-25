@@ -73,7 +73,6 @@ testing.suites {
     }
   }
   register<JvmTestSuite>("integrationTest") {
-    testType = TestSuiteType.INTEGRATION_TEST
     targets.configureEach {
       testTask {
         val docsDir = file("src/docs")
@@ -84,7 +83,6 @@ testing.suites {
     }
   }
   register<JvmTestSuite>("functionalTest") {
-    testType = TestSuiteType.FUNCTIONAL_TEST
     targets.configureEach {
       testTask {
         // Required to enable `IssueExtension` for all tests.
