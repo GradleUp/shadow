@@ -355,6 +355,7 @@ class RelocationTest : BasePluginTest() {
   fun preserveLastModifiedCorrectly(preserveFileTimestamps: Boolean) {
     // Minus 1 minute to avoid the time difference between the file system and the JVM.
     val currentTimeMillis = System.currentTimeMillis() - 1.minutes.inWholeMilliseconds
+    writeMainClass()
     projectScriptPath.appendText(
       """
         dependencies {
