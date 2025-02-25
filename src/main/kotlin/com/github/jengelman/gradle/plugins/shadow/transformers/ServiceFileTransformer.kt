@@ -78,10 +78,10 @@ public open class ServiceFileTransformer(
     }
   }
 
-  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202.
+  @Input // Trigger task executions after includes changed.
   override fun getIncludes(): MutableSet<String> = patternSet.includes
 
-  @Input // TODO: https://github.com/GradleUp/shadow/issues/1202.
+  @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
   private companion object {
