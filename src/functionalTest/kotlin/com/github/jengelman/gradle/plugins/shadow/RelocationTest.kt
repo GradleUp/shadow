@@ -354,6 +354,7 @@ class RelocationTest : BasePluginTest() {
   fun preserveLastModifiedCorrectly(enableRelocation: Boolean, preserveFileTimestamps: Boolean) {
     // Minus 3 sec to avoid the time difference between the file system and the JVM.
     val currentTimeMillis = System.currentTimeMillis() - 3.seconds.inWholeMilliseconds
+    val junitEntryTimeRange = junitRawEntries.map { it.time }.let { it.min()..it.max() }
     writeMainClass(withImports = true)
     projectScriptPath.appendText(
       """
@@ -381,8 +382,8 @@ class RelocationTest : BasePluginTest() {
 
       if (preserveFileTimestamps) {
         relocatedClasses.forEach { entry ->
-          // Relocated classes should preserve the last modified time of the original classes, about in 2006.
-          if (entry.time > currentTimeMillis || entry.time <= CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+          // Relocated files should preserve the last modified time of the original files.
+          if (entry.time !in junitEntryTimeRange) {
             fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
           }
         }
@@ -409,8 +410,8 @@ class RelocationTest : BasePluginTest() {
 
       if (preserveFileTimestamps) {
         shadowedEntries.forEach { entry ->
-          // Shadowed entries should preserve the last modified time of the original entries, about in 2006.
-          if (entry.time > currentTimeMillis || entry.time <= CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+          // Shadowed entries should preserve the last modified time of the original entries.
+          if (entry.time !in junitEntryTimeRange) {
             fail("Shadowed entry ${entry.name} has an invalid last modified time: ${entry.time}")
           }
         }

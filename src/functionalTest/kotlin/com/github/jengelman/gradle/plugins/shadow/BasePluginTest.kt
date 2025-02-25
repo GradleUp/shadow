@@ -16,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
+import java.util.jar.JarEntry
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
@@ -348,11 +349,10 @@ abstract class BasePluginTest {
     }
 
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
-    val junitEntries: Array<String> = JarPath(junitJar)
+    val junitRawEntries: List<JarEntry> = JarPath(junitJar)
       .use { it.entries().toList() }
-      .map { entry -> entry.name }
-      .filterNot { it == "junit3.8.2/" || it.startsWith("META-INF/") }
-      .toTypedArray()
+      .filterNot { it.name == "junit3.8.2/" || it.name.startsWith("META-INF/") }
+    val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
 
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
