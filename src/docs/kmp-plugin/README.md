@@ -2,8 +2,7 @@
 
 Shadow honors Kotlin's
 [`org.jetbrains.kotlin.multiplatform`](https://kotlinlang.org/docs/multiplatform-intro.html) plugin and will automatically
-configure additional tasks for bundling the shadowed JAR for it's `jvm` target.
-
+configure additional tasks for bundling the shadowed JAR for its `jvm` target.
 ```groovy
 // Using Shadow with KMP Plugin
 plugins {
