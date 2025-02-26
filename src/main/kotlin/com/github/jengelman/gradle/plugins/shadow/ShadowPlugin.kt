@@ -21,6 +21,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
       }
       withId("org.jetbrains.kotlin.multiplatform") {
         apply(ShadowJavaPlugin::class.java)
+        apply(ShadowKmpPlugin::class.java)
       }
 
       // Apply the legacy plugin last.

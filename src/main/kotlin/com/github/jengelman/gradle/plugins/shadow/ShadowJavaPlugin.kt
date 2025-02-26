@@ -24,7 +24,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 public abstract class ShadowJavaPlugin @Inject constructor(
   private val softwareComponentFactory: SoftwareComponentFactory,
@@ -53,6 +52,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
         }
       }
+      task.from(sourceSets.named("main").map { it.output })
+      task.configurations.convention(provider { listOf(runtimeConfiguration) })
       task.exclude(
         "META-INF/INDEX.LIST",
         "META-INF/*.SF",
@@ -62,19 +63,6 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         "META-INF/versions/**/module-info.class",
         "module-info.class",
       )
-
-      if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
-        val kmpExtension = extensions.getByType(KotlinMultiplatformExtension::class.java)
-        val kotlinJvmMain = kmpExtension.jvm().compilations.named("main")
-
-        task.from(kotlinJvmMain.map { it.output.allOutputs })
-        task.configurations.convention(
-          provider { listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName)) },
-        )
-      } else {
-        task.from(sourceSets.named("main").map { it.output })
-        task.configurations.convention(provider { listOf(runtimeConfiguration) })
-      }
     }
     artifacts.add(configurations.shadow.name, taskProvider)
   }
