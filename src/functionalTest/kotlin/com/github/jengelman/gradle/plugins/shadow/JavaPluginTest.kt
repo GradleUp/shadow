@@ -20,6 +20,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
@@ -659,11 +660,15 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun canAddExtraFilesIntoShadowJar() {
     writeMainClass()
+    path("Foo").writeText("Foo")
     projectScriptPath.appendText(
       """
         $shadowJar {
           from(files('${artifactAJar.toUri().toURL().path}')) {
             into('META-INF')
+          }
+          from('Foo') {
+            into('Bar')
           }
         }
       """.trimIndent(),
@@ -675,8 +680,10 @@ class JavaPluginTest : BasePluginTest() {
       containsEntries(
         "my/Main.class",
         "META-INF/a-1.0.jar",
+        "Bar/Foo",
       )
       doesNotContainEntries(*entriesInA)
+      getContent("Bar/Foo").isEqualTo("Foo")
     }
     val unzipped = path("unzipped")
     outputShadowJar.use {
