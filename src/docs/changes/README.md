@@ -6,7 +6,7 @@
 **Added**
 
 - Compat Kotlin Multiplatform plugin. ([#1280](https://github.com/GradleUp/shadow/pull/1280))  
-  You still have to configure `manifest.attributes` (e.g. `Main-Class` attr) manually in the `shadowJar` task if necessary.
+  You still need to manually configure `manifest.attributes` (e.g. `Main-Class` attr) in the `shadowJar` task if necessary.
 
 **Fixed**
 
