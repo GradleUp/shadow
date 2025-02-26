@@ -9,6 +9,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
@@ -138,6 +139,37 @@ class PublishingTest : BasePluginTest() {
     assertShadowJarCommon(repoJarPath("my/maven/1.0/maven-1.0.jar"))
     assertPomCommon(repoPath("my/maven/1.0/maven-1.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")))
+  }
+
+  @Test
+  fun publishCustomShadowJar() {
+    projectScriptPath.appendText(
+      publishConfiguration(
+        projectBlock = """
+          def testShadowJar = tasks.register('testShadowJar', ${ShadowJar::class.java.name}) {
+            group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+            description = "Create a combined JAR of project and test dependencies"
+            archiveClassifier = "tests"
+            from sourceSets.test.output
+            configurations = [project.configurations.testRuntimeClasspath]
+          }
+        """.trimIndent(),
+        dependenciesBlock = """
+          testImplementation 'junit:junit:3.8.2'
+        """.trimIndent(),
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            artifact testShadowJar
+          }
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    assertThat(repoJarPath("my/maven/1.0/maven-1.0-tests.jar")).useAll {
+      containsEntries(*junitEntries)
+    }
   }
 
   @ParameterizedTest

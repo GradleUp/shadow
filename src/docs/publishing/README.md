@@ -90,3 +90,42 @@ publishing {
   }
 }
 ```
+
+
+## Publish Custom ShadowJar Task Outputs
+
+It is possible to publish a custom `ShadowJar` task's output via the [`MavenPublication.artifact(java.lang.Object)`](https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)) method. 
+
+```groovy
+// Publishing a Shadow JAR with the Maven-Publish Plugin
+plugins {
+  id 'java'
+  id 'maven-publish'
+  id 'com.gradleup.shadow'
+}
+
+def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+  group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+  description = "Create a combined JAR of project and test dependencies"
+  archiveClassifier = "tests"
+  from sourceSets.test.output
+  configurations = [project.configurations.testRuntimeClasspath]
+}
+
+dependencies {
+  testImplementation 'junit:junit:3.8.2'
+}
+
+publishing {
+  publications {
+    shadow(MavenPublication) {
+      artifact(testShadowJar)
+    }
+  }
+  repositories {
+    maven {
+      url = "https://repo.myorg.com"
+    }
+  }
+}
+```
