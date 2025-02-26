@@ -3,14 +3,26 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import kotlin.io.path.appendText
+import kotlin.io.path.writeText
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class KmpPluginTest : BasePluginTest() {
+  @BeforeEach
+  override fun setup() {
+    super.setup()
+    val projectBuildScript = getDefaultProjectBuildScript(
+      plugin = "org.jetbrains.kotlin.multiplatform",
+      withGroup = true,
+      withVersion = true,
+    )
+    projectScriptPath.writeText(projectBuildScript)
+  }
+
   @Test
   fun compatKmpJvmTarget() {
     projectScriptPath.appendText(
       """
-        apply plugin: 'org.jetbrains.kotlin.multiplatform'
         kotlin {
           jvm()
           sourceSets {

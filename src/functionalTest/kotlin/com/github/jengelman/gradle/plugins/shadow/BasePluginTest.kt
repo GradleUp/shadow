@@ -103,7 +103,7 @@ abstract class BasePluginTest {
   val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   fun getDefaultProjectBuildScript(
-    javaPlugin: String = "java",
+    plugin: String = "java",
     withGroup: Boolean = false,
     withVersion: Boolean = false,
   ): String {
@@ -111,7 +111,7 @@ abstract class BasePluginTest {
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
-        id('$javaPlugin')
+        id('$plugin')
         id('com.gradleup.shadow')
       }
       $groupInfo
