@@ -11,7 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
-import java.util.jar.Attributes
+import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
@@ -152,7 +152,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   private fun commonAssertions(
-    mainAttributesBlock: Attributes.() -> Unit = {
+    mainAttributesBlock: JarAttribute.() -> Unit = {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
       assertThat(getValue(mainClassAttributeKey)).isEqualTo("my.Main")
       assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
