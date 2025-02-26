@@ -14,7 +14,9 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       registerShadowJarCommon { task ->
         task.from(kotlinJvmMain.map { it.output.allOutputs })
         task.configurations.convention(
-          provider { listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName)) },
+          provider {
+            listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName))
+          },
         )
       }
     }
