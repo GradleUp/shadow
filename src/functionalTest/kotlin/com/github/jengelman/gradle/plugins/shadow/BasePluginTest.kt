@@ -103,7 +103,7 @@ abstract class BasePluginTest {
   val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   fun getDefaultProjectBuildScript(
-    javaPlugin: String = "java",
+    plugin: String = "java",
     withGroup: Boolean = false,
     withVersion: Boolean = false,
   ): String {
@@ -111,7 +111,7 @@ abstract class BasePluginTest {
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
-        id('$javaPlugin')
+        id('$plugin')
         id('com.gradleup.shadow')
       }
       $groupInfo
@@ -194,26 +194,43 @@ abstract class BasePluginTest {
     packageName: String = "my",
     withImports: Boolean = false,
     className: String = "Main",
+    isJava: Boolean = true,
   ): String {
-    val imports = if (withImports) "import junit.framework.Test;" else ""
-    val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-    path("src/$sourceSet/java/$packageName/$className.java").writeText(
-      """
-        package $packageName;
-        $imports
-        public class $className {
-          public static void main(String[] args) {
-            if (args.length == 0) {
-              throw new IllegalArgumentException("No arguments provided.");
+    if (isJava) {
+      val imports = if (withImports) "import junit.framework.Test;" else ""
+      val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
+      path("src/$sourceSet/java/$packageName/$className.java").writeText(
+        """
+          package $packageName;
+          $imports
+          public class $className {
+            public static void main(String[] args) {
+              if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
+              String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
+              System.out.println(content);
+              System.out.println($classRef);
             }
-            String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
-            System.out.println(content);
-            System.out.println($classRef);
           }
-        }
-      """.trimIndent(),
-    )
-    return packageName.replace('.', '/') + "/$className.class"
+        """.trimIndent(),
+      )
+    } else {
+      val imports = if (withImports) "import junit.framework.Test;" else ""
+      val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
+      path("src/$sourceSet/kotlin/$packageName/$className.kt").writeText(
+        """
+          package $packageName
+          $imports
+          fun main(vararg args: String) {
+            if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
+            val content ="Hello, World! (%s) from $className".format(*args)
+            println(content)
+            println($classRef)
+          }
+        """.trimIndent(),
+      )
+    }
+    val baseClassPath = packageName.replace('.', '/') + "/$className"
+    return if (isJava) "$baseClassPath.class" else "${baseClassPath}Kt.class"
   }
 
   fun writeClientAndServerModules(

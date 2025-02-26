@@ -19,6 +19,10 @@ public abstract class ShadowPlugin : Plugin<Project> {
       withType(ApplicationPlugin::class.java) {
         apply(ShadowApplicationPlugin::class.java)
       }
+      withId("org.jetbrains.kotlin.multiplatform") {
+        apply(ShadowKmpPlugin::class.java)
+      }
+
       // Apply the legacy plugin last.
       // Because we apply the ShadowJavaPlugin/ShadowApplication plugin in a withType callback for the
       // respective JavaPlugin/ApplicationPlugin, it may still apply before the shadowJar task is created etc.

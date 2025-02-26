@@ -51,6 +51,7 @@ val testPluginClasspath by configurations.registering {
 }
 
 dependencies {
+  compileOnly(libs.kotlin.kmp)
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
@@ -62,6 +63,7 @@ dependencies {
 
   testPluginClasspath(libs.foojayResolver)
   testPluginClasspath(libs.pluginPublish)
+  testPluginClasspath(libs.kotlin.kmp)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }

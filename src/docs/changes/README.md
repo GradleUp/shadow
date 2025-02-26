@@ -3,6 +3,11 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Compat Kotlin Multiplatform plugin. ([#1280](https://github.com/GradleUp/shadow/pull/1280))  
+  You still need to manually configure `manifest.attributes` (e.g. `Main-Class` attr) in the `shadowJar` task if necessary.
+
 **Fixed**
 
 - Fix the last modified time of shadowed directories. ([#1277](https://github.com/GradleUp/shadow/pull/1277))
