@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.inject.Inject
+import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -121,8 +122,9 @@ public abstract class ShadowJavaPlugin @Inject constructor(
     public inline val ConfigurationContainer.shadowRuntimeElements: NamedDomainObjectProvider<Configuration>
       get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
 
-    public inline fun Project.registerShadowJarCommon(
-      crossinline action: (ShadowJar) -> Unit = {},
+    @JvmStatic
+    public fun Project.registerShadowJarCommon(
+      action: Action<ShadowJar>,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
         task.group = ShadowBasePlugin.GROUP_NAME
@@ -137,7 +139,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
-        action(task)
+        action.execute(task)
       }
     }
   }
