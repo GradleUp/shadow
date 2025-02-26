@@ -2,8 +2,6 @@
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.utils.extendsFrom
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
@@ -52,16 +50,8 @@ val testPluginClasspath by configurations.registering {
   isCanBeResolved = true
 }
 
-// https://www.liutikas.net/2025/01/12/Kotlin-Library-Friends.html
-val friends by configurations.registering {
-  isCanBeResolved = true
-  isCanBeConsumed = false
-  isTransitive = false
-}
-configurations.implementation.extendsFrom(friends)
-
 dependencies {
-  friends(libs.kotlin.kmp)
+  compileOnly(libs.kotlin.kmp)
   implementation(libs.apache.ant)
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
@@ -156,10 +146,6 @@ tasks.pluginUnderTestMetadata {
   pluginClasspath.from(
     testPluginClasspath,
   )
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-  friendPaths.from(friends.map { it.incoming.artifactView { }.files })
 }
 
 tasks.check {
