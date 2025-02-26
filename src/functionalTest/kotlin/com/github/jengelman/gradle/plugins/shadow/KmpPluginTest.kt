@@ -21,6 +21,7 @@ class KmpPluginTest : BasePluginTest() {
 
   @Test
   fun compatKmpJvmTarget() {
+    val mainClass = writeMainClass(sourceSet = "jvmMain", isJava = false)
     projectScriptPath.appendText(
       """
         kotlin {
@@ -44,7 +45,10 @@ class KmpPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(*entriesInAB)
+      containsEntries(
+        mainClass,
+        *entriesInAB,
+      )
     }
   }
 }
