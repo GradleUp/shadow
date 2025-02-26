@@ -53,7 +53,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         }
       }
       task.from(sourceSets.named("main").map { it.output })
-      task.configurations.convention(listOf(runtimeConfiguration))
+      task.configurations.convention(provider { listOf(runtimeConfiguration) })
       task.exclude(
         "META-INF/INDEX.LIST",
         "META-INF/*.SF",
