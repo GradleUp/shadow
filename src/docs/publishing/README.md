@@ -92,7 +92,7 @@ publishing {
 ```
 
 
-## Publish Custom Shadowed JAR with the Custom ShadowJar Task
+## Publish Custom ShadowJar Task Outputs
 
 It is possible to publish a custom `ShadowJar` task's output via the [`MavenPublication.artifact(java.lang.Object)`](https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)) method. 
 
