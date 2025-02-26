@@ -26,6 +26,7 @@ module.exports = {
       '/configuration/reproducible-builds/',
       '/custom-tasks/',
       '/application-plugin/',
+      '/kmp-plugin/',
       '/publishing/',
       '/multi-project/',
       '/plugins/',
