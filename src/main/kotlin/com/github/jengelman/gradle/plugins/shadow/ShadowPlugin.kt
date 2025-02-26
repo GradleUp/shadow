@@ -20,7 +20,6 @@ public abstract class ShadowPlugin : Plugin<Project> {
         apply(ShadowApplicationPlugin::class.java)
       }
       withId("org.jetbrains.kotlin.multiplatform") {
-        apply(ShadowJavaPlugin::class.java)
         apply(ShadowKmpPlugin::class.java)
       }
 

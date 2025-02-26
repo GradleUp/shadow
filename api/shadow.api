@@ -56,6 +56,13 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugi
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {
 	public final fun getShadowJar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 	public final fun getShadowRuntimeElements (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
+	public final fun registerShadowJarCommon (Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;)Lorg/gradle/api/tasks/TaskProvider;
+	public static synthetic fun registerShadowJarCommon$default (Lcom/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion;Lorg/gradle/api/Project;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lorg/gradle/api/tasks/TaskProvider;
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public final synthetic fun execute (Ljava/lang/Object;)V
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin : org/gradle/api/Plugin {

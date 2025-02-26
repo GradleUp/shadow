@@ -38,10 +38,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
   protected open fun Project.configureShadowJar() {
     val jarTask = tasks.jar
-    val taskProvider = tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
-      task.group = ShadowBasePlugin.GROUP_NAME
-      task.description = "Create a combined JAR of project and runtime dependencies"
-      task.archiveClassifier.set("all")
+    val taskProvider = registerShadowJarCommon { task ->
       @Suppress("EagerGradleConfiguration")
       task.manifest.inheritFrom(jarTask.get().manifest)
       val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
@@ -54,15 +51,6 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       }
       task.from(sourceSets.named("main").map { it.output })
       task.configurations.convention(provider { listOf(runtimeConfiguration) })
-      task.exclude(
-        "META-INF/INDEX.LIST",
-        "META-INF/*.SF",
-        "META-INF/*.DSA",
-        "META-INF/*.RSA",
-        // module-info.class in Multi-Release folders.
-        "META-INF/versions/**/module-info.class",
-        "module-info.class",
-      )
     }
     artifacts.add(configurations.shadow.name, taskProvider)
   }
@@ -132,5 +120,25 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
     public inline val ConfigurationContainer.shadowRuntimeElements: NamedDomainObjectProvider<Configuration>
       get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+
+    public inline fun Project.registerShadowJarCommon(
+      crossinline action: (ShadowJar) -> Unit = {},
+    ): TaskProvider<ShadowJar> {
+      return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
+        task.group = ShadowBasePlugin.GROUP_NAME
+        task.description = "Create a combined JAR of project and runtime dependencies"
+        task.archiveClassifier.set("all")
+        task.exclude(
+          "META-INF/INDEX.LIST",
+          "META-INF/*.SF",
+          "META-INF/*.DSA",
+          "META-INF/*.RSA",
+          // module-info.class in Multi-Release folders.
+          "META-INF/versions/**/module-info.class",
+          "module-info.class",
+        )
+        action(task)
+      }
+    }
   }
 }
