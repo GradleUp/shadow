@@ -1,10 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.IOException
-import java.util.jar.Attributes
+import java.util.jar.Attributes as JarAttribute
 import java.util.jar.JarFile
 import java.util.jar.Manifest
 import javax.inject.Inject
@@ -40,7 +41,7 @@ public open class ManifestResourceTransformer @Inject constructor(
 
   @get:Optional
   @get:Input
-  public open val manifestEntries: MapProperty<String, Attributes> = objectFactory.mapProperty()
+  public open val manifestEntries: MapProperty<String, JarAttribute> = objectFactory.mapProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return JarFile.MANIFEST_NAME.equals(element.path, ignoreCase = true)
@@ -70,17 +71,17 @@ public open class ManifestResourceTransformer @Inject constructor(
 
     val attributes = manifest!!.mainAttributes
     mainClass.orNull?.let {
-      attributes[Attributes.Name.MAIN_CLASS] = it
+      attributes[mainClassAttributeKey] = it
     }
     manifestEntries.get().forEach { (key, value) ->
-      attributes[Attributes.Name(key)] = value
+      attributes[JarAttribute.Name(key)] = value
     }
 
     os.putNextEntry(zipEntry(JarFile.MANIFEST_NAME, preserveFileTimestamps))
     manifest!!.write(os)
   }
 
-  public open fun attributes(attributes: Map<String, Attributes>): ManifestResourceTransformer = apply {
+  public open fun attributes(attributes: Map<String, JarAttribute>): ManifestResourceTransformer = apply {
     manifestEntries.putAll(attributes)
   }
 
