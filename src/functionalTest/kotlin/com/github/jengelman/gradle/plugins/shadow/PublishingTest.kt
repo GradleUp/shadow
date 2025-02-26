@@ -156,7 +156,6 @@ class PublishingTest : BasePluginTest() {
         """.trimIndent(),
         dependenciesBlock = """
           testImplementation 'junit:junit:3.8.2'
-          shadow 'my:b:1.0'
         """.trimIndent(),
         publicationsBlock = """
           shadow(MavenPublication) {
