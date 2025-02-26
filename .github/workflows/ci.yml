@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-24.04-arm, windows-latest ]
+        os: [ ubuntu-latest, windows-latest ]
         # Always test on the latest version and some LTS.
         java: [ 17, 21, 23 ]
     runs-on: ${{ matrix.os }}
@@ -26,7 +26,7 @@ jobs:
 
   publish-snapshot:
     needs: build
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     if: github.repository == 'GradleUp/shadow' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
