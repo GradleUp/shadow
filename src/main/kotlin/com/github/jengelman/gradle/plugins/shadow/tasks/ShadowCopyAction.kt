@@ -60,8 +60,12 @@ public open class ShadowCopyAction(
     } catch (e: Exception) {
       if (e.cause is Zip64RequiredException) {
         throw Zip64RequiredException(
-          "${e.cause?.message}\n\nTo build this archive, please enable the zip64 extension.\n" +
-            "See: ${documentationRegistry.getDslRefForProperty(Zip::class.java, "zip64")}",
+          """
+            ${e.cause?.message}
+
+            To build this archive, please enable the zip64 extension.
+            See: ${documentationRegistry.getDslRefForProperty(Zip::class.java.name, "zip64")}
+          """.trimIndent(),
         )
       }
       zipFile.delete()
