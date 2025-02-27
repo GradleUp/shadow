@@ -15,7 +15,6 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
@@ -23,7 +22,6 @@ import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
-import org.gradle.api.tasks.bundling.Zip
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
@@ -34,7 +32,6 @@ import org.objectweb.asm.commons.ClassRemapper
 public open class ShadowCopyAction(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
-  private val documentationRegistry: DocumentationRegistry,
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
@@ -64,8 +61,13 @@ public open class ShadowCopyAction(
           """
             $message
 
-            To build this archive, please enable the zip64 extension.
-            See: ${documentationRegistry.getDslRefForProperty(Zip::class.java.name, "zip64")}
+            To build this archive, please enable the zip64 extension. e.g.
+            ```
+            tasks.shadowJar {
+              isZip64 = true
+            }
+            ```
+            See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64
           """.trimIndent(),
         )
       }
