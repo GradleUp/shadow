@@ -12,7 +12,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
-import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
@@ -30,7 +29,6 @@ import org.gradle.api.UncheckedIOException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.provider.Property
@@ -269,7 +267,6 @@ public abstract class ShadowJar :
         throw UncheckedIOException("Unable to create ZIP output stream for file $destination.", e)
       }
     }
-    val documentationRegistry = services.get(DocumentationRegistry::class.java)
     val unusedClasses = if (minimizeJar.get()) {
       val unusedTracker = UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
       includedDependencies.files.forEach {
@@ -282,7 +279,6 @@ public abstract class ShadowJar :
     return ShadowCopyAction(
       archiveFile.get().asFile,
       zosProvider,
-      documentationRegistry,
       transformers.get(),
       relocators.get() + packageRelocators,
       unusedClasses,

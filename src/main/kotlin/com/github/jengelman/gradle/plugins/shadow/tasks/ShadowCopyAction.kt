@@ -15,7 +15,6 @@ import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.internal.DocumentationRegistry
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
@@ -23,7 +22,6 @@ import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
-import org.gradle.api.tasks.bundling.Zip
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
@@ -34,7 +32,6 @@ import org.objectweb.asm.commons.ClassRemapper
 public open class ShadowCopyAction(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
-  private val documentationRegistry: DocumentationRegistry,
   private val transformers: Set<Transformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
@@ -58,14 +55,23 @@ public open class ShadowCopyAction(
         addDirs(zos)
       }
     } catch (e: Exception) {
-      if (e.cause is Zip64RequiredException) {
+      if (e is Zip64RequiredException || e.cause is Zip64RequiredException) {
+        val message = if (e is Zip64RequiredException) e.message else e.cause?.message
         throw Zip64RequiredException(
-          "${e.cause?.message}\n\nTo build this archive, please enable the zip64 extension.\n" +
-            "See: ${documentationRegistry.getDslRefForProperty(Zip::class.java, "zip64")}",
+          """
+            $message
+
+            To build this archive, please enable the zip64 extension. e.g.
+            ```kts
+            tasks.shadowJar {
+              isZip64 = true
+            }
+            ```
+            See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64 for more details.
+          """.trimIndent(),
         )
       }
       zipFile.delete()
-      // Rethrow the exception like `java.util.zip.ZipException: archive is not a ZIP archive`.
       throw e
     }
     return WorkResults.didWork(true)
