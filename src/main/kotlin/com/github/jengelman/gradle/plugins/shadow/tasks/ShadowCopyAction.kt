@@ -62,12 +62,12 @@ public open class ShadowCopyAction(
             $message
 
             To build this archive, please enable the zip64 extension. e.g.
-            ```
+            ```kts
             tasks.shadowJar {
               isZip64 = true
             }
             ```
-            See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64
+            See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64 for more details.
           """.trimIndent(),
         )
       }
