@@ -113,7 +113,7 @@ class TransformersTest : BaseTransformerTest() {
         }
         $shadowJar {
           // Use Transformer.Companion (no-op) to mock a custom transformer here.
-          transform(${Transformer.Companion::class.java.name})
+          transform(${ResourceTransformer.Companion::class.java.name})
         }
       """.trimIndent(),
     )

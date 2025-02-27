@@ -15,7 +15,7 @@ import org.gradle.api.tasks.Internal
  * @author John Engelman
  */
 @JvmDefaultWithCompatibility
-public interface Transformer {
+public interface ResourceTransformer {
   public fun canTransformResource(element: FileTreeElement): Boolean
 
   @Throws(IOException::class)
@@ -36,11 +36,11 @@ public interface Transformer {
     get() = throw NotImplementedError("You have to make sure this has been implemented or injected.")
 
   /**
-   * This also implements [Transformer] but no-op, which means it could be used by Kotlin delegations.
+   * This also implements [ResourceTransformer] but no-op, which means it could be used by Kotlin delegations.
    */
-  public companion object : Transformer {
+  public companion object : ResourceTransformer {
     @JvmStatic
-    public fun <T : Transformer> Class<T>.create(objectFactory: ObjectFactory): T {
+    public fun <T : ResourceTransformer> Class<T>.create(objectFactory: ObjectFactory): T {
       // If the constructor takes a single ObjectFactory, inject it in.
       val constructor = constructors.find {
         it.parameterTypes.singleOrNull() == ObjectFactory::class.java
@@ -60,7 +60,7 @@ public interface Transformer {
 }
 
 /**
- * Marks that a given instance of [Transformer] is compatible with the Gradle build cache.
+ * Marks that a given instance of [ResourceTransformer] is compatible with the Gradle build cache.
  * In other words, it has its appropriate inputs annotated so that Gradle can consider them when
  * determining the cache key.
  *

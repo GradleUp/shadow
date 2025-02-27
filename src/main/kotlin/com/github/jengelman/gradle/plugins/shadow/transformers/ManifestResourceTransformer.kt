@@ -31,7 +31,7 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 public open class ManifestResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 

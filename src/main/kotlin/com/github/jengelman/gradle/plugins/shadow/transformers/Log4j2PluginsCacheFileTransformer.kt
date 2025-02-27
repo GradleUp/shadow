@@ -23,7 +23,7 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 @CacheableTransformer
-public open class Log4j2PluginsCacheFileTransformer : Transformer {
+public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
   /**
    * Log4j config files to share across the transformation stages.
    */

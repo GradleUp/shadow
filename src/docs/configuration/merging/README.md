@@ -9,14 +9,14 @@ This allows a [`Transformer`](https://gradleup.com/shadow/api/shadow/com.github.
 determine if it should process a particular entry and apply any modifications before writing the stream to the output.
 
 ```groovy
-// Adding a Transformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+// Adding a ResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import javax.annotation.Nonnull
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
-class MyTransformer implements Transformer {
+class MyTransformer implements ResourceTransformer {
   @Override
   boolean canTransformResource(@Nonnull FileTreeElement element) { return true }
 
@@ -38,14 +38,14 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 Additionally, a `Transformer` can accept a `Closure` to configure the provided `Transformer`.
 
 ```groovy
-// Configuring a Transformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+// Configuring a ResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import javax.annotation.Nonnull
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
-class MyTransformer implements Transformer {
+class MyTransformer implements ResourceTransformer {
   boolean enabled
 
   @Override
@@ -71,14 +71,14 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 An instantiated instance of a `Transformer` can also be provided.
 
 ```groovy
-// Adding a Transformer Instance
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+// Adding a ResourceTransformer Instance
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import javax.annotation.Nonnull
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
-class MyTransformer implements Transformer {
+class MyTransformer implements ResourceTransformer {
   final boolean enabled
 
   MyTransformer(boolean enabled) {

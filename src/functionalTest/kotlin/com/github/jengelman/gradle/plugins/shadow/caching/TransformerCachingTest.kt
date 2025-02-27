@@ -13,8 +13,8 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCach
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
@@ -147,7 +147,7 @@ class TransformerCachingTest : BaseCachingTest() {
       """
         $shadowJar {
           // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
-          transform(${Transformer.Companion::class.java.name})
+          transform(${ResourceTransformer.Companion::class.java.name})
         }
       """.trimIndent(),
     )

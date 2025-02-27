@@ -24,7 +24,7 @@ import org.gradle.api.tasks.Input
 @CacheableTransformer
 public open class ManifestAppenderTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private var manifestContents = ByteArray(0)
 
   @get:Input

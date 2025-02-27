@@ -22,7 +22,7 @@ import org.gradle.api.tasks.Optional
 @Suppress("ktlint:standard:backing-property-naming")
 public open class AppendingTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   /**
    * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
    */
