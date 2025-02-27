@@ -394,14 +394,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/NoOpTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
-	public static final field INSTANCE Lcom/github/jengelman/gradle/plugins/shadow/transformers/NoOpTransformer;
-	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
-}
-
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
@@ -467,8 +459,12 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/trans
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$Companion {
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$Companion : com/github/jengelman/gradle/plugins/shadow/transformers/Transformer {
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun create (Ljava/lang/Class;Lorg/gradle/api/model/ObjectFactory;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/Transformer;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/Transformer$DefaultImpls {

@@ -12,9 +12,9 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.IncludeResourceTr
 import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.NoOpTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
@@ -146,8 +146,8 @@ class TransformerCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          // Use NoOpTransformer to mock a custom transformer here, it's not cacheable.
-          transform(${NoOpTransformer::class.java.name}.INSTANCE)
+          // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
+          transform(${Transformer.Companion::class.java.name})
         }
       """.trimIndent(),
     )

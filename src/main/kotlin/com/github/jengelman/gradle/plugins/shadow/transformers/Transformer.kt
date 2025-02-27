@@ -35,7 +35,10 @@ public interface Transformer {
   public val objectFactory: ObjectFactory
     get() = throw NotImplementedError("You have to make sure this has been implemented or injected.")
 
-  public companion object {
+  /**
+   * This also implements [Transformer] but no-op, which means it could be used by Kotlin delegations.
+   */
+  public companion object : Transformer {
     @JvmStatic
     public fun <T : Transformer> Class<T>.create(objectFactory: ObjectFactory): T {
       // If the constructor takes a single ObjectFactory, inject it in.
@@ -48,6 +51,11 @@ public interface Transformer {
         getDeclaredConstructor().newInstance()
       }
     }
+
+    public override fun canTransformResource(element: FileTreeElement): Boolean = false
+    public override fun transform(context: TransformerContext): Unit = Unit
+    public override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean): Unit = Unit
+    public override fun hasTransformedResource(): Boolean = false
   }
 }
 
@@ -61,10 +69,3 @@ public interface Transformer {
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 public annotation class CacheableTransformer
-
-public object NoOpTransformer : Transformer {
-  public override fun canTransformResource(element: FileTreeElement): Boolean = false
-  public override fun transform(context: TransformerContext): Unit = Unit
-  public override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean): Unit = Unit
-  public override fun hasTransformedResource(): Boolean = false
-}

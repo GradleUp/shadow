@@ -10,7 +10,7 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ApacheLicenseResourceTransformer : Transformer by NoOpTransformer {
+public open class ApacheLicenseResourceTransformer : Transformer by Transformer.Companion {
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.path
     return LICENSE_PATH.equals(path, ignoreCase = true) ||

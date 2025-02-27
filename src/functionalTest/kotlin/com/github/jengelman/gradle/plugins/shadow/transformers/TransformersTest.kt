@@ -112,8 +112,8 @@ class TransformersTest : BaseTransformerTest() {
           implementation 'my:b:1.0'
         }
         $shadowJar {
-          // Use NoOpTransformer to mock a custom transformer here.
-          transform(${NoOpTransformer::class.java.name}.INSTANCE)
+          // Use Transformer.Companion (no-op) to mock a custom transformer here.
+          transform(${Transformer.Companion::class.java.name})
         }
       """.trimIndent(),
     )
