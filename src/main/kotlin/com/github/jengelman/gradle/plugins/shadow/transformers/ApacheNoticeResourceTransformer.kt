@@ -58,7 +58,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   public open val organizationName: Property<String> = objectFactory.property("The Apache Software Foundation")
 
   @get:Input
-  public open val organizationURL: Property<String> = objectFactory.property("http://www.apache.org/")
+  public open val organizationURL: Property<String> = objectFactory.property("https://www.apache.org/")
 
   @get:Input
   public open val inceptionYear: Property<String> = objectFactory.property("2006")
