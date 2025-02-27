@@ -382,6 +382,8 @@ abstract class BasePluginTest {
       "--configuration-cache",
       "--build-cache",
       "--stacktrace",
+      // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:parallel
+      "-Dorg.gradle.configuration-cache.parallel=true",
     )
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
