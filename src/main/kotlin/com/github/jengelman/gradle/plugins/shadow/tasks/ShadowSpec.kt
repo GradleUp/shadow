@@ -2,9 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
-import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import java.lang.reflect.InvocationTargetException
 import org.gradle.api.Action
 import org.gradle.api.file.CopySpec
@@ -22,7 +21,7 @@ public interface ShadowSpec : CopySpec {
     NoSuchMethodException::class,
     InvocationTargetException::class,
   )
-  public fun transform(clazz: Class<Transformer>): ShadowSpec
+  public fun transform(clazz: Class<ResourceTransformer>): ShadowSpec
 
   @Throws(
     InstantiationException::class,
@@ -30,9 +29,9 @@ public interface ShadowSpec : CopySpec {
     NoSuchMethodException::class,
     InvocationTargetException::class,
   )
-  public fun <T : Transformer> transform(clazz: Class<T>, action: Action<T>?): ShadowSpec
+  public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowSpec
 
-  public fun transform(transformer: Transformer): ShadowSpec
+  public fun transform(transformer: ResourceTransformer): ShadowSpec
 
   public fun mergeServiceFiles(): ShadowSpec
 

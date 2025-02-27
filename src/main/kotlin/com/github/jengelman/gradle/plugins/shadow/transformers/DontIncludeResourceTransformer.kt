@@ -18,7 +18,7 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 public open class DontIncludeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer by Transformer.Companion {
+) : ResourceTransformer by ResourceTransformer.Companion {
   @get:Optional
   @get:Input
   public open val resource: Property<String> = objectFactory.property()

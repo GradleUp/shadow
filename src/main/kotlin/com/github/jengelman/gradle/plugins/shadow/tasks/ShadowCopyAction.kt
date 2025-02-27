@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
 import java.util.GregorianCalendar
@@ -32,7 +32,7 @@ import org.objectweb.asm.commons.ClassRemapper
 public open class ShadowCopyAction(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
-  private val transformers: Set<Transformer>,
+  private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
   private val preserveFileTimestamps: Boolean,

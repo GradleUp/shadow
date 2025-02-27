@@ -28,7 +28,7 @@ public open class ServiceFileTransformer(
   private val patternSet: PatternSet = PatternSet()
     .include(SERVICES_PATTERN)
     .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-) : Transformer,
+) : ResourceTransformer,
   PatternFilterable by patternSet {
   @get:Internal
   internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()

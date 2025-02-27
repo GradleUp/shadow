@@ -15,9 +15,9 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
@@ -102,7 +102,7 @@ public abstract class ShadowJar :
   }
 
   @get:Nested
-  public open val transformers: SetProperty<Transformer> = objectFactory.setProperty()
+  public open val transformers: SetProperty<ResourceTransformer> = objectFactory.setProperty()
 
   @get:Nested
   public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
@@ -158,15 +158,15 @@ public abstract class ShadowJar :
     action?.execute(dependencyFilter.get())
   }
 
-  override fun transform(clazz: Class<Transformer>): ShadowJar {
+  override fun transform(clazz: Class<ResourceTransformer>): ShadowJar {
     return transform(clazz, null)
   }
 
-  override fun <T : Transformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
+  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
     addTransform(clazz.create(objectFactory), action)
   }
 
-  override fun transform(transformer: Transformer): ShadowJar = apply {
+  override fun transform(transformer: ResourceTransformer): ShadowJar = apply {
     addTransform(transformer, null)
   }
 
@@ -292,7 +292,7 @@ public abstract class ShadowJar :
     relocators.add(relocator)
   }
 
-  private fun <T : Transformer> addTransform(transformer: T, action: Action<T>?) {
+  private fun <T : ResourceTransformer> addTransform(transformer: T, action: Action<T>?) {
     action?.execute(transformer)
     transformers.add(transformer)
   }

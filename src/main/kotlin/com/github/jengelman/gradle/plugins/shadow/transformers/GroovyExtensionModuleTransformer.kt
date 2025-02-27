@@ -25,7 +25,7 @@ import org.gradle.api.file.FileTreeElement
  * Related to [org.apache.maven.plugins.shade.resource.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
  */
 @CacheableTransformer
-public open class GroovyExtensionModuleTransformer : Transformer {
+public open class GroovyExtensionModuleTransformer : ResourceTransformer {
   private val module = Properties()
 
   /**

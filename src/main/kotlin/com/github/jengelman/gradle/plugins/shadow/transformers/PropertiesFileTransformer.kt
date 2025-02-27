@@ -6,7 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
@@ -101,7 +100,7 @@ import org.gradle.api.tasks.Internal
 @CacheableTransformer
 public open class PropertiesFileTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private inline val charset get() = Charset.forName(charsetName.get())
 
   @get:Internal

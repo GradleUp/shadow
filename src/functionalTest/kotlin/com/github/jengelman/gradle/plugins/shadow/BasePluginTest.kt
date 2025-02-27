@@ -10,7 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.io.Closeable
@@ -390,7 +390,7 @@ abstract class BasePluginTest {
       return paths.joinToString(System.lineSeparator()) { "implementation files('${it.toUri().toURL().path}')" }
     }
 
-    inline fun <reified T : Transformer> transform(
+    inline fun <reified T : ResourceTransformer> transform(
       dependenciesBlock: String = "",
       transformerBlock: String = "",
     ): String {

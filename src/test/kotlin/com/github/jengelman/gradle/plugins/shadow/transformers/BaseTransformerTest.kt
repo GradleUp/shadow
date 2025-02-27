@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
-import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer.Companion.create
+import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.lang.reflect.ParameterizedType
@@ -15,7 +15,7 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
 
-abstract class BaseTransformerTest<T : Transformer> {
+abstract class BaseTransformerTest<T : ResourceTransformer> {
   protected lateinit var transformer: T
     private set
 
@@ -32,7 +32,7 @@ abstract class BaseTransformerTest<T : Transformer> {
   protected companion object {
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
 
-    fun Transformer.canTransformResource(path: String, isFile: Boolean = true): Boolean {
+    fun ResourceTransformer.canTransformResource(path: String, isFile: Boolean = true): Boolean {
       val element = object : FileTreeElement by noOpDelegate() {
         private val _relativePath = RelativePath.parse(isFile, path)
         override fun getPath(): String = _relativePath.pathString
@@ -49,7 +49,7 @@ abstract class BaseTransformerTest<T : Transformer> {
     }
 
     fun doTransformAndGetTransformedPath(
-      transformer: Transformer,
+      transformer: ResourceTransformer,
       preserveFileTimestamps: Boolean,
     ): Path {
       val testableZipPath = createTempFile("testable-zip-file-", ".jar")

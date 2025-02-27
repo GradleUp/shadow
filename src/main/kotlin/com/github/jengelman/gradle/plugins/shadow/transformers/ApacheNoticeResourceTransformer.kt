@@ -26,7 +26,7 @@ import org.gradle.api.tasks.Optional
 @CacheableTransformer
 public open class ApacheNoticeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
   private inline val charset get() = Charset.forName(charsetName.get())

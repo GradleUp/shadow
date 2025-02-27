@@ -30,7 +30,7 @@ import org.xml.sax.InputSource
 @CacheableTransformer
 public open class XmlAppendingTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer {
+) : ResourceTransformer {
   private var doc: Document? = null
 
   @get:Input

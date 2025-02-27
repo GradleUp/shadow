@@ -22,7 +22,7 @@ import org.gradle.api.tasks.Internal
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ComponentsXmlResourceTransformer : Transformer {
+public open class ComponentsXmlResourceTransformer : ResourceTransformer {
   private val components = mutableMapOf<String, Xpp3Dom>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
