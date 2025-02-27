@@ -22,7 +22,7 @@ import org.gradle.api.tasks.PathSensitivity
 @CacheableTransformer
 public open class IncludeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : Transformer by NoOpTransformer {
+) : Transformer by Transformer.Companion {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
   public open val file: RegularFileProperty = objectFactory.fileProperty()
