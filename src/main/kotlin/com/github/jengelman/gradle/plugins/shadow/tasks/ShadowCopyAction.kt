@@ -70,7 +70,6 @@ public open class ShadowCopyAction(
         )
       }
       zipFile.delete()
-      // Rethrow the exception like `java.util.zip.ZipException: archive is not a ZIP archive`.
       throw e
     }
     return WorkResults.didWork(true)
