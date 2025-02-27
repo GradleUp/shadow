@@ -382,6 +382,8 @@ abstract class BasePluginTest {
       "--configuration-cache",
       "--build-cache",
       "--stacktrace",
+      // https://docs.gradle.org/current/userguide/isolated_projects.html#how_do_i_use_it
+      "-Dorg.gradle.unsafe.isolated-projects=true",
     )
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
