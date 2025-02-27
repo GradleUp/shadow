@@ -58,10 +58,11 @@ public open class ShadowCopyAction(
         addDirs(zos)
       }
     } catch (e: Exception) {
-      if (e.cause is Zip64RequiredException) {
+      if (e is Zip64RequiredException || e.cause is Zip64RequiredException) {
+        val message = if (e is Zip64RequiredException) e.message else e.cause?.message
         throw Zip64RequiredException(
           """
-            ${e.cause?.message}
+            $message
 
             To build this archive, please enable the zip64 extension.
             See: ${documentationRegistry.getDslRefForProperty(Zip::class.java.name, "zip64")}
