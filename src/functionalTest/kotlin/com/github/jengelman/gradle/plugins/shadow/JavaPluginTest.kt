@@ -657,10 +657,14 @@ class JavaPluginTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/947",
+  )
   @Test
   fun canAddExtraFilesIntoShadowJar() {
     writeMainClass()
     path("Foo").writeText("Foo")
+    path("src/main/resources/application.yml").writeText("spring boot config")
     projectScriptPath.appendText(
       """
         $shadowJar {
@@ -669,6 +673,10 @@ class JavaPluginTest : BasePluginTest() {
           }
           from('Foo') {
             into('Bar')
+          }
+          from('src/main/resources') {
+            into 'BOOT-INF/classes/'
+            include '**/*.yml'
           }
         }
       """.trimIndent(),
@@ -681,8 +689,14 @@ class JavaPluginTest : BasePluginTest() {
         "my/Main.class",
         "META-INF/a-1.0.jar",
         "Bar/Foo",
+        "BOOT-INF/classes/application.yml",
       )
-      doesNotContainEntries(*entriesInA)
+      doesNotContainEntries(
+        *entriesInA,
+        "Foo",
+        "Foo/",
+        "application.yml",
+      )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
     val unzipped = path("unzipped")
