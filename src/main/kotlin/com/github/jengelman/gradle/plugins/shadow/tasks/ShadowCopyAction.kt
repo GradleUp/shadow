@@ -174,7 +174,7 @@ public open class ShadowCopyAction(
      *
      * See [issue 364](https://github.com/GradleUp/shadow/issues/364) and [issue 408](https://github.com/GradleUp/shadow/issues/408).
      */
-    private fun FileCopyDetails.remapClass() = file.inputStream().use { inputStream ->
+    private fun FileCopyDetails.remapClass() = open().use { inputStream ->
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
       // to the original class names. This is not a problem at runtime (because these entries in the
@@ -209,7 +209,7 @@ public open class ShadowCopyAction(
 
     private fun transform(fileDetails: FileCopyDetails, mapped: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      fileDetails.file.inputStream().use { inputStream ->
+      fileDetails.open().use { inputStream ->
         transformer.transform(
           TransformerContext(
             path = mapped,
