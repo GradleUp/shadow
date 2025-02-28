@@ -679,10 +679,24 @@ class JavaPluginTest : BasePluginTest() {
             include '**/*.yml'
           }
         }
+        tasks.named('jar') {
+          from('src/main/resources') {
+            into 'BOOT-INF/classes/'
+            include '**/*.yml'
+          }
+        }
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run("jar", shadowJarTask)
+
+    assertThat(jarPath("build/libs/my-1.0.jar")).useAll {
+      containsEntries(
+        "my/Main.class",
+        "BOOT-INF/classes/application.yml",
+        "application.yml",
+      )
+    }
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
@@ -690,12 +704,12 @@ class JavaPluginTest : BasePluginTest() {
         "META-INF/a-1.0.jar",
         "Bar/Foo",
         "BOOT-INF/classes/application.yml",
+        "application.yml",
       )
       doesNotContainEntries(
         *entriesInA,
         "Foo",
         "Foo/",
-        "application.yml",
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
