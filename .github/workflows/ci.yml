@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         # Always test on the latest version and some LTS.
-        java: [ 17, 21, 23 ]
+        java: [ 17, 21 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +21,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
+          java-version-file: .github/workflows/.java-version
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build
 
