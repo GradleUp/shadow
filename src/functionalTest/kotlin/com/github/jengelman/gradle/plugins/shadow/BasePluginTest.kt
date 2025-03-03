@@ -51,6 +51,16 @@ abstract class BasePluginTest {
   lateinit var entriesInB: Array<String>
   lateinit var entriesInAB: Array<String>
 
+  val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
+  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
+  val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
+  val shadowDistZipTask = ":shadowDistZip"
+
+  val projectScriptPath: Path get() = path("build.gradle")
+  val settingsScriptPath: Path get() = path("settings.gradle")
+  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
+  val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
+
   @BeforeAll
   open fun doFirst() {
     localRepo = AppendableMavenRepository(
@@ -92,16 +102,6 @@ abstract class BasePluginTest {
   fun doLast() {
     localRepo.root.deleteRecursively()
   }
-
-  val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
-  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
-  val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
-  val shadowDistZipTask = ":shadowDistZip"
-
-  val projectScriptPath: Path get() = path("build.gradle")
-  val settingsScriptPath: Path get() = path("settings.gradle")
-  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
-  val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   fun getDefaultProjectBuildScript(
     plugin: String = "java",
