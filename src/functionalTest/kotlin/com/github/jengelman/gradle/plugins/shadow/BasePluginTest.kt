@@ -12,6 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
+import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.io.Closeable
 import java.nio.file.Path
@@ -157,6 +158,10 @@ abstract class BasePluginTest {
         it.createFile()
       }
     }
+  }
+
+  inline fun buildJar(relative: String, builder: JarBuilder.() -> Unit): Path {
+    return JarBuilder(path("temp/$relative")).apply(builder).write()
   }
 
   inline fun run(
