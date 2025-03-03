@@ -33,6 +33,7 @@ import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -98,8 +99,9 @@ abstract class BasePluginTest {
     println(projectScriptPath.readText())
   }
 
-  @OptIn(ExperimentalPathApi::class)
+  @AfterAll
   fun doLast() {
+    @OptIn(ExperimentalPathApi::class)
     localRepo.root.deleteRecursively()
   }
 
