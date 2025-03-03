@@ -12,6 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
+import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import java.io.Closeable
 import java.nio.file.Path
@@ -32,6 +33,7 @@ import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -49,6 +51,16 @@ abstract class BasePluginTest {
   lateinit var entriesInA: Array<String>
   lateinit var entriesInB: Array<String>
   lateinit var entriesInAB: Array<String>
+
+  val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
+  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
+  val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
+  val shadowDistZipTask = ":shadowDistZip"
+
+  val projectScriptPath: Path get() = path("build.gradle")
+  val settingsScriptPath: Path get() = path("settings.gradle")
+  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
+  val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   @BeforeAll
   open fun doFirst() {
@@ -87,20 +99,11 @@ abstract class BasePluginTest {
     println(projectScriptPath.readText())
   }
 
-  @OptIn(ExperimentalPathApi::class)
+  @AfterAll
   fun doLast() {
+    @OptIn(ExperimentalPathApi::class)
     localRepo.root.deleteRecursively()
   }
-
-  val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
-  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
-  val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
-  val shadowDistZipTask = ":shadowDistZip"
-
-  val projectScriptPath: Path get() = path("build.gradle")
-  val settingsScriptPath: Path get() = path("settings.gradle")
-  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
-  val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   fun getDefaultProjectBuildScript(
     plugin: String = "java",
@@ -159,14 +162,18 @@ abstract class BasePluginTest {
     }
   }
 
-  inline fun run(
+  fun buildJar(relative: String, builder: JarBuilder.() -> Unit): Path {
+    return JarBuilder(path("temp/$relative")).apply(builder).write()
+  }
+
+  fun run(
     vararg tasks: String,
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
     return runnerBlock(runner(tasks.toList())).build().assertNoDeprecationWarnings()
   }
 
-  inline fun runWithFailure(
+  fun runWithFailure(
     vararg tasks: String,
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
@@ -189,17 +196,16 @@ abstract class BasePluginTest {
     }.publish()
   }
 
-  fun writeMainClass(
+  fun writeClass(
     sourceSet: String = "main",
     packageName: String = "my",
     withImports: Boolean = false,
     className: String = "Main",
     isJava: Boolean = true,
-  ): String {
-    if (isJava) {
-      val imports = if (withImports) "import junit.framework.Test;" else ""
-      val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-      path("src/$sourceSet/java/$packageName/$className.java").writeText(
+    classContent: () -> String = {
+      if (isJava) {
+        val imports = if (withImports) "import junit.framework.Test;" else ""
+        val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
         """
           package $packageName;
           $imports
@@ -211,12 +217,10 @@ abstract class BasePluginTest {
               System.out.println($classRef);
             }
           }
-        """.trimIndent(),
-      )
-    } else {
-      val imports = if (withImports) "import junit.framework.Test;" else ""
-      val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-      path("src/$sourceSet/kotlin/$packageName/$className.kt").writeText(
+        """.trimIndent()
+      } else {
+        val imports = if (withImports) "import junit.framework.Test;" else ""
+        val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
         """
           package $packageName
           $imports
@@ -226,8 +230,14 @@ abstract class BasePluginTest {
             println(content)
             println($classRef)
           }
-        """.trimIndent(),
-      )
+        """.trimIndent()
+      }
+    },
+  ): String {
+    if (isJava) {
+      path("src/$sourceSet/java/$packageName/$className.java").writeText(classContent())
+    } else {
+      path("src/$sourceSet/kotlin/$packageName/$className.kt").writeText(classContent())
     }
     val baseClassPath = packageName.replace('.', '/') + "/$className"
     return if (isJava) "$baseClassPath.class" else "${baseClassPath}Kt.class"

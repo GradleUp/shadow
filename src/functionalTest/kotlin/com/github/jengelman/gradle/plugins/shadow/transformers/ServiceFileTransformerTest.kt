@@ -170,7 +170,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val servicesBarEntry = "META-INF/services/foo.Bar"
     val one = buildJarOne {
       insert(servicesBarEntry, CONTENT_ONE)
-    }.toUri().toURL().path
+    }
     localRepo.module("foo", "bar", "1.0") {
       buildJar {
         insert(servicesBarEntry, CONTENT_TWO)
@@ -181,7 +181,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """
         dependencies {
           implementation 'foo:bar:1.0'
-          implementation files('$one')
+          ${implementationFiles(one)}
         }
         $shadowJar {
           mergeServiceFiles()

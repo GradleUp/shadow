@@ -18,11 +18,11 @@ class RelocationCachingTest : BaseCachingTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-    writeMainClass(withImports = true)
+    val mainClass = writeClass(withImports = true)
 
     assertCompositeExecutions {
       containsEntries(
-        "my/Main.class",
+        mainClass,
         *junitEntries,
       )
     }
@@ -39,7 +39,7 @@ class RelocationCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "my/Main.class",
+        mainClass,
         *shadowedEntries,
       )
       doesNotContainEntries(

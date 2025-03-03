@@ -29,17 +29,19 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 class TransformerCachingTest : BaseCachingTest() {
+  private lateinit var mainClass: String
+
   @BeforeEach
   override fun setup() {
     super.setup()
-    writeMainClass()
+    mainClass = writeClass()
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
     val assertions = {
       assertCompositeExecutions {
-        containsEntries("my/Main.class")
+        containsEntries(mainClass)
       }
     }
 
@@ -66,7 +68,7 @@ class TransformerCachingTest : BaseCachingTest() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     val assertions = { name: String ->
       assertCompositeExecutions {
-        containsEntries("my/Main.class", "foo/$name.properties")
+        containsEntries(mainClass, "foo/$name.properties")
         getContent("foo/$name.properties").isEqualTo("foo=$name")
       }
     }
@@ -96,7 +98,7 @@ class TransformerCachingTest : BaseCachingTest() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     val assertions = { name: String ->
       assertCompositeExecutions {
-        containsEntries("my/Main.class", "foo/$name.xml")
+        containsEntries(mainClass, "foo/$name.xml")
         getContent("foo/$name.xml").contains("<foo>$name</foo>")
       }
     }
@@ -167,7 +169,7 @@ class TransformerCachingTest : BaseCachingTest() {
     }
     val assertions = {
       assertCompositeExecutions {
-        containsEntries("my/Main.class")
+        containsEntries(mainClass)
       }
     }
 
