@@ -194,17 +194,16 @@ abstract class BasePluginTest {
     }.publish()
   }
 
-  fun writeMainClass(
+  fun writeClass(
     sourceSet: String = "main",
     packageName: String = "my",
     withImports: Boolean = false,
     className: String = "Main",
     isJava: Boolean = true,
-  ): String {
-    if (isJava) {
-      val imports = if (withImports) "import junit.framework.Test;" else ""
-      val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-      path("src/$sourceSet/java/$packageName/$className.java").writeText(
+    classContent: () -> String = {
+      if (isJava) {
+        val imports = if (withImports) "import junit.framework.Test;" else ""
+        val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
         """
           package $packageName;
           $imports
@@ -216,12 +215,10 @@ abstract class BasePluginTest {
               System.out.println($classRef);
             }
           }
-        """.trimIndent(),
-      )
-    } else {
-      val imports = if (withImports) "import junit.framework.Test;" else ""
-      val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-      path("src/$sourceSet/kotlin/$packageName/$className.kt").writeText(
+        """.trimIndent()
+      } else {
+        val imports = if (withImports) "import junit.framework.Test;" else ""
+        val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
         """
           package $packageName
           $imports
@@ -231,8 +228,14 @@ abstract class BasePluginTest {
             println(content)
             println($classRef)
           }
-        """.trimIndent(),
-      )
+        """.trimIndent()
+      }
+    },
+  ): String {
+    if (isJava) {
+      path("src/$sourceSet/java/$packageName/$className.java").writeText(classContent())
+    } else {
+      path("src/$sourceSet/kotlin/$packageName/$className.kt").writeText(classContent())
     }
     val baseClassPath = packageName.replace('.', '/') + "/$className"
     return if (isJava) "$baseClassPath.class" else "${baseClassPath}Kt.class"

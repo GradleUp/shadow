@@ -18,7 +18,7 @@ class RelocationCachingTest : BaseCachingTest() {
         }
       """.trimIndent() + System.lineSeparator(),
     )
-    writeMainClass(withImports = true)
+    writeClass(withImports = true)
 
     assertCompositeExecutions {
       containsEntries(

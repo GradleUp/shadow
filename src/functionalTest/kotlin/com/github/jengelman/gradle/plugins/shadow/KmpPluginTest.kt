@@ -21,7 +21,7 @@ class KmpPluginTest : BasePluginTest() {
 
   @Test
   fun compatKmpJvmTarget() {
-    val mainClass = writeMainClass(sourceSet = "jvmMain", isJava = false)
+    val mainClass = writeClass(sourceSet = "jvmMain", isJava = false)
     projectScriptPath.appendText(
       """
         kotlin {

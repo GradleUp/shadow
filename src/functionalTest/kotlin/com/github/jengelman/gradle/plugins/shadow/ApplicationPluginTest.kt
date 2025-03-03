@@ -114,7 +114,7 @@ class ApplicationPluginTest : BasePluginTest() {
   )
   @Test
   fun canOverrideMainClassAttrInManifestBlock() {
-    writeMainClass(className = "Main2")
+    writeClass(className = "Main2")
     prepare(
       projectBlock = """
         shadowJar {
@@ -216,7 +216,7 @@ class ApplicationPluginTest : BasePluginTest() {
     dependenciesBlock: String = "implementation 'my:a:1.0'",
     runShadowBlock: String = "",
   ) {
-    writeMainClass(withImports = mainClassWithImports)
+    writeClass(withImports = mainClassWithImports)
     projectScriptPath.appendText(
       """
         apply plugin: 'application'

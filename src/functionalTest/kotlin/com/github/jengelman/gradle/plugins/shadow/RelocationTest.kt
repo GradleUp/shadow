@@ -26,7 +26,7 @@ class RelocationTest : BasePluginTest() {
   @ParameterizedTest
   @MethodSource("prefixProvider")
   fun autoRelocation(relocationPrefix: String) {
-    val mainClass = writeMainClass()
+    val mainClass = writeClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -63,7 +63,7 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateDependencyFiles() {
-    val mainClass = writeMainClass()
+    val mainClass = writeClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -104,7 +104,7 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun relocateDependencyFilesWithFiltering() {
-    val mainClass = writeMainClass()
+    val mainClass = writeClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -355,7 +355,7 @@ class RelocationTest : BasePluginTest() {
     // Minus 3 sec to avoid the time difference between the file system and the JVM.
     val currentTimeMillis = System.currentTimeMillis() - 3.seconds.inWholeMilliseconds
     val junitEntryTimeRange = junitRawEntries.map { it.time }.let { it.min()..it.max() }
-    writeMainClass(withImports = true)
+    writeClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {

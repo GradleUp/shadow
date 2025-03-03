@@ -73,7 +73,7 @@ class JavaPluginTest : BasePluginTest() {
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
-    writeMainClass(withImports = true)
+    writeClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
@@ -505,7 +505,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun canRegisterCustomShadowJarTask() {
-    writeMainClass(sourceSet = "test", withImports = true)
+    writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScriptPath.appendText(
       """
@@ -606,7 +606,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun worksWithArchiveFileName() {
-    writeMainClass()
+    writeClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -659,7 +659,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun canAddExtraFilesIntoShadowJar() {
-    writeMainClass()
+    writeClass()
     path("Foo").writeText("Foo")
     projectScriptPath.appendText(
       """

@@ -73,8 +73,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
   )
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
-    writeMainClass(className = "Main")
-    writeMainClass(className = "Main2")
+    writeClass(className = "Main")
+    writeClass(className = "Main2")
     projectScriptPath.appendText(
       """
         dependencies {
@@ -144,7 +144,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingDependencyIncludesExcludes() {
-    writeMainClass(withImports = true)
+    writeClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {

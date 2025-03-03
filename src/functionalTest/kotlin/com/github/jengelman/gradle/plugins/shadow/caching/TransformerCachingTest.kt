@@ -32,7 +32,7 @@ class TransformerCachingTest : BaseCachingTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
-    writeMainClass()
+    writeClass()
   }
 
   @Test

@@ -23,7 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource
 class TransformersTest : BaseTransformerTest() {
   @Test
   fun manifestRetained() {
-    writeMainClass()
+    writeClass()
     projectScriptPath.appendText(
       """
         jar {
@@ -45,7 +45,7 @@ class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun manifestTransformed() {
-    writeMainClass()
+    writeClass()
 
     projectScriptPath.appendText(MANIFEST_ATTRS)
 
@@ -59,7 +59,7 @@ class TransformersTest : BaseTransformerTest() {
   )
   @Test
   fun shadowManifestLeaksToJarManifest() {
-    writeMainClass()
+    writeClass()
     projectScriptPath.appendText(MANIFEST_ATTRS)
 
     run("jar", shadowJarTask)
