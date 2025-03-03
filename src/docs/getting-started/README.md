@@ -76,6 +76,8 @@ following behavior:
   * `META-INF/*.SF`
   * `META-INF/*.DSA`
   * `META-INF/*.RSA`
+  * `META-INF/versions/**/module-info.class`
+  * `module-info.class`
 * Creates and registers the `shadow` component in the project (used for integrating with `maven-publish`).
 
 ## Shadowing Gradle Plugins
