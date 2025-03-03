@@ -160,18 +160,18 @@ abstract class BasePluginTest {
     }
   }
 
-  inline fun buildJar(relative: String, builder: JarBuilder.() -> Unit): Path {
+  fun buildJar(relative: String, builder: JarBuilder.() -> Unit): Path {
     return JarBuilder(path("temp/$relative")).apply(builder).write()
   }
 
-  inline fun run(
+  fun run(
     vararg tasks: String,
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
     return runnerBlock(runner(tasks.toList())).build().assertNoDeprecationWarnings()
   }
 
-  inline fun runWithFailure(
+  fun runWithFailure(
     vararg tasks: String,
     runnerBlock: (GradleRunner) -> GradleRunner = { it },
   ): BuildResult {
