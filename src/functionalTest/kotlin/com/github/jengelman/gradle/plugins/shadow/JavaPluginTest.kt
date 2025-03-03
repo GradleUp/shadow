@@ -586,12 +586,12 @@ class JavaPluginTest : BasePluginTest() {
   fun failBuildIfProcessingBadJar() {
     val badJarPath = path("bad.jar").apply {
       writeText("A bad jar.")
-    }.toUri().toURL().path
+    }
 
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation files('$badJarPath')
+          ${implementationFiles(badJarPath)}
         }
       """.trimIndent(),
     )
@@ -664,7 +664,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          from(files('${artifactAJar.toUri().toURL().path}')) {
+          from(file('${artifactAJar.toUri().toURL().path}')) {
             into('META-INF')
           }
           from('Foo') {

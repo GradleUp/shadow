@@ -400,7 +400,7 @@ abstract class BasePluginTest {
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.toUri().toURL().path}')" }
+      return paths.joinToString(System.lineSeparator()) { "implementation file('${it.toUri().toURL().path}')" }
     }
 
     inline fun <reified T : ResourceTransformer> transform(
