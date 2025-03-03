@@ -7,6 +7,7 @@ import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
@@ -694,6 +695,47 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(jarPath(unzipped.name)).useAll {
       containsEntries(*entriesInA)
       doesNotContainEntries(mainClass)
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/520",
+  )
+  @Test
+  fun onlyKeepFilesFromProjectWhenDuplicatesStrategyIsExclude() {
+    val fooJar = buildJar("foo.jar") {
+      insert("module-info.class", "module myModuleName {}")
+    }
+    val mainClass = writeClass()
+    writeClass(className = "module-info") {
+      "module myModuleName {}"
+    }
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(fooJar)}
+        }
+        $shadowJar {
+          duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+          excludes.remove(
+            'module-info.class'
+          )
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        mainClass,
+        "module-info.class",
+      )
+      getContent("module-info.class").all {
+        isNotEmpty()
+        // It's the compiled class instead of the original content.
+        isNotEqualTo("module myModuleName {}")
+      }
     }
   }
 }
