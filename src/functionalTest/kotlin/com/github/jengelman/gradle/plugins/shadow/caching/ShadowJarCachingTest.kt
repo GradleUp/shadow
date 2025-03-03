@@ -73,8 +73,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
   )
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
-    writeClass(className = "Main")
-    writeClass(className = "Main2")
+    val mainClass = writeClass(className = "Main")
+    val main2Class = writeClass(className = "Main2")
     projectScriptPath.appendText(
       """
         dependencies {
@@ -85,7 +85,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      val entries = entriesInAB + arrayOf("my/Main.class", "my/Main2.class")
+      val entries = entriesInAB + arrayOf(mainClass, main2Class)
       containsEntries(*entries)
     }
 
@@ -99,8 +99,8 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "my/Main.class",
-        "my/Main2.class",
+        mainClass,
+        main2Class,
       )
       doesNotContainEntries(*entriesInAB)
     }
@@ -108,17 +108,17 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          include 'my/Main.class'
+          include '$mainClass'
         }
       """.trimIndent() + System.lineSeparator(),
     )
 
     assertCompositeExecutions {
       containsEntries(
-        "my/Main.class",
+        mainClass,
       )
       doesNotContainEntries(
-        "my/Main2.class",
+        main2Class,
         "a.properties",
         "a2.properties",
         "b.properties",
@@ -128,15 +128,15 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          include 'my/Main2.class'
+          include '$main2Class'
         }
       """.trimIndent() + System.lineSeparator(),
     )
 
     assertCompositeExecutions {
       containsEntries(
-        "my/Main.class",
-        "my/Main2.class",
+        mainClass,
+        main2Class,
       )
       doesNotContainEntries(*entriesInAB)
     }
@@ -144,7 +144,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingDependencyIncludesExcludes() {
-    writeClass(withImports = true)
+    val mainClass = writeClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
@@ -155,7 +155,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "my/Main.class",
+        mainClass,
         *junitEntries,
       )
     }
@@ -172,7 +172,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsEntries(
-        "my/Main.class",
+        mainClass,
       )
       doesNotContainEntries(
         *junitEntries,

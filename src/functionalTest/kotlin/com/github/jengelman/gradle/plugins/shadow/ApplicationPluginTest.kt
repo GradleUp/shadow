@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test
 
 @ExperimentalPathApi
 class ApplicationPluginTest : BasePluginTest() {
+  private lateinit var mainClass: String
+
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
@@ -73,7 +75,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     commonAssertions(
       jarPath("myapp-shadow/lib/myapp-1.0-all.jar", installPath),
-      entriesContained = arrayOf("my/Main.class", *junitEntries),
+      entriesContained = arrayOf(mainClass, *junitEntries),
     )
 
     val unixScript = path("myapp-shadow/bin/myapp", installPath)
@@ -114,7 +116,7 @@ class ApplicationPluginTest : BasePluginTest() {
   )
   @Test
   fun canOverrideMainClassAttrInManifestBlock() {
-    writeClass(className = "Main2")
+    val main2Class = writeClass(className = "Main2")
     prepare(
       projectBlock = """
         shadowJar {
@@ -135,7 +137,7 @@ class ApplicationPluginTest : BasePluginTest() {
     assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
-      entriesContained = entriesInA + arrayOf("my/Main.class", "my/Main2.class"),
+      entriesContained = entriesInA + arrayOf(mainClass, main2Class),
       mainClassAttr = "my.Main2",
     )
 
@@ -216,7 +218,7 @@ class ApplicationPluginTest : BasePluginTest() {
     dependenciesBlock: String = "implementation 'my:a:1.0'",
     runShadowBlock: String = "",
   ) {
-    writeClass(withImports = mainClassWithImports)
+    mainClass = writeClass(withImports = mainClassWithImports)
     projectScriptPath.appendText(
       """
         apply plugin: 'application'
@@ -244,7 +246,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private fun commonAssertions(
     jarPath: JarPath,
-    entriesContained: Array<String> = entriesInA + "my/Main.class",
+    entriesContained: Array<String> = entriesInA + mainClass,
     mainClassAttr: String = "my.Main",
     classPathAttr: String? = null,
   ) {
