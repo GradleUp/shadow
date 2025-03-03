@@ -683,7 +683,11 @@ class JavaPluginTest : BasePluginTest() {
         "META-INF/a-1.0.jar",
         "Bar/Foo",
       )
-      doesNotContainEntries(*entriesInA)
+      doesNotContainEntries(
+        *entriesInA,
+        "Foo",
+        "Foo/",
+      )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
     val unzipped = path("unzipped")
