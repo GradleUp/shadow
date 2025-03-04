@@ -77,8 +77,8 @@ testing.suites {
   register<JvmTestSuite>("integrationTest") {
     targets.configureEach {
       testTask {
-        val docsDir = file("src/docs")
-        // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
+        val docsDir = file("docs")
+        // Add docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
         inputs.dir(docsDir)
         systemProperty("DOCS_DIR", docsDir.absolutePath)
       }
