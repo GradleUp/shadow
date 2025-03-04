@@ -1,12 +1,13 @@
-package com.github.jengelman.gradle.plugins.shadow.tasks
+package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.InheritManifest
 import org.gradle.api.Action
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Manifest
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
-public open class DefaultInheritManifest @JvmOverloads constructor(
+internal class DefaultInheritManifest @JvmOverloads constructor(
   private val fileResolver: FileResolver,
   private val internalManifest: DefaultManifest = DefaultManifest(fileResolver),
 ) : InheritManifest,

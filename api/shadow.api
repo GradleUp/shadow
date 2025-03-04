@@ -143,24 +143,6 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun relocatePath-bvWaKNU (Ljava/lang/String;)Ljava/lang/String;
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest : com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest, org/gradle/api/java/archives/Manifest {
-	public fun <init> (Lorg/gradle/api/internal/file/FileResolver;)V
-	public fun <init> (Lorg/gradle/api/internal/file/FileResolver;Lorg/gradle/api/java/archives/internal/DefaultManifest;)V
-	public synthetic fun <init> (Lorg/gradle/api/internal/file/FileResolver;Lorg/gradle/api/java/archives/internal/DefaultManifest;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun attributes (Ljava/util/Map;)Lorg/gradle/api/java/archives/Manifest;
-	public fun attributes (Ljava/util/Map;Ljava/lang/String;)Lorg/gradle/api/java/archives/Manifest;
-	public fun from (Ljava/lang/Object;Lgroovy/lang/Closure;)Lorg/gradle/api/java/archives/Manifest;
-	public fun from (Ljava/lang/Object;Lorg/gradle/api/Action;)Lorg/gradle/api/java/archives/Manifest;
-	public fun from ([Ljava/lang/Object;)Lorg/gradle/api/java/archives/Manifest;
-	public fun getAttributes ()Lorg/gradle/api/java/archives/Attributes;
-	public synthetic fun getEffectiveManifest ()Lorg/gradle/api/java/archives/Manifest;
-	public fun getEffectiveManifest ()Lorg/gradle/api/java/archives/internal/DefaultManifest;
-	public fun getSections ()Ljava/util/Map;
-	public fun inheritFrom ([Ljava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
-	public fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
-	public fun writeTo (Ljava/lang/Object;)Lorg/gradle/api/java/archives/Manifest;
-}
-
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
