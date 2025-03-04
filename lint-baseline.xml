@@ -7,8 +7,8 @@
         errorLine1="import org.gradle.api.internal.file.FileResolver"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest.kt"
-            line="4"
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="5"
             column="1"/>
     </issue>
 
@@ -18,8 +18,8 @@
         errorLine1="import org.gradle.api.java.archives.internal.DefaultManifest"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest.kt"
-            line="6"
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="7"
             column="1"/>
     </issue>
 
@@ -29,8 +29,8 @@
         errorLine1="import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/DefaultInheritManifest.kt"
-            line="7"
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="8"
             column="1"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="32"
+            line="33"
             column="1"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="33"
+            line="34"
             column="1"/>
     </issue>
 
