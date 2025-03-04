@@ -9,7 +9,7 @@ module.exports = {
     editLinks: true,
     editLinkText: 'Help improve these docs!',
     logo: '/logo+type.svg',
-    docsDir: 'src/docs',
+    docsDir: 'docs',
     nav: [
       { text: 'User Guide', link: '/introduction/' }
     ],

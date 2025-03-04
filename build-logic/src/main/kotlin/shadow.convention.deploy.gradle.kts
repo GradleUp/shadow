@@ -7,7 +7,7 @@ plugins {
 
 val yarnBuild = tasks.named("yarn_build") {
   dependsOn(tasks.yarn)
-  inputs.dir("src/docs")
+  inputs.dir("docs")
   outputs.dir("build/site")
 }
 
