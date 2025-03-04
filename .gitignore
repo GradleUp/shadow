@@ -12,7 +12,7 @@ out
 classes/
 node_modules/
 yarn-error.log
-src/docs/.vuepress/dist/
+docs/.vuepress/dist/
 .DS_Store
 jd-gui.cfg
 bin/
