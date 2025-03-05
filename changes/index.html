@@ -1,0 +1,2404 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Gradle plugin to create fat/uber JARs, apply file transforms, and relocate packages for applications and libraries">
+      
+      
+        <meta name="author" content="GradleUp developers">
+      
+      
+      
+        <link rel="prev" href="../plugins/">
+      
+      
+        <link rel="next" href="../api/">
+      
+      
+      <link rel="icon" href="../images/logo.orig.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+    
+    
+      
+        <title>Changes - Shadow Gradle Plugin</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CFira+Code:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Fira Code"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#change-log" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Shadow Gradle Plugin" class="md-header__button md-logo" aria-label="Shadow Gradle Plugin" data-md-component="logo">
+      
+  <img src="../images/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Shadow Gradle Plugin
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/GradleUp/shadow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Shadow
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Shadow Gradle Plugin" class="md-nav__button md-logo" aria-label="Shadow Gradle Plugin" data-md-component="logo">
+      
+  <img src="../images/logo.svg" alt="logo">
+
+    </a>
+    Shadow Gradle Plugin
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/GradleUp/shadow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Shadow
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/filtering/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Filtering
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/dependencies/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dependencies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/merging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Merging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/relocation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Relocation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/minimizing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Minimizing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/reproducible-builds/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reproducible Builds
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-tasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Custom Tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../application-plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Application Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kmp-plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KMP Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../publishing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Publishing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multi-project/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multi-Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Changes
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Changes
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unreleased
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta10-2025-03-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      [v9.0.0-beta10] (2025-03-05)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta9-2025-02-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta9 (2025-02-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta8-2025-02-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta8 (2025-02-08)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta7-2025-02-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta7 (2025-02-02)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta6-2025-01-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta6 (2025-01-23)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta5-2025-01-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta5 (2025-01-21)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta4-2024-12-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta4 (2024-12-06)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta2-2024-11-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta2 (2024-11-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta1-2024-11-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta1 (2024-11-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v836-2025-02-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.6 (2025-02-02)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v835-2024-11-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.5 (2024-11-03)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v834-2024-10-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.4 (2024-10-29)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v833-2024-10-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.3 (2024-10-02)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v832-2024-09-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.2 (2024-09-18)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v831-2024-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.1 (2024-09-10)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v830-2024-08-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.0 (2024-08-08)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v811-2023-03-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.1.1 (2023-03-20)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v810-2023-02-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.1.0 (2023-02-26)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v800-2023-02-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.0.0 (2023-02-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v713-unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.3 (unreleased)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v712-2021-12-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.2 (2021-12-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v711-2021-12-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.1 (2021-12-14)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v710-2021-10-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.0 (2021-10-04)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v700-2021-04-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.0.0 (2021-04-26)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v610-2020-10-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      v6.1.0 (2020-10-05)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v600-2020-06-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      v6.0.0 (2020-06-15)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v520-2019-11-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      v5.2.0 (2019-11-10)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v510-2019-06-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      v5.1.0 (2019-06-29)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v500-2019-02-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v5.0.0 (2019-02-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v404-2019-01-19" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.4 (2019-01-19)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v403-2018-11-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.3 (2018-11-21)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v402-2018-10-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.2 (2018-10-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v401-2018-09-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.1 (2018-09-30)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v400-2018-09-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.0 (2018-09-25)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v204-2018-04-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.4 (2018-04-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v203-2018-03-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.3 (2018-03-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v202-2017-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.2 (2017-12-12)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v201-2017-06-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.1 (2017-06-23)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v200-2017-05-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.0 (2017-05-09)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v124-2016-11-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.4 (2016-11-03)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v123-2016-01-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.3 (2016-01-25)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v122-2015-07-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.2 (2015-07-17)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v121-2015-01-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.1 (2015-01-23)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v120-2014-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.0 (2014-11-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v112-2014-09-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.1.2 (2014-09-09)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v111-2014-08-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.1.1 (2014-08-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v110-2014-08-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.1.0 (2014-08-26)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v103-2014-07-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.3 (2014-07-29)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v102-2014-07-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.2 (2014-07-07)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v101-2014-06-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.1 (2014-06-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v100-2014-06-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.0 (2014-06-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m5" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M5
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m4" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M4
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m3" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M3
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m2" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m1" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M1
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unreleased
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta10-2025-03-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      [v9.0.0-beta10] (2025-03-05)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta9-2025-02-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta9 (2025-02-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta8-2025-02-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta8 (2025-02-08)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta7-2025-02-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta7 (2025-02-02)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta6-2025-01-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta6 (2025-01-23)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta5-2025-01-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta5 (2025-01-21)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta4-2024-12-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta4 (2024-12-06)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta2-2024-11-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta2 (2024-11-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v900-beta1-2024-11-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v9.0.0-beta1 (2024-11-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v836-2025-02-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.6 (2025-02-02)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v835-2024-11-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.5 (2024-11-03)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v834-2024-10-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.4 (2024-10-29)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v833-2024-10-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.3 (2024-10-02)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v832-2024-09-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.2 (2024-09-18)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v831-2024-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.1 (2024-09-10)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v830-2024-08-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.3.0 (2024-08-08)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v811-2023-03-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.1.1 (2023-03-20)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v810-2023-02-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.1.0 (2023-02-26)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v800-2023-02-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v8.0.0 (2023-02-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v713-unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.3 (unreleased)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v712-2021-12-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.2 (2021-12-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v711-2021-12-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.1 (2021-12-14)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v710-2021-10-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.1.0 (2021-10-04)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v700-2021-04-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      v7.0.0 (2021-04-26)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v610-2020-10-05" class="md-nav__link">
+    <span class="md-ellipsis">
+      v6.1.0 (2020-10-05)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v600-2020-06-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      v6.0.0 (2020-06-15)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v520-2019-11-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      v5.2.0 (2019-11-10)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v510-2019-06-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      v5.1.0 (2019-06-29)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v500-2019-02-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v5.0.0 (2019-02-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v404-2019-01-19" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.4 (2019-01-19)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v403-2018-11-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.3 (2018-11-21)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v402-2018-10-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.2 (2018-10-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v401-2018-09-30" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.1 (2018-09-30)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v400-2018-09-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      v4.0.0 (2018-09-25)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v204-2018-04-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.4 (2018-04-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v203-2018-03-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.3 (2018-03-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v202-2017-12-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.2 (2017-12-12)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v201-2017-06-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.1 (2017-06-23)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v200-2017-05-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2.0.0 (2017-05-09)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v124-2016-11-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.4 (2016-11-03)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v123-2016-01-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.3 (2016-01-25)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v122-2015-07-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.2 (2015-07-17)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v121-2015-01-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.1 (2015-01-23)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v120-2014-11-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.2.0 (2014-11-24)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v112-2014-09-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.1.2 (2014-09-09)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v111-2014-08-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.1.1 (2014-08-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v110-2014-08-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.1.0 (2014-08-26)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v103-2014-07-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.3 (2014-07-29)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v102-2014-07-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.2 (2014-07-07)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v101-2014-06-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.1 (2014-06-28)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v100-2014-06-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1.0.0 (2014-06-27)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m5" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M5
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m4" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M4
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m3" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M3
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m2" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-m1" class="md-nav__link">
+    <span class="md-ellipsis">
+      v0.9.0-M1
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link">&para;</a></h1>
+<h2 id="unreleased"><a href="https://github.com/GradleUp/shadow/compare/9.0.0-beta9...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="v900-beta10-2025-03-05">[v9.0.0-beta10] (2025-03-05)<a class="headerlink" href="#v900-beta10-2025-03-05" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Compat Kotlin Multiplatform plugin. (<a href="https://github.com/GradleUp/shadow/pull/1280">#1280</a>)<br />
+  You still need to manually configure <code>manifest.attributes</code> (e.g. <code>Main-Class</code> attr) in the <code>shadowJar</code> task if necessary.</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Rename <code>Transformer</code> to <code>ResourceTransformer</code>. (<a href="https://github.com/GradleUp/shadow/pull/1288">#1288</a>)<br />
+  Aims to better align with the name of <a href="https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java">org.apache.maven.plugins.shade.resource.ResourceTransformer.java</a> and to distinguish itself from <a href="https://docs.gradle.org/current/javadoc/org/gradle/api/Transformer.html">org.gradle.api.Transformer.java</a>.</li>
+<li><strong>BREAKING CHANGE:</strong> Mark <code>DefaultInheritManifest</code> as <code>internal</code>. (<a href="https://github.com/GradleUp/shadow/pull/1303">#1303</a>)</li>
+<li>Migrate doc sites to MkDocs. (<a href="https://github.com/GradleUp/shadow/pull/1302">#1302</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Fix the last modified time of shadowed directories. (<a href="https://github.com/GradleUp/shadow/pull/1277">#1277</a>)</li>
+</ul>
+<p><strong>Removed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Remove <code>Named</code> from the parents of <code>Transformer</code>. (<a href="https://github.com/GradleUp/shadow/pull/1289">#1289</a>)</li>
+</ul>
+<h2 id="v900-beta9-2025-02-24"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9">v9.0.0-beta9</a> (2025-02-24)<a class="headerlink" href="#v900-beta9-2025-02-24" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Mark <code>Transformer</code> as throwing <code>IOException</code>. (<a href="https://github.com/GradleUp/shadow/pull/1248">#1248</a>)</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Move tracking unused classes logic out of <code>ShadowCopyAction</code>. (<a href="https://github.com/GradleUp/shadow/pull/1257">#1257</a>)</li>
+<li>Reduce duplicated <code>SimpleRelocator</code> to improve performance. (<a href="https://github.com/GradleUp/shadow/pull/1271">#1271</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> Move <code>DependencyFilter</code> from <code>com.github.jengelman.gradle.plugins.shadow.internal</code> into <code>com.github.jengelman.gradle.plugins.shadow.tasks</code>. (<a href="https://github.com/GradleUp/shadow/pull/1272">#1272</a>)</li>
+<li>Refactor file visiting logic in <code>StreamAction</code>, handle file unzipping via <code>Project.zipTree</code>. (<a href="https://github.com/GradleUp/shadow/pull/1233">#1233</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Honor <code>DuplicatesStrategy</code>. (<a href="https://github.com/GradleUp/shadow/pull/1233">#1233</a>)</li>
+<li>Honor unzipped jars via <code>from</code>. (<a href="https://github.com/GradleUp/shadow/pull/1233">#1233</a>)</li>
+</ul>
+<p><strong>Removed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Remove <code>BaseStreamAction</code>. (<a href="https://github.com/GradleUp/shadow/pull/1258">#1258</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> Remove <code>ShadowStats</code>. (<a href="https://github.com/GradleUp/shadow/pull/1264">#1264</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> Remove <code>ShadowCopyAction.ArchiveFileTreeElement</code> and <code>RelativeArchivePath</code>. (<a href="https://github.com/GradleUp/shadow/pull/1233">#1233</a>)</li>
+</ul>
+<h2 id="v900-beta8-2025-02-08"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8">v9.0.0-beta8</a> (2025-02-08)<a class="headerlink" href="#v900-beta8-2025-02-08" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Sync <code>ShadowApplicationPlugin</code> with <code>ApplicationPlugin</code>. (<a href="https://github.com/GradleUp/shadow/pull/1224">#1224</a>)</li>
+<li>Inject <code>Multi-Release</code> manifest attribute if any dependency contains it. (<a href="https://github.com/GradleUp/shadow/pull/1239">#1239</a>)</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Mark <code>RelocatorRemapper</code> as <code>internal</code>. (<a href="https://github.com/GradleUp/shadow/pull/1227">#1227</a>)</li>
+<li>Bump min Java requirement to 11. (<a href="https://github.com/GradleUp/shadow/pull/1242">#1242</a>)</li>
+</ul>
+<p><strong>Removed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> <code>ServiceFileTransformer.ServiceStream</code> has been removed. (<a href="https://github.com/GradleUp/shadow/pull/1218">#1218</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> Remove <code>KnowsTask</code> as it&rsquo;s useless. (<a href="https://github.com/GradleUp/shadow/pull/1236">#1236</a>)</li>
+</ul>
+<h2 id="v900-beta7-2025-02-02"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7">v9.0.0-beta7</a> (2025-02-02)<a class="headerlink" href="#v900-beta7-2025-02-02" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Inject <code>TargetJvmVersion</code> attribute for Gradle Module Metadata. (<a href="https://github.com/GradleUp/shadow/pull/1199">#1199</a>)</li>
+<li>Support Java 24. (<a href="https://github.com/GradleUp/shadow/pull/1222">#1222</a>)</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li>Update start script templates. (<a href="https://github.com/GradleUp/shadow/pull/1183">#1183</a>)</li>
+<li>Mark more <code>Transformer</code>s cacheable. (<a href="https://github.com/GradleUp/shadow/pull/1210">#1210</a>)</li>
+<li>Mark <code>ShadowJar.dependencyFilter</code> as <code>@Input</code>. (<a href="https://github.com/GradleUp/shadow/pull/1206">#1206</a>)<br />
+<code>ShadowSpec.stats</code> is removed and <code>ShadowJar.stats</code> is <code>internal</code> for now.</li>
+<li>Polish <code>startShadowScripts</code> task registering. (<a href="https://github.com/GradleUp/shadow/pull/1216">#1216</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Support overriding <code>mainClass</code> provided by <code>JavaApplication</code>. (<a href="https://github.com/GradleUp/shadow/pull/1182">#1182</a>)</li>
+<li>Fix <code>ShadowJar</code> not being successful after <code>includes</code> or <code>excludes</code> are changed. (<a href="https://github.com/GradleUp/shadow/pull/1200">#1200</a>)</li>
+</ul>
+<p><strong>Removed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Remove <code>JavaJarExec</code>, now use <code>JavaExec</code> directly for <code>runShadow</code> task. (<a href="https://github.com/GradleUp/shadow/pull/1197">#1197</a>)</li>
+</ul>
+<h2 id="v900-beta6-2025-01-23"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6">v9.0.0-beta6</a> (2025-01-23)<a class="headerlink" href="#v900-beta6-2025-01-23" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Exclude <code>module-info.class</code> in Multi-Release folders by default. (<a href="https://github.com/GradleUp/shadow/pull/1177">#1177</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Fix <code>Log4j2PluginsCacheFileTransformer</code> not working for merging <code>Log4j2Plugins.dat</code> files. (<a href="https://github.com/GradleUp/shadow/pull/1175">#1175</a>)  </li>
+</ul>
+<h2 id="v900-beta5-2025-01-21"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5">v9.0.0-beta5</a> (2025-01-21)<a class="headerlink" href="#v900-beta5-2025-01-21" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Sync <code>SimpleRelocator</code> changes from maven-shade-plugin. (<a href="https://github.com/GradleUp/shadow/pull/1076">#1076</a>)</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li>Exclude kotlin-stdlib from plugin dependencies. (<a href="https://github.com/GradleUp/shadow/pull/1093">#1093</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> Migrate all <code>ListProperty</code> usages to <code>SetProperty</code>. (<a href="https://github.com/GradleUp/shadow/pull/1103">#1103</a>)<br />
+  Some public <code>List</code> parameters are also changed to <code>Set</code>.</li>
+<li>Replace deprecated <code>SelfResolvingDependency</code> with <code>FileCollectionDependency</code>. (<a href="https://github.com/GradleUp/shadow/pull/1114">#1114</a>)</li>
+<li>Support configuring <code>separator</code> in <code>AppendingTransformer</code>. (<a href="https://github.com/GradleUp/shadow/pull/1169">#1169</a>)<br />
+  This is useful for handling files like <code>resources/application.yml</code>.  </li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Fail builds if processing bad jars.  (<a href="https://github.com/GradleUp/shadow/pull/1146">#1146</a>)  </li>
+</ul>
+<h2 id="v900-beta4-2024-12-06"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4">v9.0.0-beta4</a> (2024-12-06)<a class="headerlink" href="#v900-beta4-2024-12-06" title="Permanent link">&para;</a></h2>
+<p><strong>Changed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Some public getters are removed from <code>SimpleRelocator</code>, <code>includes</code> and <code>excludes</code> are exposed as <code>SetProperty</code>s. (<a href="https://github.com/GradleUp/shadow/pull/1079">#1079</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Adjust property initializations and modifiers in <code>ShadowJar</code>. (<a href="https://github.com/GradleUp/shadow/pull/1090">#1090</a>)<br />
+  This fixes the regression for registering custom <code>ShadowJar</code> tasks.</li>
+</ul>
+<h2 id="v900-beta2-2024-11-28"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2">v9.0.0-beta2</a> (2024-11-28)<a class="headerlink" href="#v900-beta2-2024-11-28" title="Permanent link">&para;</a></h2>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Revert &ldquo;Migrate SimpleRelocator to using lazy properties&rdquo; (<a href="https://github.com/GradleUp/shadow/pull/1052">#1052</a>)<br />
+  This fixes the relocation not working in <code>v9.0.0-beta1</code>.</li>
+</ul>
+<h2 id="v900-beta1-2024-11-27"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1">v9.0.0-beta1</a> (2024-11-27)<a class="headerlink" href="#v900-beta1-2024-11-27" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Add .md support to the Apache License and Notice transformers. (<a href="https://github.com/GradleUp/shadow/pull/1041">#1041</a>)</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Rewrite this plugin in Kotlin. (<a href="https://github.com/GradleUp/shadow/pull/1012">#1012</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> Migrate <code>Transformer</code>s to using lazy properties. (<a href="https://github.com/GradleUp/shadow/pull/1036">#1036</a>)  </li>
+<li><strong>BREAKING CHANGE:</strong> Migrate <code>ShadowJar</code> to using lazy properties. (<a href="https://github.com/GradleUp/shadow/pull/1044">#1044</a>)
+  <code>isEnableRelocation</code> is removed, use <code>enableRelocation</code> instead.</li>
+<li><strong>BREAKING CHANGE:</strong> Resolve <code>Configuration</code> directly in <code>DependencyFilter</code>. (<a href="https://github.com/GradleUp/shadow/pull/1045">#1045</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> Migrate <code>SimpleRelocator</code> to using lazy properties. (<a href="https://github.com/GradleUp/shadow/pull/1047">#1047</a>)  </li>
+</ul>
+<p><strong>Removed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Remove Develocity integration. (<a href="https://github.com/GradleUp/shadow/pull/1014">#1014</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Fix single Log4j2Plugins.dat isn&rsquo;t included into fat jar. (<a href="https://github.com/GradleUp/shadow/issues/1039">#1039</a>)  </li>
+</ul>
+<h2 id="v836-2025-02-02"><a href="https://github.com/GradleUp/shadow/releases/tag/8.3.6">v8.3.6</a> (2025-02-02)<a class="headerlink" href="#v836-2025-02-02" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Support Java 24. (<a href="https://github.com/GradleUp/shadow/pull/1222">#1222</a>)</li>
+</ul>
+<h2 id="v835-2024-11-03"><a href="https://github.com/GradleUp/shadow/releases/tag/8.3.5">v8.3.5</a> (2024-11-03)<a class="headerlink" href="#v835-2024-11-03" title="Permanent link">&para;</a></h2>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Revert &ldquo;Bump Java level to 11&rdquo; (<a href="https://github.com/GradleUp/shadow/issues/1011">#1011</a>).<br />
+  This reverts the change to maintain compatibility with 8.x versions. The Java level will be bumped to 11 or above in the next major release.</li>
+</ul>
+<h2 id="v834-2024-10-29"><a href="https://github.com/GradleUp/shadow/releases/tag/8.3.4">v8.3.4</a> (2024-10-29)<a class="headerlink" href="#v834-2024-10-29" title="Permanent link">&para;</a></h2>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Apply legacy plugin last, and declare capabilities for old plugins, fixes <a href="https://github.com/GradleUp/shadow/issues/964">#964</a>. (<a href="https://github.com/GradleUp/shadow/pull/991">#991</a>)</li>
+</ul>
+<h2 id="v833-2024-10-02"><a href="https://github.com/GradleUp/shadow/releases/tag/8.3.3">v8.3.3</a> (2024-10-02)<a class="headerlink" href="#v833-2024-10-02" title="Permanent link">&para;</a></h2>
+<p><strong>Changed</strong></p>
+<ul>
+<li>Disable Develocity integration by default. (<a href="https://github.com/GradleUp/shadow/pull/993">#993</a>)</li>
+</ul>
+<h2 id="v832-2024-09-18"><a href="https://github.com/GradleUp/shadow/releases/tag/8.3.2">v8.3.2</a> (2024-09-18)<a class="headerlink" href="#v832-2024-09-18" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Support Java 23. (<a href="https://github.com/GradleUp/shadow/pull/974">#974</a>)</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li><code>ShadowExtension.component</code> has been deprecated, now you can use <code>component.shadow</code> instead. (<a href="https://github.com/GradleUp/shadow/pull/956">#956</a>)</li>
+<li><strong>BREAKING CHANGE:</strong> update to <a href="https://github.com/tcurdt/jdependency/blob/master/HISTORY.md#version-2110-release-18112024">jdependency 2.11.0</a>, this requires Java 11 or above to run. (<a href="https://github.com/GradleUp/shadow/pull/974">#974</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Stop publishing Shadow self fat jar to Maven repository. (<a href="https://github.com/GradleUp/shadow/pull/967">#967</a>)</li>
+</ul>
+<h2 id="v831-2024-09-10"><a href="https://github.com/GradleUp/shadow/releases/tag/8.3.1">v8.3.1</a> (2024-09-10)<a class="headerlink" href="#v831-2024-09-10" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Apply an empty plugin that has the legacy <code>com.github.johnrengelman.shadow</code> plugin ID.
+  This allows existing build logic to keep on reacting to the legacy plugin as the replacement is drop-in currently.</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Explicitly add classifier to maven publication. (<a href="https://github.com/GradleUp/shadow/pull/904">#904</a>)</li>
+<li>Refix excluding Gradle APIs for java-gradle-plugin. (<a href="https://github.com/GradleUp/shadow/pull/948">#948</a>)</li>
+</ul>
+<h2 id="v830-2024-08-08"><a href="https://github.com/GradleUp/shadow/releases/tag/8.3.0">v8.3.0</a> (2024-08-08)<a class="headerlink" href="#v830-2024-08-08" title="Permanent link">&para;</a></h2>
+<p><strong>Changed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> the GitHub has been transferred from <code>johnrengelman/shadow</code> to <code>GradleUp/shadow</code>, you can view 
+  more details in <a href="https://github.com/GradleUp/shadow/issues/908">GradleUp/shadow/issues/908</a>.<br />
+  We also update the plugin ID from <code>com.github.johnrengelman.shadow</code> to <code>com.gradleup.shadow</code>, and the 
+  Maven coordinate from <code>com.github.johnrengelman:shadow</code> to <code>com.gradleup.shadow:shadow-gradle-plugin</code>.</li>
+<li>Bump the min Gradle requirement from <code>8.0.0</code> to <code>8.3</code>. (<a href="https://github.com/GradleUp/shadow/pull/876">#876</a>)</li>
+<li>Support Java 21. (<a href="https://github.com/GradleUp/shadow/pull/876">#876</a>)</li>
+<li>Use new file permission API from Gradle 8.3. (<a href="https://github.com/GradleUp/shadow/pull/876">#876</a>)</li>
+</ul>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>Fix for PropertiesFileTransformer breaks Reproducible builds in
+  <code>8.1.1</code>. (<a href="https://github.com/GradleUp/shadow/pull/858">#858</a>)</li>
+</ul>
+<h2 id="v811-2023-03-20"><a href="https://github.com/GradleUp/shadow/releases/tag/8.1.1">v8.1.1</a> (2023-03-20)<a class="headerlink" href="#v811-2023-03-20" title="Permanent link">&para;</a></h2>
+<p>**NOTE: ** As of this version, the Github repository has migrated to the <code>main</code> branch as the default branch for releases.</p>
+<p><a href="https://github.com/GradleUp/shadow/releases/tag/8.1.1">Release Notes</a></p>
+<h2 id="v810-2023-02-26"><a href="https://github.com/GradleUp/shadow/releases/tag/8.1.0">v8.1.0</a> (2023-02-26)<a class="headerlink" href="#v810-2023-02-26" title="Permanent link">&para;</a></h2>
+<p><strong>BREAKING CHANGE:</strong> Due to adoption of the latest version of the <code>com.gradle.plugin-publish</code> plugin, the maven GAV coordinates have changed as of this version.
+The correct coordinates now align with the plugin ID itself: <code>group=com.github.johnrengelman, artifact=shadow, version=&lt;version&gt;</code>.
+For example, <code>classpath("com.github.johnrengelman:shadow:8.1.0")</code> is the correct configuration for this version.</p>
+<p><strong>BREAKING CHANGE:</strong> The <code>ConfigureShadowRelocation</code> task was removed as of this version to better support Gradle configuration caching. 
+Instead, use the <code>enableRelocation = true</code> and <code>relocationPrefix = "&lt;new package&gt;"</code> settings on the <code>ShadowJar</code> task type.</p>
+<p><a href="https://github.com/GradleUp/shadow/releases/tag/8.1.0">Release Notes</a></p>
+<h2 id="v800-2023-02-24"><a href="https://github.com/GradleUp/shadow/releases/tag/8.0.0">v8.0.0</a> (2023-02-24)<a class="headerlink" href="#v800-2023-02-24" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/GradleUp/shadow/releases/tag/8.0.0">Release Notes</a></p>
+<h2 id="v713-unreleased">v7.1.3 (unreleased)<a class="headerlink" href="#v713-unreleased" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The GroovyExtensionModuleTransformer now also works for Groovy 2.5+.</li>
+</ul>
+<h2 id="v712-2021-12-28">v7.1.2 (2021-12-28)<a class="headerlink" href="#v712-2021-12-28" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Upgrade log4j to 2.17.1 due to CVE-2021-45105 and CVE-2021-44832</li>
+</ul>
+<h2 id="v711-2021-12-14">v7.1.1 (2021-12-14)<a class="headerlink" href="#v711-2021-12-14" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Upgrade log4j to 2.16.0 due to CVE-2021-44228 and CVE-2021-45046</li>
+</ul>
+<h2 id="v710-2021-10-04">v7.1.0 (2021-10-04)<a class="headerlink" href="#v710-2021-10-04" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>BREAKING</strong> - The maven coordinates for the plugins have changed as of this version. The proper <code>group:artifact</code> is <code>gradle.plugin.com.github.johnrengelman:shadow</code></li>
+<li><a href="https://github.com/mathjeff">Jeff</a> - Fix <code>shadowJar</code> Out-Of-Date with configuration caching <a href="https://github.com/GradleUp/shadow/pull/708">#708</a></li>
+<li><a href="https://github.com/Fiouz">Fiouz</a> - Better support for statically typed languages. This change may require code changes if you are utilizing the Groovy generated getters for properties in some Shadow transformers <a href="https://github.com/GradleUp/shadow/pull/706">#706</a></li>
+<li><a href="https://github.com/helfper">Helder Pereira</a> - Various cleanups <a href="https://github.com/GradleUp/shadow/pull/672">#672</a>, <a href="https://github.com/GradleUp/shadow/pull/700">#700</a>, <a href="https://github.com/GradleUp/shadow/pull/701">#701</a>, <a href="https://github.com/GradleUp/shadow/pull/702">#702</a></li>
+<li><a href="https://github.com/rpalcolea">Roberto Perez Alcolea</a> - Support JVM Toolchains <a href="https://github.com/GradleUp/shadow/pull/691">#691</a></li>
+<li><a href="https://github.com/mjulianotq">mjulianotq</a> - Fix <code>Project.afterEvaluate</code> conflicts <a href="https://github.com/GradleUp/shadow/pull/675">#675</a></li>
+<li><a href="https://github.com/ileasile">Ilya Muradyan</a> - Fix relocation for <code>ComponentsXmlResourceTransformer</code> <a href="https://github.com/GradleUp/shadow/pull/678">#678</a></li>
+<li><a href="https://github.com/rieske">Vaidotas Valuckas</a> - Fix <code>JavaExec.main</code> deprecation <a href="https://github.com/GradleUp/shadow/pull/686">#686</a></li>
+<li><a href="https://github.com/vyazelenko">Dmitry Vyazelenko</a> - Support Java 18 with ASM 9.2 <a href="https://github.com/GradleUp/shadow/pull/698">#698</a></li>
+<li><a href="https://github.com/jpenilla">Jason</a> - Support Records with JDependency 2.7.0 <a href="https://github.com/GradleUp/shadow/pull/681">#681</a></li>
+</ul>
+<h2 id="v700-2021-04-26">v7.0.0 (2021-04-26)<a class="headerlink" href="#v700-2021-04-26" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Required Gradle 7.0+</li>
+<li>Support for Java 16</li>
+<li>Removes JCenter references</li>
+<li><strong>Breaking Change!</strong> - The maven group coordinate has changed to be <code>gradle.plugin.com.github.jengelman.gradle.plugins</code>. Users explicitly declaring the buildscript classpath will need to update their configuration.</li>
+</ul>
+<div class="highlight"><pre><span></span><code>buildscript {
+  repositories {
+    maven {
+      url &quot;https://plugins.gradle.org/m2/&quot;
+    }
+  }
+  dependencies {
+    classpath &quot;gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0&quot;
+  }
+}
+
+apply plugin: &quot;com.gradleup.shadow&quot;
+</code></pre></div>
+<ul>
+<li><a href="https://github.com/melix">Cédric Champeau</a> - Support Gradle 7 <a href="https://github.com/GradleUp/shadow/pull/624">#624</a></li>
+<li><a href="https://github.com/danieloakey">Daniel Oakey</a> - Close <code>FileInputStream</code> when remapping close to avoid classloader locks <a href="https://github.com/GradleUp/shadow/pull/642">#642</a></li>
+<li><a href="https://github.com/maxm123">Maximilian Müller</a> - Groovy error in <code>ServiceFileTransformer</code> in Gradle 3 <a href="https://github.com/GradleUp/shadow/pull/655">#655</a></li>
+<li><a href="https://github.com/helfper">Helder Pereira</a> - Fix deprecations errors in transformers and add CI testing around future deprecations <a href="https://github.com/GradleUp/shadow/pull/647">#647</a></li>
+<li><a href="https://github.com/nhumblot">Nicolas Humblot</a> - Handle deprecation of <code>mainClassName</code> configuration <a href="https://github.com/GradleUp/shadow/pull/609">#609</a>, <a href="https://github.com/GradleUp/shadow/pull/612">#612</a></li>
+<li><a href="https://github.com/bschelberg">Bernie Schelberg</a> - Exclude <code>api</code> and <code>implementations</code> from legacy <code>maven</code> POM <a href="https://github.com/GradleUp/shadow/pull/615">#615</a></li>
+</ul>
+<h2 id="v610-2020-10-05">v6.1.0 (2020-10-05)<a class="headerlink" href="#v610-2020-10-05" title="Permanent link">&para;</a></h2>
+<ul>
+<li>As of this version, Shadow is compiled with Java 8 source and target compatibility. This aligns the plugin with the minimum required Java version
+  for Gradle 6.0 (<a href="https://docs.gradle.org/6.0/release-notes.html">https://docs.gradle.org/6.0/release-notes.html</a>).</li>
+<li>Update ASM to 9.0 to support JDK 16.</li>
+<li><a href="https://github.com/timyates">Tim Yates</a>, <a href="https://github.com/britter">Benedikt Ritter</a> - Enable Configuration Caching for Gradle 6.6+ <a href="https://github.com/GradleUp/shadow/pull/591">#591</a></li>
+<li><a href="https://github.com/MuffinTheMan">Caleb Larsen</a> - doc updates <a href="https://github.com/GradleUp/shadow/pull/593">#583</a></li>
+<li><a href="https://github.com/ysb33r">Schalk W. Cronjé</a> - log4j version update for CVE-2020-9488 <a href="https://github.com/GradleUp/shadow/pull/590">#590</a></li>
+<li><a href="https://github.com/roxchkplusony">Victor Tso</a> - Input stream handling for large projects <a href="https://github.com/GradleUp/shadow/pull/587">#587</a></li>
+<li><a href="https://github.com/3flex">Matthew Haughton</a> - Implement Task Configuration Avoidance pattern <a href="https://github.com/GradleUp/shadow/pull/597">#597</a></li>
+</ul>
+<h2 id="v600-2020-06-15">v6.0.0 (2020-06-15)<a class="headerlink" href="#v600-2020-06-15" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Required Gradle 6.0+</li>
+<li><em>NEW</em>: Support for Gradle Metadata publication via the <code>shadowRuntimeElements</code> configuration. This is a <em>beta</em> feature
+  the hasn&rsquo;t been tested extensively. Feedback is appreciated.</li>
+<li>Fix Gradle 7 deprecation warnings <a href="https://github.com/GradleUp/shadow/issues/530">#530</a></li>
+<li>Fix to generated start script to correctly use <code>optsEnvironmentVar</code><a href="https://github.com/GradleUp/shadow/commit/7e99c02957773205c3babdd23f4bbf883330c975">#518</a></li>
+<li><a href="https://github.com/Tapchicoma">Yahor Berdnikau</a> - Fix issues with Gradle API being embedded into published JAR <a href="https://github.com/GradleUp/shadow/issues/527">#527</a></li>
+<li><a href="https://github.com/vyazelenko">Dmitry Vyazelenko</a> - ASM updates to support latest Java versions <a href="https://github.com/GradleUp/shadow/pull/549">#549</a></li>
+<li><a href="https://github.com/ejjcase">ejjcase</a> - Support exposing shadowed project dependencies via POM <a href="https://github.com/GradleUp/shadow/pull/543">#543</a></li>
+<li><a href="https://github.com/Armaxis">Artem Chubaryan</a> - Performance optimizations <a href="https://github.com/GradleUp/shadow/pull/535">#535</a></li>
+<li><a href="https://github.com/trask">Trask Stalnaker</a> - Fix exclude patterns on Windows <a href="https://github.com/GradleUp/shadow/pull/539">#539</a></li>
+<li><a href="https://github.com/Armaxis">Artem Chubaryan</a> - Allow usage of true regex patterns for include/exclude by the <code>%regex[&lt;pattern&gt;]</code> syntax <a href="https://github.com/GradleUp/shadow/pull/536">#536</a></li>
+</ul>
+<h2 id="v520-2019-11-10">v5.2.0 (2019-11-10)<a class="headerlink" href="#v520-2019-11-10" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/inez">Inez Korczyński</a> - Performance optimization when evaluating relocation paths <a href="https://github.com/GradleUp/shadow/pull/507">#507</a></li>
+<li><a href="https://github.com/jeffalder">Jeff Adler</a> - Fix remapping issues with multi release JARS <a href="https://github.com/GradleUp/shadow/pull/526">#526</a></li>
+<li><a href="https://github.com/ghale">Gary Hale</a> - Implement support for Gradle build cache <a href="https://github.com/GradleUp/shadow/pull/524">#524</a></li>
+<li><a href="https://github.com/rpalcolea">Roberto Perez Alcolea</a> - Gradle 6.x support <a href="https://github.com/GradleUp/shadow/pull/517">#517</a></li>
+<li><a href="https://github.com/grossws">Konstantin Gribov</a> - Return support for 5.0 for convention mapping <a href="https://github.com/GradleUp/shadow/pull/502">#502</a></li>
+<li><a href="https://github.com/jianglai">Lai Jiang</a> - Documentation updates on how to reconfigure <code>classifier</code> and <code>version</code> <a href="https://github.com/GradleUp/shadow/pull/512">#512</a></li>
+</ul>
+<h2 id="v510-2019-06-29">v5.1.0 (2019-06-29)<a class="headerlink" href="#v510-2019-06-29" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/chrisr3">Chris Rankin</a> - Add <code>ManifestAppenderTransformer</code> to support appending to Jar manifest <a href="https://github.com/GradleUp/shadow/pull/474">#474</a></li>
+<li><a href="https://github.com/minkenlai">Min-Ken Lai</a> - Additional escaping fixes in start script <a href="https://github.com/GradleUp/shadow/pull/487">#487</a></li>
+<li><a href="https://github.com/maguro">Alan D. Cabrera</a> - Automatically remove <code>gradleApi</code> from <code>compile</code> scope in the presence of <code>shadow</code> <a href="https://github.com/GradleUp/shadow/pull/459">#459</a></li>
+<li><a href="https://github.com/sormuras">Christian Stein</a> - Do not initialize <code>UnusedTracker</code> when not requested <a href="https://github.com/GradleUp/shadow/pull/480">#480</a>, <a href="https://github.com/GradleUp/shadow/issues/479">#479</a></li>
+<li><a href="https://github.com/kelemen">Attila Kelemen</a> - Fix <code>NullPointerException</code> when using java minimization and api project dependency with version <a href="https://github.com/GradleUp/shadow/pull/477">#477</a></li>
+</ul>
+<h2 id="v500-2019-02-28">v5.0.0 (2019-02-28)<a class="headerlink" href="#v500-2019-02-28" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Require Gradle 5.0+</li>
+<li>Fix issue with build classifier <code>-all</code> being dropped in Gradle 5.1+</li>
+<li><a href="https://github.com/rpalcolea">Roberto Perez Alcolea</a> - Exclude project dependencies from minimization <a href="https://github.com/GradleUp/shadow/pull/420">#420</a></li>
+<li><a href="https://github.com/kyrrigle">Matt King</a>, <a href="https://github.com/RichardMarbach">Richard Marbach</a> - Fix escaping in start script <a href="https://github.com/GradleUp/shadow/pull/454">#453</a>, <a href="https://github.com/GradleUp/shadow/pull/455">#455</a></li>
+<li><a href="https://github.com/Hillkorn">Dennis Schumann</a> - Fix Gradle 5.2 incompatibility with <code>ShadowJar.getMetaClass()</code> <a href="https://github.com/GradleUp/shadow/pull/456">#456</a></li>
+<li><a href="https://github.com/bfg">Brane F. Gračnar</a> - Fix compatibility with <code>com.palantir.docker</code> <a href="https://github.com/GradleUp/shadow/pull/460">#460</a></li>
+</ul>
+<h2 id="v404-2019-01-19">v4.0.4 (2019-01-19)<a class="headerlink" href="#v404-2019-01-19" title="Permanent link">&para;</a></h2>
+<ul>
+<li>When using <code>shadow</code>, <code>application</code>, and <code>maven</code> plugins together, remove <code>shadowDistZip</code> and <code>shadowDistTar</code> from
+  <code>configurations.archives</code> so they are not published or installed by default with the <code>uploadArchives</code> or <code>install</code>
+  tasks. <a href="https://github.com/GradleUp/shadow/issues/347">#347</a></li>
+<li><a href="https://github.com/JamesXNelson">James Nelson</a> - Fix <code>null</code> path when using Jar minimization and Gradle&rsquo;s <code>api</code> configuration. <a href="https://github.com/GradleUp/shadow/issues/424">#424</a>, <a href="https://github.com/GradleUp/shadow/issues/425">#425</a></li>
+</ul>
+<h2 id="v403-2018-11-21">v4.0.3 (2018-11-21)<a class="headerlink" href="#v403-2018-11-21" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/mark-vieira">Mark Vieira</a> - Don&rsquo;t leak plugin classes to Gradle&rsquo;s Spec cache <a href="https://github.com/GradleUp/shadow/pull/430">#430</a></li>
+</ul>
+<h2 id="v402-2018-10-27">v4.0.2 (2018-10-27)<a class="headerlink" href="#v402-2018-10-27" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/petarov">Petar Petrov</a> - Update to ASM 7.0-beta and jdependency 2.1.1 to support Java 11, <a href="https://github.com/GradleUp/shadow/pull/415">#415</a></li>
+<li><a href="https://github.com/roxchkplusony">Victor Tso</a> - Ensure input streams are closed, <a href="https://github.com/GradleUp/shadow/pull/411">#411</a></li>
+<li><a href="https://github.com/osipxd">Osip Fatkullin</a> - Exclude <code>api</code> configuration from minimization, <a href="https://github.com/GradleUp/shadow/pull/405">#405</a></li>
+</ul>
+<h2 id="v401-2018-09-30">v4.0.1 (2018-09-30)<a class="headerlink" href="#v401-2018-09-30" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Breaking Change!</strong> <code>Transform.modifyOutputStream(ZipOutputStream os)</code> to <code>Transform.modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps)</code>.
+  Typically breaking changes are reserved for major version releases, but this change was necessary for <code>preserverFileTimestamps</code> (introduced in v4.0.0) to work correctly
+  in the presence of transformers, <a href="https://github.com/GradleUp/shadow/issues/404">#404</a></li>
+<li>Fix regression in support Java 10+ during relocation, <a href="https://github.com/GradleUp/shadow/issues/403">#403</a></li>
+</ul>
+<h2 id="v400-2018-09-25">v4.0.0 (2018-09-25)<a class="headerlink" href="#v400-2018-09-25" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Breaking Change!</strong> Restrict Plugin to Gradle 4.0+. Shadow major versions will align with Gradle major versions going forward.</li>
+<li><strong>Breaking Change!</strong> For clarity purposes <code>com.github.johnrengelman.plugin-shadow</code> has been removed. If you intend to use this feature, you will need to declare your own <code>ConfigureShadowRelocation</code> task. See section <a href="https://gradleup.com/shadow/#automatically_relocating_dependencies">2.9.2</a> of the User Guide</li>
+<li><a href="https://github.com/SerCeMan">Sergey Tselovalnikov</a> - Upgrade to ASM 6.2.1 to support Java 11</li>
+<li><a href="https://github.com/Macil">Chris Cowan</a> - Add support for <code>shadowJar.preserveFileTimestamps</code> property. See <a href="https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps">Jar.preserveFileTimestamps</a></li>
+<li><a href="https://github.com/paul-nelson-baker">Paul N. Baker</a> - Add <code>Log4j2PluginsCacheFileTransformer</code> to process Log4j DAT files during merge.</li>
+<li><a href="https://github.com/felipecsl">Felipe Lima</a> - Fix the long standing &ldquo;No property <code>mainClassName</code>&rdquo; issue.</li>
+<li><a href="https://github.com/debanne">debanne</a> - Implement JAR minimization actions. This will attempt to exclude unused classes in your shadowed JAR.</li>
+<li>Configure exclusion of <code>module-info.class</code> from <code>shadowJar</code> when using the Shadow the Java plugin, <a href="https://github.com/GradleUp/shadow/issues/352">#352</a></li>
+</ul>
+<h2 id="v204-2018-04-27">v2.0.4 (2018-04-27)<a class="headerlink" href="#v204-2018-04-27" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Update to ASM 6.1.1 to address performance issues - <a href="https://gitlab.ow2.org/asm/asm/issues/317816">ASM Issue 317816</a></li>
+<li>Close InputStreams after using them, <a href="https://github.com/GradleUp/shadow/issues/364">#364</a></li>
+<li>Remove usage of Gradle internal <code>AbstractFileCollection</code>.</li>
+<li>Add task annotations to remove warnings when validating plugin.</li>
+</ul>
+<h2 id="v203-2018-03-24">v2.0.3 (2018-03-24)<a class="headerlink" href="#v203-2018-03-24" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/ttsiebzehntt">Martin Sadowski</a> - Update to ASM 6.1</li>
+<li><a href="https://github.com/sgnewson">Scott Newson</a> - Fix deprecated Gradle warnings, <a href="https://github.com/GradleUp/shadow/pull/356">#356</a></li>
+</ul>
+<h2 id="v202-2017-12-12">v2.0.2 (2017-12-12)<a class="headerlink" href="#v202-2017-12-12" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/ben-adazza">Ben Adazza</a>, <a href="https://github.com/tylerbenson">Tyler Benson</a> - documentation</li>
+<li><a href="https://github.com/mark-vieira">Marke Vieira</a> - Support multi-project builds with Build-Scan integration</li>
+<li>Upgrade to ASM 6, [#294]<a href="https://github.com/GradleUp/shadow/issues/294">https://github.com/GradleUp/shadow/issues/294</a>, <a href="https://github.com/GradleUp/shadow/issues/303">#303</a></li>
+<li><a href="https://github.com/rspieldenner">Rob Spieldenner</a> - Fix integration with <code>application</code> plugin in Gradle 4.3, <a href="https://github.com/GradleUp/shadow/issues/339">#339</a></li>
+<li>Fixed deprecation warning from Gradle 4.2+, <a href="https://github.com/GradleUp/shadow/issues/326">#326</a></li>
+</ul>
+<h2 id="v201-2017-06-23">v2.0.1 (2017-06-23)<a class="headerlink" href="#v201-2017-06-23" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fix <code>null+configuration</code> error, <a href="https://github.com/GradleUp/shadow/issues/297">#297</a></li>
+</ul>
+<h2 id="v200-2017-05-09">v2.0.0 (2017-05-09)<a class="headerlink" href="#v200-2017-05-09" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Breaking Change!</strong> Restrict Plugin to Gradle 3.0+</li>
+<li><strong>Breaking Change!</strong> Build with Java 7</li>
+<li><strong>Breaking Change!</strong> Updated <code>Transformer</code> interface to accept <code>TransformerContext</code> object instead of individual values</li>
+<li><strong>Breaking Change!</strong> Updated <code>Relocator</code> interface to accept <code>RelocatePathContext</code> and <code>RelocateClassContext</code> objects</li>
+<li><strong>Breaking Change!</strong> Distribution tasks <code>distShadowZip</code> and <code>distShadowTar</code> have been removed and replaced with the standard <code>shadowDistZip</code> and <code>shadowDistTar</code> from the Gradle Distribution plugin.</li>
+<li><strong>Breaking Change!</strong> The <code>installShadowApp</code> task has been removed and replaced with the standard <code>installShadowDist</code> task from the Gradle Distribution plugin.</li>
+<li><strong>Breaking Change!</strong> The new <code>installShadowDist</code> task outputs to <code>build/install/&lt;project name&gt;-shadow</code> per the standard (formerly was <code>build/installShadow</code>)</li>
+<li><strong>Breaking Change!</strong> <code>component.shadow</code> removed in favor of <code>project.shadow.component(publication)</code> so as to remove dependency on internal Gradle APIs.</li>
+<li><em>NEW</em> Introducing <code>ConfigureShadowRelocation</code> task and <code>com.github.johnrengelman.plugin-shadow</code> plugin to automatically configure package relocation for Gradle plugins.</li>
+<li><em>NEW</em> Integration with Gradle Build Scans. When running a <code>ShadowJar</code> task with Build Scans, custom values including dependencies merged anc package relocations are published in the scan.</li>
+<li>Build Shadow w/ Shadow. This will help prevent any future classpath conflicts with Gradle.</li>
+<li>Replace <code>startShadowScripts</code> tasks with Gradle&rsquo;s built-in <code>CreateStartScripts</code> type.</li>
+<li>Build with Gradle 3.1</li>
+<li><a href="https://github.com/marcphilipp">Marc Philipp</a> - Add <code>keyTransformer</code> property to <code>PropertiesFileTransformer</code></li>
+<li>Update to ASM 5.2</li>
+<li><a href="https://github.com/pkubowicz">Piotr Kubowicz</a> - Support <code>api</code>, <code>implementation</code>, <code>runtimeOnly</code> dependency configurations introdcued in Gradle 3.3</li>
+</ul>
+<h2 id="v124-2016-11-03">v1.2.4 (2016-11-03)<a class="headerlink" href="#v124-2016-11-03" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Don&rsquo;t resolve dependency configurations during config phase, <a href="https://github.com/GradleUp/shadow/issues/129">#128</a></li>
+<li>Build plugin with Gradle 2.14</li>
+<li>Fix docs regarding inheriting Jar manifest, <a href="https://github.com/GradleUp/shadow/issues/251">#251</a></li>
+<li><a href="https://github.com/ethankhall">Ethan Hall</a> - Support projects that configure uploading to Ivy repositories, <a href="https://github.com/GradleUp/shadow/pull/256">#256</a></li>
+<li>Force task to depend on dependency configuration, <a href="https://github.com/GradleUp/shadow/issues/152">#152</a></li>
+<li>Do not explode ZIP files into shadow jar, <a href="https://github.com/GradleUp/shadow/issues/196">#196</a></li>
+<li><a href="https://github.com/jszakmeister">John Szakmeister</a> - Preserve timestamps on merged jar entries, <a href="https://github.com/GradleUp/shadow/pull/260">#260</a></li>
+</ul>
+<h2 id="v123-2016-01-25">v1.2.3 (2016-01-25)<a class="headerlink" href="#v123-2016-01-25" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Support for Gradle 2.11-rc-1, <a href="https://github.com/GradleUp/shadow/issues/177">#177</a></li>
+<li>Convert internal framework to <a href="https://docs.gradle.org/current/userguide/test_kit.html">Gradle TestKit</a></li>
+<li><a href="https://github.com/fkorotkov">Fedor Korotkov</a> - Use BufferedOutputStream when writing the Zip file, <a href="https://github.com/GradleUp/shadow/pull/171[">#171</a></li>
+<li><a href="https://github.com/hbchai">Haw-Bin Chai</a> - Quote Jar path in Windows start script as it may contain spaces, <a href="https://github.com/GradleUp/shadow/pull/170">#170</a></li>
+<li><a href="https://github.com/siordache">Serban Iordache</a> - Evaluate relocation specs when merging service descriptors, <a href="https://github.com/GradleUp/shadow/pull/165">#165</a></li>
+</ul>
+<h2 id="v122-2015-07-17">v1.2.2 (2015-07-17)<a class="headerlink" href="#v122-2015-07-17" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/Minecrell">Minecrell</a> - Gradle 2.5 compatibility, <a href="https://github.com/GradleUp/shadow/issues/147">#147</a></li>
+</ul>
+<h2 id="v121-2015-01-23">v1.2.1 (2015-01-23)<a class="headerlink" href="#v121-2015-01-23" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Apply package relocations to dependency resources, <a href="https://github.com/GradleUp/shadow/issues/114">#114</a></li>
+</ul>
+<h2 id="v120-2014-11-24">v1.2.0 (2014-11-24)<a class="headerlink" href="#v120-2014-11-24" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the <code>org.apache.tools.zip</code> package.</li>
+<li>Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from <code>jdom:jdom:1.1</code> to <code>org.jdom:jdom2:2.0.5</code>), <a href="https://github.com/GradleUp/shadow/issues/98">#98</a></li>
+<li>Convert ShadowJar.groovy to ShadowJar.java to workaround binary incompatibility introduced by Gradle 2.2, <a href="https://github.com/GradleUp/shadow/issues/106">#106</a></li>
+<li>Updated ASM library to <code>5.0.3</code> to support JDK8, <a href="https://github.com/GradleUp/shadow/issues/97">#97</a></li>
+<li>Allows for regex pattern matching in the <code>dependency</code> string when including/excluding, <a href="https://github.com/GradleUp/shadow/issues/83">#83</a></li>
+<li>Apply package relocations to resource files, <a href="https://github.com/GradleUp/shadow/issues/93">#93</a></li>
+</ul>
+<h2 id="v112-2014-09-09">v1.1.2 (2014-09-09)<a class="headerlink" href="#v112-2014-09-09" title="Permanent link">&para;</a></h2>
+<ul>
+<li>fix bug in <code>runShadow</code> where dependencies from the <code>shadow</code> configuration are not available, <a href="https://github.com/GradleUp/shadow/issues/94">#94</a></li>
+</ul>
+<h2 id="v111-2014-08-27">v1.1.1 (2014-08-27)<a class="headerlink" href="#v111-2014-08-27" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fix bug in <code>'createStartScripts'</code> task that was causing it to not execute <code>'shadowJar'</code> task, <a href="https://github.com/GradleUp/shadow/issues/90">#90</a></li>
+<li>Do not include <code>null</code> in ShadowJar Manifest <code>'Class-Path'</code> value when <code>jar</code> task does not specify a value for it, <a href="https://github.com/GradleUp/shadow/issues/92">#92</a></li>
+<li>ShadowJar Manifest <code>'Class-Path'</code> should reference jars from <code>'shadow'</code> config as relative to location of <code>shadowJar</code> output, <a href="https://github.com/GradleUp/shadow/issues/91">#91</a></li>
+</ul>
+<h2 id="v110-2014-08-26">v1.1.0 (2014-08-26)<a class="headerlink" href="#v110-2014-08-26" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Breaking Change!</strong> Fix leaking of <code>shadowJar.manifest</code> into <code>jar.manifest</code>, <a href="https://github.com/GradleUp/shadow/issues/82">#82</a>
+  To simplify behavior, the <code>shadowJar.appendManifest</code> method has been removed. Replace uses with <code>shadowJar.manifest</code></li>
+<li><code>ShadowTask</code> now has a <code>configurations</code> property that is resolved to the files in the resolved configuration before
+  being added to the copy spec. This allows for an easier implementation for filtering. The default &lsquo;shadowJar&rsquo; task
+  has the convention of adding the <code>'runtime'</code> scope to this list. Manually created instances of <code>ShadowTask</code> have no
+  configurations added by default and can be configured by setting <code>task.configurations</code>.</li>
+<li>Properly configure integration with the <code>'maven'</code> plugin when added. When adding <code>'maven'</code> the <code>'uploadShadow'</code> task
+  will now properly configure the POM dependencies by removing the <code>'compile'</code> and <code>'runtime'</code> configurations from the
+  POM and adding the <code>'shadow'</code> configuration as a <code>RUNTIME</code> scope in the POM. This behavior matches the behavior when
+  using the <code>'maven-publish'</code> plugin.</li>
+<li><a href="https://github.com/mhurne">Matt Hurne</a> - Allow <code>ServiceFileTransformer</code> to specify include/exclude patterns for
+  files within the configured path to merge.</li>
+<li><a href="https://github.com/mhurne">Matt Hurne</a> - Added <code>GroovyExtensionModuleTransformer</code> for merging Groovy Extension module
+  descriptor files. The existing <code>ServiceFileTransformer</code> now excludes Groovy Extension Module descriptors by default.</li>
+<li><code>distShadowZip</code> and <code>distShadowZip</code> now contain the shadow library and run scripts instead of the default from the
+  <code>'application'</code> plugin, <a href="https://github.com/GradleUp/shadow/issues/89">#89</a></li>
+</ul>
+<h2 id="v103-2014-07-29">v1.0.3 (2014-07-29)<a class="headerlink" href="#v103-2014-07-29" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Make service files root path configurable for <code>ServiceFileTransformer</code>, <a href="https://github.com/GradleUp/shadow/issues/72">#72</a></li>
+<li>[Andres Almiray](<a href="https://github.com/aalmiray">https://github.com/aalmiray</a> - Added PropertiesFileTransformer, <a href="https://github.com/GradleUp/shadow/issues/73">#73</a></li>
+<li><a href="https://github.com/brandonkearby">Brandon Kearby</a> - Fixed StackOverflow when a cycle occurs in the resolved dependency grap, <a href="https://github.com/GradleUp/shadow/pull/69">#69</a></li>
+<li>Apply Transformers to project resources, <a href="https://github.com/GradleUp/shadow/issues/70">#70</a>, <a href="https://github.com/GradleUp/shadow/issues/71">#71</a></li>
+<li><a href="https://github.com/Minecrell">Minecrell</a> - Do not drop non-class files from dependencies when relocation is enabled, <a href="https://github.com/GradleUp/shadow/issues/61">#61</a></li>
+<li>Remove support for applying individual sub-plugins by Id (easier maintenance and cleaner presentation in Gradle Portal)</li>
+</ul>
+<h2 id="v102-2014-07-07">v1.0.2 (2014-07-07)<a class="headerlink" href="#v102-2014-07-07" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Do not add an empty Class-Path attribute to the manifest when the <code>shadow</code> configuration contains no dependencies.</li>
+<li><code>runShadow</code> now registers <code>shadowJar</code> as an input. Previously, <code>runShadow</code> did not execute <code>shadowJar</code> and an error occurred.</li>
+<li>Support Gradle 2.0, <a href="https://github.com/GradleUp/shadow/issues/66">#66</a></li>
+<li>Do not override existing &lsquo;Class-Path&rsquo; Manifest attribute settings from Jar configuration. Instead combine, <a href="https://github.com/GradleUp/shadow/issues/65">#65</a></li>
+</ul>
+<h2 id="v101-2014-06-28">v1.0.1 (2014-06-28)<a class="headerlink" href="#v101-2014-06-28" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fix issue where non-class files are dropped when using relocation, <a href="https://github.com/GradleUp/shadow/issues/58">#58</a></li>
+<li>Do not create a <code>/</code> directory inside the output jar.</li>
+<li>Fix <code>runShadow</code> task to evaluate the <code>shadowJar.archiveFile</code> property at execution time, <a href="https://github.com/GradleUp/shadow/issues/60">#60</a></li>
+</ul>
+<h2 id="v100-2014-06-27">v1.0.0 (2014-06-27)<a class="headerlink" href="#v100-2014-06-27" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Previously known as v0.9.0</li>
+<li>All changes from 0.9.0-M1 to 0.9.0-M5</li>
+<li>Properly configure the ShadowJar task inputs to observe the include/excludes from the <code>dependencies</code> block. This
+  allows UP-TO-DATE checking to work properly when changing the <code>dependencies</code> rulea, <a href="https://github.com/GradleUp/shadow/issues/54">#54</a></li>
+<li>Apply relocation remappings to classes and imports in source project, <a href="https://github.com/GradleUp/shadow/issues/55">#55</a></li>
+<li>Do not create directories in jar for source of remapped class, created directories in jar for destination of remapped classes, <a href="https://github.com/GradleUp/shadow/issues/53">#53</a></li>
+</ul>
+<h2 id="v090-m5">v0.9.0-M5<a class="headerlink" href="#v090-m5" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Add commons-io to compile classpath</li>
+<li>Update asm library to 4.1</li>
+</ul>
+<h2 id="v090-m4">v0.9.0-M4<a class="headerlink" href="#v090-m4" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Break plugin into multiple sub-plugins. <code>ShadowBasePlugin</code> is always applied.
+  <code>ShadowJavaPlugin</code> and <code>ShadowApplicationPlugin</code> are applied in reaction to applying the <code>java</code> and <code>application</code>
+  plugins respectively.</li>
+<li>Shadow does not applied <code>java</code> plugin automatically. <code>java</code> or <code>groovy</code> must be applied in conjunction with <code>shadow</code>.</li>
+<li>Moved artifact filtering to <code>dependencies {}</code> block underneath <code>shadowJar</code>. This allows better include/exclude control
+  for dependencies.</li>
+<li>Dependencies added to the <code>shadow</code> configuration are automatically added to the <code>Class-Path</code> attribute in the manifest
+  for <code>shadowJar</code></li>
+<li>Applying <code>application</code> plugin and settings <code>mainClassName</code> automatically configures the <code>Main-Class</code> attribute in
+  the manifest for <code>shadowJar</code></li>
+<li><code>runShadow</code> now utilizes the output of the <code>shadowJar</code> and executes using <code>java -jar &lt;shadow jar file&gt;</code></li>
+<li>Start Scripts for shadow distribution now utilize <code>java -jar</code> to execute instead of placing all files on classpath
+  and executing main class.</li>
+<li>Excluding/Including dependencies no longer includes transitive dependencies. All dependencies for inclusion/exclusion
+  must be explicitly configured via a spec.</li>
+</ul>
+<h2 id="v090-m3">v0.9.0-M3<a class="headerlink" href="#v090-m3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Use commons.io FilenameUtils to determine name of resolved jars for including/excluding</li>
+</ul>
+<h2 id="v090-m2">v0.9.0-M2<a class="headerlink" href="#v090-m2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Added integration with <code>application</code> plugin to replace old <code>OutputSignedJars</code> task</li>
+<li>Fixed bug that resulted in duplicate file entries in the resulting Jar</li>
+<li>Changed plugin id to &lsquo;com.github.johnrengelman.shadow&rsquo; to support Gradle 2.x plugin infrastructure.</li>
+</ul>
+<h2 id="v090-m1">v0.9.0-M1<a class="headerlink" href="#v090-m1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Rewrite based on Gradle Jar Task</li>
+<li><code>ShadowJar</code> now extends <code>Jar</code></li>
+<li>Removed <code>signedCompile</code> and <code>signedRuntime</code> configurations in favor of <code>shadow</code> configuration</li>
+<li>Removed <code>OutputSignedJars</code> task</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
