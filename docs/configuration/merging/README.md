@@ -23,7 +23,7 @@ determine if it should process a particular entry and apply any modifications be
       override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
     }
     tasks.shadowJar {
-      transform(MyTransformer::class.java)
+      transform<MyTransformer>()
     }
     ```
 
@@ -69,7 +69,7 @@ Additionally, a `Transformer` can accept a `Closure` to configure the provided `
       override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
     }
     tasks.shadowJar {
-      transform(MyTransformer::class.java) {
+      transform<MyTransformer>() {
         enabled = true
       }
     }
@@ -274,7 +274,7 @@ containing Log4j 2.x Core components. It's a Gradle equivalent of [Log4j Plugin 
 
     ```kotlin
     tasks.shadowJar {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer::class.java)
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer>()
     }
     ```
 
@@ -318,7 +318,7 @@ configure this transformer.
       // short syntax
       append("resources/application.yml", "\n---\n")
       // full syntax
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer::class.java) {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer>() {
         resource = "resources/custom-config/application.yml"
         separator = "\n---\n"
       }
@@ -352,7 +352,7 @@ It must be added using the [`transform`](https://gradleup.com/shadow/api/shadow/
 
     ```kotlin
     tasks.shadowJar {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer::class.java) {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer>() {
         resource = "properties.xml"
       }
     }
