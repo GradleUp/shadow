@@ -15,7 +15,7 @@ configured to contain the `Main-Class` attribute with the value specified in the
       application
       id("com.gradleup.shadow")
     }
-    
+
     application {
       mainClass = "myapp.Main"
     }
@@ -29,7 +29,7 @@ configured to contain the `Main-Class` attribute with the value specified in the
       id 'application'
       id 'com.gradleup.shadow'
     }
-    
+
     application {
       mainClass = 'myapp.Main'
     }
@@ -71,13 +71,13 @@ It can be configured the same as any other `JavaExec` task.
       id 'application'
       id 'com.gradleup.shadow'
     }
-    
+
     application {
       mainClass = 'myapp.Main'
       // Optionally, you can add default JVM arguments to the start scripts like this:
       applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
     }
-    
+
     tasks.named('runShadow', JavaExec) {
       args 'foo'
     }
@@ -130,7 +130,7 @@ You can also add more files into the distribution like:
       id 'application'
       id 'com.gradleup.shadow'
     }
-    
+
     application {
       mainClass = 'myapp.Main'
       // Optionally, you can include `some/dir` files in the distribution like this:
@@ -138,7 +138,7 @@ You can also add more files into the distribution like:
         include '*.txt'
       }
     }
-    
+
     // `shadow` is the name of the distribution created by Shadow plugin
     distributions.named('shadow') {
       // Optionally, you can add more files into extra directory in the distribution like this:

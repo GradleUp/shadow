@@ -15,7 +15,7 @@ artifact and dependencies in the POM file.
       `maven-publish`
       id("com.gradleup.shadow")
     }
-    
+
     publishing {
       publications {
         create<MavenPublication>("shadow") {
@@ -36,7 +36,7 @@ artifact and dependencies in the POM file.
       id 'maven-publish'
       id 'com.gradleup.shadow'
     }
-    
+
     publishing {
       publications {
         shadow(MavenPublication) {
@@ -83,10 +83,10 @@ the `archiveClassifier` of the shadowed JAR like the following:
       `maven-publish`
       id("com.gradleup.shadow")
     }
-    
+
     group = "shadow"
     version = "1.0"
-    
+
     dependencies {
       // This will be bundled in the shadowed JAR and not declared in the POM.
       implementation("some:a:1.0")
@@ -120,10 +120,10 @@ the `archiveClassifier` of the shadowed JAR like the following:
       id 'maven-publish'
       id 'com.gradleup.shadow'
     }
-    
+
     group = 'shadow'
     version = '1.0'
-    
+
     dependencies {
       // This will be bundled in the shadowed JAR and not declared in the POM.
       implementation 'some:a:1.0'
@@ -133,11 +133,11 @@ the `archiveClassifier` of the shadowed JAR like the following:
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
       compileOnly 'some:c:1.0'
     }
-    
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       archiveClassifier = ''
     }
-    
+
     publishing {
       publications {
         shadow(MavenPublication) {
@@ -165,7 +165,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       `maven-publish`
       id("com.gradleup.shadow")
     }
-    
+
     val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
       description = "Create a combined JAR of project and test dependencies"
@@ -173,11 +173,11 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       from(sourceSets["test"].output)
       configurations = listOf(project.configurations["testRuntimeClasspath"])
     }
-    
+
     dependencies {
       testImplementation("junit:junit:3.8.2")
     }
-    
+
     publishing {
       publications {
         create<MavenPublication>("shadow") {
@@ -198,7 +198,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       id 'maven-publish'
       id 'com.gradleup.shadow'
     }
-    
+
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
       description = "Create a combined JAR of project and test dependencies"
@@ -206,11 +206,11 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       from sourceSets.test.output
       configurations = [project.configurations.testRuntimeClasspath]
     }
-    
+
     dependencies {
       testImplementation 'junit:junit:3.8.2'
     }
-    
+
     publishing {
       publications {
         shadow(MavenPublication) {

@@ -17,7 +17,7 @@ A simple Gradle plugin can use this feature by applying the `shadow` plugin and 
       `java-gradle-plugin` // May have to apply the latest `com.gradle.plugin-publish` for better publishing support.
       id("com.gradleup.shadow")
     }
-    
+
     dependencies {
       implementation("org.jdom:jdom2:2.0.6")
       implementation("org.ow2.asm:asm:6.0")
@@ -26,7 +26,7 @@ A simple Gradle plugin can use this feature by applying the `shadow` plugin and 
       implementation("org.apache.ant:ant:1.9.4")
       implementation("org.codehaus.plexus:plexus-utils:2.0.6")
     }
-    
+
     tasks.shadowJar {
       enableRelocation = true
       archiveClassifier = ""
@@ -40,7 +40,7 @@ A simple Gradle plugin can use this feature by applying the `shadow` plugin and 
       id 'java-gradle-plugin' // May have to apply the latest `com.gradle.plugin-publish` for better publishing support.
       id 'com.gradleup.shadow'
     }
-    
+
     dependencies {
       implementation 'org.jdom:jdom2:2.0.6'
       implementation 'org.ow2.asm:asm:6.0'
@@ -49,7 +49,7 @@ A simple Gradle plugin can use this feature by applying the `shadow` plugin and 
       implementation 'org.apache.ant:ant:1.9.4'
       implementation 'org.codehaus.plexus:plexus-utils:2.0.6'
     }
-    
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       enableRelocation = true
       archiveClassifier = ''

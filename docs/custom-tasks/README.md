@@ -11,18 +11,18 @@ dependencies to merge into the output.
     val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
       description = "Create a combined JAR of project and test dependencies"
-      
+
       archiveClassifier = "tests"
       from(sourceSets["test"].output)
       configurations = listOf(project.configurations["testRuntimeClasspath"])
-    
+
       manifest {
         // Optionally, set the main class for the JAR.
         attributes(mapOf("Main-Class" to "test.Main"))
         // You can also set other attributes here.
       }
     }
-    
+
     // Optionally, make the `assemble` task depend on the new task.
     tasks.assemble {
       dependsOn(testShadowJar)
@@ -35,18 +35,18 @@ dependencies to merge into the output.
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
       description = "Create a combined JAR of project and test dependencies"
-      
+
       archiveClassifier = "tests"
       from sourceSets.test.output
       configurations = [project.configurations.testRuntimeClasspath]
-    
+
       manifest {
         // Optionally, set the main class for the JAR.
         attributes 'Main-Class': 'test.Main'
         // You can also set other attributes here.
       }
     }
-    
+
     // Optionally, make the `assemble` task depend on the new task.
     tasks.named('assemble') {
       dependsOn testShadowJar

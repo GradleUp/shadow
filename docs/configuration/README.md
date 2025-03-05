@@ -143,7 +143,7 @@ on the `shadowJar.manifest` object can be used to configure the upstream.
         attributes 'Description': 'This is an application JAR'
       }
     }
-    
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest.inheritFrom(testJar.get().manifest)
     }

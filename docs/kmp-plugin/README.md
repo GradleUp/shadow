@@ -11,9 +11,9 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
       kotlin("multiplatform")
       id("com.gradleup.shadow")
     }
-    
+
     val ktorVersion = "3.1.0"
-    
+
     kotlin {
       jvm()
       sourceSets {
@@ -29,7 +29,7 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
         }
       }
     }
-    
+
     tasks.shadowJar {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
@@ -45,9 +45,9 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
       id 'org.jetbrains.kotlin.multiplatform'
       id 'com.gradleup.shadow'
     }
-    
+
     def ktorVersion = "3.1.0"
-    
+
     kotlin {
       jvm()
       sourceSets {
@@ -63,7 +63,7 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
         }
       }
     }
-    
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
