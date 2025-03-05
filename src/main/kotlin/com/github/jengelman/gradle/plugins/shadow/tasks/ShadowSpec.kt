@@ -5,9 +5,11 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import java.lang.reflect.InvocationTargetException
+import kotlin.reflect.KClass
 import org.gradle.api.Action
 import org.gradle.api.file.CopySpec
 
+@JvmDefaultWithCompatibility
 public interface ShadowSpec : CopySpec {
   public fun minimize(): ShadowSpec
 
@@ -15,13 +17,9 @@ public interface ShadowSpec : CopySpec {
 
   public fun dependencies(action: Action<DependencyFilter>?): ShadowSpec
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
-  public fun transform(clazz: Class<ResourceTransformer>): ShadowSpec
+  public fun <T : ResourceTransformer> transform(clazz: Class<T>): ShadowSpec {
+    return transform(clazz, null)
+  }
 
   @Throws(
     InstantiationException::class,
@@ -31,7 +29,29 @@ public interface ShadowSpec : CopySpec {
   )
   public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowSpec
 
-  public fun transform(transformer: ResourceTransformer): ShadowSpec
+  @Throws(
+    InstantiationException::class,
+    IllegalAccessException::class,
+    NoSuchMethodException::class,
+    InvocationTargetException::class,
+  )
+  public fun <T : ResourceTransformer> transform(clazz: KClass<T>): ShadowSpec {
+    return transform(clazz, null)
+  }
+
+  @Throws(
+    InstantiationException::class,
+    IllegalAccessException::class,
+    NoSuchMethodException::class,
+    InvocationTargetException::class,
+  )
+  public fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?): ShadowSpec
+
+  public fun <T : ResourceTransformer> transform(transformer: T): ShadowSpec {
+    return transform(transformer, null)
+  }
+
+  public fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?): ShadowSpec
 
   public fun mergeServiceFiles(): ShadowSpec
 

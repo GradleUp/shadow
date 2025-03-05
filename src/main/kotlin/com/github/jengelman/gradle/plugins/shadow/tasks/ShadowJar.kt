@@ -22,6 +22,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
+import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
@@ -159,16 +160,16 @@ public abstract class ShadowJar :
     action?.execute(dependencyFilter.get())
   }
 
-  override fun transform(clazz: Class<ResourceTransformer>): ShadowJar {
-    return transform(clazz, null)
-  }
-
   override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
     addTransform(clazz.create(objectFactory), action)
   }
 
-  override fun transform(transformer: ResourceTransformer): ShadowJar = apply {
-    addTransform(transformer, null)
+  override fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?): ShadowJar = apply {
+    transform(clazz.java, action)
+  }
+
+  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?): ShadowJar = apply {
+    addTransform(transformer, action)
   }
 
   override fun mergeServiceFiles(): ShadowJar {
