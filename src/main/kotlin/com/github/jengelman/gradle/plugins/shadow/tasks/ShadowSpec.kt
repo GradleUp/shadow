@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import org.gradle.api.Action
 import org.gradle.api.file.CopySpec
@@ -22,30 +21,12 @@ public interface ShadowSpec : CopySpec {
     return transform(clazz, null)
   }
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
   public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowSpec
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
   public fun <T : ResourceTransformer> transform(clazz: KClass<T>): ShadowSpec {
     return transform(clazz, null)
   }
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
   public fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?): ShadowSpec
 
   public fun <T : ResourceTransformer> transform(transformer: T): ShadowSpec {
@@ -78,24 +59,12 @@ public interface ShadowSpec : CopySpec {
     return relocate(clazz, null)
   }
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
   public fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowSpec
 
   public fun <R : Relocator> relocate(clazz: KClass<Relocator>): ShadowSpec {
     return relocate(clazz, null)
   }
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
   public fun <R : Relocator> relocate(clazz: KClass<R>, action: Action<R>?): ShadowSpec
 
   public fun <R : Relocator> relocate(relocator: R): ShadowSpec {
