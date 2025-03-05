@@ -12,9 +12,6 @@ requires the shadowed JAR as a dependency.
 In this case, use Gradle's normal dependency declaration mechanism to depend on the `shadow`
 configuration of the shadowed project.
 
-```groovy
-// Depending On Shadow Output of Project
-dependencies {
-  implementation project(path: ':api', configuration: 'shadow')
-}
-```
+    dependencies {
+      implementation project(path: ':api', configuration: 'shadow')
+    }

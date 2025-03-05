@@ -11,22 +11,15 @@ contents.
 This means that, the configuration is applied to the individual files from both the project source set or _any_
 of the dependencies to be merged.
 
-```groovy
-// Exclude a file from Shadow Jar
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  exclude 'a2.properties'
-}
-```
-
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      exclude 'a2.properties'
+    }
 
 Excludes and includes can be combined just like a normal `Jar` task, with `excludes` taking precedence over `includes`.
 Additionally, ANT style patterns can be used to match multiple files.
 
-```groovy
-// Configuring output using ANT patterns
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  include '*.jar'
-  include '*.properties'
-  exclude 'a2.properties'
-}
-```
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      include '*.jar'
+      include '*.properties'
+      exclude 'a2.properties'
+    }
