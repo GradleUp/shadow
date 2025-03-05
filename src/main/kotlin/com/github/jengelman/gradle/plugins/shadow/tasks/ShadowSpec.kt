@@ -17,24 +17,6 @@ public interface ShadowSpec : CopySpec {
 
   public fun dependencies(action: Action<DependencyFilter>?): ShadowSpec
 
-  public fun <T : ResourceTransformer> transform(clazz: Class<T>): ShadowSpec {
-    return transform(clazz, null)
-  }
-
-  public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowSpec
-
-  public fun <T : ResourceTransformer> transform(clazz: KClass<T>): ShadowSpec {
-    return transform(clazz, null)
-  }
-
-  public fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?): ShadowSpec
-
-  public fun <T : ResourceTransformer> transform(transformer: T): ShadowSpec {
-    return transform(transformer, null)
-  }
-
-  public fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?): ShadowSpec
-
   public fun mergeServiceFiles(): ShadowSpec
 
   public fun mergeServiceFiles(rootPath: String): ShadowSpec
@@ -72,4 +54,22 @@ public interface ShadowSpec : CopySpec {
   }
 
   public fun <R : Relocator> relocate(relocator: R, action: Action<R>?): ShadowSpec
+
+  public fun <T : ResourceTransformer> transform(clazz: Class<T>): ShadowSpec {
+    return transform(clazz, null)
+  }
+
+  public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowSpec
+
+  public fun <T : ResourceTransformer> transform(clazz: KClass<T>): ShadowSpec {
+    return transform(clazz, null)
+  }
+
+  public fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?): ShadowSpec
+
+  public fun <T : ResourceTransformer> transform(transformer: T): ShadowSpec {
+    return transform(transformer, null)
+  }
+
+  public fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?): ShadowSpec
 }
