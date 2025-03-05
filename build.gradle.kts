@@ -9,7 +9,6 @@ plugins {
   alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.spotless)
   id("shadow.convention.publish")
-  id("shadow.convention.deploy")
 }
 
 java {
@@ -186,6 +185,5 @@ tasks.register("releaseAll") {
   dependsOn(
     tasks.publish,
     tasks.publishPlugins,
-    tasks.gitPublishPush,
   )
 }
