@@ -84,11 +84,11 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
   }
 
-  public open fun include(pattern: String): SimpleRelocator = apply {
+  public open fun include(pattern: String) {
     includes.addAll(normalizePatterns(listOf(pattern)))
   }
 
-  public open fun exclude(pattern: String): SimpleRelocator = apply {
+  public open fun exclude(pattern: String) {
     excludes.addAll(normalizePatterns(listOf(pattern)))
   }
 
