@@ -4,9 +4,6 @@
   <p><em>The library author's dependency toolkit</em></p>
 </div>
 
-[User Guide](introduction/)  
-[API Docs](https://gradleup.com/shadow/api/index.html)
-
 ---
 
 Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the ID [

@@ -75,4 +75,5 @@ nav:
   - 'Multi-Project': multi-project/README.md
   - 'Plugins': plugins/README.md
   - 'Changes': changes/README.md
+  - 'API': api/index.html
   - 'About': about/README.md

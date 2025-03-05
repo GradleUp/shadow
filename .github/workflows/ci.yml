@@ -30,6 +30,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew dokkaHtml
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]

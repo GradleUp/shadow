@@ -28,6 +28,10 @@ gradlePlugin {
   }
 }
 
+tasks.dokkaHtml {
+  outputDirectory = rootDir.resolve("docs/api")
+}
+
 tasks.publishPlugins {
   doFirst {
     if (version.toString().endsWith("SNAPSHOT")) {
