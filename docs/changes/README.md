@@ -9,6 +9,7 @@
   - Return values of `ShadowSpec` functions are changed to `Unit` to avoid confusion.
   - `ShadowSpec` no longer extends `CopySpec`.
   - Overload `relocate`, `transform` and things for better usability in Kotlin.
+- **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
 
 
 ## [v9.0.0-beta10] (2025-03-05)

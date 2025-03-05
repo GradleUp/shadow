@@ -35,11 +35,11 @@ internal sealed class AbstractDependencyFilter(
       ?: project.files()
   }
 
-  override fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
+  override fun exclude(spec: Spec<ResolvedDependency>) {
     excludeSpecs.add(spec)
   }
 
-  override fun include(spec: Spec<ResolvedDependency>): DependencyFilter = apply {
+  override fun include(spec: Spec<ResolvedDependency>) {
     includeSpecs.add(spec)
   }
 

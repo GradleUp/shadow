@@ -64,7 +64,7 @@ public open class ManifestAppenderTransformer @Inject constructor(
     }
   }
 
-  public open fun append(name: String, value: Comparable<*>): ManifestAppenderTransformer = apply {
+  public open fun append(name: String, value: Comparable<*>) {
     attributes.add(Pair(name, value))
   }
 

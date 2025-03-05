@@ -134,11 +134,11 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun canRelocateClass (Ljava/lang/String;)Z
 	public fun canRelocatePath (Ljava/lang/String;)Z
 	public fun equals (Ljava/lang/Object;)Z
-	public fun exclude (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
+	public fun exclude (Ljava/lang/String;)V
 	public final fun getExcludes ()Ljava/util/Set;
 	public final fun getIncludes ()Ljava/util/Set;
 	public fun hashCode ()I
-	public fun include (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator;
+	public fun include (Ljava/lang/String;)V
 	public fun relocateClass-XBGRxQs (Ljava/lang/String;)Ljava/lang/String;
 	public fun relocatePath-bvWaKNU (Ljava/lang/String;)Ljava/lang/String;
 }
@@ -146,8 +146,8 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
-	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter;
-	public abstract fun include (Lorg/gradle/api/specs/Spec;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter;
+	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)V
+	public abstract fun include (Lorg/gradle/api/specs/Spec;)V
 	public abstract fun project (Ljava/lang/String;)Lorg/gradle/api/specs/Spec;
 	public abstract fun project (Ljava/util/Map;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
@@ -155,8 +155,12 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest : org/gradle/api/java/archives/Manifest {
-	public abstract fun inheritFrom ([Ljava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
-	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
+	public fun inheritFrom ([Ljava/lang/Object;)V
+	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest$DefaultImpls {
+	public static fun inheritFrom (Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;[Ljava/lang/Object;)V
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
@@ -345,7 +349,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2Plugi
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer;
+	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAttributes ()Lorg/gradle/api/provider/SetProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
@@ -356,7 +360,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun attributes (Ljava/util/Map;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer;
+	public fun attributes (Ljava/util/Map;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;

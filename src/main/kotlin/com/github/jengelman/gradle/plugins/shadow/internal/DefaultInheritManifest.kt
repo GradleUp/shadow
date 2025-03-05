@@ -16,14 +16,8 @@ internal class DefaultInheritManifest @JvmOverloads constructor(
 
   override fun inheritFrom(
     vararg inheritPaths: Any,
-  ): InheritManifest {
-    return inheritFrom(inheritPaths = inheritPaths, action = null)
-  }
-
-  override fun inheritFrom(
-    vararg inheritPaths: Any,
     action: Action<*>?,
-  ): InheritManifest = apply {
+  ) {
     val mergeSpec = DefaultManifestMergeSpec()
     mergeSpec.from(*inheritPaths)
     inheritMergeSpecs.add(mergeSpec)

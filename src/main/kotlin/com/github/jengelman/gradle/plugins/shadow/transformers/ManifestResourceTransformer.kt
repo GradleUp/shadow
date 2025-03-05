@@ -81,7 +81,7 @@ public open class ManifestResourceTransformer @Inject constructor(
     manifest!!.write(os)
   }
 
-  public open fun attributes(attributes: Map<String, JarAttribute>): ManifestResourceTransformer = apply {
+  public open fun attributes(attributes: Map<String, JarAttribute>) {
     manifestEntries.putAll(attributes)
   }
 
