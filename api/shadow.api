@@ -155,8 +155,12 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest : org/gradle/api/java/archives/Manifest {
-	public abstract fun inheritFrom ([Ljava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
-	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
+	public fun inheritFrom ([Ljava/lang/Object;)V
+	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest$DefaultImpls {
+	public static fun inheritFrom (Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;[Ljava/lang/Object;)V
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
