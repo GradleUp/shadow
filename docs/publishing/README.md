@@ -7,27 +7,49 @@ The Shadow plugin will automatically configure the necessary tasks in the presen
 The plugin provides the `shadow` component to configure the publication with the necessary
 artifact and dependencies in the POM file.
 
-```groovy
-// Publishing a Shadow JAR with the Maven-Publish Plugin
-plugins {
-  id 'java'
-  id 'maven-publish'
-  id 'com.gradleup.shadow'
-}
+=== "Kotlin"
 
-publishing {
-  publications {
-    shadow(MavenPublication) {
-      from(components.shadow) // or components["shadow"] in Kotlin DSL
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
     }
-  }
-  repositories {
-    maven {
-      url = "https://repo.myorg.com"
+    
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
     }
-  }
-}
-```
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+    
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from(components.shadow)
+        }
+      }
+      repositories {
+        maven {
+          url = 'https://repo.myorg.com'
+        }
+      }
+    }
+    ```
 
 ## Shadow Configuration and Publishing
 
@@ -53,79 +75,152 @@ be manually configured.
 You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming 
 the `archiveClassifier` of the shadowed JAR like the following:
 
-```groovy
-plugins {
-  id 'java'
-  id 'maven-publish'
-  id 'com.gradleup.shadow'
-}
+=== "Kotlin"
 
-group = 'shadow'
-version = '1.0'
-
-dependencies {
-  // This will be bundled in the shadowed JAR and not declared in the POM.
-  implementation 'some:a:1.0'
-  // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
-  // file's `Class-Path` entry, and also in the POM file.
-  shadow 'some:b:1.0'
-  // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
-  compileOnly 'some:c:1.0'
-}
-
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  archiveClassifier = ''
-}
-
-publishing {
-  publications {
-    shadow(MavenPublication) {
-      from components.shadow
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
     }
-  }
-  repositories {
-    maven {
-      url = "https://repo.myorg.com"
+    
+    group = "shadow"
+    version = "1.0"
+    
+    dependencies {
+      // This will be bundled in the shadowed JAR and not declared in the POM.
+      implementation("some:a:1.0")
+      // This will be excluded
+      shadow("some:b:1.0")
+      // This will be excluded
+      compileOnly("some:c:1.0")
     }
-  }
-}
-```
+
+    tasks.shadowJar {
+      archiveClassifier = ""
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+    
+    group = 'shadow'
+    version = '1.0'
+    
+    dependencies {
+      // This will be bundled in the shadowed JAR and not declared in the POM.
+      implementation 'some:a:1.0'
+      // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
+      // file's `Class-Path` entry, and also in the POM file.
+      shadow 'some:b:1.0'
+      // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
+      compileOnly 'some:c:1.0'
+    }
+    
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+    
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.shadow
+        }
+      }
+      repositories {
+        maven {
+          url = "https://repo.myorg.com"
+        }
+      }
+    }
+    ```
 
 
 ## Publish Custom ShadowJar Task Outputs
 
 It is possible to publish a custom `ShadowJar` task's output via the [`MavenPublication.artifact(java.lang.Object)`](https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)) method. 
 
-```groovy
-// Publishing a Shadow JAR with the Maven-Publish Plugin
-plugins {
-  id 'java'
-  id 'maven-publish'
-  id 'com.gradleup.shadow'
-}
+=== "Kotlin"
 
-def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
-  description = "Create a combined JAR of project and test dependencies"
-  archiveClassifier = "tests"
-  from sourceSets.test.output
-  configurations = [project.configurations.testRuntimeClasspath]
-}
-
-dependencies {
-  testImplementation 'junit:junit:3.8.2'
-}
-
-publishing {
-  publications {
-    shadow(MavenPublication) {
-      artifact(testShadowJar)
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
     }
-  }
-  repositories {
-    maven {
-      url = "https://repo.myorg.com"
+    
+    val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      description = "Create a combined JAR of project and test dependencies"
+      archiveClassifier = "tests"
+      from(sourceSets["test"].output)
+      configurations = listOf(project.configurations["testRuntimeClasspath"])
     }
-  }
-}
-```
+    
+    dependencies {
+      testImplementation("junit:junit:3.8.2")
+    }
+    
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          artifact(testShadowJar)
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+    
+    def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      description = "Create a combined JAR of project and test dependencies"
+      archiveClassifier = "tests"
+      from sourceSets.test.output
+      configurations = [project.configurations.testRuntimeClasspath]
+    }
+    
+    dependencies {
+      testImplementation 'junit:junit:3.8.2'
+    }
+    
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          artifact(testShadowJar)
+        }
+      }
+      repositories {
+        maven {
+          url = "https://repo.myorg.com"
+        }
+      }
+    }
+    ```
