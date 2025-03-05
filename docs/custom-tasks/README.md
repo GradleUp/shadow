@@ -5,28 +5,53 @@ It is possible to add arbitrary [`ShadowJar`](https://gradleup.com/shadow/api/sh
 tasks to a project. When doing so, ensure that the `configurations` property is specified to inform Shadow which 
 dependencies to merge into the output.
 
-```groovy
-// Shadowing Test Sources and Dependencies
-def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
-  description = "Create a combined JAR of project and test dependencies"
-  
-  archiveClassifier = "tests"
-  from sourceSets.test.output
-  configurations = [project.configurations.testRuntimeClasspath]
+=== "Kotlin"
 
-  manifest {
-    // Optionally, set the main class for the JAR.
-    attributes 'Main-Class': 'test.Main'
-    // You can also set other attributes here.
-  }
-}
+    ```kotlin
+    val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      description = "Create a combined JAR of project and test dependencies"
+      
+      archiveClassifier = "tests"
+      from(sourceSets["test"].output)
+      configurations = listOf(project.configurations["testRuntimeClasspath"])
+    
+      manifest {
+        // Optionally, set the main class for the JAR.
+        attributes(mapOf("Main-Class" to "test.Main"))
+        // You can also set other attributes here.
+      }
+    }
+    
+    // Optionally, make the `assemble` task depend on the new task.
+    tasks.assemble {
+      dependsOn(testShadowJar)
+    }
+    ```
 
-// Optionally, make the `assemble` task depend on the new task.
-tasks.named('assemble') {
-  dependsOn testShadowJar
-}
-```
+=== "Groovy"
+
+    ```groovy
+    def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      description = "Create a combined JAR of project and test dependencies"
+      
+      archiveClassifier = "tests"
+      from sourceSets.test.output
+      configurations = [project.configurations.testRuntimeClasspath]
+    
+      manifest {
+        // Optionally, set the main class for the JAR.
+        attributes 'Main-Class': 'test.Main'
+        // You can also set other attributes here.
+      }
+    }
+    
+    // Optionally, make the `assemble` task depend on the new task.
+    tasks.named('assemble') {
+      dependsOn testShadowJar
+    }
+    ```
 
 The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all `testRuntimeOnly`
 and `testImplementation` dependencies.
