@@ -10,12 +10,21 @@ Shadow uses the ASM library to modify class byte code to replace the package nam
 statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.
 
-```groovy
-// Relocating a Package
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  relocate 'junit.framework', 'shadow.junit'
-}
-```
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      relocate("junit.framework", "shadow.junit")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      relocate 'junit.framework', 'shadow.junit'
+    }
+    ```
 
 The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`.
 For example, the class `junit.framework.TestCase` becomes `shadow.junit.TestCase`.
@@ -36,29 +45,54 @@ Specific classes or files can be `included`/`excluded` from the relocation opera
 [Ant Path Matcher](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html) 
 syntax to specify matching path for your files and directories.
 
-```groovy
-// Configuring Filtering for Relocation
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  relocate('junit.textui', 'a') {
-    exclude 'junit.textui.TestRunner'
-  }
-  relocate('junit.framework', 'b') {
-    include 'junit.framework.Test*'
-  }
-}
-```
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      relocate("junit.textui", "a") {
+        exclude("junit.textui.TestRunner")
+      }
+      relocate("junit.framework", "b") {
+        include("junit.framework.Test*")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      relocate('junit.textui', 'a') {
+        exclude 'junit.textui.TestRunner'
+      }
+      relocate('junit.framework', 'b') {
+        include 'junit.framework.Test*'
+      }
+    }
+    ```
 
 For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the expresion in `%regex[]` before
 passing it to `include`/`exclude`.
- 
-```groovy
-// Configuring Filtering for Relocation with Regex
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  relocate('org.foo', 'a') {
-    include '%regex[org/foo/.*Factory[0-9].*]'
-  }
-}
-```
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      relocate("org.foo", "a") {
+        include("%regex[org/foo/.*Factory[0-9].*]")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      relocate('org.foo', 'a') {
+        include '%regex[org/foo/.*Factory[0-9].*]'
+      }
+    }
+    ```
 
 ## Automatically Relocating Dependencies
 
@@ -69,13 +103,23 @@ removed for clarity reasons in version 4.0.0.
 To configure automatic dependency relocation, set `enableRelocation = true` and optionally specify a custom
 `relocationPrefix` to override the default value of `"shadow"`.
 
-```groovy
-// Configure Auto Relocation
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-  enableRelocation = true
-  relocationPrefix = "myapp"
-}
-```
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      enableRelocation = true
+      relocationPrefix = "myapp"
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      enableRelocation = true
+      relocationPrefix = "myapp"
+    }
+    ```
 
 In versions before 8.1.0 it was necessary to configure a separate `ConfigureShadowRelocation` task for this.
 
