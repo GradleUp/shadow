@@ -13,6 +13,7 @@
 - **BREAKING CHANGE:** Rename `Transformer` to `ResourceTransformer`. ([#1288](https://github.com/GradleUp/shadow/pull/1288))  
   Aims to better align with the name of [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java) and to distinguish itself from [org.gradle.api.Transformer.java](https://docs.gradle.org/current/javadoc/org/gradle/api/Transformer.html).
 - **BREAKING CHANGE:** Mark `DefaultInheritManifest` as `internal`. ([#1303](https://github.com/GradleUp/shadow/pull/1303))
+- Migrate doc sites to MkDocs. ([#1302](https://github.com/GradleUp/shadow/pull/1302))
 
 **Fixed**
 
