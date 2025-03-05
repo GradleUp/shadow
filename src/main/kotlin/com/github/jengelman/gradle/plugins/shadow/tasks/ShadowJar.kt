@@ -22,7 +22,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
-import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
@@ -160,18 +159,6 @@ public abstract class ShadowJar :
     action?.execute(dependencyFilter.get())
   }
 
-  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?) {
-    addTransform(clazz.create(objectFactory), action)
-  }
-
-  override fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?) {
-    transform(clazz.java, action)
-  }
-
-  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
-    addTransform(transformer, action)
-  }
-
   override fun mergeServiceFiles() {
     transform(ServiceFileTransformer::class.java, null)
   }
@@ -220,12 +207,32 @@ public abstract class ShadowJar :
     addRelocator(relocator, action)
   }
 
-  override fun <R : Relocator> relocate(clazz: KClass<R>, action: Action<R>?) {
-    relocate(clazz.java, action)
+  public inline fun <reified R : Relocator> relocate() {
+    relocate(R::class.java, null)
+  }
+
+  public inline fun <reified R : Relocator> relocate(action: Action<R>?) {
+    relocate(R::class.java, action)
   }
 
   override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
     addRelocator(relocator, action)
+  }
+
+  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?) {
+    addTransform(clazz.create(objectFactory), action)
+  }
+
+  public inline fun <reified T : ResourceTransformer> transform() {
+    transform(T::class.java, null)
+  }
+
+  public inline fun <reified T : ResourceTransformer> transform(action: Action<T>?) {
+    transform(T::class.java, action)
+  }
+
+  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
+    addTransform(transformer, action)
   }
 
   @TaskAction

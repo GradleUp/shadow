@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import kotlin.reflect.KClass
 import org.gradle.api.Action
 
 @JvmDefaultWithCompatibility
@@ -42,12 +41,6 @@ public interface ShadowSpec {
 
   public fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?)
 
-  public fun <R : Relocator> relocate(clazz: KClass<Relocator>) {
-    relocate(clazz, null)
-  }
-
-  public fun <R : Relocator> relocate(clazz: KClass<R>, action: Action<R>?)
-
   public fun <R : Relocator> relocate(relocator: R) {
     relocate(relocator, null)
   }
@@ -59,12 +52,6 @@ public interface ShadowSpec {
   }
 
   public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?)
-
-  public fun <T : ResourceTransformer> transform(clazz: KClass<T>) {
-    transform(clazz, null)
-  }
-
-  public fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?)
 
   public fun <T : ResourceTransformer> transform(transformer: T) {
     transform(transformer, null)
