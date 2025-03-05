@@ -22,6 +22,7 @@ determine if it should process a particular entry and apply any modifications be
       override fun hasTransformedResource(): Boolean = true
       override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
     }
+
     tasks.shadowJar {
       transform<MyTransformer>()
     }
@@ -39,13 +40,17 @@ determine if it should process a particular entry and apply any modifications be
     class MyTransformer implements ResourceTransformer {
       @Override
       boolean canTransformResource(@Nonnull FileTreeElement element) { return true }
+
       @Override
       void transform(@Nonnull TransformerContext context) {}
+
       @Override
       boolean hasTransformedResource() { return true }
+
       @Override
       void modifyOutputStream(@Nonnull ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       transform(MyTransformer.class)
     }
@@ -68,6 +73,7 @@ Additionally, a `Transformer` can accept a `Closure` to configure the provided `
       override fun hasTransformedResource(): Boolean = true
       override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
     }
+
     tasks.shadowJar {
       transform<MyTransformer>() {
         enabled = true
@@ -88,10 +94,13 @@ Additionally, a `Transformer` can accept a `Closure` to configure the provided `
       boolean enabled
       @Override
       boolean canTransformResource(@Nonnull FileTreeElement element) { return true }
+
       @Override
       void transform(@Nonnull TransformerContext context) {}
+
       @Override
       boolean hasTransformedResource() { return true }
+
       @Override
       void modifyOutputStream(@Nonnull ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
@@ -119,6 +128,7 @@ An instantiated instance of a `Transformer` can also be provided.
       override fun hasTransformedResource(): Boolean = true
       override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
     }
+
     tasks.shadowJar {
       transform(MyTransformer(true))
     }
@@ -140,10 +150,13 @@ An instantiated instance of a `Transformer` can also be provided.
       }
       @Override
       boolean canTransformResource(@Nonnull FileTreeElement element) { return true }
+
       @Override
       void transform(@Nonnull TransformerContext context) {}
+
       @Override
       boolean hasTransformedResource() { return true }
+
       @Override
       void modifyOutputStream(@Nonnull ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
@@ -259,6 +272,7 @@ method to add this transformer.
     ```
 
 === "Groovy"
+
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       mergeGroovyExtensionModules()
@@ -305,6 +319,7 @@ configure this transformer.
     ```
 
 === "Groovy"
+
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       append 'test.properties'
