@@ -2,7 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.executable.CodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.executor.GroovyBuildExecutor
+import com.github.jengelman.gradle.plugins.shadow.executor.KotlinBuildExecutor
 import com.github.jengelman.gradle.plugins.shadow.fixture.GroovyDslFixture
+import com.github.jengelman.gradle.plugins.shadow.fixture.KotlinDslFixture
+import com.github.jengelman.gradle.plugins.shadow.fixture.SnippetFixture
 import java.nio.file.Path
 import kotlin.io.path.Path
 import org.junit.jupiter.api.DynamicTest
@@ -17,6 +20,10 @@ class DocCodeSnippetTest {
       CodeSnippetExtractor.extract(root, docsDir, selector, executor)
     }.map {
       DynamicTest.dynamicTest(it.testName, it)
+    }.also {
+      if (it.isEmpty()) {
+        error("No code snippets found.")
+      }
     }
   }
 
@@ -24,7 +31,11 @@ class DocCodeSnippetTest {
     private val fixtures = mapOf(
       "groovy" to GroovyBuildExecutor(
         GroovyDslFixture,
-        GroovyDslFixture.importsExtractor,
+        SnippetFixture.importsExtractor,
+      ),
+      "kotlin" to KotlinBuildExecutor(
+        KotlinDslFixture,
+        SnippetFixture.importsExtractor,
       ),
     )
 

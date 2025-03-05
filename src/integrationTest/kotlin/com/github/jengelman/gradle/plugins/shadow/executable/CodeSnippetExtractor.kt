@@ -15,11 +15,11 @@ object CodeSnippetExtractor {
   fun extract(
     root: Path,
     docRoot: Path,
-    cssClass: String,
+    lang: String,
     executor: SnippetExecutor,
   ): List<CodeSnippetExecutable> {
     val snippets = mutableListOf<CodeSnippetExecutable>()
-    val snippetBlockPattern = Pattern.compile("(?ims)```$cssClass\n(.*?)\n```")
+    val snippetBlockPattern = Pattern.compile("(?ims) {4}```$lang\n(.*?)\n {4}```")
     @OptIn(ExperimentalPathApi::class)
     docRoot.walk()
       .filter { it.name.endsWith(".md", ignoreCase = true) }
