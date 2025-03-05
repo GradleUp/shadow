@@ -3,9 +3,9 @@
 
 ## [Unreleased]
 
-**Fixed**
+**Changed**
 
-- Fix overloads of `ShadowJar.transform`. ([#1307](https://github.com/GradleUp/shadow/pull/1307))
+- Overload `ShadowSpec` functions. ([#1307](https://github.com/GradleUp/shadow/pull/1307))
 
 
 ## [v9.0.0-beta10] (2025-03-05)
