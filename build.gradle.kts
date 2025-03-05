@@ -175,4 +175,5 @@ tasks.clean {
   val dirs = includedBuilds.map { it.projectDir } + projectDir
   delete.addAll(dirs.map { it.resolve(".gradle") })
   delete.addAll(dirs.map { it.resolve(".kotlin") })
+  delete.add(tasks.dokkaHtml.map { it.outputDirectory })
 }
