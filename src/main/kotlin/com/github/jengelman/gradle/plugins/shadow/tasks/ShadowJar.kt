@@ -198,10 +198,6 @@ public abstract class ShadowJar :
     }.getOrDefault(this)
   }
 
-  override fun append(resourcePath: String): ShadowJar {
-    return append(resourcePath, AppendingTransformer.DEFAULT_SEPARATOR)
-  }
-
   /**
    * Append contents to a resource in the jar.
    *

@@ -171,8 +171,6 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar, com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec {
 	public fun <init> ()V
-	public fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
-	public synthetic fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun append (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun append (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	protected fun copy ()V
@@ -223,7 +221,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec : org/gradle/api/file/CopySpec {
-	public abstract fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun append (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun append (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun dependencies (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun mergeGroovyExtensionModules ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
@@ -249,6 +247,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec$DefaultImpls {
+	public static fun append (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public static fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public static fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public static fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;

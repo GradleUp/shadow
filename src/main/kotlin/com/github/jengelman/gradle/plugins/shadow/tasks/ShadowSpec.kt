@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import java.lang.reflect.InvocationTargetException
@@ -61,7 +62,9 @@ public interface ShadowSpec : CopySpec {
 
   public fun mergeGroovyExtensionModules(): ShadowSpec
 
-  public fun append(resourcePath: String): ShadowSpec
+  public fun append(resourcePath: String): ShadowSpec {
+    return append(resourcePath, AppendingTransformer.DEFAULT_SEPARATOR)
+  }
 
   public fun append(resourcePath: String, separator: String): ShadowSpec
 
