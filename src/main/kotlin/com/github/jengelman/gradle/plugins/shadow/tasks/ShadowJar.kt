@@ -147,55 +147,47 @@ public abstract class ShadowJar :
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
-  override fun minimize(): ShadowJar = apply {
+  override fun minimize() {
     minimizeJar.set(true)
   }
 
-  override fun minimize(action: Action<DependencyFilter>?): ShadowJar = apply {
+  override fun minimize(action: Action<DependencyFilter>?) {
     minimize()
     action?.execute(dependencyFilterForMinimize)
   }
 
-  override fun dependencies(action: Action<DependencyFilter>?): ShadowJar = apply {
+  override fun dependencies(action: Action<DependencyFilter>?) {
     action?.execute(dependencyFilter.get())
   }
 
-  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowJar = apply {
+  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?) {
     addTransform(clazz.create(objectFactory), action)
   }
 
-  override fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?): ShadowJar = apply {
+  override fun <T : ResourceTransformer> transform(clazz: KClass<T>, action: Action<T>?) {
     transform(clazz.java, action)
   }
 
-  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?): ShadowJar = apply {
+  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
     addTransform(transformer, action)
   }
 
-  override fun mergeServiceFiles(): ShadowJar {
-    return runCatching {
-      transform(ServiceFileTransformer::class.java, null)
-    }.getOrDefault(this)
+  override fun mergeServiceFiles() {
+    transform(ServiceFileTransformer::class.java, null)
   }
 
-  override fun mergeServiceFiles(rootPath: String): ShadowJar {
-    return runCatching {
-      transform(ServiceFileTransformer::class.java) {
-        it.path = rootPath
-      }
-    }.getOrDefault(this)
+  override fun mergeServiceFiles(rootPath: String) {
+    transform(ServiceFileTransformer::class.java) {
+      it.path = rootPath
+    }
   }
 
-  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?): ShadowJar {
-    return runCatching {
-      transform(ServiceFileTransformer::class.java, action)
-    }.getOrDefault(this)
+  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?) {
+    transform(ServiceFileTransformer::class.java, action)
   }
 
-  override fun mergeGroovyExtensionModules(): ShadowJar {
-    return runCatching {
-      transform(GroovyExtensionModuleTransformer::class.java, null)
-    }.getOrDefault(this)
+  override fun mergeGroovyExtensionModules() {
+    transform(GroovyExtensionModuleTransformer::class.java, null)
   }
 
   /**
@@ -207,34 +199,32 @@ public abstract class ShadowJar :
    * @param separator The separator to use between the original content and the appended content,
    * defaults to `\n` ([AppendingTransformer.DEFAULT_SEPARATOR]).
    */
-  override fun append(resourcePath: String, separator: String): ShadowJar {
-    return runCatching {
-      transform(AppendingTransformer::class.java) {
-        it.resource.set(resourcePath)
-        it.separator.set(separator)
-      }
-    }.getOrDefault(this)
+  override fun append(resourcePath: String, separator: String) {
+    transform(AppendingTransformer::class.java) {
+      it.resource.set(resourcePath)
+      it.separator.set(separator)
+    }
   }
 
   override fun relocate(
     pattern: String,
     destination: String,
     action: Action<SimpleRelocator>?,
-  ): ShadowJar = apply {
+  ) {
     val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
   }
 
-  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowJar = apply {
+  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
 
-  override fun <R : Relocator> relocate(clazz: KClass<R>, action: Action<R>?): ShadowJar = apply {
+  override fun <R : Relocator> relocate(clazz: KClass<R>, action: Action<R>?) {
     relocate(clazz.java, action)
   }
 
-  override fun <R : Relocator> relocate(relocator: R, action: Action<R>?): ShadowJar = apply {
+  override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
     addRelocator(relocator, action)
   }
 
