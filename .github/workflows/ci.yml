@@ -24,21 +24,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build
 
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew dokkaHtml
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force
-
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
