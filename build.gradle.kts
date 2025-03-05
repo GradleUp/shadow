@@ -9,7 +9,6 @@ plugins {
   alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.spotless)
   id("shadow.convention.publish")
-  id("shadow.convention.deploy")
 }
 
 java {
@@ -77,8 +76,8 @@ testing.suites {
   register<JvmTestSuite>("integrationTest") {
     targets.configureEach {
       testTask {
-        val docsDir = file("src/docs")
-        // Add src/docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
+        val docsDir = file("docs")
+        // Add docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
         inputs.dir(docsDir)
         systemProperty("DOCS_DIR", docsDir.absolutePath)
       }
@@ -176,16 +175,5 @@ tasks.clean {
   val dirs = includedBuilds.map { it.projectDir } + projectDir
   delete.addAll(dirs.map { it.resolve(".gradle") })
   delete.addAll(dirs.map { it.resolve(".kotlin") })
-  delete.add("node_modules")
-}
-
-tasks.register("releaseAll") {
-  description = "Publishes the plugin to maven repos and deploys website."
-  group = PublishingPlugin.PUBLISH_TASK_GROUP
-
-  dependsOn(
-    tasks.publish,
-    tasks.publishPlugins,
-    tasks.gitPublishPush,
-  )
+  delete.add(tasks.dokkaHtml.map { it.outputDirectory })
 }
