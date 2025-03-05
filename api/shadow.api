@@ -349,7 +349,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2Plugi
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer;
+	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAttributes ()Lorg/gradle/api/provider/SetProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
@@ -360,7 +360,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun attributes (Ljava/util/Map;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer;
+	public fun attributes (Ljava/util/Map;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
