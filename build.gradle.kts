@@ -175,15 +175,4 @@ tasks.clean {
   val dirs = includedBuilds.map { it.projectDir } + projectDir
   delete.addAll(dirs.map { it.resolve(".gradle") })
   delete.addAll(dirs.map { it.resolve(".kotlin") })
-  delete.add("node_modules")
-}
-
-tasks.register("releaseAll") {
-  description = "Publishes the plugin to maven repos and deploys website."
-  group = PublishingPlugin.PUBLISH_TASK_GROUP
-
-  dependsOn(
-    tasks.publish,
-    tasks.publishPlugins,
-  )
 }
