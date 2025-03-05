@@ -1,1 +1,78 @@
-site_name: My Docs
+# pip install mkdocs mkdocs-material
+# mkdocs serve
+# mkdocs gh-deploy
+
+site_name: Shadow Gradle Plugin
+repo_name: Shadow
+repo_url: https://github.com/GradleUp/shadow
+site_description: "Gradle plugin to create fat/uber JARs, apply file transforms, and relocate packages for applications and libraries"
+site_author: GradleUp developers
+remote_branch: gh-pages
+
+theme:
+  name: 'material'
+  favicon: images/logo.orig.svg
+  logo: images/logo.svg
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: 'white'
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: 'black'
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: 'Lato'
+    code: 'Fira Code'
+  features:
+    - content.code.copy
+    - content.code.select
+
+markdown_extensions:
+  - smarty
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.emoji
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - admonition
+  - attr_list
+  - md_in_html
+
+nav:
+  - 'Home': README.md
+  - 'Introduction': introduction/README.md
+  - 'Getting Started': getting-started/README.md
+  - 'Configuration':
+      - 'Overview': configuration/README.md
+      - 'Filtering': configuration/filtering/README.md
+      - 'Dependencies': configuration/dependencies/README.md
+      - 'Merging': configuration/merging/README.md
+      - 'Relocation': configuration/relocation/README.md
+      - 'Minimizing': configuration/minimizing/README.md
+      - 'Reproducible Builds': configuration/reproducible-builds/README.md
+  - 'Custom Tasks': custom-tasks/README.md
+  - 'Application Plugin': application-plugin/README.md
+  - 'KMP Plugin': kmp-plugin/README.md
+  - 'Publishing': publishing/README.md
+  - 'Multi-Project': multi-project/README.md
+  - 'Plugins': plugins/README.md
+  - 'Changes': changes/README.md
+  - 'About': about/README.md
