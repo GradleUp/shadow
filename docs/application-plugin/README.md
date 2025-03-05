@@ -9,7 +9,6 @@ configured to contain the `Main-Class` attribute with the value specified in the
 
 === "Kotlin"
     ```kotlin
-    // Using Shadow with Application Plugin
     plugins {
       java
       application
@@ -23,7 +22,6 @@ configured to contain the `Main-Class` attribute with the value specified in the
 
 === "Groovy"
     ```groovy
-    // Using Shadow with Application Plugin
     plugins {
       id 'java'
       id 'application'
@@ -45,7 +43,6 @@ It can be configured the same as any other `JavaExec` task.
 
 === "Kotlin"
     ```kotlin
-    // Configuring the runShadow Task
     plugins {
       java
       application
@@ -63,7 +60,6 @@ It can be configured the same as any other `JavaExec` task.
 
 === "Groovy"
     ```groovy
-    // Configuring the runShadow Task
     plugins {
       id 'java'
       id 'application'
@@ -96,7 +92,6 @@ You can also add more files into the distribution like:
 
 === "Kotlin"
     ```kotlin
-    // Add extra files to the distribution
     plugins {
       java
       application
@@ -122,7 +117,6 @@ You can also add more files into the distribution like:
 
 === "Groovy"
     ```groovy
-    // Add extra files to the distribution
     plugins {
       id 'java'
       id 'application'
