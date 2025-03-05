@@ -22,12 +22,12 @@ public interface DependencyFilter : Serializable {
   /**
    * Exclude dependencies that match the provided [spec].
    */
-  public fun exclude(spec: Spec<ResolvedDependency>): DependencyFilter
+  public fun exclude(spec: Spec<ResolvedDependency>)
 
   /**
    * Include dependencies that match the provided [spec].
    */
-  public fun include(spec: Spec<ResolvedDependency>): DependencyFilter
+  public fun include(spec: Spec<ResolvedDependency>)
 
   /**
    * Create a [Spec] that matches the provided project [notation].

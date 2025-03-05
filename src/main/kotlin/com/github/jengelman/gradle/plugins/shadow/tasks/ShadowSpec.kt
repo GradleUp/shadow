@@ -2,68 +2,60 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import java.lang.reflect.InvocationTargetException
 import org.gradle.api.Action
-import org.gradle.api.file.CopySpec
 
-public interface ShadowSpec : CopySpec {
-  public fun minimize(): ShadowSpec
+@JvmDefaultWithCompatibility
+public interface ShadowSpec {
+  public fun minimize()
 
-  public fun minimize(action: Action<DependencyFilter>?): ShadowSpec
+  public fun minimize(action: Action<DependencyFilter>?)
 
-  public fun dependencies(action: Action<DependencyFilter>?): ShadowSpec
+  public fun dependencies(action: Action<DependencyFilter>?)
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
-  public fun transform(clazz: Class<ResourceTransformer>): ShadowSpec
+  public fun mergeServiceFiles()
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
-  public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?): ShadowSpec
+  public fun mergeServiceFiles(rootPath: String)
 
-  public fun transform(transformer: ResourceTransformer): ShadowSpec
+  public fun mergeServiceFiles(action: Action<ServiceFileTransformer>?)
 
-  public fun mergeServiceFiles(): ShadowSpec
+  public fun mergeGroovyExtensionModules()
 
-  public fun mergeServiceFiles(rootPath: String): ShadowSpec
+  public fun append(resourcePath: String) {
+    append(resourcePath, AppendingTransformer.DEFAULT_SEPARATOR)
+  }
 
-  public fun mergeServiceFiles(action: Action<ServiceFileTransformer>?): ShadowSpec
+  public fun append(resourcePath: String, separator: String)
 
-  public fun mergeGroovyExtensionModules(): ShadowSpec
+  public fun relocate(pattern: String, destination: String) {
+    relocate(pattern, destination, null)
+  }
 
-  public fun append(resourcePath: String): ShadowSpec
+  public fun relocate(pattern: String, destination: String, action: Action<SimpleRelocator>?)
 
-  public fun append(resourcePath: String, separator: String): ShadowSpec
+  public fun <R : Relocator> relocate(clazz: Class<R>) {
+    relocate(clazz, null)
+  }
 
-  public fun relocate(pattern: String, destination: String): ShadowSpec
+  public fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?)
 
-  public fun relocate(pattern: String, destination: String, action: Action<SimpleRelocator>?): ShadowSpec
+  public fun <R : Relocator> relocate(relocator: R) {
+    relocate(relocator, null)
+  }
 
-  public fun relocate(relocator: Relocator): ShadowSpec
+  public fun <R : Relocator> relocate(relocator: R, action: Action<R>?)
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
-  public fun relocate(clazz: Class<Relocator>): ShadowSpec
+  public fun <T : ResourceTransformer> transform(clazz: Class<T>) {
+    transform(clazz, null)
+  }
 
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
-  public fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowSpec
+  public fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?)
+
+  public fun <T : ResourceTransformer> transform(transformer: T) {
+    transform(transformer, null)
+  }
+
+  public fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?)
 }
