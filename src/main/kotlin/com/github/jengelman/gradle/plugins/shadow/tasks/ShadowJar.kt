@@ -207,6 +207,10 @@ public abstract class ShadowJar :
     addRelocator(relocator, action)
   }
 
+  override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
+    addRelocator(relocator, action)
+  }
+
   public inline fun <reified R : Relocator> relocate() {
     relocate(R::class.java, null)
   }
@@ -215,12 +219,12 @@ public abstract class ShadowJar :
     relocate(R::class.java, action)
   }
 
-  override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
-    addRelocator(relocator, action)
-  }
-
   override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?) {
     addTransform(clazz.create(objectFactory), action)
+  }
+
+  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
+    addTransform(transformer, action)
   }
 
   public inline fun <reified T : ResourceTransformer> transform() {
@@ -229,10 +233,6 @@ public abstract class ShadowJar :
 
   public inline fun <reified T : ResourceTransformer> transform(action: Action<T>?) {
     transform(T::class.java, action)
-  }
-
-  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
-    addTransform(transformer, action)
   }
 
   @TaskAction
