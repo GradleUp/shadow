@@ -36,11 +36,16 @@ class GroovyBuildExecutor(
     val mainScript = buildString {
       append(imports)
       append(System.lineSeparator())
-      if (!snippetWithoutImports.contains("plugins {")) {
-        append(fixture.pluginsBlock)
-        append(System.lineSeparator())
+      // All buildscript {} blocks must appear before any plugins {} blocks in the script.
+      if (snippetWithoutImports.contains("buildscript {")) {
+        append(snippetWithoutImports)
+      } else {
+        if (!snippetWithoutImports.contains("plugins {")) {
+          append(fixture.pluginsBlock)
+          append(System.lineSeparator())
+        }
+        append(snippetWithoutImports)
       }
-      append(snippetWithoutImports)
       append(System.lineSeparator())
     }.trimIndent()
     tempDir.addSubProject("main", mainScript)
