@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.executable.CodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.executor.GroovyBuildExecutor
-import com.github.jengelman.gradle.plugins.shadow.executor.NoopExecutor
 import com.github.jengelman.gradle.plugins.shadow.fixture.GroovyDslFixture
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -27,7 +26,6 @@ class DocCodeSnippetTest {
         GroovyDslFixture,
         GroovyDslFixture.importsExtractor,
       ),
-      "groovy no-run" to NoopExecutor,
     )
 
     val docsDir: Path = Path(System.getProperty("DOCS_DIR"))
