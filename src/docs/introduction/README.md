@@ -26,8 +26,8 @@ It must be available on the target system.
 Executable JARs contain a JAR MANIFEST that specifies the application Main Class.
 This allows the application to be started with a single command:
 
-```bash
-$ java -jar application-shadow.jar
+```shell
+java -jar application-shadow.jar
 ```
 
 ### Library Bundling

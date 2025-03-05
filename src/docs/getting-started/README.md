@@ -1,21 +1,21 @@
 # Getting Started
 
-```groovy no-run
+```groovy
 plugins {
   id 'java'
-  id 'com.gradleup.shadow' version '@version@'
+  id 'com.gradleup.shadow' version '<version>'
 }
 ```
 
 Alternatively, the plugin can be added to the buildscript classpath and applied:
 
-```groovy no-run
+```groovy
 buildscript {
   repositories {
     gradlePluginPortal()
   }
   dependencies {
-    classpath 'com.gradleup.shadow:shadow-gradle-plugin:@version@'
+    classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
   }
 }
 
@@ -31,14 +31,14 @@ Sonatype's snapshots repository</a>.
 </summary>
 <p>
 
-```groovy no-run
+```groovy
 buildscript {
   repositories {
     mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-    classpath 'com.gradleup.shadow:shadow-gradle-plugin:<snapshot-version>'
+    classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
   }
 }
 

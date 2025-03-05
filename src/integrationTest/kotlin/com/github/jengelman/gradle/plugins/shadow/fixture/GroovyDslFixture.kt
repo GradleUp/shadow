@@ -20,7 +20,8 @@ object GroovyDslFixture : SnippetFixture {
 
     listOf(
       imports.toString(),
-      scriptMinusImports.toString(),
+      // Replace the version placeholders.
+      scriptMinusImports.toString().replace("<version>", "+"),
     )
   }
 }
