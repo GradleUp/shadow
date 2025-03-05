@@ -206,16 +206,14 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public synthetic fun minimize ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun minimize (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun minimize (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
-	public synthetic fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public fun relocate (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
-	public synthetic fun relocate (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
-	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Lkotlin/reflect/KClass;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
+	public synthetic fun relocate (Lkotlin/reflect/KClass;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
 	public synthetic fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun transform (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
@@ -234,11 +232,14 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun mergeServiceFiles (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun minimize ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun minimize (Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public abstract fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public abstract fun relocate (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
-	public abstract fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public fun relocate (Lkotlin/reflect/KClass;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public abstract fun relocate (Lkotlin/reflect/KClass;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;Lorg/gradle/api/Action;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public fun transform (Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
@@ -248,6 +249,10 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec$DefaultImpls {
+	public static fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public static fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public static fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Ljava/lang/String;Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
+	public static fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Lkotlin/reflect/KClass;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public static fun transform (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public static fun transform (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Ljava/lang/Class;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;
 	public static fun transform (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;Lkotlin/reflect/KClass;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowSpec;

@@ -65,19 +65,15 @@ public interface ShadowSpec : CopySpec {
 
   public fun append(resourcePath: String, separator: String): ShadowSpec
 
-  public fun relocate(pattern: String, destination: String): ShadowSpec
+  public fun relocate(pattern: String, destination: String): ShadowSpec {
+    return relocate(pattern, destination, null)
+  }
 
   public fun relocate(pattern: String, destination: String, action: Action<SimpleRelocator>?): ShadowSpec
 
-  public fun relocate(relocator: Relocator): ShadowSpec
-
-  @Throws(
-    InstantiationException::class,
-    IllegalAccessException::class,
-    NoSuchMethodException::class,
-    InvocationTargetException::class,
-  )
-  public fun relocate(clazz: Class<Relocator>): ShadowSpec
+  public fun <R : Relocator> relocate(clazz: Class<R>): ShadowSpec {
+    return relocate(clazz, null)
+  }
 
   @Throws(
     InstantiationException::class,
@@ -86,4 +82,22 @@ public interface ShadowSpec : CopySpec {
     InvocationTargetException::class,
   )
   public fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowSpec
+
+  public fun <R : Relocator> relocate(clazz: KClass<Relocator>): ShadowSpec {
+    return relocate(clazz, null)
+  }
+
+  @Throws(
+    InstantiationException::class,
+    IllegalAccessException::class,
+    NoSuchMethodException::class,
+    InvocationTargetException::class,
+  )
+  public fun <R : Relocator> relocate(clazz: KClass<R>, action: Action<R>?): ShadowSpec
+
+  public fun <R : Relocator> relocate(relocator: R): ShadowSpec {
+    return relocate(relocator, null)
+  }
+
+  public fun <R : Relocator> relocate(relocator: R, action: Action<R>?): ShadowSpec
 }

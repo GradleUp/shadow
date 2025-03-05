@@ -220,10 +220,6 @@ public abstract class ShadowJar :
     }.getOrDefault(this)
   }
 
-  override fun relocate(pattern: String, destination: String): ShadowJar {
-    return relocate(pattern, destination, null)
-  }
-
   override fun relocate(
     pattern: String,
     destination: String,
@@ -233,16 +229,16 @@ public abstract class ShadowJar :
     addRelocator(relocator, action)
   }
 
-  override fun relocate(relocator: Relocator): ShadowJar = apply {
-    addRelocator(relocator, null)
-  }
-
-  override fun relocate(clazz: Class<Relocator>): ShadowJar {
-    return relocate(clazz, null)
-  }
-
   override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?): ShadowJar = apply {
     val relocator = clazz.getDeclaredConstructor().newInstance()
+    addRelocator(relocator, action)
+  }
+
+  override fun <R : Relocator> relocate(clazz: KClass<R>, action: Action<R>?): ShadowJar = apply {
+    relocate(clazz.java, action)
+  }
+
+  override fun <R : Relocator> relocate(relocator: R, action: Action<R>?): ShadowJar = apply {
     addRelocator(relocator, action)
   }
 
