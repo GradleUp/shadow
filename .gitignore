@@ -10,9 +10,6 @@ out
 .gradletasknamecache
 .gradle-test-kit
 classes/
-node_modules/
-yarn-error.log
-docs/.vuepress/dist/
 .DS_Store
 jd-gui.cfg
 bin/
