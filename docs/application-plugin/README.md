@@ -8,6 +8,7 @@ Just like the normal `jar` task, when the `application` plugin is applied, the `
 configured to contain the `Main-Class` attribute with the value specified in the project's `mainClassName` attribute.
 
 === "Kotlin"
+
     ```kotlin
     plugins {
       java
@@ -20,6 +21,7 @@ configured to contain the `Main-Class` attribute with the value specified in the
     ```
 
 === "Groovy"
+
     ```groovy
     plugins {
       id 'java'
@@ -40,6 +42,7 @@ task that is configured to execute `java -jar myproject-all.jar`.
 It can be configured the same as any other `JavaExec` task.
 
 === "Kotlin"
+
     ```kotlin
     plugins {
       java
@@ -57,6 +60,7 @@ It can be configured the same as any other `JavaExec` task.
     ```
 
 === "Groovy"
+
     ```groovy
     plugins {
       id 'java'
@@ -87,6 +91,7 @@ files for a distribution to `build/install/<project name>-shadow/`.
 You can also add more files into the distribution like:
 
 === "Kotlin"
+
     ```kotlin
     plugins {
       java
@@ -110,6 +115,7 @@ You can also add more files into the distribution like:
     ```
 
 === "Groovy"
+
     ```groovy
     plugins {
       id 'java'
