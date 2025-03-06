@@ -311,9 +311,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
   ```
   buildscript {
     repositories {
-      maven {
-        url "https://plugins.gradle.org/m2/"
-      }
+      gradlePluginPortal()
     }
     dependencies {
       classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"

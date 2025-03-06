@@ -40,13 +40,11 @@ artifact and dependencies in the POM file.
     publishing {
       publications {
         shadow(MavenPublication) {
-          from(components.shadow)
+          from components.shadow
         }
       }
       repositories {
-        maven {
-          url = 'https://repo.myorg.com'
-        }
+        maven { url = 'https://repo.myorg.com' }
       }
     }
     ```
@@ -145,9 +143,7 @@ the `archiveClassifier` of the shadowed JAR like the following:
         }
       }
       repositories {
-        maven {
-          url = "https://repo.myorg.com"
-        }
+        maven { url = 'https://repo.myorg.com' }
       }
     }
     ```
@@ -201,8 +197,8 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
 
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
-      description = "Create a combined JAR of project and test dependencies"
-      archiveClassifier = "tests"
+      description = 'Create a combined JAR of project and test dependencies'
+      archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
       configurations = provider { [project.configurations.testRuntimeClasspath] }
     }
@@ -218,9 +214,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
         }
       }
       repositories {
-        maven {
-          url = "https://repo.myorg.com"
-        }
+        maven { url = 'https://repo.myorg.com' }
       }
     }
     ```

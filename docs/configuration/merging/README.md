@@ -33,22 +33,14 @@ determine if it should process a particular entry and apply any modifications be
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
     import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import javax.annotation.Nonnull
     import org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer implements ResourceTransformer {
-      @Override
-      boolean canTransformResource(@Nonnull FileTreeElement element) { return true }
-
-      @Override
-      void transform(@Nonnull TransformerContext context) {}
-
-      @Override
-      boolean hasTransformedResource() { return true }
-
-      @Override
-      void modifyOutputStream(@Nonnull ZipOutputStream os, boolean preserveFileTimestamps) {}
+      @Override boolean canTransformResource(FileTreeElement element) { return true }
+      @Override void transform(TransformerContext context) {}
+      @Override boolean hasTransformedResource() { return true }
+      @Override void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -66,8 +58,7 @@ Additionally, a `Transformer` can accept a `Closure` to configure the provided `
     import org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
-    class MyTransformer : ResourceTransformer {
-      var enabled: Boolean = false
+    class MyTransformer(var enabled: Boolean = false) : ResourceTransformer {
       override fun canTransformResource(element: FileTreeElement): Boolean = true
       override fun transform(context: TransformerContext) {}
       override fun hasTransformedResource(): Boolean = true
@@ -86,23 +77,15 @@ Additionally, a `Transformer` can accept a `Closure` to configure the provided `
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
     import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import javax.annotation.Nonnull
     import org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer implements ResourceTransformer {
       boolean enabled
-      @Override
-      boolean canTransformResource(@Nonnull FileTreeElement element) { return true }
-
-      @Override
-      void transform(@Nonnull TransformerContext context) {}
-
-      @Override
-      boolean hasTransformedResource() { return true }
-
-      @Override
-      void modifyOutputStream(@Nonnull ZipOutputStream os, boolean preserveFileTimestamps) {}
+      @Override boolean canTransformResource(FileTreeElement element) { return true }
+      @Override void transform(TransformerContext context) {}
+      @Override boolean hasTransformedResource() { return true }
+      @Override void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -139,26 +122,16 @@ An instantiated instance of a `Transformer` can also be provided.
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
     import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import javax.annotation.Nonnull
     import org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer implements ResourceTransformer {
       final boolean enabled
-      MyTransformer(boolean enabled) {
-        this.enabled = enabled
-      }
-      @Override
-      boolean canTransformResource(@Nonnull FileTreeElement element) { return true }
-
-      @Override
-      void transform(@Nonnull TransformerContext context) {}
-
-      @Override
-      boolean hasTransformedResource() { return true }
-
-      @Override
-      void modifyOutputStream(@Nonnull ZipOutputStream os, boolean preserveFileTimestamps) {}
+      MyTransformer(boolean enabled) { this.enabled = enabled }
+      @Override boolean canTransformResource(FileTreeElement element) { return true }
+      @Override void transform(TransformerContext context) {}
+      @Override boolean hasTransformedResource() { return true }
+      @Override void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {

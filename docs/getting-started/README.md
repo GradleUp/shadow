@@ -25,6 +25,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     ```kotlin
     buildscript {
       repositories {
+        mavenCentral()
         gradlePluginPortal()
       }
       dependencies {
@@ -41,6 +42,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     ```groovy
     buildscript {
       repositories {
+        mavenCentral()
         gradlePluginPortal()
       }
       dependencies {

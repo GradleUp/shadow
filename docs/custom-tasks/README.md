@@ -34,9 +34,9 @@ dependencies to merge into the output.
     ```groovy
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
-      description = "Create a combined JAR of project and test dependencies"
+      description = 'Create a combined JAR of project and test dependencies'
 
-      archiveClassifier = "tests"
+      archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
       configurations = provider { [project.configurations.testRuntimeClasspath] }
 

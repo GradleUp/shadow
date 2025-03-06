@@ -515,8 +515,8 @@ class JavaPluginTest : BasePluginTest() {
         }
         def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
           group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
-          description = "Create a combined JAR of project and test dependencies"
-          archiveClassifier = "tests"
+          description = 'Create a combined JAR of project and test dependencies'
+          archiveClassifier = 'tests'
           from sourceSets.named('test').map { it.output }
           configurations = provider { [project.configurations.testRuntimeClasspath] }
           manifest {
