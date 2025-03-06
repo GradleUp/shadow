@@ -17,7 +17,7 @@ object CodeSnippetExtractor {
     lang: DslLang,
   ): List<SnippetExecutable> {
     val snippets = mutableListOf<SnippetExecutable>()
-    val snippetBlockPattern = Pattern.compile("(?ims) {4}```${lang}\n(.*?)\n {4}```")
+    val snippetBlockPattern = Pattern.compile("(?ims)```${lang}\n(.*?)\n```")
     @OptIn(ExperimentalPathApi::class)
     docRoot.walk()
       .filter { it.name.endsWith(".md", ignoreCase = true) }
