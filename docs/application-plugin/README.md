@@ -11,7 +11,6 @@ configured to contain the `Main-Class` attribute with the value specified in the
 
     ```kotlin
     plugins {
-      java
       application
       id("com.gradleup.shadow")
     }
@@ -25,7 +24,6 @@ configured to contain the `Main-Class` attribute with the value specified in the
 
     ```groovy
     plugins {
-      id 'java'
       id 'application'
       id 'com.gradleup.shadow'
     }
@@ -47,7 +45,6 @@ It can be configured the same as any other `JavaExec` task.
 
     ```kotlin
     plugins {
-      java
       application
       id("com.gradleup.shadow")
     }
@@ -67,7 +64,6 @@ It can be configured the same as any other `JavaExec` task.
 
     ```groovy
     plugins {
-      id 'java'
       id 'application'
       id 'com.gradleup.shadow'
     }
@@ -100,7 +96,6 @@ You can also add more files into the distribution like:
 
     ```kotlin
     plugins {
-      java
       application
       id("com.gradleup.shadow")
     }
@@ -126,7 +121,6 @@ You can also add more files into the distribution like:
 
     ```groovy
     plugins {
-      id 'java'
       id 'application'
       id 'com.gradleup.shadow'
     }
