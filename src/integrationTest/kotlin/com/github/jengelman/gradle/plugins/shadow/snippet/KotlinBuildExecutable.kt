@@ -1,5 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.snippet
-
+/*
 class KotlinBuildExecutable(
   override val snippet: String,
   override val displayName: String,
@@ -17,3 +17,4 @@ class KotlinBuildExecutable(
     }
   """.trimIndent()
 }
+*/
