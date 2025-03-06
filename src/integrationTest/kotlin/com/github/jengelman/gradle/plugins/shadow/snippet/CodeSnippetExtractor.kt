@@ -13,38 +13,32 @@ import kotlin.io.path.walk
 object CodeSnippetExtractor {
   private val docRoot = Path(System.getProperty("DOCS_DIR"))
 
-  fun extract(
-    lang: DslLang,
-  ): List<SnippetExecutable> {
-    val snippets = mutableListOf<SnippetExecutable>()
-    val snippetBlockPattern = Pattern.compile("(?ims)```${lang}\n(.*?)\n```")
-    @OptIn(ExperimentalPathApi::class)
-    docRoot.walk()
-      .filter { it.name.endsWith(".md", ignoreCase = true) }
-      .forEach {
-        addSnippets(snippets, it, snippetBlockPattern, lang)
-      }
-    return snippets
+  @OptIn(ExperimentalPathApi::class)
+  private val markdownPaths = docRoot.walk()
+    .filter { it.name.endsWith(".md", ignoreCase = true) }
+    .toList()
+
+  fun extract(lang: DslLang): List<SnippetExecutable> {
+    val codeBlockPattern = Pattern.compile("(?ims)```${lang}\n(.*?)\n```")
+    return markdownPaths.flatMap { path ->
+      extractExecutables(lang, path, codeBlockPattern)
+    }
   }
 
-  private fun addSnippets(
-    snippets: MutableList<SnippetExecutable>,
-    sourcePath: Path,
-    snippetBlockPattern: Pattern,
+  private fun extractExecutables(
     lang: DslLang,
-  ) {
-    val source = sourcePath.readText()
-    val relativeDocPath = sourcePath.relativeTo(docRoot).pathString
-    val snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
-
-    snippets += snippetsByLine.map { (lineNumber, snippet) ->
+    markdownPath: Path,
+    snippetBlockPattern: Pattern,
+  ): List<SnippetExecutable> {
+    val relativeDocPath = markdownPath.relativeTo(docRoot).pathString
+    val snippetsByLine = findSnippetsByLine(markdownPath.readText(), snippetBlockPattern)
+    return snippetsByLine.map { (lineNumber, snippet) ->
       SnippetExecutable.create(
         lang,
         snippet,
         "$relativeDocPath:$lineNumber",
       ) {
-        val message = "The error line in the doc is near ${sourcePath.toUri()}:$lineNumber"
-        RuntimeException(message, it)
+        RuntimeException("The error line in the doc is near ${markdownPath.toUri()}:$lineNumber", it)
       }
     }
   }
@@ -64,14 +58,10 @@ object CodeSnippetExtractor {
     snippetBlocks.forEach { block ->
       codeIndex = source.indexOf(block, codeIndex)
       val lineNumber = source.substring(0, codeIndex).lines().size + 1
-      snippetBlocksByLine[lineNumber] = extractSnippetFromBlock(block)
+      snippetBlocksByLine[lineNumber] = block.substring(block.indexOf("\n") + 1, block.lastIndexOf("\n"))
       codeIndex += block.length
     }
 
     return snippetBlocksByLine
-  }
-
-  private fun extractSnippetFromBlock(tag: String): String {
-    return tag.substring(tag.indexOf("\n") + 1, tag.lastIndexOf("\n"))
   }
 }
