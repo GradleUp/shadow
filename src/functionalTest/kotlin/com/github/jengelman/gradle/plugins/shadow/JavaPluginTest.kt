@@ -517,8 +517,8 @@ class JavaPluginTest : BasePluginTest() {
           group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
           description = "Create a combined JAR of project and test dependencies"
           archiveClassifier = "tests"
-          from sourceSets.test.output
-          configurations = [project.configurations.testRuntimeClasspath]
+          from sourceSets.named('test').map { it.output }
+          configurations = provider { [project.configurations.testRuntimeClasspath] }
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
