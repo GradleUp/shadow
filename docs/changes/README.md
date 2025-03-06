@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Add Kotlin DSL examples in docs. ([#1306](https://github.com/GradleUp/shadow/pull/1306))
+
 **Changed**
 
 - **BREAKING CHANGE:** Polish `ShadowSpec`. ([#1307](https://github.com/GradleUp/shadow/pull/1307))
