@@ -1,35 +1,33 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.executable.CodeSnippetExtractor
-import com.github.jengelman.gradle.plugins.shadow.executor.GroovyBuildExecutor
-import com.github.jengelman.gradle.plugins.shadow.executor.NoopExecutor
-import com.github.jengelman.gradle.plugins.shadow.fixture.GroovyDslFixture
+import com.github.jengelman.gradle.plugins.shadow.snippet.CodeSnippetExtractor
+import com.github.jengelman.gradle.plugins.shadow.snippet.DslLang
 import java.nio.file.Path
-import kotlin.io.path.Path
+import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.io.TempDir
 
 class DocCodeSnippetTest {
 
+  @OptIn(ExperimentalStdlibApi::class)
   @TestFactory
   fun provideDynamicTests(@TempDir root: Path): List<DynamicTest> {
-    return fixtures.flatMap { (selector, executor) ->
-      CodeSnippetExtractor.extract(root, docsDir, selector, executor)
-    }.map {
-      DynamicTest.dynamicTest(it.testName, it)
+    val langExecutables = DslLang.entries.map { executor ->
+      CodeSnippetExtractor.extract(executor)
     }
-  }
 
-  companion object {
-    private val fixtures = mapOf(
-      "groovy" to GroovyBuildExecutor(
-        GroovyDslFixture,
-        GroovyDslFixture.importsExtractor,
-      ),
-      "groovy no-run" to NoopExecutor,
-    )
+    check(langExecutables.all { it.isNotEmpty() }) {
+      "No code snippets found."
+    }
+    val langMessage = { "We must provide build script snippets for all languages." }
+    check(langExecutables.size == DslLang.entries.size, langMessage)
+    check(langExecutables.map { it.size }.distinct().size == 1, langMessage)
 
-    val docsDir: Path = Path(System.getProperty("DOCS_DIR"))
+    return langExecutables.flatten().map {
+      // Create a temporary directory for each test, root will be deleted after all tests are run.
+      it.tempDir = createTempDirectory(root)
+      DynamicTest.dynamicTest(it.displayName, it)
+    }
   }
 }
