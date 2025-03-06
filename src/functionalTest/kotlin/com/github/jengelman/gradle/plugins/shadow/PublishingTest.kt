@@ -148,10 +148,10 @@ class PublishingTest : BasePluginTest() {
         projectBlock = """
           def testShadowJar = tasks.register('testShadowJar', ${ShadowJar::class.java.name}) {
             group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
-            description = "Create a combined JAR of project and test dependencies"
-            archiveClassifier = "tests"
-            from sourceSets.test.output
-            configurations = [project.configurations.testRuntimeClasspath]
+            description = 'Create a combined JAR of project and test dependencies'
+            archiveClassifier = 'tests'
+            from sourceSets.named('test').map { it.output }
+            configurations = provider { [project.configurations.testRuntimeClasspath] }
           }
         """.trimIndent(),
         dependenciesBlock = """

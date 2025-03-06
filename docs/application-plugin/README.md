@@ -7,15 +7,31 @@ configure additional tasks for running the shadowed JAR and creating distributio
 Just like the normal `jar` task, when the `application` plugin is applied, the `shadowJar` manifest will be
 configured to contain the `Main-Class` attribute with the value specified in the project's `mainClassName` attribute.
 
+=== "Kotlin"
+
+    ```kotlin
     plugins {
-      id 'java'
+      application
+      id("com.gradleup.shadow")
+    }
+
+    application {
+      mainClass = "myapp.Main"
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
       id 'application'
       id 'com.gradleup.shadow'
     }
-    
+
     application {
       mainClass = 'myapp.Main'
     }
+    ```
 
 ## Running the Shadow JAR
 
@@ -25,21 +41,43 @@ The `runShadow` task is a [`JavaExec`](https://docs.gradle.org/current/dsl/org.g
 task that is configured to execute `java -jar myproject-all.jar`.
 It can be configured the same as any other `JavaExec` task.
 
+=== "Kotlin"
+
+    ```kotlin
     plugins {
-      id 'java'
+      application
+      id("com.gradleup.shadow")
+    }
+
+    application {
+      mainClass = "myapp.Main"
+      // Optionally, you can add default JVM arguments to the start scripts like this:
+      applicationDefaultJvmArgs = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED")
+    }
+
+    tasks.runShadow {
+      args("foo")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
       id 'application'
       id 'com.gradleup.shadow'
     }
-    
+
     application {
       mainClass = 'myapp.Main'
       // Optionally, you can add default JVM arguments to the start scripts like this:
       applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
     }
-    
+
     tasks.named('runShadow', JavaExec) {
       args 'foo'
     }
+    ```
 
 ## Distributing the Shadow JAR
 
@@ -54,12 +92,39 @@ files for a distribution to `build/install/<project name>-shadow/`.
 
 You can also add more files into the distribution like:
 
+=== "Kotlin"
+
+    ```kotlin
     plugins {
-      id 'java'
+      application
+      id("com.gradleup.shadow")
+    }
+
+    application {
+      mainClass = "myapp.Main"
+      // Optionally, you can include `some/dir` files in the distribution like this:
+      applicationDistribution.from("some/dir") {
+        include("*.txt")
+      }
+    }
+
+    // `shadow` is the name of the distribution created by Shadow plugin
+    distributions.named("shadow") {
+      // Optionally, you can add more files into extra directory in the distribution like this:
+      contents.from("extra/echo.sh") {
+        into("extra")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
       id 'application'
       id 'com.gradleup.shadow'
     }
-    
+
     application {
       mainClass = 'myapp.Main'
       // Optionally, you can include `some/dir` files in the distribution like this:
@@ -67,7 +132,7 @@ You can also add more files into the distribution like:
         include '*.txt'
       }
     }
-    
+
     // `shadow` is the name of the distribution created by Shadow plugin
     distributions.named('shadow') {
       // Optionally, you can add more files into extra directory in the distribution like this:
@@ -75,6 +140,7 @@ You can also add more files into the distribution like:
         into 'extra'
       }
     }
+    ```
 
 View [the official doc described](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin)
 for more information about configuring distributions.

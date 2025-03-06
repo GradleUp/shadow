@@ -1,7 +1,5 @@
-@file:Suppress("ktlint:standard:no-empty-file")
-
 package com.github.jengelman.gradle.plugins.shadow.snippet
-/*
+
 class KotlinBuildExecutable(
   override val snippet: String,
   override val displayName: String,
@@ -19,4 +17,3 @@ class KotlinBuildExecutable(
     }
   """.trimIndent()
 }
-*/

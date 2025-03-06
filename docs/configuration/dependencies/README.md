@@ -5,9 +5,21 @@ into the final JAR.
 The configurations from which to source dependencies for the merging can be configured using the `configurations` property
 of the [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task type.
 
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      configurations = provider { listOf(project.configurations.runtimeClasspath.get()) }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       configurations = [project.configurations.compileClasspath]
     }
+    ```
 
 The above code sample would configure the `shadowJar` task to merge dependencies from only the `compileClasspath` configuration.
 This means any dependency declared in the `runtimeOnly` configuration would be **not** be included in the final JAR.
@@ -36,25 +48,57 @@ That is, excluding a dependency does not exclude any of its dependencies from th
 The `dependency` blocks provides a number of methods for resolving dependencies using the notations familiar from
 Gradle's `configurations` block.
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation("org.apache.logging.log4j:log4j-core:2.11.1")
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude(dependency("org.apache.logging.log4j:log4j-core:2.11.1"))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
-    
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:log4j-core:2.11.1'))
       }
     }
+    ```
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation(project(":api"))
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude(dependency(":api"))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation project(':api')
     }
-    
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(project(':api'))
       }
     }
+    ```
 
 > While not being able to filter entire transitive dependency graphs might seem like an oversight, it is necessary
 because it would not be possible to intelligently determine the build author's intended results when there is a
@@ -66,51 +110,115 @@ Dependencies can be filtered using regex patterns.
 Coupled with the `<group>:<artifact>:<version>` notation for dependencies, this allows for excluding/including
 using any of these individual fields.
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation("org.apache.logging.log4j:log4j-core:2.11.1")
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude(dependency("org.apache.logging.log4j:log4j-core:.*"))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
-    
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:log4j-core:.*'))
       }
     }
+    ```
 
 Any of the individual fields can be safely absent and will function as though a wildcard was specified.
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation("org.apache.logging.log4j:log4j-core:2.11.1")
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude(dependency(":org.apache.logging.log4j:log4j-core"))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
-    
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:log4j-core'))
       }
     }
+    ```
 
 The above code snippet is functionally equivalent to the previous example.
 
 This same pattern can be used for any of the dependency notation fields.
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation("org.apache.logging.log4j:log4j-core:2.11.1")
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude(dependency(":log4j-core:2.11.1"))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
-    
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency(':log4j-core:2.11.1'))
       }
     }
+    ```
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation("org.apache.logging.log4j:log4j-core:2.11.1")
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude(dependency("org.apache.logging.log4j:2.11.1"))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
-    
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:2.11.1'))
       }
     }
+    ```
 
 ### Programmatically Selecting Dependencies to Filter
 
@@ -118,10 +226,27 @@ If more complex decisions are needed to select the dependencies to be included, 
 [`dependencies`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html)
 block provides a method that accepts a `Closure` for selecting dependencies.
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation("org.apache.logging.log4j:log4j-core:2.11.1")
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude {
+          it.moduleGroup == "org.apache.logging.log4j"
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
-    
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude {
@@ -129,3 +254,4 @@ block provides a method that accepts a `Closure` for selecting dependencies.
         }
       }
     }
+    ```

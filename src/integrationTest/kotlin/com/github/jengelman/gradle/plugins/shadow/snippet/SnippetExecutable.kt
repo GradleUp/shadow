@@ -99,7 +99,7 @@ sealed class SnippetExecutable : Executable {
       exceptionTransformer: (Throwable) -> Throwable,
     ): SnippetExecutable = when (lang) {
       DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, exceptionTransformer)
-//      DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, exceptionTransformer)
+      DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, exceptionTransformer)
     }
   }
 }

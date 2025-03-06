@@ -12,6 +12,18 @@ requires the shadowed JAR as a dependency.
 In this case, use Gradle's normal dependency declaration mechanism to depend on the `shadow`
 configuration of the shadowed project.
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation(project(path = ":api", configuration = "shadow"))
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       implementation project(path: ':api', configuration: 'shadow')
     }
+    ```

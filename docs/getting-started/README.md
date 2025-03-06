@@ -1,32 +1,96 @@
 # Getting Started
 
+=== "Kotlin"
+
+    ```kotlin
+    plugins {
+      java
+      id("com.gradleup.shadow") version "<version>"
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     plugins {
       id 'java'
       id 'com.gradleup.shadow' version '<version>'
     }
+    ```
 
 Alternatively, the plugin can be added to the buildscript classpath and applied:
 
+=== "Kotlin"
+
+    ```kotlin
     buildscript {
       repositories {
+        mavenCentral()
+        gradlePluginPortal()
+      }
+      dependencies {
+        classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
+      }
+    }
+    // `apply plugin` stuffs are used with `buildscript`.
+    apply(plugin = "java")
+    apply(plugin = "com.gradleup.shadow")
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    buildscript {
+      repositories {
+        mavenCentral()
         gradlePluginPortal()
       }
       dependencies {
         classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
       }
     }
-    
     // `apply plugin` stuffs are used with `buildscript`.
     apply plugin: 'java'
     apply plugin: 'com.gradleup.shadow'
+    ```
 
-<details>
-<summary>Snapshots of the development version are available in 
-<a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-Sonatype's snapshots repository</a>.
-</summary>
-<p>
+===! "Kotlin"
 
+    <details>
+    <summary>Snapshots of the development version are available in 
+    <a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+    Sonatype's snapshots repository</a>.
+    </summary>
+    <p>
+
+    ```kotlin
+    buildscript {
+      repositories {
+        mavenCentral()
+        maven("https://oss.sonatype.org/content/repositories/snapshots/")
+      }
+      dependencies {
+        classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
+      }
+    }
+    // `apply plugin` stuffs are used with `buildscript`.
+    apply(plugin = "java")
+    apply(plugin = "com.gradleup.shadow")
+    ```
+
+    </p>
+    </details>
+
+=== "Groovy"
+
+    <details>
+    <summary>Snapshots of the development version are available in 
+    <a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+    Sonatype's snapshots repository</a>.
+    </summary>
+    <p>
+
+    ```groovy
     buildscript {
       repositories {
         mavenCentral()
@@ -36,13 +100,13 @@ Sonatype's snapshots repository</a>.
         classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
       }
     }
-    
     // `apply plugin` stuffs are used with `buildscript`.
     apply plugin: 'java'
     apply plugin: 'com.gradleup.shadow'
+    ```
 
-</p>
-</details>
+    </p>
+    </details>
 
 **NOTE:** The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
 

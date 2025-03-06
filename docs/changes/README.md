@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Added**
+
+- Add Kotlin DSL examples in docs. ([#1306](https://github.com/GradleUp/shadow/pull/1306))
+
 **Changed**
 
 - **BREAKING CHANGE:** Polish `ShadowSpec`. ([#1307](https://github.com/GradleUp/shadow/pull/1307))
@@ -311,9 +315,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
   ```
   buildscript {
     repositories {
-      maven {
-        url "https://plugins.gradle.org/m2/"
-      }
+      gradlePluginPortal()
     }
     dependencies {
       classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"

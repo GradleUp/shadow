@@ -22,11 +22,25 @@ file at: `build/libs/myApp-1.0-all.jar`
 
 As with all `Jar` tasks in Gradle, these values can be overridden:
 
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      archiveBaseName = "shadow"
+      archiveClassifier = ""
+      archiveVersion = ""
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       archiveBaseName = 'shadow'
       archiveClassifier = ''
       archiveVersion = ''
     }
+    ```
 
 ## Configuring the Runtime Classpath
 
@@ -47,9 +61,21 @@ in the JAR manifest.
 The value of the `Class-Path` entry is the name of all dependencies resolved in the `shadow` configuration
 for the project.
 
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      shadow("junit:junit:3.8.2")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     dependencies {
       shadow 'junit:junit:3.8.2'
     }
+    ```
 
 Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the following attribute:
 
@@ -66,11 +92,25 @@ Beyond the automatic configuration of the `Class-Path` entry, the `shadowJar` ma
 First, the manifest for the `shadowJar` task is configured to __inherit__ from the manifest of the standard `jar` task.
 This means that any configuration performed on the `jar` task will propagate to the `shadowJar` tasks.
 
+=== "Kotlin"
+
+    ```kotlin
+    tasks.jar {
+      manifest {
+        attributes["Class-Path"] = "/libs/a.jar"
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     tasks.named('jar', Jar) {
       manifest {
         attributes 'Class-Path': '/libs/a.jar'
       }
     }
+    ```
 
 Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the following attribute:
 
@@ -81,15 +121,33 @@ Class-Path: /libs/a.jar
 If it is desired to inherit a manifest from a JAR task other than the standard `jar` task, the `inheritFrom` methods
 on the `shadowJar.manifest` object can be used to configure the upstream.
 
+=== "Kotlin"
+
+    ```kotlin
+    val testJar by tasks.registering(Jar::class) {
+      manifest {
+        attributes["Description"] = "This is an application JAR"
+      }
+    }
+
+    tasks.shadowJar {
+      manifest.inheritFrom(testJar.get().manifest)
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     def testJar = tasks.register('testJar', Jar) {
       manifest {
         attributes 'Description': 'This is an application JAR'
       }
     }
-    
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest.inheritFrom(testJar.get().manifest)
     }
+    ```
 
 ## Adding Extra Files
 
@@ -97,6 +155,24 @@ The `shadowJar` task is a subclass of the `Jar` task, which means that the
 [from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20groovy.lang.Closure)) 
 method can be used to add extra files.
 
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      from("extra.jar") {
+        // Copy extra.jar file (without unzipping) into META-INF/ in the shadowed JAR.
+        into("META-INF")
+      }
+      from("Foo") {
+        // Copy Foo file into Bar/ in the shadowed JAR.
+        into("Bar")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       from('extra.jar') {
         // Copy extra.jar file (without unzipping) into META-INF/ in the shadowed JAR.
@@ -107,3 +183,4 @@ method can be used to add extra files.
         into('Bar')
       }
     }
+    ```

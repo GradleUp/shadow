@@ -41,7 +41,7 @@ object CodeSnippetExtractor {
   }
 
   private fun createSnippets(source: String, lang: DslLang) = buildMap {
-    val pattern = Pattern.compile("(?ims)```${lang}\n(.*?)\n```")
+    val pattern = Pattern.compile("(?ims) {4}```${lang}\n(.*?)\n {4}```")
     val matcher = pattern.matcher(source)
 
     while (matcher.find()) {

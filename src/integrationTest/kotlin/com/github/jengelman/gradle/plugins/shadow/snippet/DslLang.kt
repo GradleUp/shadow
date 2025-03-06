@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.snippet
 
 enum class DslLang {
-//  Kotlin,
+  Kotlin,
   Groovy,
   ;
 
