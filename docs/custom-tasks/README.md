@@ -13,7 +13,7 @@ dependencies to merge into the output.
       description = "Create a combined JAR of project and test dependencies"
 
       archiveClassifier = "tests"
-      from(sourceSets["test"].output)
+      from(sourceSets.test.map { it.output })
       configurations = listOf(project.configurations["testRuntimeClasspath"])
 
       manifest {
@@ -37,7 +37,7 @@ dependencies to merge into the output.
       description = "Create a combined JAR of project and test dependencies"
 
       archiveClassifier = "tests"
-      from sourceSets.test.output
+      from sourceSets.named('test').map { it.output }
       configurations = [project.configurations.testRuntimeClasspath]
 
       manifest {

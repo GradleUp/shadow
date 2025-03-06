@@ -170,7 +170,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
-      from(sourceSets["test"].output)
+      from(sourceSets.test.map { it.output })
       configurations = listOf(project.configurations["testRuntimeClasspath"])
     }
 
@@ -203,7 +203,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
-      from sourceSets.test.output
+      from sourceSets.named('test').map { it.output }
       configurations = [project.configurations.testRuntimeClasspath]
     }
 
