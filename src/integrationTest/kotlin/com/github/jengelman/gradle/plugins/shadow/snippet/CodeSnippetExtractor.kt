@@ -19,20 +19,17 @@ object CodeSnippetExtractor {
     .toList()
 
   fun extract(lang: DslLang): List<SnippetExecutable> {
-    val codeBlockPattern = Pattern.compile("(?ims)```${lang}\n(.*?)\n```")
     return markdownPaths.flatMap { path ->
-      extractExecutables(lang, path, codeBlockPattern)
+      createExecutables(lang, path)
     }
   }
 
-  private fun extractExecutables(
+  private fun createExecutables(
     lang: DslLang,
     markdownPath: Path,
-    snippetBlockPattern: Pattern,
   ): List<SnippetExecutable> {
     val relativeDocPath = markdownPath.relativeTo(docRoot).pathString
-    val snippetsByLine = findSnippetsByLine(markdownPath.readText(), snippetBlockPattern)
-    return snippetsByLine.map { (lineNumber, snippet) ->
+    return createSnippets(markdownPath.readText(), lang).map { (lineNumber, snippet) ->
       SnippetExecutable.create(
         lang,
         snippet,
@@ -43,25 +40,22 @@ object CodeSnippetExtractor {
     }
   }
 
-  private fun findSnippetBlocks(code: String, snippetTagPattern: Pattern) = buildList {
-    val matcher = snippetTagPattern.matcher(code)
+  private fun createSnippets(source: String, lang: DslLang) = buildMap {
+    val pattern = Pattern.compile("(?ims)```${lang}\n(.*?)\n```")
+    val matcher = pattern.matcher(source)
+
     while (matcher.find()) {
-      add(matcher.group(0))
+      val line = source.lineNumberAt(matcher.start())
+      val code = matcher.group(1)
+      put(line, code)
     }
   }
 
-  private fun findSnippetsByLine(source: String, snippetTagPattern: Pattern): Map<Int, String> {
-    val snippetBlocks = findSnippetBlocks(source, snippetTagPattern)
-    val snippetBlocksByLine = mutableMapOf<Int, String>()
-
-    var codeIndex = 0
-    snippetBlocks.forEach { block ->
-      codeIndex = source.indexOf(block, codeIndex)
-      val lineNumber = source.substring(0, codeIndex).lines().size + 1
-      snippetBlocksByLine[lineNumber] = block.substring(block.indexOf("\n") + 1, block.lastIndexOf("\n"))
-      codeIndex += block.length
+  private fun String.lineNumberAt(index: Int): Int {
+    var line = 1
+    for (i in 0 until index.coerceAtMost(length)) {
+      if (this[i] == '\n') line++
     }
-
-    return snippetBlocksByLine
+    return line
   }
 }
