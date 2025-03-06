@@ -710,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -809,11 +809,22 @@ is applying the Shadow plugin.</p>
 requires the shadowed JAR as a dependency.
 In this case, use Gradle&rsquo;s normal dependency declaration mechanism to depend on the <code>shadow</code>
 configuration of the shadowed project.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Depending On Shadow Output of Project</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="n">project</span><span class="p">(</span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;:api&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">configuration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;shadow&quot;</span><span class="p">))</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="n">project</span><span class="o">(</span><span class="nl">path:</span><span class="w"> </span><span class="s1">&#39;:api&#39;</span><span class="o">,</span><span class="w"> </span><span class="nl">configuration:</span><span class="w"> </span><span class="s1">&#39;shadow&#39;</span><span class="o">)</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 
 
 

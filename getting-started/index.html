@@ -719,7 +719,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -818,32 +818,91 @@
 
 
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">java</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s">&quot;&lt;version&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s1">&#39;&lt;version&gt;&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>Alternatively, the plugin can be added to the buildscript classpath and applied:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">buildscript</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">mavenCentral</span><span class="p">()</span>
+<span class="w">    </span><span class="n">gradlePluginPortal</span><span class="p">()</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">classpath</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow:shadow-gradle-plugin:&lt;version&gt;&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// `apply plugin` stuffs are used with `buildscript`.</span>
+<span class="n">apply</span><span class="p">(</span><span class="n">plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;java&quot;</span><span class="p">)</span>
+<span class="n">apply</span><span class="p">(</span><span class="n">plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">buildscript</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="n">mavenCentral</span><span class="o">()</span>
 <span class="w">    </span><span class="n">gradlePluginPortal</span><span class="o">()</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">classpath</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow:shadow-gradle-plugin:&lt;version&gt;&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
-
 <span class="c1">// `apply plugin` stuffs are used with `buildscript`.</span>
 <span class="n">apply</span><span class="w"> </span><span class="nl">plugin:</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
 <span class="n">apply</span><span class="w"> </span><span class="nl">plugin:</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
 </code></pre></div>
-<details>
+</div>
+</div>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label><label for="__tabbed_3_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><details>
 <summary>Snapshots of the development version are available in 
 <a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-Sonatype's snapshots repository</a>.
+Sonatype&rsquo;s snapshots repository</a>.
 </summary>
-<p>
-
+<p></p>
+<div class="highlight"><pre><span></span><code><span class="n">buildscript</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">mavenCentral</span><span class="p">()</span>
+<span class="w">    </span><span class="n">maven</span><span class="p">(</span><span class="s">&quot;https://oss.sonatype.org/content/repositories/snapshots/&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">classpath</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow:shadow-gradle-plugin:&lt;version&gt;&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// `apply plugin` stuffs are used with `buildscript`.</span>
+<span class="n">apply</span><span class="p">(</span><span class="n">plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;java&quot;</span><span class="p">)</span>
+<span class="n">apply</span><span class="p">(</span><span class="n">plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p></p>
+</details></p>
+</div>
+<div class="tabbed-block">
+<p><details>
+<summary>Snapshots of the development version are available in 
+<a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+Sonatype&rsquo;s snapshots repository</a>.
+</summary>
+<p></p>
 <div class="highlight"><pre><span></span><code><span class="n">buildscript</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">mavenCentral</span><span class="o">()</span>
@@ -853,15 +912,15 @@ Sonatype's snapshots repository</a>.
 <span class="w">    </span><span class="n">classpath</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow:shadow-gradle-plugin:&lt;version&gt;&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
-
 <span class="c1">// `apply plugin` stuffs are used with `buildscript`.</span>
 <span class="n">apply</span><span class="w"> </span><span class="nl">plugin:</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
 <span class="n">apply</span><span class="w"> </span><span class="nl">plugin:</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
 </code></pre></div>
-
-</p>
-</details>
-
+<p></p>
+</details></p>
+</div>
+</div>
+</div>
 <p><strong>NOTE:</strong> The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin documentation <a href="https://plugins.gradle.org/plugin/com.gradleup.shadow">here</a>.</p>
 <p>Shadow is a reactive plugin.
 This means that applying Shadow by itself will perform no configuration on your project.
@@ -877,16 +936,20 @@ following behavior:</p>
 <li>Configures the <code>shadowJar</code> task to include all sources from the project&rsquo;s <code>main</code> sourceSet.</li>
 <li>Configures the <code>shadowJar</code> task to bundle all dependencies from the <code>runtimeClasspath</code> configuration.</li>
 <li>Configures the <em>classifier</em> attribute of the <code>shadowJar</code> task to be <code>'all'</code> .</li>
-<li>Configures the <code>shadowJar</code> task to generate a <code>Manifest</code> with:</li>
+<li>Configures the <code>shadowJar</code> task to generate a <code>Manifest</code> with:<ul>
 <li>Inheriting all configuration from the standard <code>jar</code> task.</li>
 <li>Adds a <code>Class-Path</code> attribute to the <code>Manifest</code> that appends all dependencies from the <code>shadow</code> configuration</li>
-<li>Configures the <code>shadowJar</code> task to <em>exclude</em> any JAR index or cryptographic signature files matching the following patterns:</li>
+</ul>
+</li>
+<li>Configures the <code>shadowJar</code> task to <em>exclude</em> any JAR index or cryptographic signature files matching the following patterns:<ul>
 <li><code>META-INF/INDEX.LIST</code></li>
 <li><code>META-INF/*.SF</code></li>
 <li><code>META-INF/*.DSA</code></li>
 <li><code>META-INF/*.RSA</code></li>
 <li><code>META-INF/versions/**/module-info.class</code></li>
 <li><code>module-info.class</code></li>
+</ul>
+</li>
 <li>Creates and registers the <code>shadow</code> component in the project (used for integrating with <code>maven-publish</code>).</li>
 </ul>
 <h2 id="shadowing-gradle-plugins">Shadowing Gradle Plugins<a class="headerlink" href="#shadowing-gradle-plugins" title="Permanent link">&para;</a></h2>

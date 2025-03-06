@@ -739,7 +739,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -869,13 +869,26 @@ Additionally, it configures the <code>archiveClassifier</code> to be <code>all</
 <p>If working with a Gradle project with the name <code>myApp</code> and archiveVersion <code>1.0</code>, the default <code>shadowJar</code> task will output a
 file at: <code>build/libs/myApp-1.0-all.jar</code></p>
 <p>As with all <code>Jar</code> tasks in Gradle, these values can be overridden:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Output to build/libs/shadow.jar</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">archiveBaseName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;shadow&quot;</span>
+<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">  </span><span class="n">archiveVersion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">archiveBaseName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;shadow&#39;</span>
 <span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
 <span class="w">  </span><span class="n">archiveVersion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="configuring-the-runtime-classpath">Configuring the Runtime Classpath<a class="headerlink" href="#configuring-the-runtime-classpath" title="Permanent link">&para;</a></h2>
 <p>Each Java JAR file contains a manifest file that provides meta data about the contents of the JAR file itself.
 When using a shadowed JAR file as an executable JAR, it is assumed that all necessary runtime classes are contained
@@ -891,10 +904,22 @@ to <code>configurations.shadow</code> as <code>RUNTIME</code> scope dependencies
 in the JAR manifest.
 The value of the <code>Class-Path</code> entry is the name of all dependencies resolved in the <code>shadow</code> configuration
 for the project.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">shadow</span><span class="p">(</span><span class="s">&quot;junit:junit:3.8.2&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">shadow</span><span class="w"> </span><span class="s1">&#39;junit:junit:3.8.2&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>Inspecting the <code>META-INF/MANIFEST.MF</code> entry in the JAR file will reveal the following attribute:</p>
 <div class="highlight"><pre><span></span><code>Class-Path: junit-3.8.2.jar
 </code></pre></div>
@@ -904,17 +929,46 @@ for the project.</p>
 <p>Beyond the automatic configuration of the <code>Class-Path</code> entry, the <code>shadowJar</code> manifest is configured in a number of ways.
 First, the manifest for the <code>shadowJar</code> task is configured to <strong>inherit</strong> from the manifest of the standard <code>jar</code> task.
 This means that any configuration performed on the <code>jar</code> task will propagate to the <code>shadowJar</code> tasks.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label><label for="__tabbed_3_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">jar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">manifest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">attributes</span><span class="o">[</span><span class="s">&quot;Class-Path&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/libs/a.jar&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;jar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">Jar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">manifest</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">attributes</span><span class="w"> </span><span class="s1">&#39;Class-Path&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;/libs/a.jar&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>Inspecting the <code>META-INF/MANIFEST.MF</code> entry in the JAR file will reveal the following attribute:</p>
 <div class="highlight"><pre><span></span><code>Class-Path: /libs/a.jar
 </code></pre></div>
 <p>If it is desired to inherit a manifest from a JAR task other than the standard <code>jar</code> task, the <code>inheritFrom</code> methods
 on the <code>shadowJar.manifest</code> object can be used to configure the upstream.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Kotlin</label><label for="__tabbed_4_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">testJar</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">tasks</span><span class="p">.</span><span class="na">registering</span><span class="p">(</span><span class="n">Jar</span><span class="o">::</span><span class="n">class</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">manifest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">attributes</span><span class="o">[</span><span class="s">&quot;Description&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;This is an application JAR&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">manifest</span><span class="p">.</span><span class="na">inheritFrom</span><span class="p">(</span><span class="n">testJar</span><span class="p">.</span><span class="na">get</span><span class="p">().</span><span class="na">manifest</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kt">def</span><span class="w"> </span><span class="n">testJar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;testJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">Jar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">manifest</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">attributes</span><span class="w"> </span><span class="s1">&#39;Description&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;This is an application JAR&#39;</span>
@@ -925,10 +979,29 @@ on the <code>shadowJar.manifest</code> object can be used to configure the upstr
 <span class="w">  </span><span class="n">manifest</span><span class="o">.</span><span class="na">inheritFrom</span><span class="o">(</span><span class="n">testJar</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">manifest</span><span class="o">)</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="adding-extra-files">Adding Extra Files<a class="headerlink" href="#adding-extra-files" title="Permanent link">&para;</a></h2>
 <p>The <code>shadowJar</code> task is a subclass of the <code>Jar</code> task, which means that the 
 <a href="https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20groovy.lang.Closure)">from</a> 
 method can be used to add extra files.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Kotlin</label><label for="__tabbed_5_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">from</span><span class="p">(</span><span class="s">&quot;extra.jar&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Copy extra.jar file (without unzipping) into META-INF/ in the shadowed JAR.</span>
+<span class="w">    </span><span class="n">into</span><span class="p">(</span><span class="s">&quot;META-INF&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">from</span><span class="p">(</span><span class="s">&quot;Foo&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Copy Foo file into Bar/ in the shadowed JAR.</span>
+<span class="w">    </span><span class="n">into</span><span class="p">(</span><span class="s">&quot;Bar&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">from</span><span class="o">(</span><span class="s1">&#39;extra.jar&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="c1">// Copy extra.jar file (without unzipping) into META-INF/ in the shadowed JAR.</span>
@@ -940,6 +1013,9 @@ method can be used to add extra files.</p>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 
 
 

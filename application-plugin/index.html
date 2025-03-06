@@ -719,7 +719,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -823,9 +823,21 @@
 configure additional tasks for running the shadowed JAR and creating distributions containing the shadowed JAR.</p>
 <p>Just like the normal <code>jar</code> task, when the <code>application</code> plugin is applied, the <code>shadowJar</code> manifest will be
 configured to contain the <code>Main-Class</code> attribute with the value specified in the project&rsquo;s <code>mainClassName</code> attribute.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Using Shadow with Application Plugin</span>
-<span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">application</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">application</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">mainClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;myapp.Main&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;application&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
 <span class="o">}</span>
@@ -834,15 +846,36 @@ configured to contain the <code>Main-Class</code> attribute with the value speci
 <span class="w">  </span><span class="n">mainClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;myapp.Main&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="running-the-shadow-jar">Running the Shadow JAR<a class="headerlink" href="#running-the-shadow-jar" title="Permanent link">&para;</a></h2>
 <p>When applied along with the <code>application</code> plugin, the <code>runShadow</code> task will be created for starting
 the application from the shadowed JAR.
 The <code>runShadow</code> task is a <a href="https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html"><code>JavaExec</code></a>
 task that is configured to execute <code>java -jar myproject-all.jar</code>.
 It can be configured the same as any other <code>JavaExec</code> task.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Configuring the runShadow Task</span>
-<span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">application</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">application</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">mainClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;myapp.Main&quot;</span>
+<span class="w">  </span><span class="c1">// Optionally, you can add default JVM arguments to the start scripts like this:</span>
+<span class="w">  </span><span class="n">applicationDefaultJvmArgs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">&quot;--add-opens=java.base/java.lang=ALL-UNNAMED&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">runShadow</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">args</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;application&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
 <span class="o">}</span>
@@ -857,6 +890,9 @@ It can be configured the same as any other <code>JavaExec</code> task.</p>
 <span class="w">  </span><span class="n">args</span><span class="w"> </span><span class="s1">&#39;foo&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="distributing-the-shadow-jar">Distributing the Shadow JAR<a class="headerlink" href="#distributing-the-shadow-jar" title="Permanent link">&para;</a></h2>
 <p>The Shadow plugin will also configure distribution tasks when in the presence of the <code>application</code> plugin.
 The plugin will create <code>shadowDistZip</code> and <code>shadowDistTar</code> which creates Zip and Tar distributions
@@ -866,9 +902,33 @@ the application.</p>
 <p>Additionally, the plugin will create the <code>installShadowDist</code> and <code>startShadowScripts</code> tasks which stages the necessary
 files for a distribution to <code>build/install/&lt;project name&gt;-shadow/</code>.</p>
 <p>You can also add more files into the distribution like:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Add extra files to the distribution</span>
-<span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label><label for="__tabbed_3_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">application</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">application</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">mainClass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;myapp.Main&quot;</span>
+<span class="w">  </span><span class="c1">// Optionally, you can include `some/dir` files in the distribution like this:</span>
+<span class="w">  </span><span class="n">applicationDistribution</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="s">&quot;some/dir&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">include</span><span class="p">(</span><span class="s">&quot;*.txt&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// `shadow` is the name of the distribution created by Shadow plugin</span>
+<span class="n">distributions</span><span class="p">.</span><span class="na">named</span><span class="p">(</span><span class="s">&quot;shadow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Optionally, you can add more files into extra directory in the distribution like this:</span>
+<span class="w">  </span><span class="n">contents</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="s">&quot;extra/echo.sh&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">into</span><span class="p">(</span><span class="s">&quot;extra&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;application&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
 <span class="o">}</span>
@@ -889,6 +949,9 @@ files for a distribution to <code>build/install/&lt;project name&gt;-shadow/</co
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>View <a href="https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin">the official doc described</a>
 for more information about configuring distributions.</p>
 

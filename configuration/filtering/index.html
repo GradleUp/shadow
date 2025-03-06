@@ -672,7 +672,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -753,20 +753,44 @@ on the various versions of the methods and their behavior.</p>
 contents.
 This means that, the configuration is applied to the individual files from both the project source set or <em>any</em>
 of the dependencies to be merged.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Exclude a file from Shadow Jar</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">exclude</span><span class="p">(</span><span class="s">&quot;a2.properties&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">exclude</span><span class="w"> </span><span class="s1">&#39;a2.properties&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>Excludes and includes can be combined just like a normal <code>Jar</code> task, with <code>excludes</code> taking precedence over <code>includes</code>.
 Additionally, ANT style patterns can be used to match multiple files.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Configuring output using ANT patterns</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">include</span><span class="p">(</span><span class="s">&quot;*.jar&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">include</span><span class="p">(</span><span class="s">&quot;*.properties&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">exclude</span><span class="p">(</span><span class="s">&quot;a2.properties&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">include</span><span class="w"> </span><span class="s1">&#39;*.jar&#39;</span>
 <span class="w">  </span><span class="n">include</span><span class="w"> </span><span class="s1">&#39;*.properties&#39;</span>
 <span class="w">  </span><span class="n">exclude</span><span class="w"> </span><span class="s1">&#39;a2.properties&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 
 
 

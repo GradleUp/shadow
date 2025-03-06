@@ -745,7 +745,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -872,10 +872,22 @@
 into the final JAR.
 The configurations from which to source dependencies for the merging can be configured using the <code>configurations</code> property
 of the <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html"><code>ShadowJar</code></a> task type.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">provider</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">project</span><span class="p">.</span><span class="na">configurations</span><span class="p">.</span><span class="na">runtimeClasspath</span><span class="p">.</span><span class="na">get</span><span class="p">())</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">project</span><span class="o">.</span><span class="na">configurations</span><span class="o">.</span><span class="na">compileClasspath</span><span class="o">]</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>The above code sample would configure the <code>shadowJar</code> task to merge dependencies from only the <code>compileClasspath</code> configuration.
 This means any dependency declared in the <code>runtimeOnly</code> configuration would be <strong>not</strong> be included in the final JAR.</p>
 <blockquote>
@@ -898,28 +910,54 @@ Dependency filtering does <strong>not</strong> apply to transitive dependencies.
 That is, excluding a dependency does not exclude any of its dependencies from the final JAR.</p>
 <p>The <code>dependency</code> blocks provides a number of methods for resolving dependencies using the notations familiar from
 Gradle&rsquo;s <code>configurations</code> block.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Exclude an Module Dependency</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:4"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label><label for="__tabbed_2_3">Kotlin</label><label for="__tabbed_2_4">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:2.11.1&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="n">dependency</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:2.11.1&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:2.11.1&#39;</span>
 <span class="o">}</span>
-
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="o">(</span><span class="n">dependency</span><span class="o">(</span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:2.11.1&#39;</span><span class="o">))</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// Exclude a Project Dependency</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="n">project</span><span class="p">(</span><span class="s">&quot;:api&quot;</span><span class="p">))</span>
+<span class="p">}</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="n">dependency</span><span class="p">(</span><span class="s">&quot;:api&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="n">project</span><span class="o">(</span><span class="s1">&#39;:api&#39;</span><span class="o">)</span>
 <span class="o">}</span>
-
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="o">(</span><span class="n">project</span><span class="o">(</span><span class="s1">&#39;:api&#39;</span><span class="o">))</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <blockquote>
 <p>While not being able to filter entire transitive dependency graphs might seem like an oversight, it is necessary
 because it would not be possible to intelligently determine the build author&rsquo;s intended results when there is a
@@ -929,62 +967,132 @@ common dependency between two 1<sup>st</sup> level dependencies when one is excl
 <p>Dependencies can be filtered using regex patterns.
 Coupled with the <code>&lt;group&gt;:&lt;artifact&gt;:&lt;version&gt;</code> notation for dependencies, this allows for excluding/including
 using any of these individual fields.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Exclude Any Version of a Dependency</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label><label for="__tabbed_3_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:2.11.1&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="n">dependency</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:.*&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:2.11.1&#39;</span>
 <span class="o">}</span>
-
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="o">(</span><span class="n">dependency</span><span class="o">(</span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:.*&#39;</span><span class="o">))</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>Any of the individual fields can be safely absent and will function as though a wildcard was specified.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Ignore Dependency Version</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Kotlin</label><label for="__tabbed_4_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:2.11.1&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="n">dependency</span><span class="p">(</span><span class="s">&quot;:org.apache.logging.log4j:log4j-core&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:2.11.1&#39;</span>
 <span class="o">}</span>
-
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="o">(</span><span class="n">dependency</span><span class="o">(</span><span class="s1">&#39;org.apache.logging.log4j:log4j-core&#39;</span><span class="o">))</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>The above code snippet is functionally equivalent to the previous example.</p>
 <p>This same pattern can be used for any of the dependency notation fields.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Ignoring An Artifact Regardless of Group</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:4"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><input id="__tabbed_5_4" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Kotlin</label><label for="__tabbed_5_2">Groovy</label><label for="__tabbed_5_3">Kotlin</label><label for="__tabbed_5_4">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:2.11.1&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="n">dependency</span><span class="p">(</span><span class="s">&quot;:log4j-core:2.11.1&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:2.11.1&#39;</span>
 <span class="o">}</span>
-
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="o">(</span><span class="n">dependency</span><span class="o">(</span><span class="s1">&#39;:log4j-core:2.11.1&#39;</span><span class="o">))</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// Excluding All Artifacts From Group</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:2.11.1&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="n">dependency</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:2.11.1&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:2.11.1&#39;</span>
 <span class="o">}</span>
-
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="o">(</span><span class="n">dependency</span><span class="o">(</span><span class="s1">&#39;org.apache.logging.log4j:2.11.1&#39;</span><span class="o">))</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h3 id="programmatically-selecting-dependencies-to-filter">Programmatically Selecting Dependencies to Filter<a class="headerlink" href="#programmatically-selecting-dependencies-to-filter" title="Permanent link">&para;</a></h3>
 <p>If more complex decisions are needed to select the dependencies to be included, the
 <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html"><code>dependencies</code></a>
 block provides a method that accepts a <code>Closure</code> for selecting dependencies.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Selecting Dependencies to Filter With a Spec</span>
-<span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Kotlin</label><label for="__tabbed_6_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.apache.logging.log4j:log4j-core:2.11.1&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nb">it</span><span class="p">.</span><span class="na">moduleGroup</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;org.apache.logging.log4j&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;org.apache.logging.log4j:log4j-core:2.11.1&#39;</span>
 <span class="o">}</span>
-
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="w"> </span><span class="o">{</span>
@@ -993,6 +1101,9 @@ block provides a method that accepts a <code>Closure</code> for selecting depend
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 
 
 

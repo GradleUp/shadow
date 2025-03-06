@@ -719,7 +719,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -825,6 +825,30 @@ to relocate your dependencies to a different package name to avoid the collision
 beforehand. As of Shadow v8.1.0, automatic package relocation can be enabled by setting the <code>enabledRelocation</code> 
 and <code>relocationPrefix</code> settings on any <code>ShadowJar</code> task.</p>
 <p>A simple Gradle plugin can use this feature by applying the <code>shadow</code> plugin and configuring the <code>shadowJar</code> task for relocation.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">`java-gradle-plugin`</span><span class="w"> </span><span class="c1">// May have to apply the latest `com.gradle.plugin-publish` for better publishing support.</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.jdom:jdom2:2.0.6&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.ow2.asm:asm:6.0&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.ow2.asm:asm-commons:6.0&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;commons-io:commons-io:2.4&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.apache.ant:ant:1.9.4&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.codehaus.plexus:plexus-utils:2.0.6&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">enableRelocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java-gradle-plugin&#39;</span><span class="w"> </span><span class="c1">// May have to apply the latest `com.gradle.plugin-publish` for better publishing support.</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
@@ -844,6 +868,9 @@ and <code>relocationPrefix</code> settings on any <code>ShadowJar</code> task.</
 <span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="publishing-shadowed-gradle-plugins">Publishing shadowed Gradle plugins<a class="headerlink" href="#publishing-shadowed-gradle-plugins" title="Permanent link">&para;</a></h2>
 <p>The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
 Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be

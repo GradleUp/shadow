@@ -721,7 +721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -829,11 +829,22 @@ to classpath pollution in a downstream project.</p>
 <p>Shadow uses the ASM library to modify class byte code to replace the package name and any import
 statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Relocating a Package</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">relocate</span><span class="p">(</span><span class="s">&quot;junit.framework&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;shadow.junit&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">relocate</span><span class="w"> </span><span class="s1">&#39;junit.framework&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;shadow.junit&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>The code snippet will rewrite the location for any class in the <code>junit.framework</code> to be <code>shadow.junit</code>.
 For example, the class <code>junit.framework.TestCase</code> becomes <code>shadow.junit.TestCase</code>.
 In the resulting JAR, the class file is relocated from <code>junit/framework/TestCase.class</code> to
@@ -850,8 +861,21 @@ Be specific as possible when configuring relocation as to avoid unintended reloc
 <p>Specific classes or files can be <code>included</code>/<code>excluded</code> from the relocation operation if necessary. Use
 <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html">Ant Path Matcher</a> 
 syntax to specify matching path for your files and directories.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Configuring Filtering for Relocation</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">relocate</span><span class="p">(</span><span class="s">&quot;junit.textui&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="s">&quot;junit.textui.TestRunner&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">relocate</span><span class="p">(</span><span class="s">&quot;junit.framework&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">include</span><span class="p">(</span><span class="s">&quot;junit.framework.Test*&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">relocate</span><span class="o">(</span><span class="s1">&#39;junit.textui&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="w"> </span><span class="s1">&#39;junit.textui.TestRunner&#39;</span>
 <span class="w">  </span><span class="o">}</span>
@@ -860,27 +884,55 @@ syntax to specify matching path for your files and directories.</p>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>For a more advanced path matching you might want to use <a href="https://regexr.com/">Regular Expressions</a> instead. Wrap the expresion in <code>%regex[]</code> before
 passing it to <code>include</code>/<code>exclude</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Configuring Filtering for Relocation with Regex</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label><label for="__tabbed_3_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">relocate</span><span class="p">(</span><span class="s">&quot;org.foo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">include</span><span class="p">(</span><span class="s">&quot;%regex[org/foo/.*Factory[0-9].*]&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">relocate</span><span class="o">(</span><span class="s1">&#39;org.foo&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;a&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">include</span><span class="w"> </span><span class="s1">&#39;%regex[org/foo/.*Factory[0-9].*]&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="automatically-relocating-dependencies">Automatically Relocating Dependencies<a class="headerlink" href="#automatically-relocating-dependencies" title="Permanent link">&para;</a></h2>
 <p>Shadow is shipped with a task that can be used to automatically configure all packages from all dependencies to be relocated.
 This feature was formally shipped into a 2<sup>nd</sup> plugin (<code>com.github.johnrengelman.plugin-shadow</code>) but has been
 removed for clarity reasons in version 4.0.0.</p>
 <p>To configure automatic dependency relocation, set <code>enableRelocation = true</code> and optionally specify a custom
 <code>relocationPrefix</code> to override the default value of <code>"shadow"</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Configure Auto Relocation</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Kotlin</label><label for="__tabbed_4_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">enableRelocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="n">relocationPrefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;myapp&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">enableRelocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">  </span><span class="n">relocationPrefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;myapp&quot;</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>In versions before 8.1.0 it was necessary to configure a separate <code>ConfigureShadowRelocation</code> task for this.</p>
 <blockquote>
 <p>Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies

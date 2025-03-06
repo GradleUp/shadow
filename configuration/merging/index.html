@@ -778,7 +778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/" class="md-nav__link">
+      <a href="../../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -941,53 +941,81 @@ A <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.pl
 entry in the JAR before being written to the final output JAR.
 This allows a <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-transformer/index.html"><code>Transformer</code></a> to 
 determine if it should process a particular entry and apply any modifications before writing the stream to the output.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Adding a ResourceTransformer</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.apache.tools.zip.ZipOutputStream</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.gradle.api.file.FileTreeElement</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">MyTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ResourceTransformer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">canTransformResource</span><span class="p">(</span><span class="n">element</span><span class="p">:</span><span class="w"> </span><span class="n">FileTreeElement</span><span class="p">):</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">TransformerContext</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">hasTransformedResource</span><span class="p">():</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">modifyOutputStream</span><span class="p">(</span><span class="n">os</span><span class="p">:</span><span class="w"> </span><span class="n">ZipOutputStream</span><span class="p">,</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">transform</span><span class="o">&lt;</span><span class="n">MyTransformer</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">javax.annotation.Nonnull</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.tools.zip.ZipOutputStream</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">org.gradle.api.file.FileTreeElement</span>
 
 <span class="kd">class</span><span class="w"> </span><span class="nc">MyTransformer</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">ResourceTransformer</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">boolean</span><span class="w"> </span><span class="n">canTransformResource</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">FileTreeElement</span><span class="w"> </span><span class="n">element</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">transform</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">TransformerContext</span><span class="w"> </span><span class="n">context</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hasTransformedResource</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">modifyOutputStream</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">ZipOutputStream</span><span class="w"> </span><span class="n">os</span><span class="o">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">canTransformResource</span><span class="o">(</span><span class="n">FileTreeElement</span><span class="w"> </span><span class="n">element</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">transform</span><span class="o">(</span><span class="n">TransformerContext</span><span class="w"> </span><span class="n">context</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hasTransformedResource</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">modifyOutputStream</span><span class="o">(</span><span class="n">ZipOutputStream</span><span class="w"> </span><span class="n">os</span><span class="o">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
 <span class="o">}</span>
 
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">transform</span><span class="o">(</span><span class="n">MyTransformer</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>Additionally, a <code>Transformer</code> can accept a <code>Closure</code> to configure the provided <code>Transformer</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Configuring a ResourceTransformer</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.apache.tools.zip.ZipOutputStream</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.gradle.api.file.FileTreeElement</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">MyTransformer</span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="nv">enabled</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ResourceTransformer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">canTransformResource</span><span class="p">(</span><span class="n">element</span><span class="p">:</span><span class="w"> </span><span class="n">FileTreeElement</span><span class="p">):</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">TransformerContext</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">hasTransformedResource</span><span class="p">():</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">modifyOutputStream</span><span class="p">(</span><span class="n">os</span><span class="p">:</span><span class="w"> </span><span class="n">ZipOutputStream</span><span class="p">,</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">transform</span><span class="o">&lt;</span><span class="n">MyTransformer</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">javax.annotation.Nonnull</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.tools.zip.ZipOutputStream</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">org.gradle.api.file.FileTreeElement</span>
 
 <span class="kd">class</span><span class="w"> </span><span class="nc">MyTransformer</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">ResourceTransformer</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="kt">boolean</span><span class="w"> </span><span class="n">enabled</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">boolean</span><span class="w"> </span><span class="n">canTransformResource</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">FileTreeElement</span><span class="w"> </span><span class="n">element</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">transform</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">TransformerContext</span><span class="w"> </span><span class="n">context</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hasTransformedResource</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">modifyOutputStream</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">ZipOutputStream</span><span class="w"> </span><span class="n">os</span><span class="o">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">canTransformResource</span><span class="o">(</span><span class="n">FileTreeElement</span><span class="w"> </span><span class="n">element</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">transform</span><span class="o">(</span><span class="n">TransformerContext</span><span class="w"> </span><span class="n">context</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hasTransformedResource</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">modifyOutputStream</span><span class="o">(</span><span class="n">ZipOutputStream</span><span class="w"> </span><span class="n">os</span><span class="o">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
 <span class="o">}</span>
 
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
@@ -996,38 +1024,52 @@ determine if it should process a particular entry and apply any modifications be
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>An instantiated instance of a <code>Transformer</code> can also be provided.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Adding a ResourceTransformer Instance</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label><label for="__tabbed_3_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.apache.tools.zip.ZipOutputStream</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.gradle.api.file.FileTreeElement</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">MyTransformer</span><span class="p">(</span><span class="kd">val</span><span class="w"> </span><span class="nv">enabled</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ResourceTransformer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">canTransformResource</span><span class="p">(</span><span class="n">element</span><span class="p">:</span><span class="w"> </span><span class="n">FileTreeElement</span><span class="p">):</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">TransformerContext</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">hasTransformedResource</span><span class="p">():</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">modifyOutputStream</span><span class="p">(</span><span class="n">os</span><span class="p">:</span><span class="w"> </span><span class="n">ZipOutputStream</span><span class="p">,</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">transform</span><span class="p">(</span><span class="n">MyTransformer</span><span class="p">(</span><span class="kc">true</span><span class="p">))</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">javax.annotation.Nonnull</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.tools.zip.ZipOutputStream</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">org.gradle.api.file.FileTreeElement</span>
 
 <span class="kd">class</span><span class="w"> </span><span class="nc">MyTransformer</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">ResourceTransformer</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">enabled</span>
-
-<span class="w">  </span><span class="n">MyTransformer</span><span class="o">(</span><span class="kt">boolean</span><span class="w"> </span><span class="n">enabled</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="k">this</span><span class="o">.</span><span class="na">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enabled</span>
-<span class="w">  </span><span class="o">}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">boolean</span><span class="w"> </span><span class="n">canTransformResource</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">FileTreeElement</span><span class="w"> </span><span class="n">element</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">transform</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">TransformerContext</span><span class="w"> </span><span class="n">context</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hasTransformedResource</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
-
-<span class="w">  </span><span class="nd">@Override</span>
-<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">modifyOutputStream</span><span class="o">(</span><span class="nd">@Nonnull</span><span class="w"> </span><span class="n">ZipOutputStream</span><span class="w"> </span><span class="n">os</span><span class="o">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
+<span class="w">  </span><span class="n">MyTransformer</span><span class="o">(</span><span class="kt">boolean</span><span class="w"> </span><span class="n">enabled</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">this</span><span class="o">.</span><span class="na">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enabled</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">canTransformResource</span><span class="o">(</span><span class="n">FileTreeElement</span><span class="w"> </span><span class="n">element</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">transform</span><span class="o">(</span><span class="n">TransformerContext</span><span class="w"> </span><span class="n">context</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">hasTransformedResource</span><span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">modifyOutputStream</span><span class="o">(</span><span class="n">ZipOutputStream</span><span class="w"> </span><span class="n">os</span><span class="o">,</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="n">preserveFileTimestamps</span><span class="o">)</span><span class="w"> </span><span class="o">{}</span>
 <span class="o">}</span>
 
 <span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">transform</span><span class="o">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyTransformer</span><span class="o">(</span><span class="kc">true</span><span class="o">))</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="merging-service-descriptor-files">Merging Service Descriptor Files<a class="headerlink" href="#merging-service-descriptor-files" title="Permanent link">&para;</a></h2>
 <p>Java libraries often contain service descriptors files in the <code>META-INF/services</code> directory of the JAR.
 A service descriptor typically contains a line delimited list of classes that are supported for a particular <em>service</em>.
@@ -1037,11 +1079,22 @@ In this case, it is generally desired to merge the content of each instance of t
 The <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html"><code>ServiceFileTransformer</code></a> 
 class is used to perform this merging. By default, it will merge each copy of a file under <code>META-INF/services</code> into a 
 single file in the output JAR.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Merging Service Files</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Kotlin</label><label for="__tabbed_4_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">mergeServiceFiles</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">mergeServiceFiles</span><span class="o">()</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>The above code snippet is a convenience syntax for calling
 <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html"><code>transform(ServiceFileTransformer.class)</code></a>.</p>
 <blockquote>
@@ -1055,23 +1108,49 @@ these files if your dependencies contain them.</p>
 <p>By default the <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html"><code>ServiceFileTransformer</code></a> 
 is configured to merge files in <code>META-INF/services</code>.
 This directory can be overridden to merge descriptor files in a different location.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Merging Service Files in a Specific Directory</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Kotlin</label><label for="__tabbed_5_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">mergeServiceFiles</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;META-INF/custom&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">mergeServiceFiles</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;META-INF/custom&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h4 id="excludingincluding-specific-service-descriptor-files-from-merging">Excluding/Including Specific Service Descriptor Files From Merging<a class="headerlink" href="#excludingincluding-specific-service-descriptor-files-from-merging" title="Permanent link">&para;</a></h4>
 <p>The <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html"><code>ServiceFileTransformer</code></a> 
 class supports specifying specific files to include or exclude from merging.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Excluding a Service Descriptor From Merging</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Kotlin</label><label for="__tabbed_6_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">mergeServiceFiles</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exclude</span><span class="p">(</span><span class="s">&quot;META-INF/services/com.acme.*&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">mergeServiceFiles</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">exclude</span><span class="w"> </span><span class="s1">&#39;META-INF/services/com.acme.*&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="merging-groovy-extension-modules">Merging Groovy Extension Modules<a class="headerlink" href="#merging-groovy-extension-modules" title="Permanent link">&para;</a></h2>
 <p>Shadow provides a specific transformer for dealing with Groovy extension module files.
 This is due to their special syntax and how they need to be merged together.
@@ -1079,19 +1158,41 @@ The <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.
 will handle these files.
 The <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html"><code>ShadowJar</code></a> task also provides a short syntax 
 method to add this transformer.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Merging Groovy Extension Modules</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Kotlin</label><label for="__tabbed_7_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">mergeGroovyExtensionModules</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">mergeGroovyExtensionModules</span><span class="o">()</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="merging-log4j2-plugin-cache-files-log4j2pluginsdat">Merging Log4j2 Plugin Cache Files (<code>Log4j2Plugins.dat</code>)<a class="headerlink" href="#merging-log4j2-plugin-cache-files-log4j2pluginsdat" title="Permanent link">&para;</a></h2>
 <p><code>Log4j2PluginsCacheFileTransformer</code> is a <code>Transformer</code> that merges <code>META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat</code> plugin caches from all the jars
 containing Log4j 2.x Core components. It&rsquo;s a Gradle equivalent of <a href="https://logging.apache.org/log4j/transform/log4j-transform-maven-shade-plugin-extensions.html#log4j-plugin-cache-transformer">Log4j Plugin Descriptor Transformer</a>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Merging Log4j2 Plugin Cache Files</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">Kotlin</label><label for="__tabbed_8_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">transform</span><span class="o">&lt;</span><span class="n">com</span><span class="p">.</span><span class="na">github</span><span class="p">.</span><span class="na">jengelman</span><span class="p">.</span><span class="na">gradle</span><span class="p">.</span><span class="na">plugins</span><span class="p">.</span><span class="na">shadow</span><span class="p">.</span><span class="na">transformers</span><span class="p">.</span><span class="na">Log4j2PluginsCacheFileTransformer</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">transform</span><span class="o">(</span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">transformers</span><span class="o">.</span><span class="na">Log4j2PluginsCacheFileTransformer</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="appending-text-files">Appending Text Files<a class="headerlink" href="#appending-text-files" title="Permanent link">&para;</a></h2>
 <p>Generic text files can be appended together using the
 <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/index.html"><code>AppendingTransformer</code></a>.
@@ -1100,13 +1201,34 @@ The <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.
 method of
 <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html"><code>append(String)</code></a> to 
 configure this transformer.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Appending a Property File</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="9:4"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><input id="__tabbed_9_4" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">Kotlin</label><label for="__tabbed_9_2">Groovy</label><label for="__tabbed_9_3">Kotlin</label><label for="__tabbed_9_4">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">append</span><span class="p">(</span><span class="s">&quot;test.properties&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">append</span><span class="w"> </span><span class="s1">&#39;test.properties&#39;</span>
 <span class="o">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// Appending application.yml files</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// short syntax</span>
+<span class="w">  </span><span class="n">append</span><span class="p">(</span><span class="s">&quot;resources/application.yml&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;\n---\n&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="c1">// full syntax</span>
+<span class="w">  </span><span class="n">transform</span><span class="o">&lt;</span><span class="n">com</span><span class="p">.</span><span class="na">github</span><span class="p">.</span><span class="na">jengelman</span><span class="p">.</span><span class="na">gradle</span><span class="p">.</span><span class="na">plugins</span><span class="p">.</span><span class="na">shadow</span><span class="p">.</span><span class="na">transformers</span><span class="p">.</span><span class="na">AppendingTransformer</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;resources/custom-config/application.yml&quot;</span>
+<span class="w">    </span><span class="n">separator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;\n---\n&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="c1">// short syntax</span>
 <span class="w">  </span><span class="n">append</span><span class="o">(</span><span class="s1">&#39;resources/application.yml&#39;</span><span class="o">,</span><span class="w"> </span><span class="s1">&#39;\n---\n&#39;</span><span class="o">)</span>
 <span class="w">  </span><span class="c1">// full syntax</span>
@@ -1116,19 +1238,35 @@ configure this transformer.</p>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="appending-xml-files">Appending XML Files<a class="headerlink" href="#appending-xml-files" title="Permanent link">&para;</a></h2>
 <p>XML files require a special transformer for merging.
 The <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html"><code>XmlAppendingTransformer</code></a> 
 reads each XML document and merges each root element into a single document.
 There is no short syntax method for the <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html"><code>XmlAppendingTransformer</code></a>.
 It must be added using the <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html"><code>transform</code></a>) methods.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Appending a XML File</span>
-<span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="10:2"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">Kotlin</label><label for="__tabbed_10_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">transform</span><span class="o">&lt;</span><span class="n">com</span><span class="p">.</span><span class="na">github</span><span class="p">.</span><span class="na">jengelman</span><span class="p">.</span><span class="na">gradle</span><span class="p">.</span><span class="na">plugins</span><span class="p">.</span><span class="na">shadow</span><span class="p">.</span><span class="na">transformers</span><span class="p">.</span><span class="na">XmlAppendingTransformer</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;properties.xml&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">tasks</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;shadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">transform</span><span class="o">(</span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">transformers</span><span class="o">.</span><span class="na">XmlAppendingTransformer</span><span class="o">.</span><span class="na">class</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;properties.xml&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 
 
 

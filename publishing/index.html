@@ -737,7 +737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -859,8 +859,29 @@
 <code>maven-publish</code> plugin.
 The plugin provides the <code>shadow</code> component to configure the publication with the necessary
 artifact and dependencies in the POM file.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Publishing a Shadow JAR with the Maven-Publish Plugin</span>
-<span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">java</span>
+<span class="w">  </span><span class="n">`maven-publish`</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">publishing</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">publications</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">create</span><span class="o">&lt;</span><span class="n">MavenPublication</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;shadow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">from</span><span class="p">(</span><span class="n">components</span><span class="o">[</span><span class="s">&quot;shadow&quot;</span><span class="o">]</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">maven</span><span class="p">(</span><span class="s">&quot;https://repo.myorg.com&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;maven-publish&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
@@ -869,16 +890,17 @@ artifact and dependencies in the POM file.</p>
 <span class="n">publishing</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">publications</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="n">shadow</span><span class="o">(</span><span class="n">MavenPublication</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
-<span class="w">      </span><span class="n">from</span><span class="o">(</span><span class="n">components</span><span class="o">.</span><span class="na">shadow</span><span class="o">)</span><span class="w"> </span><span class="c1">// or components[&quot;shadow&quot;] in Kotlin DSL</span>
+<span class="w">      </span><span class="n">from</span><span class="w"> </span><span class="n">components</span><span class="o">.</span><span class="na">shadow</span>
 <span class="w">    </span><span class="o">}</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="n">maven</span><span class="w"> </span><span class="o">{</span>
-<span class="w">      </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://repo.myorg.com&quot;</span>
-<span class="w">    </span><span class="o">}</span>
+<span class="w">    </span><span class="n">maven</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://repo.myorg.com&#39;</span><span class="w"> </span><span class="o">}</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="shadow-configuration-and-publishing">Shadow Configuration and Publishing<a class="headerlink" href="#shadow-configuration-and-publishing" title="Permanent link">&para;</a></h2>
 <p>The Shadow plugin provides a custom configuration (<code>configurations.shadow</code>) to specify
 runtime dependencies that are <strong>not</strong> merged into the final JAR file.
@@ -896,6 +918,44 @@ be manually configured.</p>
 <h2 id="publish-the-shadowed-jar-instead-of-the-original-jar">Publish the Shadowed JAR instead of the Original JAR<a class="headerlink" href="#publish-the-shadowed-jar-instead-of-the-original-jar" title="Permanent link">&para;</a></h2>
 <p>You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming 
 the <code>archiveClassifier</code> of the shadowed JAR like the following:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Kotlin</label><label for="__tabbed_2_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">java</span>
+<span class="w">  </span><span class="n">`maven-publish`</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;shadow&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span>
+
+<span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// This will be bundled in the shadowed JAR and not declared in the POM.</span>
+<span class="w">  </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;some:a:1.0&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="c1">// This will be excluded</span>
+<span class="w">  </span><span class="n">shadow</span><span class="p">(</span><span class="s">&quot;some:b:1.0&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="c1">// This will be excluded</span>
+<span class="w">  </span><span class="n">compileOnly</span><span class="p">(</span><span class="s">&quot;some:c:1.0&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="p">}</span>
+
+<span class="n">publishing</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">publications</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">create</span><span class="o">&lt;</span><span class="n">MavenPublication</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;shadow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">from</span><span class="p">(</span><span class="n">components</span><span class="o">[</span><span class="s">&quot;shadow&quot;</span><span class="o">]</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">maven</span><span class="p">(</span><span class="s">&quot;https://repo.myorg.com&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;maven-publish&#39;</span>
@@ -926,16 +986,50 @@ the <code>archiveClassifier</code> of the shadowed JAR like the following:</p>
 <span class="w">    </span><span class="o">}</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="n">maven</span><span class="w"> </span><span class="o">{</span>
-<span class="w">      </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://repo.myorg.com&quot;</span>
-<span class="w">    </span><span class="o">}</span>
+<span class="w">    </span><span class="n">maven</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://repo.myorg.com&#39;</span><span class="w"> </span><span class="o">}</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <h2 id="publish-custom-shadowjar-task-outputs">Publish Custom ShadowJar Task Outputs<a class="headerlink" href="#publish-custom-shadowjar-task-outputs" title="Permanent link">&para;</a></h2>
 <p>It is possible to publish a custom <code>ShadowJar</code> task&rsquo;s output via the <a href="https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)"><code>MavenPublication.artifact(java.lang.Object)</code></a> method. </p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Publishing a Shadow JAR with the Maven-Publish Plugin</span>
-<span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label><label for="__tabbed_3_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">java</span>
+<span class="w">  </span><span class="n">`maven-publish`</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">testShadowJar</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">tasks</span><span class="p">.</span><span class="na">registering</span><span class="p">(</span><span class="n">com</span><span class="p">.</span><span class="na">github</span><span class="p">.</span><span class="na">jengelman</span><span class="p">.</span><span class="na">gradle</span><span class="p">.</span><span class="na">plugins</span><span class="p">.</span><span class="na">shadow</span><span class="p">.</span><span class="na">tasks</span><span class="p">.</span><span class="na">ShadowJar</span><span class="o">::</span><span class="n">class</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">github</span><span class="p">.</span><span class="na">jengelman</span><span class="p">.</span><span class="na">gradle</span><span class="p">.</span><span class="na">plugins</span><span class="p">.</span><span class="na">shadow</span><span class="p">.</span><span class="na">ShadowBasePlugin</span><span class="p">.</span><span class="na">GROUP_NAME</span>
+<span class="w">  </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Create a combined JAR of project and test dependencies&quot;</span>
+<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;tests&quot;</span>
+<span class="w">  </span><span class="n">from</span><span class="p">(</span><span class="n">sourceSets</span><span class="p">.</span><span class="na">test</span><span class="p">.</span><span class="na">map</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">output</span><span class="w"> </span><span class="p">})</span>
+<span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">provider</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">project</span><span class="p">.</span><span class="na">configurations</span><span class="o">[</span><span class="s">&quot;testRuntimeClasspath&quot;</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;junit:junit:3.8.2&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">publishing</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">publications</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">create</span><span class="o">&lt;</span><span class="n">MavenPublication</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;shadow&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">artifact</span><span class="p">(</span><span class="n">testShadowJar</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">maven</span><span class="p">(</span><span class="s">&quot;https://repo.myorg.com&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;maven-publish&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
@@ -943,10 +1037,10 @@ the <code>archiveClassifier</code> of the shadowed JAR like the following:</p>
 
 <span class="kt">def</span><span class="w"> </span><span class="n">testShadowJar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;testShadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">ShadowBasePlugin</span><span class="o">.</span><span class="na">GROUP_NAME</span>
-<span class="w">  </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Create a combined JAR of project and test dependencies&quot;</span>
-<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;tests&quot;</span>
-<span class="w">  </span><span class="n">from</span><span class="w"> </span><span class="n">sourceSets</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">output</span>
-<span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">project</span><span class="o">.</span><span class="na">configurations</span><span class="o">.</span><span class="na">testRuntimeClasspath</span><span class="o">]</span>
+<span class="w">  </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Create a combined JAR of project and test dependencies&#39;</span>
+<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;tests&#39;</span>
+<span class="w">  </span><span class="n">from</span><span class="w"> </span><span class="n">sourceSets</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;test&#39;</span><span class="o">).</span><span class="na">map</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">it</span><span class="o">.</span><span class="na">output</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">provider</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[</span><span class="n">project</span><span class="o">.</span><span class="na">configurations</span><span class="o">.</span><span class="na">testRuntimeClasspath</span><span class="o">]</span><span class="w"> </span><span class="o">}</span>
 <span class="o">}</span>
 
 <span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
@@ -960,12 +1054,13 @@ the <code>archiveClassifier</code> of the shadowed JAR like the following:</p>
 <span class="w">    </span><span class="o">}</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="w">  </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="n">maven</span><span class="w"> </span><span class="o">{</span>
-<span class="w">      </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://repo.myorg.com&quot;</span>
-<span class="w">    </span><span class="o">}</span>
+<span class="w">    </span><span class="n">maven</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://repo.myorg.com&#39;</span><span class="w"> </span><span class="o">}</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 
 
 

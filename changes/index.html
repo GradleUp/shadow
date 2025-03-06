@@ -16,7 +16,7 @@
         <link rel="prev" href="../plugins/">
       
       
-        <link rel="next" href="../api/">
+        <link rel="next" href="../about/">
       
       
       <link rel="icon" href="../images/logo.orig.svg">
@@ -698,7 +698,7 @@
         <li class="md-nav__item">
   <a href="#v900-beta10-2025-03-05" class="md-nav__link">
     <span class="md-ellipsis">
-      [v9.0.0-beta10] (2025-03-05)
+      v9.0.0-beta10 (2025-03-05)
     </span>
   </a>
   
@@ -1214,7 +1214,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1287,7 +1287,7 @@
         <li class="md-nav__item">
   <a href="#v900-beta10-2025-03-05" class="md-nav__link">
     <span class="md-ellipsis">
-      [v9.0.0-beta10] (2025-03-05)
+      v9.0.0-beta10 (2025-03-05)
     </span>
   </a>
   
@@ -1808,8 +1808,20 @@
 
 
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link">&para;</a></h1>
-<h2 id="unreleased"><a href="https://github.com/GradleUp/shadow/compare/9.0.0-beta9...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
-<h2 id="v900-beta10-2025-03-05">[v9.0.0-beta10] (2025-03-05)<a class="headerlink" href="#v900-beta10-2025-03-05" title="Permanent link">&para;</a></h2>
+<h2 id="unreleased"><a href="https://github.com/GradleUp/shadow/compare/9.0.0-beta10...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<p><strong>Added</strong></p>
+<ul>
+<li>Add Kotlin DSL examples in docs. (<a href="https://github.com/GradleUp/shadow/pull/1306">#1306</a>)</li>
+</ul>
+<p><strong>Changed</strong></p>
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Polish <code>ShadowSpec</code>. (<a href="https://github.com/GradleUp/shadow/pull/1307">#1307</a>)</li>
+<li>Return values of <code>ShadowSpec</code> functions are changed to <code>Unit</code> to avoid confusion.</li>
+<li><code>ShadowSpec</code> no longer extends <code>CopySpec</code>.</li>
+<li>Overload <code>relocate</code>, <code>transform</code> and things for better usability in Kotlin.</li>
+<li><strong>BREAKING CHANGE:</strong> Remove redundant types from function returning. (<a href="https://github.com/GradleUp/shadow/pull/1308">#1308</a>)</li>
+</ul>
+<h2 id="v900-beta10-2025-03-05"><a href="https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10">v9.0.0-beta10</a> (2025-03-05)<a class="headerlink" href="#v900-beta10-2025-03-05" title="Permanent link">&para;</a></h2>
 <p><strong>Added</strong></p>
 <ul>
 <li>Compat Kotlin Multiplatform plugin. (<a href="https://github.com/GradleUp/shadow/pull/1280">#1280</a>)<br />
@@ -2065,9 +2077,7 @@ Instead, use the <code>enableRelocation = true</code> and <code>relocationPrefix
 </ul>
 <div class="highlight"><pre><span></span><code>buildscript {
   repositories {
-    maven {
-      url &quot;https://plugins.gradle.org/m2/&quot;
-    }
+    gradlePluginPortal()
   }
   dependencies {
     classpath &quot;gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0&quot;

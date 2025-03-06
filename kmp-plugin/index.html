@@ -670,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -745,9 +745,43 @@
 <h1 id="integrating-with-kotlin-multiplatform-plugin">Integrating with Kotlin Multiplatform Plugin<a class="headerlink" href="#integrating-with-kotlin-multiplatform-plugin" title="Permanent link">&para;</a></h1>
 <p>Shadow honors Kotlin&rsquo;s
 <a href="https://kotlinlang.org/docs/multiplatform-intro.html"><code>org.jetbrains.kotlin.multiplatform</code></a> plugin and will automatically
-configure additional tasks for bundling the shadowed JAR for its <code>jvm</code> target.
-<div class="highlight"><pre><span></span><code><span class="c1">// Using Shadow with KMP Plugin</span>
-<span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
+configure additional tasks for bundling the shadowed JAR for its <code>jvm</code> target.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">kotlin</span><span class="p">(</span><span class="s">&quot;multiplatform&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.gradleup.shadow&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">ktorVersion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;3.1.0&quot;</span>
+
+<span class="n">kotlin</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">jvm</span><span class="p">()</span>
+<span class="w">  </span><span class="n">sourceSets</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">commonMain</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">getting</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.ktor:ktor-client-core:</span><span class="si">$</span><span class="n">ktorVersion</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">jvmMain</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">getting</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.ktor:ktor-client-okhttp:</span><span class="si">$</span><span class="n">ktorVersion</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">tasks</span><span class="p">.</span><span class="na">shadowJar</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">manifest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Optionally, set the main class for the shadowed JAR.</span>
+<span class="w">    </span><span class="n">attributes</span><span class="o">[</span><span class="s">&quot;Main-Class&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;com.example.MainKt&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">plugins</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;org.jetbrains.kotlin.multiplatform&#39;</span>
 <span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span>
 <span class="o">}</span>
@@ -776,7 +810,10 @@ configure additional tasks for bundling the shadowed JAR for its <code>jvm</code
 <span class="w">    </span><span class="n">attributes</span><span class="w"> </span><span class="s1">&#39;Main-Class&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;com.example.MainKt&#39;</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">}</span>
-</code></pre></div></p>
+</code></pre></div>
+</div>
+</div>
+</div>
 
 
 

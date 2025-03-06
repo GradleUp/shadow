@@ -670,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -747,14 +747,38 @@
 It is possible to add arbitrary <a href="https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html"><code>ShadowJar</code></a> 
 tasks to a project. When doing so, ensure that the <code>configurations</code> property is specified to inform Shadow which 
 dependencies to merge into the output.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Shadowing Test Sources and Dependencies</span>
-<span class="kt">def</span><span class="w"> </span><span class="n">testShadowJar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;testShadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">ShadowBasePlugin</span><span class="o">.</span><span class="na">GROUP_NAME</span>
-<span class="w">  </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Create a combined JAR of project and test dependencies&quot;</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Kotlin</label><label for="__tabbed_1_2">Groovy</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">testShadowJar</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">tasks</span><span class="p">.</span><span class="na">registering</span><span class="p">(</span><span class="n">com</span><span class="p">.</span><span class="na">github</span><span class="p">.</span><span class="na">jengelman</span><span class="p">.</span><span class="na">gradle</span><span class="p">.</span><span class="na">plugins</span><span class="p">.</span><span class="na">shadow</span><span class="p">.</span><span class="na">tasks</span><span class="p">.</span><span class="na">ShadowJar</span><span class="o">::</span><span class="n">class</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">github</span><span class="p">.</span><span class="na">jengelman</span><span class="p">.</span><span class="na">gradle</span><span class="p">.</span><span class="na">plugins</span><span class="p">.</span><span class="na">shadow</span><span class="p">.</span><span class="na">ShadowBasePlugin</span><span class="p">.</span><span class="na">GROUP_NAME</span>
+<span class="w">  </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Create a combined JAR of project and test dependencies&quot;</span>
 
-<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;tests&quot;</span>
-<span class="w">  </span><span class="n">from</span><span class="w"> </span><span class="n">sourceSets</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">output</span>
-<span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">project</span><span class="o">.</span><span class="na">configurations</span><span class="o">.</span><span class="na">testRuntimeClasspath</span><span class="o">]</span>
+<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;tests&quot;</span>
+<span class="w">  </span><span class="n">from</span><span class="p">(</span><span class="n">sourceSets</span><span class="p">.</span><span class="na">test</span><span class="p">.</span><span class="na">map</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">output</span><span class="w"> </span><span class="p">})</span>
+<span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">provider</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">project</span><span class="p">.</span><span class="na">configurations</span><span class="o">[</span><span class="s">&quot;testRuntimeClasspath&quot;</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">  </span><span class="n">manifest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Optionally, set the main class for the JAR.</span>
+<span class="w">    </span><span class="n">attributes</span><span class="p">(</span><span class="n">mapOf</span><span class="p">(</span><span class="s">&quot;Main-Class&quot;</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="s">&quot;test.Main&quot;</span><span class="p">))</span>
+<span class="w">    </span><span class="c1">// You can also set other attributes here.</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Optionally, make the `assemble` task depend on the new task.</span>
+<span class="n">tasks</span><span class="p">.</span><span class="na">assemble</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">dependsOn</span><span class="p">(</span><span class="n">testShadowJar</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kt">def</span><span class="w"> </span><span class="n">testShadowJar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tasks</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="s1">&#39;testShadowJar&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">tasks</span><span class="o">.</span><span class="na">ShadowJar</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">com</span><span class="o">.</span><span class="na">github</span><span class="o">.</span><span class="na">jengelman</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugins</span><span class="o">.</span><span class="na">shadow</span><span class="o">.</span><span class="na">ShadowBasePlugin</span><span class="o">.</span><span class="na">GROUP_NAME</span>
+<span class="w">  </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Create a combined JAR of project and test dependencies&#39;</span>
+
+<span class="w">  </span><span class="n">archiveClassifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;tests&#39;</span>
+<span class="w">  </span><span class="n">from</span><span class="w"> </span><span class="n">sourceSets</span><span class="o">.</span><span class="na">named</span><span class="o">(</span><span class="s1">&#39;test&#39;</span><span class="o">).</span><span class="na">map</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">it</span><span class="o">.</span><span class="na">output</span><span class="w"> </span><span class="o">}</span>
+<span class="w">  </span><span class="n">configurations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">provider</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="o">[</span><span class="n">project</span><span class="o">.</span><span class="na">configurations</span><span class="o">.</span><span class="na">testRuntimeClasspath</span><span class="o">]</span><span class="w"> </span><span class="o">}</span>
 
 <span class="w">  </span><span class="n">manifest</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="c1">// Optionally, set the main class for the JAR.</span>
@@ -768,6 +792,9 @@ dependencies to merge into the output.</p>
 <span class="w">  </span><span class="n">dependsOn</span><span class="w"> </span><span class="n">testShadowJar</span>
 <span class="o">}</span>
 </code></pre></div>
+</div>
+</div>
+</div>
 <p>The code snippet above will generate a shadowed JAR containing both the <code>main</code> and <code>test</code> sources as well as all <code>testRuntimeOnly</code>
 and <code>testImplementation</code> dependencies.
 The file is output to <code>build/libs/&lt;project&gt;-&lt;version&gt;-tests.jar</code>.</p>
