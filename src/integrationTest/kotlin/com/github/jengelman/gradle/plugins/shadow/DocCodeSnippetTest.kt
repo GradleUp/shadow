@@ -17,12 +17,15 @@ class DocCodeSnippetTest {
       CodeSnippetExtractor.extract(executor)
     }
 
-    check(langExecutables.all { it.isNotEmpty() }) {
+    check(langExecutables.sumOf { it.size } > 0) {
       "No code snippets found."
     }
-    val langMessage = { "We must provide build script snippets for all languages." }
-    check(langExecutables.size == DslLang.entries.size, langMessage)
-    check(langExecutables.map { it.size }.distinct().size == 1, langMessage)
+    check(langExecutables.size == DslLang.entries.size) {
+      "We must provide build script snippets for all languages."
+    }
+    check(langExecutables.map { it.size }.distinct().size == 1) {
+      "All languages must have the same number of code snippets."
+    }
 
     return langExecutables.flatten().map {
       // Create a temporary directory for each test, root will be deleted after all tests are run.

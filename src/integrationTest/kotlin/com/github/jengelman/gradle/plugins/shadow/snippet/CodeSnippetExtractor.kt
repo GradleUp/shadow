@@ -13,65 +13,49 @@ import kotlin.io.path.walk
 object CodeSnippetExtractor {
   private val docRoot = Path(System.getProperty("DOCS_DIR"))
 
-  fun extract(
-    lang: DslLang,
-  ): List<SnippetExecutable> {
-    val snippets = mutableListOf<SnippetExecutable>()
-    val snippetBlockPattern = Pattern.compile("(?ims) {4}```${lang}\n(.*?)\n {4}```")
-    @OptIn(ExperimentalPathApi::class)
-    docRoot.walk()
-      .filter { it.name.endsWith(".md", ignoreCase = true) }
-      .forEach {
-        addSnippets(snippets, it, snippetBlockPattern, lang)
-      }
-    return snippets
+  @OptIn(ExperimentalPathApi::class)
+  private val markdownPaths = docRoot.walk()
+    .filter { it.name.endsWith(".md", ignoreCase = true) }
+    .toList()
+
+  fun extract(lang: DslLang): List<SnippetExecutable> {
+    return markdownPaths.flatMap { path ->
+      createExecutables(lang, path)
+    }
   }
 
-  private fun addSnippets(
-    snippets: MutableList<SnippetExecutable>,
-    sourcePath: Path,
-    snippetBlockPattern: Pattern,
+  private fun createExecutables(
     lang: DslLang,
-  ) {
-    val source = sourcePath.readText()
-    val relativeDocPath = sourcePath.relativeTo(docRoot).pathString
-    val snippetsByLine = findSnippetsByLine(source, snippetBlockPattern)
-
-    snippets += snippetsByLine.map { (lineNumber, snippet) ->
+    markdownPath: Path,
+  ): List<SnippetExecutable> {
+    val relativeDocPath = markdownPath.relativeTo(docRoot).pathString
+    return createSnippets(markdownPath.readText(), lang).map { (lineNumber, snippet) ->
       SnippetExecutable.create(
         lang,
         snippet,
         "$relativeDocPath:$lineNumber",
       ) {
-        val message = "The error line in the doc is near ${sourcePath.toUri()}:$lineNumber"
-        RuntimeException(message, it)
+        RuntimeException("The error line in the doc is near ${markdownPath.toUri()}:$lineNumber", it)
       }
     }
   }
 
-  private fun findSnippetBlocks(code: String, snippetTagPattern: Pattern) = buildList {
-    val matcher = snippetTagPattern.matcher(code)
+  private fun createSnippets(source: String, lang: DslLang) = buildMap {
+    val pattern = Pattern.compile("(?ims)```${lang}\n(.*?)\n```")
+    val matcher = pattern.matcher(source)
+
     while (matcher.find()) {
-      add(matcher.group(0))
+      val line = source.lineNumberAt(matcher.start())
+      val code = matcher.group(1)
+      put(line, code)
     }
   }
 
-  private fun findSnippetsByLine(source: String, snippetTagPattern: Pattern): Map<Int, String> {
-    val snippetBlocks = findSnippetBlocks(source, snippetTagPattern)
-    val snippetBlocksByLine = mutableMapOf<Int, String>()
-
-    var codeIndex = 0
-    snippetBlocks.forEach { block ->
-      codeIndex = source.indexOf(block, codeIndex)
-      val lineNumber = source.substring(0, codeIndex).lines().size + 1
-      snippetBlocksByLine[lineNumber] = extractSnippetFromBlock(block)
-      codeIndex += block.length
+  private fun String.lineNumberAt(index: Int): Int {
+    var line = 1
+    for (i in 0 until index.coerceAtMost(length)) {
+      if (this[i] == '\n') line++
     }
-
-    return snippetBlocksByLine
-  }
-
-  private fun extractSnippetFromBlock(tag: String): String {
-    return tag.substring(tag.indexOf("\n") + 1, tag.lastIndexOf("\n"))
+    return line
   }
 }
