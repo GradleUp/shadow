@@ -124,7 +124,7 @@ class AppendableMavenRepository(
     }
 
     fun build(): Path {
-      if (!::existingJar.isInitialized) error("No jar file provided for $coordinate")
+      check(::existingJar.isInitialized) { "No jar file provided for $coordinate" }
       return existingJar.also {
         check(it.exists()) { "Jar file doesn't exist for $coordinate in: $it" }
         check(it.isRegularFile()) { "Jar is not a regular file for $coordinate in: $it" }

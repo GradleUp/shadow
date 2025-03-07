@@ -9,8 +9,8 @@ fun runProcess(
   val err = process.errorStream.bufferedReader().use { it.readText() }
   val out = process.inputStream.bufferedReader().use { it.readText() }
 
-  if (exitCode != 0 || err.isNotEmpty()) {
-    error("Error occurred when running command line: $err")
+  check(exitCode == 0 && err.isEmpty()) {
+    "Error occurred when running command line: $err"
   }
 
   return out
