@@ -432,6 +432,11 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/295",
+    "https://github.com/GradleUp/shadow/issues/562",
+    "https://github.com/GradleUp/shadow/issues/884",
+  )
   @Test
   fun preserveKotlinBuiltins() {
     val kotlinJar = buildJar("kotlin.jar") {
