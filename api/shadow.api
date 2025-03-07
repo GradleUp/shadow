@@ -109,6 +109,11 @@ public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocat
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
+public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocationContextKt {
+	public static final fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Ljava/lang/String;)Ljava/lang/String;
+	public static final fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Ljava/lang/String;)Ljava/lang/String;
+}
+
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator$Companion;
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
