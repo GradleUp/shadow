@@ -34,7 +34,7 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           pip install mkdocs-material
-          mkdocs gh-deploy --force
+          mkdocs gh-deploy
       - name: Extract release notes
         # TODO: replace this after https://github.com/ffurrer2/extract-release-notes/pull/355 is merged.
         uses: Goooler/extract-release-notes@6e686e7a607d03716b7cff561371a82065b22c33
