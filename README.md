@@ -1,4 +1,4 @@
-# Gradle Shadow
+# Shadow
 
 Gradle plugin for creating fat/uber JARs with support for package relocation.
 
