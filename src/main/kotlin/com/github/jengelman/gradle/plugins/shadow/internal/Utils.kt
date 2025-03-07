@@ -1,8 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -50,14 +47,6 @@ internal inline fun zipEntry(
     time = ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
   }
   block()
-}
-
-internal fun Relocator.relocatePath(path: String): String {
-  return relocatePath(RelocatePathContext(path))
-}
-
-internal fun Relocator.relocateClass(className: String): String {
-  return relocateClass(RelocateClassContext(className))
 }
 
 internal fun Properties.inputStream(

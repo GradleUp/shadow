@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.net.URL
 import java.nio.file.Path
 import java.util.Collections
@@ -69,10 +69,9 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
     pluginCache.allCategories.values.forEach { currentMap ->
       currentMap.values.forEach { currentPluginEntry ->
         val className = currentPluginEntry.className
-        val relocateClassContext = RelocateClassContext(className)
         tempRelocators.firstOrNull { it.canRelocateClass(className) }?.let { relocator ->
           // Then we perform that relocation and update the plugin entry to reflect the new value.
-          currentPluginEntry.className = relocator.relocateClass(relocateClassContext)
+          currentPluginEntry.className = relocator.relocateClass(className)
         }
       }
     }

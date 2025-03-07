@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -108,8 +108,7 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
       if (!className.isNullOrEmpty()) {
         for (relocator in context.relocators) {
           if (relocator.canRelocateClass(className)) {
-            val relocateClassContext = RelocateClassContext(className)
-            return relocator.relocateClass(relocateClassContext)
+            return relocator.relocateClass(className)
           }
         }
       }

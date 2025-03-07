@@ -1,6 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.util.regex.Pattern
 import org.objectweb.asm.commons.Remapper
 

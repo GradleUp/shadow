@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -48,8 +48,7 @@ public open class ServiceFileTransformer(
     var resource = context.path.substringAfter("$path/")
     context.relocators.forEach { relocator ->
       if (relocator.canRelocateClass(resource)) {
-        val classContext = RelocateClassContext(className = resource)
-        resource = relocator.relocateClass(classContext)
+        resource = relocator.relocateClass(resource)
         return@forEach
       }
     }
@@ -60,8 +59,7 @@ public open class ServiceFileTransformer(
       var line = it
       context.relocators.forEach { relocator ->
         if (relocator.canRelocateClass(line)) {
-          val lineContext = RelocateClassContext(line)
-          line = relocator.relocateClass(lineContext)
+          line = relocator.relocateClass(line)
         }
       }
       out.add(line)
