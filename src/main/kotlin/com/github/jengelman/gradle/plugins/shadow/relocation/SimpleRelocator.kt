@@ -1,8 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.regex.Pattern
-import kotlin.io.path.Path
-import kotlin.io.path.name
+import org.apache.commons.io.FilenameUtils
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
 
@@ -201,8 +200,9 @@ public open class SimpleRelocator @JvmOverloads constructor(
           continue
         }
 
-        val fakePath = Path(pattern)
-        val classPattern = if (fakePath.parent != null && fakePath.name.isNotEmpty()) {
+        val fileName = FilenameUtils.getName(pattern)
+        val fileParent = FilenameUtils.getPathNoEndSeparator(pattern)
+        val classPattern = if (!fileParent.isNullOrEmpty() && fileName.isNotEmpty()) {
           // It's a file pattern like `kotlin/kotlin.kotlin_builtins`, so we don't need to normalize it.
           pattern
         } else {
