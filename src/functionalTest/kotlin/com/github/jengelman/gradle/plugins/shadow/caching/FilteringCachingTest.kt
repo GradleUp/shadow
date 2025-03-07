@@ -1,13 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
-import assertk.assertThat
+import assertk.Assert
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
@@ -22,17 +22,15 @@ class FilteringCachingTest : BaseCachingTest() {
   fun dependencyExclusionsAffectUpToDateCheck() {
     dependOnAndExcludeArtifactD()
 
-    run(shadowJarTask)
-
-    commonAssertions()
+    assertCompositeExecutions {
+      commonAssertions()
+    }
 
     val replaced = projectScriptPath.readText()
       .replace("exclude(dependency('my:d:1.0'))", "exclude(dependency('my:c:1.0'))")
     projectScriptPath.writeText(replaced)
-    val result = run(shadowJarTask)
 
-    assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
-    assertThat(outputShadowJar).useAll {
+    assertCompositeExecutions {
       containsEntries(
         *entriesInAB,
         "d.properties",
@@ -47,18 +45,15 @@ class FilteringCachingTest : BaseCachingTest() {
   fun projectExclusionsAffectUpToDateCheck() {
     dependOnAndExcludeArtifactD()
 
-    run(shadowJarTask)
-
-    commonAssertions()
+    assertCompositeExecutions {
+      commonAssertions()
+    }
 
     val replaced = projectScriptPath.readText()
       .replace("exclude(dependency('my:d:1.0'))", "exclude 'a.properties'")
     projectScriptPath.writeText(replaced)
 
-    val result = run(shadowJarTask)
-
-    assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
-    assertThat(outputShadowJar).useAll {
+    assertCompositeExecutions {
       containsEntries(
         "a2.properties",
         "b.properties",
@@ -203,15 +198,13 @@ class FilteringCachingTest : BaseCachingTest() {
     )
   }
 
-  private fun commonAssertions() {
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        *entriesInAB,
-        "c.properties",
-      )
-      doesNotContainEntries(
-        "d.properties",
-      )
-    }
+  private fun Assert<JarPath>.commonAssertions() {
+    containsEntries(
+      *entriesInAB,
+      "c.properties",
+    )
+    doesNotContainEntries(
+      "d.properties",
+    )
   }
 }
