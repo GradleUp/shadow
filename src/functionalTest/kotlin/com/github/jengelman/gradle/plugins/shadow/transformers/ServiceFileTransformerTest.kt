@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
@@ -205,9 +204,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     val result = runWithFailure(shadowJarTask)
 
-    assertThat(result).all {
-      transform { it.output }.containsMatch(outputRegex.toRegex())
-    }
+    assertThat(result.output).containsMatch(outputRegex.toRegex())
   }
 
   @ParameterizedTest

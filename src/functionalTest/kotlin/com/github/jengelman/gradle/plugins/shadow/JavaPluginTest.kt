@@ -560,9 +560,7 @@ class JavaPluginTest : BasePluginTest() {
 
     val result = runWithFailure(shadowJarTask)
 
-    assertThat(result).all {
-      transform { it.output }.containsMatch("Cannot expand ZIP '.*bad\\.jar'".toRegex())
-    }
+    assertThat(result.output).containsMatch("Cannot expand ZIP '.*bad\\.jar'".toRegex())
   }
 
   @Test
