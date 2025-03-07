@@ -158,7 +158,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     }
 
     fun ZipFile.getStream(entryName: String): InputStream {
-      val entry = getEntry(entryName) ?: error("Entry $entryName not found in all entries: ${entries().toList()}")
+      val entry = requireNotNull(getEntry(entryName)) { "Entry $entryName not found in all entries: ${entries().toList()}" }
       return getInputStream(entry)
     }
 

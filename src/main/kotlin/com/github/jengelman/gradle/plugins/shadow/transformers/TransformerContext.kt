@@ -18,7 +18,7 @@ public data class TransformerContext @JvmOverloads constructor(
     public fun relocators(relocators: Set<Relocator>): Builder = apply { this.relocators = relocators }
     public fun build(): TransformerContext = TransformerContext(
       path = path,
-      inputStream = inputStream ?: error("inputStream is required"),
+      inputStream = requireNotNull(inputStream) { "inputStream is required" },
       relocators = relocators,
     )
   }
