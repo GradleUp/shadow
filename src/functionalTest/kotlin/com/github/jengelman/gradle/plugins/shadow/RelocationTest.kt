@@ -450,7 +450,6 @@ class RelocationTest : BasePluginTest() {
         $shadowJar {
           relocate('kotlin.', 'foo.kotlin.') {
             exclude('kotlin/kotlin.kotlin_builtins')
-            exclude('kotlin.kotlin.kotlin_builtins')
           }
         }
       """.trimIndent(),

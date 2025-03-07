@@ -67,6 +67,11 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("test")).isFalse() // shorter than path pattern with /
     assertThat(relocator.canRelocatePath("org/f")).isTrue() // equal to path pattern
     assertThat(relocator.canRelocatePath("/org/f")).isTrue() // equal to path pattern with /
+
+    relocator = SimpleRelocator("foo.")
+    assertThat(relocator.canRelocatePath("foo/foo.bar")).isTrue()
+    relocator.exclude("foo/foo.bar")
+    assertThat(relocator.canRelocatePath("foo/foo.bar")).isFalse() // Don't handle file path pattern.
   }
 
   @Test
