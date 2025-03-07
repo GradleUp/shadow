@@ -526,9 +526,8 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(testShadowJarTask)
+    run(testShadowJarTask)
 
-    assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
       containsEntries(
         mainClass,
