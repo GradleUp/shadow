@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.regex.Pattern
+import org.apache.commons.io.FilenameUtils
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
 
@@ -199,12 +200,19 @@ public open class SimpleRelocator @JvmOverloads constructor(
           continue
         }
 
-        val classPattern = pattern.replace('.', '/')
-        add(classPattern)
+        val fileName = FilenameUtils.getName(pattern)
+        val fileParent = FilenameUtils.getPathNoEndSeparator(pattern)
+        val filePattern = if (!fileParent.isNullOrEmpty() && fileName.isNotEmpty()) {
+          // It's a file pattern like `kotlin/kotlin.kotlin_builtins`, so we don't need to normalize it.
+          pattern
+        } else {
+          pattern.replace('.', '/')
+        }
+        add(filePattern)
         // Actually, class patterns should just use 'foo.bar.*' ending with a single asterisk, but some users
         // mistake them for path patterns like 'my/path/**', so let us be a bit more lenient here.
-        if (classPattern.endsWith("/*") || classPattern.endsWith("/**")) {
-          val packagePattern = classPattern.substring(0, classPattern.lastIndexOf('/'))
+        if (filePattern.endsWith("/*") || filePattern.endsWith("/**")) {
+          val packagePattern = filePattern.substring(0, filePattern.lastIndexOf('/'))
           add(packagePattern)
         }
       }

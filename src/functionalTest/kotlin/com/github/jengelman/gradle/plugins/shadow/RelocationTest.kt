@@ -432,6 +432,41 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/295",
+    "https://github.com/GradleUp/shadow/issues/562",
+    "https://github.com/GradleUp/shadow/issues/884",
+  )
+  @Test
+  fun preserveKotlinBuiltins() {
+    val kotlinJar = buildJar("kotlin.jar") {
+      insert("kotlin/kotlin.kotlin_builtins", "This is a Kotlin builtins file.")
+    }
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(kotlinJar)}
+        }
+        $shadowJar {
+          relocate('kotlin.', 'foo.kotlin.') {
+            exclude('kotlin/kotlin.kotlin_builtins')
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "kotlin/kotlin.kotlin_builtins",
+      )
+      doesNotContainEntries(
+        "foo/kotlin/kotlin.kotlin_builtins",
+      )
+    }
+  }
+
   private companion object {
     @JvmStatic
     fun prefixProvider() = listOf(
