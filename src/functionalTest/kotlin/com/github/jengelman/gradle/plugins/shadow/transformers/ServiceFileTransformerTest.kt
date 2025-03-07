@@ -9,7 +9,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
