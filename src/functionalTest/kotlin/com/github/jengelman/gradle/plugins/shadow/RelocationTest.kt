@@ -451,9 +451,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask) {
-      it.withDebug(true)
-    }
+    run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
