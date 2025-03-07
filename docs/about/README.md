@@ -7,7 +7,7 @@ our development team greatly.
 Unfortunately, the closest thing that Gradle had to Maven's Shade plugin was its ability to create application TARs and
 ZIPs.
 
-So, Charlie Knudsen and me (John Engelman) set out to port the existing Shade code into a Gradle plugin.
+So, Charlie Knudsen and I (John Engelman) set out to port the existing Shade code into a Gradle plugin.
 This port is what existed up until the `0.9` milestone releases for Shadow.
 It functioned, but it wasn't idiomatic Gradle by any means.
 
