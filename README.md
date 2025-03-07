@@ -27,6 +27,7 @@ Gradle plugin for creating fat/uber JARs with support for package relocation.
 | Shadow Version | Min Gradle Version | Min Java Version |
 |----------------|--------------------|------------------|
 | 5.2.0 - 6.1.0  | 5.x - 6.x          | 7                |
+| 6.1.0+         | 6.x                | 8                |
 | 7.0.0+         | 7.x                | 8                |
 | 8.0.0+         | 8.0+               | 8                |
 | 8.3.0+         | 8.3+               | 8                |
