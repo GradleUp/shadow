@@ -14,9 +14,4 @@ jobs:
         with:
           # Fetch all tags and branches, so that MkDocs could push incremental updates.
           fetch-depth: 0
-      - name: Deploy site
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          pip install mkdocs-material
-          mkdocs gh-deploy
+      - uses: ./.github/actions/deploy-site

@@ -1,0 +1,15 @@
+name: 'Deploy Site'
+description: 'Deploy site to GitHub Pages'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy Site
+      shell: bash
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        # Don't cache it to track updates.
+        pip install mkdocs-material
+        # Incremental pushes, make sure gh-pages branch is fetched by checkout.
+        mkdocs gh-deploy
