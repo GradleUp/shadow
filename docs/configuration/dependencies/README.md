@@ -26,9 +26,8 @@ This means any dependency declared in the `runtimeOnly` configuration would be *
 
 > Note the literal use of `project.configurations` when setting the `configurations` attribute of a
 [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task.
-This is **required**. It maybe be tempting to specify `configurations = [configurations.compile]` but this will not
-have the intended effect, as `configurations.compile` will try to delegate to the `configurations` property of the
-the [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task instead of the `project`
+This is **required**. It maybe is tempting to specify `configurations = [configurations.compile]` but this will not
+have the intended effect, as `configurations.compile` will try to delegate to the `configurations` property of the [`ShadowJar`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task instead of the `project`
 
 ## Embedding Jar Files Inside Your Shadow Jar
 

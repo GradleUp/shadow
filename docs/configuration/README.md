@@ -44,10 +44,10 @@ As with all `Jar` tasks in Gradle, these values can be overridden:
 
 ## Configuring the Runtime Classpath
 
-Each Java JAR file contains a manifest file that provides meta data about the contents of the JAR file itself.
+Each Java JAR file contains a manifest file that provides metadata about the contents of the JAR file itself.
 When using a shadowed JAR file as an executable JAR, it is assumed that all necessary runtime classes are contained
 within the JAR itself.
-There may be situations where the desire is to **not** bundle select dependencies into the shadowed JAR file but
+There may be situations where the desire is to **not** bundle select dependencies into the shadowed JAR file, but
 they are still required for runtime execution.
 
 In these scenarios, Shadow creates a `shadow` configuration to declare these dependencies.

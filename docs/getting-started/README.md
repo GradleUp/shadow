@@ -143,4 +143,4 @@ following behavior:
 Shadow ships with a companion task that can be used to automatically discover dependency packages and configure 
 them for relocation. This is useful in projects if you want to relocate all dependencies.
 
-For more details see the section [Using Shadow to Package Gradle Plugins](/plugins/)
+For more details see the section [Using Shadow to Package Gradle Plugins](../plugins/README.md)

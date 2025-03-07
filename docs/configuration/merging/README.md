@@ -178,7 +178,7 @@ these files if your dependencies contain them.
 
 ### Configuring the Location of Service Descriptor Files
 
-By default the [`ServiceFileTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html) 
+By default, the [`ServiceFileTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html) 
 is configured to merge files in `META-INF/services`.
 This directory can be overridden to merge descriptor files in a different location.
 

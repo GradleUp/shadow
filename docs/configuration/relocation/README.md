@@ -71,7 +71,7 @@ syntax to specify matching path for your files and directories.
     }
     ```
 
-For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the expresion in `%regex[]` before
+For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the expression in `%regex[]` before
 passing it to `include`/`exclude`.
 
 === "Kotlin"
