@@ -184,6 +184,9 @@ class SimpleRelocatorTest {
     var relocator = SimpleRelocator("org.foo")
     assertThat(relocator.relocatePath("org/foo/bar/Class.class"))
       .isEqualTo("hidden/org/foo/bar/Class.class")
+    // Post-pattern case.
+    assertThat(relocator.relocatePath("org/foosssssss/bar/Class.class"))
+      .isEqualTo("hidden/org/foosssssss/bar/Class.class")
 
     relocator = SimpleRelocator("org.foo", "private.stuff")
     assertThat(relocator.relocatePath("org/foo/bar/Class.class"))

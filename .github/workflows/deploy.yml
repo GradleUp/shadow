@@ -1,0 +1,17 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.repository == 'GradleUp/shadow'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Fetch all tags and branches, so that MkDocs could push incremental updates.
+          fetch-depth: 0
+      - uses: ./.github/actions/deploy-site

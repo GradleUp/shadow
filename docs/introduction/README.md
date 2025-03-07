@@ -11,7 +11,7 @@ into the output jar without incurring the I/O overhead of expanding the jars to 
 Shadowing a project output has 2 major use cases:
 
 1. Creating an _executable_ JAR distribution
-1. Bundling and relocating common dependencies in libraries to avoid classpath conflicts
+2. Bundling and relocating common dependencies in libraries to avoid classpath conflicts
 
 ### Executable Distributions
 

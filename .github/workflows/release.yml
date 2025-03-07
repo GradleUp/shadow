@@ -13,6 +13,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Fetch all tags and branches, so that MkDocs could push incremental updates.
+          fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
@@ -29,12 +32,7 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
-      - name: Deploy site
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          pip install mkdocs-material
-          mkdocs gh-deploy --force
+      - uses: ./.github/actions/deploy-site
       - name: Extract release notes
         # TODO: replace this after https://github.com/ffurrer2/extract-release-notes/pull/355 is merged.
         uses: Goooler/extract-release-notes@6e686e7a607d03716b7cff561371a82065b22c33
