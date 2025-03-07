@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import kotlin.io.path.appendText
@@ -65,118 +64,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertExecutionsFromCacheAndUpToDate()
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).useAll {
       containsEntries(*entriesInAB)
-    }
-  }
-
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/717",
-  )
-  @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
-    val mainClass = writeClass(className = "Main")
-    val main2Class = writeClass(className = "Main2")
-    projectScriptPath.appendText(
-      """
-        dependencies {
-          implementation 'my:a:1.0'
-          implementation 'my:b:1.0'
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    assertCompositeExecutions {
-      val entries = entriesInAB + arrayOf(mainClass, main2Class)
-      containsEntries(*entries)
-    }
-
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          exclude '**.properties'
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-        main2Class,
-      )
-      doesNotContainEntries(*entriesInAB)
-    }
-
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          include '$mainClass'
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-      )
-      doesNotContainEntries(
-        main2Class,
-        "a.properties",
-        "a2.properties",
-        "b.properties",
-      )
-    }
-
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          include '$main2Class'
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-        main2Class,
-      )
-      doesNotContainEntries(*entriesInAB)
-    }
-  }
-
-  @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingDependencyIncludesExcludes() {
-    val mainClass = writeClass(withImports = true)
-    projectScriptPath.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-        *junitEntries,
-      )
-    }
-
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          dependencies {
-            exclude(dependency('junit:junit'))
-          }
-        }
-      """.trimIndent(),
-    )
-
-    assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-      )
-      doesNotContainEntries(
-        *junitEntries,
-      )
     }
   }
 

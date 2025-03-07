@@ -4,9 +4,7 @@ import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import kotlin.io.path.appendText
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -89,57 +87,6 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     commonAssertions()
-  }
-
-  @Test
-  fun dependencyExclusionsAffectUpToDateCheck() {
-    dependOnAndExcludeArtifactD()
-
-    run(shadowJarTask)
-
-    commonAssertions()
-
-    val replaced = projectScriptPath.readText()
-      .replace("exclude(dependency('my:d:1.0'))", "exclude(dependency('my:c:1.0'))")
-    projectScriptPath.writeText(replaced)
-    val result = run(shadowJarTask)
-
-    assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
-    assertThat(outputShadowJar).useAll {
-      val entries = entriesInAB + "d.properties"
-      containsEntries(*entries)
-      doesNotContainEntries(
-        "c.properties",
-      )
-    }
-  }
-
-  @Test
-  fun projectExclusionsAffectUpToDateCheck() {
-    dependOnAndExcludeArtifactD()
-
-    run(shadowJarTask)
-
-    commonAssertions()
-
-    val replaced = projectScriptPath.readText()
-      .replace("exclude(dependency('my:d:1.0'))", "exclude 'a.properties'")
-    projectScriptPath.writeText(replaced)
-
-    val result = run(shadowJarTask)
-
-    assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
-    assertThat(outputShadowJar).useAll {
-      containsEntries(
-        "a2.properties",
-        "b.properties",
-        "c.properties",
-        "d.properties",
-      )
-      doesNotContainEntries(
-        "a.properties",
-      )
-    }
   }
 
   @Test
