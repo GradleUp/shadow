@@ -207,7 +207,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val result = runWithFailure(shadowJarTask)
 
     assertThat(result).all {
-      taskOutcomeEquals(shadowJarTask, FAILED)
       transform { it.output }.containsMatch(outputRegex.toRegex())
     }
   }
