@@ -72,6 +72,9 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("foo/foo.bar")).isTrue()
     relocator.exclude("foo/foo.bar")
     assertThat(relocator.canRelocatePath("foo/foo.bar")).isFalse() // Don't handle file path pattern.
+    assertThat(relocator.canRelocatePath("foo/foobar")).isTrue()
+    relocator.exclude("foo/foobar")
+    assertThat(relocator.canRelocatePath("foo/foobar")).isFalse() // File without extension.
   }
 
   @Test
