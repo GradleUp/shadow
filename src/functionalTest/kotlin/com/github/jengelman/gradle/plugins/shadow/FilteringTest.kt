@@ -117,8 +117,10 @@ class FilteringTest : BasePluginTest() {
         "d.properties",
         "my/Passed.class",
       )
-      val entries = entriesInAB + "c.properties"
-      doesNotContainEntries(*entries)
+      doesNotContainEntries(
+        *entriesInAB,
+        "c.properties",
+      )
     }
   }
 
@@ -220,8 +222,10 @@ class FilteringTest : BasePluginTest() {
 
   private fun commonAssertions() {
     assertThat(outputShadowJar).useAll {
-      val entries = entriesInAB + "c.properties"
-      containsEntries(*entries)
+      containsEntries(
+        *entriesInAB,
+        "c.properties",
+      )
       doesNotContainEntries(
         "d.properties",
       )

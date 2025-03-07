@@ -33,8 +33,10 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertThat(result).taskOutcomeEquals(shadowJarTask, SUCCESS)
     assertThat(outputShadowJar).useAll {
-      val entries = entriesInAB + "d.properties"
-      containsEntries(*entries)
+      containsEntries(
+        *entriesInAB,
+        "d.properties",
+      )
       doesNotContainEntries(
         "c.properties",
       )
@@ -86,8 +88,11 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      val entries = entriesInAB + arrayOf(mainClass, main2Class)
-      containsEntries(*entries)
+      containsEntries(
+        *entriesInAB,
+        mainClass,
+        main2Class,
+      )
     }
 
     projectScriptPath.appendText(
@@ -200,8 +205,10 @@ class FilteringCachingTest : BaseCachingTest() {
 
   private fun commonAssertions() {
     assertThat(outputShadowJar).useAll {
-      val entries = entriesInAB + "c.properties"
-      containsEntries(*entries)
+      containsEntries(
+        *entriesInAB,
+        "c.properties",
+      )
       doesNotContainEntries(
         "d.properties",
       )
