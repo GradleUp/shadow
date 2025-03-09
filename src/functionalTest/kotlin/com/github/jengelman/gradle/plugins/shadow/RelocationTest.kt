@@ -473,15 +473,11 @@ class RelocationTest : BasePluginTest() {
   fun relocateAllPackagesButSomeone(exclude: Boolean) {
     val relocateConfig = if (exclude) {
       """
-        relocate('', 'shadow/') {
-          exclude 'junit/**'
-          exclude 'META-INF/MANIFEST.MF'
-        }
+        exclude 'junit/**'
+        exclude 'META-INF/MANIFEST.MF'
       """.trimIndent()
     } else {
-      """
-        relocate '', 'shadow/'
-      """.trimIndent()
+      ""
     }
     projectScriptPath.appendText(
       """
@@ -489,7 +485,9 @@ class RelocationTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
         }
         $shadowJar {
-          $relocateConfig
+          relocate('', 'foo/') {
+            $relocateConfig
+          }
         }
       """.trimIndent(),
     )
@@ -498,20 +496,18 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       if (exclude) {
-        assertThat(outputShadowJar).useAll {
-          containsEntries(
-            "META-INF/MANIFEST.MF",
-            *junitEntries,
-          )
-          doesNotContainEntries(
-            "shadow/META-INF/MANIFEST.MF",
-            *junitEntries.map { "shadow/$it" }.toTypedArray(),
-          )
-        }
+        containsEntries(
+          "META-INF/MANIFEST.MF",
+          *junitEntries,
+        )
+        doesNotContainEntries(
+          "foo/META-INF/MANIFEST.MF",
+          *junitEntries.map { "foo/$it" }.toTypedArray(),
+        )
       } else {
         containsEntries(
-          "shadow/META-INF/MANIFEST.MF",
-          *junitEntries.map { "shadow/$it" }.toTypedArray(),
+          "foo/META-INF/MANIFEST.MF",
+          *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
         doesNotContainEntries(
           "META-INF/MANIFEST.MF",
