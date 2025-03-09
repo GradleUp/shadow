@@ -470,7 +470,7 @@ class RelocationTest : BasePluginTest() {
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun relocateAllPackagesButSomeone(exclude: Boolean) {
+  fun relocateAllPackagesButCertainOne(exclude: Boolean) {
     val relocateConfig = if (exclude) {
       """
         exclude 'junit/**'
