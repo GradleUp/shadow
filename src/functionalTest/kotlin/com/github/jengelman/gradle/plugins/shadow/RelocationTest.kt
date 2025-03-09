@@ -14,6 +14,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
 import org.junit.jupiter.api.Test
@@ -463,6 +464,57 @@ class RelocationTest : BasePluginTest() {
       )
       doesNotContainEntries(
         "foo/kotlin/kotlin.kotlin_builtins",
+      )
+    }
+  }
+
+  @Test
+  fun relocateAllPackagesButSomeone() {
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        $shadowJar {
+          relocate '', 'shadow/'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "shadow/META-INF/MANIFEST.MF",
+        *junitEntries.map { "shadow/$it" }.toTypedArray(),
+      )
+      doesNotContainEntries(
+        "META-INF/MANIFEST.MF",
+        *junitEntries,
+      )
+    }
+
+    val replaced = projectScriptPath.readText().replace(
+      "relocate '', 'shadow/'",
+      """
+        relocate('', 'shadow/') {
+          exclude 'junit/**'
+          exclude 'META-INF/MANIFEST.MF'
+        }
+      """.trimIndent(),
+    )
+    projectScriptPath.writeText(replaced)
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "META-INF/MANIFEST.MF",
+        *junitEntries,
+      )
+      doesNotContainEntries(
+        "shadow/META-INF/MANIFEST.MF",
+        *junitEntries.map { "shadow/$it" }.toTypedArray(),
       )
     }
   }
