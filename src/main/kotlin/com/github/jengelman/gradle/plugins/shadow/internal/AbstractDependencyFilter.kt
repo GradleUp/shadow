@@ -7,6 +7,8 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
+import org.gradle.api.internal.catalog.DependencyValueSource
+import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
 
 internal sealed class AbstractDependencyFilter(
@@ -52,7 +54,15 @@ internal sealed class AbstractDependencyFilter(
   }
 
   override fun dependency(dependencyNotation: Any): Spec<ResolvedDependency> {
-    return dependency(project.dependencies.create(dependencyNotation))
+    val realNotation = when (dependencyNotation) {
+      is Provider<*> -> dependencyNotation.get()
+      is DependencyValueSource -> {
+        val model = requireNotNull(dependencyNotation.obtain())
+        "${model.group}:${model.name}:${model.versionRef}"
+      }
+      else -> dependencyNotation
+    }
+    return dependency(project.dependencies.create(realNotation))
   }
 
   override fun dependency(dependency: Dependency): Spec<ResolvedDependency> {
