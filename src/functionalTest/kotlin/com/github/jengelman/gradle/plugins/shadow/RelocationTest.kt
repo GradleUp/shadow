@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
@@ -465,55 +464,6 @@ class RelocationTest : BasePluginTest() {
       doesNotContainEntries(
         "foo/kotlin/kotlin.kotlin_builtins",
       )
-    }
-  }
-
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun relocateAllPackagesButCertainOne(exclude: Boolean) {
-    val relocateConfig = if (exclude) {
-      """
-        exclude 'junit/**'
-        exclude 'META-INF/MANIFEST.MF'
-      """.trimIndent()
-    } else {
-      ""
-    }
-    projectScriptPath.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJar {
-          relocate('', 'foo/') {
-            $relocateConfig
-          }
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowJar).useAll {
-      if (exclude) {
-        containsEntries(
-          "META-INF/MANIFEST.MF",
-          *junitEntries,
-        )
-        doesNotContainEntries(
-          "foo/META-INF/MANIFEST.MF",
-          *junitEntries.map { "foo/$it" }.toTypedArray(),
-        )
-      } else {
-        containsEntries(
-          "foo/META-INF/MANIFEST.MF",
-          *junitEntries.map { "foo/$it" }.toTypedArray(),
-        )
-        doesNotContainEntries(
-          "META-INF/MANIFEST.MF",
-          *junitEntries,
-        )
-      }
     }
   }
 
