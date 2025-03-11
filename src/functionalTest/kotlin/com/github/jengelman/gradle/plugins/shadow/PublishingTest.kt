@@ -264,7 +264,7 @@ class PublishingTest : BasePluginTest() {
         archiveBaseName = 'maven-all'
       """.trimIndent(),
     )
-    path("c/build.gradle").writeText(
+    path("c/build.gradle.kts").writeText(
       """
         ${getDefaultProjectBuildScript(withGroup = true, withVersion = true)}
         $publishBlock
@@ -290,7 +290,7 @@ class PublishingTest : BasePluginTest() {
   @Test
   fun publishJarThatDependsOnShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
-    path("client/build.gradle").appendText(
+    path("client/build.gradle.kts").appendText(
       publishingBlock(
         projectBlock = "group = 'example'",
         publicationsBlock = """
@@ -300,7 +300,7 @@ class PublishingTest : BasePluginTest() {
         """.trimIndent(),
       ),
     )
-    path("server/build.gradle").appendText(
+    path("server/build.gradle.kts").appendText(
       publishingBlock(
         projectBlock = "group = 'example'",
         publicationsBlock = """

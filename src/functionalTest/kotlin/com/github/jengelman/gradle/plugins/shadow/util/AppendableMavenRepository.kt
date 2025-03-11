@@ -22,9 +22,9 @@ class AppendableMavenRepository(
 
   init {
     root.resolve("temp").createDirectories()
-    root.resolve("settings.gradle").createFile()
+    root.resolve("settings.gradle.kts").createFile()
       .writeText("rootProject.name = '${root.name}'")
-    projectBuildScript = root.resolve("build.gradle").createFile()
+    projectBuildScript = root.resolve("build.gradle.kts").createFile()
   }
 
   fun module(

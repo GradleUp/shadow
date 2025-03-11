@@ -29,7 +29,7 @@ class MinimizationCachingTest : BaseCachingTest() {
       )
     }
 
-    path("server/build.gradle").appendText(
+    path("server/build.gradle.kts").appendText(
       """
         $shadowJar {
           minimize {

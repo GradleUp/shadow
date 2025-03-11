@@ -208,7 +208,7 @@ class RelocationTest : BasePluginTest() {
         include 'core', 'app'
       """.trimIndent(),
     )
-    path("core/build.gradle").writeText(
+    path("core/build.gradle.kts").writeText(
       """
         plugins {
           id 'java-library'
@@ -229,7 +229,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    path("app/build.gradle").writeText(
+    path("app/build.gradle.kts").writeText(
       """
         ${getDefaultProjectBuildScript()}
         dependencies {

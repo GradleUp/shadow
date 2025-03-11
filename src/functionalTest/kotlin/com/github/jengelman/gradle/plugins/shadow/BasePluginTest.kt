@@ -57,8 +57,8 @@ abstract class BasePluginTest {
   val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
   val shadowDistZipTask = ":shadowDistZip"
 
-  val projectScriptPath: Path get() = path("build.gradle")
-  val settingsScriptPath: Path get() = path("settings.gradle")
+  val projectScriptPath: Path get() = path("build.gradle.kts")
+  val settingsScriptPath: Path get() = path("settings.gradle.kts")
   open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
   val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
@@ -261,7 +261,7 @@ abstract class BasePluginTest {
         public class Client {}
       """.trimIndent(),
     )
-    path("client/build.gradle").writeText(
+    path("client/build.gradle.kts").writeText(
       """
         ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
@@ -277,7 +277,7 @@ abstract class BasePluginTest {
         public class Server {}
       """.trimIndent(),
     )
-    path("server/build.gradle").writeText(
+    path("server/build.gradle.kts").writeText(
       """
         ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
@@ -290,7 +290,7 @@ abstract class BasePluginTest {
     )
 
     if (!clientShadowed) return
-    path("client/build.gradle").appendText(
+    path("client/build.gradle.kts").appendText(
       """
         $shadowJar {
           relocate 'junit.framework', 'client.junit.framework'
@@ -305,9 +305,9 @@ abstract class BasePluginTest {
         public class Server {}
       """.trimIndent(),
     )
-    val replaced = path("server/build.gradle").readText()
+    val replaced = path("server/build.gradle.kts").readText()
       .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
-    path("server/build.gradle").writeText(replaced)
+    path("server/build.gradle.kts").writeText(replaced)
   }
 
   fun writeGradlePluginModule(legacy: Boolean) {

@@ -41,7 +41,7 @@ class MinimizeTest : BasePluginTest() {
   @Test
   fun useMinimizeWithTransitiveDependenciesWithApiScope() {
     writeApiLibAndImplModules()
-    path("api/build.gradle").writeText(
+    path("api/build.gradle.kts").writeText(
       """
         plugins {
           id 'java-library'
@@ -225,7 +225,7 @@ class MinimizeTest : BasePluginTest() {
         public class UnusedLibEntity implements LibEntity {}
       """.trimIndent(),
     )
-    path("lib/build.gradle").writeText(
+    path("lib/build.gradle.kts").writeText(
       """
         plugins {
           id 'java'
@@ -246,7 +246,7 @@ class MinimizeTest : BasePluginTest() {
         public class UnusedEntity implements LibEntity {}
       """.trimIndent(),
     )
-    path("api/build.gradle").writeText(
+    path("api/build.gradle.kts").writeText(
       """
         plugins {
           id 'java'
@@ -265,7 +265,7 @@ class MinimizeTest : BasePluginTest() {
         public class SimpleEntity implements Entity {}
       """.trimIndent(),
     )
-    path("impl/build.gradle").writeText(
+    path("impl/build.gradle.kts").writeText(
       """
         ${getDefaultProjectBuildScript("java-library")}
         dependencies {

@@ -203,7 +203,7 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun containsMultiReleaseAttrIfAnyDependencyContainsIt() {
     writeClientAndServerModules()
-    path("client/build.gradle").appendText(
+    path("client/build.gradle.kts").appendText(
       """
         jar {
           manifest {
