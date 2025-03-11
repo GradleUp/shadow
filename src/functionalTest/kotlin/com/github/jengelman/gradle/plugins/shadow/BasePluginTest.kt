@@ -9,7 +9,6 @@ import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
@@ -110,12 +109,12 @@ abstract class BasePluginTest {
     withGroup: Boolean = false,
     withVersion: Boolean = false,
   ): String {
-    val groupInfo = if (withGroup) "group = 'my'" else ""
-    val versionInfo = if (withVersion) "version = '1.0'" else ""
+    val groupInfo = if (withGroup) "group = \"my\"" else ""
+    val versionInfo = if (withVersion) "version = \"1.0\"" else ""
     return """
       plugins {
-        id('$plugin')
-        id('com.gradleup.shadow')
+        id("$plugin")
+        id("com.gradleup.shadow")
       }
       $groupInfo
       $versionInfo
@@ -127,21 +126,21 @@ abstract class BasePluginTest {
     // Use a test-specific build cache directory. This ensures that we'll only use cached outputs generated during
     // this test, and we won't accidentally use cached outputs from a different test or a different build.
     // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
-    buildCacheBlock: String = "local { directory = file('build-cache') }",
-    endBlock: String = "rootProject.name = 'my'",
+    buildCacheBlock: String = "local { directory = file(\"build-cache\") }",
+    endBlock: String = "rootProject.name = \"my\"",
   ): String {
     return """
       $startBlock
       dependencyResolutionManagement {
         repositories {
-          maven { url = '${localRepo.root.toUri()}' }
+          maven("${localRepo.root.toUri()}")
           mavenCentral()
         }
       }
       buildCache {
         $buildCacheBlock
       }
-      enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+      enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
       $endBlock
     """.trimIndent() + System.lineSeparator()
   }
@@ -250,7 +249,7 @@ abstract class BasePluginTest {
   ) {
     settingsScriptPath.appendText(
       """
-        include 'client', 'server'
+        include("client", "server")
       """.trimIndent(),
     )
     projectScriptPath.writeText("")
@@ -265,7 +264,7 @@ abstract class BasePluginTest {
       """
         ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
       """.trimIndent() + System.lineSeparator(),
     )
@@ -281,7 +280,7 @@ abstract class BasePluginTest {
       """
         ${getDefaultProjectBuildScript("java", withVersion = true)}
         dependencies {
-          implementation project(':client')
+          implementation(project(":client"))
         }
         $shadowJar {
           $serverShadowBlock
@@ -293,7 +292,7 @@ abstract class BasePluginTest {
     path("client/build.gradle.kts").appendText(
       """
         $shadowJar {
-          relocate 'junit.framework', 'client.junit.framework'
+          relocate("junit.framework", "client.junit.framework")
         }
       """.trimIndent() + System.lineSeparator(),
     )
@@ -306,7 +305,7 @@ abstract class BasePluginTest {
       """.trimIndent(),
     )
     val replaced = path("server/build.gradle.kts").readText()
-      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
+      .replace("project(\":client\")", "project(path = \":client\", configuration = \"shadow\")")
     path("server/build.gradle.kts").writeText(replaced)
   }
 
@@ -323,9 +322,9 @@ abstract class BasePluginTest {
       gradlePluginBlock = """
         gradlePlugin {
           plugins {
-            create('myPlugin') {
-              id = '$pluginId'
-              implementationClass = '$pluginClass'
+            create("myPlugin") {
+              id = "$pluginId"
+              implementationClass = "$pluginClass"
             }
           }
         }
@@ -353,7 +352,7 @@ abstract class BasePluginTest {
     )
   }
 
-  fun runner(
+  private fun runner(
     arguments: Iterable<String> = emptyList(),
     projectDir: Path? = projectRoot,
   ): GradleRunner = GradleRunner.create()
@@ -382,11 +381,8 @@ abstract class BasePluginTest {
       .filterNot { it.name == "junit3.8.2/" || it.name.startsWith("META-INF/") }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
 
-    val shadowJar: String = """
-      tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
-    """.trimIndent()
-
-    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)".trim()
+    val shadowJar: String = "tasks.$SHADOW_JAR_TASK_NAME".trim()
+    val runShadow: String = "tasks.$SHADOW_RUN_TASK_NAME".trim()
 
     val commonArguments = listOf(
       "--warning-mode=fail",
@@ -401,7 +397,7 @@ abstract class BasePluginTest {
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.toUri().toURL().path}')" }
+      return paths.joinToString(System.lineSeparator()) { "implementation(files(\"${it.toUri().toURL().path}\"))" }
     }
 
     inline fun <reified T : ResourceTransformer> transform(

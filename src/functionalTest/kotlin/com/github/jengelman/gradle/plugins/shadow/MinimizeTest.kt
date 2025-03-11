@@ -252,7 +252,7 @@ class MinimizeTest : BasePluginTest() {
           id 'java'
         }
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
           implementation project(':lib')
         }
       """.trimIndent() + System.lineSeparator(),

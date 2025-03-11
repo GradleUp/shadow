@@ -75,7 +75,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
       """.trimIndent(),
     )
@@ -111,7 +111,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-         implementation 'junit:junit:3.8.2'
+         implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           archiveBaseName = 'fat'
@@ -389,7 +389,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
       """.trimIndent(),
     )
@@ -508,7 +508,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          testImplementation 'junit:junit:3.8.2'
+          testimplementation("junit:junit:3.8.2")
         }
         def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
           group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
@@ -569,7 +569,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           archiveFileName = 'my-shadow.tar'

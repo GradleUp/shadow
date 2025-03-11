@@ -149,7 +149,7 @@ class FilteringCachingTest : BaseCachingTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
       """.trimIndent() + System.lineSeparator(),
     )

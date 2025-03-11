@@ -37,7 +37,7 @@ class ApplicationPluginTest : BasePluginTest() {
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
       mainClassWithImports = true,
-      dependenciesBlock = "implementation 'junit:junit:3.8.2'",
+      dependenciesBlock = "implementation("junit:junit:3.8.2")",
       projectBlock = """
         java {
           toolchain.languageVersion = JavaLanguageVersion.of(17)

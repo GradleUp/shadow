@@ -31,7 +31,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           enableRelocation = true
@@ -68,7 +68,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           relocate 'junit.runner', 'a'
@@ -109,7 +109,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           relocate('junit.runner', 'a') {
@@ -156,7 +156,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           relocate 'junit.framework', 'shadow.junit'
@@ -360,7 +360,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           enableRelocation = $enableRelocation
@@ -482,7 +482,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'junit:junit:3.8.2'
+          implementation("junit:junit:3.8.2")
         }
         $shadowJar {
           relocate('', 'foo/') {
