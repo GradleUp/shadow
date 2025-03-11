@@ -34,8 +34,13 @@ sealed class SnippetExecutable : Executable {
             mavenLocal()
             mavenCentral()
           }
+          versionCatalogs.create('libs') {
+            library('log4j-core', 'org.apache.logging.log4j:log4j-core:2.11.1')
+          }
         }
-        include 'api', 'main'
+        include ':api', ':main'
+        rootProject.name = 'snippet'
+        enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
       """.trimIndent(),
     )
     projectRoot.addSubProject("api", pluginsBlock)

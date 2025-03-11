@@ -219,6 +219,44 @@ This same pattern can be used for any of the dependency notation fields.
     }
     ```
 
+### Using type-safe dependency accessors
+
+You can also use type-safe project accessors or version catalog accessors to filter dependencies.
+
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      // Have to declare this dependency in your libs.versions.toml
+      implementation(libs.log4j.core)
+      // Have to enable `TYPESAFE_PROJECT_ACCESSORS` flag in your settings.gradle.kts
+      implementation(projects.api)
+    }
+    tasks.shadowJar {
+      dependencies {
+        exclude(dependency(libs.log4j.core))
+        exclude(project(projects.api))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    dependencies {
+      // Have to declare this dependency in your libs.versions.toml
+      implementation libs.log4j.core
+      // Have to enable `TYPESAFE_PROJECT_ACCESSORS` flag in your settings.gradle
+      implementation projects.api
+    }
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      dependencies {
+        exclude(dependency(libs.log4j.core))
+        exclude(project(projects.api))
+      }
+    }
+    ```
+
 ### Programmatically Selecting Dependencies to Filter
 
 If more complex decisions are needed to select the dependencies to be included, the
