@@ -73,7 +73,7 @@ testing.suites {
       implementation(libs.xmlunit)
     }
   }
-  register<JvmTestSuite>("integrationTest") {
+  register<JvmTestSuite>("documentationTest") {
     targets.configureEach {
       testTask {
         val docsDir = file("docs")
@@ -136,7 +136,7 @@ kotlin.target.compilations {
 gradlePlugin {
   testSourceSets(
     sourceSets["functionalTest"],
-    sourceSets["integrationTest"],
+    sourceSets["documentationTest"],
   )
 }
 
