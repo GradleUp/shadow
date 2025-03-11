@@ -118,7 +118,7 @@ testing.suites {
     }
     targets.configureEach {
       testTask {
-        maxParallelForks = Runtime.getRuntime().availableProcessors() * 2
+        maxParallelForks = Runtime.getRuntime().availableProcessors()
       }
     }
   }
