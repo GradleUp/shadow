@@ -141,6 +141,7 @@ abstract class BasePluginTest {
       buildCache {
         $buildCacheBlock
       }
+      enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
       $endBlock
     """.trimIndent() + System.lineSeparator()
   }

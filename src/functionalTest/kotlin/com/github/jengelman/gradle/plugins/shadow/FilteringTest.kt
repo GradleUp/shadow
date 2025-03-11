@@ -8,6 +8,8 @@ import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class FilteringTest : BasePluginTest() {
   @BeforeAll
@@ -124,12 +126,14 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @Test
-  fun filterProjectDependencies() {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun filterProjectDependencies(useAccessor: Boolean) {
+    val clientProject = if (useAccessor) "projects.client" else "project(':client')"
     writeClientAndServerModules(
       serverShadowBlock = """
         dependencies {
-          exclude(project(':client'))
+          exclude($clientProject)
         }
       """.trimIndent(),
     )
