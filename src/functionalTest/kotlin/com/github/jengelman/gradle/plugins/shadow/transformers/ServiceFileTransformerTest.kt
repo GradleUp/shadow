@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
@@ -9,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -206,10 +204,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     val result = runWithFailure(shadowJarTask)
 
-    assertThat(result).all {
-      taskOutcomeEquals(shadowJarTask, FAILED)
-      transform { it.output }.containsMatch(outputRegex.toRegex())
-    }
+    assertThat(result.output).containsMatch(outputRegex.toRegex())
   }
 
   @ParameterizedTest

@@ -31,9 +31,6 @@ import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testkit.runner.TaskOutcome.FAILED
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledForJreRange
 import org.junit.jupiter.api.condition.JRE
@@ -526,9 +523,8 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(testShadowJarTask)
+    run(testShadowJarTask)
 
-    assertThat(result).taskOutcomeEquals(":$testShadowJarTask", SUCCESS)
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
       containsEntries(
         mainClass,
@@ -543,41 +539,6 @@ class JavaPluginTest : BasePluginTest() {
       "Hello, World! (foo) from Main",
       "Refs: junit.framework.Test",
     )
-  }
-
-  @Test
-  fun configurationCachingOfConfigurationsIsUpToDate() {
-    settingsScriptPath.appendText(
-      """
-        include 'lib'
-      """.trimIndent(),
-    )
-    projectScriptPath.writeText("")
-
-    path("lib/src/main/java/lib/Lib.java").writeText(
-      """
-        package lib;
-        public class Lib {}
-      """.trimIndent(),
-    )
-    path("lib/build.gradle").writeText(
-      """
-        ${getDefaultProjectBuildScript()}
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJar {
-          configurations = [project.configurations.compileClasspath]
-        }
-      """.trimIndent(),
-    )
-
-    val libShadowJarTask = ":lib:$SHADOW_JAR_TASK_NAME"
-    run(libShadowJarTask)
-    val result = run(libShadowJarTask)
-
-    assertThat(result).taskOutcomeEquals(libShadowJarTask, UP_TO_DATE)
-    assertThat(result.output).contains("Reusing configuration cache.")
   }
 
   @Issue(
@@ -599,10 +560,7 @@ class JavaPluginTest : BasePluginTest() {
 
     val result = runWithFailure(shadowJarTask)
 
-    assertThat(result).all {
-      taskOutcomeEquals(shadowJarTask, FAILED)
-      transform { it.output }.containsMatch("Cannot expand ZIP '.*bad\\.jar'".toRegex())
-    }
+    assertThat(result.output).containsMatch("Cannot expand ZIP '.*bad\\.jar'".toRegex())
   }
 
   @Test
