@@ -62,9 +62,10 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @Test
-  fun excludeDependency() {
-    dependOnAndExcludeArtifactD()
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun excludeDependency(useAccessor: Boolean) {
+    dependOnAndExcludeArtifactD(useAccessor)
 
     run(shadowJarTask)
 
@@ -209,15 +210,25 @@ class FilteringTest : BasePluginTest() {
     commonAssertions()
   }
 
-  private fun dependOnAndExcludeArtifactD() {
+  private fun dependOnAndExcludeArtifactD(useAccessor: Boolean = false) {
+    settingsScriptPath.appendText(
+      """
+        dependencyResolutionManagement {
+          versionCatalogs.create('libs') {
+            library('my-d', 'my:d:1.0')
+          }
+        }
+      """.trimIndent(),
+    )
+    val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation 'my:d:1.0'
+          implementation $dependency
         }
         $shadowJar {
           dependencies {
-            exclude(dependency('my:d:1.0'))
+            exclude(dependency($dependency))
           }
         }
       """.trimIndent(),
