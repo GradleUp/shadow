@@ -159,10 +159,6 @@ method can be used to add extra files.
 
     ```kotlin
     tasks.shadowJar {
-      from("extra.jar") {
-        // Copy extra.jar file (without unzipping) into META-INF/ in the shadowed JAR.
-        into("META-INF")
-      }
       from("Foo") {
         // Copy Foo file into Bar/ in the shadowed JAR.
         into("Bar")
@@ -174,10 +170,6 @@ method can be used to add extra files.
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      from('extra.jar') {
-        // Copy extra.jar file (without unzipping) into META-INF/ in the shadowed JAR.
-        into('META-INF')
-      }
       from('Foo') {
         // Copy Foo file into Bar/ in the shadowed JAR.
         into('Bar')

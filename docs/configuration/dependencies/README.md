@@ -31,11 +31,41 @@ have the intended effect, as `configurations.compile` will try to delegate to th
 
 ## Embedding Jar Files Inside Your Shadow Jar
 
-Because of the way that Gradle handles dependency configuration, from a plugin perspective, shadow is unable to 
-distinguish between a jar file configured as a dependency and a jar file included in the resource folder.  This means 
-that any jar found in a resource directory will be merged into the shadow jar the same as any other dependency.  If 
-your intention is to embed the jar inside, you must rename the jar as to not end with `.jar` before the shadow task 
-begins.
+The `shadowJar` task is a subclass of the `Jar` task, which means that the
+[from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20groovy.lang.Closure))
+method can be used to add extra files.
+
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      // Merge foo.jar (with unzipping) into the shadowed JAR.
+      implementation(files("foo.jar"))
+    }
+    tasks.shadowJar {
+      from("bar.jar") {
+        // Copy bar.jar file (without unzipping) into META-INF/ in the shadowed JAR.
+        into("META-INF")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    dependencies {
+      // Merge foo.jar (with unzipping) into the shadowed JAR.
+      implementation files('foo.jar')
+    }
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      from('bar.jar') {
+        // Copy bar.jar file (without unzipping) into META-INF/ in the shadowed JAR.
+        into('META-INF')
+      }
+    }
+    ```
+
+See also [Adding Extra Files](../README.md#adding-extra-files)
 
 ## Filtering Dependencies
 
