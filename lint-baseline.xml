@@ -4,17 +4,6 @@
     <issue
         id="InternalGradleApiUsage"
         message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.api.internal.catalog.DependencyValueSource"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/AbstractDependencyFilter.kt"
-            line="10"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
         errorLine1="import org.gradle.api.internal.file.FileResolver"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
