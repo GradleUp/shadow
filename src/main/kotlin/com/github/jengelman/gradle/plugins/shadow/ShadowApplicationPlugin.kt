@@ -18,6 +18,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
@@ -34,7 +35,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.addRunTask() {
-    val extension = applicationExtension
     tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
@@ -43,9 +43,21 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
       }
       task.classpath(jarFile)
-      task.mainModule.set(extension.mainModule)
-      task.mainClass.set(extension.mainClass)
-      task.jvmArguments.convention(provider { extension.applicationDefaultJvmArgs })
+
+      if (isKmpApplied) {
+        extensions.getByType(KotlinMultiplatformExtension::class.java).jvm().binaries {
+          executable {
+            task.mainModule.set(mainModule)
+            task.mainClass.set(mainClass)
+            task.jvmArguments.convention(applicationDefaultJvmArgs)
+          }
+        }
+      } else {
+        val extension = applicationExtension
+        task.mainModule.set(extension.mainModule)
+        task.mainClass.set(extension.mainClass)
+        task.jvmArguments.convention(provider { extension.applicationDefaultJvmArgs })
+      }
 
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
       task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
@@ -53,7 +65,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.addCreateScriptsTask() {
-    val extension = applicationExtension
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
       task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
@@ -65,12 +76,27 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         resources.text.fromString(requireResourceAsText("$dir/windowsStartScript.txt"))
 
       task.classpath = files(tasks.shadowJar)
-      task.mainModule.set(extension.mainModule)
-      task.mainClass.set(extension.mainClass)
-      task.conventionMapping.map("applicationName", extension::getApplicationName)
-      task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
-      task.conventionMapping.map("executableDir", extension::getExecutableDir)
-      task.conventionMapping.map("defaultJvmOpts", extension::getApplicationDefaultJvmArgs)
+
+      if (isKmpApplied) {
+        extensions.getByType(KotlinMultiplatformExtension::class.java).jvm().binaries {
+          executable {
+            task.mainModule.set(mainModule)
+            task.mainClass.set(mainClass)
+            task.conventionMapping.map("applicationName", ::applicationName)
+            task.conventionMapping.map("executableDir", ::executableDir)
+            task.conventionMapping.map("defaultJvmOpts", ::applicationDefaultJvmArgs)
+          }
+        }
+      } else {
+        val extension = applicationExtension
+        task.mainModule.set(extension.mainModule)
+        task.mainClass.set(extension.mainClass)
+        task.conventionMapping.map("applicationName", extension::getApplicationName)
+        task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
+        task.conventionMapping.map("executableDir", extension::getExecutableDir)
+        task.conventionMapping.map("defaultJvmOpts", extension::getApplicationDefaultJvmArgs)
+      }
+
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
