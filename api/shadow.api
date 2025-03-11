@@ -153,6 +153,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun dependency (Lorg/gradle/api/artifacts/Dependency;)Lorg/gradle/api/specs/Spec;
 	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)V
 	public abstract fun include (Lorg/gradle/api/specs/Spec;)V
+	public abstract fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun project (Ljava/lang/String;)Lorg/gradle/api/specs/Spec;
 	public abstract fun project (Ljava/util/Map;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;

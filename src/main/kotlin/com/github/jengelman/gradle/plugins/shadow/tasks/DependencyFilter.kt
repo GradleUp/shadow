@@ -32,6 +32,11 @@ public interface DependencyFilter : Serializable {
   /**
    * Create a [Spec] that matches the provided project [notation].
    */
+  public fun project(notation: Any): Spec<ResolvedDependency>
+
+  /**
+   * Create a [Spec] that matches the provided project [notation].
+   */
   public fun project(notation: Map<String, *>): Spec<ResolvedDependency>
 
   /**
