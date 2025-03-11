@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import assertk.assertions.contains
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -50,5 +51,37 @@ class KmpPluginTest : BasePluginTest() {
         *entriesInAB,
       )
     }
+  }
+
+  @Test
+  fun compatKmpApplicationDsl() {
+    writeClass(sourceSet = "jvmMain", isJava = false, withImports = true)
+    projectScriptPath.appendText(
+      """
+        kotlin {
+          jvm {
+            binaries {
+              executable {
+                mainClass.set("my.MainKt")
+              }
+            }
+          }
+          sourceSets {
+            jvmMain {
+              dependencies {
+                implementation 'junit:junit:3.8.2'
+              }
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(runShadowTask)
+
+    assertThat(result.output).contains(
+      "Hello, World! (foo) from Main",
+      "Refs: junit.framework.Test",
+    )
   }
 }
