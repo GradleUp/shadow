@@ -20,6 +20,10 @@
 
 - Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
 
+**Removed**
+
+- **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
+
 
 ## [v9.0.0-beta10] (2025-03-05)
 

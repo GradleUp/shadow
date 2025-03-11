@@ -47,21 +47,14 @@ internal sealed class AbstractDependencyFilter(
 
   override fun project(notation: Any): Spec<ResolvedDependency> {
     @Suppress("UNCHECKED_CAST")
-    return when (notation) {
-      is ProjectDependency -> dependency(notation)
-      is Provider<*> -> project(notation.get() as String)
-      is String -> project(notation)
-      is Map<*, *> -> project(notation as Map<String, *>)
-      else -> error("Unsupported notation type: ${notation::class.java}")
+    val realNotation = when (notation) {
+      is ProjectDependency -> return notation.toSpec()
+      is Provider<*> -> mapOf("path" to notation.get())
+      is String -> mapOf("path" to notation)
+      is Map<*, *> -> notation as Map<String, Any>
+      else -> throw IllegalArgumentException("Unsupported notation type: ${notation::class.java}")
     }
-  }
-
-  override fun project(notation: Map<String, *>): Spec<ResolvedDependency> {
-    return dependency(project.dependencies.project(notation))
-  }
-
-  override fun project(path: String): Spec<ResolvedDependency> {
-    return project(mapOf("path" to path))
+    return project.dependencies.project(realNotation).toSpec()
   }
 
   override fun dependency(dependencyNotation: Any): Spec<ResolvedDependency> {
@@ -69,20 +62,20 @@ internal sealed class AbstractDependencyFilter(
       is Provider<*> -> dependencyNotation.get()
       else -> dependencyNotation
     }
-    return dependency(project.dependencies.create(realNotation))
-  }
-
-  override fun dependency(dependency: Dependency): Spec<ResolvedDependency> {
-    return Spec<ResolvedDependency> { resolvedDependency ->
-      (dependency.group == null || resolvedDependency.moduleGroup.matches(dependency.group!!.toRegex())) &&
-        resolvedDependency.moduleName.matches(dependency.name.toRegex()) &&
-        (dependency.version == null || resolvedDependency.moduleVersion.matches(dependency.version!!.toRegex()))
-    }
+    return project.dependencies.create(realNotation).toSpec()
   }
 
   protected fun ResolvedDependency.isIncluded(): Boolean {
     val include = includeSpecs.isEmpty() || includeSpecs.any { it.isSatisfiedBy(this) }
     val exclude = excludeSpecs.isNotEmpty() && excludeSpecs.any { it.isSatisfiedBy(this) }
     return include && !exclude
+  }
+
+  private fun Dependency.toSpec(): Spec<ResolvedDependency> {
+    return Spec<ResolvedDependency> { resolvedDependency ->
+      (group == null || resolvedDependency.moduleGroup.matches(group!!.toRegex())) &&
+        resolvedDependency.moduleName.matches(name.toRegex()) &&
+        (version == null || resolvedDependency.moduleVersion.matches(version!!.toRegex()))
+    }
   }
 }
