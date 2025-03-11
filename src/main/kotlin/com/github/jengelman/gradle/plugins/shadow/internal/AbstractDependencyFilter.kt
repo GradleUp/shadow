@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
@@ -42,6 +43,17 @@ internal sealed class AbstractDependencyFilter(
 
   override fun include(spec: Spec<ResolvedDependency>) {
     includeSpecs.add(spec)
+  }
+
+  override fun project(notation: Any): Spec<ResolvedDependency> {
+    @Suppress("UNCHECKED_CAST")
+    return when (notation) {
+      is ProjectDependency -> dependency(notation)
+      is Provider<*> -> project(notation.get() as String)
+      is String -> project(notation)
+      is Map<*, *> -> project(notation as Map<String, *>)
+      else -> error("Unsupported notation type: ${notation::class.java}")
+    }
   }
 
   override fun project(notation: Map<String, *>): Spec<ResolvedDependency> {
