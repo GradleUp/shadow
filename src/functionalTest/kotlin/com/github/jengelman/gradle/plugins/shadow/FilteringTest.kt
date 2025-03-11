@@ -130,7 +130,7 @@ class FilteringTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun filterProjectDependencies(useAccessor: Boolean) {
-    val clientProject = if (useAccessor) "projects.client" else "project(':client')"
+    val clientProject = if (useAccessor) "dependency(projects.client)" else "project(':client')"
     writeClientAndServerModules(
       serverShadowBlock = """
         dependencies {
