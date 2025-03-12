@@ -243,7 +243,7 @@ abstract class BasePluginTest {
     },
   ): String {
     val basePath = packageName.replace('.', '/') + "/$className"
-    path("src/$sourceSet/$jvmLang/$basePath.$jvmLang").writeText(content())
+    path("src/$sourceSet/$jvmLang/$basePath.${jvmLang.suffix}").writeText(content())
     return "$basePath.class"
   }
 
