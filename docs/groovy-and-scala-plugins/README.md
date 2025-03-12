@@ -1,6 +1,6 @@
 # Integrating with Groovy and Scala Plugins
 
-Shadow also works well for Groovy and Scala, here are examples:
+Shadow also works well for Groovy and Scala, here are integration examples:
 
 For Groovy:
 
