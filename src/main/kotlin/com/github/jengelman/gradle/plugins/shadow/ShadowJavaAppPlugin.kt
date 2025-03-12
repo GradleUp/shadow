@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  *
  * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
  */
-public abstract class ShadowApplicationPlugin : Plugin<Project> {
+public abstract class ShadowJavaAppPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     project.addRunTask()
     project.addCreateScriptsTask()

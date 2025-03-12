@@ -6,7 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaAppPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.DISTRIBUTION_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
