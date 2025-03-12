@@ -57,7 +57,7 @@ markdown_extensions:
   - md_in_html
 
 nav:
-  - 'Introduction': introduction/README.md
+  - 'Introduction': README.md
   - 'Getting Started': getting-started/README.md
   - 'Configuration':
       - 'Overview': configuration/README.md
