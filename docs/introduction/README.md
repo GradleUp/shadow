@@ -1,3 +1,8 @@
+<div style="text-align: center;">
+  <img src="../images/logo.svg" alt="Shadow Gradle Plugin" style="max-width: 300px; height: auto;">
+  <h1><strong>Shadow Gradle Plugin</strong></h1>
+</div>
+
 # Introduction
 
 Shadow is a Gradle plugin for combining a project's dependency classes and resources into a single
@@ -5,6 +10,17 @@ output Jar.
 The combined Jar is often referred to a _fat-jar_ or _uber-jar_.
 Shadow utilizes [`JarInputStream`](https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarInputStream.html) and [`JarOutputStream`](https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarOutputStream.html) to efficiently process dependent libraries
 into the output jar without incurring the I/O overhead of expanding the jars to disk.
+
+!!! warning "Plugin ID Change"
+
+    Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the ID [
+    `com.github.johnrengelman.shadow`](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow)
+    before maintenance was transferred to the [GradleUp organization](https://github.com/GradleUp) to ensure future
+    development, see [#908](https://github.com/GradleUp/shadow/issues/908).
+    
+    If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID [
+    `com.gradleup.shadow`](https://plugins.gradle.org/plugin/com.gradleup.shadow)
+    and update to the latest version to receive all the latest bug fixes and improvements.
 
 ## Benefits of Shadow
 
