@@ -42,6 +42,7 @@ method can be used to add extra files.
       // Merge foo.jar (with unzipping) into the shadowed JAR.
       implementation(files("foo.jar"))
     }
+
     tasks.shadowJar {
       from("bar.jar") {
         // Copy bar.jar file (without unzipping) into META-INF/ in the shadowed JAR.
@@ -57,6 +58,7 @@ method can be used to add extra files.
       // Merge foo.jar (with unzipping) into the shadowed JAR.
       implementation files('foo.jar')
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       from('bar.jar') {
         // Copy bar.jar file (without unzipping) into META-INF/ in the shadowed JAR.
@@ -83,6 +85,7 @@ Gradle's `configurations` block.
     dependencies {
       implementation("org.apache.logging.log4j:log4j-core:2.11.1")
     }
+
     tasks.shadowJar {
       dependencies {
         exclude(dependency("org.apache.logging.log4j:log4j-core:2.11.1"))
@@ -96,6 +99,7 @@ Gradle's `configurations` block.
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:log4j-core:2.11.1'))
@@ -109,6 +113,7 @@ Gradle's `configurations` block.
     dependencies {
       implementation(project(":api"))
     }
+
     tasks.shadowJar {
       dependencies {
         exclude(dependency(":api"))
@@ -122,6 +127,7 @@ Gradle's `configurations` block.
     dependencies {
       implementation project(':api')
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(project(':api'))
@@ -145,6 +151,7 @@ using any of these individual fields.
     dependencies {
       implementation("org.apache.logging.log4j:log4j-core:2.11.1")
     }
+
     tasks.shadowJar {
       dependencies {
         exclude(dependency("org.apache.logging.log4j:log4j-core:.*"))
@@ -158,6 +165,7 @@ using any of these individual fields.
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:log4j-core:.*'))
@@ -173,6 +181,7 @@ Any of the individual fields can be safely absent and will function as though a 
     dependencies {
       implementation("org.apache.logging.log4j:log4j-core:2.11.1")
     }
+
     tasks.shadowJar {
       dependencies {
         exclude(dependency(":org.apache.logging.log4j:log4j-core"))
@@ -186,6 +195,7 @@ Any of the individual fields can be safely absent and will function as though a 
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:log4j-core'))
@@ -203,6 +213,7 @@ This same pattern can be used for any of the dependency notation fields.
     dependencies {
       implementation("org.apache.logging.log4j:log4j-core:2.11.1")
     }
+
     tasks.shadowJar {
       dependencies {
         exclude(dependency(":log4j-core:2.11.1"))
@@ -216,6 +227,7 @@ This same pattern can be used for any of the dependency notation fields.
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency(':log4j-core:2.11.1'))
@@ -229,6 +241,7 @@ This same pattern can be used for any of the dependency notation fields.
     dependencies {
       implementation("org.apache.logging.log4j:log4j-core:2.11.1")
     }
+
     tasks.shadowJar {
       dependencies {
         exclude(dependency("org.apache.logging.log4j:2.11.1"))
@@ -242,6 +255,7 @@ This same pattern can be used for any of the dependency notation fields.
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency('org.apache.logging.log4j:2.11.1'))
@@ -262,6 +276,7 @@ You can also use type-safe project accessors or version catalog accessors to fil
       // Have to enable `TYPESAFE_PROJECT_ACCESSORS` flag in your settings.gradle.kts
       implementation(projects.api)
     }
+
     tasks.shadowJar {
       dependencies {
         exclude(dependency(libs.log4j.core))
@@ -279,6 +294,7 @@ You can also use type-safe project accessors or version catalog accessors to fil
       // Have to enable `TYPESAFE_PROJECT_ACCESSORS` flag in your settings.gradle
       implementation projects.api
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude(dependency(libs.log4j.core))
@@ -299,6 +315,7 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     dependencies {
       implementation("org.apache.logging.log4j:log4j-core:2.11.1")
     }
+
     tasks.shadowJar {
       dependencies {
         exclude {
@@ -314,6 +331,7 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     dependencies {
       implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
     }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       dependencies {
         exclude {
