@@ -517,6 +517,36 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun relocateProjectResourcesOnly() {
+    val mainClassEntry = writeClass()
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        $shadowJar {
+          configurations = []
+          relocate('', 'foo/')
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        "foo/$mainClassEntry",
+        "foo/META-INF/MANIFEST.MF",
+      )
+      doesNotContainEntries(
+        "META-INF/MANIFEST.MF",
+        *junitEntries,
+        *junitEntries.map { "foo/$it" }.toTypedArray(),
+      )
+    }
+  }
+
   private companion object {
     @JvmStatic
     fun prefixProvider() = listOf(
