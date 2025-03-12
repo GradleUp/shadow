@@ -24,13 +24,13 @@ class KmpPluginTest : BasePluginTest() {
 
   @Test
   fun compatKmpJvmTarget() {
-    val mainClassEntry = "my.MainKt"
-    val mainClassPath = writeClass(sourceSet = "jvmMain", isJava = false)
+    val mainClassName = "my.MainKt"
+    val mainClassEntry = writeClass(sourceSet = "jvmMain", isJava = false)
     projectScriptPath.appendText(
       """
         kotlin {
           jvm().mainRun {
-            mainClass = '$mainClassEntry'
+            it.mainClass.set('$mainClassName')
           }
           sourceSets {
             commonMain {

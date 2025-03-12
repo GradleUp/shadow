@@ -8,6 +8,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion as KgpVersion
 
 public abstract class ShadowKmpPlugin : Plugin<Project> {
   private lateinit var kmpExtension: KotlinMultiplatformExtension
@@ -29,7 +30,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
   }
 
   private fun configureMainClass(task: ShadowJar) {
-    if (KotlinVersion.CURRENT < KotlinVersion(2, 10, 20)) return
+    if (KgpVersion.DEFAULT < KgpVersion.KOTLIN_2_1) return
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     kmpExtension.jvm().mainRun {

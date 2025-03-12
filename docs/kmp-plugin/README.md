@@ -54,7 +54,7 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
     kotlin {
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`, it's avaliable from Kotlin 2.1.0
-        mainClass = "myapp.MainKt"
+        it.mainClass.set('myapp.MainKt')
       }
       sourceSets {
         commonMain {
