@@ -53,10 +53,11 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           }
         }
       } else {
-        val extension = applicationExtension
-        task.mainModule.set(extension.mainModule)
-        task.mainClass.set(extension.mainClass)
-        task.jvmArguments.convention(provider { extension.applicationDefaultJvmArgs })
+        with(applicationExtension) {
+          task.mainModule.set(mainModule)
+          task.mainClass.set(mainClass)
+          task.jvmArguments.convention(provider { applicationDefaultJvmArgs })
+        }
       }
 
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
@@ -88,13 +89,14 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           }
         }
       } else {
-        val extension = applicationExtension
-        task.mainModule.set(extension.mainModule)
-        task.mainClass.set(extension.mainClass)
-        task.conventionMapping.map("applicationName", extension::getApplicationName)
-        task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
-        task.conventionMapping.map("executableDir", extension::getExecutableDir)
-        task.conventionMapping.map("defaultJvmOpts", extension::getApplicationDefaultJvmArgs)
+        with(applicationExtension) {
+          task.mainModule.set(mainModule)
+          task.mainClass.set(mainClass)
+          task.conventionMapping.map("applicationName", ::getApplicationName)
+          task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
+          task.conventionMapping.map("executableDir", ::getExecutableDir)
+          task.conventionMapping.map("defaultJvmOpts", ::getApplicationDefaultJvmArgs)
+        }
       }
 
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
