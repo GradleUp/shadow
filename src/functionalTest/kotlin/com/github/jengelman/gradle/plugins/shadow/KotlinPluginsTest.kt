@@ -26,6 +26,28 @@ class KotlinPluginsTest : BasePluginTest() {
   }
 
   @Test
+  fun compatKotlinJvmPlugin() {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm", withGroup = true, withVersion = true)}
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+      """.trimIndent(),
+    )
+    val mainClassEntry = writeClass(jvmLang = JvmLang.Kotlin)
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        mainClassEntry,
+        *junitEntries,
+      )
+    }
+  }
+
+  @Test
   fun compatKmpJvmTarget() {
     val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
     projectScriptPath.appendText(
