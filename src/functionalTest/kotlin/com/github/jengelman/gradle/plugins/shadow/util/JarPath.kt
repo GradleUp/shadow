@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.util
 import assertk.Assert
 import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
+import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
-import assertk.fail
 import java.io.InputStream
 import java.nio.file.Path
 import java.util.jar.JarFile
@@ -45,12 +45,9 @@ fun Assert<JarPath>.containsEntries(vararg entries: String) = transform { actual
   actual.entries().toList().map { it.name }
 }.containsAtLeast(*entries)
 
-fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = given { actual ->
-  entries.forEach { entry ->
-    actual.getEntry(entry) ?: return@forEach
-    fail("Jar file ${actual.path} contains entry $entry in entries: ${actual.entries().toList()}")
-  }
-}
+fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = transform { actual ->
+  actual.entries().toList().map { it.name }
+}.containsNone(*entries)
 
 fun Assert<JarPath>.containsFileEntriesOnly(vararg entries: String) = transform { actual ->
   actual.entries().toList().filter { !it.isDirectory }.map { it.name }
