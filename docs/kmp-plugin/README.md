@@ -15,7 +15,10 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
     val ktorVersion = "3.1.0"
 
     kotlin {
-      jvm()
+      jvm().mainRun {
+        // Optionally, set the main class for `runJvm`, it's avaliable from Kotlin 2.1.0
+        mainClass = "myapp.MainKt"
+      }
       sourceSets {
         val commonMain by getting {
           dependencies {
@@ -49,7 +52,10 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
     def ktorVersion = "3.1.0"
 
     kotlin {
-      jvm()
+      jvm().mainRun {
+        // Optionally, set the main class for `runJvm`, it's avaliable from Kotlin 2.1.0
+        mainClass = "myapp.MainKt"
+      }
       sourceSets {
         commonMain {
           dependencies {
