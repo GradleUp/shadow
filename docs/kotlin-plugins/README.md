@@ -24,13 +24,6 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     dependencies {
       implementation("io.ktor:ktor-client-okhttp:3.1.0")
     }
-
-    tasks.shadowJar {
-      manifest {
-        // Optionally, set the main class for the shadowed JAR.
-        attributes["Main-Class"] = "com.example.MainKt"
-      }
-    }
     ```
 
 === "Groovy"
@@ -43,13 +36,6 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
 
     dependencies {
       implementation 'io.ktor:ktor-client-okhttp:3.1.0'
-    }
-
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      manifest {
-        // Optionally, set the main class for the shadowed JAR.
-        attributes 'Main-Class': 'com.example.MainKt'
-      }
     }
     ```
 
