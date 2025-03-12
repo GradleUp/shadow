@@ -116,13 +116,16 @@ Instead, Shadow _reacts_
 This means, that for most users, the `java` or `groovy` plugins must be _explicitly_ applied
 to have the desired effect.
 
-## Default Java/Groovy Tasks
+## Default Java/Kotlin/Groovy Tasks
 
-In the presence of the `java` or `groovy` plugins, Shadow will automatically configure the
-following behavior:
+In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins
+(that apply [JavaPlugin](https://docs.gradle.org/current/userguide/java_plugin.html) in their build logic),
+Shadow will automatically configure the following behavior:
 
 * Adds a `shadowJar` task to the project.
 * Adds a `shadow` configuration to the project.
+* Adds a `shadow` variant to the project.
+* Adds a `shadow` component to the project.
 * Configures the `shadowJar` task to include all sources from the project's `main` sourceSet.
 * Configures the `shadowJar` task to bundle all dependencies from the `runtimeClasspath` configuration.
 * Configures the _classifier_ attribute of the `shadowJar` task to be `'all'` .
@@ -137,10 +140,3 @@ following behavior:
     * `META-INF/versions/**/module-info.class`
     * `module-info.class`
 * Creates and registers the `shadow` component in the project (used for integrating with `maven-publish`).
-
-## Shadowing Gradle Plugins
-
-Shadow ships with a companion task that can be used to automatically discover dependency packages and configure 
-them for relocation. This is useful in projects if you want to relocate all dependencies.
-
-For more details see the section [Using Shadow to Package Gradle Plugins](../plugins/README.md)

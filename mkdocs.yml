@@ -57,8 +57,7 @@ markdown_extensions:
   - md_in_html
 
 nav:
-  - 'Home': README.md
-  - 'Introduction': introduction/README.md
+  - 'Introduction': README.md
   - 'Getting Started': getting-started/README.md
   - 'Configuration':
       - 'Overview': configuration/README.md
@@ -74,7 +73,7 @@ nav:
   - 'Groovy and Scala Plugins': groovy-and-scala-plugins/README.md
   - 'Publishing': publishing/README.md
   - 'Multi-Project': multi-project/README.md
-  - 'Plugins': plugins/README.md
+  - 'Gradle Plugins': gradle-plugins/README.md
   - 'Changes': changes/README.md
   - 'API': api/index.html
   - 'About': about/README.md
