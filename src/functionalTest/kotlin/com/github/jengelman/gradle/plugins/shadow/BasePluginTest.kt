@@ -223,6 +223,7 @@ abstract class BasePluginTest {
         val imports = if (withImports) "import junit.framework.Test;" else ""
         val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
         """
+          @file:JvmName("$className")
           package $packageName
           $imports
           fun main(vararg args: String) {
@@ -235,13 +236,13 @@ abstract class BasePluginTest {
       }
     },
   ): String {
+    val basePath = packageName.replace('.', '/') + "/$className"
     if (isJava) {
-      path("src/$sourceSet/java/$packageName/$className.java").writeText(classContent())
+      path("src/$sourceSet/java/$basePath.java").writeText(classContent())
     } else {
-      path("src/$sourceSet/kotlin/$packageName/$className.kt").writeText(classContent())
+      path("src/$sourceSet/kotlin/$basePath.kt").writeText(classContent())
     }
-    val baseClassPath = packageName.replace('.', '/') + "/$className"
-    return if (isJava) "$baseClassPath.class" else "${baseClassPath}Kt.class"
+    return "$basePath.class"
   }
 
   fun writeClientAndServerModules(
