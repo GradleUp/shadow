@@ -19,6 +19,7 @@ so Shadow was published there.
 ## Maintainers
 
 * [John Engelman](https://github.com/johnrengelman)
+* [Goooler](https://github.com/Goooler)
 
 ## Contributors
 
