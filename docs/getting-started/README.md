@@ -116,13 +116,16 @@ Instead, Shadow _reacts_
 This means, that for most users, the `java` or `groovy` plugins must be _explicitly_ applied
 to have the desired effect.
 
-## Default Java/Groovy Tasks
+## Default Java/Kotlin/Groovy Tasks
 
-In the presence of the `java` or `groovy` plugins, Shadow will automatically configure the
-following behavior:
+In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins 
+(that applied [JavaPlugin](https://docs.gradle.org/current/userguide/java_plugin.html) in their build logic), 
+Shadow will automatically configure the following behavior:
 
 * Adds a `shadowJar` task to the project.
 * Adds a `shadow` configuration to the project.
+* Adds a `shadow` variant to the project.
+* Adds a `shadow` component to the project.
 * Configures the `shadowJar` task to include all sources from the project's `main` sourceSet.
 * Configures the `shadowJar` task to bundle all dependencies from the `runtimeClasspath` configuration.
 * Configures the _classifier_ attribute of the `shadowJar` task to be `'all'` .
