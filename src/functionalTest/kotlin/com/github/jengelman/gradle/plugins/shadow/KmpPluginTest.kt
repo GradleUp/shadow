@@ -1,7 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
@@ -21,11 +24,14 @@ class KmpPluginTest : BasePluginTest() {
 
   @Test
   fun compatKmpJvmTarget() {
-    val mainClass = writeClass(sourceSet = "jvmMain", isJava = false)
+    val mainClassName = "my.MainKt"
+    val mainClassPath = writeClass(sourceSet = "jvmMain", isJava = false)
     projectScriptPath.appendText(
       """
         kotlin {
-          jvm()
+          jvm().mainRun {
+            mainClass = '$mainClassName'
+          }
           sourceSets {
             commonMain {
               dependencies {
@@ -46,9 +52,10 @@ class KmpPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        mainClass,
+        mainClassPath,
         *entriesInAB,
       )
+      getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName)
     }
   }
 }
