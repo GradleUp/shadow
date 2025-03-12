@@ -13,6 +13,7 @@ For Groovy:
     }
 
     dependencies {
+      // If you don't want the Groovy standard library to be shadowed, please replace `implementation` with `api`.
       implementation(localGroovy())
     }
 
@@ -33,6 +34,7 @@ For Groovy:
     }
 
     dependencies {
+      // If you don't want the Groovy standard library to be shadowed, please replace `implementation` with `api`.
       implementation localGroovy()
     }
 
@@ -55,6 +57,7 @@ For Scala:
     }
 
     dependencies {
+      // If you don't want the Scala standard library to be shadowed, please replace `implementation` with `api`.
       implementation("org.scala-lang:scala-library:2.13.16")
     }
 
@@ -75,6 +78,7 @@ For Scala:
     }
 
     dependencies {
+      // If you don't want the Scala standard library to be shadowed, please replace `implementation` with `api`.
       implementation 'org.scala-lang:scala-library:2.13.16'
     }
 
