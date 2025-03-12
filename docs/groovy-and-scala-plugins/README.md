@@ -70,7 +70,7 @@ For Scala:
 
     ```groovy
     plugins {
-      id 'groovy'
+      id 'scala'
       id 'com.gradleup.shadow'
     }
 
