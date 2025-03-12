@@ -70,7 +70,7 @@ nav:
       - 'Reproducible Builds': configuration/reproducible-builds/README.md
   - 'Custom Tasks': custom-tasks/README.md
   - 'Application Plugin': application-plugin/README.md
-  - 'KMP Plugin': kmp-plugin/README.md
+  - 'Kotlin Plugins': kotlin-plugins/README.md
   - 'Groovy and Scala Plugins': groovy-and-scala-plugins/README.md
   - 'Publishing': publishing/README.md
   - 'Multi-Project': multi-project/README.md

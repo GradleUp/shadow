@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class KmpPluginTest : BasePluginTest() {
+class KotlinPluginsTest : BasePluginTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
@@ -23,6 +23,28 @@ class KmpPluginTest : BasePluginTest() {
       withVersion = true,
     )
     projectScriptPath.writeText(projectBuildScript)
+  }
+
+  @Test
+  fun compatKotlinJvmPlugin() {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm", withGroup = true, withVersion = true)}
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+      """.trimIndent(),
+    )
+    val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Kotlin)
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        mainClassEntry,
+        *junitEntries,
+      )
+    }
   }
 
   @Test
