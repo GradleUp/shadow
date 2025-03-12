@@ -9,6 +9,8 @@ import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class KmpPluginTest : BasePluginTest() {
   @BeforeEach
@@ -24,14 +26,11 @@ class KmpPluginTest : BasePluginTest() {
 
   @Test
   fun compatKmpJvmTarget() {
-    val mainClassName = "my.MainKt"
     val mainClassEntry = writeClass(sourceSet = "jvmMain", isJava = false)
     projectScriptPath.appendText(
       """
         kotlin {
-          jvm().mainRun {
-            it.mainClass.set('$mainClassName')
-          }
+          jvm()
           sourceSets {
             commonMain {
               dependencies {
@@ -55,7 +54,44 @@ class KmpPluginTest : BasePluginTest() {
         mainClassEntry,
         *entriesInAB,
       )
-      getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName)
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun canSetMainClassAttribute(useShadowAttr: Boolean) {
+    val mainClassEntry = writeClass(sourceSet = "jvmMain", isJava = false)
+    val main2ClassEntry = writeClass(sourceSet = "jvmMain", isJava = false, className = "Main2")
+    val mainClassName = "my.Main"
+    val main2ClassName = "my.Main2"
+    val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
+    projectScriptPath.appendText(
+      """
+        kotlin {
+          jvm().mainRun {
+            it.mainClass.set('$mainClassName')
+          }
+        }
+        $shadowJar {
+          manifest {
+            $mainAttr
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsEntries(
+        mainClassEntry,
+        main2ClassEntry,
+      )
+      if (useShadowAttr) {
+        getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName)
+      } else {
+        getMainAttr("Main-Class").isEqualTo(mainClassName)
+      }
     }
   }
 }

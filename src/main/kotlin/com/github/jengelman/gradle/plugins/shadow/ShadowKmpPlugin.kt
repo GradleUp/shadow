@@ -38,9 +38,9 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       val mainClassName = provider { mainClass }
       task.inputs.property("mainClassName", mainClassName)
       task.doFirst {
-        // Inject the attribute if it is not already present.
-        if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
-          task.manifest.attributes[mainClassAttributeKey] = mainClassName.get().get()
+        val realClass = mainClassName.get().orNull
+        if (!task.manifest.attributes.contains(mainClassAttributeKey) && !realClass.isNullOrEmpty()) {
+          task.manifest.attributes[mainClassAttributeKey] = realClass
         }
       }
     }
