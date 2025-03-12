@@ -9,7 +9,6 @@ kotlin.stdlib.default.dependency=false
 
 See more information about [Dependency on the standard library](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library).
 
-
 ## For Kotlin JVM Plugin
 
 Shadow works well for Kotlin JVM projects like Java projects. Here is an example:
@@ -29,7 +28,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     tasks.shadowJar {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
-        attributes["Main-Class"] = "com.example.Main"
+        attributes["Main-Class"] = "com.example.MainKt"
       }
     }
     ```
@@ -49,7 +48,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
-        attributes 'Main-Class': 'com.example.Main'
+        attributes 'Main-Class': 'com.example.MainKt'
       }
     }
     ```
