@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
+import assertk.assertions.containsOnly
 import assertk.fail
 import java.io.InputStream
 import java.nio.file.Path
@@ -51,3 +52,7 @@ fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = given { actu
     fail("Jar file ${actual.path} contains entry $entry in entries: ${actual.entries().toList()}")
   }
 }
+
+fun Assert<JarPath>.containsFileEntriesOnly(vararg entries: String) = transform { actual ->
+  actual.entries().toList().filter { !it.isDirectory }.map { it.name }
+}.containsOnly(*entries)

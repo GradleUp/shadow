@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsFileEntriesOnly
 import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
@@ -535,14 +536,9 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsFileEntriesOnly(
         "foo/$mainClassEntry",
         "foo/META-INF/MANIFEST.MF",
-      )
-      doesNotContainEntries(
-        "META-INF/MANIFEST.MF",
-        *junitEntries,
-        *junitEntries.map { "foo/$it" }.toTypedArray(),
       )
     }
   }
