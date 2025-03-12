@@ -118,8 +118,8 @@ to have the desired effect.
 
 ## Default Java/Kotlin/Groovy Tasks
 
-In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins 
-(that applied [JavaPlugin](https://docs.gradle.org/current/userguide/java_plugin.html) in their build logic), 
+In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins
+(that apply [JavaPlugin](https://docs.gradle.org/current/userguide/java_plugin.html) in their build logic),
 Shadow will automatically configure the following behavior:
 
 * Adds a `shadowJar` task to the project.
