@@ -116,7 +116,7 @@ class ApplicationPluginTest : BasePluginTest() {
   )
   @Test
   fun canOverrideMainClassAttrInManifestBlock() {
-    val main2Class = writeClass(className = "Main2")
+    val main2ClassEntry = writeClass(className = "Main2")
     prepare(
       projectBlock = """
         shadowJar {
@@ -137,7 +137,7 @@ class ApplicationPluginTest : BasePluginTest() {
     assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
-      entriesContained = entriesInA + arrayOf(mainClass, main2Class),
+      entriesContained = entriesInA + arrayOf(mainClass, main2ClassEntry),
       mainClassAttr = "my.Main2",
     )
 
