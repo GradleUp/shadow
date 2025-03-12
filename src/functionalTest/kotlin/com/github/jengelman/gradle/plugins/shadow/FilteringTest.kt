@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeAll
@@ -35,7 +35,7 @@ class FilteringTest : BasePluginTest() {
   fun includeAllDependencies() {
     run(shadowJarTask)
     assertThat(outputShadowJar).useAll {
-      containsEntries(*entriesInAB)
+      containsAtLeast(*entriesInAB)
     }
   }
 
@@ -52,11 +52,11 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "a.properties",
         "b.properties",
       )
-      doesNotContainEntries(
+      containsNone(
         "a2.properties",
       )
     }
@@ -116,11 +116,11 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "d.properties",
         "my/Passed.class",
       )
-      doesNotContainEntries(
+      containsNone(
         *entriesInAB,
         "c.properties",
       )
@@ -142,11 +142,11 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "server/Server.class",
         *junitEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         "client/Client.class",
       )
     }
@@ -165,11 +165,11 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "server/Server.class",
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries,
       )
     }
@@ -190,11 +190,11 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "a.properties",
         "b.properties",
       )
-      doesNotContainEntries(
+      containsNone(
         "a2.properties",
       )
     }
@@ -237,11 +237,11 @@ class FilteringTest : BasePluginTest() {
 
   private fun commonAssertions() {
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         *entriesInAB,
         "c.properties",
       )
-      doesNotContainEntries(
+      containsNone(
         "d.properties",
       )
     }

@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 import assertk.Assert
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -31,11 +31,11 @@ class FilteringCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         *entriesInAB,
         "d.properties",
       )
-      doesNotContainEntries(
+      containsNone(
         "c.properties",
       )
     }
@@ -54,13 +54,13 @@ class FilteringCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         "a2.properties",
         "b.properties",
         "c.properties",
         "d.properties",
       )
-      doesNotContainEntries(
+      containsNone(
         "a.properties",
       )
     }
@@ -83,7 +83,7 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         *entriesInAB,
         mainClassEntry,
         main2ClassEntry,
@@ -99,11 +99,11 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         main2ClassEntry,
       )
-      doesNotContainEntries(*entriesInAB)
+      containsNone(*entriesInAB)
     }
 
     projectScriptPath.appendText(
@@ -115,10 +115,10 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
       )
-      doesNotContainEntries(
+      containsNone(
         main2ClassEntry,
         "a.properties",
         "a2.properties",
@@ -135,11 +135,11 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         main2ClassEntry,
       )
-      doesNotContainEntries(*entriesInAB)
+      containsNone(*entriesInAB)
     }
   }
 
@@ -155,7 +155,7 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *junitEntries,
       )
@@ -172,10 +172,10 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries,
       )
     }
@@ -199,11 +199,11 @@ class FilteringCachingTest : BaseCachingTest() {
   }
 
   private fun Assert<JarPath>.commonAssertions() {
-    containsEntries(
+    containsAtLeast(
       *entriesInAB,
       "c.properties",
     )
-    doesNotContainEntries(
+    containsNone(
       "d.properties",
     )
   }

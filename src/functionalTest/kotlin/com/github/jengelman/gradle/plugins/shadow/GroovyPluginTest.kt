@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
@@ -35,7 +35,7 @@ class GroovyPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *junitEntries,
       )

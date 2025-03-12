@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
-import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
@@ -41,14 +40,18 @@ fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(en
 
 fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
 
-fun Assert<JarPath>.containsEntries(vararg entries: String) = transform { actual ->
-  actual.entries().toList().map { it.name }
-}.containsAtLeast(*entries)
+fun Assert<JarPath>.containsAtLeast(vararg entries: String) = toEntries().containsAtLeast(*entries)
 
-fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = transform { actual ->
-  actual.entries().toList().map { it.name }
-}.containsNone(*entries)
+fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsNone(*entries)
 
-fun Assert<JarPath>.containsFileEntriesOnly(vararg entries: String) = transform { actual ->
-  actual.entries().toList().filter { !it.isDirectory }.map { it.name }
+fun Assert<JarPath>.containsOnly(
+  vararg entries: String,
+  includeDirs: Boolean = false,
+) = toEntries().transform { actual ->
+  // Jar directories are represented as entries ending with a slash.
+  actual.filter { includeDirs || !it.endsWith('/') }
 }.containsOnly(*entries)
+
+private fun Assert<JarPath>.toEntries() = transform { actual ->
+  actual.entries().toList().map { it.name }
+}

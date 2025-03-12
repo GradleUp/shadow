@@ -2,8 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -21,13 +21,13 @@ class MinimizeTest : BasePluginTest() {
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
-      containsEntries(
+      containsAtLeast(
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
       )
-      doesNotContainEntries(
+      containsNone(
         "junit/framework/Test.class",
         "lib/UnusedLibEntity.class",
       )
@@ -55,14 +55,14 @@ class MinimizeTest : BasePluginTest() {
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
-      containsEntries(
+      containsAtLeast(
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries,
       )
     }
@@ -93,11 +93,11 @@ class MinimizeTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "server/Server.class",
       )
-      doesNotContainEntries(
+      containsNone(
         "junit/framework/Test.class",
       )
     }
@@ -121,11 +121,11 @@ class MinimizeTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "server/Server.class",
         *junitEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         "client/Client.class",
       )
     }
@@ -148,7 +148,7 @@ class MinimizeTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "server/Server.class",
       )
@@ -181,7 +181,7 @@ class MinimizeTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
@@ -197,7 +197,7 @@ class MinimizeTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "server/Server.class",
         *junitEntries,

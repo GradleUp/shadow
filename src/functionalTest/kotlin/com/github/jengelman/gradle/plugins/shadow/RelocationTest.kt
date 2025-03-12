@@ -10,9 +10,9 @@ import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.containsFileEntriesOnly
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -45,11 +45,11 @@ class RelocationTest : BasePluginTest() {
     val result = run(shadowJarTask, "--info")
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *junitEntries.map { "$entryPrefix/$it" }.toTypedArray(),
       )
-      doesNotContainEntries(
+      containsNone(
         "$entryPrefix/$mainClassEntry",
         *junitEntries,
       )
@@ -90,13 +90,13 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries.filter { it !in otherJunitEntries }.toTypedArray(),
         *otherJunitEntries.map { "a/$it" }.toTypedArray(),
         *otherJunitEntries.map { "b/$it" }.toTypedArray(),
@@ -135,13 +135,13 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *otherJunitEntries.map { "a/$it" }.toTypedArray(),
         *otherJunitEntries.map { "b/$it" }.toTypedArray(),
       )
@@ -182,11 +182,11 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "my/MyTest.class",
         *shadowedEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
@@ -257,7 +257,7 @@ class RelocationTest : BasePluginTest() {
     run(":app:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
-      containsEntries(
+      containsAtLeast(
         "TEST",
         "APP-TEST",
         "test.properties",
@@ -265,7 +265,7 @@ class RelocationTest : BasePluginTest() {
         "app/App.class",
         *shadowedEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
@@ -304,12 +304,12 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "bar/Foo.class",
         "bar/foo.properties",
         "bar/dep.properties",
       )
-      doesNotContainEntries(
+      containsNone(
         "foo/Foo.class",
         "foo/foo.properties",
         "foo/dep.properties",
@@ -460,10 +460,10 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "kotlin/kotlin.kotlin_builtins",
       )
-      doesNotContainEntries(
+      containsNone(
         "foo/kotlin/kotlin.kotlin_builtins",
       )
     }
@@ -497,20 +497,20 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       if (exclude) {
-        containsEntries(
+        containsAtLeast(
           "META-INF/MANIFEST.MF",
           *junitEntries,
         )
-        doesNotContainEntries(
+        containsNone(
           "foo/META-INF/MANIFEST.MF",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
       } else {
-        containsEntries(
+        containsAtLeast(
           "foo/META-INF/MANIFEST.MF",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
-        doesNotContainEntries(
+        containsNone(
           "META-INF/MANIFEST.MF",
           *junitEntries,
         )
@@ -536,7 +536,7 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsFileEntriesOnly(
+      containsOnly(
         "foo/$mainClassEntry",
         "foo/META-INF/MANIFEST.MF",
       )

@@ -13,8 +13,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.gavs
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.squareup.moshi.JsonAdapter
@@ -168,7 +168,7 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("my/maven/1.0/maven-1.0-tests.jar")).useAll {
-      containsEntries(*junitEntries)
+      containsAtLeast(*junitEntries)
     }
   }
 
@@ -274,11 +274,11 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar")).useAll {
-      containsEntries(
+      containsAtLeast(
         "aa.properties",
         "aa2.properties",
       )
-      doesNotContainEntries(
+      containsNone(
         *entriesInAB,
         "bb.properties",
       )
@@ -365,10 +365,10 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).useAll {
-      doesNotContainEntries(*entriesInAB)
+      containsNone(*entriesInAB)
     }
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
-      containsEntries(*entriesInAB)
+      containsAtLeast(*entriesInAB)
     }
 
     assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("my:a:1.0", "my:b:1.0"))
@@ -489,8 +489,8 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertShadowJarCommon(jarPath: JarPath) {
     assertThat(jarPath).useAll {
-      containsEntries(*entriesInA)
-      doesNotContainEntries(*entriesInB)
+      containsAtLeast(*entriesInA)
+      containsNone(*entriesInB)
       getMainAttr(classPathAttributeKey).isEqualTo("b-1.0.jar")
     }
   }
