@@ -7,6 +7,8 @@
 
 - Add Kotlin DSL examples in docs. ([#1306](https://github.com/GradleUp/shadow/pull/1306))
 - Support using type-safe dependency accessors in `ShadowJar.dependencies`. ([#1322](https://github.com/GradleUp/shadow/pull/1322))
+- Set `Main-Class` attr from `kotlin.jvm().mainRun.mainClass`. ([#1337](https://github.com/GradleUp/shadow/pull/1337))  
+  This is added from Kotlin 2.1.20, which is still experimental.
 
 **Changed**
 
