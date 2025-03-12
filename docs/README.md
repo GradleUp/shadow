@@ -1,5 +1,5 @@
 <div style="text-align: center;">
-  <img src="images/logo.svg" alt="Shadow Gradle Plugin" style="max-width: 300px; height: auto;">
+  <img src="images/logo.svg" alt="Shadow Gradle Plugin" width="300"/>
   <h1><strong>Shadow Gradle Plugin</strong></h1>
 </div>
 
