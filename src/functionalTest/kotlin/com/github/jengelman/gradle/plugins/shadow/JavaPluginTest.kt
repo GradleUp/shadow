@@ -71,7 +71,7 @@ class JavaPluginTest : BasePluginTest() {
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
-    val mainClass = writeClass(withImports = true)
+    val mainClassEntry = writeClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
@@ -86,7 +86,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        mainClass,
+        mainClassEntry,
         *junitEntries,
       )
     }
@@ -503,7 +503,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun canRegisterCustomShadowJarTask() {
-    val mainClass = writeClass(sourceSet = "test", withImports = true)
+    val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScriptPath.appendText(
       """
@@ -527,7 +527,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
       containsEntries(
-        mainClass,
+        mainClassEntry,
         *junitEntries,
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
@@ -565,7 +565,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun worksWithArchiveFileName() {
-    val mainClass = writeClass()
+    val mainClassEntry = writeClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -581,7 +581,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
       containsEntries(
-        mainClass,
+        mainClassEntry,
         *junitEntries,
       )
     }
@@ -618,7 +618,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun canAddExtraFilesIntoShadowJar() {
-    val mainClass = writeClass()
+    val mainClassEntry = writeClass()
     path("Foo").writeText("Foo")
     projectScriptPath.appendText(
       """
@@ -637,7 +637,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        mainClass,
+        mainClassEntry,
         "META-INF/a-1.0.jar",
         "Bar/Foo",
       )
@@ -656,7 +656,7 @@ class JavaPluginTest : BasePluginTest() {
     }
     assertThat(jarPath(unzipped.name)).useAll {
       containsEntries(*entriesInA)
-      doesNotContainEntries(mainClass)
+      doesNotContainEntries(mainClassEntry)
     }
   }
 
@@ -668,7 +668,7 @@ class JavaPluginTest : BasePluginTest() {
     val fooJar = buildJar("foo.jar") {
       insert("module-info.class", "module myModuleName {}")
     }
-    val mainClass = writeClass()
+    val mainClassEntry = writeClass()
     writeClass(className = "module-info") {
       "module myModuleName {}"
     }
@@ -690,7 +690,7 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        mainClass,
+        mainClassEntry,
         "module-info.class",
       )
       getContent("module-info.class").all {

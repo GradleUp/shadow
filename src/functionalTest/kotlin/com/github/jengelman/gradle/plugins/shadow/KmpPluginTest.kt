@@ -24,13 +24,13 @@ class KmpPluginTest : BasePluginTest() {
 
   @Test
   fun compatKmpJvmTarget() {
-    val mainClassName = "my.MainKt"
+    val mainClassEntry = "my.MainKt"
     val mainClassPath = writeClass(sourceSet = "jvmMain", isJava = false)
     projectScriptPath.appendText(
       """
         kotlin {
           jvm().mainRun {
-            mainClass = '$mainClassName'
+            mainClass = '$mainClassEntry'
           }
           sourceSets {
             commonMain {
@@ -52,7 +52,7 @@ class KmpPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsEntries(
-        mainClassPath,
+        mainClassEntry,
         *entriesInAB,
       )
       getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName)
