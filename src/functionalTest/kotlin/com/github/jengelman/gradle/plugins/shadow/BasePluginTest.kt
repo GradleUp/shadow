@@ -225,8 +225,8 @@ abstract class BasePluginTest {
           """.trimIndent()
         }
         JvmLang.Kotlin -> {
-          val imports = if (withImports) "import junit.framework.Test;" else ""
-          val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
+          val imports = if (withImports) "import junit.framework.Test" else ""
+          val classRef = if (withImports) "\"Refs: \" + Test::class.java.name" else "\"Refs: null\""
           """
             @file:JvmName("$className")
             package $packageName

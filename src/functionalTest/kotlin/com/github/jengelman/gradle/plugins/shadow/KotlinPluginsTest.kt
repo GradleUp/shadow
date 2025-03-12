@@ -35,7 +35,7 @@ class KotlinPluginsTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    val mainClassEntry = writeClass(jvmLang = JvmLang.Kotlin)
+    val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Kotlin)
 
     run(shadowJarTask)
 
