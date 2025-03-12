@@ -137,10 +137,3 @@ following behavior:
     * `META-INF/versions/**/module-info.class`
     * `module-info.class`
 * Creates and registers the `shadow` component in the project (used for integrating with `maven-publish`).
-
-## Shadowing Gradle Plugins
-
-Shadow ships with a companion task that can be used to automatically discover dependency packages and configure 
-them for relocation. This is useful in projects if you want to relocate all dependencies.
-
-For more details see the section [Using Shadow to Package Gradle Plugins](../plugins/README.md)
