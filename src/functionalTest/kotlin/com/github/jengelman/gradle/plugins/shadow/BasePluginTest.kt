@@ -14,6 +14,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
+import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
@@ -202,46 +203,45 @@ abstract class BasePluginTest {
     packageName: String = "my",
     withImports: Boolean = false,
     className: String = "Main",
-    isJava: Boolean = true,
-    classContent: () -> String = {
-      if (isJava) {
-        val imports = if (withImports) "import junit.framework.Test;" else ""
-        val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-        """
-          package $packageName;
-          $imports
-          public class $className {
-            public static void main(String[] args) {
-              if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
-              String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
-              System.out.println(content);
-              System.out.println($classRef);
+    jvmLang: JvmLang = JvmLang.Java,
+    content: () -> String = {
+      when (jvmLang) {
+        JvmLang.Java -> {
+          val imports = if (withImports) "import junit.framework.Test;" else ""
+          val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
+          """
+            package $packageName;
+            $imports
+            public class $className {
+              public static void main(String[] args) {
+                if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
+                String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
+                System.out.println(content);
+                System.out.println($classRef);
+              }
             }
-          }
-        """.trimIndent()
-      } else {
-        val imports = if (withImports) "import junit.framework.Test;" else ""
-        val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
-        """
-          @file:JvmName("$className")
-          package $packageName
-          $imports
-          fun main(vararg args: String) {
-            if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
-            val content ="Hello, World! (%s) from $className".format(*args)
-            println(content)
-            println($classRef)
-          }
-        """.trimIndent()
+          """.trimIndent()
+        }
+        JvmLang.Kotlin -> {
+          val imports = if (withImports) "import junit.framework.Test;" else ""
+          val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
+          """
+            @file:JvmName("$className")
+            package $packageName
+            $imports
+            fun main(vararg args: String) {
+              if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
+              val content ="Hello, World! (%s) from $className".format(*args)
+              println(content)
+              println($classRef)
+            }
+          """.trimIndent()
+        }
       }
     },
   ): String {
     val basePath = packageName.replace('.', '/') + "/$className"
-    if (isJava) {
-      path("src/$sourceSet/java/$basePath.java").writeText(classContent())
-    } else {
-      path("src/$sourceSet/kotlin/$basePath.kt").writeText(classContent())
-    }
+    path("src/$sourceSet/$jvmLang/$basePath.$jvmLang").writeText(content())
     return "$basePath.class"
   }
 

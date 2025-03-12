@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import kotlin.io.path.appendText
@@ -26,7 +27,7 @@ class KmpPluginTest : BasePluginTest() {
 
   @Test
   fun compatKmpJvmTarget() {
-    val mainClassEntry = writeClass(sourceSet = "jvmMain", isJava = false)
+    val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
     projectScriptPath.appendText(
       """
         kotlin {
@@ -60,8 +61,8 @@ class KmpPluginTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun canSetMainClassAttribute(useShadowAttr: Boolean) {
-    val mainClassEntry = writeClass(sourceSet = "jvmMain", isJava = false)
-    val main2ClassEntry = writeClass(sourceSet = "jvmMain", isJava = false, className = "Main2")
+    val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
+    val main2ClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin, className = "Main2")
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
     val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
