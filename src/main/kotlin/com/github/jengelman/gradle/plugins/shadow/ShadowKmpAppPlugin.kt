@@ -6,9 +6,8 @@ import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
-import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
-import org.gradle.api.GradleException
+import kotlin.io.path.Path
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
@@ -18,19 +17,18 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
  *
  * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
  */
-public abstract class ShadowJavaAppPlugin : Plugin<Project> {
+public abstract class ShadowKmpAppPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     project.addRunTask()
     project.addCreateScriptsTask()
-    project.configureDistribution()
-    project.configureShadowJarMainClass()
-    project.configureInstallTask()
+//    project.configureDistribution()
   }
 
   protected open fun Project.addRunTask() {
@@ -38,15 +36,16 @@ public abstract class ShadowJavaAppPlugin : Plugin<Project> {
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
-      val jarFile = tasks.installShadowDist.zip(tasks.shadowJar) { i, s ->
-        i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
-      }
-      task.classpath(jarFile)
-
-      with(applicationExtension) {
-        task.mainModule.set(mainModule)
-        task.mainClass.set(mainClass)
-        task.jvmArguments.convention(provider { applicationDefaultJvmArgs })
+      extensions.getByType(KotlinMultiplatformExtension::class.java).jvm().binaries {
+        executable {
+          task.mainModule.set(mainModule)
+          task.mainClass.set(mainClass)
+          task.jvmArguments.convention(applicationDefaultJvmArgs)
+          val jarFile = executableDir.zip(tasks.shadowJar) { e, s ->
+            Path(e).resolveSibling("lib/${s.archiveFile.get().asFile.name}")
+          }
+          task.classpath(jarFile)
+        }
       }
 
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
@@ -67,45 +66,17 @@ public abstract class ShadowJavaAppPlugin : Plugin<Project> {
 
       task.classpath = files(tasks.shadowJar)
 
-      with(applicationExtension) {
-        task.mainModule.set(mainModule)
-        task.mainClass.set(mainClass)
-        task.conventionMapping.map("applicationName", ::getApplicationName)
-        task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
-        task.conventionMapping.map("executableDir", ::getExecutableDir)
-        task.conventionMapping.map("defaultJvmOpts", ::getApplicationDefaultJvmArgs)
+      extensions.getByType(KotlinMultiplatformExtension::class.java).jvm().binaries {
+        executable {
+          task.mainModule.set(mainModule)
+          task.mainClass.set(mainClass)
+          task.conventionMapping.map("applicationName", ::applicationName)
+          task.conventionMapping.map("executableDir", ::executableDir)
+          task.conventionMapping.map("defaultJvmOpts", ::applicationDefaultJvmArgs)
+        }
       }
 
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
-    }
-  }
-
-  protected open fun Project.configureInstallTask() {
-    tasks.installShadowDist.configure { task ->
-      val applicationName = providers.provider { applicationExtension.applicationName }
-
-      task.doFirst {
-        if (
-          !task.destinationDir.listFiles().isNullOrEmpty() &&
-          (
-            !task.destinationDir.resolve("lib").isDirectory ||
-              !task.destinationDir.resolve("bin").isDirectory
-            )
-        ) {
-          throw GradleException(
-            "The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
-              "If you really want to install to this directory, delete it and run the install task again.\n" +
-              "Alternatively, choose a different installation directory.",
-          )
-        }
-      }
-      task.doLast {
-        task.eachFile {
-          if (it.path == "bin/${applicationName.get()}") {
-            it.permissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
-          }
-        }
-      }
     }
   }
 
@@ -122,19 +93,6 @@ public abstract class ShadowJavaAppPlugin : Plugin<Project> {
           bin.filePermissions { it.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
         distSpec.with(applicationExtension.applicationDistribution)
-      }
-    }
-  }
-
-  protected open fun Project.configureShadowJarMainClass() {
-    val mainClassName = applicationExtension.mainClass
-    tasks.shadowJar.configure { task ->
-      task.inputs.property("mainClassName", mainClassName)
-      task.doFirst {
-        // Inject the attribute if it is not already present.
-        if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
-          task.manifest.attributes[mainClassAttributeKey] = mainClassName.get()
-        }
       }
     }
   }

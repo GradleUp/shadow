@@ -18,16 +18,6 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
             listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName))
           },
         )
-        kmpExtension.jvm().binaries {
-          executable {
-            mainClass
-            mainModule
-            applicationName
-            applicationDefaultJvmArgs
-            executableDir
-            applicationDistribution
-          }
-        }
       }
     }
   }

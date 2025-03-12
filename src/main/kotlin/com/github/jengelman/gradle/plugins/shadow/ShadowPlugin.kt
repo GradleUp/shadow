@@ -20,9 +20,8 @@ public abstract class ShadowPlugin : Plugin<Project> {
         apply(ShadowJavaAppPlugin::class.java)
       }
       withId("org.jetbrains.kotlin.multiplatform") {
-        isKmpApplied = true
         apply(ShadowKmpPlugin::class.java)
-        apply(ShadowJavaAppPlugin::class.java)
+        apply(ShadowKmpAppPlugin::class.java)
       }
 
       // Apply the legacy plugin last.
@@ -34,6 +33,3 @@ public abstract class ShadowPlugin : Plugin<Project> {
     }
   }
 }
-
-internal var isKmpApplied: Boolean = false
-  private set
