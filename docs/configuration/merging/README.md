@@ -390,10 +390,10 @@ override it like:
     }
     ```
 
-Different strategies will lead to different results:
+Different strategies will lead to different results for `foo/bar` files in the JARs to be merged:
 
-- `EXCLUDE`: The first `foo/bar` file will be included in the final JAR.
-- `FAIL`: Fail the build with a `DuplicateFileCopyingException` if there are duplicated `foo/bar` files.
-- `INCLUDE`: The last `foo/bar` file will be included in the final JAR (the default behavior).
-- `INHERIT`: Fail the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
-- `WARN`: The last `foo/bar` file will be included in the final JAR, and a warning message will be logged.
+- `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
+- `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicated `foo/bar` files.
+- `INCLUDE`: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
+- `INHERIT`: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+- `WARN`: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
