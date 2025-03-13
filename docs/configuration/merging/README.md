@@ -369,7 +369,7 @@ which means it honors the `duplicatesStrategy` property as its parent classes do
 - `WARN`: Do not attempt to prevent duplicates, but log a warning message when multiple items are to be created at the same path.
 
 You can see more details about them in 
-[`DuplicatesStrategy`](https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.file/-duplicates-strategy/index.html).
+[`DuplicatesStrategy`](https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html).
 
 `ShadowJar` recognizes `DuplicatesStrategy.INCLUDE` as the default, if you want to change the strategy, you can 
 override it like:
@@ -395,5 +395,5 @@ Different strategies will lead to different results:
 - `EXCLUDE`: The first `foo/bar` file will be included in the final JAR.
 - `FAIL`: Fail the build with a `DuplicateFileCopyingException` if there are duplicated `foo/bar` files.
 - `INCLUDE`: The last `foo/bar` file will be included in the final JAR (the default behavior).
-- `INHERIT`: Fail the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`. See the [DuplicatesStrategy documentation](https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.file/-duplicates-strategy/index.html) for more information.
+- `INHERIT`: Fail the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
 - `WARN`: The last `foo/bar` file will be included in the final JAR, and a warning message will be logged.
