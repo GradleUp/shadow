@@ -356,8 +356,7 @@ It must be added using the [`transform`](https://gradleup.com/shadow/api/shadow/
     }
     ```
 
-## Handing Duplicates Strategy
-
+## Handling Duplicates Strategy
 ShadowJar` is a subclass of 
 [`org.gradle.api.tasks.AbstractCopyTask`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html), 
 which means it honors the `duplicatesStrategy` property as its parent classes do. There are several strategies to handle:
