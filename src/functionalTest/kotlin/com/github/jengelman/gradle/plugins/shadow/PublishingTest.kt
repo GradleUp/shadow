@@ -15,6 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.gavs
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.squareup.moshi.JsonAdapter
@@ -274,13 +275,10 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
         "aa.properties",
         "aa2.properties",
-      )
-      containsNone(
-        *entriesInAB,
-        "bb.properties",
+        MANIFEST_ENTRY,
       )
     }
     assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
@@ -368,7 +366,10 @@ class PublishingTest : BasePluginTest() {
       containsNone(*entriesInAB)
     }
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
-      containsAtLeast(*entriesInAB)
+      containsOnly(
+        *entriesInAB,
+        MANIFEST_ENTRY,
+      )
     }
 
     assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("my:a:1.0", "my:b:1.0"))

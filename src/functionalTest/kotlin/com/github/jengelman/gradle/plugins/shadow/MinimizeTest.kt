@@ -4,6 +4,7 @@ import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -55,15 +56,13 @@ class MinimizeTest : BasePluginTest() {
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
-      )
-      containsNone(
-        *junitEntries,
+        MANIFEST_ENTRY,
       )
     }
   }

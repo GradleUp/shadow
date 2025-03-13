@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -34,8 +34,10 @@ class ShadowJarCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      containsAtLeast(*entriesInA)
-      containsNone(*entriesInB)
+      containsOnly(
+        *entriesInA,
+        MANIFEST_ENTRY,
+      )
     }
   }
 

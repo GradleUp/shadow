@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
+import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
@@ -21,6 +22,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
@@ -100,39 +102,6 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun includeProjectSources() {
-    path("src/main/java/my/Passed.java").writeText(
-      """
-        package my;
-        public class Passed {}
-      """.trimIndent(),
-    )
-
-    projectScriptPath.appendText(
-      """
-        dependencies {
-         implementation 'junit:junit:3.8.2'
-        }
-        $shadowJar {
-          archiveBaseName = 'fat'
-          archiveClassifier = ''
-          archiveVersion = ''
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(jarPath("build/libs/fat.jar")).useAll {
-      containsAtLeast(
-        "my/Passed.class",
-        *junitEntries,
-      )
-      containsNone("/")
-    }
-  }
-
-  @Test
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 
@@ -154,13 +123,9 @@ class JavaPluginTest : BasePluginTest() {
     run(":server:jar")
 
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
         "server/Server.class",
-      )
-      containsNone(
-        "client/Client.class",
-        *junitEntries,
-        "client/junit/framework/Test.class",
+        MANIFEST_ENTRY,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
@@ -258,19 +223,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
-      )
-      containsNone(
-        "META-INF/INDEX.LIST",
-        "META-INF/a.SF",
-        "META-INF/a.DSA",
-        "META-INF/a.RSA",
-        "META-INF/versions/9/module-info.class",
-        "META-INF/versions/16/module-info.class",
-        "module-info.class",
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -289,8 +246,10 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(*entriesInA)
-      containsNone(*entriesInB)
+      containsOnly(
+        *entriesInA,
+        MANIFEST_ENTRY,
+      )
     }
   }
 
@@ -352,8 +311,10 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(*entriesInA)
-      containsNone(*entriesInB)
+      containsOnly(
+        *entriesInA,
+        MANIFEST_ENTRY,
+      )
     }
   }
 
@@ -361,11 +322,11 @@ class JavaPluginTest : BasePluginTest() {
   fun defaultCopyingStrategy() {
     localRepo.module("my", "a", "1.0") {
       buildJar {
-        insert("META-INF/MANIFEST.MF", "MANIFEST A")
+        insert(MANIFEST_ENTRY, "MANIFEST A")
       }
     }.module("my", "b", "1.0") {
       buildJar {
-        insert("META-INF/MANIFEST.MF", "MANIFEST B")
+        insert(MANIFEST_ENTRY, "MANIFEST B")
       }
     }.publish()
 
@@ -493,8 +454,12 @@ class JavaPluginTest : BasePluginTest() {
       // Doesn't contain Gradle classes.
       getMainAttr(classPathAttributeKey).isNull()
 
-      containsAtLeast(*entriesInA)
-      containsNone(*entriesInB)
+      containsOnly(
+        "my/plugin/MyPlugin.class",
+        "META-INF/gradle-plugins/my.plugin.properties",
+        *entriesInA,
+        MANIFEST_ENTRY,
+      )
     }
   }
 
@@ -655,8 +620,7 @@ class JavaPluginTest : BasePluginTest() {
       }
     }
     assertThat(jarPath(unzipped.name)).useAll {
-      containsAtLeast(*entriesInA)
-      containsNone(mainClassEntry)
+      containsOnly(*entriesInA)
     }
   }
 

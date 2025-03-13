@@ -4,7 +4,7 @@ import assertk.Assert
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -31,12 +31,10 @@ class FilteringCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      containsAtLeast(
-        *entriesInAB,
+      containsOnly(
         "d.properties",
-      )
-      containsNone(
-        "c.properties",
+        *entriesInAB,
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -54,14 +52,12 @@ class FilteringCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
         "a2.properties",
         "b.properties",
         "c.properties",
         "d.properties",
-      )
-      containsNone(
-        "a.properties",
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -99,11 +95,11 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
         mainClassEntry,
         main2ClassEntry,
+        MANIFEST_ENTRY,
       )
-      containsNone(*entriesInAB)
     }
 
     projectScriptPath.appendText(
@@ -115,14 +111,9 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
         mainClassEntry,
-      )
-      containsNone(
-        main2ClassEntry,
-        "a.properties",
-        "a2.properties",
-        "b.properties",
+        MANIFEST_ENTRY,
       )
     }
 
@@ -135,11 +126,11 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
         mainClassEntry,
         main2ClassEntry,
+        MANIFEST_ENTRY,
       )
-      containsNone(*entriesInAB)
     }
   }
 
@@ -172,11 +163,9 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
         mainClassEntry,
-      )
-      containsNone(
-        *junitEntries,
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -199,12 +188,10 @@ class FilteringCachingTest : BaseCachingTest() {
   }
 
   private fun Assert<JarPath>.commonAssertions() {
-    containsAtLeast(
-      *entriesInAB,
+    containsOnly(
       "c.properties",
-    )
-    containsNone(
-      "d.properties",
+      *entriesInAB,
+      MANIFEST_ENTRY,
     )
   }
 }

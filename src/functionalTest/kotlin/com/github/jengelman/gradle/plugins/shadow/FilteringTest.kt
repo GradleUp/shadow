@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeAll
@@ -52,12 +53,10 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "a.properties",
         "b.properties",
-      )
-      containsNone(
-        "a2.properties",
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -116,13 +115,10 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "d.properties",
         "my/Passed.class",
-      )
-      containsNone(
-        *entriesInAB,
-        "c.properties",
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -165,12 +161,10 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "client/Client.class",
         "server/Server.class",
-      )
-      containsNone(
-        *junitEntries,
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -190,12 +184,10 @@ class FilteringTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "a.properties",
         "b.properties",
-      )
-      containsNone(
-        "a2.properties",
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -237,12 +229,10 @@ class FilteringTest : BasePluginTest() {
 
   private fun commonAssertions() {
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
-        *entriesInAB,
+      containsOnly(
         "c.properties",
-      )
-      containsNone(
-        "d.properties",
+        *entriesInAB,
+        MANIFEST_ENTRY,
       )
     }
   }

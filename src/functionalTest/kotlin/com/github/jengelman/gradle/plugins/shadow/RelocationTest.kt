@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -304,15 +305,11 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "bar/Foo.class",
         "bar/foo.properties",
         "bar/dep.properties",
-      )
-      containsNone(
-        "foo/Foo.class",
-        "foo/foo.properties",
-        "foo/dep.properties",
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -460,11 +457,9 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "kotlin/kotlin.kotlin_builtins",
-      )
-      containsNone(
-        "foo/kotlin/kotlin.kotlin_builtins",
+        MANIFEST_ENTRY,
       )
     }
   }
@@ -475,7 +470,7 @@ class RelocationTest : BasePluginTest() {
     val relocateConfig = if (exclude) {
       """
         exclude 'junit/**'
-        exclude 'META-INF/MANIFEST.MF'
+        exclude '$MANIFEST_ENTRY'
       """.trimIndent()
     } else {
       ""
@@ -498,21 +493,21 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       if (exclude) {
         containsAtLeast(
-          "META-INF/MANIFEST.MF",
           *junitEntries,
+          MANIFEST_ENTRY,
         )
         containsNone(
-          "foo/META-INF/MANIFEST.MF",
+          "foo/$MANIFEST_ENTRY",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
       } else {
         containsAtLeast(
-          "foo/META-INF/MANIFEST.MF",
+          "foo/$MANIFEST_ENTRY",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
         containsNone(
-          "META-INF/MANIFEST.MF",
           *junitEntries,
+          MANIFEST_ENTRY,
         )
       }
     }
@@ -538,7 +533,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "foo/$mainClassEntry",
-        "foo/META-INF/MANIFEST.MF",
+        "foo/$MANIFEST_ENTRY",
       )
     }
   }

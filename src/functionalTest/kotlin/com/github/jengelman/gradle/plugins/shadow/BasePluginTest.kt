@@ -401,6 +401,8 @@ abstract class BasePluginTest {
       .filterNot { it.name == "junit3.8.2/" || it.name.startsWith("META-INF/") }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
 
+    const val MANIFEST_ENTRY = "META-INF/MANIFEST.MF"
+
     val shadowJar: String = """
       tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
     """.trimIndent()
