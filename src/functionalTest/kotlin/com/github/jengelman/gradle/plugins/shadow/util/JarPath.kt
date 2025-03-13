@@ -1,7 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import assertk.Assert
-import assertk.fail
+import assertk.assertions.containsAtLeast
+import assertk.assertions.containsNone
+import assertk.assertions.containsOnly
 import java.io.InputStream
 import java.nio.file.Path
 import java.util.jar.JarFile
@@ -38,16 +40,18 @@ fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(en
 
 fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
 
-fun Assert<JarPath>.containsEntries(vararg entries: String) = given { actual ->
-  entries.forEach { entry ->
-    actual.getEntry(entry)
-      ?: fail("Jar file ${actual.path} does not contain entry $entry in entries: ${actual.entries().toList()}")
-  }
-}
+fun Assert<JarPath>.containsAtLeast(vararg entries: String) = toEntries().containsAtLeast(*entries)
 
-fun Assert<JarPath>.doesNotContainEntries(vararg entries: String) = given { actual ->
-  entries.forEach { entry ->
-    actual.getEntry(entry) ?: return@forEach
-    fail("Jar file ${actual.path} contains entry $entry in entries: ${actual.entries().toList()}")
-  }
+fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsNone(*entries)
+
+fun Assert<JarPath>.containsOnly(
+  vararg entries: String,
+  includeDirs: Boolean = false,
+) = toEntries().transform { actual ->
+  // Jar directories are represented as entries ending with a slash.
+  actual.filter { includeDirs || !it.endsWith('/') }
+}.containsOnly(*entries)
+
+private fun Assert<JarPath>.toEntries() = transform { actual ->
+  actual.entries().toList().map { it.name }
 }

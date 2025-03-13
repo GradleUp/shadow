@@ -10,8 +10,9 @@ import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -40,17 +41,28 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
+    val shadowedEntries = buildSet {
+      addAll(
+        junitEntries.map { "$entryPrefix/$it" }
+          .filterNot { it.startsWith("$entryPrefix/META-INF/") },
+      )
+      var parent = entryPrefix
+      while (parent.isNotEmpty()) {
+        add("$parent/")
+        parent = parent.substringBeforeLast('/', "")
+      }
+    }.toTypedArray()
 
     val result = run(shadowJarTask, "--info")
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsOnly(
+        "my/",
         mainClassEntry,
-        *junitEntries.map { "$entryPrefix/$it" }.toTypedArray(),
-      )
-      doesNotContainEntries(
-        "$entryPrefix/$mainClassEntry",
-        *junitEntries,
+        *shadowedEntries,
+        "META-INF/",
+        manifestEntry,
+        includeDirs = true,
       )
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
@@ -89,13 +101,13 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries.filter { it !in otherJunitEntries }.toTypedArray(),
         *otherJunitEntries.map { "a/$it" }.toTypedArray(),
         *otherJunitEntries.map { "b/$it" }.toTypedArray(),
@@ -134,13 +146,13 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *otherJunitEntries.map { "a/$it" }.toTypedArray(),
         *otherJunitEntries.map { "b/$it" }.toTypedArray(),
       )
@@ -181,11 +193,11 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "my/MyTest.class",
         *shadowedEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
@@ -256,7 +268,7 @@ class RelocationTest : BasePluginTest() {
     run(":app:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
-      containsEntries(
+      containsAtLeast(
         "TEST",
         "APP-TEST",
         "test.properties",
@@ -264,7 +276,7 @@ class RelocationTest : BasePluginTest() {
         "app/App.class",
         *shadowedEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
@@ -303,15 +315,11 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsOnly(
         "bar/Foo.class",
         "bar/foo.properties",
         "bar/dep.properties",
-      )
-      doesNotContainEntries(
-        "foo/Foo.class",
-        "foo/foo.properties",
-        "foo/dep.properties",
+        manifestEntry,
       )
     }
   }
@@ -459,11 +467,9 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsOnly(
         "kotlin/kotlin.kotlin_builtins",
-      )
-      doesNotContainEntries(
-        "foo/kotlin/kotlin.kotlin_builtins",
+        manifestEntry,
       )
     }
   }
@@ -474,7 +480,7 @@ class RelocationTest : BasePluginTest() {
     val relocateConfig = if (exclude) {
       """
         exclude 'junit/**'
-        exclude 'META-INF/MANIFEST.MF'
+        exclude '$manifestEntry'
       """.trimIndent()
     } else {
       ""
@@ -496,22 +502,22 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       if (exclude) {
-        containsEntries(
-          "META-INF/MANIFEST.MF",
+        containsAtLeast(
           *junitEntries,
+          manifestEntry,
         )
-        doesNotContainEntries(
-          "foo/META-INF/MANIFEST.MF",
+        containsNone(
+          "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
       } else {
-        containsEntries(
-          "foo/META-INF/MANIFEST.MF",
+        containsAtLeast(
+          "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
-        doesNotContainEntries(
-          "META-INF/MANIFEST.MF",
+        containsNone(
           *junitEntries,
+          manifestEntry,
         )
       }
     }
@@ -535,14 +541,9 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsOnly(
         "foo/$mainClassEntry",
-        "foo/META-INF/MANIFEST.MF",
-      )
-      doesNotContainEntries(
-        "META-INF/MANIFEST.MF",
-        *junitEntries,
-        *junitEntries.map { "foo/$it" }.toTypedArray(),
+        "foo/$manifestEntry",
       )
     }
   }

@@ -386,6 +386,7 @@ abstract class BasePluginTest {
       }
     }
 
+  @Suppress("ConstPropertyName")
   companion object {
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
@@ -398,14 +399,15 @@ abstract class BasePluginTest {
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
     val junitRawEntries: List<JarEntry> = JarPath(junitJar)
       .use { it.entries().toList() }
-      .filterNot { it.name == "junit3.8.2/" || it.name.startsWith("META-INF/") }
+      .filterNot {
+        // This entry is not present in the jar file.
+        it.name == "junit3.8.2/"
+      }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
+    const val manifestEntry = "META-INF/MANIFEST.MF"
 
-    val shadowJar: String = """
-      tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
-    """.trimIndent()
-
-    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)".trim()
+    val shadowJar: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
+    const val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
 
     val commonArguments = listOf(
       "--warning-mode=fail",

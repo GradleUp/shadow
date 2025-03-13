@@ -12,7 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
@@ -251,7 +251,7 @@ class ApplicationPluginTest : BasePluginTest() {
     classPathAttr: String? = null,
   ) {
     assertThat(jarPath).useAll {
-      containsEntries(*entriesContained)
+      containsAtLeast(*entriesContained)
       getMainAttr(mainClassAttributeKey).isEqualTo(mainClassAttr)
       getMainAttr(classPathAttributeKey).isEqualTo(classPathAttr)
     }

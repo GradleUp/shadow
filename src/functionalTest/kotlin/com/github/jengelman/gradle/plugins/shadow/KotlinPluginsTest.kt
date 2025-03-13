@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -40,7 +40,7 @@ class KotlinPluginsTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *junitEntries,
       )
@@ -73,7 +73,7 @@ class KotlinPluginsTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         *entriesInAB,
       )
@@ -106,7 +106,7 @@ class KotlinPluginsTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         mainClassEntry,
         main2ClassEntry,
       )
