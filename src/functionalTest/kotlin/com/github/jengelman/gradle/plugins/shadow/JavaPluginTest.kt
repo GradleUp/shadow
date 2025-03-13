@@ -4,7 +4,6 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
-import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
@@ -125,7 +124,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
       containsOnly(
         "server/Server.class",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
@@ -227,7 +226,7 @@ class JavaPluginTest : BasePluginTest() {
         "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -248,7 +247,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -313,7 +312,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -322,11 +321,11 @@ class JavaPluginTest : BasePluginTest() {
   fun defaultCopyingStrategy() {
     localRepo.module("my", "a", "1.0") {
       buildJar {
-        insert(MANIFEST_ENTRY, "MANIFEST A")
+        insert(manifestEntry, "MANIFEST A")
       }
     }.module("my", "b", "1.0") {
       buildJar {
-        insert(MANIFEST_ENTRY, "MANIFEST B")
+        insert(manifestEntry, "MANIFEST B")
       }
     }.publish()
 
@@ -458,7 +457,7 @@ class JavaPluginTest : BasePluginTest() {
         "my/plugin/MyPlugin.class",
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -601,15 +600,15 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
-        "META-INF/a-1.0.jar",
+        "Bar/",
         "Bar/Foo",
-      )
-      containsNone(
-        *entriesInA,
-        "Foo",
-        "Foo/",
+        "META-INF/",
+        "META-INF/a-1.0.jar",
+        manifestEntry,
+        includeDirs = true,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }

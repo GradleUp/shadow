@@ -1,9 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isGreaterThanOrEqualTo
+import assertk.assertions.isIn
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
@@ -61,7 +65,7 @@ class RelocationTest : BasePluginTest() {
         mainClassEntry,
         *shadowedEntries,
         "META-INF/",
-        MANIFEST_ENTRY,
+        manifestEntry,
         includeDirs = true,
       )
     }
@@ -319,7 +323,7 @@ class RelocationTest : BasePluginTest() {
         "bar/Foo.class",
         "bar/foo.properties",
         "bar/dep.properties",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -392,22 +396,16 @@ class RelocationTest : BasePluginTest() {
       if (preserveFileTimestamps) {
         relocatedClasses.forEach { entry ->
           // Relocated files should preserve the last modified time of the original files.
-          if (entry.time !in junitEntryTimeRange) {
-            fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
-          }
+          assertThat(entry.time).isIn(junitEntryTimeRange)
         }
         (relocatedDirs + otherEntries).forEach { entry ->
           // Relocated directories and other entries are newly created, so they should be in now time.
-          if (entry.time < currentTimeMillis) {
-            fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
-          }
+          assertThat(entry.time).isGreaterThanOrEqualTo(currentTimeMillis)
         }
       } else {
         (relocatedEntries + otherEntries).forEach { entry ->
           // All entries should be newly modified, that default to CONSTANT_TIME_FOR_ZIP_ENTRIES.
-          if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
-            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
-          }
+          assertThat(entry.time).isEqualTo(CONSTANT_TIME_FOR_ZIP_ENTRIES)
         }
       }
     } else {
@@ -420,22 +418,19 @@ class RelocationTest : BasePluginTest() {
       if (preserveFileTimestamps) {
         shadowedEntries.forEach { entry ->
           // Shadowed entries should preserve the last modified time of the original entries.
-          if (entry.time !in junitEntryTimeRange) {
-            fail("Shadowed entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          assertThat(entry.time).all {
           }
+        }
+        assertThat(shadowedEntries).all {
         }
         otherEntries.forEach { entry ->
           // Other entries are newly created, so they should be in now time.
-          if (entry.time < currentTimeMillis) {
-            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
-          }
+          assertThat(entry.time).isGreaterThanOrEqualTo(currentTimeMillis)
         }
       } else {
         (shadowedEntries + otherEntries).forEach { entry ->
           // All entries should be newly modified, defaults to CONSTANT_TIME_FOR_ZIP_ENTRIES.
-          if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
-            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
-          }
+          assertThat(entry.time).isEqualTo(CONSTANT_TIME_FOR_ZIP_ENTRIES)
         }
       }
     }
@@ -469,7 +464,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "kotlin/kotlin.kotlin_builtins",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -480,7 +475,7 @@ class RelocationTest : BasePluginTest() {
     val relocateConfig = if (exclude) {
       """
         exclude 'junit/**'
-        exclude '$MANIFEST_ENTRY'
+        exclude '$manifestEntry'
       """.trimIndent()
     } else {
       ""
@@ -504,20 +499,20 @@ class RelocationTest : BasePluginTest() {
       if (exclude) {
         containsAtLeast(
           *junitEntries,
-          MANIFEST_ENTRY,
+          manifestEntry,
         )
         containsNone(
-          "foo/$MANIFEST_ENTRY",
+          "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
       } else {
         containsAtLeast(
-          "foo/$MANIFEST_ENTRY",
+          "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
         containsNone(
           *junitEntries,
-          MANIFEST_ENTRY,
+          manifestEntry,
         )
       }
     }
@@ -543,7 +538,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "foo/$mainClassEntry",
-        "foo/$MANIFEST_ENTRY",
+        "foo/$manifestEntry",
       )
     }
   }

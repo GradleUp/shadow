@@ -386,6 +386,7 @@ abstract class BasePluginTest {
       }
     }
 
+  @Suppress("ConstPropertyName")
   companion object {
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
@@ -403,14 +404,10 @@ abstract class BasePluginTest {
         it.name == "junit3.8.2/"
       }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
+    const val manifestEntry = "META-INF/MANIFEST.MF"
 
-    const val MANIFEST_ENTRY = "META-INF/MANIFEST.MF"
-
-    val shadowJar: String = """
-      tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})
-    """.trimIndent()
-
-    val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)".trim()
+    val shadowJar: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
+    const val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
 
     val commonArguments = listOf(
       "--warning-mode=fail",

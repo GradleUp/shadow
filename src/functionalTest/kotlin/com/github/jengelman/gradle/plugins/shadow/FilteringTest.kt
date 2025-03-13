@@ -56,7 +56,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "a.properties",
         "b.properties",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -118,7 +118,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "d.properties",
         "my/Passed.class",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -164,7 +164,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "client/Client.class",
         "server/Server.class",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -187,7 +187,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "a.properties",
         "b.properties",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
@@ -232,7 +232,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "c.properties",
         *entriesInAB,
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }

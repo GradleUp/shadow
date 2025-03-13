@@ -62,7 +62,7 @@ class MinimizeTest : BasePluginTest() {
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
-        MANIFEST_ENTRY,
+        manifestEntry,
       )
     }
   }
