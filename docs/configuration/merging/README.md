@@ -358,7 +358,7 @@ It must be added using the [`transform`](https://gradleup.com/shadow/api/shadow/
 
 ## Handing Duplicates Strategy
 
-`ShaoowJar` is a subclass of 
+ShadowJar` is a subclass of 
 [`org.gradle.api.tasks.AbstractCopyTask`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html), 
 which means it honors the `duplicatesStrategy` property as its parent classes do. There are several strategies to handle:
 
@@ -395,5 +395,5 @@ Different strategies will lead to different results:
 - `EXCLUDE`: The first `foo/bar` file will be included in the final JAR.
 - `FAIL`: Fail the build with a `DuplicateFileCopyingException` if there are duplicated `foo/bar` files.
 - `INCLUDE`: The last `foo/bar` file will be included in the final JAR (the default behavior).
-- `INHERIT`: Fail the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+- `INHERIT`: Fail the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`. See the [DuplicatesStrategy documentation](https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.file/-duplicates-strategy/index.html) for more information.
 - `WARN`: The last `foo/bar` file will be included in the final JAR, and a warning message will be logged.
