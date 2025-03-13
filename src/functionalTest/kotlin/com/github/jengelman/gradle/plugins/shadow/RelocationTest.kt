@@ -1,13 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import assertk.all
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
-import assertk.assertions.isGreaterThanOrEqualTo
-import assertk.assertions.isIn
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
@@ -396,16 +392,22 @@ class RelocationTest : BasePluginTest() {
       if (preserveFileTimestamps) {
         relocatedClasses.forEach { entry ->
           // Relocated files should preserve the last modified time of the original files.
-          assertThat(entry.time).isIn(junitEntryTimeRange)
+          if (entry.time !in junitEntryTimeRange) {
+            fail("Relocated file ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
         }
         (relocatedDirs + otherEntries).forEach { entry ->
           // Relocated directories and other entries are newly created, so they should be in now time.
-          assertThat(entry.time).isGreaterThanOrEqualTo(currentTimeMillis)
+          if (entry.time < currentTimeMillis) {
+            fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
         }
       } else {
         (relocatedEntries + otherEntries).forEach { entry ->
           // All entries should be newly modified, that default to CONSTANT_TIME_FOR_ZIP_ENTRIES.
-          assertThat(entry.time).isEqualTo(CONSTANT_TIME_FOR_ZIP_ENTRIES)
+          if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
         }
       }
     } else {
@@ -418,19 +420,22 @@ class RelocationTest : BasePluginTest() {
       if (preserveFileTimestamps) {
         shadowedEntries.forEach { entry ->
           // Shadowed entries should preserve the last modified time of the original entries.
-          assertThat(entry.time).all {
+          if (entry.time !in junitEntryTimeRange) {
+            fail("Shadowed entry ${entry.name} has an invalid last modified time: ${entry.time}")
           }
-        }
-        assertThat(shadowedEntries).all {
         }
         otherEntries.forEach { entry ->
           // Other entries are newly created, so they should be in now time.
-          assertThat(entry.time).isGreaterThanOrEqualTo(currentTimeMillis)
+          if (entry.time < currentTimeMillis) {
+            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
         }
       } else {
         (shadowedEntries + otherEntries).forEach { entry ->
           // All entries should be newly modified, defaults to CONSTANT_TIME_FOR_ZIP_ENTRIES.
-          assertThat(entry.time).isEqualTo(CONSTANT_TIME_FOR_ZIP_ENTRIES)
+          if (entry.time != CONSTANT_TIME_FOR_ZIP_ENTRIES) {
+            fail("Entry ${entry.name} has an invalid last modified time: ${entry.time}")
+          }
         }
       }
     }
