@@ -355,3 +355,45 @@ It must be added using the [`transform`](https://gradleup.com/shadow/api/shadow/
       }
     }
     ```
+
+## Handling Duplicates Strategy
+
+`ShadowJar` is a subclass of 
+[`org.gradle.api.tasks.AbstractCopyTask`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html), 
+which means it honors the `duplicatesStrategy` property as its parent classes do. There are several strategies to handle:
+
+- `EXCLUDE`: Do not allow duplicates by ignoring subsequent items to be created at the same path.
+- `FAIL`: Throw a `DuplicateFileCopyingException` when subsequent items are to be created at the same path.
+- `INCLUDE`: Do not attempt to prevent duplicates.
+- `INHERIT`: Uses the same strategy as the parent copy specification.
+- `WARN`: Do not attempt to prevent duplicates, but log a warning message when multiple items are to be created at the same path.
+
+You can see more details about them in 
+[`DuplicatesStrategy`](https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html).
+
+`ShadowJar` recognizes `DuplicatesStrategy.INCLUDE` as the default, if you want to change the strategy, you can 
+override it like:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or something else.
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or something else.
+    }
+    ```
+
+Different strategies will lead to different results for `foo/bar` files in the JARs to be merged:
+
+- `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
+- `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicated `foo/bar` files.
+- `INCLUDE`: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
+- `INHERIT`: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+- `WARN`: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
