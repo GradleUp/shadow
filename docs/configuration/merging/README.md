@@ -1,11 +1,11 @@
 # Controlling JAR Content Merging
 
 Shadow allows for customizing the process by which the output JAR is generated through the
-[`Transformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-transformer/index.html) interface.
+[`ResourceTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html) interface.
 This is a concept that has been carried over from the original Maven Shade implementation.
-A [`Transformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-transformer/index.html) is invoked for each 
+A [`ResourceTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html) is invoked for each 
 entry in the JAR before being written to the final output JAR.
-This allows a [`Transformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-transformer/index.html) to 
+This allows a [`ResourceTransformer`](https://gradleup.com/shadow/api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html) to 
 determine if it should process a particular entry and apply any modifications before writing the stream to the output.
 
 === "Kotlin"
@@ -48,7 +48,7 @@ determine if it should process a particular entry and apply any modifications be
     }
     ```
 
-Additionally, a `Transformer` can accept a `Closure` to configure the provided `Transformer`.
+Additionally, a `ResourceTransformer` can accept a `Closure` to configure the provided `ResourceTransformer`.
 
 === "Kotlin"
 
@@ -95,7 +95,7 @@ Additionally, a `Transformer` can accept a `Closure` to configure the provided `
     }
     ```
 
-An instantiated instance of a `Transformer` can also be provided.
+An instantiated instance of a `ResourceTransformer` can also be provided.
 
 === "Kotlin"
 
@@ -254,7 +254,7 @@ method to add this transformer.
 
 ## Merging Log4j2 Plugin Cache Files (`Log4j2Plugins.dat`)
 
-`Log4j2PluginsCacheFileTransformer` is a `Transformer` that merges `META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat` plugin caches from all the jars
+`Log4j2PluginsCacheFileTransformer` is a `ResourceTransformer` that merges `META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat` plugin caches from all the jars
 containing Log4j 2.x Core components. It's a Gradle equivalent of [Log4j Plugin Descriptor Transformer](https://logging.apache.org/log4j/transform/log4j-transform-maven-shade-plugin-extensions.html#log4j-plugin-cache-transformer).
 
 === "Kotlin"
