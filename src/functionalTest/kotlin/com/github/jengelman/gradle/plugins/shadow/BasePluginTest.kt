@@ -398,7 +398,10 @@ abstract class BasePluginTest {
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
     val junitRawEntries: List<JarEntry> = JarPath(junitJar)
       .use { it.entries().toList() }
-      .filterNot { it.name == "junit3.8.2/" || it.name.startsWith("META-INF/") }
+      .filterNot {
+        // This entry is not present in the jar file.
+        it.name == "junit3.8.2/"
+      }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
 
     const val MANIFEST_ENTRY = "META-INF/MANIFEST.MF"

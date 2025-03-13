@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -42,17 +41,28 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
+    val shadowedEntries = buildSet {
+      addAll(
+        junitEntries.map { "$entryPrefix/$it" }
+          .filterNot { it.startsWith("$entryPrefix/META-INF/") },
+      )
+      var parent = entryPrefix
+      while (parent.isNotEmpty()) {
+        add("$parent/")
+        parent = parent.substringBeforeLast('/', "")
+      }
+    }.toTypedArray()
 
     val result = run(shadowJarTask, "--info")
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
-        *junitEntries.map { "$entryPrefix/$it" }.toTypedArray(),
-      )
-      containsNone(
-        "$entryPrefix/$mainClassEntry",
-        *junitEntries,
+        *shadowedEntries,
+        "META-INF/",
+        MANIFEST_ENTRY,
+        includeDirs = true,
       )
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
