@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ class MinimizationCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         "server/Server.class",
         "client/Client.class",
         *junitEntries,
@@ -40,11 +40,11 @@ class MinimizationCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         "server/Server.class",
         *junitEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         "client/Client.class",
       )
     }

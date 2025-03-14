@@ -28,7 +28,7 @@ theme:
         name: Switch to light mode
   font:
     text: 'Lato'
-    code: 'Fira Code'
+    code: 'JetBrains Mono'
   features:
     - content.code.copy
     - content.code.select
@@ -57,8 +57,7 @@ markdown_extensions:
   - md_in_html
 
 nav:
-  - 'Home': README.md
-  - 'Introduction': introduction/README.md
+  - 'Introduction': README.md
   - 'Getting Started': getting-started/README.md
   - 'Configuration':
       - 'Overview': configuration/README.md
@@ -70,10 +69,11 @@ nav:
       - 'Reproducible Builds': configuration/reproducible-builds/README.md
   - 'Custom Tasks': custom-tasks/README.md
   - 'Application Plugin': application-plugin/README.md
-  - 'KMP Plugin': kmp-plugin/README.md
+  - 'Kotlin Plugins': kotlin-plugins/README.md
+  - 'Groovy and Scala Plugins': groovy-and-scala-plugins/README.md
   - 'Publishing': publishing/README.md
   - 'Multi-Project': multi-project/README.md
-  - 'Plugins': plugins/README.md
+  - 'Gradle Plugins': gradle-plugins/README.md
   - 'Changes': changes/README.md
   - 'API': api/index.html
   - 'About': about/README.md

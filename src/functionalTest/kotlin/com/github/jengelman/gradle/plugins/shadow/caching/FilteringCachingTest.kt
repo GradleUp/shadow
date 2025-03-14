@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 import assertk.Assert
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -31,12 +31,10 @@ class FilteringCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      containsEntries(
-        *entriesInAB,
+      containsOnly(
         "d.properties",
-      )
-      doesNotContainEntries(
-        "c.properties",
+        *entriesInAB,
+        manifestEntry,
       )
     }
   }
@@ -54,14 +52,12 @@ class FilteringCachingTest : BaseCachingTest() {
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
-      containsEntries(
+      containsOnly(
         "a2.properties",
         "b.properties",
         "c.properties",
         "d.properties",
-      )
-      doesNotContainEntries(
-        "a.properties",
+        manifestEntry,
       )
     }
   }
@@ -71,8 +67,8 @@ class FilteringCachingTest : BaseCachingTest() {
   )
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
-    val mainClass = writeClass(className = "Main")
-    val main2Class = writeClass(className = "Main2")
+    val mainClassEntry = writeClass(className = "Main")
+    val main2ClassEntry = writeClass(className = "Main2")
     projectScriptPath.appendText(
       """
         dependencies {
@@ -83,10 +79,10 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
+      containsAtLeast(
         *entriesInAB,
-        mainClass,
-        main2Class,
+        mainClassEntry,
+        main2ClassEntry,
       )
     }
 
@@ -99,53 +95,48 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-        main2Class,
-      )
-      doesNotContainEntries(*entriesInAB)
-    }
-
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          include '$mainClass'
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-      )
-      doesNotContainEntries(
-        main2Class,
-        "a.properties",
-        "a2.properties",
-        "b.properties",
+      containsOnly(
+        mainClassEntry,
+        main2ClassEntry,
+        manifestEntry,
       )
     }
 
     projectScriptPath.appendText(
       """
         $shadowJar {
-          include '$main2Class'
+          include '$mainClassEntry'
         }
       """.trimIndent() + System.lineSeparator(),
     )
 
     assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-        main2Class,
+      containsOnly(
+        mainClassEntry,
+        manifestEntry,
       )
-      doesNotContainEntries(*entriesInAB)
+    }
+
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          include '$main2ClassEntry'
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    assertCompositeExecutions {
+      containsOnly(
+        mainClassEntry,
+        main2ClassEntry,
+        manifestEntry,
+      )
     }
   }
 
   @Test
   fun shadowJarIsCachedCorrectlyWhenUsingDependencyIncludesExcludes() {
-    val mainClass = writeClass(withImports = true)
+    val mainClassEntry = writeClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
@@ -155,8 +146,8 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
-        mainClass,
+      containsAtLeast(
+        mainClassEntry,
         *junitEntries,
       )
     }
@@ -172,11 +163,9 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsEntries(
-        mainClass,
-      )
-      doesNotContainEntries(
-        *junitEntries,
+      containsOnly(
+        mainClassEntry,
+        manifestEntry,
       )
     }
   }
@@ -199,12 +188,10 @@ class FilteringCachingTest : BaseCachingTest() {
   }
 
   private fun Assert<JarPath>.commonAssertions() {
-    containsEntries(
-      *entriesInAB,
+    containsOnly(
       "c.properties",
-    )
-    doesNotContainEntries(
-      "d.properties",
+      *entriesInAB,
+      manifestEntry,
     )
   }
 }
