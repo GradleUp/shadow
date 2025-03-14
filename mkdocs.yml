@@ -28,7 +28,7 @@ theme:
         name: Switch to light mode
   font:
     text: 'Lato'
-    code: 'Fira Code'
+    code: 'JetBrains Mono'
   features:
     - content.code.copy
     - content.code.select
