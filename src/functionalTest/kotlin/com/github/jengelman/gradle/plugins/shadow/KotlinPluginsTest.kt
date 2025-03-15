@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
@@ -116,5 +117,37 @@ class KotlinPluginsTest : BasePluginTest() {
         getMainAttr("Main-Class").isEqualTo(mainClassName)
       }
     }
+  }
+
+  @Test
+  fun compatKmpApplicationDsl() {
+    writeClass(sourceSet = "jvmMain", withImports = true, jvmLang = JvmLang.Kotlin)
+    projectScriptPath.appendText(
+      """
+        kotlin {
+          jvm {
+            binaries {
+              executable {
+                mainClass.set("my.MainKt")
+              }
+            }
+          }
+          sourceSets {
+            jvmMain {
+              dependencies {
+                implementation 'junit:junit:3.8.2'
+              }
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(runShadowTask)
+
+    assertThat(result.output).contains(
+      "Hello, World! (foo) from Main",
+      "Refs: junit.framework.Test",
+    )
   }
 }
