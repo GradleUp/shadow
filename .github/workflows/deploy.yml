@@ -6,7 +6,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.repository == 'GradleUp/shadow'
+    if: github.event.repository.fork == false
     environment:
       name: github-pages
     permissions:
