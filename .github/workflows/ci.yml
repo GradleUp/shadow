@@ -23,6 +23,7 @@ jobs:
           java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build
+      - run: cd reproduction-gradle-shadow-artifact-transform && ./gradlew build
 
   publish-snapshot:
     needs: build
