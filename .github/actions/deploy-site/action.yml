@@ -4,6 +4,12 @@ description: 'Deploy site to GitHub Pages'
 runs:
   using: 'composite'
   steps:
+    - uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: true
+    - name: Prepare API documentation
+      shell: bash
+      run: ./gradlew dokkaHtml --no-configuration-cache
     - name: Deploy Site
       shell: bash
       run: |
