@@ -420,6 +420,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
     ```
 
 The `ServiceFileTransformer` will not work as expected because the `duplicatesStrategy` will exclude the duplicated 
-service files before, but it might be what you expected for duplicated `foo/bar` files not to be included.  
-Want to keep `ResourceTransformer`s and `duplicatesStrategy` working together? There is a way to do it, leave the 
+service files beforehand. However, this behavior might be what you expected for duplicated `foo/bar` files, preventing 
+them from being included.
+Want `ResourceTransformer`s and `duplicatesStrategy` to work together? There is a way to achieve this, leave the 
 `duplicatesStrategy` as `INCLUDE` and declare a custom `ResourceTransformer` to handle the duplicated files.
