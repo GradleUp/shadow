@@ -397,3 +397,29 @@ Different strategies will lead to different results for `foo/bar` files in the J
 - `INCLUDE`: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
 - `INHERIT`: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
 - `WARN`: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
+
+**NOTE:** The `duplicatesStrategy` takes precedence over transforming and relocating. If you mix the usages of
+`duplicatesStrategy` and `ResourceTransformer` like below:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      mergeServiceFiles()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      mergeServiceFiles()
+    }
+    ```
+
+The `ServiceFileTransformer` will not work as expected because the `duplicatesStrategy` will exclude the duplicated 
+service files before, but it might be what you expected for duplicated `foo/bar` files not to be included.  
+Want to keep `ResourceTransformer`s and `duplicatesStrategy` working together? There is a way to do it, leave the 
+`duplicatesStrategy` as `INCLUDE` and declare a custom `ResourceTransformer` to handle the duplicated files.
