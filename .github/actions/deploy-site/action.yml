@@ -10,12 +10,13 @@ runs:
     - name: Prepare API documentation
       shell: bash
       run: ./gradlew dokkaHtml --no-configuration-cache
-    - name: Deploy Site
+    - name: Build Site
       shell: bash
       run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         # Don't cache it to track updates.
         pip install mkdocs-material
-        # Incremental pushes, make sure gh-pages branch is fetched by checkout.
-        mkdocs gh-deploy
+        mkdocs build
+    - uses: actions/upload-pages-artifact@v3
+      with:
+        path: site
+    - uses: actions/deploy-pages@v4
