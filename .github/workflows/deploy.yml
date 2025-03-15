@@ -14,9 +14,4 @@ jobs:
         with:
           # Fetch all tags and branches, so that MkDocs could push incremental updates.
           fetch-depth: 0
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: true
-      # Prepare API documentations for MkDocs.
-      - run: ./gradlew dokkaHtml --no-configuration-cache
       - uses: ./.github/actions/deploy-site
