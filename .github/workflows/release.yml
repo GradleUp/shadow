@@ -9,8 +9,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: github.repository == 'GradleUp/shadow'
+    environment:
+      name: github-pages
     permissions:
       contents: write
+      id-token: write
+      pages: write
     steps:
       - uses: actions/checkout@v4
         with:
