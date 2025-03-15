@@ -15,7 +15,4 @@ jobs:
       pages: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          # Fetch all tags and branches, so that MkDocs could push incremental updates.
-          fetch-depth: 0
       - uses: ./.github/actions/deploy-site
