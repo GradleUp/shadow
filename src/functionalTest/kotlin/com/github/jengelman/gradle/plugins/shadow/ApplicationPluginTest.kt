@@ -12,7 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
@@ -116,7 +116,7 @@ class ApplicationPluginTest : BasePluginTest() {
   )
   @Test
   fun canOverrideMainClassAttrInManifestBlock() {
-    val main2Class = writeClass(className = "Main2")
+    val main2ClassEntry = writeClass(className = "Main2")
     prepare(
       projectBlock = """
         shadowJar {
@@ -137,7 +137,7 @@ class ApplicationPluginTest : BasePluginTest() {
     assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
-      entriesContained = entriesInA + arrayOf(mainClass, main2Class),
+      entriesContained = entriesInA + arrayOf(mainClass, main2ClassEntry),
       mainClassAttr = "my.Main2",
     )
 
@@ -251,7 +251,7 @@ class ApplicationPluginTest : BasePluginTest() {
     classPathAttr: String? = null,
   ) {
     assertThat(jarPath).useAll {
-      containsEntries(*entriesContained)
+      containsAtLeast(*entriesContained)
       getMainAttr(mainClassAttributeKey).isEqualTo(mainClassAttr)
       getMainAttr(classPathAttributeKey).isEqualTo(classPathAttr)
     }

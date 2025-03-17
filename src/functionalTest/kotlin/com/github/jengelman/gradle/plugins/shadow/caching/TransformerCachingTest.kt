@@ -16,7 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTra
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
@@ -41,7 +41,7 @@ class TransformerCachingTest : BaseCachingTest() {
   fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
     val assertions = {
       assertCompositeExecutions {
-        containsEntries(mainClass)
+        containsAtLeast(mainClass)
       }
     }
 
@@ -68,7 +68,7 @@ class TransformerCachingTest : BaseCachingTest() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     val assertions = { name: String ->
       assertCompositeExecutions {
-        containsEntries(mainClass, "foo/$name.properties")
+        containsAtLeast(mainClass, "foo/$name.properties")
         getContent("foo/$name.properties").isEqualTo("foo=$name")
       }
     }
@@ -98,7 +98,7 @@ class TransformerCachingTest : BaseCachingTest() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     val assertions = { name: String ->
       assertCompositeExecutions {
-        containsEntries(mainClass, "foo/$name.xml")
+        containsAtLeast(mainClass, "foo/$name.xml")
         getContent("foo/$name.xml").contains("<foo>$name</foo>")
       }
     }
@@ -169,7 +169,7 @@ class TransformerCachingTest : BaseCachingTest() {
     }
     val assertions = {
       assertCompositeExecutions {
-        containsEntries(mainClass)
+        containsAtLeast(mainClass)
       }
     }
 

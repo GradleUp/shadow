@@ -127,3 +127,31 @@ In versions before 8.1.0 it was necessary to configure a separate `ConfigureShad
 in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
 Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these 
 dependencies if you do not intend to shadow them into your library.
+
+## Relocating Project Resources Only
+
+If you want to relocate the resources of the project only and exclude all dependencies (related to a normal JAR but with 
+relocating), you can try out the trick like:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      // Empty configurations list will exclude all dependencies.
+      configurations = emptyList()
+      relocate("com.example", "shadow.com.example")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Empty configurations list will exclude all dependencies.
+      configurations = []
+      relocate 'com.example', 'shadow.com.example'
+    }
+    ```
+
+This is useful in some cases like [#759](https://github.com/GradleUp/shadow/issues/759) mentioned. See 
+[Configuring Shadowed Dependencies](../dependencies/README.md) for more information about `configurations`.

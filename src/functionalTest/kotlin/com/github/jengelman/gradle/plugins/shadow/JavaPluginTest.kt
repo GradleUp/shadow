@@ -19,8 +19,9 @@ import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttribute
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.containsEntries
-import com.github.jengelman.gradle.plugins.shadow.util.doesNotContainEntries
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
@@ -71,7 +72,7 @@ class JavaPluginTest : BasePluginTest() {
     disabledReason = "Gradle 8.3 doesn't support Java 21.",
   )
   fun compatibleWithMinGradleVersion() {
-    val mainClass = writeClass(withImports = true)
+    val mainClassEntry = writeClass(withImports = true)
     projectScriptPath.appendText(
       """
         dependencies {
@@ -85,8 +86,8 @@ class JavaPluginTest : BasePluginTest() {
     }
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        mainClass,
+      containsAtLeast(
+        mainClassEntry,
         *junitEntries,
       )
     }
@@ -100,46 +101,13 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun includeProjectSources() {
-    path("src/main/java/my/Passed.java").writeText(
-      """
-        package my;
-        public class Passed {}
-      """.trimIndent(),
-    )
-
-    projectScriptPath.appendText(
-      """
-        dependencies {
-         implementation 'junit:junit:3.8.2'
-        }
-        $shadowJar {
-          archiveBaseName = 'fat'
-          archiveClassifier = ''
-          archiveVersion = ''
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(jarPath("build/libs/fat.jar")).useAll {
-      containsEntries(
-        "my/Passed.class",
-        *junitEntries,
-      )
-      doesNotContainEntries("/")
-    }
-  }
-
-  @Test
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
@@ -154,17 +122,13 @@ class JavaPluginTest : BasePluginTest() {
     run(":server:jar")
 
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
-      containsEntries(
+      containsOnly(
         "server/Server.class",
-      )
-      doesNotContainEntries(
-        "client/Client.class",
-        *junitEntries,
-        "client/junit/framework/Test.class",
+        manifestEntry,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "client/junit/framework/Test.class",
       )
@@ -180,17 +144,17 @@ class JavaPluginTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "server/Server.class",
         *shadowedEntries,
       )
-      doesNotContainEntries(
+      containsNone(
         *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
-      containsEntries(
+      containsAtLeast(
         "client/Client.class",
         "client/junit/framework/Test.class",
       )
@@ -258,19 +222,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsOnly(
         "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
-      )
-      doesNotContainEntries(
-        "META-INF/INDEX.LIST",
-        "META-INF/a.SF",
-        "META-INF/a.DSA",
-        "META-INF/a.RSA",
-        "META-INF/versions/9/module-info.class",
-        "META-INF/versions/16/module-info.class",
-        "module-info.class",
+        manifestEntry,
       )
     }
   }
@@ -289,8 +245,10 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(*entriesInA)
-      doesNotContainEntries(*entriesInB)
+      containsOnly(
+        *entriesInA,
+        manifestEntry,
+      )
     }
   }
 
@@ -329,7 +287,7 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
+      containsAtLeast(
         "api.properties",
         "implementation.properties",
         "runtimeOnly.properties",
@@ -352,8 +310,10 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(*entriesInA)
-      doesNotContainEntries(*entriesInB)
+      containsOnly(
+        *entriesInA,
+        manifestEntry,
+      )
     }
   }
 
@@ -361,11 +321,11 @@ class JavaPluginTest : BasePluginTest() {
   fun defaultCopyingStrategy() {
     localRepo.module("my", "a", "1.0") {
       buildJar {
-        insert("META-INF/MANIFEST.MF", "MANIFEST A")
+        insert(manifestEntry, "MANIFEST A")
       }
     }.module("my", "b", "1.0") {
       buildJar {
-        insert("META-INF/MANIFEST.MF", "MANIFEST B")
+        insert(manifestEntry, "MANIFEST B")
       }
     }.publish()
 
@@ -493,8 +453,12 @@ class JavaPluginTest : BasePluginTest() {
       // Doesn't contain Gradle classes.
       getMainAttr(classPathAttributeKey).isNull()
 
-      containsEntries(*entriesInA)
-      doesNotContainEntries(*entriesInB)
+      containsOnly(
+        "my/plugin/MyPlugin.class",
+        "META-INF/gradle-plugins/my.plugin.properties",
+        *entriesInA,
+        manifestEntry,
+      )
     }
   }
 
@@ -503,7 +467,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun canRegisterCustomShadowJarTask() {
-    val mainClass = writeClass(sourceSet = "test", withImports = true)
+    val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScriptPath.appendText(
       """
@@ -526,8 +490,8 @@ class JavaPluginTest : BasePluginTest() {
     run(testShadowJarTask)
 
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
-      containsEntries(
-        mainClass,
+      containsAtLeast(
+        mainClassEntry,
         *junitEntries,
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
@@ -565,7 +529,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun worksWithArchiveFileName() {
-    val mainClass = writeClass()
+    val mainClassEntry = writeClass()
     projectScriptPath.appendText(
       """
         dependencies {
@@ -580,8 +544,8 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
-      containsEntries(
-        mainClass,
+      containsAtLeast(
+        mainClassEntry,
         *junitEntries,
       )
     }
@@ -618,7 +582,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun canAddExtraFilesIntoShadowJar() {
-    val mainClass = writeClass()
+    val mainClassEntry = writeClass()
     path("Foo").writeText("Foo")
     projectScriptPath.appendText(
       """
@@ -636,15 +600,15 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        mainClass,
-        "META-INF/a-1.0.jar",
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        "Bar/",
         "Bar/Foo",
-      )
-      doesNotContainEntries(
-        *entriesInA,
-        "Foo",
-        "Foo/",
+        "META-INF/",
+        "META-INF/a-1.0.jar",
+        manifestEntry,
+        includeDirs = true,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
@@ -655,8 +619,7 @@ class JavaPluginTest : BasePluginTest() {
       }
     }
     assertThat(jarPath(unzipped.name)).useAll {
-      containsEntries(*entriesInA)
-      doesNotContainEntries(mainClass)
+      containsOnly(*entriesInA)
     }
   }
 
@@ -668,7 +631,7 @@ class JavaPluginTest : BasePluginTest() {
     val fooJar = buildJar("foo.jar") {
       insert("module-info.class", "module myModuleName {}")
     }
-    val mainClass = writeClass()
+    val mainClassEntry = writeClass()
     writeClass(className = "module-info") {
       "module myModuleName {}"
     }
@@ -689,8 +652,8 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsEntries(
-        mainClass,
+      containsAtLeast(
+        mainClassEntry,
         "module-info.class",
       )
       getContent("module-info.class").all {
