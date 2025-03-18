@@ -23,6 +23,8 @@ import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
  *
  * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
+ *
+ * @see [ApplicationPlugin]
  */
 public abstract class ShadowJavaAppPlugin : Plugin<Project> {
   override fun apply(project: Project) {
@@ -38,10 +40,7 @@ public abstract class ShadowJavaAppPlugin : Plugin<Project> {
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
-      val jarFile = tasks.installShadowDist.zip(tasks.shadowJar) { i, s ->
-        i.destinationDir.resolve("lib/${s.archiveFile.get().asFile.name}")
-      }
-      task.classpath(jarFile)
+      task.classpath = files(tasks.shadowJar)
 
       with(applicationExtension) {
         task.mainModule.set(mainModule)

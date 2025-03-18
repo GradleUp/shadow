@@ -43,9 +43,6 @@ class ApplicationPluginTest : BasePluginTest() {
           toolchain.languageVersion = JavaLanguageVersion.of(17)
         }
       """.trimIndent(),
-      applicationBlock = """
-        applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
-      """.trimIndent(),
       settingsBlock = """
         plugins {
           id 'org.gradle.toolchains.foojay-resolver-convention'
@@ -65,6 +62,17 @@ class ApplicationPluginTest : BasePluginTest() {
       "Hello, World! (foo) from Main",
       "Refs: junit.framework.Test",
     )
+  }
+
+  @Test
+  fun installShadowOutputs() {
+    prepare(
+      mainClassWithImports = true,
+      dependenciesBlock = "implementation 'junit:junit:3.8.2'",
+      applicationBlock = "applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']",
+    )
+
+    run(installShadowDistTask)
 
     val installPath = path("build/install/")
     assertThat(installPath.walkEntries()).containsOnly(
@@ -106,7 +114,7 @@ class ApplicationPluginTest : BasePluginTest() {
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 
-    run(SHADOW_INSTALL_TASK_NAME)
+    run(installShadowDistTask)
 
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
@@ -134,9 +142,9 @@ class ApplicationPluginTest : BasePluginTest() {
       }
     }
 
-    assertions(run(runShadowTask).output, "foo")
+    assertions(run(runShadowTask, shadowJarTask).output, "foo")
     commonAssertions(
-      jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"),
+      jarPath("build/libs/myapp-1.0-all.jar"),
       entriesContained = entriesInA + arrayOf(mainClass, main2ClassEntry),
       mainClassAttr = "my.Main2",
     )
