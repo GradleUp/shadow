@@ -7,7 +7,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
-import kotlin.io.path.Path
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
@@ -18,6 +17,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmBinaryDsl
 
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
@@ -26,27 +26,23 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  */
 public abstract class ShadowKmpAppPlugin : Plugin<Project> {
   override fun apply(project: Project) {
-    project.addRunTask()
-    project.addCreateScriptsTask()
+    project.extensions.getByType(KotlinMultiplatformExtension::class.java).jvm().binaries {
+      executable {
+        project.addRunTask(this)
+      }
+    }
 //    project.configureDistribution()
   }
 
-  protected open fun Project.addRunTask() {
+  protected open fun Project.addRunTask(dsl: KotlinJvmBinaryDsl) {
     tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
-      extensions.getByType(KotlinMultiplatformExtension::class.java).jvm().binaries {
-        executable {
-          task.mainModule.set(mainModule)
-          task.mainClass.set(mainClass)
-          task.jvmArguments.convention(applicationDefaultJvmArgs)
-          val jarFile = executableDir.zip(tasks.shadowJar) { e, s ->
-            Path(e).resolveSibling("lib/${s.archiveFile.get().asFile.name}")
-          }
-          task.classpath(jarFile)
-        }
-      }
+      task.mainModule.set(dsl.mainModule)
+      task.mainClass.set(dsl.mainClass)
+      task.jvmArguments.convention(dsl.applicationDefaultJvmArgs)
+      task.classpath(tasks.shadowJar)
 
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
       task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
