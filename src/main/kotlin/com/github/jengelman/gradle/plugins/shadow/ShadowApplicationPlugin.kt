@@ -24,7 +24,7 @@ import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
  *
  * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
  *
- * @see ApplicationPlugin
+ * @see [ApplicationPlugin]
  */
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
   override fun apply(project: Project) {

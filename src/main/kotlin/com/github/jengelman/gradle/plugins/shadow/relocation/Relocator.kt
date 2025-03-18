@@ -29,7 +29,7 @@ public interface Relocator {
  * In other words, it has its appropriate inputs annotated so that Gradle can consider them when
  * determining the cache key.
  *
- * @see CacheableTransformer
+ * @see [CacheableTransformer]
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)

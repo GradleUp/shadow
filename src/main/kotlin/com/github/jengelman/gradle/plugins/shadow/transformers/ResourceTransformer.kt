@@ -64,7 +64,7 @@ public interface ResourceTransformer {
  * In other words, it has its appropriate inputs annotated so that Gradle can consider them when
  * determining the cache key.
  *
- * @see CacheableRelocator
+ * @see [CacheableRelocator]
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
