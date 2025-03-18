@@ -16,6 +16,7 @@
   - `ShadowSpec` no longer extends `CopySpec`.
   - Overload `relocate`, `transform` and things for better usability in Kotlin.
 - **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
+- `runShadow` no longer depends on `installShadowDist`. ([#1353](https://github.com/GradleUp/shadow/pull/1353))
 
 **Fixed**
 

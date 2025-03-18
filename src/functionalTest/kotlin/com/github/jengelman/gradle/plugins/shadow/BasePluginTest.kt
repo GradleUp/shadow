@@ -6,6 +6,7 @@ import assertk.assertThat
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
@@ -56,6 +57,7 @@ abstract class BasePluginTest {
   val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
   val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
   val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
+  val installShadowDistTask = ":$SHADOW_INSTALL_TASK_NAME"
   val shadowDistZipTask = ":shadowDistZip"
 
   val projectScriptPath: Path get() = path("build.gradle")
