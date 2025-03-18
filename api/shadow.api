@@ -67,7 +67,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowKmpAppPlu
 	public static final field SHADOW_SCRIPTS_TASK_NAME Ljava/lang/String;
 	public fun <init> ()V
 	protected fun addCreateScriptsTask (Lorg/gradle/api/Project;)V
-	protected fun addRunTask (Lorg/gradle/api/Project;)V
+	protected fun addRunTask (Lorg/gradle/api/Project;Lorg/jetbrains/kotlin/gradle/targets/jvm/KotlinJvmBinaryDsl;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
 	protected fun configureDistribution (Lorg/gradle/api/Project;)V
