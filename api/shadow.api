@@ -24,7 +24,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugi
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion;
 	public static final field DISTRIBUTION_NAME Ljava/lang/String;
 	public static final field EXTENSION_NAME Ljava/lang/String;
-	public static final field GROUP_NAME Ljava/lang/String;
 	public static final field SHADOW Ljava/lang/String;
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
