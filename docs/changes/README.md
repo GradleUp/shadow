@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
+
 
 ## [v9.0.0-beta11] (2025-03-18)
 
