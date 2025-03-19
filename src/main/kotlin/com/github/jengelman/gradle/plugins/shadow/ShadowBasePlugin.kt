@@ -21,7 +21,6 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
 
   public companion object {
     public const val SHADOW: String = "shadow"
-    public const val GROUP_NAME: String = SHADOW
     public const val EXTENSION_NAME: String = SHADOW
     public const val CONFIGURATION_NAME: String = SHADOW
     public const val COMPONENT_NAME: String = SHADOW
