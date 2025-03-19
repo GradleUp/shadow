@@ -9,7 +9,7 @@ dependencies to merge into the output.
 
     ```kotlin
     val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
-      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      group = LifecycleBasePlugin.BUILD_GROUP
       description = "Create a combined JAR of project and test dependencies"
 
       archiveClassifier = "tests"
@@ -33,7 +33,7 @@ dependencies to merge into the output.
 
     ```groovy
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      group = LifecycleBasePlugin.BUILD_GROUP
       description = 'Create a combined JAR of project and test dependencies'
 
       archiveClassifier = 'tests'

@@ -163,7 +163,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
     }
 
     val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
-      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      group = LifecycleBasePlugin.BUILD_GROUP
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
@@ -196,7 +196,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
     }
 
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      group = com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.GROUP_NAME
+      group = LifecycleBasePlugin.BUILD_GROUP
       description = 'Create a combined JAR of project and test dependencies'
       archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
