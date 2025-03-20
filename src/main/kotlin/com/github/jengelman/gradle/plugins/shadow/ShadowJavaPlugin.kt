@@ -24,6 +24,7 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 public abstract class ShadowJavaPlugin @Inject constructor(
@@ -127,7 +128,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       action: Action<ShadowJar>,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
-        task.group = ShadowBasePlugin.GROUP_NAME
+        task.group = LifecycleBasePlugin.BUILD_GROUP
         task.description = "Create a combined JAR of project and runtime dependencies"
         task.archiveClassifier.set("all")
         task.exclude(

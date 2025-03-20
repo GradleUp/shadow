@@ -3,6 +3,13 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
+
+
+## [v9.0.0-beta11] (2025-03-18)
+
 **Added**
 
 - Add Kotlin DSL examples in docs. ([#1306](https://github.com/GradleUp/shadow/pull/1306))
@@ -609,7 +616,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta10...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta11...HEAD
+[v9.0.0-beta11]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta11
 [v9.0.0-beta10]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10
 [v9.0.0-beta9]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9
 [v9.0.0-beta8]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8
