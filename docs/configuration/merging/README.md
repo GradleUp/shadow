@@ -202,7 +202,7 @@ This directory can be overridden to merge descriptor files in a different locati
     }
     ```
 
-#### Excluding/Including Specific Service Descriptor Files From Merging
+### Excluding/Including Specific Service Descriptor Files From Merging
 
 The [`ServiceFileTransformer`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html) 
 class supports specifying specific files to include or exclude from merging.
