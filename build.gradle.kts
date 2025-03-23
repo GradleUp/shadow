@@ -148,7 +148,7 @@ tasks.pluginUnderTestMetadata {
 }
 
 tasks.validatePlugins {
-  // TODO: https://github.com/gradle/gradle/issues/22879
+  // TODO: https://github.com/gradle/gradle/issues/22600
   enableStricterValidation = true
 }
 
