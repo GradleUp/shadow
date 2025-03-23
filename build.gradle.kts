@@ -147,6 +147,11 @@ tasks.pluginUnderTestMetadata {
   )
 }
 
+tasks.validatePlugins {
+  // TODO: https://github.com/gradle/gradle/issues/22879
+  enableStricterValidation = true
+}
+
 tasks.check {
   dependsOn(tasks.withType<Test>())
 }
