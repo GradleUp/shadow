@@ -14,7 +14,7 @@ dependencies to merge into the output.
 
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
-      configurations = provider { listOf(project.configurations["testRuntimeClasspath"]) }
+      configurations = project.configurations.testRuntimeClasspath.map { listOf(it) }
 
       manifest {
         // Optionally, set the main class for the JAR.
@@ -38,7 +38,7 @@ dependencies to merge into the output.
 
       archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
-      configurations = provider { [project.configurations.testRuntimeClasspath] }
+      configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
 
       manifest {
         // Optionally, set the main class for the JAR.
