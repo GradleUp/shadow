@@ -2,6 +2,7 @@
 
 
 ## [Unreleased]
+[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta11...HEAD
 
 **Changed**
 
@@ -9,6 +10,7 @@
 
 
 ## [v9.0.0-beta11] (2025-03-18)
+[v9.0.0-beta11]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta11
 
 **Added**
 
@@ -35,6 +37,7 @@
 
 
 ## [v9.0.0-beta10] (2025-03-05)
+[v9.0.0-beta10]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10
 
 **Added**
 
@@ -58,6 +61,7 @@
 
 
 ## [v9.0.0-beta9] (2025-02-24)
+[v9.0.0-beta9]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9
 
 **Added**
 
@@ -83,6 +87,7 @@
 
 
 ## [v9.0.0-beta8] (2025-02-08)
+[v9.0.0-beta8]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8
 
 **Added**
 
@@ -101,6 +106,7 @@
 
 
 ## [v9.0.0-beta7] (2025-02-02)
+[v9.0.0-beta7]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7
 
 **Added**
 
@@ -126,6 +132,7 @@
 
 
 ## [v9.0.0-beta6] (2025-01-23)
+[v9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
 
 **Added**
 
@@ -137,6 +144,7 @@
 
 
 ## [v9.0.0-beta5] (2025-01-21)
+[v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
 
 **Added**
 
@@ -157,6 +165,7 @@
 
 
 ## [v9.0.0-beta4] (2024-12-06)
+[v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
 
 **Changed**
 
@@ -169,6 +178,7 @@
 
 
 ## [v9.0.0-beta2] (2024-11-28)
+[v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
 
 **Fixed**
 
@@ -177,6 +187,7 @@
 
 
 ## [v9.0.0-beta1] (2024-11-27)
+[v9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
 
 **Added**
 
@@ -201,6 +212,7 @@
 
 
 ## [v8.3.6] (2025-02-02)
+[v8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
 
 **Added**
 
@@ -208,6 +220,7 @@
 
 
 ## [v8.3.5] (2024-11-03)
+[v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
 
 **Fixed**
 
@@ -216,12 +229,14 @@
 
 
 ## [v8.3.4] (2024-10-29)
+[v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
 
 **Fixed**
 
 - Apply legacy plugin last, and declare capabilities for old plugins, fixes [#964](https://github.com/GradleUp/shadow/issues/964). ([#991](https://github.com/GradleUp/shadow/pull/991))
 
 ## [v8.3.3] (2024-10-02)
+[v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
 
 **Changed**
 
@@ -229,6 +244,7 @@
 
 
 ## [v8.3.2] (2024-09-18)
+[v8.3.2]: https://github.com/GradleUp/shadow/releases/tag/8.3.2
 
 **Added**
 
@@ -245,6 +261,7 @@
 
 
 ## [v8.3.1] (2024-09-10)
+[v8.3.1]: https://github.com/GradleUp/shadow/releases/tag/8.3.1
 
 **Added**
 
@@ -257,8 +274,8 @@
 - Refix excluding Gradle APIs for java-gradle-plugin. ([#948](https://github.com/GradleUp/shadow/pull/948))
 
 
-
 ## [v8.3.0] (2024-08-08)
+[v8.3.0]: https://github.com/GradleUp/shadow/releases/tag/8.3.0
 
 **Changed**
 
@@ -277,12 +294,13 @@
 
 
 ## [v8.1.1] (2023-03-20)
+[v8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
 
 **NOTE: ** As of this version, the Github repository has migrated to the `main` branch as the default branch for releases.
 
-[Release Notes](https://github.com/GradleUp/shadow/releases/tag/8.1.1)
 
 ## [v8.1.0] (2023-02-26)
+[v8.1.0]: https://github.com/GradleUp/shadow/releases/tag/8.1.0
 
 **BREAKING CHANGE:** Due to adoption of the latest version of the `com.gradle.plugin-publish` plugin, the maven GAV coordinates have changed as of this version.
 The correct coordinates now align with the plugin ID itself: `group=com.github.johnrengelman, artifact=shadow, version=<version>`.
@@ -291,12 +309,10 @@ For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct
 **BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle configuration caching. 
 Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task type.
 
-[Release Notes](https://github.com/GradleUp/shadow/releases/tag/8.1.0)
-
 
 ## [v8.0.0] (2023-02-24)
+[v8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
 
-[Release Notes](https://github.com/GradleUp/shadow/releases/tag/8.0.0)
 
 ## v7.1.3 (unreleased)
 
@@ -613,28 +629,3 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - `ShadowJar` now extends `Jar`
 - Removed `signedCompile` and `signedRuntime` configurations in favor of `shadow` configuration
 - Removed `OutputSignedJars` task
-
-
-
-[Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta11...HEAD
-[v9.0.0-beta11]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta11
-[v9.0.0-beta10]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10
-[v9.0.0-beta9]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9
-[v9.0.0-beta8]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8
-[v9.0.0-beta7]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7
-[v9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
-[v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
-[v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
-[v9.0.0-beta3]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta3
-[v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
-[v9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
-[v8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
-[v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
-[v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
-[v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
-[v8.3.2]: https://github.com/GradleUp/shadow/releases/tag/8.3.2
-[v8.3.1]: https://github.com/GradleUp/shadow/releases/tag/8.3.1
-[v8.3.0]: https://github.com/GradleUp/shadow/releases/tag/8.3.0
-[v8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
-[v8.1.0]: https://github.com/GradleUp/shadow/releases/tag/8.1.0
-[v8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
