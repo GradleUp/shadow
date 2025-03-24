@@ -60,7 +60,7 @@ published artifact.
 No other dependencies are automatically configured for inclusion in the POM file.
 For example, excluded dependencies are **not** automatically added to the POM file or
 if the configuration for merging are modified by specifying
-`shadowJar.configurations = [configurations.myconfiguration]`, there is no automatic
+`shadowJar.configurations = [configurations.myConfiguration]`, there is no automatic
 configuration of the POM file.
 
 This automatic configuration occurs _only_ when using the above methods for
