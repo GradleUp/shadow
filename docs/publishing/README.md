@@ -167,7 +167,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
-      configurations = provider { listOf(project.configurations["testRuntimeClasspath"]) }
+      configurations = project.configurations.testRuntimeClasspath.map { listOf(it) }
     }
 
     dependencies {
@@ -200,7 +200,7 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       description = 'Create a combined JAR of project and test dependencies'
       archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
-      configurations = provider { [project.configurations.testRuntimeClasspath] }
+      configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
     }
 
     dependencies {

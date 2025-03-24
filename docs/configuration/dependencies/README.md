@@ -9,7 +9,7 @@ of the [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow
 
     ```kotlin
     tasks.shadowJar {
-      configurations = provider { listOf(project.configurations.runtimeClasspath.get()) }
+      configurations = project.configurations.runtimeClasspath.map { listOf(it) }
     }
     ```
 
@@ -17,7 +17,7 @@ of the [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      configurations = [project.configurations.compileClasspath]
+      configurations = project.configurations.named('runtimeClasspath').map { [it] }
     }
     ```
 
