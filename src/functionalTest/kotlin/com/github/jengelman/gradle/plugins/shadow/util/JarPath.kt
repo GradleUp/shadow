@@ -25,6 +25,8 @@ class JarPath(val path: Path) :
   fun getMainAttr(name: String): String? {
     return manifest.mainAttributes.getValue(name)
   }
+
+  override fun toString(): String = path.toString()
 }
 
 fun ZipFile.getContent(entryName: String): String {
