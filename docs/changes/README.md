@@ -296,7 +296,23 @@
 ## [v8.1.1] (2023-03-20)
 [v8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
 
-**NOTE: ** As of this version, the Github repository has migrated to the `main` branch as the default branch for releases.
+**NOTE:** As of this version, the GitHub repository has migrated to the `main` branch as the default branch for releases.
+
+## What's Changed
+* Replace deprecated ConfigureUtil by [@Goooler](https://github.com/Goooler) in [#826](https://github.com/GradleUp/shadow/pull/826)
+* Polish outdated configs by [@Goooler](https://github.com/Goooler) in [#831](https://github.com/GradleUp/shadow/pull/831)
+* Update plugin com.gradle.enterprise to v3.12.5 by [@renovate](https://github.com/renovate) in [#838](https://github.com/GradleUp/shadow/pull/838)
+* Update dependency gradle to v8.0.2 by [@renovate](https://github.com/renovate) in [#844](https://github.com/GradleUp/shadow/pull/844)
+* fix(deps): update dependency org.codehaus.plexus:plexus-utils to v3.5.1 by [@renovate](https://github.com/renovate) in [#837](https://github.com/GradleUp/shadow/pull/837)
+* chore(deps): update dependency prismjs to v1.27.0 [security] by [@renovate](https://github.com/renovate) in [#828](https://github.com/GradleUp/shadow/pull/828)
+* Encode transformed properties files with specified Charset by [@scottsteen](https://github.com/scottsteen) in [#819](https://github.com/GradleUp/shadow/pull/819)
+* chore(deps): update dependency vuepress to v1.9.9 by [@renovate](https://github.com/renovate) in [#842](https://github.com/GradleUp/shadow/pull/842)
+
+## New Contributors
+* [@renovate](https://github.com/renovate) made their first contribution in [#838](https://github.com/GradleUp/shadow/pull/838)
+* [@scottsteen](https://github.com/scottsteen) made their first contribution in [#819](https://github.com/GradleUp/shadow/pull/819)
+
+**Full Changelog**: [`8.1.0...8.1.1`](https://github.com/GradleUp/shadow/compare/8.1.0...8.1.1)
 
 
 ## [v8.1.0] (2023-02-26)
@@ -309,9 +325,52 @@ For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct
 **BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle configuration caching. 
 Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task type.
 
+## What's Changed
+* Minor cleanups by [@Goooler](https://github.com/Goooler) in [#823](https://github.com/GradleUp/shadow/pull/823)
+* Support config cache by [@Goooler](https://github.com/Goooler) in [#824](https://github.com/GradleUp/shadow/pull/824)
+* Fix RelocatorRemapper: do not map inner class name if not changed by [@Him188](https://github.com/Him188) in [#793](https://github.com/GradleUp/shadow/pull/793)
+
+## New Contributors
+* [@Him188](https://github.com/Him188) made their first contribution in [#793](https://github.com/GradleUp/shadow/pull/793)
+
+**Full Changelog**: [`8.0.0...8.1.0`](https://github.com/GradleUp/shadow/compare/8.0.0...8.1.0)
+
 
 ## [v8.0.0] (2023-02-24)
 [v8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
+
+## What's Changed
+* Fix the plugin dependency identifier in the docs by [@lnhrdt](https://github.com/lnhrdt) in [#754](https://github.com/GradleUp/shadow/pull/754)
+* mergeGroovyExtensionModules() not working with Groovy 2.5+ by [@paulk-asert](https://github.com/paulk-asert) in [#779](https://github.com/GradleUp/shadow/pull/779)
+* Upgrade to ASM 9.3 to support JDK 19. by [@vyazelenko](https://github.com/vyazelenko) in [#770](https://github.com/GradleUp/shadow/pull/770)
+* Do not add a dependencies block if it's already there by [@desiderantes](https://github.com/desiderantes) in [#769](https://github.com/GradleUp/shadow/pull/769)
+* Update README with new badge and links by [@ThexXTURBOXx](https://github.com/ThexXTURBOXx) in [#743](https://github.com/GradleUp/shadow/pull/743)
+* Fix value not set when rawString is true. by [@qian0817](https://github.com/qian0817) in [#765](https://github.com/GradleUp/shadow/pull/765)
+* Mark the Log4j2PluginsCacheFileTransformer as cacheable. by [@staktrace](https://github.com/staktrace) in [#724](https://github.com/GradleUp/shadow/pull/724)
+* Fix retrieval of dependencies node when publishing by [@netomi](https://github.com/netomi) in [#798](https://github.com/GradleUp/shadow/pull/798)
+* Upgrade dependency ASM from `9.3` to `9.4` by [@codecholeric](https://github.com/codecholeric) in [#817](https://github.com/GradleUp/shadow/pull/817)
+* Fix a typo of code comment in the minimizing page by [@jebnix](https://github.com/jebnix) in [#800](https://github.com/GradleUp/shadow/pull/800)
+* Prefer using plugin extensions over deprecated conventions by [@eskatos](https://github.com/eskatos) in [#821](https://github.com/GradleUp/shadow/pull/821)
+* Introduce CleanProperties by [@simPod](https://github.com/simPod) in [#622](https://github.com/GradleUp/shadow/pull/622)
+* Support Gradle 8.0 by [@Goooler](https://github.com/Goooler) in [#822](https://github.com/GradleUp/shadow/pull/822)
+* Updated dependencies, Gradle versions and Fix Test by [@ElisaMin](https://github.com/ElisaMin) in [#791](https://github.com/GradleUp/shadow/pull/791)
+
+## New Contributors
+* [@lnhrdt](https://github.com/lnhrdt) made their first contribution in [#754](https://github.com/GradleUp/shadow/pull/754)
+* [@paulk-asert](https://github.com/paulk-asert) made their first contribution in [#779](https://github.com/GradleUp/shadow/pull/779)
+* [@desiderantes](https://github.com/desiderantes) made their first contribution in [#769](https://github.com/GradleUp/shadow/pull/769)
+* [@ThexXTURBOXx](https://github.com/ThexXTURBOXx) made their first contribution in [#743](https://github.com/GradleUp/shadow/pull/743)
+* [@qian0817](https://github.com/qian0817) made their first contribution in [#765](https://github.com/GradleUp/shadow/pull/765)
+* [@staktrace](https://github.com/staktrace) made their first contribution in [#724](https://github.com/GradleUp/shadow/pull/724)
+* [@netomi](https://github.com/netomi) made their first contribution in [#798](https://github.com/GradleUp/shadow/pull/798)
+* [@codecholeric](https://github.com/codecholeric) made their first contribution in [#817](https://github.com/GradleUp/shadow/pull/817)
+* [@jebnix](https://github.com/jebnix) made their first contribution in [#800](https://github.com/GradleUp/shadow/pull/800)
+* [@eskatos](https://github.com/eskatos) made their first contribution in [#821](https://github.com/GradleUp/shadow/pull/821)
+* [@simPod](https://github.com/simPod) made their first contribution in [#622](https://github.com/GradleUp/shadow/pull/622)
+* [@Goooler](https://github.com/Goooler) made their first contribution in [#822](https://github.com/GradleUp/shadow/pull/822)
+* [@ElisaMin](https://github.com/ElisaMin) made their first contribution in [#791](https://github.com/GradleUp/shadow/pull/791)
+
+**Full Changelog**: [`7.1.2...8.0.0`](https://github.com/GradleUp/shadow/compare/7.1.2...8.0.0)
 
 
 ## v7.1.3 (unreleased)
