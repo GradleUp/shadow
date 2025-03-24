@@ -298,7 +298,7 @@
 
 **NOTE:** As of this version, the GitHub repository has migrated to the `main` branch as the default branch for releases.
 
-## What's Changed
+### What's Changed
 * Replace deprecated ConfigureUtil by [@Goooler](https://github.com/Goooler) in [#826](https://github.com/GradleUp/shadow/pull/826)
 * Polish outdated configs by [@Goooler](https://github.com/Goooler) in [#831](https://github.com/GradleUp/shadow/pull/831)
 * Update plugin com.gradle.enterprise to v3.12.5 by [@renovate](https://github.com/renovate) in [#838](https://github.com/GradleUp/shadow/pull/838)
@@ -308,7 +308,7 @@
 * Encode transformed properties files with specified Charset by [@scottsteen](https://github.com/scottsteen) in [#819](https://github.com/GradleUp/shadow/pull/819)
 * chore(deps): update dependency vuepress to v1.9.9 by [@renovate](https://github.com/renovate) in [#842](https://github.com/GradleUp/shadow/pull/842)
 
-## New Contributors
+### New Contributors
 * [@renovate](https://github.com/renovate) made their first contribution in [#838](https://github.com/GradleUp/shadow/pull/838)
 * [@scottsteen](https://github.com/scottsteen) made their first contribution in [#819](https://github.com/GradleUp/shadow/pull/819)
 
@@ -325,12 +325,12 @@ For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct
 **BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle configuration caching. 
 Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task type.
 
-## What's Changed
+### What's Changed
 * Minor cleanups by [@Goooler](https://github.com/Goooler) in [#823](https://github.com/GradleUp/shadow/pull/823)
 * Support config cache by [@Goooler](https://github.com/Goooler) in [#824](https://github.com/GradleUp/shadow/pull/824)
 * Fix RelocatorRemapper: do not map inner class name if not changed by [@Him188](https://github.com/Him188) in [#793](https://github.com/GradleUp/shadow/pull/793)
 
-## New Contributors
+### New Contributors
 * [@Him188](https://github.com/Him188) made their first contribution in [#793](https://github.com/GradleUp/shadow/pull/793)
 
 **Full Changelog**: [`8.0.0...8.1.0`](https://github.com/GradleUp/shadow/compare/8.0.0...8.1.0)
@@ -339,7 +339,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 ## [v8.0.0] (2023-02-24)
 [v8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
 
-## What's Changed
+### What's Changed
 * Fix the plugin dependency identifier in the docs by [@lnhrdt](https://github.com/lnhrdt) in [#754](https://github.com/GradleUp/shadow/pull/754)
 * mergeGroovyExtensionModules() not working with Groovy 2.5+ by [@paulk-asert](https://github.com/paulk-asert) in [#779](https://github.com/GradleUp/shadow/pull/779)
 * Upgrade to ASM 9.3 to support JDK 19. by [@vyazelenko](https://github.com/vyazelenko) in [#770](https://github.com/GradleUp/shadow/pull/770)
@@ -355,7 +355,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 * Support Gradle 8.0 by [@Goooler](https://github.com/Goooler) in [#822](https://github.com/GradleUp/shadow/pull/822)
 * Updated dependencies, Gradle versions and Fix Test by [@ElisaMin](https://github.com/ElisaMin) in [#791](https://github.com/GradleUp/shadow/pull/791)
 
-## New Contributors
+### New Contributors
 * [@lnhrdt](https://github.com/lnhrdt) made their first contribution in [#754](https://github.com/GradleUp/shadow/pull/754)
 * [@paulk-asert](https://github.com/paulk-asert) made their first contribution in [#779](https://github.com/GradleUp/shadow/pull/779)
 * [@desiderantes](https://github.com/desiderantes) made their first contribution in [#769](https://github.com/GradleUp/shadow/pull/769)
