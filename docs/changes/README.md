@@ -322,7 +322,7 @@
 The correct coordinates now align with the plugin ID itself: `group=com.github.johnrengelman, artifact=shadow, version=<version>`.
 For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct configuration for this version.
 
-**BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle configuration caching.
+**BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle configuration caching. 
 Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task type.
 
 ## What's Changed
