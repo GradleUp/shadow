@@ -155,3 +155,12 @@ Here are the options that can be passed to the `shadowJar`:
 --relocation-prefix       Prefix to use for relocated packages
 --rerun                   Causes the task to be re-run even if up-to-date
 ```
+
+Also, you can view more information about the `shadowJar` task by running the following command:
+
+```sh
+./gradlew -q help --task shadowJar
+```
+
+Like the related stuffs described in 
+[listing command line options](https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options).
