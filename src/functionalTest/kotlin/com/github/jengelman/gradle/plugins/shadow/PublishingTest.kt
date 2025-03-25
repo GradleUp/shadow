@@ -169,7 +169,10 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("my/maven/1.0/maven-1.0-tests.jar")).useAll {
-      containsAtLeast(*junitEntries)
+      containsOnly(
+        *junitEntries,
+        *manifestEntries,
+      )
     }
   }
 

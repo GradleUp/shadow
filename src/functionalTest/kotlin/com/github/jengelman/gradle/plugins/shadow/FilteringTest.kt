@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
-import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -143,12 +141,11 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "server/",
         "server/Server.class",
         *junitEntries,
-      )
-      containsNone(
-        "client/Client.class",
+        *manifestEntries,
       )
     }
   }

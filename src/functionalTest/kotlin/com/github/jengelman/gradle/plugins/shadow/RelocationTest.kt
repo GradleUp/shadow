@@ -10,8 +10,6 @@ import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
@@ -99,16 +97,13 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
-      )
-      containsNone(
-        *junitEntries.filter { it !in otherJunitEntries }.toTypedArray(),
-        *otherJunitEntries.map { "a/$it" }.toTypedArray(),
-        *otherJunitEntries.map { "b/$it" }.toTypedArray(),
+        *manifestEntries,
       )
     }
   }
@@ -144,15 +139,15 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "b/",
+        "my/",
+        "junit/runner/",
         mainClassEntry,
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
-      )
-      containsNone(
-        *otherJunitEntries.map { "a/$it" }.toTypedArray(),
-        *otherJunitEntries.map { "b/$it" }.toTypedArray(),
+        *manifestEntries,
       )
     }
   }
@@ -191,12 +186,12 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
+        "shadow/",
         "my/MyTest.class",
         *shadowedEntries,
-      )
-      containsNone(
-        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
+        *manifestEntries,
       )
     }
 
@@ -266,16 +261,17 @@ class RelocationTest : BasePluginTest() {
     run(":app:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
         "TEST",
         "APP-TEST",
         "test.properties",
-        "app/core/Core.class",
+        "app/",
+        "app/core/",
+        "app/junit/",
         "app/App.class",
+        "app/core/Core.class",
         *shadowedEntries,
-      )
-      containsNone(
-        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
+        *manifestEntries,
       )
     }
   }
@@ -507,13 +503,10 @@ class RelocationTest : BasePluginTest() {
           *manifestEntries,
         )
       } else {
-        containsAtLeast(
+        containsOnly(
+          "foo/",
           "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
-        )
-        containsNone(
-          *junitEntries,
-          manifestEntry,
         )
       }
     }
