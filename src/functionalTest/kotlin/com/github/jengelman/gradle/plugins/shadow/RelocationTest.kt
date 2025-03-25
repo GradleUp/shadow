@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -548,6 +549,50 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @ParameterizedTest
+  @MethodSource("relocationCliOptionProvider")
+  fun enableRelocationByCliOption(enableRelocation: Boolean, relocationPrefix: String) {
+    val mainClassEntry = writeClass()
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+      """.trimIndent(),
+    )
+    val relocatedEntries = junitEntries.map { "$relocationPrefix/$it" }
+      .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
+      .toTypedArray()
+
+    if (enableRelocation) {
+      run(shadowJarTask, "--enable-relocation", "--relocation-prefix=$relocationPrefix")
+    } else {
+      run(shadowJarTask, "--relocation-prefix=$relocationPrefix")
+    }
+
+    assertThat(outputShadowJar).useAll {
+      if (enableRelocation) {
+        containsAtLeast(
+          mainClassEntry,
+          *relocatedEntries,
+          manifestEntry,
+        )
+        containsNone(
+          *junitEntries.filterNot { it.startsWith("META-INF/") }.toTypedArray(),
+        )
+      } else {
+        containsAtLeast(
+          mainClassEntry,
+          *junitEntries,
+          manifestEntry,
+        )
+        containsNone(
+          *relocatedEntries.filterNot { it.startsWith("META-INF/") }.toTypedArray(),
+        )
+      }
+    }
+  }
+
   private companion object {
     @JvmStatic
     fun prefixProvider() = listOf(
@@ -563,6 +608,14 @@ class RelocationTest : BasePluginTest() {
       Arguments.of(true, false),
       Arguments.of(false, true),
       Arguments.of(true, true),
+    )
+
+    @JvmStatic
+    fun relocationCliOptionProvider() = listOf(
+      Arguments.of(false, "foo"),
+      Arguments.of(false, "bar"),
+      Arguments.of(true, "foo"),
+      Arguments.of(true, "bar"),
     )
   }
 }
