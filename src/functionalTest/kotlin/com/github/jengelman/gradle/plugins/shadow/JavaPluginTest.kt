@@ -57,12 +57,15 @@ class JavaPluginTest : BasePluginTest() {
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
 
-    assertThat(shadowTask.archiveBaseName.get()).isEqualTo(projectName)
-    assertThat(shadowTask.destinationDirectory.get().asFile)
-      .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
-    assertThat(shadowTask.archiveVersion.get()).isEqualTo(version)
-    assertThat(shadowTask.archiveClassifier.get()).isEqualTo("all")
-    assertThat(shadowTask.archiveExtension.get()).isEqualTo("jar")
+    with(shadowTask) {
+      assertThat(archiveBaseName.get()).isEqualTo(projectName)
+      assertThat(destinationDirectory.get().asFile)
+        .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
+      assertThat(archiveVersion.get()).isEqualTo(version)
+      assertThat(archiveClassifier.get()).isEqualTo("all")
+      assertThat(archiveExtension.get()).isEqualTo("jar")
+    }
+
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
   }
 
