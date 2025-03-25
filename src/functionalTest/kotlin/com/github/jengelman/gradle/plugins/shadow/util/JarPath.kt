@@ -42,10 +42,24 @@ fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(en
 
 fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
 
+/**
+ * Ensures the JAR contains at least the specified entries.
+ * Commonly used with [containsNone] to verify additional constraints.
+ */
 fun Assert<JarPath>.containsAtLeast(vararg entries: String) = toEntries().containsAtLeast(*entries)
 
+/**
+ * Ensures the JAR does not contain any of the specified entries.
+ * Commonly used with [containsAtLeast] for stricter checks.
+ */
 fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsNone(*entries)
 
+/**
+ * Ensures the JAR contains only the specified entries.
+ * Used alone, without [containsAtLeast] or [containsNone].
+ *
+ * @param includeDirs whether to include directories in the expected entries.
+ */
 fun Assert<JarPath>.containsOnly(
   vararg entries: String,
   includeDirs: Boolean = false,
