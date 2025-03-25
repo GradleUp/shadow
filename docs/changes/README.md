@@ -6,7 +6,7 @@
 
 **Added**
 
-- Support command line options in `ShadowJar`. ([#1365](https://github.com/GradleUp/shadow/pull/1365))
+- Support command line options for `ShadowJar`. ([#1365](https://github.com/GradleUp/shadow/pull/1365))
 ```
 Options:
 
