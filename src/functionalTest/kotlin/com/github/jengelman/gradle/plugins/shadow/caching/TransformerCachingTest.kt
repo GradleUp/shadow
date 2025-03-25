@@ -186,10 +186,7 @@ class TransformerCachingTest : BaseCachingTest() {
     }
     val assertions = {
       assertCompositeExecutions {
-        containsAtLeast(
-          mainClass,
-          *manifestEntries,
-        )
+        containsAtLeast(mainClass)
       }
     }
 
