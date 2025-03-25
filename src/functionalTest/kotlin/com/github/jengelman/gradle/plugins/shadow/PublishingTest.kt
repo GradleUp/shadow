@@ -278,7 +278,7 @@ class PublishingTest : BasePluginTest() {
       containsOnly(
         "aa.properties",
         "aa2.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
     assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
@@ -368,7 +368,7 @@ class PublishingTest : BasePluginTest() {
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
       containsOnly(
         *entriesInAB,
-        manifestEntry,
+        *manifestEntries,
       )
     }
 

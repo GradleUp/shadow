@@ -64,7 +64,7 @@ class MinimizationTest : BasePluginTest() {
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -221,7 +221,7 @@ class MinimizationTest : BasePluginTest() {
       if (enable) {
         containsAtLeast(
           "server/Server.class",
-          manifestEntry,
+          *manifestEntries,
         )
         containsNone(
           "client/Client.class",
@@ -231,7 +231,7 @@ class MinimizationTest : BasePluginTest() {
           "client/Client.class",
           "server/Server.class",
           *junitEntries,
-          manifestEntry,
+          *manifestEntries,
         )
       }
     }

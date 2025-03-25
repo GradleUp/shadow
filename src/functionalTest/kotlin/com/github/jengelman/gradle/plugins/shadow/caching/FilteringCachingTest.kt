@@ -34,7 +34,7 @@ class FilteringCachingTest : BaseCachingTest() {
       containsOnly(
         "d.properties",
         *entriesInAB,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -57,7 +57,7 @@ class FilteringCachingTest : BaseCachingTest() {
         "b.properties",
         "c.properties",
         "d.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -98,7 +98,7 @@ class FilteringCachingTest : BaseCachingTest() {
       containsOnly(
         mainClassEntry,
         main2ClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
 
@@ -113,7 +113,7 @@ class FilteringCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsOnly(
         mainClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
 
@@ -129,7 +129,7 @@ class FilteringCachingTest : BaseCachingTest() {
       containsOnly(
         mainClassEntry,
         main2ClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -165,7 +165,7 @@ class FilteringCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsOnly(
         mainClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -191,7 +191,7 @@ class FilteringCachingTest : BaseCachingTest() {
     containsOnly(
       "c.properties",
       *entriesInAB,
-      manifestEntry,
+      *manifestEntries,
     )
   }
 }

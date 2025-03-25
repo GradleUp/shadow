@@ -36,7 +36,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
