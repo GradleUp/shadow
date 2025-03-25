@@ -9,7 +9,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
-class MinimizeTest : BasePluginTest() {
+class MinimizationTest : BasePluginTest() {
   /**
    * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
    * The minimize step shall remove 'junit', but not 'api'.
