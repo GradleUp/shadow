@@ -4,7 +4,9 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
+import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -16,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -57,12 +60,29 @@ class JavaPluginTest : BasePluginTest() {
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
 
-    assertThat(shadowTask.archiveBaseName.get()).isEqualTo(projectName)
-    assertThat(shadowTask.destinationDirectory.get().asFile)
-      .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
-    assertThat(shadowTask.archiveVersion.get()).isEqualTo(version)
-    assertThat(shadowTask.archiveClassifier.get()).isEqualTo("all")
-    assertThat(shadowTask.archiveExtension.get()).isEqualTo("jar")
+    with(shadowTask) {
+      assertThat(archiveBaseName.get()).isEqualTo(projectName)
+      assertThat(destinationDirectory.get().asFile)
+        .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
+      assertThat(archiveVersion.get()).isEqualTo(version)
+      assertThat(archiveClassifier.get()).isEqualTo("all")
+      assertThat(archiveExtension.get()).isEqualTo("jar")
+      assertThat(archiveFileName.get()).isEqualTo("my-shadow-1.0.0-all.jar")
+      assertThat(archiveFile.get().asFile).all {
+        isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
+        isEqualTo(project.projectDir.resolve("build/libs/my-shadow-1.0.0-all.jar"))
+      }
+      assertThat(archiveAppendix.orNull).isNull()
+
+      assertThat(minimizeJar.get()).isFalse()
+      assertThat(enableRelocation.get()).isFalse()
+      assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
+      assertThat(configurations.get()).all {
+        isNotEmpty()
+        containsOnly(project.runtimeConfiguration)
+      }
+    }
+
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
   }
 

@@ -551,8 +551,7 @@ class RelocationTest : BasePluginTest() {
   private companion object {
     @JvmStatic
     fun prefixProvider() = listOf(
-      // The default values.
-      Arguments.of(ShadowBasePlugin.SHADOW),
+      Arguments.of("foo"),
       Arguments.of("new.pkg"),
       Arguments.of("new/path"),
     )
