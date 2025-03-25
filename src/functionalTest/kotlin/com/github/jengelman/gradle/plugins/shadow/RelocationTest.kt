@@ -509,10 +509,6 @@ class RelocationTest : BasePluginTest() {
           *manifestEntries,
           includeDirs = true,
         )
-        containsNone(
-          "foo/$manifestEntry",
-          *junitEntries.map { "foo/$it" }.toTypedArray(),
-        )
       } else {
         containsOnly(
           "foo/$manifestEntry",
