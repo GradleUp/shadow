@@ -233,7 +233,7 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Relocate classes matching [pattern] to [destination] using [SimpleRelocator].
+   * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
    */
   override fun relocate(
     pattern: String,
@@ -245,7 +245,7 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Relocate classes using a [Relocator].
+   * Relocate classes and resources using a [Relocator].
    */
   override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
@@ -253,14 +253,14 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Relocate classes using a [Relocator].
+   * Relocate classes and resources using a [Relocator].
    */
   override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
     addRelocator(relocator, action)
   }
 
   /**
-   * Relocate classes using a [Relocator].
+   * Relocate classes and resources using a [Relocator].
    *
    * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
    */
@@ -269,7 +269,7 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Relocate classes using a [Relocator].
+   * Relocate classes and resources using a [Relocator].
    *
    * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
    */
