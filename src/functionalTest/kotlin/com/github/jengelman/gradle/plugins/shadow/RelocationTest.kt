@@ -320,6 +320,7 @@ class RelocationTest : BasePluginTest() {
         "bar/foo.properties",
         "bar/dep.properties",
         *manifestEntries,
+        includeDirs = true,
       )
     }
   }
@@ -470,6 +471,7 @@ class RelocationTest : BasePluginTest() {
       containsOnly(
         "kotlin/kotlin.kotlin_builtins",
         *manifestEntries,
+        includeDirs = true,
       )
     }
   }
@@ -502,22 +504,19 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       if (exclude) {
-        containsAtLeast(
+        containsOnly(
           *junitEntries,
           *manifestEntries,
+          includeDirs = true,
         )
         containsNone(
           "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
         )
       } else {
-        containsAtLeast(
+        containsOnly(
           "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
-        )
-        containsNone(
-          *junitEntries,
-          *manifestEntries,
         )
       }
     }
@@ -571,22 +570,18 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       if (enableRelocation) {
-        containsAtLeast(
+        containsOnly(
           mainClassEntry,
           *relocatedEntries,
           *manifestEntries,
-        )
-        containsNone(
-          *junitEntries.filterNot { it.startsWith("META-INF/") }.toTypedArray(),
+          includeDirs = true,
         )
       } else {
-        containsAtLeast(
+        containsOnly(
           mainClassEntry,
           *junitEntries,
           *manifestEntries,
-        )
-        containsNone(
-          *relocatedEntries.filterNot { it.startsWith("META-INF/") }.toTypedArray(),
+          includeDirs = true,
         )
       }
     }

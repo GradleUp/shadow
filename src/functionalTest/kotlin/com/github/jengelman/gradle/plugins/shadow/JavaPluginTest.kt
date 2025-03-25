@@ -158,6 +158,7 @@ class JavaPluginTest : BasePluginTest() {
       containsOnly(
         "server/Server.class",
         *manifestEntries,
+        includeDirs = true,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
@@ -260,6 +261,7 @@ class JavaPluginTest : BasePluginTest() {
         "a.properties",
         "META-INF/a.properties",
         *manifestEntries,
+        includeDirs = true,
       )
     }
   }
@@ -281,6 +283,7 @@ class JavaPluginTest : BasePluginTest() {
       containsOnly(
         *entriesInA,
         *manifestEntries,
+        includeDirs = true,
       )
     }
   }
@@ -346,6 +349,7 @@ class JavaPluginTest : BasePluginTest() {
       containsOnly(
         *entriesInA,
         *manifestEntries,
+        includeDirs = true,
       )
     }
   }
@@ -491,6 +495,7 @@ class JavaPluginTest : BasePluginTest() {
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
         *manifestEntries,
+        includeDirs = true,
       )
     }
   }

@@ -279,6 +279,7 @@ class PublishingTest : BasePluginTest() {
         "aa.properties",
         "aa2.properties",
         *manifestEntries,
+        includeDirs = true,
       )
     }
     assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
@@ -369,6 +370,7 @@ class PublishingTest : BasePluginTest() {
       containsOnly(
         *entriesInAB,
         *manifestEntries,
+        includeDirs = true,
       )
     }
 

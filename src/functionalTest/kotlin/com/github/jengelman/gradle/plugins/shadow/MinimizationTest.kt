@@ -65,6 +65,7 @@ class MinimizationTest : BasePluginTest() {
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
         *manifestEntries,
+        includeDirs = true,
       )
     }
   }
@@ -219,19 +220,18 @@ class MinimizationTest : BasePluginTest() {
 
     assertThat(outputServerShadowJar).useAll {
       if (enable) {
-        containsAtLeast(
+        containsOnly(
           "server/Server.class",
           *manifestEntries,
-        )
-        containsNone(
-          "client/Client.class",
+          includeDirs = true,
         )
       } else {
-        containsAtLeast(
+        containsOnly(
           "client/Client.class",
           "server/Server.class",
           *junitEntries,
           *manifestEntries,
+          includeDirs = true,
         )
       }
     }
