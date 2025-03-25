@@ -162,5 +162,4 @@ Also, you can view more information about the `shadowJar` task by running the fo
 ./gradlew -q help --task shadowJar
 ```
 
-Like the related stuffs described in 
-[listing command line options](https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options).
+Refer to [listing command line options](https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options).
