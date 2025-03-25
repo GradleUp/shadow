@@ -4,6 +4,19 @@
 ## [Unreleased]
 [Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta11...HEAD
 
+**Added**
+
+- Support command line options in `ShadowJar`. ([#1365](https://github.com/GradleUp/shadow/pull/1365))
+```
+Options:
+
+--enable-relocation  Enable relocation of packages in the jar
+--no-enable-relocation  Disables option --enable-relocation.
+--minimize-jar  Minimize the jar by removing unused classes
+--no-minimize-jar  Disables option --minimize-jar.
+--relocation-prefix  Prefix to use for relocated packages
+```
+
 **Changed**
 
 - Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
