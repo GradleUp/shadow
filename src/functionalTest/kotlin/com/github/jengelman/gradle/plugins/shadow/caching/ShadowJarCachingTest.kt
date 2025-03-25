@@ -37,7 +37,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
       containsOnly(
         *entriesInA,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }

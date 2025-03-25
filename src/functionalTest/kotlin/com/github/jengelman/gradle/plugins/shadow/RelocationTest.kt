@@ -61,7 +61,6 @@ class RelocationTest : BasePluginTest() {
         mainClassEntry,
         *shadowedEntries,
         *manifestEntries,
-        includeDirs = true,
       )
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
@@ -320,7 +319,6 @@ class RelocationTest : BasePluginTest() {
         "bar/foo.properties",
         "bar/dep.properties",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -472,7 +470,6 @@ class RelocationTest : BasePluginTest() {
         "kotlin/",
         "kotlin/kotlin.kotlin_builtins",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -508,7 +505,6 @@ class RelocationTest : BasePluginTest() {
         containsOnly(
           *junitEntries,
           *manifestEntries,
-          includeDirs = true,
         )
       } else {
         containsAtLeast(
@@ -542,6 +538,9 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
+        "foo/",
+        "foo/my/",
+        "foo/META-INF/",
         "foo/$mainClassEntry",
         "foo/$manifestEntry",
       )
@@ -577,7 +576,6 @@ class RelocationTest : BasePluginTest() {
           mainClassEntry,
           *relocatedEntries,
           *manifestEntries,
-          includeDirs = true,
         )
       } else {
         containsOnly(
@@ -585,7 +583,6 @@ class RelocationTest : BasePluginTest() {
           mainClassEntry,
           *junitEntries,
           *manifestEntries,
-          includeDirs = true,
         )
       }
     }

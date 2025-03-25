@@ -68,7 +68,6 @@ class MinimizationTest : BasePluginTest() {
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -238,7 +237,6 @@ class MinimizationTest : BasePluginTest() {
           "server/Server.class",
           *junitEntries,
           *manifestEntries,
-          includeDirs = true,
         )
       }
     }

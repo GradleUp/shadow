@@ -40,7 +40,6 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         *entriesInAB,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -62,7 +61,6 @@ class FilteringTest : BasePluginTest() {
         "a.properties",
         "b.properties",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -126,7 +124,6 @@ class FilteringTest : BasePluginTest() {
         "my/",
         "my/Passed.class",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -175,7 +172,6 @@ class FilteringTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -199,7 +195,6 @@ class FilteringTest : BasePluginTest() {
         "a.properties",
         "b.properties",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -245,7 +240,6 @@ class FilteringTest : BasePluginTest() {
         "c.properties",
         *entriesInAB,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }

@@ -57,16 +57,8 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
 /**
  * Ensures the JAR contains only the specified entries.
  * Used alone, without [containsAtLeast] or [containsNone].
- *
- * @param includeDirs whether to include directories in the expected entries.
  */
-fun Assert<JarPath>.containsOnly(
-  vararg entries: String,
-  includeDirs: Boolean = false,
-) = toEntries().transform { actual ->
-  // Jar directories are represented as entries ending with a slash.
-  actual.filter { includeDirs || !it.endsWith('/') }
-}.containsOnly(*entries)
+fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }

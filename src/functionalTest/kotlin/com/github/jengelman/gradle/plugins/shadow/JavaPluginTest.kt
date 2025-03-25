@@ -107,10 +107,10 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -149,7 +149,6 @@ class JavaPluginTest : BasePluginTest() {
         "server/Server.class",
         *junitEntries,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -165,7 +164,6 @@ class JavaPluginTest : BasePluginTest() {
         "server/",
         "server/Server.class",
         *manifestEntries,
-        includeDirs = true,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
@@ -273,7 +271,6 @@ class JavaPluginTest : BasePluginTest() {
         "a.properties",
         "META-INF/a.properties",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -295,7 +292,6 @@ class JavaPluginTest : BasePluginTest() {
       containsOnly(
         *entriesInA,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -361,7 +357,6 @@ class JavaPluginTest : BasePluginTest() {
       containsOnly(
         *entriesInA,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -510,7 +505,6 @@ class JavaPluginTest : BasePluginTest() {
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -660,7 +654,6 @@ class JavaPluginTest : BasePluginTest() {
         "Bar/Foo",
         "META-INF/a-1.0.jar",
         *manifestEntries,
-        includeDirs = true,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }

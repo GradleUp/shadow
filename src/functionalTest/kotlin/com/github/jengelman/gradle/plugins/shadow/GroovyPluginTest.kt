@@ -40,7 +40,6 @@ class GroovyPluginTest : BasePluginTest() {
         mainClassEntry,
         *junitEntries,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }

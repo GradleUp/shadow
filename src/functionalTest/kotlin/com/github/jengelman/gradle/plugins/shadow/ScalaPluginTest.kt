@@ -37,10 +37,10 @@ class ScalaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "my/",
+        "my/Main$.class",
         mainClassEntry,
         *junitEntries,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }

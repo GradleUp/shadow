@@ -35,7 +35,6 @@ class FilteringCachingTest : BaseCachingTest() {
         "d.properties",
         *entriesInAB,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -59,7 +58,6 @@ class FilteringCachingTest : BaseCachingTest() {
         "c.properties",
         "d.properties",
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -102,7 +100,6 @@ class FilteringCachingTest : BaseCachingTest() {
         mainClassEntry,
         main2ClassEntry,
         *manifestEntries,
-        includeDirs = true,
       )
     }
 
@@ -119,7 +116,6 @@ class FilteringCachingTest : BaseCachingTest() {
         "my/",
         mainClassEntry,
         *manifestEntries,
-        includeDirs = true,
       )
     }
 
@@ -137,7 +133,6 @@ class FilteringCachingTest : BaseCachingTest() {
         mainClassEntry,
         main2ClassEntry,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -175,7 +170,6 @@ class FilteringCachingTest : BaseCachingTest() {
         "my/",
         mainClassEntry,
         *manifestEntries,
-        includeDirs = true,
       )
     }
   }
@@ -202,7 +196,6 @@ class FilteringCachingTest : BaseCachingTest() {
       "c.properties",
       *entriesInAB,
       *manifestEntries,
-      includeDirs = true,
     )
   }
 }
