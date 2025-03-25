@@ -46,6 +46,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.gradle.api.tasks.options.Option
 
 @CacheableTask
 public abstract class ShadowJar :
@@ -74,6 +75,7 @@ public abstract class ShadowJar :
    * Defaults to `false`.
    */
   @get:Input
+  @get:Option(option = "minimize-jar", description = "Minimize the jar by removing unused classes")
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @get:Classpath
@@ -141,6 +143,7 @@ public abstract class ShadowJar :
    * Defaults to `false`.
    */
   @get:Input
+  @get:Option(option = "enable-relocation", description = "Enable relocation of packages in the jar")
   public open val enableRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
@@ -149,6 +152,7 @@ public abstract class ShadowJar :
    * Defaults to `shadow`.
    */
   @get:Input
+  @get:Option(option = "relocation-prefix", description = "Prefix to use for relocated packages")
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   @Internal

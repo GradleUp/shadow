@@ -121,6 +121,19 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
+  fun shadowJarCliOptions() {
+    val result = run("help", "--task", shadowJarTask)
+
+    assertThat(result.output).contains(
+      "--enable-relocation     Enable relocation of packages in the jar",
+      "--no-enable-relocation     Disables option --enable-relocation",
+      "--minimize-jar     Minimize the jar by removing unused classes",
+      " --no-minimize-jar     Disables option --minimize-jar",
+      "--relocation-prefix     Prefix to use for relocated packages",
+    )
+  }
+
+  @Test
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 

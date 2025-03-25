@@ -8,6 +8,8 @@ import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class MinimizationTest : BasePluginTest() {
   /**
@@ -201,6 +203,37 @@ class MinimizationTest : BasePluginTest() {
         "server/Server.class",
         *junitEntries,
       )
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun enableMinimizationByCliOption(enable: Boolean) {
+    writeClientAndServerModules()
+
+    if (enable) {
+      run(serverShadowJarTask, "--minimize-jar")
+    } else {
+      run(serverShadowJarTask)
+    }
+
+    assertThat(outputServerShadowJar).useAll {
+      if (enable) {
+        containsAtLeast(
+          "server/Server.class",
+          manifestEntry,
+        )
+        containsNone(
+          "client/Client.class",
+        )
+      } else {
+        containsAtLeast(
+          "client/Client.class",
+          "server/Server.class",
+          *junitEntries,
+          manifestEntry,
+        )
+      }
     }
   }
 
