@@ -98,6 +98,7 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
         main2ClassEntry,
         *manifestEntries,
@@ -115,6 +116,7 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
         *manifestEntries,
         includeDirs = true,
@@ -131,6 +133,7 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
         main2ClassEntry,
         *manifestEntries,
@@ -169,6 +172,7 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
         *manifestEntries,
         includeDirs = true,

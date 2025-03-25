@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -316,6 +315,7 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
+        "bar/",
         "bar/Foo.class",
         "bar/foo.properties",
         "bar/dep.properties",
@@ -469,6 +469,7 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
+        "kotlin/",
         "kotlin/kotlin.kotlin_builtins",
         *manifestEntries,
         includeDirs = true,
@@ -510,9 +511,13 @@ class RelocationTest : BasePluginTest() {
           includeDirs = true,
         )
       } else {
-        containsOnly(
+        containsAtLeast(
           "foo/$manifestEntry",
           *junitEntries.map { "foo/$it" }.toTypedArray(),
+        )
+        containsNone(
+          *junitEntries,
+          manifestEntry,
         )
       }
     }
@@ -567,6 +572,8 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       if (enableRelocation) {
         containsOnly(
+          "my/",
+          "$relocationPrefix/",
           mainClassEntry,
           *relocatedEntries,
           *manifestEntries,
@@ -574,6 +581,7 @@ class RelocationTest : BasePluginTest() {
         )
       } else {
         containsOnly(
+          "my/",
           mainClassEntry,
           *junitEntries,
           *manifestEntries,

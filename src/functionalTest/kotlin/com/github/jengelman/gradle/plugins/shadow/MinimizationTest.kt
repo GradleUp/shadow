@@ -59,6 +59,9 @@ class MinimizationTest : BasePluginTest() {
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
       containsOnly(
+        "api/",
+        "impl/",
+        "lib/",
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
@@ -220,13 +223,17 @@ class MinimizationTest : BasePluginTest() {
 
     assertThat(outputServerShadowJar).useAll {
       if (enable) {
-        containsOnly(
+        containsAtLeast(
           "server/Server.class",
-          *manifestEntries,
-          includeDirs = true,
+          manifestEntry,
+        )
+        containsNone(
+          "client/Client.class",
         )
       } else {
         containsOnly(
+          "client/",
+          "server/",
           "client/Client.class",
           "server/Server.class",
           *junitEntries,

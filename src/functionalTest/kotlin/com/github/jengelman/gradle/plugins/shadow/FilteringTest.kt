@@ -35,8 +35,13 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun includeAllDependencies() {
     run(shadowJarTask)
+
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(*entriesInAB)
+      containsOnly(
+        *entriesInAB,
+        *manifestEntries,
+        includeDirs = true,
+      )
     }
   }
 
@@ -118,6 +123,7 @@ class FilteringTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "d.properties",
+        "my/",
         "my/Passed.class",
         *manifestEntries,
         includeDirs = true,
@@ -164,6 +170,8 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(outputServerShadowJar).useAll {
       containsOnly(
+        "client/",
+        "server/",
         "client/Client.class",
         "server/Server.class",
         *manifestEntries,
