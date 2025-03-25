@@ -102,12 +102,23 @@ public abstract class ShadowJar :
     }
   }
 
+  /**
+   * [ResourceTransformer]s to be applied in the shadow steps.
+   */
   @get:Nested
   public open val transformers: SetProperty<ResourceTransformer> = objectFactory.setProperty()
 
+  /**
+   * [Relocator]s to be applied in the shadow steps.
+   */
   @get:Nested
   public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
 
+  /**
+   * The configurations to include dependencies from.
+   *
+   * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
+   */
   @get:Classpath
   @get:Optional
   public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
@@ -116,6 +127,9 @@ public abstract class ShadowJar :
   public open val dependencyFilter: Property<DependencyFilter> =
     objectFactory.property(DefaultDependencyFilter(project))
 
+  /**
+   * Final dependencies to be shadowed.
+   */
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
     dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
@@ -132,7 +146,7 @@ public abstract class ShadowJar :
   /**
    * Prefix to use for relocated packages.
    *
-   * Defaults to [ShadowBasePlugin.SHADOW].
+   * Defaults to `shadow`.
    */
   @get:Input
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
@@ -146,33 +160,54 @@ public abstract class ShadowJar :
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
+  /**
+   * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
+   */
   override fun minimize() {
     minimizeJar.set(true)
   }
 
+  /**
+   * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
+   */
   override fun minimize(action: Action<DependencyFilter>?) {
     minimize()
     action?.execute(dependencyFilterForMinimize)
   }
 
+  /**
+   * Extra dependency operations to be applied in the shadow steps.
+   */
   override fun dependencies(action: Action<DependencyFilter>?) {
     action?.execute(dependencyFilter.get())
   }
 
+  /**
+   * Merge Java services files.
+   */
   override fun mergeServiceFiles() {
     transform(ServiceFileTransformer::class.java, null)
   }
 
+  /**
+   * Merge Java services files with [rootPath].
+   */
   override fun mergeServiceFiles(rootPath: String) {
     transform(ServiceFileTransformer::class.java) {
       it.path = rootPath
     }
   }
 
+  /**
+   * Merge Java services files with [action].
+   */
   override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?) {
     transform(ServiceFileTransformer::class.java, action)
   }
 
+  /**
+   * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
+   */
   override fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, null)
   }
@@ -193,6 +228,9 @@ public abstract class ShadowJar :
     }
   }
 
+  /**
+   * Relocate classes matching [pattern] to [destination] using [SimpleRelocator].
+   */
   override fun relocate(
     pattern: String,
     destination: String,
@@ -202,35 +240,67 @@ public abstract class ShadowJar :
     addRelocator(relocator, action)
   }
 
+  /**
+   * Relocate classes using a [Relocator].
+   */
   override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
 
+  /**
+   * Relocate classes using a [Relocator].
+   */
   override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
     addRelocator(relocator, action)
   }
 
+  /**
+   * Relocate classes using a [Relocator].
+   *
+   * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified R : Relocator> relocate() {
     relocate(R::class.java, null)
   }
 
+  /**
+   * Relocate classes using a [Relocator].
+   *
+   * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified R : Relocator> relocate(action: Action<R>?) {
     relocate(R::class.java, action)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   */
   override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?) {
     addTransform(clazz.create(objectFactory), action)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   */
   override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
     addTransform(transformer, action)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   *
+   * This is a convenience method for [transform] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified T : ResourceTransformer> transform() {
     transform(T::class.java, null)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   *
+   * This is a convenience method for [transform] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified T : ResourceTransformer> transform(action: Action<T>?) {
     transform(T::class.java, action)
   }
