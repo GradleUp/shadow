@@ -149,9 +149,9 @@ Here are the options that can be passed to the `shadowJar`:
 
 ```
 --enable-relocation       Enable relocation of packages in the jar
---no-enable-relocation    Disables option --enable-relocation.
+--no-enable-relocation    Disables option --enable-relocation
 --minimize-jar            Minimize the jar by removing unused classes
---no-minimize-jar         Disables option --minimize-jar.
+--no-minimize-jar         Disables option --minimize-jar
 --relocation-prefix       Prefix to use for relocated packages
 --rerun                   Causes the task to be re-run even if up-to-date
 ```
