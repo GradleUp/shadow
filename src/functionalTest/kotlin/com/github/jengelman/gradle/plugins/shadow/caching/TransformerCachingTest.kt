@@ -75,9 +75,9 @@ class TransformerCachingTest : BaseCachingTest() {
       assertCompositeExecutions {
         containsOnly(
           "my/",
-          mainClass,
           "foo/",
           "foo/$name.properties",
+          mainClass,
           *manifestEntries,
         )
         getContent("foo/$name.properties").isEqualTo("foo=$name")
@@ -112,8 +112,8 @@ class TransformerCachingTest : BaseCachingTest() {
         containsOnly(
           "my/",
           "foo/",
-          mainClass,
           "foo/$name.xml",
+          mainClass,
           *manifestEntries,
         )
         getContent("foo/$name.xml").contains("<foo>$name</foo>")

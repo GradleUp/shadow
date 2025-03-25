@@ -505,8 +505,8 @@ class JavaPluginTest : BasePluginTest() {
       containsOnly(
         "my/",
         "my/plugin/",
-        "META-INF/gradle-plugins/",
         "my/plugin/MyPlugin.class",
+        "META-INF/gradle-plugins/",
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
         *manifestEntries,
@@ -658,10 +658,10 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "my/",
-        mainClassEntry,
         "Bar/",
         "Bar/Foo",
         "META-INF/a-1.0.jar",
+        mainClassEntry,
         *manifestEntries,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
