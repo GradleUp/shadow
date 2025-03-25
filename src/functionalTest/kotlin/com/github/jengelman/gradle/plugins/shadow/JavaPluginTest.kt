@@ -16,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -26,7 +27,9 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
+import kotlin.io.path.copyToRecursively
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
@@ -38,6 +41,7 @@ import org.junit.jupiter.api.condition.JRE
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
+@ExperimentalPathApi
 class JavaPluginTest : BasePluginTest() {
   @Test
   fun applyPlugin() {
@@ -661,6 +665,29 @@ class JavaPluginTest : BasePluginTest() {
         // It's the compiled class instead of the original content.
         isNotEqualTo("module myModuleName {}")
       }
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/882",
+  )
+  @Test
+  fun compatGradleArtifactTransform() {
+    requireResourceAsPath("fixtures/gradle-artifact-transform").copyToRecursively(
+      target = projectRoot,
+      followLinks = false,
+      overwrite = true,
+    )
+
+    run(":lib:jar")
+    run(":app:$SHADOW_JAR_TASK_NAME")
+
+    assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
+      containsAtLeast(
+        "com/company/Main.class",
+        "com/company/Utils.class",
+        manifestEntry,
+      )
     }
   }
 }
