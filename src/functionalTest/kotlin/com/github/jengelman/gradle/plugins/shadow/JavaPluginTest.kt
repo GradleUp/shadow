@@ -74,13 +74,13 @@ class JavaPluginTest : BasePluginTest() {
       }
       assertThat(archiveAppendix.orNull).isNull()
 
+      assertThat(minimizeJar.get()).isFalse()
+      assertThat(enableRelocation.get()).isFalse()
+      assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
       assertThat(configurations.get()).all {
         isNotEmpty()
         containsOnly(project.runtimeConfiguration)
       }
-      assertThat(minimizeJar.get()).isFalse()
-      assertThat(enableRelocation.get()).isFalse()
-      assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
