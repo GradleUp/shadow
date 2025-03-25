@@ -106,9 +106,11 @@ class JavaPluginTest : BasePluginTest() {
     }
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -140,10 +142,13 @@ class JavaPluginTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -156,14 +161,19 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
       containsOnly(
+        "server/",
         "server/Server.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsAtLeast(
+        "client/",
         "client/Client.class",
         "client/junit/framework/Test.class",
+      )
+      containsNone(
+        "server/Server.class",
       )
     }
   }
@@ -177,19 +187,23 @@ class JavaPluginTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
+        "client/junit/",
         "client/Client.class",
         "server/Server.class",
         *shadowedEntries,
-      )
-      containsNone(
-        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
+        *manifestEntries,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsAtLeast(
         "client/Client.class",
         "client/junit/framework/Test.class",
+      )
+      containsNone(
+        "server/Server.class",
       )
     }
   }
@@ -256,10 +270,11 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
+        "my/",
         "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -280,7 +295,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -320,11 +335,12 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "api.properties",
         "implementation.properties",
         "runtimeOnly.properties",
         "implementation-dep.properties",
+        *manifestEntries,
       )
     }
   }
@@ -345,7 +361,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -487,10 +503,13 @@ class JavaPluginTest : BasePluginTest() {
       getMainAttr(classPathAttributeKey).isNull()
 
       containsOnly(
+        "my/",
+        "my/plugin/",
         "my/plugin/MyPlugin.class",
+        "META-INF/gradle-plugins/",
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -523,9 +542,11 @@ class JavaPluginTest : BasePluginTest() {
     run(testShadowJarTask)
 
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
@@ -577,9 +598,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -635,13 +658,11 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "my/",
-        mainClassEntry,
         "Bar/",
         "Bar/Foo",
-        "META-INF/",
         "META-INF/a-1.0.jar",
-        manifestEntry,
-        includeDirs = true,
+        mainClassEntry,
+        *manifestEntries,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
@@ -685,9 +706,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
-        mainClassEntry,
+      containsOnly(
         "module-info.class",
+        "my/",
+        mainClassEntry,
+        *manifestEntries,
       )
       getContent("module-info.class").all {
         isNotEmpty()

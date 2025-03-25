@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
-import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -35,8 +33,12 @@ class FilteringTest : BasePluginTest() {
   @Test
   fun includeAllDependencies() {
     run(shadowJarTask)
+
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(*entriesInAB)
+      containsOnly(
+        *entriesInAB,
+        *manifestEntries,
+      )
     }
   }
 
@@ -56,7 +58,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "a.properties",
         "b.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -117,8 +119,9 @@ class FilteringTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "d.properties",
+        "my/",
         "my/Passed.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -138,12 +141,11 @@ class FilteringTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "server/",
         "server/Server.class",
         *junitEntries,
-      )
-      containsNone(
-        "client/Client.class",
+        *manifestEntries,
       )
     }
   }
@@ -162,9 +164,11 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(outputServerShadowJar).useAll {
       containsOnly(
+        "client/",
+        "server/",
         "client/Client.class",
         "server/Server.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -187,7 +191,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "a.properties",
         "b.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -232,7 +236,7 @@ class FilteringTest : BasePluginTest() {
       containsOnly(
         "c.properties",
         *entriesInAB,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }

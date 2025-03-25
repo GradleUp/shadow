@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
-import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -25,7 +24,10 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(*entriesInAB)
+      containsOnly(
+        *entriesInAB,
+        *manifestEntries,
+      )
     }
 
     val replaced = projectScriptPath.readText().lines()
@@ -36,7 +38,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
     assertCompositeExecutions {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -52,7 +54,10 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(*entriesInAB)
+      containsOnly(
+        *entriesInAB,
+        *manifestEntries,
+      )
     }
 
     projectScriptPath.appendText(
@@ -65,7 +70,10 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     assertExecutionsFromCacheAndUpToDate()
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).useAll {
-      containsAtLeast(*entriesInAB)
+      containsOnly(
+        *entriesInAB,
+        *manifestEntries,
+      )
     }
   }
 
@@ -81,9 +89,10 @@ class ShadowJarCachingTest : BaseCachingTest() {
     )
     val assertions = {
       assertCompositeExecutions {
-        containsAtLeast(
+        containsOnly(
           "c.properties",
           "d.properties",
+          *manifestEntries,
         )
       }
     }

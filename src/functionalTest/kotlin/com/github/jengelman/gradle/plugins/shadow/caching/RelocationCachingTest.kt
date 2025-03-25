@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
-import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.util.containsNone
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 
@@ -21,9 +20,11 @@ class RelocationCachingTest : BaseCachingTest() {
     val mainClassEntry = writeClass(withImports = true)
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
     }
 
@@ -38,12 +39,13 @@ class RelocationCachingTest : BaseCachingTest() {
       .map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
+        "my/",
+        "foo/",
+        "foo/junit/",
         mainClassEntry,
         *shadowedEntries,
-      )
-      containsNone(
-        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
+        *manifestEntries,
       )
     }
   }

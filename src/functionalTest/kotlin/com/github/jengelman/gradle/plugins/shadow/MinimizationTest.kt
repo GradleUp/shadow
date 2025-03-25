@@ -25,14 +25,14 @@ class MinimizationTest : BasePluginTest() {
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
       containsAtLeast(
+        "api/",
+        "lib/",
+        "impl/",
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
-      )
-      containsNone(
-        "junit/framework/Test.class",
-        "lib/UnusedLibEntity.class",
+        *manifestEntries,
       )
     }
   }
@@ -59,12 +59,15 @@ class MinimizationTest : BasePluginTest() {
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
       containsOnly(
+        "api/",
+        "impl/",
+        "lib/",
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -149,9 +152,13 @@ class MinimizationTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
         "client/Client.class",
         "server/Server.class",
+        *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -221,17 +228,19 @@ class MinimizationTest : BasePluginTest() {
       if (enable) {
         containsAtLeast(
           "server/Server.class",
-          manifestEntry,
+          *manifestEntries,
         )
         containsNone(
           "client/Client.class",
         )
       } else {
-        containsAtLeast(
+        containsOnly(
+          "client/",
+          "server/",
           "client/Client.class",
           "server/Server.class",
           *junitEntries,
-          manifestEntry,
+          *manifestEntries,
         )
       }
     }

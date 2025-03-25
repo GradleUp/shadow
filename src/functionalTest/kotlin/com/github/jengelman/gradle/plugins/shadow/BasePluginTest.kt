@@ -407,6 +407,7 @@ abstract class BasePluginTest {
       }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
     const val manifestEntry = "META-INF/MANIFEST.MF"
+    val manifestEntries = arrayOf("META-INF/", manifestEntry)
 
     val shadowJar: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
     const val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
