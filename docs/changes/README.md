@@ -10,11 +10,11 @@
 ```
 Options:
 
---enable-relocation  Enable relocation of packages in the jar
---no-enable-relocation  Disables option --enable-relocation.
---minimize-jar  Minimize the jar by removing unused classes
---no-minimize-jar  Disables option --minimize-jar.
---relocation-prefix  Prefix to use for relocated packages
+--enable-relocation       Enable relocation of packages in the jar
+--no-enable-relocation    Disables option --enable-relocation.
+--minimize-jar            Minimize the jar by removing unused classes
+--no-minimize-jar         Disables option --minimize-jar.
+--relocation-prefix       Prefix to use for relocated packages
 ```
 
 **Changed**

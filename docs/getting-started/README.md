@@ -140,3 +140,18 @@ Shadow will automatically configure the following behavior:
     * `META-INF/versions/**/module-info.class`
     * `module-info.class`
 * Creates and registers the `shadow` component in the project (used for integrating with `maven-publish`).
+
+## ShadowJar Command Line options
+
+Sometimes, a user wants to declare the value of an exposed task property on the command line instead of the 
+build script. Passing property values on the command line is particularly helpful if they change more frequently.  
+Here are the options that can be passed to the `shadowJar`:
+
+```
+--enable-relocation       Enable relocation of packages in the jar
+--no-enable-relocation    Disables option --enable-relocation.
+--minimize-jar            Minimize the jar by removing unused classes
+--no-minimize-jar         Disables option --minimize-jar.
+--relocation-prefix       Prefix to use for relocated packages
+--rerun                   Causes the task to be re-run even if up-to-date
+```
