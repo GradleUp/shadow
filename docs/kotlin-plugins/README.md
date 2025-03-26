@@ -1,11 +1,31 @@
 # Integrating with Kotlin Plugins
 
-Kotlin standard libraries (stdlib) are added by Kotlin plugins by default, they will be bundled into the shadowed JARs automatically.
+Kotlin standard libraries (stdlib) are added by Kotlin plugins by default via `implementation` (`runtimeClasspath`), 
+they will be bundled into the shadowed JARs automatically.
 If you don't need a standard library at all, you can add the following Gradle property to your gradle.properties file:
 
 ```properties
 kotlin.stdlib.default.dependency=false
 ```
+
+Kotlin compilations may still require the standard libraries, you can add them into `compileOnly` (`compileClasspath`) 
+to make sure compilations success and avoid shadowing as follows:
+
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    dependencies {
+      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
+    }
+    ```
 
 See more information about [Dependency on the standard library](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library).
 
