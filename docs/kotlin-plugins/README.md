@@ -12,17 +12,15 @@ Kotlin compilations may still require the standard libraries, you can add them i
 
 === "Kotlin"
 
-    ```kotlin
-    dependencies {
-      compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+      compileOnly("org.jetbrains.kotlin:kotlin-stdlib") // Use compileOnly to avoid including the stdlib in the final JAR if it's already provided at runtime
+
     }
     ```
 
 === "Groovy"
 
-    ```groovy
-    dependencies {
-      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
+      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib' // Use compileOnly to avoid including the stdlib in the final JAR if it's already provided at runtime
+
     }
     ```
 
