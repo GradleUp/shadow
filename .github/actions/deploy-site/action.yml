@@ -9,7 +9,7 @@ runs:
         cache-read-only: true
     - name: Prepare API documentation
       shell: bash
-      run: ./gradlew dokkaHtml --no-configuration-cache
+      run: ./gradlew dokkaHtml
     - name: Build Site
       shell: bash
       run: |
