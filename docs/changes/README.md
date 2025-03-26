@@ -520,7 +520,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - **Breaking Change!** For clarity purposes `com.github.johnrengelman.plugin-shadow` has been removed. If you intend to use this feature, you will need to declare your own `ConfigureShadowRelocation` task. See section [2.9.2](https://gradleup.com/shadow/#automatically_relocating_dependencies) of the User Guide
 - [Sergey Tselovalnikov](https://github.com/SerCeMan) - Upgrade to ASM 6.2.1 to support Java 11
 - [Chris Cowan](https://github.com/Macil) - Add support for `shadowJar.preserveFileTimestamps` property. See [Jar.preserveFileTimestamps](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps)
-- [Paul N. Baker](https://github.com/paul-nelson-baker) - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files during merge.
+- [Paul N. Baker](https://github.com/niko-dunixi) - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files during merge.
 - [Felipe Lima](https://github.com/felipecsl) - Fix the long standing "No property `mainClassName`" issue.
 - [debanne](https://github.com/debanne) - Implement JAR minimization actions. This will attempt to exclude unused classes in your shadowed JAR.
 - Configure exclusion of `module-info.class` from `shadowJar` when using the Shadow the Java plugin, [#352](https://github.com/GradleUp/shadow/issues/352)
@@ -539,7 +539,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 ## v2.0.2 (2017-12-12)
 
-- [Ben Adazza](https://github.com/ben-adazza), [Tyler Benson](https://github.com/tylerbenson) - documentation
+- [Ben Adazza](https://github.com/ghost), [Tyler Benson](https://github.com/tylerbenson) - documentation
 - [Marke Vieira](https://github.com/mark-vieira) - Support multi-project builds with Build-Scan integration
 - Upgrade to ASM 6, [#294]https://github.com/GradleUp/shadow/issues/294, [#303](https://github.com/GradleUp/shadow/issues/303)
 - [Rob Spieldenner](https://github.com/rspieldenner) - Fix integration with `application` plugin in Gradle 4.3, [#339](https://github.com/GradleUp/shadow/issues/339)
@@ -582,7 +582,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 - Support for Gradle 2.11-rc-1, [#177](https://github.com/GradleUp/shadow/issues/177)
 - Convert internal framework to [Gradle TestKit](https://docs.gradle.org/current/userguide/test_kit.html)
-- [Fedor Korotkov](https://github.com/fkorotkov) - Use BufferedOutputStream when writing the Zip file, [#171](https://github.com/GradleUp/shadow/pull/171[)
+- [Fedor Korotkov](https://github.com/fkorotkov) - Use BufferedOutputStream when writing the Zip file, [#171](https://github.com/GradleUp/shadow/pull/171)
 - [Haw-Bin Chai](https://github.com/hbchai) - Quote Jar path in Windows start script as it may contain spaces, [#170](https://github.com/GradleUp/shadow/pull/170)
 - [Serban Iordache](https://github.com/siordache) - Evaluate relocation specs when merging service descriptors, [#165](https://github.com/GradleUp/shadow/pull/165)
 
@@ -625,9 +625,9 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
   will now properly configure the POM dependencies by removing the `'compile'` and `'runtime'` configurations from the
   POM and adding the `'shadow'` configuration as a `RUNTIME` scope in the POM. This behavior matches the behavior when
   using the `'maven-publish'` plugin.
-- [Matt Hurne](https://github.com/mhurne) - Allow `ServiceFileTransformer` to specify include/exclude patterns for
+- [Matt Hurne](https://github.com/matthurne) - Allow `ServiceFileTransformer` to specify include/exclude patterns for
   files within the configured path to merge.
-- [Matt Hurne](https://github.com/mhurne) - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
+- [Matt Hurne](https://github.com/matthurne) - Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module
   descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default.
 - `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the
   `'application'` plugin, [#89](https://github.com/GradleUp/shadow/issues/89)
