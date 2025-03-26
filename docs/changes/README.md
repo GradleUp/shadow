@@ -315,15 +315,15 @@ Options:
 ### What's Changed
 * Replace deprecated ConfigureUtil by [@Goooler](https://github.com/Goooler) in [#826](https://github.com/GradleUp/shadow/pull/826)
 * Polish outdated configs by [@Goooler](https://github.com/Goooler) in [#831](https://github.com/GradleUp/shadow/pull/831)
-* Update plugin com.gradle.enterprise to v3.12.5 by [@renovate](https://github.com/renovate) in [#838](https://github.com/GradleUp/shadow/pull/838)
-* Update dependency gradle to v8.0.2 by [@renovate](https://github.com/renovate) in [#844](https://github.com/GradleUp/shadow/pull/844)
-* fix(deps): update dependency org.codehaus.plexus:plexus-utils to v3.5.1 by [@renovate](https://github.com/renovate) in [#837](https://github.com/GradleUp/shadow/pull/837)
-* chore(deps): update dependency prismjs to v1.27.0 [security] by [@renovate](https://github.com/renovate) in [#828](https://github.com/GradleUp/shadow/pull/828)
+* Update plugin com.gradle.enterprise to v3.12.5 by [@renovate](https://github.com/renovate-bot) in [#838](https://github.com/GradleUp/shadow/pull/838)
+* Update dependency gradle to v8.0.2 by [@renovate](https://github.com/renovate-bot) in [#844](https://github.com/GradleUp/shadow/pull/844)
+* fix(deps): update dependency org.codehaus.plexus:plexus-utils to v3.5.1 by [@renovate](https://github.com/renovate-bot) in [#837](https://github.com/GradleUp/shadow/pull/837)
+* chore(deps): update dependency prismjs to v1.27.0 [security] by [@renovate](https://github.com/renovate-bot) in [#828](https://github.com/GradleUp/shadow/pull/828)
 * Encode transformed properties files with specified Charset by [@scottsteen](https://github.com/scottsteen) in [#819](https://github.com/GradleUp/shadow/pull/819)
-* chore(deps): update dependency vuepress to v1.9.9 by [@renovate](https://github.com/renovate) in [#842](https://github.com/GradleUp/shadow/pull/842)
+* chore(deps): update dependency vuepress to v1.9.9 by [@renovate](https://github.com/renovate-bot) in [#842](https://github.com/GradleUp/shadow/pull/842)
 
 ### New Contributors
-* [@renovate](https://github.com/renovate) made their first contribution in [#838](https://github.com/GradleUp/shadow/pull/838)
+* [@renovate](https://github.com/renovate-bot) made their first contribution in [#838](https://github.com/GradleUp/shadow/pull/838)
 * [@scottsteen](https://github.com/scottsteen) made their first contribution in [#819](https://github.com/GradleUp/shadow/pull/819)
 
 **Full Changelog**: [`8.1.0...8.1.1`](https://github.com/GradleUp/shadow/compare/8.1.0...8.1.1)
