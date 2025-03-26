@@ -35,7 +35,7 @@ class RelocationCachingTest : BaseCachingTest() {
         }
       """.trimIndent(),
     )
-    val shadowedEntries = junitEntries
+    val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
 
     assertCompositeExecutions {
@@ -44,7 +44,7 @@ class RelocationCachingTest : BaseCachingTest() {
         "foo/",
         "foo/junit/",
         mainClassEntry,
-        *shadowedEntries,
+        *relocatedEntries,
         *manifestEntries,
       )
     }

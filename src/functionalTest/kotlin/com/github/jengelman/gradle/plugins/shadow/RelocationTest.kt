@@ -39,7 +39,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
-    val shadowedEntries = buildSet {
+    val relocatedEntries = buildSet {
       addAll(
         junitEntries.map { "$entryPrefix/$it" }
           .filterNot { it.startsWith("$entryPrefix/META-INF/") },
@@ -57,7 +57,7 @@ class RelocationTest : BasePluginTest() {
       containsOnly(
         "my/",
         mainClassEntry,
-        *shadowedEntries,
+        *relocatedEntries,
         *manifestEntries,
       )
     }
@@ -168,7 +168,7 @@ class RelocationTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    val shadowedEntries = junitEntries
+    val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "shadow/junit/") }.toTypedArray()
 
     path("src/main/java/my/MyTest.java").writeText(
@@ -190,7 +190,7 @@ class RelocationTest : BasePluginTest() {
         "my/",
         "shadow/",
         "my/MyTest.class",
-        *shadowedEntries,
+        *relocatedEntries,
         *manifestEntries,
       )
     }
@@ -255,7 +255,7 @@ class RelocationTest : BasePluginTest() {
         public class App {}
       """.trimIndent(),
     )
-    val shadowedEntries = junitEntries
+    val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "app/junit/framework/") }.toTypedArray()
 
     run(":app:$SHADOW_JAR_TASK_NAME")
@@ -270,7 +270,7 @@ class RelocationTest : BasePluginTest() {
         "app/junit/",
         "app/App.class",
         "app/core/Core.class",
-        *shadowedEntries,
+        *relocatedEntries,
         *manifestEntries,
       )
     }

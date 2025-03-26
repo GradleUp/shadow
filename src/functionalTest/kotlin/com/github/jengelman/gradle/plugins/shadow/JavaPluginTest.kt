@@ -181,7 +181,7 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun shadowProjectShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
-    val shadowedEntries = junitEntries
+    val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
     run(serverShadowJarTask)
@@ -193,7 +193,7 @@ class JavaPluginTest : BasePluginTest() {
         "client/junit/",
         "client/Client.class",
         "server/Server.class",
-        *shadowedEntries,
+        *relocatedEntries,
         *manifestEntries,
       )
     }
