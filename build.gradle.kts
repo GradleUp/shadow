@@ -127,7 +127,7 @@ testing.suites {
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
 kotlin.target.compilations {
   val main by getting
-  val functionalTest by getting {
+  getByName("functionalTest") {
     // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
     associateWith(main)
   }
