@@ -24,7 +24,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
-      # Disable CC due to https://github.com/gradle/gradle/issues/22779
+      # TODO: https://github.com/gradle/gradle/issues/22779
       - run: ./gradlew publish publishPlugins --no-configuration-cache
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_KEY }}

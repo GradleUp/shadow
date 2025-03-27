@@ -38,7 +38,6 @@ tasks.publishPlugins {
       error("Cannot publish SNAPSHOT versions to Plugin Portal!")
     }
   }
-  notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/21283")
 }
 
 configurations {
