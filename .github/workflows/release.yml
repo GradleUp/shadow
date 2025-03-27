@@ -25,7 +25,7 @@ jobs:
         with:
           cache-read-only: true
       # TODO: https://github.com/gradle/gradle/issues/22779
-      - run: ./gradlew publish publishPlugins --no-configuration-cache
+      - run: ./gradlew publishToMavenCentral publishPlugins --no-configuration-cache
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_SECRET }}

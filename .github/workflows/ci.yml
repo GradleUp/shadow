@@ -38,7 +38,7 @@ jobs:
         with:
           cache-read-only: true
       # TODO: https://github.com/gradle/gradle/issues/22779
-      - run: ./gradlew publish --no-configuration-cache
+      - run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
