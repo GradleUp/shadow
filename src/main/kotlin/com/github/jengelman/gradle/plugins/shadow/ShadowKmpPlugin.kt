@@ -17,8 +17,8 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     with(project) {
       kmpExtension = extensions.getByType(KotlinMultiplatformExtension::class.java)
-      kmpExtension.targets.configureEach { target ->
-        if (target !is KotlinJvmTarget) return@configureEach
+      kmpExtension.targets { target ->
+        if (target !is KotlinJvmTarget) return@targets
 
         val kotlinJvmMain = target.compilations.named("main")
         registerShadowJarCommon { task ->
