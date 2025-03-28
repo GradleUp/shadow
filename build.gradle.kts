@@ -65,6 +65,7 @@ dependencies {
   testPluginClasspath(libs.kotlin.kmp)
 
   lintChecks(libs.androidx.gradlePluginLints)
+  lintChecks(libs.slack.lintChecks)
 }
 
 testing.suites {

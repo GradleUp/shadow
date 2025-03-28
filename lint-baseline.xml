@@ -1,5 +1,1336 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.9.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.0)" variant="all" version="8.9.0">
+<issues format="6" by="lint 8.9.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.1)" variant="all" version="8.9.1">
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="      (group == null || resolvedDependency.moduleGroup.matches(group!!.toRegex())) &amp;&amp;"
+        errorLine2="                                                                    ~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/AbstractDependencyFilter.kt"
+            line="76"
+            column="69"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="        (version == null || resolvedDependency.moduleVersion.matches(version!!.toRegex()))"
+        errorLine2="                                                                            ~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/AbstractDependencyFilter.kt"
+            line="78"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    val attributes = manifest!!.mainAttributes"
+        errorLine2="                             ~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer.kt"
+            line="72"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="    manifest!!.write(os)"
+        errorLine2="            ~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer.kt"
+            line="81"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="        val mergedEl = doc!!.rootElement"
+        errorLine2="                          ~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer.kt"
+            line="64"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="AvoidUsingNotNullOperator"
+        message="Avoid using the `!!` operator"
+        errorLine1="        doc!!.rootElement.addContent(n.clone())"
+        errorLine2="           ~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendingTransformer.kt"
+            line="71"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.codehaus.plexus.util.xml.XmlStreamReader.XmlStreamReader is deprecated; consider using an alternative."
+        errorLine1="      Xpp3DomBuilder.build(XmlStreamReader(bis))"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer.kt"
+            line="40"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.artifacts.ProjectDependency.getPath is deprecated; consider using an alternative."
+        errorLine1="    project.project(path)"
+        errorLine2="                    ~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/GradleCompat.kt"
+            line="105"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.artifacts.ProjectDependency.getDependencyProject is deprecated; consider using an alternative."
+        errorLine1="    dependencyProject"
+        errorLine2="    ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/GradleCompat.kt"
+            line="108"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="      task.description = &quot;Runs this project as a JVM application using the shadow jar&quot;"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="40"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="      task.description = &quot;Runs this project as a JVM application using the shadow jar&quot;"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="40"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="      task.group = ApplicationPlugin.APPLICATION_GROUP"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="41"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="      task.group = ApplicationPlugin.APPLICATION_GROUP"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="41"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.JavaExec.setClasspath is deprecated; consider using an alternative."
+        errorLine1="      task.classpath = files(tasks.shadowJar)"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="43"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.JavaExec.getMainModule is deprecated; consider using an alternative."
+        errorLine1="        task.mainModule.set(mainModule)"
+        errorLine2="        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="46"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.JavaExec.getMainClass is deprecated; consider using an alternative."
+        errorLine1="        task.mainClass.set(mainClass)"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="47"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.JavaExec.getJvmArguments is deprecated; consider using an alternative."
+        errorLine1="        task.jvmArguments.convention(provider { applicationDefaultJvmArgs })"
+        errorLine2="        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="48"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.JavaExec.getModularity is deprecated; consider using an alternative."
+        errorLine1="      task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)"
+        errorLine2="      ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="51"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.JavaExec.getJavaLauncher is deprecated; consider using an alternative."
+        errorLine1="      task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))"
+        errorLine2="      ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="52"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="      task.description = &quot;Creates OS specific scripts to run the project as a JVM application using the shadow jar&quot;"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="58"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="      task.description = &quot;Creates OS specific scripts to run the project as a JVM application using the shadow jar&quot;"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="58"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="      task.group = ApplicationPlugin.APPLICATION_GROUP"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="59"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="      task.group = ApplicationPlugin.APPLICATION_GROUP"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="59"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.application.tasks.CreateStartScripts.getUnixStartScriptGenerator is deprecated; consider using an alternative."
+        errorLine1="      (task.unixStartScriptGenerator as TemplateBasedScriptGenerator).template ="
+        errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="62"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.application.tasks.CreateStartScripts.getWindowsStartScriptGenerator is deprecated; consider using an alternative."
+        errorLine1="      (task.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template ="
+        errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="64"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.application.tasks.CreateStartScripts.setClasspath is deprecated; consider using an alternative."
+        errorLine1="      task.classpath = files(tasks.shadowJar)"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="67"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.application.tasks.CreateStartScripts.setClasspath is deprecated; consider using an alternative."
+        errorLine1="      task.classpath = files(tasks.shadowJar)"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="67"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.application.tasks.CreateStartScripts.getMainModule is deprecated; consider using an alternative."
+        errorLine1="        task.mainModule.set(mainModule)"
+        errorLine2="        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="70"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.application.tasks.CreateStartScripts.getMainClass is deprecated; consider using an alternative."
+        errorLine1="        task.mainClass.set(mainClass)"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="71"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.internal.ConventionTask.getConventionMapping is deprecated; consider using an alternative."
+        errorLine1="        task.conventionMapping.map(&quot;applicationName&quot;, ::getApplicationName)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="72"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.internal.ConventionTask.getConventionMapping is deprecated; consider using an alternative."
+        errorLine1="        task.conventionMapping.map(&quot;outputDir&quot;) { layout.buildDirectory.dir(&quot;scriptsShadow&quot;).get().asFile }"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="73"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.internal.ConventionTask.getConventionMapping is deprecated; consider using an alternative."
+        errorLine1="        task.conventionMapping.map(&quot;executableDir&quot;, ::getExecutableDir)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="74"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.internal.ConventionTask.getConventionMapping is deprecated; consider using an alternative."
+        errorLine1="        task.conventionMapping.map(&quot;defaultJvmOpts&quot;, ::getApplicationDefaultJvmArgs)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="75"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.application.tasks.CreateStartScripts.getModularity is deprecated; consider using an alternative."
+        errorLine1="      task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)"
+        errorLine2="      ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="78"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.doFirst is deprecated; consider using an alternative."
+        errorLine1="      task.doFirst {"
+        errorLine2="      ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="86"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.Sync.getDestinationDir is deprecated; consider using an alternative."
+        errorLine1="          !task.destinationDir.listFiles().isNullOrEmpty() &amp;&amp;"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="88"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.Sync.getDestinationDir is deprecated; consider using an alternative."
+        errorLine1="            !task.destinationDir.resolve(&quot;lib&quot;).isDirectory ||"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="90"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.Sync.getDestinationDir is deprecated; consider using an alternative."
+        errorLine1="              !task.destinationDir.resolve(&quot;bin&quot;).isDirectory"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="91"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.Sync.getDestinationDir is deprecated; consider using an alternative."
+        errorLine1="            &quot;The specified installation directory &apos;${task.destinationDir}&apos; is neither empty nor does it contain an installation for &apos;${applicationName.get()}&apos;.\n&quot; +"
+        errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="95"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.doLast is deprecated; consider using an alternative."
+        errorLine1="      task.doLast {"
+        errorLine2="      ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="101"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.eachFile is deprecated; consider using an alternative."
+        errorLine1="        task.eachFile {"
+        errorLine2="        ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="102"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getInputs is deprecated; consider using an alternative."
+        errorLine1="      task.inputs.property(&quot;mainClassName&quot;, mainClassName)"
+        errorLine2="      ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="131"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.doFirst is deprecated; consider using an alternative."
+        errorLine1="      task.doFirst {"
+        errorLine2="      ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="132"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getManifest is deprecated; consider using an alternative."
+        errorLine1="        if (!task.manifest.attributes.contains(mainClassAttributeKey)) {"
+        errorLine2="             ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="134"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getManifest is deprecated; consider using an alternative."
+        errorLine1="          task.manifest.attributes[mainClassAttributeKey] = mainClassName.get()"
+        errorLine2="          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
+            line="135"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.Jar.Jar is deprecated; consider using an alternative."
+        errorLine1="  Jar(),"
+        errorLine2="  ~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="53"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getProject is deprecated; consider using an alternative."
+        errorLine1="  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)"
+        errorLine2="                                                                     ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="55"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getProject is deprecated; consider using an alternative."
+        errorLine1="  private val includedZipTrees = project.provider {"
+        errorLine2="                                 ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="57"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getProject is deprecated; consider using an alternative."
+        errorLine1="    includedDependencies.files.map { project.zipTree(it) }"
+        errorLine2="                                     ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="58"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.setDuplicatesStrategy is deprecated; consider using an alternative."
+        errorLine1="    duplicatesStrategy = DuplicatesStrategy.INCLUDE"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="63"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.internal.AbstractTask.getServices is deprecated; consider using an alternative."
+        errorLine1="    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))"
+        errorLine2="                                      ~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="64"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.internal.AbstractTask.getServices is deprecated; consider using an alternative."
+        errorLine1="    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))"
+        errorLine2="                                      ~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="64"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.tasks.Jar.setManifest is deprecated; consider using an alternative."
+        errorLine1="    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="64"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getOutputs is deprecated; consider using an alternative."
+        errorLine1="    outputs.doNotCacheIf(&quot;Has one or more transforms or relocators that are not cacheable&quot;) {"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="66"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val minimizeJar: Property&lt;Boolean> = objectFactory.property(false)"
+        errorLine2="                                                   ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="79"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {"
+        errorLine2="                                                           ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="82"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {"
+        errorLine2="                                                        ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="89"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getProject is deprecated; consider using an alternative."
+        errorLine1="      if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet()"
+        errorLine2="                                                  ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="91"
+            column="51"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {"
+        errorLine2="                                                                      ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="97"
+            column="71"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getProject is deprecated; consider using an alternative."
+        errorLine1="        project.sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }"
+        errorLine2="        ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="100"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val transformers: SetProperty&lt;ResourceTransformer> = objectFactory.setProperty()"
+        errorLine2="                                                                   ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="111"
+            column="68"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val relocators: SetProperty&lt;Relocator> = objectFactory.setProperty()"
+        errorLine2="                                                       ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="117"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val configurations: SetProperty&lt;Configuration> = objectFactory.setProperty()"
+        errorLine2="                                                               ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="126"
+            column="64"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getProject is deprecated; consider using an alternative."
+        errorLine1="    objectFactory.property(DefaultDependencyFilter(project))"
+        errorLine2="                                                   ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="130"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="    objectFactory.property(DefaultDependencyFilter(project))"
+        errorLine2="    ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="130"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {"
+        errorLine2="                                                                     ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="136"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val enableRelocation: Property&lt;Boolean> = objectFactory.property(false)"
+        errorLine2="                                                        ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="147"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="  public open val relocationPrefix: Property&lt;String> = objectFactory.property(ShadowBasePlugin.SHADOW)"
+        errorLine2="                                                       ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="156"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.tasks.Jar.getManifest is deprecated; consider using an alternative."
+        errorLine1="  override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest"
+        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="159"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getIncludes is deprecated; consider using an alternative."
+        errorLine1="  override fun getIncludes(): MutableSet&lt;String> = super.getIncludes()"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="162"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getExcludes is deprecated; consider using an alternative."
+        errorLine1="  override fun getExcludes(): MutableSet&lt;String> = super.getExcludes()"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="165"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.minimize is deprecated; consider using an alternative."
+        errorLine1="    minimize()"
+        errorLine2="    ~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="178"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.transform is deprecated; consider using an alternative."
+        errorLine1="    transform(ServiceFileTransformer::class.java, null)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="193"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.transform is deprecated; consider using an alternative."
+        errorLine1="    transform(ServiceFileTransformer::class.java) {"
+        errorLine2="    ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="200"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.transform is deprecated; consider using an alternative."
+        errorLine1="    transform(ServiceFileTransformer::class.java, action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="209"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.transform is deprecated; consider using an alternative."
+        errorLine1="    transform(GroovyExtensionModuleTransformer::class.java, null)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="216"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.transform is deprecated; consider using an alternative."
+        errorLine1="    transform(AppendingTransformer::class.java) {"
+        errorLine2="    ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="229"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.addRelocator is deprecated; consider using an alternative."
+        errorLine1="    addRelocator(relocator, action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="244"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.addRelocator is deprecated; consider using an alternative."
+        errorLine1="    addRelocator(relocator, action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="252"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.addRelocator is deprecated; consider using an alternative."
+        errorLine1="    addRelocator(relocator, action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="259"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.relocate is deprecated; consider using an alternative."
+        errorLine1="    relocate(R::class.java, null)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="268"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.relocate is deprecated; consider using an alternative."
+        errorLine1="    relocate(R::class.java, action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="277"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.addTransform is deprecated; consider using an alternative."
+        errorLine1="    addTransform(clazz.create(objectFactory), action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="284"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.getObjectFactory is deprecated; consider using an alternative."
+        errorLine1="    addTransform(clazz.create(objectFactory), action)"
+        errorLine2="                              ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="284"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.addTransform is deprecated; consider using an alternative."
+        errorLine1="    addTransform(transformer, action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="291"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.transform is deprecated; consider using an alternative."
+        errorLine1="    transform(T::class.java, null)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="300"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.transform is deprecated; consider using an alternative."
+        errorLine1="    transform(T::class.java, action)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="309"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.from is deprecated; consider using an alternative."
+        errorLine1="    from(includedZipTrees.get())"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="314"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.injectMultiReleaseAttrIfPresent is deprecated; consider using an alternative."
+        errorLine1="    injectMultiReleaseAttrIfPresent()"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="315"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.copy is deprecated; consider using an alternative."
+        errorLine1="    super.copy()"
+        errorLine2="    ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="316"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.Zip.getEntryCompression is deprecated; consider using an alternative."
+        errorLine1="        val entryCompressionMethod = when (entryCompression) {"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="322"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.Zip.getEntryCompression is deprecated; consider using an alternative."
+        errorLine1="          else -> throw IllegalArgumentException(&quot;Unknown Compression type $entryCompression.&quot;)"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="325"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.Zip.isZip64 is deprecated; consider using an alternative."
+        errorLine1="          setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)"
+        errorLine2="                          ~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="328"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.AbstractArchiveTask.getArchiveFile is deprecated; consider using an alternative."
+        errorLine1="      archiveFile.get().asFile,"
+        errorLine2="      ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="345"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.AbstractArchiveTask.isPreserveFileTimestamps is deprecated; consider using an alternative."
+        errorLine1="      isPreserveFileTimestamps,"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="350"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.tasks.Jar.getMetadataCharset is deprecated; consider using an alternative."
+        errorLine1="      metadataCharset,"
+        errorLine2="      ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="351"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getManifest is deprecated; consider using an alternative."
+        errorLine1="      manifest.attributes[multiReleaseAttributeKey] = true"
+        errorLine2="      ~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
+            line="393"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getManifest is deprecated; consider using an alternative."
+        errorLine1="      task.manifest.inheritFrom(jarTask.get().manifest)"
+        errorLine2="      ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="45"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.tasks.Jar.getManifest is deprecated; consider using an alternative."
+        errorLine1="      task.manifest.inheritFrom(jarTask.get().manifest)"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="45"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.jvm.tasks.Jar.getManifest is deprecated; consider using an alternative."
+        errorLine1="      val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }"
+        errorLine2="                                       ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="46"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.doFirst is deprecated; consider using an alternative."
+        errorLine1="      task.doFirst {"
+        errorLine2="      ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="48"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getManifest is deprecated; consider using an alternative."
+        errorLine1="          task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(&quot; &quot;).trim()"
+        errorLine2="          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="51"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.from is deprecated; consider using an alternative."
+        errorLine1="      task.from(sourceSets.named(&quot;main&quot;).map { it.output })"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="54"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="        task.group = LifecycleBasePlugin.BUILD_GROUP"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="131"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="        task.group = LifecycleBasePlugin.BUILD_GROUP"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="131"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="        task.group = LifecycleBasePlugin.BUILD_GROUP"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="131"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setGroup is deprecated; consider using an alternative."
+        errorLine1="        task.group = LifecycleBasePlugin.BUILD_GROUP"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="131"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="        task.description = &quot;Create a combined JAR of project and runtime dependencies&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="132"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="        task.description = &quot;Create a combined JAR of project and runtime dependencies&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="132"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="        task.description = &quot;Create a combined JAR of project and runtime dependencies&quot;"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="132"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.setDescription is deprecated; consider using an alternative."
+        errorLine1="        task.description = &quot;Create a combined JAR of project and runtime dependencies&quot;"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="132"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.AbstractArchiveTask.getArchiveClassifier is deprecated; consider using an alternative."
+        errorLine1="        task.archiveClassifier.set(&quot;all&quot;)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="133"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.bundling.AbstractArchiveTask.getArchiveClassifier is deprecated; consider using an alternative."
+        errorLine1="        task.archiveClassifier.set(&quot;all&quot;)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="133"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.exclude is deprecated; consider using an alternative."
+        errorLine1="        task.exclude("
+        errorLine2="        ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="134"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.exclude is deprecated; consider using an alternative."
+        errorLine1="        task.exclude("
+        errorLine2="        ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin.kt"
+            line="134"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.tasks.AbstractCopyTask.from is deprecated; consider using an alternative."
+        errorLine1="        task.from(kotlinJvmMain.map { it.output.allOutputs })"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin.kt"
+            line="21"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.getInputs is deprecated; consider using an alternative."
+        errorLine1="      task.inputs.property(&quot;mainClassName&quot;, mainClassName)"
+        errorLine2="      ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin.kt"
+            line="39"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.DefaultTask.doFirst is deprecated; consider using an alternative."
+        errorLine1="      task.doFirst {"
+        errorLine2="      ^">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin.kt"
+            line="40"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getManifest is deprecated; consider using an alternative."
+        errorLine1="        if (!task.manifest.attributes.contains(mainClassAttributeKey) &amp;&amp; !realClass.isNullOrEmpty()) {"
+        errorLine2="             ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin.kt"
+            line="42"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getManifest is deprecated; consider using an alternative."
+        errorLine1="          task.manifest.attributes[mainClassAttributeKey] = realClass"
+        errorLine2="          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin.kt"
+            line="43"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="DeprecatedCall"
+        message="org.gradle.api.artifacts.FileCollectionDependency.getFiles is deprecated; consider using an alternative."
+        errorLine1="            apiJars.addAll(dep.files)"
+        errorLine2="                           ~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/UnusedTracker.kt"
+            line="63"
+            column="28"/>
+    </issue>
 
     <issue
         id="InternalGradleApiUsage"
