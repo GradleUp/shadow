@@ -22,6 +22,10 @@ Options:
 
 - Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
 
+**Fixed**
+
+- Avoid creating jvm targets eagerly for KMP. ([#1378](https://github.com/GradleUp/shadow/pull/1378))
+
 
 ## [v9.0.0-beta11] (2025-03-18)
 [v9.0.0-beta11]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta11
