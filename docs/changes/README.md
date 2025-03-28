@@ -4,6 +4,10 @@
 ## [Unreleased]
 [Unreleased]: https://github.com/GradleUp/shadow/compare/9.0.0-beta12...HEAD
 
+**Fixed**
+
+- Avoid creating jvm targets eagerly for KMP. ([#1378](https://github.com/GradleUp/shadow/pull/1378))
+
 
 ## [v9.0.0-beta12] (2025-04-01)
 [v9.0.0-beta12]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta12
