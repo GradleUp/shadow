@@ -38,8 +38,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
       - name: Extract release notes
-        # TODO: replace this after https://github.com/ffurrer2/extract-release-notes/pull/355 is merged.
-        uses: Goooler/extract-release-notes@6e686e7a607d03716b7cff561371a82065b22c33
+        uses: ffurrer2/extract-release-notes@v2
         with:
           changelog_file: src/docs/changes/README.md
           release_notes_file: RELEASE_NOTES.md
