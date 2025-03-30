@@ -35,7 +35,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
       - uses: ./.github/actions/deploy-site
       - name: Extract release notes
-        uses: ffurrer2/extract-release-notes@main
+        uses: ffurrer2/extract-release-notes@v2
         with:
           changelog_file: docs/changes/README.md
           release_notes_file: RELEASE_NOTES.md
