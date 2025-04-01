@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - '**'
-  pull_request:
 
 jobs:
   release:
@@ -24,23 +23,23 @@ jobs:
         with:
           cache-read-only: true
       # TODO: https://github.com/gradle/gradle/issues/22779
-#      - run: ./gradlew publishToMavenCentral publishPlugins --no-configuration-cache
-#        env:
-#          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_KEY }}
-#          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_SECRET }}
-#          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
-#          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
-#          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
-#          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
-#      - name: Extract release notes
-#        uses: ffurrer2/extract-release-notes@v2
-#        with:
-#          changelog_file: docs/changes/README.md
-#          release_notes_file: RELEASE_NOTES.md
-#      - name: Create release
-#        run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: ./gradlew publishToMavenCentral publishPlugins --no-configuration-cache
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_SECRET }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
+      - name: Extract release notes
+        uses: ffurrer2/extract-release-notes@v2
+        with:
+          changelog_file: docs/changes/README.md
+          release_notes_file: RELEASE_NOTES.md
+      - name: Create release
+        run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: release
