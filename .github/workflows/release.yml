@@ -30,8 +30,6 @@ jobs:
 #          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
 #          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
 #          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
-      - name: Deploy Site
-        uses: ./.github/workflows/deploy.yml
 #      - name: Extract release notes
 #        uses: ffurrer2/extract-release-notes@v2
 #        with:
@@ -41,3 +39,7 @@ jobs:
 #        run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: release
+    uses: ./.github/workflows/deploy.yml
