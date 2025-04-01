@@ -8,11 +8,13 @@ on:
       - docs/**
       - README.md
       - RELEASING.md
+      - .github/workflows/links.yml
   pull_request:
     paths:
       - docs/**
       - README.md
       - RELEASING.md
+      - .github/workflows/links.yml
   workflow_dispatch:
 
 jobs:
