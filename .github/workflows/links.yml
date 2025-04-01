@@ -8,11 +8,13 @@ on:
       - docs/**
       - README.md
       - RELEASING.md
+      - .github/workflows/links.yml
   pull_request:
     paths:
       - docs/**
       - README.md
       - RELEASING.md
+      - .github/workflows/links.yml
   workflow_dispatch:
 
 jobs:
@@ -25,6 +27,11 @@ jobs:
           cache-read-only: true
       # This is required for action-linkspector to work with API links.
       - run: ./gradlew dokkaHtml
+      - name: Mkdocs build validation
+        run: |
+          # Don't cache it to track updates.
+          pip install mkdocs-material
+          mkdocs build --strict
       - uses: umbrelladocs/action-linkspector@v1
         with:
           reporter: github-pr-check
