@@ -10,9 +10,21 @@ jobs:
     environment:
       name: github-pages
     permissions:
-      contents: write
       id-token: write
       pages: write
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/deploy-site
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+      - name: Prepare API documentation
+        run: ./gradlew dokkaHtml
+      - name: Build Site
+        run: |
+          # Don't cache it to track updates.
+          pip install mkdocs-material
+          mkdocs build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4

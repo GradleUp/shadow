@@ -9,12 +9,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: github.event.repository.fork == false
-    environment:
-      name: github-pages
     permissions:
       contents: write
-      id-token: write
-      pages: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -33,7 +29,8 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_KEY_PASSWORD }}
-      - uses: ./.github/actions/deploy-site
+      - name: Deploy Site
+        uses: ./.github/workflows/deploy.yml
       - name: Extract release notes
         uses: ffurrer2/extract-release-notes@v2
         with:
