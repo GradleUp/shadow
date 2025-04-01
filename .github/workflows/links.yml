@@ -30,7 +30,7 @@ jobs:
       - name: Mkdocs build validation
         run: |
           # Don't cache it to track updates.
-          pip install mkdocs
+          pip install mkdocs-material
           mkdocs build --strict
       - uses: umbrelladocs/action-linkspector@v1
         with:
