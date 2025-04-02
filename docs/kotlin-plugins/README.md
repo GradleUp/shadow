@@ -37,7 +37,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
 
     ```kotlin
     plugins {
-      kotlin("jvm")
+      id("org.jetbrains.kotlin.jvm")
       id("com.gradleup.shadow")
     }
 
@@ -73,7 +73,7 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
 
     ```kotlin
     plugins {
-      kotlin("multiplatform")
+      id("org.jetbrains.kotlin.multiplatform")
       id("com.gradleup.shadow")
     }
 
