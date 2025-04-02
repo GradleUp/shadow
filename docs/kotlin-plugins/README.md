@@ -80,6 +80,7 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
     val ktorVersion = "3.1.0"
 
     kotlin {
+      @Suppress("OPT_IN_USAGE")
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`, it's available from Kotlin 2.1.0
         mainClass = "myapp.MainKt"
