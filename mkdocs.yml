@@ -77,3 +77,7 @@ nav:
   - 'Changes': changes/README.md
   - 'API': api/index.html
   - 'About': about/README.md
+
+validation:
+  unrecognized_links: warn
+  anchors: warn

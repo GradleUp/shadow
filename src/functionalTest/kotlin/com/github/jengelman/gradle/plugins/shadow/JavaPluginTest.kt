@@ -4,7 +4,9 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
+import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -16,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -57,12 +60,29 @@ class JavaPluginTest : BasePluginTest() {
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
 
-    assertThat(shadowTask.archiveBaseName.get()).isEqualTo(projectName)
-    assertThat(shadowTask.destinationDirectory.get().asFile)
-      .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
-    assertThat(shadowTask.archiveVersion.get()).isEqualTo(version)
-    assertThat(shadowTask.archiveClassifier.get()).isEqualTo("all")
-    assertThat(shadowTask.archiveExtension.get()).isEqualTo("jar")
+    with(shadowTask) {
+      assertThat(archiveBaseName.get()).isEqualTo(projectName)
+      assertThat(destinationDirectory.get().asFile)
+        .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
+      assertThat(archiveVersion.get()).isEqualTo(version)
+      assertThat(archiveClassifier.get()).isEqualTo("all")
+      assertThat(archiveExtension.get()).isEqualTo("jar")
+      assertThat(archiveFileName.get()).isEqualTo("my-shadow-1.0.0-all.jar")
+      assertThat(archiveFile.get().asFile).all {
+        isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
+        isEqualTo(project.projectDir.resolve("build/libs/my-shadow-1.0.0-all.jar"))
+      }
+      assertThat(archiveAppendix.orNull).isNull()
+
+      assertThat(minimizeJar.get()).isFalse()
+      assertThat(enableRelocation.get()).isFalse()
+      assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
+      assertThat(configurations.get()).all {
+        isNotEmpty()
+        containsOnly(project.runtimeConfiguration)
+      }
+    }
+
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
   }
 
@@ -86,9 +106,11 @@ class JavaPluginTest : BasePluginTest() {
     }
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -101,16 +123,32 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
+  fun shadowJarCliOptions() {
+    val result = run("help", "--task", shadowJarTask)
+
+    assertThat(result.output).contains(
+      "--enable-relocation     Enable relocation of packages in the jar",
+      "--no-enable-relocation     Disables option --enable-relocation",
+      "--minimize-jar     Minimize the jar by removing unused classes",
+      " --no-minimize-jar     Disables option --minimize-jar",
+      "--relocation-prefix     Prefix to use for relocated packages",
+    )
+  }
+
+  @Test
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -123,14 +161,19 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
       containsOnly(
+        "server/",
         "server/Server.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsAtLeast(
+        "client/",
         "client/Client.class",
         "client/junit/framework/Test.class",
+      )
+      containsNone(
+        "server/Server.class",
       )
     }
   }
@@ -138,25 +181,29 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun shadowProjectShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
-    val shadowedEntries = junitEntries
+    val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
+        "client/junit/",
         "client/Client.class",
         "server/Server.class",
-        *shadowedEntries,
-      )
-      containsNone(
-        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
+        *relocatedEntries,
+        *manifestEntries,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsAtLeast(
         "client/Client.class",
         "client/junit/framework/Test.class",
+      )
+      containsNone(
+        "server/Server.class",
       )
     }
   }
@@ -223,10 +270,11 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
+        "my/",
         "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -247,7 +295,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -287,11 +335,12 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "api.properties",
         "implementation.properties",
         "runtimeOnly.properties",
         "implementation-dep.properties",
+        *manifestEntries,
       )
     }
   }
@@ -312,7 +361,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -454,10 +503,13 @@ class JavaPluginTest : BasePluginTest() {
       getMainAttr(classPathAttributeKey).isNull()
 
       containsOnly(
+        "my/",
+        "my/plugin/",
         "my/plugin/MyPlugin.class",
+        "META-INF/gradle-plugins/",
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -479,7 +531,7 @@ class JavaPluginTest : BasePluginTest() {
           description = 'Create a combined JAR of project and test dependencies'
           archiveClassifier = 'tests'
           from sourceSets.named('test').map { it.output }
-          configurations = provider { [project.configurations.testRuntimeClasspath] }
+          configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
@@ -490,9 +542,11 @@ class JavaPluginTest : BasePluginTest() {
     run(testShadowJarTask)
 
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
@@ -544,9 +598,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -602,13 +658,11 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "my/",
-        mainClassEntry,
         "Bar/",
         "Bar/Foo",
-        "META-INF/",
         "META-INF/a-1.0.jar",
-        manifestEntry,
-        includeDirs = true,
+        mainClassEntry,
+        *manifestEntries,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
@@ -652,9 +706,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
-        mainClassEntry,
+      containsOnly(
         "module-info.class",
+        "my/",
+        mainClassEntry,
+        *manifestEntries,
       )
       getContent("module-info.class").all {
         isNotEmpty()

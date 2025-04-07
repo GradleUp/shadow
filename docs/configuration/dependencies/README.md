@@ -9,7 +9,7 @@ of the [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow
 
     ```kotlin
     tasks.shadowJar {
-      configurations = provider { listOf(project.configurations.runtimeClasspath.get()) }
+      configurations = project.configurations.compileClasspath.map { listOf(it) }
     }
     ```
 
@@ -17,7 +17,7 @@ of the [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      configurations = [project.configurations.compileClasspath]
+      configurations = project.configurations.named('compileClasspath').map { [it] }
     }
     ```
 
@@ -26,7 +26,7 @@ This means any dependency declared in the `runtimeOnly` configuration would be *
 
 > Note the literal use of `project.configurations` when setting the `configurations` attribute of a
 [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task.
-This is **required**. It may be tempting to specify `configurations = [configurations.compile]` but this will not
+This is **required**. It may be tempting to specify `configurations = [configurations.compileClasspath]` but this will not
 have the intended effect, as `configurations.compile` will try to delegate to the `configurations` property of the [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task instead of the `project`
 
 ## Embedding Jar Files Inside Your Shadow Jar

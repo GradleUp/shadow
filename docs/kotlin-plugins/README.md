@@ -1,11 +1,31 @@
 # Integrating with Kotlin Plugins
 
-Kotlin standard libraries (stdlib) are added by Kotlin plugins by default, they will be bundled into the shadowed JARs automatically.
+Kotlin standard libraries (stdlib) are added by Kotlin plugins by default via `implementation` (`runtimeClasspath`), 
+they will be bundled into the shadowed JARs automatically.
 If you don't need a standard library at all, you can add the following Gradle property to your gradle.properties file:
 
 ```properties
 kotlin.stdlib.default.dependency=false
 ```
+
+Kotlin compilations may still require the standard libraries, you can add them into `compileOnly` (`compileClasspath`) 
+to make sure compilations success and avoid shadowing as follows:
+
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    dependencies {
+      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
+    }
+    ```
 
 See more information about [Dependency on the standard library](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library).
 
@@ -17,7 +37,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
 
     ```kotlin
     plugins {
-      kotlin("jvm")
+      id("org.jetbrains.kotlin.jvm")
       id("com.gradleup.shadow")
     }
 
@@ -53,13 +73,14 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
 
     ```kotlin
     plugins {
-      kotlin("multiplatform")
+      id("org.jetbrains.kotlin.multiplatform")
       id("com.gradleup.shadow")
     }
 
     val ktorVersion = "3.1.0"
 
     kotlin {
+      @Suppress("OPT_IN_USAGE")
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`, it's available from Kotlin 2.1.0
         mainClass = "myapp.MainKt"
@@ -78,7 +99,8 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
       }
     }
 
-    tasks.shadowJar {
+    // TODO: we can't use `tasks.shadowJar` here like the other examples, something wrong with Gradle or Kotlin plugin?
+    tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
         attributes["Main-Class"] = "com.example.MainKt"

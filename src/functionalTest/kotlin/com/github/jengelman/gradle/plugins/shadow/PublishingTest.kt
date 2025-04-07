@@ -152,7 +152,7 @@ class PublishingTest : BasePluginTest() {
             description = 'Create a combined JAR of project and test dependencies'
             archiveClassifier = 'tests'
             from sourceSets.named('test').map { it.output }
-            configurations = provider { [project.configurations.testRuntimeClasspath] }
+            configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
           }
         """.trimIndent(),
         dependenciesBlock = """
@@ -169,7 +169,10 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("my/maven/1.0/maven-1.0-tests.jar")).useAll {
-      containsAtLeast(*junitEntries)
+      containsOnly(
+        *junitEntries,
+        *manifestEntries,
+      )
     }
   }
 
@@ -278,7 +281,7 @@ class PublishingTest : BasePluginTest() {
       containsOnly(
         "aa.properties",
         "aa2.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
     assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
@@ -368,7 +371,7 @@ class PublishingTest : BasePluginTest() {
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
       containsOnly(
         *entriesInAB,
-        manifestEntry,
+        *manifestEntries,
       )
     }
 

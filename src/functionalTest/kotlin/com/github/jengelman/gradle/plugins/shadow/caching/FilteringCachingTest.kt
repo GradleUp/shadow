@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.caching
 import assertk.Assert
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -34,7 +33,7 @@ class FilteringCachingTest : BaseCachingTest() {
       containsOnly(
         "d.properties",
         *entriesInAB,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -57,7 +56,7 @@ class FilteringCachingTest : BaseCachingTest() {
         "b.properties",
         "c.properties",
         "d.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -79,10 +78,12 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(
-        *entriesInAB,
+      containsOnly(
+        "my/",
         mainClassEntry,
         main2ClassEntry,
+        *entriesInAB,
+        *manifestEntries,
       )
     }
 
@@ -96,9 +97,10 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
         main2ClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
 
@@ -112,8 +114,9 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
 
@@ -127,9 +130,10 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
         main2ClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -146,9 +150,11 @@ class FilteringCachingTest : BaseCachingTest() {
     )
 
     assertCompositeExecutions {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
     }
 
@@ -164,8 +170,9 @@ class FilteringCachingTest : BaseCachingTest() {
 
     assertCompositeExecutions {
       containsOnly(
+        "my/",
         mainClassEntry,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -191,7 +198,7 @@ class FilteringCachingTest : BaseCachingTest() {
     containsOnly(
       "c.properties",
       *entriesInAB,
-      manifestEntry,
+      *manifestEntries,
     )
   }
 }
