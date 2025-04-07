@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion as KgpVersion
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 public abstract class ShadowKmpPlugin : Plugin<Project> {
   private lateinit var kmpExtension: KotlinMultiplatformExtension
@@ -16,24 +17,28 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
   override fun apply(project: Project) {
     with(project) {
       kmpExtension = extensions.getByType(KotlinMultiplatformExtension::class.java)
-      val kotlinJvmMain = kmpExtension.jvm().compilations.named("main")
-      registerShadowJarCommon { task ->
-        task.from(kotlinJvmMain.map { it.output.allOutputs })
-        task.configurations.convention(
-          provider {
-            listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName))
-          },
-        )
-        configureMainClass(task)
+      kmpExtension.targets.configureEach { target ->
+        if (target !is KotlinJvmTarget) return@configureEach
+
+        val kotlinJvmMain = target.compilations.named("main")
+        registerShadowJarCommon { task ->
+          task.from(kotlinJvmMain.map { it.output.allOutputs })
+          task.configurations.convention(
+            provider {
+              listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName))
+            },
+          )
+          configureMainClass(target.name, task)
+        }
       }
     }
   }
 
-  private fun Project.configureMainClass(task: ShadowJar) {
+  private fun Project.configureMainClass(targetName: String, task: ShadowJar) {
     if (KgpVersion.DEFAULT < KgpVersion.KOTLIN_2_1) return
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    kmpExtension.jvm().mainRun {
+    kmpExtension.jvm(targetName).mainRun {
       // Fix cannot serialize object of type 'org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun'.
       val mainClassName = provider { mainClass }
       task.inputs.property("mainClassName", mainClassName)
