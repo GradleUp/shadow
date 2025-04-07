@@ -99,7 +99,8 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
       }
     }
 
-    tasks.shadowJar {
+    // TODO: we can't use `tasks.shadowJar` here like the other examples, something wrong with Gradle or Kotlin plugin?
+    tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
         attributes["Main-Class"] = "com.example.MainKt"
