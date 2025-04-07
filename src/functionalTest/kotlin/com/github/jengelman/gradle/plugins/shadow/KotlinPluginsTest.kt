@@ -107,6 +107,40 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun compatKmpForOtherNamedJvmTarget() {
+    val stdlib = compileOnlyStdlib(true)
+    val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
+    projectScriptPath.appendText(
+      """
+        kotlin {
+          jvm("newJvm")
+          sourceSets {
+            commonMain {
+              dependencies {
+                implementation 'my:b:1.0'
+                $stdlib
+              }
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      val entries = arrayOf(
+        "my/",
+        "META-INF/my.kotlin_module",
+        mainClassEntry,
+        *entriesInAB,
+        *manifestEntries,
+      )
+      containsAtLeast(*entries)
+    }
+  }
+
   @Issue(
     "https://github.com/GradleUp/shadow/issues/1377",
   )
