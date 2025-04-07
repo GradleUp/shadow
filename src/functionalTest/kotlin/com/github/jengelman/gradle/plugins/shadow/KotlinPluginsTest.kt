@@ -109,12 +109,14 @@ class KotlinPluginsTest : BasePluginTest() {
 
   @Test
   fun compatKmpForOtherNamedJvmTarget() {
+    val jvmTargetName = "newJvm"
+    val jvmTargetMain = "${jvmTargetName}Main"
     val stdlib = compileOnlyStdlib(true)
-    val mainClassEntry = writeClass(sourceSet = "newJvmMain", jvmLang = JvmLang.Kotlin)
+    val mainClassEntry = writeClass(sourceSet = jvmTargetMain, jvmLang = JvmLang.Kotlin)
     projectScriptPath.appendText(
       """
         kotlin {
-          jvm("newJvm")
+          jvm("$jvmTargetName")
           sourceSets {
             commonMain {
               dependencies {
@@ -122,7 +124,7 @@ class KotlinPluginsTest : BasePluginTest() {
                 $stdlib
               }
             }
-            newJvmMain {
+            $jvmTargetMain {
               dependencies {
                 implementation 'my:a:1.0'
               }
