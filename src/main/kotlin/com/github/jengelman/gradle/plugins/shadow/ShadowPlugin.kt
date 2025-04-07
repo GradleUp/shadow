@@ -17,11 +17,10 @@ public abstract class ShadowPlugin : Plugin<Project> {
       }
       @Suppress("WithTypeWithoutConfigureEach")
       withType(ApplicationPlugin::class.java) {
-        apply(ShadowJavaAppPlugin::class.java)
+        apply(ShadowApplicationPlugin::class.java)
       }
       withId("org.jetbrains.kotlin.multiplatform") {
         apply(ShadowKmpPlugin::class.java)
-        apply(ShadowKmpAppPlugin::class.java)
       }
 
       // Apply the legacy plugin last.
