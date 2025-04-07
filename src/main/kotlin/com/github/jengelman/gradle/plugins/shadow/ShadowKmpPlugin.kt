@@ -28,17 +28,17 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
               listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName))
             },
           )
-          configureMainClass(task)
+          configureMainClass(target.name, task)
         }
       }
     }
   }
 
-  private fun Project.configureMainClass(task: ShadowJar) {
+  private fun Project.configureMainClass(targetName: String, task: ShadowJar) {
     if (KgpVersion.DEFAULT < KgpVersion.KOTLIN_2_1) return
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    kmpExtension.jvm().mainRun {
+    kmpExtension.jvm(targetName).mainRun {
       // Fix cannot serialize object of type 'org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun'.
       val mainClassName = provider { mainClass }
       task.inputs.property("mainClassName", mainClassName)
