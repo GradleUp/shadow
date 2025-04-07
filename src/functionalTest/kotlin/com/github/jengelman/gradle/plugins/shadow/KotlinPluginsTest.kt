@@ -107,6 +107,9 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1377",
+  )
   @Test
   fun compatKmpForOtherNamedJvmTarget() {
     val jvmTargetName = "newJvm"
