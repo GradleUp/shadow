@@ -34,4 +34,4 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 android-lint = "com.android.lint:8.9.1"
 jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.17.0"
-spotless = "com.diffplug.spotless:7.0.2"
+spotless = "com.diffplug.spotless:7.0.3"
