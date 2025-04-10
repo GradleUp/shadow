@@ -32,7 +32,7 @@ have the intended effect, as `configurations.compile` will try to delegate to th
 ## Embedding Jar Files Inside Your Shadow Jar
 
 The `shadowJar` task is a subclass of the `Jar` task, which means that the
-[from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20groovy.lang.Closure))
+[Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action))
 method can be used to add extra files.
 
 === "Kotlin"
