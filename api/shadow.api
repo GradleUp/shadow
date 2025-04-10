@@ -196,9 +196,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
-	public fun manifest (Lgroovy/lang/Closure;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;
-	public synthetic fun manifest (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/bundling/Jar;
-	public synthetic fun manifest (Lgroovy/lang/Closure;)Lorg/gradle/jvm/tasks/Jar;
 	public fun mergeGroovyExtensionModules ()V
 	public fun mergeServiceFiles ()V
 	public fun mergeServiceFiles (Ljava/lang/String;)V
