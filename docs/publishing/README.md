@@ -222,10 +222,8 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
 
 ## Publish the Shadowed JAR with Custom Artifact Name
 
-It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, you can see 
-more customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name).
-e.g.
-
+It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more 
+customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name). e.g.
 
 === "Kotlin"
 
@@ -292,4 +290,4 @@ e.g.
     ```
 
 We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will 
-be named `my-artifact-2.0-my-classifier.my-ext` instead of `all-1.0.jar`.
+be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.

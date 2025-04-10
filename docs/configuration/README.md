@@ -34,7 +34,7 @@ The output shadowed JAR file will be named with the following format:
 archiveBaseName-$archiveAppendix-$archiveVersion-$archiveClassifier.$archiveExtension
 ```
 
-If working with a Gradle project with the name `myApp` and archiveVersion `1.0`, the default `shadowJar` task will output a
+If working with a Gradle project with the name `myApp` and version `1.0`, the default `shadowJar` task will output a
 file at: `build/libs/myApp-1.0-all.jar`. You can override the properties listed above to change the output name of the 
 shadowed JAR file. e.g.
 
@@ -55,6 +55,7 @@ shadowed JAR file. e.g.
     ```
 
 This will result in the output file being named `myApp-all.jar` instead of `myApp-1.0-all.jar`.
+
 
 ## Configuring the Runtime Classpath
 
@@ -165,8 +166,8 @@ on the `shadowJar.manifest` object can be used to configure the upstream.
 
 ## Adding Extra Files
 
-The `shadowJar` task is a subclass of the `Jar` task, which means that the
-[Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action))
+The `shadowJar` task is a subclass of the `Jar` task, which means that the 
+[Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)) 
 method can be used to add extra files.
 
 === "Kotlin"
