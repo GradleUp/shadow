@@ -218,3 +218,76 @@ It is possible to publish a custom `ShadowJar` task's output via the [`MavenPubl
       }
     }
     ```
+
+
+## Publish the Shadowed JAR with Custom Artifact Name
+
+It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more 
+customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name). e.g.
+
+=== "Kotlin"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    group = "my-group"
+    version = "1.0"
+
+    tasks.shadowJar {
+      archiveClassifier = "my-classifier"
+      archiveExtension = "my-ext"
+      archiveBaseName = "maven-all"
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+          // This will override `archiveBaseName`.
+          artifactId = "my-artifact"
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    group = 'my-group'
+    version = '1.0'
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = 'my-classifier'
+      archiveExtension = 'my-ext'
+      archiveBaseName = 'maven-all'
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.shadow
+          // This will override `archiveBaseName`.
+          artifactId = 'my-artifact'
+        }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+    ```
+
+We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will 
+be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.

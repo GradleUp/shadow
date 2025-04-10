@@ -368,7 +368,7 @@ which means it honors the `duplicatesStrategy` property as its parent classes do
 - `INHERIT`: Uses the same strategy as the parent copy specification.
 - `WARN`: Do not attempt to prevent duplicates, but log a warning message when multiple items are to be created at the same path.
 
-You can see more details about them in 
+see more details about them in 
 [`DuplicatesStrategy`](https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html).
 
 `ShadowJar` recognizes `DuplicatesStrategy.INCLUDE` as the default, if you want to change the strategy, you can 
