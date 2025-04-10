@@ -34,6 +34,7 @@ import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledForJreRange
@@ -60,20 +61,24 @@ class JavaPluginTest : BasePluginTest() {
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
 
-    with(shadowTask) {
+    // Check extended properties.
+    with(shadowTask as Jar) {
+      assertThat(archiveAppendix.orNull).isNull()
       assertThat(archiveBaseName.get()).isEqualTo(projectName)
-      assertThat(destinationDirectory.get().asFile)
-        .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
-      assertThat(archiveVersion.get()).isEqualTo(version)
       assertThat(archiveClassifier.get()).isEqualTo("all")
       assertThat(archiveExtension.get()).isEqualTo("jar")
       assertThat(archiveFileName.get()).isEqualTo("my-shadow-1.0.0-all.jar")
+      assertThat(archiveVersion.get()).isEqualTo(version)
       assertThat(archiveFile.get().asFile).all {
         isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
         isEqualTo(project.projectDir.resolve("build/libs/my-shadow-1.0.0-all.jar"))
       }
-      assertThat(archiveAppendix.orNull).isNull()
+      assertThat(destinationDirectory.get().asFile)
+        .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
+    }
 
+    // Check self properties.
+    with(shadowTask) {
       assertThat(minimizeJar.get()).isFalse()
       assertThat(enableRelocation.get()).isFalse()
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
