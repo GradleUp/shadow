@@ -19,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import groovy.lang.Closure
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
@@ -163,6 +164,10 @@ public abstract class ShadowJar :
 
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
+
+  override fun manifest(configureClosure: Closure<*>): ShadowJar = apply {
+    super.manifest(configureClosure)
+  }
 
   /**
    * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
