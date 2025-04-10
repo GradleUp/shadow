@@ -5,10 +5,10 @@ api: api/com/github/jengelman/gradle/plugins/shadow
 # Configuring Shadow
 
 The [`ShadowJar`](../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task type extends from Gradle's
-[`Jar`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) type.
+[`Jar`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html) type.
 This means that all attributes and methods available on `Jar` are also available on
 [`ShadowJar`](../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html).
-Refer the _Gradle User Guide_ for [Jar](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) for
+Refer the _Gradle User Guide_ for [Jar](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html) for
 details.
 
 ## Configuring Output Name
