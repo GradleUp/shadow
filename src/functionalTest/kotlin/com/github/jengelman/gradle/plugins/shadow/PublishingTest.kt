@@ -219,9 +219,13 @@ class PublishingTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/945",
   )
   @Test
-  fun publishShadowJarWithCustomClassifierAndExtension() {
+  fun publishShadowJarWithCustomArtifactName() {
     projectScriptPath.appendText(
       publishConfiguration(
+        projectBlock = """
+          group = 'my-group'
+          version = '2.0'
+        """.trimIndent(),
         shadowBlock = """
           archiveClassifier = 'my-classifier'
           archiveExtension = 'my-ext'
@@ -230,7 +234,7 @@ class PublishingTest : BasePluginTest() {
         publicationsBlock = """
         shadow(MavenPublication) {
           from components.shadow
-          artifactId = 'my-group'
+          artifactId = 'my-artifact'
         }
         """.trimIndent(),
       ),
@@ -238,27 +242,27 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertThat(repoPath("my/my-group/1.0/").listDirectoryEntries().map { it.name }).containsOnly(
-      "my-group-1.0-my-classifier.my-ext.sha512",
-      "my-group-1.0-my-classifier.my-ext",
-      "my-group-1.0.pom.sha256",
-      "my-group-1.0.module",
-      "my-group-1.0.pom",
-      "my-group-1.0.module.sha256",
-      "my-group-1.0.module.sha1",
-      "my-group-1.0.module.md5",
-      "my-group-1.0.pom.sha512",
-      "my-group-1.0-my-classifier.my-ext.sha256",
-      "my-group-1.0.module.sha512",
-      "my-group-1.0-my-classifier.my-ext.sha1",
-      "my-group-1.0-my-classifier.my-ext.md5",
-      "my-group-1.0.pom.md5",
-      "my-group-1.0.pom.sha1",
+    assertThat(repoPath("my-group/my-artifact/2.0/").listDirectoryEntries().map { it.name }).containsOnly(
+      "my-artifact-2.0-my-classifier.my-ext.sha512",
+      "my-artifact-2.0-my-classifier.my-ext",
+      "my-artifact-2.0.pom.sha256",
+      "my-artifact-2.0.module",
+      "my-artifact-2.0.pom",
+      "my-artifact-2.0.module.sha256",
+      "my-artifact-2.0.module.sha1",
+      "my-artifact-2.0.module.md5",
+      "my-artifact-2.0.pom.sha512",
+      "my-artifact-2.0-my-classifier.my-ext.sha256",
+      "my-artifact-2.0.module.sha512",
+      "my-artifact-2.0-my-classifier.my-ext.sha1",
+      "my-artifact-2.0-my-classifier.my-ext.md5",
+      "my-artifact-2.0.pom.md5",
+      "my-artifact-2.0.pom.sha1",
     )
 
-    assertShadowJarCommon(repoJarPath("my/my-group/1.0/my-group-1.0-my-classifier.my-ext"))
-    assertPomCommon(repoPath("my/my-group/1.0/my-group-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/my-group/1.0/my-group-1.0.module")))
+    assertShadowJarCommon(repoJarPath("my-group/my-artifact/2.0/my-artifact-2.0-my-classifier.my-ext"))
+    assertPomCommon(repoPath("my-group/my-artifact/2.0/my-artifact-2.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my-group/my-artifact/2.0/my-artifact-2.0.module")))
   }
 
   @Test

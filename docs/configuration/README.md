@@ -26,10 +26,12 @@ Shadow configures the default `shadowJar` task to set the output JAR's
 to the same default values as Gradle does for all `Jar` tasks.
 Additionally, it configures the
 [`archiveClassifier`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveClassifier)
-to be `all`. The output shadowed JAR file will be named with the following format:
+to be `all`. The listed ones are not full, you can view all the properties in 
+[`Jar`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html).
+The output shadowed JAR file will be named with the following format:
 
 ```
-$destinationDirectory/$archiveBaseName-$archiveAppendix-$archiveVersion-$archiveClassifier.$archiveExtension
+archiveBaseName-$archiveAppendix-$archiveVersion-$archiveClassifier.$archiveExtension
 ```
 
 If working with a Gradle project with the name `myApp` and archiveVersion `1.0`, the default `shadowJar` task will output a
