@@ -449,8 +449,6 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 ## [6.1.0] - 2020-10-05
 [6.1.0]: https://github.com/GradleUp/shadow/releases/tag/6.1.0
-[6.1.0]: https://github.com/GradleUp/shadow/releases/tag/6.1.0
-
 - As of this version, Shadow is compiled with Java 8 source and target compatibility. This aligns the plugin with the minimum required Java version
   for Gradle 6.0 (https://docs.gradle.org/6.0/release-notes.html).
 - Update ASM to 9.0 to support JDK 16.
