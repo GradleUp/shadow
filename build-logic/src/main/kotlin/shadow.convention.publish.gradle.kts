@@ -6,6 +6,7 @@ import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
 plugins {
   id("com.gradle.plugin-publish")
   id("com.vanniktech.maven.publish")
+  id("org.jetbrains.changelog")
   id("org.jetbrains.dokka")
 }
 
@@ -16,6 +17,10 @@ description = providers.gradleProperty("POM_DESCRIPTION").get()
 java {
   withSourcesJar()
   withJavadocJar()
+}
+
+changelog {
+  path = "$rootDir/docs/changes/README.md"
 }
 
 gradlePlugin {

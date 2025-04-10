@@ -19,6 +19,7 @@ moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "mosh
 
 pluginPublish = "com.gradle.publish:plugin-publish-plugin:1.3.1"
 mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.31.0"
+jetbrains-changelog = "org.jetbrains.changelog:org.jetbrains.changelog.gradle.plugin:2.2.1"
 jetbrains-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.0.0"
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:0.10.0"
 kotlin-kmp = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
