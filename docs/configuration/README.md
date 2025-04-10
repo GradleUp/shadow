@@ -13,21 +13,33 @@ details.
 
 ## Configuring Output Name
 
-Shadow configures the default `shadowJar` task to set the output JAR's `destinationDirectory`, `archiveBaseName`, `appendix`,
-`archiveVersion`, and `extension` to the same default values as Gradle does for all `Jar` tasks.
-Additionally, it configures the `archiveClassifier` to be `all`.
+Shadow configures the default `shadowJar` task to set the output JAR's
+
+- [`archiveAppendix`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveAppendix)
+- [`archiveBaseName`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveBaseName)
+- [`archiveExtension`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:archiveExtension)
+- [`archiveFile`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:archiveFile)
+- [`archiveFileName`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:archiveFileName)
+- [`archiveVersion`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:archiveVersion)
+- [`destinationDirectory`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:destinationDirectory)
+
+to the same default values as Gradle does for all `Jar` tasks.
+Additionally, it configures the
+[`archiveClassifier`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveClassifier)
+to be `all`. The output shadowed JAR file will be named with the following format:
+
+```
+$destinationDirectory/$archiveBaseName-$archiveAppendix-$archiveVersion-$archiveClassifier.$archiveExtension
+```
 
 If working with a Gradle project with the name `myApp` and archiveVersion `1.0`, the default `shadowJar` task will output a
-file at: `build/libs/myApp-1.0-all.jar`
-
-As with all `Jar` tasks in Gradle, these values can be overridden:
+file at: `build/libs/myApp-1.0-all.jar`. You can override the properties listed above to change the output name of the 
+shadowed JAR file. e.g.
 
 === "Kotlin"
 
     ```kotlin
     tasks.shadowJar {
-      archiveBaseName = "shadow"
-      archiveClassifier = ""
       archiveVersion = ""
     }
     ```
@@ -36,11 +48,11 @@ As with all `Jar` tasks in Gradle, these values can be overridden:
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      archiveBaseName = 'shadow'
-      archiveClassifier = ''
       archiveVersion = ''
     }
     ```
+
+This will result in the output file being named `myApp-all.jar` instead of `myApp-1.0-all.jar`.
 
 ## Configuring the Runtime Classpath
 
@@ -151,8 +163,8 @@ on the `shadowJar.manifest` object can be used to configure the upstream.
 
 ## Adding Extra Files
 
-The `shadowJar` task is a subclass of the `Jar` task, which means that the 
-[Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)) 
+The `shadowJar` task is a subclass of the `Jar` task, which means that the
+[Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action))
 method can be used to add extra files.
 
 === "Kotlin"
