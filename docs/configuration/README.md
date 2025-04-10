@@ -152,7 +152,7 @@ on the `shadowJar.manifest` object can be used to configure the upstream.
 ## Adding Extra Files
 
 The `shadowJar` task is a subclass of the `Jar` task, which means that the 
-[from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20groovy.lang.Closure)) 
+[from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)) 
 method can be used to add extra files.
 
 === "Kotlin"
