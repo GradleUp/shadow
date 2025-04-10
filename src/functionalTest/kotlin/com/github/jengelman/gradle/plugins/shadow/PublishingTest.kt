@@ -214,6 +214,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Issue(
+    "https://github.com/GradleUp/shadow/issues/614",
     "https://github.com/GradleUp/shadow/issues/860",
     "https://github.com/GradleUp/shadow/issues/945",
   )
@@ -226,14 +227,38 @@ class PublishingTest : BasePluginTest() {
           archiveExtension = 'my-ext'
           archiveBaseName = 'maven-all'
         """.trimIndent(),
+        publicationsBlock = """
+        shadow(MavenPublication) {
+          from components.shadow
+          artifactId = 'my-group'
+        }
+        """.trimIndent(),
       ),
     )
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("my/maven-all/1.0/maven-all-1.0-my-classifier.my-ext"))
-    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")))
+    assertThat(repoPath("my/my-group/1.0/").listDirectoryEntries().map { it.name }).containsOnly(
+      "my-group-1.0-my-classifier.my-ext.sha512",
+      "my-group-1.0-my-classifier.my-ext",
+      "my-group-1.0.pom.sha256",
+      "my-group-1.0.module",
+      "my-group-1.0.pom",
+      "my-group-1.0.module.sha256",
+      "my-group-1.0.module.sha1",
+      "my-group-1.0.module.md5",
+      "my-group-1.0.pom.sha512",
+      "my-group-1.0-my-classifier.my-ext.sha256",
+      "my-group-1.0.module.sha512",
+      "my-group-1.0-my-classifier.my-ext.sha1",
+      "my-group-1.0-my-classifier.my-ext.md5",
+      "my-group-1.0.pom.md5",
+      "my-group-1.0.pom.sha1",
+    )
+
+    assertShadowJarCommon(repoJarPath("my/my-group/1.0/my-group-1.0-my-classifier.my-ext"))
+    assertPomCommon(repoPath("my/my-group/1.0/my-group-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/my-group/1.0/my-group-1.0.module")))
   }
 
   @Test
