@@ -9,8 +9,8 @@
 - Avoid creating jvm targets eagerly for KMP. ([#1378](https://github.com/GradleUp/shadow/pull/1378))
 
 
-## [v9.0.0-beta12] (2025-04-01)
-[v9.0.0-beta12]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta12
+## [9.0.0-beta12] - 2025-04-01
+[9.0.0-beta12]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta12
 
 **Added**
 
@@ -31,8 +31,8 @@ Options:
 - Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
 
 
-## [v9.0.0-beta11] (2025-03-18)
-[v9.0.0-beta11]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta11
+## [9.0.0-beta11] - 2025-03-18
+[9.0.0-beta11]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta11
 
 **Added**
 
@@ -58,8 +58,8 @@ Options:
 - **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
 
 
-## [v9.0.0-beta10] (2025-03-05)
-[v9.0.0-beta10]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10
+## [9.0.0-beta10] - 2025-03-05
+[9.0.0-beta10]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10
 
 **Added**
 
@@ -82,8 +82,8 @@ Options:
 - **BREAKING CHANGE:** Remove `Named` from the parents of `Transformer`. ([#1289](https://github.com/GradleUp/shadow/pull/1289))
 
 
-## [v9.0.0-beta9] (2025-02-24)
-[v9.0.0-beta9]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9
+## [9.0.0-beta9] - 2025-02-24
+[9.0.0-beta9]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9
 
 **Added**
 
@@ -108,8 +108,8 @@ Options:
 - **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 
-## [v9.0.0-beta8] (2025-02-08)
-[v9.0.0-beta8]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8
+## [9.0.0-beta8] - 2025-02-08
+[9.0.0-beta8]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8
 
 **Added**
 
@@ -127,8 +127,8 @@ Options:
 - **BREAKING CHANGE:** Remove `KnowsTask` as it's useless. ([#1236](https://github.com/GradleUp/shadow/pull/1236))
 
 
-## [v9.0.0-beta7] (2025-02-02)
-[v9.0.0-beta7]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7
+## [9.0.0-beta7] - 2025-02-02
+[9.0.0-beta7]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7
 
 **Added**
 
@@ -153,8 +153,8 @@ Options:
 - **BREAKING CHANGE:** Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow` task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
 
 
-## [v9.0.0-beta6] (2025-01-23)
-[v9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
+## [9.0.0-beta6] - 2025-01-23
+[9.0.0-beta6]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6
 
 **Added**
 
@@ -165,8 +165,8 @@ Options:
 - Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1175](https://github.com/GradleUp/shadow/pull/1175))  
 
 
-## [v9.0.0-beta5] (2025-01-21)
-[v9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
+## [9.0.0-beta5] - 2025-01-21
+[9.0.0-beta5]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5
 
 **Added**
 
@@ -186,8 +186,8 @@ Options:
 - Fail builds if processing bad jars.  ([#1146](https://github.com/GradleUp/shadow/pull/1146))  
 
 
-## [v9.0.0-beta4] (2024-12-06)
-[v9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
+## [9.0.0-beta4] - 2024-12-06
+[9.0.0-beta4]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4
 
 **Changed**
 
@@ -199,8 +199,8 @@ Options:
   This fixes the regression for registering custom `ShadowJar` tasks.
 
 
-## [v9.0.0-beta2] (2024-11-28)
-[v9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
+## [9.0.0-beta2] - 2024-11-28
+[9.0.0-beta2]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2
 
 **Fixed**
 
@@ -208,8 +208,8 @@ Options:
   This fixes the relocation not working in `v9.0.0-beta1`.
 
 
-## [v9.0.0-beta1] (2024-11-27)
-[v9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
+## [9.0.0-beta1] - 2024-11-27
+[9.0.0-beta1]: https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1
 
 **Added**
 
@@ -233,16 +233,16 @@ Options:
 - Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039))  
 
 
-## [v8.3.6] (2025-02-02)
-[v8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
+## [8.3.6] - 2025-02-02
+[8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
 
 **Added**
 
 - Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
 
 
-## [v8.3.5] (2024-11-03)
-[v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
+## [8.3.5] - 2024-11-03
+[8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
 
 **Fixed**
 
@@ -250,23 +250,23 @@ Options:
   This reverts the change to maintain compatibility with 8.x versions. The Java level will be bumped to 11 or above in the next major release.
 
 
-## [v8.3.4] (2024-10-29)
-[v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
+## [8.3.4] - 2024-10-29
+[8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4
 
 **Fixed**
 
 - Apply legacy plugin last, and declare capabilities for old plugins, fixes [#964](https://github.com/GradleUp/shadow/issues/964). ([#991](https://github.com/GradleUp/shadow/pull/991))
 
-## [v8.3.3] (2024-10-02)
-[v8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
+## [8.3.3] - 2024-10-02
+[8.3.3]: https://github.com/GradleUp/shadow/releases/tag/8.3.3
 
 **Changed**
 
 - Disable Develocity integration by default. ([#993](https://github.com/GradleUp/shadow/pull/993))
 
 
-## [v8.3.2] (2024-09-18)
-[v8.3.2]: https://github.com/GradleUp/shadow/releases/tag/8.3.2
+## [8.3.2] - 2024-09-18
+[8.3.2]: https://github.com/GradleUp/shadow/releases/tag/8.3.2
 
 **Added**
 
@@ -282,8 +282,8 @@ Options:
 - Stop publishing Shadow self fat jar to Maven repository. ([#967](https://github.com/GradleUp/shadow/pull/967))
 
 
-## [v8.3.1] (2024-09-10)
-[v8.3.1]: https://github.com/GradleUp/shadow/releases/tag/8.3.1
+## [8.3.1] - 2024-09-10
+[8.3.1]: https://github.com/GradleUp/shadow/releases/tag/8.3.1
 
 **Added**
 
@@ -296,8 +296,8 @@ Options:
 - Refix excluding Gradle APIs for java-gradle-plugin. ([#948](https://github.com/GradleUp/shadow/pull/948))
 
 
-## [v8.3.0] (2024-08-08)
-[v8.3.0]: https://github.com/GradleUp/shadow/releases/tag/8.3.0
+## [8.3.0] - 2024-08-08
+[8.3.0]: https://github.com/GradleUp/shadow/releases/tag/8.3.0
 
 **Changed**
 
@@ -315,8 +315,8 @@ Options:
   `8.1.1`. ([#858](https://github.com/GradleUp/shadow/pull/858))
 
 
-## [v8.1.1] (2023-03-20)
-[v8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
+## [8.1.1] - 2023-03-20
+[8.1.1]: https://github.com/GradleUp/shadow/releases/tag/8.1.1
 
 **NOTE:** As of this version, the GitHub repository has migrated to the `main` branch as the default branch for releases.
 
@@ -337,8 +337,8 @@ Options:
 **Full Changelog**: [`8.1.0...8.1.1`](https://github.com/GradleUp/shadow/compare/8.1.0...8.1.1)
 
 
-## [v8.1.0] (2023-02-26)
-[v8.1.0]: https://github.com/GradleUp/shadow/releases/tag/8.1.0
+## [8.1.0] - 2023-02-26
+[8.1.0]: https://github.com/GradleUp/shadow/releases/tag/8.1.0
 
 **BREAKING CHANGE:** Due to adoption of the latest version of the `com.gradle.plugin-publish` plugin, the maven GAV coordinates have changed as of this version.
 The correct coordinates now align with the plugin ID itself: `group=com.github.johnrengelman, artifact=shadow, version=<version>`.
@@ -358,8 +358,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 **Full Changelog**: [`8.0.0...8.1.0`](https://github.com/GradleUp/shadow/compare/8.0.0...8.1.0)
 
 
-## [v8.0.0] (2023-02-24)
-[v8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
+## [8.0.0] - 2023-02-24
+[8.0.0]: https://github.com/GradleUp/shadow/releases/tag/8.0.0
 
 ### What's Changed
 * Fix the plugin dependency identifier in the docs by [@lnhrdt](https://github.com/lnhrdt) in [#754](https://github.com/GradleUp/shadow/pull/754)
@@ -395,19 +395,18 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 **Full Changelog**: [`7.1.2...8.0.0`](https://github.com/GradleUp/shadow/compare/7.1.2...8.0.0)
 
 
-## v7.1.3 (unreleased)
-
-- The GroovyExtensionModuleTransformer now also works for Groovy 2.5+.
-
-## v7.1.2 (2021-12-28)
+## [7.1.2] - 2021-12-28
+[7.1.2]: https://github.com/GradleUp/shadow/releases/tag/7.1.2
 
 - Upgrade log4j to 2.17.1 due to CVE-2021-45105 and CVE-2021-44832
 
-## v7.1.1 (2021-12-14)
+## [7.1.1] - 2021-12-14
+[7.1.1]: https://github.com/GradleUp/shadow/releases/tag/7.1.1
 
 - Upgrade log4j to 2.16.0 due to CVE-2021-44228 and CVE-2021-45046
 
-## v7.1.0 (2021-10-04)
+## [7.1.0] - 2021-10-04
+[7.1.0]: https://github.com/GradleUp/shadow/releases/tag/7.1.0
 
 - **BREAKING** - The maven coordinates for the plugins have changed as of this version. The proper `group:artifact` is `gradle.plugin.com.github.johnrengelman:shadow`
 - [Jeff](https://github.com/mathjeff) - Fix `shadowJar` Out-Of-Date with configuration caching [#708](https://github.com/GradleUp/shadow/pull/708)
@@ -420,7 +419,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Dmitry Vyazelenko](https://github.com/vyazelenko) - Support Java 18 with ASM 9.2 [#698](https://github.com/GradleUp/shadow/pull/698)
 - [Jason](https://github.com/jpenilla) - Support Records with JDependency 2.7.0 [#681](https://github.com/GradleUp/shadow/pull/681)
 
-## v7.0.0 (2021-04-26)
+## [7.0.0] - 2021-04-26
+[7.0.0]: https://github.com/GradleUp/shadow/releases/tag/7.0.0
 
 - Required Gradle 7.0+
 - Support for Java 16
@@ -447,8 +447,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Nicolas Humblot](https://github.com/nhumblot) - Handle deprecation of `mainClassName` configuration [#609](https://github.com/GradleUp/shadow/pull/609), [#612](https://github.com/GradleUp/shadow/pull/612)
 - [Bernie Schelberg](https://github.com/bschelberg) - Exclude `api` and `implementations` from legacy `maven` POM [#615](https://github.com/GradleUp/shadow/pull/615)
 
-## v6.1.0 (2020-10-05)
-
+## [6.1.0] - 2020-10-05
+[6.1.0]: https://github.com/GradleUp/shadow/releases/tag/6.1.0
 - As of this version, Shadow is compiled with Java 8 source and target compatibility. This aligns the plugin with the minimum required Java version
   for Gradle 6.0 (https://docs.gradle.org/6.0/release-notes.html).
 - Update ASM to 9.0 to support JDK 16.
@@ -458,7 +458,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Victor Tso](https://github.com/roxchkplusony) - Input stream handling for large projects [#587](https://github.com/GradleUp/shadow/pull/587)
 - [Matthew Haughton](https://github.com/3flex) - Implement Task Configuration Avoidance pattern [#597](https://github.com/GradleUp/shadow/pull/597)
 
-## v6.0.0 (2020-06-15)
+## [6.0.0] - 2020-06-15
+[6.0.0]: https://github.com/GradleUp/shadow/releases/tag/6.0.0
 
 - Required Gradle 6.0+
 - _NEW_: Support for Gradle Metadata publication via the `shadowRuntimeElements` configuration. This is a _beta_ feature
@@ -472,7 +473,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Trask Stalnaker](https://github.com/trask) - Fix exclude patterns on Windows [#539](https://github.com/GradleUp/shadow/pull/539)
 - [Artem Chubaryan](https://github.com/Armaxis) - Allow usage of true regex patterns for include/exclude by the `%regex[<pattern>]` syntax [#536](https://github.com/GradleUp/shadow/pull/536)
 
-## v5.2.0 (2019-11-10)
+## [5.2.0] - 2019-11-10
+[5.2.0]: https://github.com/GradleUp/shadow/releases/tag/5.2.0
 
 - [Inez Korczyński](https://github.com/inez) - Performance optimization when evaluating relocation paths [#507](https://github.com/GradleUp/shadow/pull/507)
 - [Jeff Adler](https://github.com/jeffalder) - Fix remapping issues with multi release JARS [#526](https://github.com/GradleUp/shadow/pull/526)
@@ -481,7 +483,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Konstantin Gribov](https://github.com/grossws) - Return support for 5.0 for convention mapping [#502](https://github.com/GradleUp/shadow/pull/502)
 - [Lai Jiang](https://github.com/jianglai) - Documentation updates on how to reconfigure `classifier` and `version` [#512](https://github.com/GradleUp/shadow/pull/512)
 
-## v5.1.0 (2019-06-29)
+## [5.1.0] - 2019-06-29
+[5.1.0]: https://github.com/GradleUp/shadow/releases/tag/5.1.0
 
 - [Chris Rankin](https://github.com/chrisr3) - Add `ManifestAppenderTransformer` to support appending to Jar manifest [#474](https://github.com/GradleUp/shadow/pull/474)
 - [Min-Ken Lai](https://github.com/minkenlai) - Additional escaping fixes in start script [#487](https://github.com/GradleUp/shadow/pull/487)
@@ -489,7 +492,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Christian Stein](https://github.com/sormuras) - Do not initialize `UnusedTracker` when not requested [#480](https://github.com/GradleUp/shadow/pull/480), [#479](https://github.com/GradleUp/shadow/issues/479)
 - [Attila Kelemen](https://github.com/kelemen) - Fix `NullPointerException` when using java minimization and api project dependency with version [#477](https://github.com/GradleUp/shadow/pull/477)
 
-## v5.0.0 (2019-02-28)
+## [5.0.0] - 2019-02-28
+[5.0.0]: https://github.com/GradleUp/shadow/releases/tag/5.0.0
 
 - Require Gradle 5.0+
 - Fix issue with build classifier `-all` being dropped in Gradle 5.1+
@@ -498,31 +502,36 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Dennis Schumann](https://github.com/Hillkorn) - Fix Gradle 5.2 incompatibility with `ShadowJar.getMetaClass()` [#456](https://github.com/GradleUp/shadow/pull/456)
 - [Brane F. Gračnar](https://github.com/bfg) - Fix compatibility with `com.palantir.docker` [#460](https://github.com/GradleUp/shadow/pull/460)
 
-## v4.0.4 (2019-01-19)
+## [4.0.4] - 2019-01-19
+[4.0.4]: https://github.com/GradleUp/shadow/releases/tag/4.0.4
 
 - When using `shadow`, `application`, and `maven` plugins together, remove `shadowDistZip` and `shadowDistTar` from
   `configurations.archives` so they are not published or installed by default with the `uploadArchives` or `install`
   tasks. [#347](https://github.com/GradleUp/shadow/issues/347)
 - [James Nelson](https://github.com/JamesXNelson) - Fix `null` path when using Jar minimization and Gradle's `api` configuration. [#424](https://github.com/GradleUp/shadow/issues/424), [#425](https://github.com/GradleUp/shadow/issues/425)
 
-## v4.0.3 (2018-11-21)
+## [4.0.3] - 2018-11-21
+[4.0.3]: https://github.com/GradleUp/shadow/releases/tag/4.0.3
 
 - [Mark Vieira](https://github.com/mark-vieira) - Don't leak plugin classes to Gradle's Spec cache [#430](https://github.com/GradleUp/shadow/pull/430)
 
-## v4.0.2 (2018-10-27)
+## [4.0.2] - 2018-10-27
+[4.0.2]: https://github.com/GradleUp/shadow/releases/tag/4.0.2
 
 - [Petar Petrov](https://github.com/petarov) - Update to ASM 7.0-beta and jdependency 2.1.1 to support Java 11, [#415](https://github.com/GradleUp/shadow/pull/415)
 - [Victor Tso](https://github.com/roxchkplusony) - Ensure input streams are closed, [#411](https://github.com/GradleUp/shadow/pull/411)
 - [Osip Fatkullin](https://github.com/osipxd) - Exclude `api` configuration from minimization, [#405](https://github.com/GradleUp/shadow/pull/405)
 
-## v4.0.1 (2018-09-30)
+## [4.0.1] - 2018-09-30
+[4.0.1]: https://github.com/GradleUp/shadow/releases/tag/4.0.1
 
 - **Breaking Change!** `Transform.modifyOutputStream(ZipOutputStream os)` to `Transform.modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps)`.
   Typically breaking changes are reserved for major version releases, but this change was necessary for `preserverFileTimestamps` (introduced in v4.0.0) to work correctly
   in the presence of transformers, [#404](https://github.com/GradleUp/shadow/issues/404)
 - Fix regression in support Java 10+ during relocation, [#403](https://github.com/GradleUp/shadow/issues/403)
 
-## v4.0.0 (2018-09-25)
+## [4.0.0] - 2018-09-25
+[4.0.0]: https://github.com/GradleUp/shadow/releases/tag/4.0.0
 
 - **Breaking Change!** Restrict Plugin to Gradle 4.0+. Shadow major versions will align with Gradle major versions going forward.
 - **Breaking Change!** For clarity purposes `com.github.johnrengelman.plugin-shadow` has been removed. If you intend to use this feature, you will need to declare your own `ConfigureShadowRelocation` task. See section [2.9.2](https://gradleup.com/shadow/#automatically_relocating_dependencies) of the User Guide
@@ -533,19 +542,22 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [debanne](https://github.com/debanne) - Implement JAR minimization actions. This will attempt to exclude unused classes in your shadowed JAR.
 - Configure exclusion of `module-info.class` from `shadowJar` when using the Shadow the Java plugin, [#352](https://github.com/GradleUp/shadow/issues/352)
 
-## v2.0.4 (2018-04-27)
+## [2.0.4] - 2018-04-27
+[2.0.4]: https://github.com/GradleUp/shadow/releases/tag/2.0.4
 
 - Update to ASM 6.1.1 to address performance issues - [ASM Issue 317816](https://gitlab.ow2.org/asm/asm/issues/317816)
 - Close InputStreams after using them, [#364](https://github.com/GradleUp/shadow/issues/364)
 - Remove usage of Gradle internal `AbstractFileCollection`.
 - Add task annotations to remove warnings when validating plugin.
 
-## v2.0.3 (2018-03-24)
+## [2.0.3] - 2018-03-24
+[2.0.3]: https://github.com/GradleUp/shadow/releases/tag/2.0.3
 
 - [Martin Sadowski](https://github.com/ttsiebzehntt) - Update to ASM 6.1
 - [Scott Newson](https://github.com/sgnewson) - Fix deprecated Gradle warnings, [#356](https://github.com/GradleUp/shadow/pull/356)
 
-## v2.0.2 (2017-12-12)
+## [2.0.2] - 2017-12-12
+[2.0.2]: https://github.com/GradleUp/shadow/releases/tag/2.0.2
 
 - [Ben Adazza](https://github.com/ghost), [Tyler Benson](https://github.com/tylerbenson) - documentation
 - [Marke Vieira](https://github.com/mark-vieira) - Support multi-project builds with Build-Scan integration
@@ -553,11 +565,13 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Rob Spieldenner](https://github.com/rspieldenner) - Fix integration with `application` plugin in Gradle 4.3, [#339](https://github.com/GradleUp/shadow/issues/339)
 - Fixed deprecation warning from Gradle 4.2+, [#326](https://github.com/GradleUp/shadow/issues/326)
 
-## v2.0.1 (2017-06-23)
+## [2.0.1] - 2017-06-23
+[2.0.1]: https://github.com/GradleUp/shadow/releases/tag/2.0.1
 
 - Fix `null+configuration` error, [#297](https://github.com/GradleUp/shadow/issues/297)
 
-## v2.0.0 (2017-05-09)
+## [2.0.0] - 2017-05-09
+[2.0.0]: https://github.com/GradleUp/shadow/releases/tag/2.0.0
 
 - **Breaking Change!** Restrict Plugin to Gradle 3.0+
 - **Breaking Change!** Build with Java 7
@@ -576,7 +590,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - Update to ASM 5.2
 - [Piotr Kubowicz](https://github.com/pkubowicz) - Support `api`, `implementation`, `runtimeOnly` dependency configurations introdcued in Gradle 3.3
 
-## v1.2.4 (2016-11-03)
+## [1.2.4] - 2016-11-03
+[1.2.4]: https://github.com/GradleUp/shadow/releases/tag/1.2.4
 
 - Don't resolve dependency configurations during config phase, [#128](https://github.com/GradleUp/shadow/issues/129)
 - Build plugin with Gradle 2.14
@@ -586,7 +601,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - Do not explode ZIP files into shadow jar, [#196](https://github.com/GradleUp/shadow/issues/196)
 - [John Szakmeister](https://github.com/jszakmeister) - Preserve timestamps on merged jar entries, [#260](https://github.com/GradleUp/shadow/pull/260)
 
-## v1.2.3 (2016-01-25)
+## [1.2.3] - 2016-01-25
+[1.2.3]: https://github.com/GradleUp/shadow/releases/tag/1.2.3
 
 - Support for Gradle 2.11-rc-1, [#177](https://github.com/GradleUp/shadow/issues/177)
 - Convert internal framework to [Gradle TestKit](https://docs.gradle.org/current/userguide/test_kit.html)
@@ -594,15 +610,18 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Haw-Bin Chai](https://github.com/hbchai) - Quote Jar path in Windows start script as it may contain spaces, [#170](https://github.com/GradleUp/shadow/pull/170)
 - [Serban Iordache](https://github.com/siordache) - Evaluate relocation specs when merging service descriptors, [#165](https://github.com/GradleUp/shadow/pull/165)
 
-## v1.2.2 (2015-07-17)
+## [1.2.2] - 2015-07-17
+[1.2.2]: https://github.com/GradleUp/shadow/releases/tag/1.2.2
 
 - [Minecrell](https://github.com/Minecrell) - Gradle 2.5 compatibility, [#147](https://github.com/GradleUp/shadow/issues/147)
 
-## v1.2.1 (2015-01-23)
+## [1.2.1] - 2015-01-23
+[1.2.1]: https://github.com/GradleUp/shadow/releases/tag/1.2.1
 
 - Apply package relocations to dependency resources, [#114](https://github.com/GradleUp/shadow/issues/114)
 
-## v1.2.0 (2014-11-24)
+## [1.2.0] - 2014-11-24
+[1.2.0]: https://github.com/GradleUp/shadow/releases/tag/1.2.0
 
 - Re-organize some code to remove need for forcing the Gradle API ClassLoader to allow the `org.apache.tools.zip` package.
 - Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from `jdom:jdom:1.1` to `org.jdom:jdom2:2.0.5`), [#98](https://github.com/GradleUp/shadow/issues/98)
@@ -611,17 +630,20 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - Allows for regex pattern matching in the `dependency` string when including/excluding, [#83](https://github.com/GradleUp/shadow/issues/83)
 - Apply package relocations to resource files, [#93](https://github.com/GradleUp/shadow/issues/93)
 
-## v1.1.2 (2014-09-09)
+## [1.1.2] - 2014-09-09
+[1.1.2]: https://github.com/GradleUp/shadow/releases/tag/1.1.2
 
 - fix bug in `runShadow` where dependencies from the `shadow` configuration are not available, [#94](https://github.com/GradleUp/shadow/issues/94)
 
-## v1.1.1 (2014-08-27)
+## [1.1.1] - 2014-08-27
+[1.1.1]: https://github.com/GradleUp/shadow/releases/tag/1.1.1
 
 - Fix bug in `'createStartScripts'` task that was causing it to not execute `'shadowJar'` task, [#90](https://github.com/GradleUp/shadow/issues/90)
 - Do not include `null` in ShadowJar Manifest `'Class-Path'` value when `jar` task does not specify a value for it, [#92](https://github.com/GradleUp/shadow/issues/92)
 - ShadowJar Manifest `'Class-Path'` should reference jars from `'shadow'` config as relative to location of `shadowJar` output, [#91](https://github.com/GradleUp/shadow/issues/91)
 
-## v1.1.0 (2014-08-26)
+## [1.1.0] - 2014-08-26
+[1.1.0]: https://github.com/GradleUp/shadow/releases/tag/1.1.0
 
 - **Breaking Change!** Fix leaking of `shadowJar.manifest` into `jar.manifest`, [#82](https://github.com/GradleUp/shadow/issues/82)
   To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with `shadowJar.manifest`
@@ -640,7 +662,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the
   `'application'` plugin, [#89](https://github.com/GradleUp/shadow/issues/89)
 
-## v1.0.3 (2014-07-29)
+## [1.0.3] - 2014-07-29
+[1.0.3]: https://github.com/GradleUp/shadow/releases/tag/1.0.3
 
 - Make service files root path configurable for `ServiceFileTransformer`, [#72](https://github.com/GradleUp/shadow/issues/72)
 - [Andres Almiray](https://github.com/aalmiray - Added PropertiesFileTransformer, [#73](https://github.com/GradleUp/shadow/issues/73)
@@ -649,20 +672,23 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - [Minecrell](https://github.com/Minecrell) - Do not drop non-class files from dependencies when relocation is enabled, [#61](https://github.com/GradleUp/shadow/issues/61)
 - Remove support for applying individual sub-plugins by Id (easier maintenance and cleaner presentation in Gradle Portal)
 
-## v1.0.2 (2014-07-07)
+## [1.0.2] - 2014-07-07
+[1.0.2]: https://github.com/GradleUp/shadow/releases/tag/1.0.2
 
 - Do not add an empty Class-Path attribute to the manifest when the `shadow` configuration contains no dependencies.
 - `runShadow` now registers `shadowJar` as an input. Previously, `runShadow` did not execute `shadowJar` and an error occurred.
 - Support Gradle 2.0, [#66](https://github.com/GradleUp/shadow/issues/66)
 - Do not override existing 'Class-Path' Manifest attribute settings from Jar configuration. Instead combine, [#65](https://github.com/GradleUp/shadow/issues/65)
 
-## v1.0.1 (2014-06-28)
+## [1.0.1] - 2014-06-28
+[1.0.1]: https://github.com/GradleUp/shadow/releases/tag/1.0.1
 
 - Fix issue where non-class files are dropped when using relocation, [#58](https://github.com/GradleUp/shadow/issues/58)
 - Do not create a `/` directory inside the output jar.
 - Fix `runShadow` task to evaluate the `shadowJar.archiveFile` property at execution time, [#60](https://github.com/GradleUp/shadow/issues/60)
 
-## v1.0.0 (2014-06-27)
+## [1.0.0] - 2014-06-27
+[1.0.0]: https://github.com/GradleUp/shadow/releases/tag/1.0.0
 
 - Previously known as v0.9.0
 - All changes from 0.9.0-M1 to 0.9.0-M5
@@ -671,12 +697,14 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - Apply relocation remappings to classes and imports in source project, [#55](https://github.com/GradleUp/shadow/issues/55)
 - Do not create directories in jar for source of remapped class, created directories in jar for destination of remapped classes, [#53](https://github.com/GradleUp/shadow/issues/53)
 
-## v0.9.0-M5
+## [0.9.0-M5] - 2014-06-26
+[0.9.0-M5]: https://github.com/GradleUp/shadow/releases/tag/0.9.0-M5
 
 - Add commons-io to compile classpath
 - Update asm library to 4.1
 
-## v0.9.0-M4
+## [0.9.0-M4] - 2014-06-21
+[0.9.0-M4]: https://github.com/GradleUp/shadow/releases/tag/0.9.0-M4
 
 - Break plugin into multiple sub-plugins. `ShadowBasePlugin` is always applied.
   `ShadowJavaPlugin` and `ShadowApplicationPlugin` are applied in reaction to applying the `java` and `application`
@@ -694,17 +722,20 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - Excluding/Including dependencies no longer includes transitive dependencies. All dependencies for inclusion/exclusion
   must be explicitly configured via a spec.
 
-## v0.9.0-M3
+## [0.9.0-M3] - 2014-06-14
+[0.9.0-M3]: https://github.com/GradleUp/shadow/releases/tag/0.9.0-M3
 
 - Use commons.io FilenameUtils to determine name of resolved jars for including/excluding
 
-## v0.9.0-M2
+## [0.9.0-M2] - 2014-06-09
+[0.9.0-M2]: https://github.com/GradleUp/shadow/releases/tag/0.9.0-M2
 
 - Added integration with `application` plugin to replace old `OutputSignedJars` task
 - Fixed bug that resulted in duplicate file entries in the resulting Jar
 - Changed plugin id to 'com.github.johnrengelman.shadow' to support Gradle 2.x plugin infrastructure.
 
-## v0.9.0-M1
+## [0.9.0-M1] - 2014-06-06
+[0.9.0-M1]: https://github.com/GradleUp/shadow/releases/tag/0.9.0-M1
 
 - Rewrite based on Gradle Jar Task
 - `ShadowJar` now extends `Jar`
