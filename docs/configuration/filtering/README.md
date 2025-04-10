@@ -3,7 +3,7 @@
 The final contents of a shadow JAR can be filtered using the `exclude` and `include` methods inherited from Gradle's
 `Jar` task type.
 
-Refer to the [Jar](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html) documentation for details
+Refer to the [Jar](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) documentation for details
 on the various versions of the methods and their behavior.
 
 When using `exclude`/`include` with a `ShadowJar` task, the resulting copy specs are applied to the _final_ JAR
