@@ -4,7 +4,7 @@ moshi = "1.15.2"
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
-apache-commonsIo = "commons-io:commons-io:2.18.0"
+apache-commonsIo = "commons-io:commons-io:2.19.0"
 apache-log4j = "org.apache.logging.log4j:log4j-core:2.24.3"
 apache-maven-modelBuilder = "org.apache.maven:maven-model-builder:3.9.9"
 asm = "org.ow2.asm:asm-commons:9.7.1"
