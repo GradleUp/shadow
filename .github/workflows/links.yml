@@ -26,7 +26,7 @@ jobs:
         with:
           cache-read-only: true
       # This is required for action-linkspector to work with API links.
-      - run: ./gradlew dokkaHtml
+      - run: ./gradlew dokkaGenerate
       - name: Mkdocs build validation
         run: |
           # Don't cache it to track updates.

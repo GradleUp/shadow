@@ -19,7 +19,7 @@ jobs:
         with:
           cache-read-only: true
       - name: Prepare API documentation
-        run: ./gradlew dokkaHtml
+        run: ./gradlew dokkaGenerate
       - name: Build Site
         run: |
           # Don't cache it to track updates.
