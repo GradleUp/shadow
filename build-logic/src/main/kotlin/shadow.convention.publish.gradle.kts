@@ -13,6 +13,12 @@ version = providers.gradleProperty("VERSION_NAME").get()
 group = providers.gradleProperty("GROUP").get()
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
+dokka {
+  dokkaPublications.html {
+    outputDirectory = rootDir.resolve("docs/api")
+  }
+}
+
 java {
   withSourcesJar()
   withJavadocJar()
@@ -31,10 +37,6 @@ gradlePlugin {
       tags = listOf("onejar", "shade", "fatjar", "uberjar")
     }
   }
-}
-
-tasks.dokkaHtml {
-  outputDirectory = rootDir.resolve("docs/api")
 }
 
 tasks.publishPlugins {
