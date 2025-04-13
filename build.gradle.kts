@@ -85,6 +85,14 @@ configurations.configureEach {
   }
 }
 
+publishing.publications.withType<MavenPublication>().configureEach {
+  // We don't care about capabilities being unmappable to Maven.
+  suppressPomMetadataWarningsFor(API_ELEMENTS_CONFIGURATION_NAME)
+  suppressPomMetadataWarningsFor(RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+  suppressPomMetadataWarningsFor(JAVADOC_ELEMENTS_CONFIGURATION_NAME)
+  suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
+}
+
 dependencies {
   compileOnly(libs.kotlin.kmp)
   implementation(libs.apache.ant)
