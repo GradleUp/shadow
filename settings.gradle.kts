@@ -10,8 +10,6 @@ pluginManagement {
     }
     gradlePluginPortal()
   }
-
-  includeBuild("build-logic")
 }
 
 plugins {

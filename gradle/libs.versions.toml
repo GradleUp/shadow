@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.1.20"
 moshi = "1.15.2"
+pluginPublish = "1.3.1"
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
@@ -17,11 +18,9 @@ xmlunit = "org.xmlunit:xmlunit-legacy:2.10.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
-pluginPublish = "com.gradle.publish:plugin-publish-plugin:1.3.1"
-mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.31.0"
-jetbrains-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.0.0"
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:0.10.0"
 kotlin-kmp = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
+pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "pluginPublish" }
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha03"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
@@ -34,4 +33,7 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 android-lint = "com.android.lint:8.9.1"
 jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.17.0"
+jetbrains-dokka = "org.jetbrains.dokka:2.0.0"
+mavenPublish = "com.vanniktech.maven.publish:0.31.0"
+pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 spotless = "com.diffplug.spotless:7.0.3"
