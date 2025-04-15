@@ -1,6 +1,6 @@
 # Configuring Shadowed Dependencies
 
-Shadow configures the default `shadowJar` task to merge all dependencies from the project's `runtimeClasspath` configuration
+Shadow configures the default [`ShadowJar`] task to merge all dependencies from the project's `runtimeClasspath` configuration
 into the final JAR.
 The configurations from which to source dependencies for the merging can be configured using the `configurations` property
 of the [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task type.
@@ -21,7 +21,7 @@ of the [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow
     }
     ```
 
-The above code sample would configure the `shadowJar` task to merge dependencies from only the `compileClasspath` configuration.
+The above code sample would configure the [`ShadowJar`] task to merge dependencies from only the `compileClasspath` configuration.
 This means any dependency declared in the `runtimeOnly` configuration would be **not** be included in the final JAR.
 
 > Note the literal use of `project.configurations` when setting the `configurations` attribute of a
@@ -31,7 +31,7 @@ have the intended effect, as `configurations.compile` will try to delegate to th
 
 ## Embedding Jar Files Inside Your Shadow Jar
 
-The `shadowJar` task is a subclass of the `Jar` task, which means that the
+The [`ShadowJar`] task is a subclass of the [`Jar`] task, which means that the
 [Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action))
 method can be used to add extra files.
 
@@ -340,3 +340,8 @@ block provides a method that accepts a `Closure` for selecting dependencies.
       }
     }
     ```
+
+
+
+[`Jar`]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[`ShadowJar`]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
