@@ -122,17 +122,17 @@ In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins
 (that apply [JavaPlugin](https://docs.gradle.org/current/userguide/java_plugin.html) in their build logic),
 Shadow will automatically configure the following behavior:
 
-* Adds a [`ShadowJar`] task to the project.
+* Adds a [ShadowJar] task to the project.
 * Adds a `shadow` configuration to the project.
 * Adds a `shadow` variant to the project.
 * Adds a `shadow` component to the project.
-* Configures the [`ShadowJar`] task to include all sources from the project's `main` sourceSet.
-* Configures the [`ShadowJar`] task to bundle all dependencies from the `runtimeClasspath` configuration.
-* Configures the _classifier_ attribute of the [`ShadowJar`] task to be `'all'` .
-* Configures the [`ShadowJar`] task to generate a `Manifest` with:
-    * Inheriting all configuration from the standard [`Jar`] task.
+* Configures the [ShadowJar] task to include all sources from the project's `main` sourceSet.
+* Configures the [ShadowJar] task to bundle all dependencies from the `runtimeClasspath` configuration.
+* Configures the _classifier_ attribute of the [ShadowJar] task to be `'all'` .
+* Configures the [ShadowJar] task to generate a `Manifest` with:
+    * Inheriting all configuration from the standard [Jar] task.
     * Adds a `Class-Path` attribute to the `Manifest` that appends all dependencies from the `shadow` configuration
-* Configures the [`ShadowJar`] task to _exclude_ any JAR index or cryptographic signature files matching the following patterns:
+* Configures the [ShadowJar] task to _exclude_ any JAR index or cryptographic signature files matching the following patterns:
     * `META-INF/INDEX.LIST`
     * `META-INF/*.SF`
     * `META-INF/*.DSA`
@@ -156,7 +156,7 @@ Here are the options that can be passed to the `shadowJar`:
 --rerun                   Causes the task to be re-run even if up-to-date
 ```
 
-Also, you can view more information about the [`ShadowJar`] task by running the following command:
+Also, you can view more information about the [ShadowJar] task by running the following command:
 
 ```sh
 ./gradlew -q help --task shadowJar
@@ -166,5 +166,5 @@ Refer to [listing command line options](https://docs.gradle.org/current/userguid
 
 
 
-[`Jar`]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
-[`ShadowJar`]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
