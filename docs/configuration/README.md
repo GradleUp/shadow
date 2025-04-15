@@ -1,7 +1,3 @@
----
-api: api/com/github/jengelman/gradle/plugins/shadow
----
-
 # Configuring Shadow
 
 The [`ShadowJar`](../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task type extends from Gradle's
