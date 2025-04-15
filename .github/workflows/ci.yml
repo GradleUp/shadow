@@ -24,18 +24,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build
 
-  release-note:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gradle/actions/setup-gradle@v4
-      - name: Extract release notes
-        uses: ffurrer2/extract-release-notes@v2
-        with:
-          changelog_file: docs/changes/README.md
-          release_notes_file: RELEASE_NOTES.md
-      - run: cat RELEASE_NOTES.md
-
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
