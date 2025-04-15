@@ -8,7 +8,7 @@
 - Avoid creating jvm targets eagerly for KMP. ([#1378](https://github.com/GradleUp/shadow/pull/1378))
 
 
-## [9.0.0-beta12](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta12) - 2025-04-01
+## [9.0.0-beta12](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta12) - 2025-04-01
 
 **Added**
 
@@ -29,7 +29,7 @@ Options:
 - Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
 
 
-## [9.0.0-beta11](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta11) - 2025-03-18
+## [9.0.0-beta11](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta11) - 2025-03-18
 
 **Added**
 
@@ -55,7 +55,7 @@ Options:
 - **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
 
 
-## [9.0.0-beta10](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta10) - 2025-03-05
+## [9.0.0-beta10](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10) - 2025-03-05
 
 **Added**
 
@@ -78,7 +78,7 @@ Options:
 - **BREAKING CHANGE:** Remove `Named` from the parents of `Transformer`. ([#1289](https://github.com/GradleUp/shadow/pull/1289))
 
 
-## [9.0.0-beta9](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta9) - 2025-02-24
+## [9.0.0-beta9](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9) - 2025-02-24
 
 **Added**
 
@@ -103,7 +103,7 @@ Options:
 - **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 
-## [9.0.0-beta8](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta8) - 2025-02-08
+## [9.0.0-beta8](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8) - 2025-02-08
 
 **Added**
 
@@ -121,7 +121,7 @@ Options:
 - **BREAKING CHANGE:** Remove `KnowsTask` as it's useless. ([#1236](https://github.com/GradleUp/shadow/pull/1236))
 
 
-## [9.0.0-beta7](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta7) - 2025-02-02
+## [9.0.0-beta7](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7) - 2025-02-02
 
 **Added**
 
@@ -146,7 +146,7 @@ Options:
 - **BREAKING CHANGE:** Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow` task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
 
 
-## [9.0.0-beta6](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta6) - 2025-01-23
+## [9.0.0-beta6](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6) - 2025-01-23
 
 **Added**
 
@@ -157,7 +157,7 @@ Options:
 - Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1175](https://github.com/GradleUp/shadow/pull/1175))  
 
 
-## [9.0.0-beta5](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta5) - 2025-01-21
+## [9.0.0-beta5](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5) - 2025-01-21
 
 **Added**
 
@@ -177,7 +177,7 @@ Options:
 - Fail builds if processing bad jars.  ([#1146](https://github.com/GradleUp/shadow/pull/1146))  
 
 
-## [9.0.0-beta4](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta4) - 2024-12-06
+## [9.0.0-beta4](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4) - 2024-12-06
 
 **Changed**
 
@@ -189,7 +189,7 @@ Options:
   This fixes the regression for registering custom `ShadowJar` tasks.
 
 
-## [9.0.0-beta2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta2) - 2024-11-28
+## [9.0.0-beta2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2) - 2024-11-28
 
 **Fixed**
 
@@ -197,7 +197,7 @@ Options:
   This fixes the relocation not working in `v9.0.0-beta1`.
 
 
-## [9.0.0-beta1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-Beta1) - 2024-11-27
+## [9.0.0-beta1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta1) - 2024-11-27
 
 **Added**
 
@@ -645,12 +645,12 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - Apply relocation remappings to classes and imports in source project, [#55](https://github.com/GradleUp/shadow/issues/55)
 - Do not create directories in jar for source of remapped class, created directories in jar for destination of remapped classes, [#53](https://github.com/GradleUp/shadow/issues/53)
 
-## [0.9.0-M5](https://github.com/GradleUp/shadow/releases/TAG/0.9.0-M5) - 2014-06-26
+## [0.9.0-M5](https://github.com/GradleUp/shadow/releases/tag/0.9.0-M5) - 2014-06-26
 
 - Add commons-io to compile classpath
 - Update asm library to 4.1
 
-## [0.9.0-M4](https://github.com/GradleUp/shadow/releases/TAG/0.9.0-M4) - 2014-06-21
+## [0.9.0-M4](https://github.com/GradleUp/shadow/releases/tag/0.9.0-M4) - 2014-06-21
 
 - Break plugin into multiple sub-plugins. `ShadowBasePlugin` is always applied.
   `ShadowJavaPlugin` and `ShadowApplicationPlugin` are applied in reaction to applying the `java` and `application`
@@ -668,17 +668,17 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 - Excluding/Including dependencies no longer includes transitive dependencies. All dependencies for inclusion/exclusion
   must be explicitly configured via a spec.
 
-## [0.9.0-M3](https://github.com/GradleUp/shadow/releases/TAG/0.9.0-M3) - 2014-06-14
+## [0.9.0-M3](https://github.com/GradleUp/shadow/releases/tag/0.9.0-M3) - 2014-06-14
 
 - Use commons.io FilenameUtils to determine name of resolved jars for including/excluding
 
-## [0.9.0-M2](https://github.com/GradleUp/shadow/releases/TAG/0.9.0-M2) - 2014-06-09
+## [0.9.0-M2](https://github.com/GradleUp/shadow/releases/tag/0.9.0-M2) - 2014-06-09
 
 - Added integration with `application` plugin to replace old `OutputSignedJars` task
 - Fixed bug that resulted in duplicate file entries in the resulting Jar
 - Changed plugin id to 'com.github.johnrengelman.shadow' to support Gradle 2.x plugin infrastructure.
 
-## [0.9.0-M1](https://github.com/GradleUp/shadow/releases/TAG/0.9.0-M1) - 2014-06-06
+## [0.9.0-M1](https://github.com/GradleUp/shadow/releases/tag/0.9.0-M1) - 2014-06-06
 
 - Rewrite based on Gradle Jar Task
 - `ShadowJar` now extends `Jar`
