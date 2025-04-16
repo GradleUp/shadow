@@ -65,9 +65,8 @@ easily organize your build logic for [Packaging Gradle Plugins](../gradle-plugin
 
 ## For Kotlin Multiplatform Plugin
 
-Shadow honors Kotlin's
-[`org.jetbrains.kotlin.multiplatform`](https://kotlinlang.org/docs/multiplatform-intro.html) plugin and will automatically
-configure additional tasks for bundling the shadowed JAR for its `jvm` target.
+Shadow honors Kotlin's [`org.jetbrains.kotlin.multiplatform`][org.jetbrains.kotlin.multiplatform] plugin and will
+automatically configure additional tasks for bundling the shadowed JAR for its `jvm` target.
 
 === "Kotlin"
 
@@ -144,3 +143,7 @@ configure additional tasks for bundling the shadowed JAR for its `jvm` target.
       }
     }
     ```
+
+
+
+[org.jetbrains.kotlin.multiplatform]: https://kotlinlang.org/docs/multiplatform-intro.html

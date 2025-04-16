@@ -2,7 +2,7 @@
 
 When using Shadow in a multi-project build, project dependencies will be treated the same as
 external dependencies.
-That is a project dependency will be merged into the `shadowJar` output of the project that
+That is a project dependency will be merged into the [`ShadowJar`][ShadowJar] output of the project that
 is applying the Shadow plugin.
 
 ## Depending on the Shadow Jar from Another Project
@@ -27,3 +27,8 @@ configuration of the shadowed project.
       implementation project(path: ':api', configuration: 'shadow')
     }
     ```
+
+
+
+[Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
