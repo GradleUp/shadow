@@ -2,7 +2,7 @@
 
 The [`ShadowJar`][ShadowJar] task type extends from Gradle's [`Jar`][Jar] type.
 This means that all attributes and methods available on [`Jar`][Jar] are also available on [`ShadowJar`][ShadowJar].
-Refer the _Gradle User Guide_ for [`Jar`][Jar] for details.
+
 
 ## Configuring Output Name
 

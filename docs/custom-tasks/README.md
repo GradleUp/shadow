@@ -1,9 +1,9 @@
 # Creating a Custom ShadowJar Task
 
 The built in [`ShadowJar`][ShadowJar] task only provides an output for the `main` source set of the project.
-It is possible to add arbitrary [`ShadowJar`][ShadowJar] 
-tasks to a project. When doing so, ensure that the `configurations` property is specified to inform Shadow which 
-dependencies to merge into the output.
+It is possible to add arbitrary [`ShadowJar`][ShadowJar] tasks to a project. When doing so, ensure that the
+[`configurations`][ShadowJar.configurations] property is specified to inform Shadow which dependencies to merge into
+the output.
 
 === "Kotlin"
 
@@ -60,4 +60,5 @@ The file is output to `build/libs/<project>-<version>-tests.jar`.
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[ShadowJar.configurations]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
