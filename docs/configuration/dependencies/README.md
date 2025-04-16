@@ -1,8 +1,9 @@
 # Configuring Shadowed Dependencies
 
-Shadow configures the default [`ShadowJar`][ShadowJar] task to merge all dependencies from the project's `runtimeClasspath` configuration
-into the final JAR. The configurations from which to source dependencies for the merging can be configured using the
-[`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task type.
+Shadow configures the default [`ShadowJar`][ShadowJar] task to merge all dependencies from the project's
+`runtimeClasspath` configuration into the final JAR. The configurations from which to source dependencies for the
+merging can be configured using the [`configurations`][ShadowJar.configurations] property of the
+[`ShadowJar`][ShadowJar] task type.
 
 === "Kotlin"
 
@@ -20,14 +21,15 @@ into the final JAR. The configurations from which to source dependencies for the
     }
     ```
 
-The above code sample would configure the [`ShadowJar`][ShadowJar] task to merge dependencies from only the `compileClasspath` configuration.
+The above code sample would configure the [`ShadowJar`][ShadowJar] task to merge dependencies from only the
+`compileClasspath` configuration.
 This means any dependency declared in the `runtimeOnly` configuration would be **not** be included in the final JAR.
 
 > Note the literal use of [`project.configurations`][Project.configurations] when setting the
-[`configurations`][ShadowJar.configurations] attribute of a [`ShadowJar`][ShadowJar] task.
-This is **required**. It may be tempting to specify `configurations = [configurations.compileClasspath]` but this will not
-have the intended effect, as `configurations.compile` will try to delegate to the
-[`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`
+> [`configurations`][ShadowJar.configurations] attribute of a [`ShadowJar`][ShadowJar] task.
+> This is **required**. It may be tempting to specify `configurations = [configurations.compileClasspath]` but this will
+> not have the intended effect, as `configurations.compile` will try to delegate to the
+> [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`
 
 ## Embedding Jar Files Inside Your Shadow Jar
 
@@ -134,8 +136,8 @@ Gradle's [`project.configurations`][Project.configurations] block.
     ```
 
 > While not being able to filter entire transitive dependency graphs might seem like an oversight, it is necessary
-because it would not be possible to intelligently determine the build author's intended results when there is a
-common dependency between two 1st level dependencies when one is excluded and the other is not.
+> because it would not be possible to intelligently determine the build author's intended results when there is a
+> common dependency between two 1st level dependencies when one is excluded and the other is not.
 
 ### Using Regex Patterns to Filter Dependencies
 

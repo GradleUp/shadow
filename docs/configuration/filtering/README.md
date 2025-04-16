@@ -23,9 +23,8 @@ source set or _any_ of the dependencies to be merged.
     }
     ```
 
-
-Excludes and includes can be combined just like a normal [`Jar`][Jar] task, with `excludes` taking precedence over `includes`.
-Additionally, ANT style patterns can be used to match multiple files.
+Excludes and includes can be combined just like a normal [`Jar`][Jar] task, with `excludes` taking precedence over
+`includes`. Additionally, ANT style patterns can be used to match multiple files.
 
 === "Kotlin"
 

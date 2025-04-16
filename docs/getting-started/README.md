@@ -108,7 +108,8 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     </p>
     </details>
 
-**NOTE:** The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
+**NOTE:** The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin
+documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
 
 Shadow is a reactive plugin.
 This means that applying Shadow by itself will perform no configuration on your project.
@@ -131,18 +132,20 @@ in their build logic), Shadow will automatically configure the following behavio
 * Configures the [`ShadowJar`][ShadowJar] task to generate a `Manifest` with:
     * Inheriting all configuration from the standard [`Jar`][Jar] task.
     * Adds a `Class-Path` attribute to the `Manifest` that appends all dependencies from the `shadow` configuration
-* Configures the [`ShadowJar`][ShadowJar] task to _exclude_ any JAR index or cryptographic signature files matching the following patterns:
+* Configures the [`ShadowJar`][ShadowJar] task to _exclude_ any JAR index or cryptographic signature files matching the
+  following patterns:
     * `META-INF/INDEX.LIST`
     * `META-INF/*.SF`
     * `META-INF/*.DSA`
     * `META-INF/*.RSA`
     * `META-INF/versions/**/module-info.class`
     * `module-info.class`
-* Creates and registers the `shadow` component in the project (used for integrating with [`maven-publish`][maven-publish]).
+* Creates and registers the `shadow` component in the project (used for integrating with
+  [`maven-publish`][maven-publish]).
 
 ## ShadowJar Command Line options
 
-Sometimes, a user wants to declare the value of an exposed task property on the command line instead of the 
+Sometimes, a user wants to declare the value of an exposed task property on the command line instead of the
 build script. Passing property values on the command line is particularly helpful if they change more frequently.  
 Here are the options that can be passed to the `shadowJar`:
 
@@ -161,7 +164,8 @@ Also, you can view more information about the [`ShadowJar`][ShadowJar] task by r
 ./gradlew -q help --task shadowJar
 ```
 
-Refer to [listing command line options](https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options).
+Refer to
+[listing command line options](https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options).
 
 
 
