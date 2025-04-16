@@ -1,11 +1,11 @@
 # Integrating with Application Plugin
 
-Shadow reacts to the presence of Gradle's
-[`application`](https://docs.gradle.org/current/userguide/application_plugin.html) plugin and will automatically
-configure additional tasks for running the shadowed JAR and creating distributions containing the shadowed JAR.
+Shadow reacts to the presence of Gradle's [`application`][application] plugin and will automatically configure
+additional tasks for running the shadowed JAR and creating distributions containing the shadowed JAR.
 
-Just like the normal [`Jar`][Jar] task, when the `application` plugin is applied, the [`ShadowJar`][ShadowJar] manifest will be
-configured to contain the `Main-Class` attribute with the value specified in the project's `mainClassName` attribute.
+Just like the normal [`Jar`][Jar] task, when the [`application`][application] plugin is applied,
+the [`ShadowJar`][ShadowJar] manifest will be configured to contain the `Main-Class` attribute with the value specified
+in the project's `application.mainClass` attribute.
 
 === "Kotlin"
 
@@ -37,9 +37,8 @@ configured to contain the `Main-Class` attribute with the value specified in the
 
 When applied along with the `application` plugin, the `runShadow` task will be created for starting
 the application from the shadowed JAR.
-The `runShadow` task is a [`JavaExec`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html)
-task that is configured to execute `java -jar myproject-all.jar`.
-It can be configured the same as any other `JavaExec` task.
+The `runShadow` task is a [`JavaExec`][JavaExec] task that is configured to execute `java -jar myproject-all.jar`.
+It can be configured the same as any other [`JavaExec`][JavaExec] task.
 
 === "Kotlin"
 
@@ -81,10 +80,9 @@ It can be configured the same as any other `JavaExec` task.
 
 ## Distributing the Shadow JAR
 
-The Shadow plugin will also configure distribution tasks when in the presence of the `application` plugin.
-The plugin will create `shadowDistZip` and `shadowDistTar` which creates Zip and Tar distributions
-respectively.
-Each distribution will contain the shadowed JAR file along with the necessary start scripts to launch
+The Shadow plugin will also configure distribution tasks when in the presence of the [`application`][application]
+plugin. The plugin will create `shadowDistZip` and `shadowDistTar` which creates Zip and Tar distributions
+respectively. Each distribution will contain the shadowed JAR file along with the necessary start scripts to launch
 the application.
 
 Additionally, the plugin will create the `installShadowDist` and `startShadowScripts` tasks which stages the necessary
@@ -142,10 +140,11 @@ You can also add more files into the distribution like:
     }
     ```
 
-View [the official doc described](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin)
+View [The Distribution Plugin](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin)
 for more information about configuring distributions.
 
 
-
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[JavaExec]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[application]: https://docs.gradle.org/current/userguide/application_plugin.html

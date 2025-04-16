@@ -31,8 +31,7 @@ have the intended effect, as `configurations.compile` will try to delegate to th
 
 ## Embedding Jar Files Inside Your Shadow Jar
 
-The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the
-[Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action))
+The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
 
 === "Kotlin"
@@ -306,7 +305,7 @@ You can also use type-safe project accessors or version catalog accessors to fil
 ### Programmatically Selecting Dependencies to Filter
 
 If more complex decisions are needed to select the dependencies to be included, the
-[`dependencies`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html)
+[`ShadowJar.dependencies`][ShadowJar.dependencies]
 block provides a method that accepts a `Closure` for selecting dependencies.
 
 === "Kotlin"
@@ -343,5 +342,7 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 
 
 
+[Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

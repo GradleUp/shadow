@@ -118,9 +118,8 @@ to have the desired effect.
 
 ## Default Java/Kotlin/Groovy Tasks
 
-In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins
-(that apply [JavaPlugin](https://docs.gradle.org/current/userguide/java_plugin.html) in their build logic),
-Shadow will automatically configure the following behavior:
+In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins (that apply [`JavaPlugin`][JavaPlugin]
+in their build logic), Shadow will automatically configure the following behavior:
 
 * Adds a [`ShadowJar`][ShadowJar] task to the project.
 * Adds a `shadow` configuration to the project.
@@ -139,7 +138,7 @@ Shadow will automatically configure the following behavior:
     * `META-INF/*.RSA`
     * `META-INF/versions/**/module-info.class`
     * `module-info.class`
-* Creates and registers the `shadow` component in the project (used for integrating with `maven-publish`).
+* Creates and registers the `shadow` component in the project (used for integrating with [`maven-publish`][maven-publish]).
 
 ## ShadowJar Command Line options
 
@@ -167,4 +166,6 @@ Refer to [listing command line options](https://docs.gradle.org/current/userguid
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[JavaPlugin]: https://docs.gradle.org/current/userguide/java_plugin.html
+[maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

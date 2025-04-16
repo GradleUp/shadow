@@ -3,7 +3,7 @@
 ## Publishing with Maven-Publish Plugin
 
 The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle's
-`maven-publish` plugin.
+[`maven-publish`][maven-publish] plugin.
 The plugin provides the `shadow` component to configure the publication with the necessary
 artifact and dependencies in the POM file.
 
@@ -151,7 +151,8 @@ the `archiveClassifier` of the shadowed JAR like the following:
 
 ## Publish Custom ShadowJar Task Outputs
 
-It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the [`MavenPublication.artifact(java.lang.Object)`](https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)) method. 
+It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
+[`MavenPublication.artifact()`][MavenPublication.artifact] method. 
 
 === "Kotlin"
 
@@ -295,4 +296,6 @@ be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html

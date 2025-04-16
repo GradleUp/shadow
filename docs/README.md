@@ -8,7 +8,7 @@
 Shadow is a Gradle plugin for combining a project's dependency classes and resources into a single
 output Jar.
 The combined Jar is often referred to a _fat-jar_ or _uber-jar_.
-Shadow utilizes [`JarInputStream`](https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarInputStream.html) and [`JarOutputStream`](https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarOutputStream.html) to efficiently process dependent libraries
+Shadow utilizes [`JarInputStream`][JarInputStream] and [`JarOutputStream`][JarOutputStream] to efficiently process dependent libraries
 into the output jar without incurring the I/O overhead of expanding the jars to disk.
 
 !!! warning "Plugin ID Change"
@@ -57,3 +57,8 @@ These issues often manifest themselves as binary incompatibilities in either the
 
 By utilizing Shadow's ability to _relocate_ the package names for dependencies, a library author can ensure that the
 library's dependencies will not conflict with the same dependency being declared by the downstream application.
+
+
+
+[JarInputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarInputStream.html
+[JarOutputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarOutputStream.html
