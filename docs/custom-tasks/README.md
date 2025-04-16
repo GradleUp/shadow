@@ -53,10 +53,9 @@ the output.
     }
     ```
 
-The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all `testRuntimeOnly`
-and `testImplementation` dependencies.
-The file is output to `build/libs/<project>-<version>-tests.jar`.
-
+The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all
+`testRuntimeOnly` and `testImplementation` dependencies. The file is output to
+`build/libs/<project>-<version>-tests.jar`.
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html

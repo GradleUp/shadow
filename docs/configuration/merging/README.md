@@ -46,7 +46,8 @@ should process a particular entry and apply any modifications before writing the
     }
     ```
 
-Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closure` to configure the provided `ResourceTransformer`.
+Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closure` to configure the provided
+[`ResourceTransformer`][ResourceTransformer].
 
 === "Kotlin"
 
@@ -320,7 +321,6 @@ this transformer.
     }
     ```
 
-
 ## Appending XML Files
 
 XML files require a special transformer for merging. The [`XmlAppendingTransformer`][XmlAppendingTransformer]
@@ -357,11 +357,12 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 - `FAIL`: Throw a `DuplicateFileCopyingException` when subsequent items are to be created at the same path.
 - `INCLUDE`: Do not attempt to prevent duplicates.
 - `INHERIT`: Uses the same strategy as the parent copy specification.
-- `WARN`: Do not attempt to prevent duplicates, but log a warning message when multiple items are to be created at the same path.
+- `WARN`: Do not attempt to prevent duplicates, but log a warning message when multiple items are to be created at the
+  same path.
 
 see more details about them in [`DuplicatesStrategy`][DuplicatesStrategy].
 
-`ShadowJar` recognizes `DuplicatesStrategy.INCLUDE` as the default, if you want to change the strategy, you can 
+`ShadowJar` recognizes `DuplicatesStrategy.INCLUDE` as the default, if you want to change the strategy, you can
 override it like:
 
 === "Kotlin"
@@ -385,7 +386,8 @@ Different strategies will lead to different results for `foo/bar` files in the J
 - `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
 - `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicated `foo/bar` files.
 - `INCLUDE`: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
-- `INHERIT`: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+- `INHERIT`: **Fail** the build with an exception like
+  `Entry .* is a duplicate but no duplicate handling strategy has been set`.
 - `WARN`: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
 
 **NOTE:** The `duplicatesStrategy` takes precedence over transforming and relocating. If you mix the usages of
@@ -412,7 +414,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
 The [`ServiceFileTransformer`][ServiceFileTransformer] will not work as expected because the `duplicatesStrategy` will
 exclude the duplicated service files beforehand. However, this behavior might be what you expected for duplicated
 `foo/bar` files, preventing them from being included.
-Want `ResourceTransformer`s and `duplicatesStrategy` to work together? There is a way to achieve this, leave the 
+Want `ResourceTransformer`s and `duplicatesStrategy` to work together? There is a way to achieve this, leave the
 `duplicatesStrategy` as `INCLUDE` and declare a custom [`ResourceTransformer`][ResourceTransformer] to handle the
 duplicated files.
 

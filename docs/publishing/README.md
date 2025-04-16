@@ -67,10 +67,9 @@ This automatic configuration occurs _only_ when using the above methods for
 configuring publishing. If this behavior is not desirable, then publishing **must**
 be manually configured.
 
-
 ## Publish the Shadowed JAR instead of the Original JAR
 
-You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming 
+You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
 the `archiveClassifier` of the shadowed JAR like the following:
 
 === "Kotlin"
@@ -148,11 +147,10 @@ the `archiveClassifier` of the shadowed JAR like the following:
     }
     ```
 
-
 ## Publish Custom ShadowJar Task Outputs
 
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
-[`MavenPublication.artifact()`][MavenPublication.artifact] method. 
+[`MavenPublication.artifact()`][MavenPublication.artifact] method.
 
 === "Kotlin"
 
@@ -220,10 +218,9 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
     }
     ```
 
-
 ## Publish the Shadowed JAR with Custom Artifact Name
 
-It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more 
+It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more
 customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name). e.g.
 
 === "Kotlin"
@@ -290,7 +287,7 @@ customizable properties listed in [Configuring Output Name](../configuration/REA
     }
     ```
 
-We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will 
+We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will
 be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
 

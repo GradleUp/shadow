@@ -3,7 +3,6 @@
 The [`ShadowJar`][ShadowJar] task type extends from Gradle's [`Jar`][Jar] type.
 This means that all attributes and methods available on [`Jar`][Jar] are also available on [`ShadowJar`][ShadowJar].
 
-
 ## Configuring Output Name
 
 Shadow configures the default [`ShadowJar`][ShadowJar] task to set the output JAR's
@@ -17,7 +16,7 @@ Shadow configures the default [`ShadowJar`][ShadowJar] task to set the output JA
 - [`destinationDirectory`][destinationDirectory]
 
 to the same default values as Gradle does for all [`Jar`][Jar] tasks. Additionally, it configures the
-[`archiveClassifier`][archiveClassifier] to be `all`. The listed ones are not full, you can view all the properties in 
+[`archiveClassifier`][archiveClassifier] to be `all`. The listed ones are not full, you can view all the properties in
 [`Jar`][Jar]. The output shadowed JAR file will be named with the following format:
 
 ```
@@ -46,7 +45,6 @@ of the shadowed JAR file. e.g.
 
 This will result in the output file being named `myApp-all.jar` instead of `myApp-1.0-all.jar`.
 
-
 ## Configuring the Runtime Classpath
 
 Each Java JAR file contains a manifest file that provides metadata about the contents of the JAR file itself.
@@ -61,10 +59,10 @@ Think of `configurations.shadow` as unmerged, runtime dependencies.
 The integration with the [`maven-publish`][maven-publish] plugin will automatically configure dependencies added
 to `configurations.shadow` as `RUNTIME` scope dependencies in the resulting POM file.
 
-Additionally, Shadow automatically configures the manifest of the [`ShadowJar`][ShadowJar] task to contain a `Class-Path` entry
-in the JAR manifest.
-The value of the `Class-Path` entry is the name of all dependencies resolved in the `shadow` configuration
-for the project.
+Additionally, Shadow automatically configures the manifest of the [`ShadowJar`][ShadowJar] task to contain a
+`Class-Path` entry in the JAR manifest.
+The value of the `Class-Path` entry is the name of all dependencies resolved in the `shadow` configuration for the
+project.
 
 === "Kotlin"
 
@@ -93,9 +91,10 @@ When deploying a shadowed JAR as an execution JAR, it is important to note that 
 
 ## Configuring the JAR Manifest
 
-Beyond the automatic configuration of the `Class-Path` entry, the [`ShadowJar`][ShadowJar] manifest is configured in a number of ways.
-First, the manifest for the [`ShadowJar`][ShadowJar] task is configured to __inherit__ from the manifest of the standard [`Jar`][Jar] task.
-This means that any configuration performed on the [`Jar`][Jar] task will propagate to the [`ShadowJar`][ShadowJar] tasks.
+Beyond the automatic configuration of the `Class-Path` entry, the [`ShadowJar`][ShadowJar] manifest is configured in a
+number of ways. First, the manifest for the [`ShadowJar`][ShadowJar] task is configured to __inherit__ from the
+manifest of the standard [`Jar`][Jar] task. This means that any configuration performed on the [`Jar`][Jar] task
+will propagate to the [`ShadowJar`][ShadowJar] tasks.
 
 === "Kotlin"
 
@@ -123,8 +122,8 @@ Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the foll
 Class-Path: /libs/a.jar
 ```
 
-If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`][Jar] task, the `inheritFrom` methods
-on the `shadowJar.manifest` object can be used to configure the upstream.
+If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`][Jar] task, the `inheritFrom`
+methods on the `shadowJar.manifest` object can be used to configure the upstream.
 
 === "Kotlin"
 

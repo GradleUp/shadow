@@ -5,10 +5,11 @@ conflicts with the same dependency provided by the Gradle runtime. If this is th
 to relocate your dependencies to a different package name to avoid the collision.
 
 Configuring the relocation has always been possible, but the build author is required to know all the package names
-beforehand. As of Shadow v8.1.0, automatic package relocation can be enabled by setting the `enabledRelocation` 
+beforehand. As of Shadow v8.1.0, automatic package relocation can be enabled by setting the `enabledRelocation`
 and `relocationPrefix` settings on any [`ShadowJar`][ShadowJar] task.
 
-A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the [`ShadowJar`][ShadowJar] task for relocation.
+A simple Gradle plugin can use this feature by applying the `shadow` plugin and configuring the [`ShadowJar`][ShadowJar]
+task for relocation.
 
 === "Kotlin"
 
@@ -57,15 +58,19 @@ A simple Gradle plugin can use this feature by applying the `shadow` plugin and 
     ```
 
 ## Publishing shadowed Gradle plugins
+
 The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
 Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be
-automatically configured to publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the plugin.
-See the [Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies) for details.
+automatically configured to publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the
+plugin. See the
+[Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies)
+for details.
 
 ## Automatic package relocation with Shadow prior to v8.1.0
 
 Prior to Shadow v8.1.0, Shadow handled this by introducing a new task type `ConfigureShadowRelocation`.
-Tasks of this type are configured to target an instance of a [`ShadowJar`][ShadowJar] task and run immediately before it.
+Tasks of this type are configured to target an instance of a [`ShadowJar`][ShadowJar] task and run immediately before
+it.
 
 The `ConfigureShadowRelocation` task, scans the dependencies from the configurations specified on the associated
 `ShadowJar` task and collects the package names contained within them. It then configures relocation for these

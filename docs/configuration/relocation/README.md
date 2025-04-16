@@ -32,17 +32,16 @@ In the resulting JAR, the class file is relocated from `junit/framework/TestCase
 `shadow/junit/TestCase.class`.
 
 > Relocation operates at a package level.
-It is not necessary to specify any patterns for matching, it will operate simply on the prefix
-provided.
+> It is not necessary to specify any patterns for matching, it will operate simply on the prefix provided.
 
 > Relocation will be applied globally to all instances of the matched prefix.
-That is, it does **not** scope to _only_ the dependencies being shadowed.
-Be specific as possible when configuring relocation as to avoid unintended relocations.
+> That is, it does **not** scope to _only_ the dependencies being shadowed.
+> Be specific as possible when configuring relocation as to avoid unintended relocations.
 
 ## Filtering Relocation
 
 Specific classes or files can be `included`/`excluded` from the relocation operation if necessary. Use
-[Ant Path Matcher](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html) 
+[Ant Path Matcher](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html)
 syntax to specify matching path for your files and directories.
 
 === "Kotlin"
@@ -71,8 +70,8 @@ syntax to specify matching path for your files and directories.
     }
     ```
 
-For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the expression in `%regex[]` before
-passing it to `include`/`exclude`.
+For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the
+expression in `%regex[]` before passing it to `include`/`exclude`.
 
 === "Kotlin"
 
@@ -96,8 +95,8 @@ passing it to `include`/`exclude`.
 
 ## Automatically Relocating Dependencies
 
-Shadow is shipped with a task that can be used to automatically configure all packages from all dependencies to be relocated.
-This feature was formally shipped into a 2nd plugin (`com.github.johnrengelman.plugin-shadow`) but has been
+Shadow is shipped with a task that can be used to automatically configure all packages from all dependencies to be
+relocated. This feature was formally shipped into a 2nd plugin (`com.github.johnrengelman.plugin-shadow`) but has been
 removed for clarity reasons in version 4.0.0.
 
 To configure automatic dependency relocation, set `enableRelocation = true` and optionally specify a custom
@@ -124,13 +123,13 @@ To configure automatic dependency relocation, set `enableRelocation = true` and 
 In versions before 8.1.0 it was necessary to configure a separate `ConfigureShadowRelocation` task for this.
 
 > Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
-in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
-Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these 
-dependencies if you do not intend to shadow them into your library.
+> in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
+> Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these
+> dependencies if you do not intend to shadow them into your library.
 
 ## Relocating Project Resources Only
 
-If you want to relocate the resources of the project only and exclude all dependencies (related to a normal JAR but with 
+If you want to relocate the resources of the project only and exclude all dependencies (related to a normal JAR but with
 relocating), you can try out the trick like:
 
 === "Kotlin"
@@ -153,5 +152,5 @@ relocating), you can try out the trick like:
     }
     ```
 
-This is useful in some cases like [#759](https://github.com/GradleUp/shadow/issues/759) mentioned. See 
+This is useful in some cases like [#759](https://github.com/GradleUp/shadow/issues/759) mentioned. See
 [Configuring Shadowed Dependencies](../dependencies/README.md) for more information about `configurations`.
