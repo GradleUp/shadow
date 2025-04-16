@@ -118,6 +118,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/reloc
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun canRelocateClass (Ljava/lang/String;)Z
 	public abstract fun canRelocatePath (Ljava/lang/String;)Z
+	public abstract fun isSkipStringLiteral ()Z
 	public abstract fun relocateClass-XBGRxQs (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun relocatePath-bvWaKNU (Ljava/lang/String;)Ljava/lang/String;
 }
@@ -133,7 +134,8 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZZ)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public fun canRelocateClass (Ljava/lang/String;)Z
 	public fun canRelocatePath (Ljava/lang/String;)Z
@@ -143,6 +145,7 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public final fun getIncludes ()Ljava/util/Set;
 	public fun hashCode ()I
 	public fun include (Ljava/lang/String;)V
+	public fun isSkipStringLiteral ()Z
 	public fun relocateClass-XBGRxQs (Ljava/lang/String;)Ljava/lang/String;
 	public fun relocatePath-bvWaKNU (Ljava/lang/String;)Ljava/lang/String;
 }

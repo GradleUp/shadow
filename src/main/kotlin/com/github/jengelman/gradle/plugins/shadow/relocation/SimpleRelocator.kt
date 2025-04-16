@@ -19,6 +19,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   includes: List<String>? = null,
   excludes: List<String>? = null,
   private val rawString: Boolean = false,
+  override val isSkipStringLiteral: Boolean = true,
 ) : Relocator {
   private val pattern: String
   private val pathPattern: String
