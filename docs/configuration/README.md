@@ -1,12 +1,12 @@
 # Configuring Shadow
 
-The [`ShadowJar`] task type extends from Gradle's [`Jar`] type.
-This means that all attributes and methods available on [`Jar`] are also available on [`ShadowJar`].
-Refer the _Gradle User Guide_ for [`Jar`] for details.
+The [`ShadowJar`][ShadowJar] task type extends from Gradle's [`Jar`][Jar] type.
+This means that all attributes and methods available on [`Jar`][Jar] are also available on [`ShadowJar`][ShadowJar].
+Refer the _Gradle User Guide_ for [`Jar`][Jar] for details.
 
 ## Configuring Output Name
 
-Shadow configures the default [`ShadowJar`] task to set the output JAR's
+Shadow configures the default [`ShadowJar`][ShadowJar] task to set the output JAR's
 
 - [`archiveAppendix`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveAppendix)
 - [`archiveBaseName`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveBaseName)
@@ -16,18 +16,18 @@ Shadow configures the default [`ShadowJar`] task to set the output JAR's
 - [`archiveVersion`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:archiveVersion)
 - [`destinationDirectory`](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:destinationDirectory)
 
-to the same default values as Gradle does for all [`Jar`] tasks.
+to the same default values as Gradle does for all [`Jar`][Jar] tasks.
 Additionally, it configures the
 [`archiveClassifier`](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveClassifier)
 to be `all`. The listed ones are not full, you can view all the properties in 
-[`Jar`].
+[`Jar`][Jar].
 The output shadowed JAR file will be named with the following format:
 
 ```
 archiveBaseName-$archiveAppendix-$archiveVersion-$archiveClassifier.$archiveExtension
 ```
 
-If working with a Gradle project with the name `myApp` and version `1.0`, the default [`ShadowJar`] task will output a
+If working with a Gradle project with the name `myApp` and version `1.0`, the default [`ShadowJar`][ShadowJar] task will output a
 file at: `build/libs/myApp-1.0-all.jar`. You can override the properties listed above to change the output name of the 
 shadowed JAR file. e.g.
 
@@ -64,7 +64,7 @@ Think of `configurations.shadow` as unmerged, runtime dependencies.
 The integration with the `maven-publish` plugin will automatically configure dependencies added
 to `configurations.shadow` as `RUNTIME` scope dependencies in the resulting POM file.
 
-Additionally, Shadow automatically configures the manifest of the [`ShadowJar`] task to contain a `Class-Path` entry
+Additionally, Shadow automatically configures the manifest of the [`ShadowJar`][ShadowJar] task to contain a `Class-Path` entry
 in the JAR manifest.
 The value of the `Class-Path` entry is the name of all dependencies resolved in the `shadow` configuration
 for the project.
@@ -96,9 +96,9 @@ When deploying a shadowed JAR as an execution JAR, it is important to note that 
 
 ## Configuring the JAR Manifest
 
-Beyond the automatic configuration of the `Class-Path` entry, the [`ShadowJar`] manifest is configured in a number of ways.
-First, the manifest for the [`ShadowJar`] task is configured to __inherit__ from the manifest of the standard [`Jar`] task.
-This means that any configuration performed on the [`Jar`] task will propagate to the [`ShadowJar`] tasks.
+Beyond the automatic configuration of the `Class-Path` entry, the [`ShadowJar`][ShadowJar] manifest is configured in a number of ways.
+First, the manifest for the [`ShadowJar`][ShadowJar] task is configured to __inherit__ from the manifest of the standard [`Jar`][Jar] task.
+This means that any configuration performed on the [`Jar`][Jar] task will propagate to the [`ShadowJar`][ShadowJar] tasks.
 
 === "Kotlin"
 
@@ -126,7 +126,7 @@ Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the foll
 Class-Path: /libs/a.jar
 ```
 
-If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`] task, the `inheritFrom` methods
+If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`][Jar] task, the `inheritFrom` methods
 on the `shadowJar.manifest` object can be used to configure the upstream.
 
 === "Kotlin"
@@ -159,7 +159,7 @@ on the `shadowJar.manifest` object can be used to configure the upstream.
 
 ## Adding Extra Files
 
-The [`ShadowJar`] task is a subclass of the [`Jar`] task, which means that the 
+The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the 
 [Jar.from](https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)) 
 method can be used to add extra files.
 
@@ -187,5 +187,5 @@ method can be used to add extra files.
 
 
 
-[`ShadowJar`]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
-[`Jar`]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
