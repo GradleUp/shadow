@@ -226,7 +226,7 @@ from merging.
 
 Shadow provides a specific transformer for dealing with Groovy extension module files.
 This is due to their special syntax and how they need to be merged together.
-The [`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer]will handle these files.
+The [`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files.
 The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
 
 === "Kotlin"
