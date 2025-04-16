@@ -8,9 +8,11 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -579,6 +581,44 @@ class RelocationTest : BasePluginTest() {
         )
       }
     }
+  }
+
+  @Test
+  fun relocateStringConstantsByDefault() {
+    writeClass {
+      """
+        package my;
+        public class Main {
+          public static final String junit = "junit.framework.Test";
+          public static void main(String[] args) {
+            System.out.println(getValue() + junit);
+          }
+          // Use this method to force the compiler to not inline the string literal.
+          private static String getValue() { return "the value is "; }
+        }
+      """.trimIndent()
+    }
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+          relocate('junit', 'foo.junit')
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask) {
+      it.withDebug(true)
+    }
+
+    val pathString = outputShadowJar.use { it.toString() }
+    val result = runProcess("java", "-jar", pathString)
+
+    assertThat(result).contains(
+      "the value is foo.junit.framework.Test",
+    )
   }
 
   private companion object {
