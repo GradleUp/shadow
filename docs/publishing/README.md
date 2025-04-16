@@ -151,7 +151,7 @@ the `archiveClassifier` of the shadowed JAR like the following:
 
 ## Publish Custom ShadowJar Task Outputs
 
-It is possible to publish a custom [ShadowJar] task's output via the [`MavenPublication.artifact(java.lang.Object)`](https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)) method. 
+It is possible to publish a custom [`ShadowJar`] task's output via the [`MavenPublication.artifact(java.lang.Object)`](https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)) method. 
 
 === "Kotlin"
 
@@ -294,5 +294,5 @@ be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
 
 
-[Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
-[ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[`Jar`]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[`ShadowJar`]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

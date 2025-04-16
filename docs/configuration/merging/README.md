@@ -233,7 +233,7 @@ Shadow provides a specific transformer for dealing with Groovy extension module 
 This is due to their special syntax and how they need to be merged together.
 The [`GroovyExtensionModuleTransformer`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-groovy-extension-module-transformer/index.html) 
 will handle these files.
-The [ShadowJar](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task also provides a short syntax 
+The [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task also provides a short syntax 
 method to add this transformer.
 
 === "Kotlin"
@@ -278,7 +278,7 @@ containing Log4j 2.x Core components. It's a Gradle equivalent of [Log4j Plugin 
 Generic text files can be appended together using the
 [`AppendingTransformer`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/index.html).
 Each file is appended using separators (defaults to `\n`) to separate content.
-The [ShadowJar](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task provides a short syntax 
+The [`ShadowJar`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html) task provides a short syntax 
 method of
 [`append(String)`](../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html) to 
 configure this transformer.

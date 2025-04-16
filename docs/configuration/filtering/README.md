@@ -6,7 +6,7 @@ The final contents of a shadow JAR can be filtered using the `exclude` and `incl
 Refer to the [Jar](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html) documentation for details
 on the various versions of the methods and their behavior.
 
-When using `exclude`/`include` with a [ShadowJar] task, the resulting copy specs are applied to the _final_ JAR
+When using `exclude`/`include` with a [`ShadowJar`] task, the resulting copy specs are applied to the _final_ JAR
 contents.
 This means that, the configuration is applied to the individual files from both the project source set or _any_
 of the dependencies to be merged.
@@ -28,7 +28,7 @@ of the dependencies to be merged.
     ```
 
 
-Excludes and includes can be combined just like a normal [Jar] task, with `excludes` taking precedence over `includes`.
+Excludes and includes can be combined just like a normal [`Jar`] task, with `excludes` taking precedence over `includes`.
 Additionally, ANT style patterns can be used to match multiple files.
 
 === "Kotlin"
@@ -53,5 +53,5 @@ Additionally, ANT style patterns can be used to match multiple files.
 
 
 
-[Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
-[ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[`Jar`]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[`ShadowJar`]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
