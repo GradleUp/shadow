@@ -21,7 +21,7 @@ public interface Relocator {
   public fun applyToSourceContent(sourceContent: String): String
 
   @get:Internal
-  public val isSkipStringLiteral: Boolean
+  public val skipStringLiteral: Boolean
 
   public companion object {
     public val ROLE: String = Relocator::class.java.name
