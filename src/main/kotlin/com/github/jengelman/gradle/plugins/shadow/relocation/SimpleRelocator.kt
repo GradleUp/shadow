@@ -19,7 +19,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   includes: List<String>? = null,
   excludes: List<String>? = null,
   private val rawString: Boolean = false,
-  override val isSkipStringLiteral: Boolean = true,
+  @Input override var isSkipStringLiteral: Boolean = true,
 ) : Relocator {
   private val pattern: String
   private val pathPattern: String
@@ -138,6 +138,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
     if (this === other) return true
     if (other !is SimpleRelocator) return false
     return rawString == other.rawString &&
+      isSkipStringLiteral == other.isSkipStringLiteral &&
       pattern == other.pattern &&
       pathPattern == other.pathPattern &&
       shadedPattern == other.shadedPattern &&
@@ -150,6 +151,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun hashCode(): Int {
     var result = rawString.hashCode()
+    result = 31 * result + isSkipStringLiteral.hashCode()
     result = 31 * result + pattern.hashCode()
     result = 31 * result + pathPattern.hashCode()
     result = 31 * result + shadedPattern.hashCode()

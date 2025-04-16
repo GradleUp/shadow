@@ -148,6 +148,7 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun isSkipStringLiteral ()Z
 	public fun relocateClass-XBGRxQs (Ljava/lang/String;)Ljava/lang/String;
 	public fun relocatePath-bvWaKNU (Ljava/lang/String;)Ljava/lang/String;
+	public fun setSkipStringLiteral (Z)V
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
