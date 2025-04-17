@@ -589,12 +589,9 @@ class RelocationTest : BasePluginTest() {
       """
         package my;
         public class Main {
-          public static final String junit = "junit.framework.Test";
           public static void main(String[] args) {
-            System.out.println(getValue() + junit);
+            System.out.println("junit.framework.Test");
           }
-          // Use this method to force the compiler to not inline the string literal.
-          private static String getValue() { return "the value is "; }
         }
       """.trimIndent()
     }
@@ -609,15 +606,13 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask) {
-      it.withDebug(true)
-    }
+    run(shadowJarTask)
 
     val pathString = outputShadowJar.use { it.toString() }
     val result = runProcess("java", "-jar", pathString)
 
     assertThat(result).contains(
-      "the value is foo.junit.framework.Test",
+      "foo.junit.framework.Test",
     )
   }
 
