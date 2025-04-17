@@ -607,9 +607,7 @@ class RelocationTest : BasePluginTest() {
     )
 
     run(shadowJarTask)
-
-    val pathString = outputShadowJar.use { it.toString() }
-    val result = runProcess("java", "-jar", pathString)
+    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
 
     assertThat(result).contains(
       "foo.junit.framework.Test",
