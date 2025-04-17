@@ -45,7 +45,7 @@ kotlin {
 }
 
 lint {
-  baseline = file("lint-baseline.xml")
+  baseline = file("gradle/lint-baseline.xml")
   ignoreTestSources = true
   warningsAsErrors = true
 }
@@ -120,7 +120,9 @@ testing.suites {
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
-        val docsDir = file("docs")
+        val docsDir = file("docs").also {
+          if (!it.exists() || !it.isDirectory) error("Docs dir $it does not exist or is not a directory.")
+        }
         // Add docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
         inputs.dir(docsDir)
         systemProperty("DOCS_DIR", docsDir.absolutePath)
@@ -216,16 +218,16 @@ tasks.check {
 tasks.register<Copy>("downloadStartScripts") {
   description = "Download start scripts from Gradle sources, this should be run intervally to track updates."
 
-  val urlPrefix = "https://raw.githubusercontent.com/gradle/gradle/refs/heads/master/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins"
+  val urlPrefix = "https://raw.githubusercontent.com/gradle/gradle/refs/heads/master/platforms/jvm/" +
+    "plugins-application/src/main/resources/org/gradle/api/internal/plugins"
   from(resources.text.fromUri("$urlPrefix/unixStartScript.txt")) {
     rename { "unixStartScript.txt" }
   }
   from(resources.text.fromUri("$urlPrefix/windowsStartScript.txt")) {
     rename { "windowsStartScript.txt" }
   }
-  val destDir = file("src/main/resources/com/github/jengelman/gradle/plugins/shadow/internal")
-  if (!destDir.exists() || !destDir.isDirectory || destDir.listFiles().isNullOrEmpty()) {
-    error("Download destination dir $destDir does not exist or is empty.")
+  val destDir = file("src/main/resources/com/github/jengelman/gradle/plugins/shadow/internal").also {
+    if (!it.exists() || !it.isDirectory) error("Download destination dir $it does not exist or is not a directory.")
   }
   into(destDir)
 }
