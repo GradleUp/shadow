@@ -19,17 +19,13 @@ internal class RelocatorRemapper(
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
-      mapName(value)
+      map(value)
     } else {
       super.mapValue(value)
     }
   }
 
-  override fun map(internalName: String): String = mapName(internalName)
-
-  fun mapPath(path: String): String = mapName(path.substring(0, path.indexOf('.')))
-
-  fun mapName(name: String): String {
+  override fun map(name: String): String {
     var newName = name
     var prefix = ""
     var suffix = ""
@@ -50,5 +46,9 @@ internal class RelocatorRemapper(
     }
 
     return name
+  }
+
+  fun mapPath(path: String): String {
+    return map(path.substring(0, path.indexOf('.')))
   }
 }

@@ -155,7 +155,7 @@ public open class ShadowCopyAction(
         }
         fileDetails.remapClass()
       } else {
-        val mapped = remapper.mapName(path)
+        val mapped = remapper.map(path)
         if (transform(fileDetails, mapped)) return
         fileDetails.writeToZip(mapped)
       }
