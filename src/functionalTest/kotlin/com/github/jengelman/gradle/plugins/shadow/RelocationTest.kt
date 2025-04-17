@@ -583,6 +583,37 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun relocateStringConstantsByDefault() {
+    writeClass {
+      """
+        package my;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("junit.framework.Test");
+          }
+        }
+      """.trimIndent()
+    }
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+          relocate('junit', 'foo.junit')
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
+
+    assertThat(result).contains(
+      "foo.junit.framework.Test",
+    )
+  }
+
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun canDisableRelocateStringConstants(skipStringLiteral: Boolean) {
