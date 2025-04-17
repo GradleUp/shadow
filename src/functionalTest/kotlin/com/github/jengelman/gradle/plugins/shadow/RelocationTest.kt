@@ -585,16 +585,7 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun relocateStringConstantsByDefault() {
-    writeClass {
-      """
-        package my;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("junit.framework.Test");
-          }
-        }
-      """.trimIndent()
-    }
+    writeClassWithStringRef()
     projectScriptPath.appendText(
       """
         $shadowJar {
@@ -614,22 +605,13 @@ class RelocationTest : BasePluginTest() {
     )
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/232",
+  )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun canDisableRelocateStringConstants(skipStringLiteral: Boolean) {
-    writeClass {
-      """
-        package my;
-        public class Main {
-          public static final String junit = "junit.framework.Test";
-          public static void main(String[] args) {
-            System.out.println(getValue() + junit);
-          }
-          // Use this method to force the compiler to not inline the string literal.
-          private static String getValue() { return "the value is "; }
-        }
-      """.trimIndent()
-    }
+    writeClassWithStringRef()
     projectScriptPath.appendText(
       """
         $shadowJar {
@@ -643,20 +625,29 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask) {
-      it.withDebug(true)
-    }
-
-    val pathString = outputShadowJar.use { it.toString() }
-    val result = runProcess("java", "-jar", pathString)
+    run(shadowJarTask)
+    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
 
     assertThat(result).contains(
       if (skipStringLiteral) {
-        "the value is junit.framework.Test"
+        "junit.framework.Test"
       } else {
-        "the value is foo.junit.framework.Test"
+        "foo.junit.framework.Test"
       },
     )
+  }
+
+  private fun writeClassWithStringRef() {
+    writeClass {
+      """
+        package my;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("junit.framework.Test");
+          }
+        }
+      """.trimIndent()
+    }
   }
 
   private companion object {
