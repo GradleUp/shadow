@@ -8,9 +8,11 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -579,6 +581,37 @@ class RelocationTest : BasePluginTest() {
         )
       }
     }
+  }
+
+  @Test
+  fun relocateStringConstantsByDefault() {
+    writeClass {
+      """
+        package my;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("junit.framework.Test");
+          }
+        }
+      """.trimIndent()
+    }
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+          relocate('junit', 'foo.junit')
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
+
+    assertThat(result).contains(
+      "foo.junit.framework.Test",
+    )
   }
 
   private companion object {
