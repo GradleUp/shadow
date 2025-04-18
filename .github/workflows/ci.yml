@@ -42,3 +42,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USER }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        with:
+          path: build/libs
+          if-no-files-found: 'error'
