@@ -1,10 +1,16 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.registerShadowJarCommon
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.shadowJar
+import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import kotlin.collections.contains
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.ApplicationPlugin
+import org.gradle.api.tasks.JavaExec
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion as KgpVersion
@@ -18,6 +24,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         if (target !is KotlinJvmTarget) return@configureEach
 
         configureShadowJar(target)
+        addRunTask(target)
       }
     }
   }
@@ -46,6 +53,28 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
           }
         }
       }
+    }
+  }
+
+  private fun Project.addRunTask(target: KotlinJvmTarget) {
+//      if (KgpVersion.DEFAULT < KgpVersion.fromVersion("2.1.20")) return@configureEach
+
+    tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
+      task.description = "Runs this project as a JVM application using the shadow jar"
+      task.group = ApplicationPlugin.APPLICATION_GROUP
+
+      task.classpath = files(tasks.shadowJar)
+
+      target.binaries {
+        executable { dsl ->
+          task.mainModule.set(dsl.mainModule)
+          task.mainClass.set(dsl.mainClass)
+          task.jvmArguments.convention(dsl.applicationDefaultJvmArgs)
+        }
+      }
+
+      task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
+      task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
     }
   }
 }
