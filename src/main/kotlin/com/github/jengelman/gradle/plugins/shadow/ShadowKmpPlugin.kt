@@ -12,13 +12,11 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 public abstract class ShadowKmpPlugin : Plugin<Project> {
 
-  override fun apply(project: Project) {
-    with(project) {
-      extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target ->
-        if (target !is KotlinJvmTarget) return@configureEach
+  override fun apply(project: Project): Unit = with(project) {
+    extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target ->
+      if (target !is KotlinJvmTarget) return@configureEach
 
-        configureShadowJar(target)
-      }
+      configureShadowJar(target)
     }
   }
 
