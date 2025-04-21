@@ -31,11 +31,11 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   private val softwareComponentFactory: SoftwareComponentFactory,
 ) : Plugin<Project> {
 
-  override fun apply(project: Project) {
-    project.configureShadowJar()
-    project.configureConfigurations()
-    project.configureComponents()
-    project.configureJavaGradlePlugin()
+  override fun apply(project: Project): Unit = with(project) {
+    configureShadowJar()
+    configureConfigurations()
+    configureComponents()
+    configureJavaGradlePlugin()
   }
 
   protected open fun Project.configureShadowJar() {
