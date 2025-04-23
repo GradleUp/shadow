@@ -621,7 +621,7 @@ type.
 - [Sergey Tselovalnikov](https://github.com/SerCeMan) - Upgrade to ASM 6.2.1 to support Java 11
 - [Chris Cowan](https://github.com/Macil) - Add support for `shadowJar.preserveFileTimestamps` property.
   See [Jar.preserveFileTimestamps](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps)
-- [Paul N. Baker](https://github.com/niko-dunixi) - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files
+- [Paul N. Baker](https://github.com/nikole-dunixi) - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files
   during merge.
 - [Felipe Lima](https://github.com/felipecsl) - Fix the long standing "No property `mainClassName`" issue.
 - [debanne](https://github.com/debanne) - Implement JAR minimization actions. This will attempt to exclude unused
