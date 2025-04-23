@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.1.20"
+kotlin = "2.0.21-RC"
 moshi = "1.15.2"
 pluginPublish = "1.3.1"
 
