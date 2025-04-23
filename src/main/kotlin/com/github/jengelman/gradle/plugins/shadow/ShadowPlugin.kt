@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.internal.KMP_PLUGIN_ID
+import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_PLUGIN_ID
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,7 +19,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
     withType(ApplicationPlugin::class.java) {
       apply(ShadowApplicationPlugin::class.java)
     }
-    withId(KMP_PLUGIN_ID) {
+    withId(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
       apply(ShadowKmpPlugin::class.java)
     }
 
