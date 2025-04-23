@@ -30,7 +30,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         },
       )
 
-      if (!isAtLeastKgpVersion(2, 1, 0)) return@registerShadowJarCommon
+      if (!isAtLeastKgpVersion(1, 9, 0)) return@registerShadowJarCommon
 
       @OptIn(ExperimentalKotlinGradlePluginApi::class)
       target.mainRun {
