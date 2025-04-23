@@ -12,9 +12,7 @@ internal fun Project.isAtLeastKgpVersion(
   id: String = KOTLIN_MULTIPLATFORM_PLUGIN_ID,
 ): Boolean {
   val plugin = plugins.getPlugin(id) as KotlinBasePlugin
-  val elements = plugin.pluginVersion.takeWhile { it != '-' }.split(".")
-  val kgpMajor = elements[0].toInt()
-  val kgpMinor = elements[1].toInt()
-  val kgpPatch = elements[2].toInt()
-  return kgpMajor > major || (kgpMajor == major && (kgpMinor > minor || (kgpMinor == minor && kgpPatch >= patch)))
+  val elements = plugin.pluginVersion.takeWhile { it != '-' }.split(".").map { it.toInt() }
+  val (kgpMajor, kgpMinor, kgpPatch) = elements
+  return kgpMajor >= major && kgpMinor >= minor && kgpPatch >= patch
 }
