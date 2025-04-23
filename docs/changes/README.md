@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta12...HEAD) - 2025-xx-xx
 
+**Added**
+
+- Support disabling of string constant remapping. ([#1401](https://github.com/GradleUp/shadow/pull/1401))
+
 **Changed**
 
 - Set `Main-Class` attr for KMP 1.9.0 or above. ([#1410](https://github.com/GradleUp/shadow/pull/1410))
