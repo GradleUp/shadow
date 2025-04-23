@@ -1,24 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.registerShadowJarCommon
+import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgpVersion
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import kotlin.collections.contains
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion as KgpVersion
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 public abstract class ShadowKmpPlugin : Plugin<Project> {
 
-  override fun apply(project: Project) {
-    with(project) {
-      extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target ->
-        if (target !is KotlinJvmTarget) return@configureEach
+  override fun apply(project: Project): Unit = with(project) {
+    extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target ->
+      if (target !is KotlinJvmTarget) return@configureEach
 
-        configureShadowJar(target)
-      }
+      configureShadowJar(target)
     }
   }
 
@@ -32,7 +30,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         },
       )
 
-      if (KgpVersion.DEFAULT < KgpVersion.KOTLIN_2_1) return@registerShadowJarCommon
+      if (!isAtLeastKgpVersion(1, 9, 0)) return@registerShadowJarCommon
 
       @OptIn(ExperimentalKotlinGradlePluginApi::class)
       target.mainRun {
