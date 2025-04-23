@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta12...HEAD) - 2025-xx-xx
 
+**Changed**
+
+- Set `Main-Class` attr for KMP 1.9.0 or above. ([#1410](https://github.com/GradleUp/shadow/pull/1410))
+
 **Fixed**
 
 - Avoid creating jvm targets eagerly for KMP. ([#1378](https://github.com/GradleUp/shadow/pull/1378))

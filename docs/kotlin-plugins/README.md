@@ -83,7 +83,7 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     kotlin {
       @Suppress("OPT_IN_USAGE")
       jvm().mainRun {
-        // Optionally, set the main class for `runJvm`, it's available from Kotlin 2.1.0
+        // Optionally, set the main class for `runJvm`.
         mainClass = "myapp.MainKt"
       }
       sourceSets {
@@ -121,7 +121,7 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
 
     kotlin {
       jvm().mainRun {
-        // Optionally, set the main class for `runJvm`, it's available from Kotlin 2.1.0
+        // Optionally, set the main class for `runJvm`.
         it.mainClass.set('myapp.MainKt')
       }
       sourceSets {
