@@ -27,7 +27,7 @@ jobs:
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
+#    if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
