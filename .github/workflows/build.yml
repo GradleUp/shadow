@@ -26,7 +26,7 @@ jobs:
 
   publish-snapshot:
     needs: build
-    if: github.ref == 'refs/heads/main'
+#    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/maven.yml
     with:
       plugin-portal: false
