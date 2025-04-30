@@ -22,7 +22,7 @@ foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.to
 kotlin-kmp = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "pluginPublish" }
 
-androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha03"
+androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha04"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.5.0"
 
