@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta13...HEAD) - 2025-xx-xx
 
+**Changed**
+
+- Update start script templates. ([#1419](https://github.com/GradleUp/shadow/pull/1419))
 
 ## [9.0.0-beta13](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta13) - 2025-04-29
 
