@@ -585,16 +585,7 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun relocateStringConstantsByDefault() {
-    writeClass {
-      """
-        package my;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("junit.framework.Test");
-          }
-        }
-      """.trimIndent()
-    }
+    writeClassWithStringRef()
     projectScriptPath.appendText(
       """
         $shadowJar {
@@ -612,6 +603,51 @@ class RelocationTest : BasePluginTest() {
     assertThat(result).contains(
       "foo.junit.framework.Test",
     )
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/232",
+  )
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun canDisableRelocateStringConstants(skipStringLiteral: Boolean) {
+    writeClassWithStringRef()
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+          relocate('junit', 'foo.junit') {
+            skipStringLiteral = $skipStringLiteral
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
+
+    assertThat(result).contains(
+      if (skipStringLiteral) {
+        "junit.framework.Test"
+      } else {
+        "foo.junit.framework.Test"
+      },
+    )
+  }
+
+  private fun writeClassWithStringRef() {
+    writeClass {
+      """
+        package my;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("junit.framework.Test");
+          }
+        }
+      """.trimIndent()
+    }
   }
 
   private companion object {
