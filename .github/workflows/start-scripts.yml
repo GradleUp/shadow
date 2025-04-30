@@ -1,6 +1,7 @@
 name: Update Start Scripts
 
 on:
+  push:
   schedule:
     - cron: '0 */3 * * *'
   workflow_dispatch:
