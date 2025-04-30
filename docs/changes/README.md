@@ -2,12 +2,11 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta13...HEAD) - 2025-xx-xx
 
-
-## [9.0.0-beta13](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta13) - 2025-04-29
-
 **Added**
 
 - Support disabling of string constant remapping. ([#1401](https://github.com/GradleUp/shadow/pull/1401))
+
+## [9.0.0-beta13](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta13) - 2025-04-29
 
 **Changed**
 
