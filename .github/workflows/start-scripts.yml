@@ -17,6 +17,8 @@ jobs:
           distribution: 'zulu'
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
       - run: ./gradlew downloadStartScripts
       - uses: peter-evans/create-pull-request@v7
         with:
