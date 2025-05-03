@@ -35,6 +35,8 @@ import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
@@ -521,6 +523,44 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Issue(
+    "https://github.com/GradleUp/shadow/issues/1422",
+  )
+  @Test
+  fun movesLocalGradleApiToCompileOnly() {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin")}
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    val outputCompileOnly = dependencies(COMPILE_ONLY_CONFIGURATION_NAME)
+    val outputApi = dependencies(API_CONFIGURATION_NAME)
+
+    // "unspecified" is the local Gradle API.
+    assertThat(outputCompileOnly).contains("unspecified")
+    assertThat(outputApi).doesNotContain("unspecified")
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
+  fun doesNotReAddSuppressedGradleApi(configuration: String) {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin")}
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    val output = dependencies(
+      configuration = configuration,
+      // Internal flag added in 8.14 to experiment with suppressing local Gradle API.
+      "-Dorg.gradle.unsafe.suppress-gradle-api=true",
+    )
+
+    // "unspecified" is the local Gradle API.
+    assertThat(output).doesNotContain("unspecified")
+  }
+
+  @Issue(
     "https://github.com/GradleUp/shadow/issues/1070",
   )
   @Test
@@ -611,55 +651,6 @@ class JavaPluginTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-  }
-
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/459",
-    "https://github.com/GradleUp/shadow/issues/852",
-  )
-  @Test
-  fun movesLocalGradleApiToCompileOnly() {
-    projectScriptPath.writeText(
-      """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    fun dependencies(configuration: String): String {
-      return run(
-        "dependencies",
-        "--configuration",
-        configuration,
-      ).output
-    }
-
-    val outputCompileOnly = dependencies(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME)
-    val outputApi = dependencies(JavaPlugin.API_CONFIGURATION_NAME)
-
-    // "unspecified" is the local Gradle API
-    assertThat(outputCompileOnly).contains("unspecified")
-    assertThat(outputApi).doesNotContain("unspecified")
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = [JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME, JavaPlugin.API_CONFIGURATION_NAME])
-  fun doesNotReAddSuppressedGradleApi(configuration: String) {
-    projectScriptPath.writeText(
-      """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + System.lineSeparator(),
-    )
-
-    val output = run(
-      // Internal flag added in 8.14 to experiment with suppressing local Gradle API
-      "-Dorg.gradle.unsafe.suppress-gradle-api=true",
-      "dependencies",
-      "--configuration",
-      configuration,
-    ).output
-
-    // "unspecified" is the local Gradle API
-    assertThat(output).doesNotContain("unspecified")
   }
 
   @Test
@@ -773,5 +764,9 @@ class JavaPluginTest : BasePluginTest() {
         isNotEqualTo("module myModuleName {}")
       }
     }
+  }
+
+  private fun dependencies(configuration: String, vararg flags: String): String {
+    return run("dependencies", "--configuration", configuration, *flags).output
   }
 }
