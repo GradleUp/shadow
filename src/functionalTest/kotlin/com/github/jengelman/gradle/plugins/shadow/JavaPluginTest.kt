@@ -5,6 +5,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.containsOnly
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
@@ -610,6 +611,55 @@ class JavaPluginTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/459",
+    "https://github.com/GradleUp/shadow/issues/852",
+  )
+  @Test
+  fun movesLocalGradleApiToCompileOnly() {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin")}
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    fun dependencies(configuration: String): String {
+      return run(
+        "dependencies",
+        "--configuration",
+        configuration,
+      ).output
+    }
+
+    val outputCompileOnly = dependencies(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME)
+    val outputApi = dependencies(JavaPlugin.API_CONFIGURATION_NAME)
+
+    // "unspecified" is the local Gradle API
+    assertThat(outputCompileOnly).contains("unspecified")
+    assertThat(outputApi).doesNotContain("unspecified")
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = [JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME, JavaPlugin.API_CONFIGURATION_NAME])
+  fun doesNotReAddSuppressedGradleApi(configuration: String) {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin")}
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    val output = run(
+      // Internal flag added in 8.14 to experiment with suppressing local Gradle API
+      "-Dorg.gradle.unsafe.suppress-gradle-api=true",
+      "dependencies",
+      "--configuration",
+      configuration,
+    ).output
+
+    // "unspecified" is the local Gradle API
+    assertThat(output).doesNotContain("unspecified")
   }
 
   @Test
