@@ -98,15 +98,18 @@ public abstract class ShadowJavaPlugin @Inject constructor(
     }
   }
 
-  protected open fun Project.configureJavaGradlePlugin() = afterEvaluate {
+  protected open fun Project.configureJavaGradlePlugin() {
     plugins.withType(JavaGradlePluginPlugin::class.java).configureEach {
       val gradleApi = dependencies.gradleApi()
       // Remove the gradleApi so it isn't merged into the jar file.
       // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
       // See https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161.
-      if (configurations.findByName(JavaPlugin.API_CONFIGURATION_NAME)?.dependencies?.remove(gradleApi) == true) {
+      configurations.named(JavaPlugin.API_CONFIGURATION_NAME) { api ->
+        // Only proceed if the removal is successful.
+        if (!api.dependencies.remove(gradleApi)) return@named
         // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
-        configurations.findByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME)?.dependencies?.add(gradleApi)
+        configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME)
+          .dependencies.add(dependencies.gradleApi())
       }
     }
   }
