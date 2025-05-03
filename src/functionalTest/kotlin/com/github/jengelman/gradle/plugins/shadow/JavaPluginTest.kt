@@ -541,6 +541,9 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputApi).doesNotContain("unspecified")
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1422",
+  )
   @ParameterizedTest
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
   fun doesNotReAddSuppressedGradleApi(configuration: String) {
