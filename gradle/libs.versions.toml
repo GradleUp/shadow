@@ -31,7 +31,7 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-android-lint = "com.android.lint:8.9.2"
+android-lint = "com.android.lint:8.10.0"
 jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.17.0"
 jetbrains-dokka = "org.jetbrains.dokka:2.0.0"
 mavenPublish = "com.vanniktech.maven.publish:0.31.0"
