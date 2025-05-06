@@ -100,7 +100,7 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       }
     }
 
-    // TODO: we can't use `tasks.shadowJar` here like the other examples, something wrong with Gradle or Kotlin plugin?
+    // TODO: Gradle doesn't generate accessors for this use case, so we can't call `tasks.shadowJar` directly like the other examples.
     tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
