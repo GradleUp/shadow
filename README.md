@@ -17,7 +17,7 @@ Gradle plugin for creating fat/uber JARs with support for package relocation.
 ## Current Status
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.gradleup.shadow/shadow-gradle-plugin)](https://central.sonatype.com/artifact/com.gradleup.shadow/shadow-gradle-plugin)
-[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.gradleup.shadow/shadow-gradle-plugin?&server=https://oss.sonatype.org/)](https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/)
+[![Central Portal Snapshots](https://img.shields.io/nexus/s/com.gradleup.shadow/shadow-gradle-plugin?&server=https://oss.sonatype.org/)](https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/)
 [![Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.gradleup.shadow)](https://plugins.gradle.org/plugin/com.gradleup.shadow)
 [![CI](https://github.com/GradleUp/shadow/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/GradleUp/shadow/actions/workflows/build.yml?query=branch:main+event:push)
 [![License](https://img.shields.io/github/license/GradleUp/shadow.svg)](LICENSE)
