@@ -58,7 +58,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 
     <details>
     <summary>Snapshots of the development version are available in 
-    <a href="https://central.sonatype.com/repository/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+    <a href="https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
     Sonatype's snapshots repository</a>.
     </summary>
     <p>
@@ -85,7 +85,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 
     <details>
     <summary>Snapshots of the development version are available in 
-    <a href="https://central.sonatype.com/repository/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+    <a href="https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
     Sonatype's snapshots repository</a>.
     </summary>
     <p>
