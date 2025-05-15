@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultPackageMapper
+import com.github.jengelman.gradle.plugins.shadow.internal.ShadowClassRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -24,7 +25,6 @@ import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.commons.ClassRemapper
 
 /**
  * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
@@ -124,7 +124,7 @@ public open class ShadowCopyAction(
   private inner class StreamAction(
     private val zipOutStr: ZipOutputStream,
   ) : CopyActionProcessingStreamAction {
-    private val remapper = RelocatorRemapper(relocators)
+    private val packageMapper = DefaultPackageMapper(relocators)
 
     init {
       logger.info("Relocator count: ${relocators.size}.")
@@ -155,7 +155,7 @@ public open class ShadowCopyAction(
         }
         fileDetails.remapClass()
       } else {
-        val mapped = remapper.map(path)
+        val mapped = packageMapper.map(path, mapPaths = true, mapPackages = true)
         if (transform(fileDetails, mapped)) return
         fileDetails.writeToZip(mapped)
       }
@@ -184,7 +184,8 @@ public open class ShadowCopyAction(
       // that use the constant pool to determine the dependencies of a class.
       val cw = ClassWriter(0)
       val cr = ClassReader(inputStream)
-      val cv = ClassRemapper(cw, remapper)
+      val pkg = name.substring(0, name.lastIndexOf('/') + 1)
+      val cv = ShadowClassRemapper(cw, packageMapper, pkg)
 
       try {
         cr.accept(cv, ClassReader.EXPAND_FRAMES)
@@ -195,7 +196,9 @@ public open class ShadowCopyAction(
       // Temporarily remove the multi-release prefix.
       val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
       val newPath = path.replace(multiReleasePrefix, "")
-      val mappedName = multiReleasePrefix + remapper.mapPath(newPath)
+      val mappedName = multiReleasePrefix + packageMapper.map(newPath, mapPaths = true, mapPackages = false)
+        // Need to take the .class off for remapping evaluation
+        .substringBeforeLast('.')
       try {
         val entry = zipEntry("$mappedName.class", preserveFileTimestamps, lastModified) {
           unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
