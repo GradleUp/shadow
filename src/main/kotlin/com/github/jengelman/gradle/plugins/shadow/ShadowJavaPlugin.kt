@@ -41,7 +41,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   protected open fun Project.configureShadowJar() {
     val jarTask = tasks.jar
     val taskProvider = registerShadowJarCommon { task ->
-      @Suppress("EagerGradleConfiguration") // mergeSpec.from haven't supported lazy configuration yet.
+      @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
       task.manifest.inheritFrom(jarTask.get().manifest)
       val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
       val files = files(configurations.shadow)
