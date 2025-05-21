@@ -16,6 +16,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     }
     @Suppress("DEPRECATION")
     extensions.create(EXTENSION_NAME, ShadowExtension::class.java, project)
+    @Suppress("EagerGradleConfiguration") // this should be created eagerly.
     configurations.create(CONFIGURATION_NAME)
   }
 
