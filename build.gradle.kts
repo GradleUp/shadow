@@ -115,8 +115,7 @@ dependencies {
 testing.suites {
   getByName<JvmTestSuite>("test") {
     dependencies {
-      implementation(libs.xmlunit.core)
-      implementation(libs.xmlunit.legacy)
+      implementation(libs.xmlunit)
     }
   }
   register<JvmTestSuite>("documentTest") {
