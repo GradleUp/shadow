@@ -36,4 +36,4 @@ jetbrains-bcv = "org.jetbrains.kotlinx.binary-compatibility-validator:0.17.0"
 jetbrains-dokka = "org.jetbrains.dokka:2.0.0"
 mavenPublish = "com.vanniktech.maven.publish:0.32.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
-spotless = "com.diffplug.spotless:7.0.3"
+spotless = "com.diffplug.spotless:7.0.4"
