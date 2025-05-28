@@ -182,6 +182,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	protected fun createCopyAction ()Lorg/gradle/api/internal/file/copy/CopyAction;
 	public fun dependencies (Lorg/gradle/api/Action;)V
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
 	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getEnableRelocation ()Lorg/gradle/api/provider/Property;

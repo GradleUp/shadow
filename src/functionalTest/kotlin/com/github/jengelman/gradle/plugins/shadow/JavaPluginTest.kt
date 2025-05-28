@@ -724,4 +724,44 @@ class JavaPluginTest : BasePluginTest() {
       }
     }
   }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1441",
+  )
+  @Test
+  fun includeFilesInTaskOutputDirectory() {
+    // Create a build that has a task with jars in the output directory
+    projectScriptPath.appendText(
+      """
+      def createJars = tasks.register('createJars') {
+        def artifactAJar = file('${artifactAJar.toUri().toURL().path}')
+        def artifactBJar = file('${artifactBJar.toUri().toURL().path}')
+        inputs.files(artifactAJar, artifactBJar)
+        def outputDir = file('${'$'}{buildDir}/jars')
+        outputs.dir(outputDir)
+        doLast {
+          artifactAJar.withInputStream { input ->
+              new File(outputDir, 'jarA.jar').withOutputStream { output ->
+                  output << input
+              }
+          }
+          artifactBJar.withInputStream { input ->
+              new File(outputDir, 'jarB.jar').withOutputStream { output ->
+                  output << input
+              }
+          }
+        }
+      }
+      $shadowJar {
+        includedDependencies.from(files(createJars).asFileTree)
+      }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(*entriesInAB, *manifestEntries)
+    }
+  }
 }
