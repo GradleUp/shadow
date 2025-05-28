@@ -733,27 +733,26 @@ class JavaPluginTest : BasePluginTest() {
     // Create a build that has a task with jars in the output directory
     projectScriptPath.appendText(
       """
-      def createJars = tasks.register("createJars") {
-        def artifactAJar = file("$artifactAJar")
-        def artifactBJar = file("$artifactBJar")
+      def createJars = tasks.register('createJars') {
+        def artifactAJar = file('${artifactAJar.toUri().toURL().path}')
+        def artifactBJar = file('${artifactBJar.toUri().toURL().path}')
         inputs.files(artifactAJar, artifactBJar)
-        def outputDir = file("${'$'}{buildDir}/jars")
+        def outputDir = file('${'$'}{buildDir}/jars')
         outputs.dir(outputDir)
         doLast {
           artifactAJar.withInputStream { input ->
-              new File(outputDir, "jarA.jar").withOutputStream { output ->
+              new File(outputDir, 'jarA.jar').withOutputStream { output ->
                   output << input
               }
           }
           artifactBJar.withInputStream { input ->
-              new File(outputDir, "jarB.jar").withOutputStream { output ->
+              new File(outputDir, 'jarB.jar').withOutputStream { output ->
                   output << input
               }
           }
         }
       }
-
-      tasks.shadowJar {
+      $shadowJar {
         includedDependencies.from(files(createJars).asFileTree)
       }
       """.trimIndent(),
