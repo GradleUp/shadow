@@ -4,7 +4,6 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
@@ -33,14 +32,9 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
 }
 
-tasks.compileKotlin {
-  explicitApiMode = ExplicitApiMode.Strict
+kotlin {
+  explicitApi()
   compilerOptions {
-    // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    @Suppress("DEPRECATION") // TODO: bump apiVersion to 2.0 to match Gradle 9.0
-    apiVersion = KotlinVersion.KOTLIN_1_8
-    languageVersion = apiVersion
-
     jvmTarget = JvmTarget.JVM_11
     freeCompilerArgs.addAll(
       "-Xjvm-default=all",
@@ -200,6 +194,16 @@ kotlin.target.compilations {
   getByName("functionalTest") {
     // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
     associateWith(main)
+  }
+}
+
+// Just override flags for plugin sources, we can still use new features in tests.
+tasks.compileKotlin {
+  compilerOptions {
+    // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+    @Suppress("DEPRECATION") // TODO: bump apiVersion to 2.0 to match Gradle 9.0
+    apiVersion = KotlinVersion.KOTLIN_1_8
+    languageVersion = apiVersion
   }
 }
 
