@@ -30,6 +30,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
@@ -425,7 +426,7 @@ abstract class BasePluginTest {
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.toUri().toURL().path}')" }
+      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.invariantSeparatorsPathString}')" }
     }
 
     inline fun <reified T : ResourceTransformer> transform(
