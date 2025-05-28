@@ -13,14 +13,14 @@ class DocCodeSnippetTest {
   @OptIn(ExperimentalStdlibApi::class)
   @TestFactory
   fun provideDynamicTests(@TempDir root: Path): List<DynamicTest> {
-    val langExecutables = DslLang.entries.map { executor ->
+    val langExecutables = DslLang.values().map { executor ->
       CodeSnippetExtractor.extract(executor)
     }
 
     check(langExecutables.sumOf { it.size } > 0) {
       "No code snippets found."
     }
-    check(langExecutables.size == DslLang.entries.size) {
+    check(langExecutables.size == DslLang.values().size) {
       "We must provide build script snippets for all languages."
     }
     check(langExecutables.map { it.size }.distinct().size == 1) {

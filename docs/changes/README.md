@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta14...HEAD) - 2025-xx-xx
 
+**Fixed**
+
+- Pin the plugin's Kotlin language level on 1.8. ([#1448](https://github.com/GradleUp/shadow/pull/1448))
 
 ## [9.0.0-beta14](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta14) - 2025-05-28
 

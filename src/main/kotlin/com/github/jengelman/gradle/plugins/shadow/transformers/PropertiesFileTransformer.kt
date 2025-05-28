@@ -239,7 +239,7 @@ public open class PropertiesFileTransformer @Inject constructor(
       @JvmStatic
       public fun from(value: String): MergeStrategy {
         @OptIn(ExperimentalStdlibApi::class)
-        return entries.find { it.name.equals(value, ignoreCase = true) }
+        return values().find { it.name.equals(value, ignoreCase = true) }
           ?: throw IllegalArgumentException("Unknown merge strategy: $value")
       }
     }
