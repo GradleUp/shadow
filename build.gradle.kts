@@ -35,6 +35,7 @@ java {
 kotlin {
   explicitApi()
   compilerOptions {
+    allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_2_0
     languageVersion = apiVersion
