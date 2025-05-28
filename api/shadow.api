@@ -81,31 +81,25 @@ public abstract interface annotation class com/github/jengelman/gradle/plugins/s
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext {
-	public static final synthetic fun box-impl (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
-	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;Ljava/lang/String;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
 	public final fun getClassName ()Ljava/lang/String;
 	public fun hashCode ()I
-	public static fun hashCode-impl (Ljava/lang/String;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext {
-	public static final synthetic fun box-impl (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
-	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
+	public static synthetic fun copy$default (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;Ljava/lang/String;ILjava/lang/Object;)Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
 	public final fun getPath ()Ljava/lang/String;
 	public fun hashCode ()I
-	public static fun hashCode-impl (Ljava/lang/String;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/RelocationContextKt {
@@ -118,8 +112,8 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/reloc
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun canRelocateClass (Ljava/lang/String;)Z
 	public abstract fun canRelocatePath (Ljava/lang/String;)Z
-	public abstract fun relocateClass-XBGRxQs (Ljava/lang/String;)Ljava/lang/String;
-	public abstract fun relocatePath-bvWaKNU (Ljava/lang/String;)Ljava/lang/String;
+	public abstract fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
+	public abstract fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator$Companion {
@@ -143,8 +137,8 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public final fun getIncludes ()Ljava/util/Set;
 	public fun hashCode ()I
 	public fun include (Ljava/lang/String;)V
-	public fun relocateClass-XBGRxQs (Ljava/lang/String;)Ljava/lang/String;
-	public fun relocatePath-bvWaKNU (Ljava/lang/String;)Ljava/lang/String;
+	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
+	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {

@@ -9,6 +9,7 @@
 **Fixed**
 
 - Allow using file trees of JARs together with the configuration cache. ([#1441](https://github.com/GradleUp/shadow/pull/1441))
+- Fallback `RelocateClassContext` and `RelocatePathContext` to data classes. ([#1445](https://github.com/GradleUp/shadow/pull/1445))
 
 ## [9.0.0-beta13](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta13) - 2025-04-29
 
