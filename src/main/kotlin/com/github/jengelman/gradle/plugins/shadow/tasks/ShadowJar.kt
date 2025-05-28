@@ -162,6 +162,9 @@ public abstract class ShadowJar :
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
+  @get:Inject
+  protected abstract val archiveOperations: ArchiveOperations
+
   /**
    * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
    */
@@ -391,7 +394,4 @@ public abstract class ShadowJar :
       manifest.attributes[multiReleaseAttributeKey] = true
     }
   }
-
-  @get:Inject
-  protected abstract val archiveOperations: ArchiveOperations
 }
