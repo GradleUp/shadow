@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta15...HEAD) - 2025-xx-xx
 
+**Fixed**
+
+- Restore removed `Named` from `ResourceTransformer`. ([#1449](https://github.com/GradleUp/shadow/pull/1449))
 
 ## [9.0.0-beta15](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta15) - 2025-05-28
 
