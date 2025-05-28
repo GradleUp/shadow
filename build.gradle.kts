@@ -4,6 +4,7 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
@@ -32,8 +33,8 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
 }
 
-kotlin {
-  explicitApi()
+tasks.compileKotlin {
+  explicitApiMode = ExplicitApiMode.Strict
   compilerOptions {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     @Suppress("DEPRECATION") // TODO: bump apiVersion to 2.0 to match Gradle 9.0
