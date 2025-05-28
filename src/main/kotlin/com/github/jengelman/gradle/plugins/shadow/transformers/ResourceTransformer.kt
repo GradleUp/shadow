@@ -27,6 +27,7 @@ public interface ResourceTransformer : Named {
   @Throws(IOException::class)
   public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
 
+  @Suppress("unused") // Used by Gradle side, see https://github.com/GradleUp/shadow/pull/1289#issuecomment-2915738983.
   @Internal
   override fun getName(): String = this::class.java.simpleName
 
