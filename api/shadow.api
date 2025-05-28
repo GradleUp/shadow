@@ -389,6 +389,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Prope
 	public static final field First Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 	public static final field Latest Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 	public static final fun from (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 	public static fun values ()[Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 }
