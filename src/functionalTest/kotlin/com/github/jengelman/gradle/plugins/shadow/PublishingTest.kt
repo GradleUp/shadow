@@ -492,9 +492,7 @@ class PublishingTest : BasePluginTest() {
           $publicationsBlock
         }
         repositories {
-          maven {
-            url = '${remoteRepoPath.toUri()}'
-          }
+          maven { url = '${remoteRepoPath.toUri()}' }
         }
       }
     """.trimIndent()

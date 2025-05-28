@@ -30,6 +30,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
@@ -648,7 +649,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          from(file('${artifactAJar.toUri().toURL().path}')) {
+          from(file('${artifactAJar.invariantSeparatorsPathString}')) {
             into('META-INF')
           }
           from('Foo') {
@@ -734,8 +735,8 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
       def createJars = tasks.register('createJars') {
-        def artifactAJar = file('${artifactAJar.toUri().toURL().path}')
-        def artifactBJar = file('${artifactBJar.toUri().toURL().path}')
+        def artifactAJar = file('${artifactAJar.invariantSeparatorsPathString}')
+        def artifactBJar = file('${artifactBJar.invariantSeparatorsPathString}')
         inputs.files(artifactAJar, artifactBJar)
         def outputDir = file('${'$'}{buildDir}/jars')
         outputs.dir(outputDir)
