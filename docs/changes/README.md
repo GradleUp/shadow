@@ -1,5 +1,8 @@
 # Change Log
 
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta15...HEAD) - 2025-xx-xx
+
+
 ## [9.0.0-beta15](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta15) - 2025-05-28
 
 **Fixed**
