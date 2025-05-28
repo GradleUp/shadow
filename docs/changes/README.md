@@ -2,6 +2,11 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta14...HEAD) - 2025-xx-xx
 
+**Fixed**
+
+- Pin the plugin's Kotlin language level on 2.0. ([#1448](https://github.com/GradleUp/shadow/pull/1448))  
+  The language level used in `9.0.0-beta14` is 2.2, which may cause compatibility issues for the plugins depending on
+  Shadow.
 
 ## [9.0.0-beta14](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta14) - 2025-05-28
 

@@ -36,8 +36,8 @@ kotlin {
   explicitApi()
   compilerOptions {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    @Suppress("DEPRECATION") // TODO: bump apiVersion to 2.0 to match Gradle 9.0
-    apiVersion = KotlinVersion.KOTLIN_1_8
+    apiVersion = KotlinVersion.KOTLIN_2_0
+    languageVersion = apiVersion
     jvmTarget = JvmTarget.JVM_11
     freeCompilerArgs.addAll(
       "-Xjvm-default=all",
