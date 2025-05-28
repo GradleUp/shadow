@@ -49,9 +49,7 @@ class AppendableMavenRepository(
             ${modules.joinToString(System.lineSeparator()) { createPublication(it) }}
           }
           repositories {
-            maven {
-              url = '${root.toUri()}'
-            }
+            maven { url = '${root.toUri()}' }
           }
         }
       """.trimIndent(),
