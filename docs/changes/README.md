@@ -132,7 +132,9 @@ Options:
 
 **Fixed**
 
-- Honor `DuplicatesStrategy`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- Honor `DuplicatesStrategy`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
+  Shadow recognized `DuplicatesStrategy.EXCLUDE` as the default, but the other strategies didn't work properly.
+  Now we honor `DuplicatesStrategy.INCLUDE` as the default, and align all the strategy behaviors with the Gradle side.
 - Honor unzipped jars via `from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 **Removed**
