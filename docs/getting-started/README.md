@@ -58,8 +58,8 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 
     <details>
     <summary>Snapshots of the development version are available in 
-    <a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-    Sonatype's snapshots repository</a>.
+    <a href="https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+    Central Portal Snapshots</a>.
     </summary>
     <p>
 
@@ -67,7 +67,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     buildscript {
       repositories {
         mavenCentral()
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
+        maven("https://central.sonatype.com/repository/maven-snapshots/")
       }
       dependencies {
         classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
@@ -85,8 +85,8 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 
     <details>
     <summary>Snapshots of the development version are available in 
-    <a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-    Sonatype's snapshots repository</a>.
+    <a href="https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
+    Central Portal Snapshots</a>.
     </summary>
     <p>
 
@@ -94,7 +94,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     buildscript {
       repositories {
         mavenCentral()
-        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
       }
       dependencies {
         classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
