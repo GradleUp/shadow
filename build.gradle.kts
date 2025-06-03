@@ -37,8 +37,7 @@ kotlin {
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    apiVersion = KotlinVersion.KOTLIN_2_0
-    languageVersion = apiVersion
+    languageVersion = KotlinVersion.KOTLIN_2_0
     jvmTarget = JvmTarget.JVM_11
     freeCompilerArgs.addAll(
       "-Xjvm-default=all",
