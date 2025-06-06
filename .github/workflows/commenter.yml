@@ -1,3 +1,5 @@
+name: Commenter
+
 on:
   release:
     types: [ published ]
