@@ -147,6 +147,7 @@ Options:
 - **BREAKING CHANGE:** Remove `ShadowStats`. ([#1264](https://github.com/GradleUp/shadow/pull/1264))
 - **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and
   `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- **BREAKING CHANGE:** Remove `TransformerContext.getEntryTimestamp`. ([#1245](https://github.com/GradleUp/shadow/pull/1245))
 
 ## [9.0.0-beta8](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8) - 2025-02-08
 
