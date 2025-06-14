@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta15...HEAD) - 2025-xx-xx
 
+**Changed**
+
+- Update ASM to 9.8 to support Java 25. ([#1380](https://github.com/GradleUp/shadow/pull/1380))
+
 **Fixed**
 
 - Restore removed `Named` from `ResourceTransformer`. ([#1449](https://github.com/GradleUp/shadow/pull/1449))
