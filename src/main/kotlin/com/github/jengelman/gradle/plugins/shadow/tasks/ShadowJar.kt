@@ -27,7 +27,6 @@ import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
-import org.gradle.api.UncheckedIOException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
@@ -330,7 +329,7 @@ public abstract class ShadowJar :
           setMethod(entryCompressionMethod)
         }
       } catch (e: Exception) {
-        throw UncheckedIOException("Unable to create ZIP output stream for file $destination.", e)
+        throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }
     }
     val unusedClasses = if (minimizeJar.get()) {

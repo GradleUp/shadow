@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta16...HEAD) - 2025-xx-xx
 
+**Fixed**
+
+- Fix compatibility for Gradle 9.0.0 RC1. ([#1468](https://github.com/GradleUp/shadow/pull/1468))
 
 ## [9.0.0-beta16](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta16) - 2025-06-14
 
