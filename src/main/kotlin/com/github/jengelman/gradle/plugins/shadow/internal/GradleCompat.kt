@@ -104,7 +104,6 @@ internal fun ProjectDependency.dependencyProjectCompat(project: Project): Projec
   return if (GradleVersion.current() >= GradleVersion.version("8.11")) {
     project.project(path)
   } else {
-    @Suppress("DEPRECATION")
-    dependencyProject
+    return this::class.java.getDeclaredMethod("getDependencyProject").invoke(this) as Project
   }
 }
