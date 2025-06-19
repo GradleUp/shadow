@@ -459,7 +459,7 @@ class ShadowCopyAction implements CopyAction {
                 return null
             } else {
                 //Parent is always a directory so add / to the end of the path
-                String path = segments[0..-2].join('/') + '/'
+                String path = segments.take(segments.length - 1).join('/') + '/'
                 return new RelativeArchivePath(setArchiveTimes(new ZipEntry(path)))
             }
         }
