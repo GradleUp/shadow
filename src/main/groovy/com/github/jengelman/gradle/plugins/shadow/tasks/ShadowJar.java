@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 @CacheableTask
-public class ShadowJar extends Jar implements ShadowSpec {
+public abstract class ShadowJar extends Jar implements ShadowSpec {
 
     private List<Transformer> transformers;
     private List<Relocator> relocators;
