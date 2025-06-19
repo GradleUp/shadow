@@ -2,8 +2,7 @@ plugins {
   groovy
   `java-gradle-plugin`
   id("shadow.convention.publish")
-  id("shadow.convention.deploy")
-  id("com.diffplug.spotless") version "7.0.0.BETA4"
+  id("com.diffplug.spotless") version "7.0.4"
 }
 
 java {
@@ -23,22 +22,22 @@ dependencies {
   compileOnly(localGroovy())
 
   implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("org.ow2.asm:asm-commons:9.7.1")
-  implementation("commons-io:commons-io:2.17.0")
+  implementation("org.ow2.asm:asm-commons:9.8")
+  implementation("commons-io:commons-io:2.19.0")
   implementation("org.apache.ant:ant:1.10.15")
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
-  implementation("org.codehaus.plexus:plexus-xml:4.0.4")
+  implementation("org.codehaus.plexus:plexus-xml:4.1.0")
   implementation("org.apache.logging.log4j:log4j-core:2.24.1")
-  implementation("org.vafer:jdependency:2.12")
+  implementation("org.vafer:jdependency:2.13")
 
   testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
-  testImplementation("org.xmlunit:xmlunit-legacy:2.10.0")
+  testImplementation("org.xmlunit:xmlunit-legacy:2.10.2")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation(platform("org.junit:junit-bom:5.11.3"))
+  testImplementation(platform("org.junit:junit-bom:5.13.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.platform:junit-platform-suite-engine")
 }
@@ -69,12 +68,5 @@ tasks.withType<Test>().configureEach {
     "java.base/java.lang.invoke=ALL-UNNAMED",
     "--add-opens",
     "java.base/java.net=ALL-UNNAMED",
-  )
-}
-
-tasks.register("release") {
-  dependsOn(
-    tasks.publish,
-    tasks.publishPlugins,
   )
 }
