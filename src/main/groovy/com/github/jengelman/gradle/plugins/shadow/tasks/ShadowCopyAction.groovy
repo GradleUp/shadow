@@ -17,7 +17,6 @@ import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.GradleException
-import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
