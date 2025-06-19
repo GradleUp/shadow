@@ -77,7 +77,7 @@ class ApacheNoticeResourceTransformerParameterTests extends TransformerTestSuppo
         processAndFailOnNullPointer("\n")
     }
 
-    private static void processAndFailOnNullPointer(final String noticeText) {
+    private void processAndFailOnNullPointer(final String noticeText) {
         try {
             final ByteArrayInputStream noticeInputStream = new ByteArrayInputStream(noticeText.getBytes())
             final List<Relocator> emptyList = Collections.emptyList()
