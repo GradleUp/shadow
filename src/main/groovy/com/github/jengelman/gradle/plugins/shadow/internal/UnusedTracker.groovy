@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ProjectDependency
-import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.vafer.jdependency.Clazz
@@ -72,8 +72,8 @@ class UnusedTracker {
             if (dep instanceof ProjectDependency) {
                 apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
                 addJar(runtimeConfiguration, dep, apiJars)
-            } else if (dep instanceof SelfResolvingDependency) {
-                apiJars.addAll(dep.resolve())
+            } else if (dep instanceof FileCollectionDependency) {
+                apiJars.addAll(dep.files)
             } else {
                 addJar(runtimeConfiguration, dep, apiJars)
                 apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
