@@ -7,6 +7,7 @@ import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
+import org.gradle.util.GradleVersion
 import org.vafer.jdependency.Clazz
 import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
@@ -70,7 +71,7 @@ class UnusedTracker {
         def apiJars = new LinkedList<File>()
         apiDependencies.each { dep ->
             if (dep instanceof ProjectDependency) {
-                apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
+                apiJars.addAll(getApiJarsFromProject(dependencyProjectCompat(dep, project)))
                 addJar(runtimeConfiguration, dep, apiJars)
             } else if (dep instanceof FileCollectionDependency) {
                 apiJars.addAll(dep.files)
@@ -81,5 +82,15 @@ class UnusedTracker {
         }
 
         return project.files(apiJars)
+    }
+
+    /**
+     * TODO: this could be removed after bumping the min Gradle requirement to 8.11 or above.
+     */
+    private static dependencyProjectCompat(ProjectDependency projectDependency, Project project) {
+        if (GradleVersion.current() >= GradleVersion.version("8.11")) {
+            return project.project(projectDependency.path)
+        }
+        return projectDependency.dependencyProject
     }
 }
