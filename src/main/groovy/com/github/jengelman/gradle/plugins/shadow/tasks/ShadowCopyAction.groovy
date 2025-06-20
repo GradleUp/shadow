@@ -527,7 +527,9 @@ class ShadowCopyAction implements CopyAction {
             return archivePath
         }
 
-        @Override
+        /**
+         * This method should be annotated with @Override, but the parent has been removed from Gradle 9.
+         */
         int getMode() {
             return archivePath.entry.unixMode
         }
