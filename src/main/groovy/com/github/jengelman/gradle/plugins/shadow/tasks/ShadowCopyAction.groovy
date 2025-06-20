@@ -528,6 +528,11 @@ class ShadowCopyAction implements CopyAction {
         }
 
         @Override
+        int getMode() {
+            return archivePath.entry.unixMode
+        }
+
+        @Override
         FilePermissions getPermissions() {
             return new DefaultFilePermissions(getMode())
         }
