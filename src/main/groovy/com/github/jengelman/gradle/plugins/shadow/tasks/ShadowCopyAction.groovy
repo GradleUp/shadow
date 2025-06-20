@@ -17,7 +17,6 @@ import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.GradleException
-import org.gradle.api.UncheckedIOException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FilePermissions
 import org.gradle.api.file.FileTreeElement
@@ -460,7 +459,7 @@ class ShadowCopyAction implements CopyAction {
                 return null
             } else {
                 //Parent is always a directory so add / to the end of the path
-                String path = segments[0..-2].join('/') + '/'
+                String path = segments.take(segments.length - 1).join('/') + '/'
                 return new RelativeArchivePath(setArchiveTimes(new ZipEntry(path)))
             }
         }
@@ -528,7 +527,9 @@ class ShadowCopyAction implements CopyAction {
             return archivePath
         }
 
-        @Override
+        /**
+         * This method should be annotated with @Override, but the parent has been removed from Gradle 9.
+         */
         int getMode() {
             return archivePath.entry.unixMode
         }

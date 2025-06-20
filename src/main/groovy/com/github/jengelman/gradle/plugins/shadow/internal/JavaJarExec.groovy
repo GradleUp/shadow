@@ -4,7 +4,7 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
-class JavaJarExec extends JavaExec {
+abstract class JavaJarExec extends JavaExec {
 
     @InputFile
     File jarFile

@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Fix compatibility for Gradle 9.0.0 RC1. ([#1470](https://github.com/GradleUp/shadow/pull/1470))
+
 
 ## [v8.3.6] (2025-02-02)
 

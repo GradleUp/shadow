@@ -17,7 +17,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.UncheckedIOException
 
 class DefaultZipCompressor implements ZipCompressor {
     private final int entryCompressionMethod

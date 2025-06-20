@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util;
 
-import org.gradle.api.UncheckedIOException;
 import org.gradle.internal.UncheckedException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -8,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
