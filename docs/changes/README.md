@@ -140,6 +140,21 @@ Options:
 - Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 - **BREAKING CHANGE:** Move `DependencyFilter` from `com.github.jengelman.gradle.plugins.shadow.internal` into
   `com.github.jengelman.gradle.plugins.shadow.tasks`. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
+- **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
+  In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
+  issues that hard to fix. Now it behaves like Gradle's `CopySpec.from`, which means it will not unzip the files, only
+  copy the files as-is. If you still want to shadow the unzipped files, try out something like:
+  ```kotlin
+    tasks.shadowJar {
+      from(zipTree(files('path/to/your/file.zip')))
+    }
+  ```
+  or
+  ```kotlin
+    dependencies {
+      implementation(files('path/to/your/file.zip'))
+    }
+  ```
 - Refactor file visiting logic in `StreamAction`, handle file unzipping via
   `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
