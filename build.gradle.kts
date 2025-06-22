@@ -14,8 +14,8 @@ plugins {
   alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.jetbrains.dokka)
   alias(libs.plugins.mavenPublish)
-  alias(libs.plugins.pluginPublish)
   alias(libs.plugins.spotless)
+  `java-gradle-plugin`
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
