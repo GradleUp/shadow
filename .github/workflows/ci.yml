@@ -28,7 +28,7 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}"
+      - run: ./gradlew build --info "-PtestGradleVersion=${{ matrix.gradle }}"
 
   publish-snapshot:
     needs: build
