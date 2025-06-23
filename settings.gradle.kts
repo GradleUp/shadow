@@ -3,8 +3,6 @@ pluginManagement {
     mavenCentral()
     gradlePluginPortal()
   }
-
-  includeBuild("build-logic")
 }
 
 plugins {

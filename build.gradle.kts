@@ -1,13 +1,39 @@
+import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+
 plugins {
   groovy
   `java-gradle-plugin`
-  id("shadow.convention.publish")
+  id("com.vanniktech.maven.publish") version "0.32.0"
   id("com.diffplug.spotless") version "7.0.4"
 }
+
+version = providers.gradleProperty("VERSION_NAME").get()
+group = providers.gradleProperty("GROUP").get()
+description = providers.gradleProperty("POM_DESCRIPTION").get()
 
 java {
   sourceCompatibility = JavaVersion.VERSION_1_8
   targetCompatibility = JavaVersion.VERSION_1_8
+  withSourcesJar()
+  withJavadocJar()
+}
+
+gradlePlugin {
+  website = providers.gradleProperty("POM_URL")
+  vcsUrl = providers.gradleProperty("POM_URL")
+
+  plugins {
+    create("shadowPlugin") {
+      id = "com.gradleup.shadow"
+      implementationClass = "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
+      displayName = providers.gradleProperty("POM_NAME").get()
+      description = providers.gradleProperty("POM_DESCRIPTION").get()
+      tags = listOf("onejar", "shade", "fatjar", "uberjar")
+    }
+  }
 }
 
 spotless {
@@ -18,9 +44,37 @@ spotless {
   }
 }
 
-dependencies {
-  compileOnly(localGroovy())
+configurations.configureEach {
+  when (name) {
+    API_ELEMENTS_CONFIGURATION_NAME,
+    RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+    JAVADOC_ELEMENTS_CONFIGURATION_NAME,
+    SOURCES_ELEMENTS_CONFIGURATION_NAME,
+    -> {
+      outgoing {
+        // Main/current capability.
+        capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
 
+        // Historical capabilities.
+        capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
+        capability("com.github.johnrengelman:shadow:$version")
+        capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
+        capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
+        capability("com.github.jengelman.gradle.plugins:shadow:$version")
+      }
+    }
+  }
+}
+
+publishing.publications.withType<MavenPublication>().configureEach {
+  // We don't care about capabilities being unmappable to Maven.
+  suppressPomMetadataWarningsFor(API_ELEMENTS_CONFIGURATION_NAME)
+  suppressPomMetadataWarningsFor(RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+  suppressPomMetadataWarningsFor(JAVADOC_ELEMENTS_CONFIGURATION_NAME)
+  suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
+}
+
+dependencies {
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("org.ow2.asm:asm-commons:9.8")
   implementation("commons-io:commons-io:2.19.0")
@@ -40,6 +94,16 @@ dependencies {
   testImplementation(platform("org.junit:junit-bom:5.13.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.platform:junit-platform-suite-engine")
+}
+
+tasks.withType<Javadoc>().configureEach {
+  (options as? StandardJavadocDocletOptions)?.let {
+    it.links(
+      "https://docs.oracle.com/en/java/javase/17/docs/api/",
+      "https://docs.groovy-lang.org/2.4.7/html/gapi/",
+    )
+    it.addStringOption("Xdoclint:none", "-quiet")
+  }
 }
 
 val isCI = providers.environmentVariable("CI").isPresent
