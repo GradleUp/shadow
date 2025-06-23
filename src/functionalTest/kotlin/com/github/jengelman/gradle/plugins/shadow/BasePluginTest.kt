@@ -21,6 +21,8 @@ import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.JarEntry
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
@@ -380,6 +382,7 @@ abstract class BasePluginTest {
     .withGradleVersion(testGradleVersion)
     .forwardOutput()
     .withPluginClasspath()
+    .withTestKitDir(testKitDir.toFile())
     .withArguments(commonArguments + arguments)
     .apply {
       if (projectDir != null) {
@@ -391,6 +394,14 @@ abstract class BasePluginTest {
   companion object {
     private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
       ?: error("TEST_GRADLE_VERSION system property is not set.")
+
+    val testKitDir: Path = run {
+      var gradleUserHome = System.getenv("GRADLE_USER_HOME")
+      if (gradleUserHome == null) {
+        gradleUserHome = Path(System.getProperty("user.home"), ".gradle").absolutePathString()
+      }
+      Path(gradleUserHome, "testkit")
+    }
 
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
     val junitRawEntries: List<JarEntry> = JarPath(junitJar)
