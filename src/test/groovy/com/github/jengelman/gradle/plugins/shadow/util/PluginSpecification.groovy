@@ -18,6 +18,8 @@ abstract class PluginSpecification extends Specification {
 
     public static final String SHADOW_VERSION = System.getProperty("shadowVersion")
 
+    public static final String TEST_GRADLE_VERSION = System.getProperty("TEST_GRADLE_VERSION")
+
     AppendableMavenFileRepository repo
 
     def setup() {
@@ -55,6 +57,7 @@ abstract class PluginSpecification extends Specification {
 
     GradleRunner getRunner() {
         GradleRunner.create()
+                .withGradleVersion(TEST_GRADLE_VERSION)
                 .withProjectDir(dir.toFile())
                 .forwardOutput()
                 .withPluginClasspath()

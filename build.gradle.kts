@@ -111,6 +111,12 @@ val isCI = providers.environmentVariable("CI").isPresent
 tasks.withType<Test>().configureEach {
   useJUnitPlatform()
 
+  val testGradleVersion = providers.gradleProperty("testGradleVersion").orNull.let {
+    if (it == null || it == "current") GradleVersion.current().version else it
+  }
+  logger.info("Using test Gradle version: $testGradleVersion")
+  systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
+
   maxParallelForks = Runtime.getRuntime().availableProcessors()
 
   if (isCI) {
