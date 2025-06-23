@@ -12,8 +12,8 @@ import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
 
 /** Tracks unused classes in the project classpath. */
-internal class UnusedTracker private constructor(
-  classDirs: Iterable<File>,
+internal class UnusedTracker(
+  sourceSetsClassesDirs: Iterable<File>,
   classJars: FileCollection,
   @get:InputFiles val toMinimize: FileCollection,
 ) {
@@ -21,7 +21,7 @@ internal class UnusedTracker private constructor(
   private val cp = Clazzpath()
 
   init {
-    projectUnits = classDirs.map { cp.addClazzpathUnit(it) } + classJars.map { cp.addClazzpathUnit(it) }
+    projectUnits = sourceSetsClassesDirs.map { cp.addClazzpathUnit(it) } + classJars.map { cp.addClazzpathUnit(it) }
   }
 
   fun findUnused(): Set<String> {
@@ -40,14 +40,6 @@ internal class UnusedTracker private constructor(
   }
 
   companion object {
-    fun forProject(
-      apiJars: FileCollection,
-      sourceSetsClassesDirs: Iterable<File>,
-      toMinimize: FileCollection,
-    ): UnusedTracker {
-      return UnusedTracker(sourceSetsClassesDirs, apiJars, toMinimize)
-    }
-
     fun getApiJarsFromProject(project: Project): FileCollection {
       val apiDependencies = project.configurations.findByName("api")?.dependencies
         ?: return project.files()

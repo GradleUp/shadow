@@ -333,7 +333,11 @@ public abstract class ShadowJar :
       }
     }
     val unusedClasses = if (minimizeJar.get()) {
-      val unusedTracker = UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+      val unusedTracker = UnusedTracker(
+        sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+        classJars = apiJars,
+        toMinimize = toMinimize,
+      )
       includedDependencies.files.forEach {
         unusedTracker.addDependency(it)
       }
