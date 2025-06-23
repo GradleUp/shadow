@@ -142,7 +142,7 @@ Options:
   `com.github.jengelman.gradle.plugins.shadow.tasks`. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
-  issues that hard to fix. Now it behaves like Gradle's `CopySpec.from`, which means it will not unzip the files, only
+  issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip the files, only
   copy the files as-is. If you still want to shadow the unzipped files, try out something like:
   ```kotlin
     tasks.shadowJar {
