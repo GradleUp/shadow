@@ -4,14 +4,15 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.android.lint)
-  alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.jetbrains.dokka)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.pluginPublish)
@@ -35,6 +36,10 @@ java {
 
 kotlin {
   explicitApi()
+  @OptIn(ExperimentalAbiValidation::class)
+  abiValidation {
+    enabled = true
+  }
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
@@ -213,7 +218,11 @@ tasks.validatePlugins {
 }
 
 tasks.check {
-  dependsOn(tasks.withType<Test>())
+  dependsOn(
+    tasks.withType<Test>(),
+    // TODO: https://youtrack.jetbrains.com/issue/KT-78525
+    tasks.checkLegacyAbi,
+  )
 }
 
 tasks.register<Copy>("downloadStartScripts") {
