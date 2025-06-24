@@ -12,8 +12,14 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        # Always test on the latest version and all LTS.
-        java: [ 11, 17, 21, 23 ]
+        # Always test on the latest version and some LTS.
+        java: [ 17, 21, 24 ]
+        # Test on the minimum Gradle version and the latest.
+        gradle: [ 8.3, current ]
+        exclude:
+          # Gradle 8.3 doesn't support Java 24.
+          - gradle: 8.3
+            java: 24
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +28,7 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew build
+      - run: ./gradlew build --info "-PtestGradleVersion=${{ matrix.gradle }}"
 
   publish-snapshot:
     needs: build

@@ -84,7 +84,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             startScripts.description = 'Creates OS specific scripts to run the project as a JVM application using the shadow jar'
             startScripts.group = ApplicationPlugin.APPLICATION_GROUP
             startScripts.classpath = project.files(jar)
-            startScripts.conventionMapping.mainClassName = { javaApplication.mainClass.get() }
+            startScripts.mainClass.set(javaApplication.mainClass)
             startScripts.conventionMapping.applicationName = { javaApplication.applicationName }
             startScripts.conventionMapping.outputDir = { new File(project.layout.buildDirectory.asFile.get(), 'scriptsShadow') }
             startScripts.conventionMapping.defaultJvmOpts = { javaApplication.applicationDefaultJvmArgs }

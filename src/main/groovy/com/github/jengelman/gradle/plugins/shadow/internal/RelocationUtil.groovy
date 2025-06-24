@@ -12,7 +12,10 @@ class RelocationUtil {
                 JarFile jf = new JarFile(jar)
                 jf.entries().each { entry ->
                     if (entry.name.endsWith(".class") && entry.name != "module-info.class") {
-                        packages << entry.name[0..entry.name.lastIndexOf('/') - 1].replaceAll('/', '.')
+                        def i = entry.name.lastIndexOf('/')
+                        if (i != -1) {
+                            packages << entry.name.take(i).replaceAll('/', '.')
+                        }
                     }
                 }
                 jf.close()

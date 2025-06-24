@@ -3,10 +3,11 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ProjectDependency
-import org.gradle.api.artifacts.SelfResolvingDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
+import org.gradle.util.GradleVersion
 import org.vafer.jdependency.Clazz
 import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
@@ -70,10 +71,10 @@ class UnusedTracker {
         def apiJars = new LinkedList<File>()
         apiDependencies.each { dep ->
             if (dep instanceof ProjectDependency) {
-                apiJars.addAll(getApiJarsFromProject(dep.dependencyProject))
+                apiJars.addAll(getApiJarsFromProject(dependencyProjectCompat(dep, project)))
                 addJar(runtimeConfiguration, dep, apiJars)
-            } else if (dep instanceof SelfResolvingDependency) {
-                apiJars.addAll(dep.resolve())
+            } else if (dep instanceof FileCollectionDependency) {
+                apiJars.addAll(dep.files)
             } else {
                 addJar(runtimeConfiguration, dep, apiJars)
                 apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
@@ -81,5 +82,15 @@ class UnusedTracker {
         }
 
         return project.files(apiJars)
+    }
+
+    /**
+     * TODO: this could be removed after bumping the min Gradle requirement to 8.11 or above.
+     */
+    private static dependencyProjectCompat(ProjectDependency projectDependency, Project project) {
+        if (GradleVersion.current() >= GradleVersion.version("8.11")) {
+            return project.project(projectDependency.path)
+        }
+        return projectDependency.dependencyProject
     }
 }

@@ -84,7 +84,7 @@ dependencies {
   implementation("org.apache.logging.log4j:log4j-core:2.24.1")
   implementation("org.vafer:jdependency:2.13")
 
-  testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
+  testImplementation("org.spockframework:spock-core:2.3-groovy-4.0") {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
@@ -110,6 +110,12 @@ val isCI = providers.environmentVariable("CI").isPresent
 
 tasks.withType<Test>().configureEach {
   useJUnitPlatform()
+
+  val testGradleVersion = providers.gradleProperty("testGradleVersion").orNull.let {
+    if (it == null || it == "current") GradleVersion.current().version else it
+  }
+  logger.info("Using test Gradle version: $testGradleVersion")
+  systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
 
   maxParallelForks = Runtime.getRuntime().availableProcessors()
 

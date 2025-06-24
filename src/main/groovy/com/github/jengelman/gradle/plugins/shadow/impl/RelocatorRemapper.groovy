@@ -24,6 +24,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContex
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.RelativeArchivePath
+import groovy.transform.CompileStatic
 import org.objectweb.asm.commons.Remapper
 
 import java.util.regex.Matcher
@@ -34,6 +35,7 @@ import java.util.regex.Pattern
  *
  * @author John Engelman
  */
+@CompileStatic
 class RelocatorRemapper extends Remapper {
 
     private final Pattern classPattern = Pattern.compile("(\\[*)?L(.+)")
