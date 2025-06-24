@@ -6,6 +6,9 @@
 
 ## [v8.3.7] (2025-06-24)
 
+> [!WARNING]
+> Only Gradle 9 support is being backported to this version. No additional features or crucial bug fixes will be included in the 8.x line. Please migrate to Shadow 9 as soon as possible.
+
 **Fixed**
 
 - Fix compatibility for Gradle 9.0.0 RC1. ([#1470](https://github.com/GradleUp/shadow/pull/1470))
@@ -429,7 +432,7 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.7...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.7...8.x
 [v8.3.7]: https://github.com/GradleUp/shadow/releases/tag/8.3.7
 [v8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
 [v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
