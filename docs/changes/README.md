@@ -299,6 +299,12 @@ Options:
 
 - Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039))
 
+## [8.3.7](https://github.com/GradleUp/shadow/releases/tag/8.3.7) - 2025-06-24
+
+**Fixed**
+
+- Fix compatibility for Gradle 9.0.0 RC1. ([#1470](https://github.com/GradleUp/shadow/pull/1470))
+
 ## [8.3.6](https://github.com/GradleUp/shadow/releases/tag/8.3.6) - 2025-02-02
 
 **Added**
