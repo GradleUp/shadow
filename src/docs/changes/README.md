@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+
+## [v8.3.7] (2025-06-24)
+
 **Fixed**
 
 - Fix compatibility for Gradle 9.0.0 RC1. ([#1470](https://github.com/GradleUp/shadow/pull/1470))
@@ -426,7 +429,8 @@ Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package
 
 
 
-[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.6...HEAD
+[Unreleased]: https://github.com/GradleUp/shadow/compare/8.3.7...HEAD
+[v8.3.7]: https://github.com/GradleUp/shadow/releases/tag/8.3.7
 [v8.3.6]: https://github.com/GradleUp/shadow/releases/tag/8.3.6
 [v8.3.5]: https://github.com/GradleUp/shadow/releases/tag/8.3.5
 [v8.3.4]: https://github.com/GradleUp/shadow/releases/tag/8.3.4

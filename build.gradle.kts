@@ -6,6 +6,7 @@ import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
 plugins {
   groovy
   `java-gradle-plugin`
+  id("com.gradle.plugin-publish") version "1.3.1"
   id("com.vanniktech.maven.publish") version "0.32.0"
   id("com.diffplug.spotless") version "7.0.4"
 }
