@@ -37,5 +37,6 @@ Gradle plugin for creating fat/uber JARs with support for package relocation.
 | 9.0.0+         | 8.3                | 11               | [`com.gradleup.shadow`][gradleup's]                  |
 
 
+
 [johnrengelman's]: https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 [gradleup's]: https://plugins.gradle.org/plugin/com.gradleup.shadow
