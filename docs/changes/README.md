@@ -4,7 +4,7 @@
 
 **Changed**
 
-- Expose Ant as compile scope. ([#1487](https://github.com/GradleUp/shadow/pull/1487))
+- Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
 
 ## [9.0.0-beta17](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta17) - 2025-06-18
 
