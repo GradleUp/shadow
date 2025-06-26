@@ -101,7 +101,7 @@ publishing.publications.withType<MavenPublication>().configureEach {
 
 dependencies {
   compileOnly(libs.kotlin.kmp)
-  implementation(libs.apache.ant)
+  api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
   implementation(libs.asm)
