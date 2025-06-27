@@ -23,9 +23,19 @@ version = providers.gradleProperty("VERSION_NAME").get()
 group = providers.gradleProperty("GROUP").get()
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
+// Release artifacts target Java 11; however, some tests require Java 17+
+val testJdk = providers.gradleProperty("testJdk").getOrElse("17")
+
 dokka {
   dokkaPublications.html {
     outputDirectory = rootDir.resolve("docs/api")
+  }
+}
+
+java {
+  toolchain {
+    // Use Java 21 for building the project (a recent LTS) to minimize the chances of bugs in the compiler
+    languageVersion = JavaLanguageVersion.of(21)
   }
 }
 
@@ -168,6 +178,11 @@ testing.suites {
     targets.configureEach {
       testTask {
         maxParallelForks = Runtime.getRuntime().availableProcessors()
+        javaLauncher.set(
+          javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(testJdk))
+          }
+        )
       }
     }
   }

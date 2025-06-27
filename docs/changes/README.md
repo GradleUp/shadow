@@ -5,6 +5,7 @@
 **Changed**
 
 - Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
+- Use Java 21 for the build (the target is still Java 11) ([#1491](https://github.com/GradleUp/shadow/pull/1491))
 
 ## [9.0.0-beta17](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta17) - 2025-06-18
 

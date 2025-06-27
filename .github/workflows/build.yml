@@ -20,9 +20,13 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: ${{ matrix.java }}
+          # Setup the selected Java, and configure Java 21 by default
+          java-version: |
+            ${{ matrix.java }}
+            21
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew build
+      # We provision JDKs with GitHub Actions for caching purposes, so Gradle should rather fail in case JDK is not found
+      - run: ./gradlew -Porg.gradle.java.installations.auto-download=false -PtestJdk=${{ matrix.java }} build
 
   # There's no need to run the update task frequently; the start scripts are typically updated with Gradle releases.
   update-start-scripts:
@@ -61,7 +65,8 @@ jobs:
         with:
           cache-read-only: true
       # TODO: https://github.com/gradle/gradle/issues/22779
-      - run: ./gradlew publishToMavenCentral --no-configuration-cache
+      # We provision JDKs with GitHub Actions for caching purposes, so Gradle should rather fail in case JDK is not found
+      - run: ./gradlew -Porg.gradle.java.installations.auto-download=false publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
