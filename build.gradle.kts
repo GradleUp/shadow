@@ -29,9 +29,8 @@ dokka {
   }
 }
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+tasks.withType<JavaCompile>().configureEach {
+  options.release = 11
 }
 
 kotlin {
@@ -47,6 +46,7 @@ kotlin {
     languageVersion = apiVersion
     jvmTarget = JvmTarget.JVM_11
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+    freeCompilerArgs.add("-Xjdk-release=11")
   }
 }
 
