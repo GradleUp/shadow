@@ -107,7 +107,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           mappings = [
-            "META-INF/a.properties": ["mergeStrategy": "append", "mergeSeparator": ":"],
+            "META-INF/a.properties": ["mergeStrategy": "append", "mergeSeparator": ";"],
             "META-INF/b.properties": ["mergeStrategy": "latest"]
           ]
         """.trimIndent(),
@@ -117,7 +117,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      getContent("META-INF/a.properties").contains("k=1:3")
+      getContent("META-INF/a.properties").contains("k=1;3")
       getContent("META-INF/b.properties").contains("k=4")
     }
   }
