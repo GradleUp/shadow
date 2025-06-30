@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
+class PropertiesFileTransformerTest : BaseTransformerTest() {
 
   @ParameterizedTest
   @ValueSource(strings = ["First", "Latest", "Append"])
-  fun `should merge properties files with different strategies`(strategy: String) {
+  fun mergePropertiesWithDifferentStrategies(strategy: String) {
     val one = buildJarOne {
       insert("META-INF/test.properties", "key1=one\nkey2=one")
     }
@@ -32,7 +32,7 @@ class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
                 paths = ["META-INF/test.properties"]
               }
             }
-            """.trimIndent(),
+      """.trimIndent(),
     )
 
     run(shadowJarTask)
@@ -46,7 +46,7 @@ class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
   }
 
   @Test
-  fun `should merge properties with key transformer`() {
+  fun mergePropertiesWithKeyTransformer() {
     val one = buildJarOne {
       insert("META-INF/test.properties", "foo=bar")
     }
@@ -65,7 +65,7 @@ class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
                 paths = ["META-INF/test.properties"]
               }
             }
-            """.trimIndent(),
+      """.trimIndent(),
     )
 
     run(shadowJarTask)
@@ -75,7 +75,7 @@ class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
   }
 
   @Test
-  fun `should merge properties with mappings`() {
+  fun mergePropertiesWithMappings() {
     val one = buildJarOne {
       insert("META-INF/a.properties", "k=1")
       insert("META-INF/b.properties", "k=2")
@@ -97,7 +97,7 @@ class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
                 ]
               }
             }
-            """.trimIndent(),
+      """.trimIndent(),
     )
 
     run(shadowJarTask)
@@ -109,7 +109,7 @@ class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
   }
 
   @Test
-  fun `should merge properties with specified charset`() {
+  fun mergePropertiesWithSpecifiedCharset() {
     val one = buildJarOne {
       insert("META-INF/utf8.properties", "foo=传傳")
     }
@@ -124,7 +124,7 @@ class PropertiesFileTransformerFunctionalTest : BaseTransformerTest() {
                 paths = ["META-INF/utf8.properties"]
               }
             }
-            """.trimIndent(),
+      """.trimIndent(),
     )
 
     run(shadowJarTask)
