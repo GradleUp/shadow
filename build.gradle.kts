@@ -76,10 +76,18 @@ publishing.publications.withType<MavenPublication>().configureEach {
 }
 
 dependencies {
+  constraints {
+    compileOnly("commons-io:commons-io") {
+      because("We do not want adding commons-io to the dependencies to reduce the surface for transitive CVEs")
+      version {
+        rejectAll()
+      }
+    }
+  }
+
   api("org.apache.ant:ant:1.10.15") // Types from Ant are exposed in the public API.
   implementation("org.jdom:jdom2:2.0.6.1")
   implementation("org.ow2.asm:asm-commons:9.8")
-  implementation("commons-io:commons-io:2.19.0")
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
   implementation("org.codehaus.plexus:plexus-xml:4.1.0")
   implementation("org.apache.logging.log4j:log4j-core:2.24.1")
@@ -91,6 +99,7 @@ dependencies {
   }
   testImplementation("org.xmlunit:xmlunit-legacy:2.10.2")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
+  testImplementation("commons-io:commons-io:2.19.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
   testImplementation(platform("org.junit:junit-bom:5.13.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")

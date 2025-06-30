@@ -22,13 +22,14 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import org.apache.commons.io.IOUtils
-import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginEntry
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 
@@ -65,12 +66,7 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
         def temporaryFile = File.createTempFile("Log4j2Plugins", ".dat")
         temporaryFile.deleteOnExit()
         temporaryFiles.add(temporaryFile)
-        FileOutputStream fos = new FileOutputStream(temporaryFile)
-        try {
-            IOUtils.copy(inputStream, fos)
-        } finally {
-            fos.close()
-        }
+        Files.copy(inputStream, temporaryFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         def contextRelocators = context.relocators
         if (contextRelocators != null) {
             this.relocators.addAll(contextRelocators)
@@ -99,7 +95,14 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
         ZipEntry entry = new ZipEntry(PLUGIN_CACHE_FILE)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         zipOutputStream.putNextEntry(entry)
-        pluginCache.writeCache(CloseShieldOutputStream.wrap(zipOutputStream))
+        pluginCache.writeCache(
+            new BufferedOutputStream(zipOutputStream) {
+                @Override
+                void close() throws IOException {
+                    flush()
+                }
+            }
+        )
         temporaryFiles.clear()
     }
 

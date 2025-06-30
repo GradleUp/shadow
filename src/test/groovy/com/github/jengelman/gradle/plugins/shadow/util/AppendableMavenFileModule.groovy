@@ -2,7 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.util.repo.maven.MavenFileModule
 import groovy.transform.InheritConstructors
-import org.apache.commons.io.IOUtils
+
+import java.nio.file.Files
 
 @InheritConstructors
 class AppendableMavenFileModule extends MavenFileModule {
@@ -38,7 +39,7 @@ class AppendableMavenFileModule extends MavenFileModule {
         String classifier = (String) artifact['classifier'] ?: ''
         if (files.containsKey(classifier)) {
             publishWithStream(artifactFile) { OutputStream os ->
-                IOUtils.copy(files[classifier].newInputStream(), os)
+                Files.copy(files[classifier].toPath(), os)
             }
         } else {
             publishWithStream(artifactFile) { OutputStream os ->

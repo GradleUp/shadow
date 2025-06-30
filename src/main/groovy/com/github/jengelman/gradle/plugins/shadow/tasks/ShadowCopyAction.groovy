@@ -8,8 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import groovy.util.logging.Slf4j
-import org.apache.commons.io.FilenameUtils
-import org.apache.commons.io.IOUtils
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
@@ -171,7 +169,7 @@ class ShadowCopyAction implements CopyAction {
         }
 
         protected boolean isClass(FileCopyDetails fileDetails) {
-            return FilenameUtils.getExtension(fileDetails.path) == 'class'
+            return fileDetails.path.endsWith(".class")
         }
 
         @Override
@@ -302,7 +300,7 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private boolean isUnused(String classPath) {
-            final String className = FilenameUtils.removeExtension(classPath)
+            final String className = classPath.dropRight(".class".length())
                     .replace('/' as char, '.' as char)
             final boolean result = unused.contains(className)
             if (result) {
@@ -320,7 +318,7 @@ class ShadowCopyAction implements CopyAction {
         }
 
         private void remapClass(FileCopyDetails fileCopyDetails) {
-            if (FilenameUtils.getExtension(fileCopyDetails.name) == 'class') {
+            if (fileCopyDetails.name.endsWith(".class")) {
                 InputStream is = fileCopyDetails.file.newInputStream()
                 try {
                     remapClass(is, fileCopyDetails.path, fileCopyDetails.lastModified)
@@ -363,18 +361,15 @@ class ShadowCopyAction implements CopyAction {
             path = path.replace(multiReleasePrefix, "")
             String mappedName = multiReleasePrefix + remapper.mapPath(path)
 
-            InputStream bis = new ByteArrayInputStream(renamedClass)
             try {
                 // Now we put it back on so the class file is written out with the right extension.
                 ZipEntry archiveEntry = new ZipEntry(mappedName + ".class")
                 archiveEntry.setTime(getArchiveTimeFor(lastModified))
                 zipOutStr.putNextEntry(archiveEntry)
-                IOUtils.copyLarge(bis, zipOutStr)
+                zipOutStr.write(renamedClass)
                 zipOutStr.closeEntry()
             } catch (ZipException ignored) {
                 log.warn("We have a duplicate " + mappedName + " in source project")
-            } finally {
-                bis.close()
             }
         }
 
@@ -385,11 +380,8 @@ class ShadowCopyAction implements CopyAction {
             RelativeArchivePath mappedFile = new RelativeArchivePath(entry)
             addParentDirectories(mappedFile)
             zipOutStr.putNextEntry(mappedFile.entry)
-            InputStream is = archive.getInputStream(archiveFile.entry)
-            try {
-                IOUtils.copyLarge(is, zipOutStr)
-            } finally {
-                is.close()
+            try (InputStream is = archive.getInputStream(archiveFile.entry)) {
+                zipOutStr << is
             }
             zipOutStr.closeEntry()
         }

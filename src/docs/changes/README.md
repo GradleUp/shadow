@@ -6,6 +6,7 @@
 **Changed**
 
 - Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
+- Remove `commons-io:commons-io` dependency. ([#1492](https://github.com/GradleUp/shadow/pull/1492))
 
 
 ## [v8.3.7] (2025-06-24)
