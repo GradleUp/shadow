@@ -3,17 +3,18 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.params.provider.EnumSource
 
 class PropertiesFileTransformerTest : BaseTransformerTest() {
 
   @ParameterizedTest
-  @ValueSource(strings = ["First", "Latest", "Append"])
-  fun mergePropertiesWithDifferentStrategies(strategy: String) {
+  @EnumSource(MergeStrategy::class)
+  fun mergePropertiesWithDifferentStrategies(strategy: MergeStrategy) {
     val one = buildJarOne {
       insert("META-INF/test.properties", "key1=one\nkey2=one")
     }
@@ -37,12 +38,13 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
     run(shadowJarTask)
 
-    val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
-    when (strategy) {
-      "First" -> assertThat(content).contains("key1=one", "key2=one", "key3=two")
-      "Latest" -> assertThat(content).contains("key1=one", "key2=two", "key3=two")
-      "Append" -> assertThat(content).contains("key1=one", "key2=one;two", "key3=two")
+    val expected = when (strategy) {
+      MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
+      MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
+      MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
     }
+    val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
+    assertThat(content).contains(*expected)
   }
 
   @Test
