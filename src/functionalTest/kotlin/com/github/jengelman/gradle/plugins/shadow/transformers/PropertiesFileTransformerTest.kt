@@ -111,15 +111,19 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
   @Test
   fun mergePropertiesWithSpecifiedCharset() {
     val one = buildJarOne {
-      insert("META-INF/utf8.properties", "foo=传傳")
+      insert("META-INF/utf8.properties", "foo=第一")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/utf8.properties", "foo=第二")
     }
     projectScriptPath.appendText(
       """
             dependencies {
-              ${implementationFiles(one)}
+              ${implementationFiles(one, two)}
             }
             $shadowJar {
               transform(com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer) {
+                mergeStrategy = com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy.Append
                 charsetName = "utf-8"
                 paths = ["META-INF/utf8.properties"]
               }
@@ -130,6 +134,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     val content = outputShadowJar.use { it.getContent("META-INF/utf8.properties") }
-    assertThat(content).contains("foo=传傳")
+    assertThat(content).contains("foo=第一,第二")
   }
 }
