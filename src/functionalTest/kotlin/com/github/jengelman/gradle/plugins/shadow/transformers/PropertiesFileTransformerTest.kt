@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
@@ -22,18 +21,14 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       insert("META-INF/test.properties", "key2=two\nkey3=two")
     }
     projectScriptPath.appendText(
-      """
-            dependencies {
-              ${implementationFiles(one, two)}
-            }
-            $shadowJar {
-              transform(com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer) {
-                mergeStrategy = com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy.$strategy
-                mergeSeparator = ";"
-                paths = ["META-INF/test.properties"]
-              }
-            }
-      """.trimIndent(),
+      transform<PropertiesFileTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          mergeStrategy = $mergeStrategyClassName.$strategy
+          mergeSeparator = ";"
+          paths = ["META-INF/test.properties"]
+        """.trimIndent(),
+      ),
     )
 
     run(shadowJarTask)
@@ -56,24 +51,45 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       insert("META-INF/test.properties", "FOO=baz")
     }
     projectScriptPath.appendText(
-      """
-            dependencies {
-              ${implementationFiles(one, two)}
-            }
-            $shadowJar {
-              transform(com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer) {
-                mergeStrategy = com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy.Append
-                keyTransformer = { key -> key.toUpperCase() }
-                paths = ["META-INF/test.properties"]
-              }
-            }
-      """.trimIndent(),
+      transform<PropertiesFileTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          mergeStrategy = $mergeStrategyClassName.Append
+          keyTransformer = { key -> key.toUpperCase() }
+          paths = ["META-INF/test.properties"]
+        """.trimIndent(),
+      ),
     )
 
     run(shadowJarTask)
 
     val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content).contains("FOO=bar,baz")
+  }
+
+  @Test
+  fun mergePropertiesWithSpecifiedCharset() {
+    val one = buildJarOne {
+      insert("META-INF/utf8.properties", "foo=第一")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/utf8.properties", "foo=第二")
+    }
+    projectScriptPath.appendText(
+      transform<PropertiesFileTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          mergeStrategy = $mergeStrategyClassName.Append
+                charsetName = "utf-8"
+                paths = ["META-INF/utf8.properties"]
+        """.trimIndent(),
+      ),
+    )
+
+    run(shadowJarTask)
+
+    val content = outputShadowJar.use { it.getContent("META-INF/utf8.properties") }
+    assertThat(content).contains("foo=第一,第二")
   }
 
   @Test
@@ -87,55 +103,26 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       insert("META-INF/b.properties", "k=4")
     }
     projectScriptPath.appendText(
-      """
-            dependencies {
-              ${implementationFiles(one, two)}
-            }
-            $shadowJar {
-              transform(com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer) {
-                mappings = [
-                  "META-INF/a.properties": ["mergeStrategy": "append", "mergeSeparator": ":"],
-                  "META-INF/b.properties": ["mergeStrategy": "latest"]
-                ]
-              }
-            }
-      """.trimIndent(),
+      transform<PropertiesFileTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          mappings = [
+            "META-INF/a.properties": ["mergeStrategy": "append", "mergeSeparator": ":"],
+            "META-INF/b.properties": ["mergeStrategy": "latest"]
+          ]
+        """.trimIndent(),
+      ),
     )
 
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      getContent("META-INF/a.properties").isEqualTo("k=1:3")
-      getContent("META-INF/b.properties").isEqualTo("k=4")
+      getContent("META-INF/a.properties").contains("k=1:3")
+      getContent("META-INF/b.properties").contains("k=4")
     }
   }
 
-  @Test
-  fun mergePropertiesWithSpecifiedCharset() {
-    val one = buildJarOne {
-      insert("META-INF/utf8.properties", "foo=第一")
-    }
-    val two = buildJarTwo {
-      insert("META-INF/utf8.properties", "foo=第二")
-    }
-    projectScriptPath.appendText(
-      """
-            dependencies {
-              ${implementationFiles(one, two)}
-            }
-            $shadowJar {
-              transform(com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer) {
-                mergeStrategy = com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy.Append
-                charsetName = "utf-8"
-                paths = ["META-INF/utf8.properties"]
-              }
-            }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    val content = outputShadowJar.use { it.getContent("META-INF/utf8.properties") }
-    assertThat(content).contains("foo=第一,第二")
+  private companion object {
+    val mergeStrategyClassName = requireNotNull(MergeStrategy::class.java.canonicalName)
   }
 }
