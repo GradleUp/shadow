@@ -95,20 +95,20 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
   @Test
   fun mergePropertiesWithMappings() {
     val one = buildJarOne {
-      insert("META-INF/a.properties", "k=1")
-      insert("META-INF/b.properties", "k=2")
+      insert("META-INF/foo.properties", "foo=1")
+      insert("META-INF/bar.properties", "bar=2")
     }
     val two = buildJarTwo {
-      insert("META-INF/a.properties", "k=3")
-      insert("META-INF/b.properties", "k=4")
+      insert("META-INF/foo.properties", "foo=3")
+      insert("META-INF/bar.properties", "bar=4")
     }
     projectScriptPath.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           mappings = [
-            "META-INF/a.properties": ["mergeStrategy": "append", "mergeSeparator": ";"],
-            "META-INF/b.properties": ["mergeStrategy": "latest"]
+            "META-INF/foo.properties": ["mergeStrategy": "append", "mergeSeparator": ";"],
+            "META-INF/bar.properties": ["mergeStrategy": "latest"]
           ]
         """.trimIndent(),
       ),
@@ -117,8 +117,8 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      getContent("META-INF/a.properties").contains("k=1;3")
-      getContent("META-INF/b.properties").contains("k=4")
+      getContent("META-INF/foo.properties").contains("foo=1;3")
+      getContent("META-INF/bar.properties").contains("bar=4")
     }
   }
 
