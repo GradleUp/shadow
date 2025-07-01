@@ -379,6 +379,7 @@ abstract class BasePluginTest {
     arguments: Iterable<String> = emptyList(),
     projectDir: Path? = projectRoot,
   ): GradleRunner = GradleRunner.create()
+    .withGradleVersion(testGradleVersion)
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())
@@ -391,6 +392,9 @@ abstract class BasePluginTest {
 
   @Suppress("ConstPropertyName")
   companion object {
+    private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
+      ?: error("TEST_GRADLE_VERSION system property is not set.")
+
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
       if (gradleUserHome == null) {
