@@ -2,7 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
@@ -120,6 +122,40 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       getContent("META-INF/foo.properties").contains("foo=1;3")
       getContent("META-INF/bar.properties").contains("bar=4")
     }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/622",
+    "https://github.com/GradleUp/shadow/issues/856",
+  )
+  @Test
+  fun mergedPropertiesDontContainDateComment() {
+    val one = buildJarOne {
+      insert("META-INF/test.properties", "foo=one")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/test.properties", "foo=two")
+    }
+    projectScriptPath.appendText(
+      transform<PropertiesFileTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          mergeStrategy = $mergeStrategyClassName.Append
+          paths = ["META-INF/test.properties"]
+        """.trimIndent(),
+      ),
+    )
+
+    run(shadowJarTask)
+
+    val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
+    assertThat(content.trimIndent()).isEqualTo(
+      """
+        #
+
+        foo=one,two
+      """.trimIndent(),
+    )
   }
 
   private companion object {
