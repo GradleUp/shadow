@@ -120,17 +120,6 @@ class PropertiesFileTransformer implements Transformer {
 
     private Map<String, CleanProperties> propertiesEntries = [:]
 
-    /**
-     * This is a copy of the Closure.IDENTITY from Groovy 4.
-     */
-    private static final Closure IDENTITY = new Closure<Object>((Object)null) {
-        private static final long serialVersionUID = 730973623329943963L
-
-        Object doCall(Object args) {
-            return args
-        }
-    }
-
     @Input
     List<String> paths = []
 
@@ -147,7 +136,7 @@ class PropertiesFileTransformer implements Transformer {
     String charset = 'ISO_8859_1'
 
     @Internal
-    Closure<String> keyTransformer = IDENTITY
+    transient Closure<String> keyTransformer = IDENTITY
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
@@ -203,7 +192,7 @@ class PropertiesFileTransformer implements Transformer {
     }
 
     private Properties transformKeys(Properties properties) {
-        if (keyTransformer == IDENTITY) {
+        if (keyTransformer == IDENTITY || keyTransformer == null) {
             return properties
         }
         def result = new CleanProperties()
