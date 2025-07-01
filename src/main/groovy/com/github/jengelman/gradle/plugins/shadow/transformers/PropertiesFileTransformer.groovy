@@ -136,7 +136,7 @@ class PropertiesFileTransformer implements Transformer {
     String charset = 'ISO_8859_1'
 
     @Internal
-    transient Closure<String> keyTransformer = IDENTITY
+    Closure<String> keyTransformer = IDENTITY
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
@@ -192,7 +192,10 @@ class PropertiesFileTransformer implements Transformer {
     }
 
     private Properties transformKeys(Properties properties) {
-        if (keyTransformer == IDENTITY || keyTransformer == null) {
+        if (keyTransformer == null) {
+            throw new IllegalStateException("keyTransformer must not be null.")
+        }
+        if (keyTransformer == IDENTITY) {
             return properties
         }
         def result = new CleanProperties()
