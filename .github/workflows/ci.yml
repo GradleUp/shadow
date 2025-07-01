@@ -15,7 +15,7 @@ jobs:
         # Always test on the latest version and some LTS.
         java: [ 17, 21, 24 ]
         # Test on the minimum Gradle version and the latest.
-        gradle: [ 8.3, current, 9.0.0-rc-1 ]
+        gradle: [ 8.3, 8.14.2, current ]
         exclude:
           # Gradle 8.3 doesn't support Java 24.
           - gradle: 8.3
