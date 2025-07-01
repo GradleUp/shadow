@@ -1,11 +1,47 @@
 # Change Log
 
-## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta13...HEAD) - 2025-xx-xx
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta17...HEAD) - 2025-xx-xx
+
+**Changed**
+
+- Bump the min Gradle requirement to 8.11. ([#1479](https://github.com/GradleUp/shadow/pull/1479))
+- Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
+
+## [9.0.0-beta17](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta17) - 2025-06-18
+
+**Fixed**
+
+- Fix compatibility for Gradle 9.0.0 RC1. ([#1468](https://github.com/GradleUp/shadow/pull/1468))
+
+## [9.0.0-beta16](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta16) - 2025-06-14
+
+**Changed**
+
+- Update ASM to 9.8 to support Java 25. ([#1380](https://github.com/GradleUp/shadow/pull/1380))
+
+**Fixed**
+
+- Restore removed `Named` from `ResourceTransformer`. ([#1449](https://github.com/GradleUp/shadow/pull/1449))
+
+## [9.0.0-beta15](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta15) - 2025-05-28
+
+**Fixed**
+
+- Pin the plugin's Kotlin language level on 2.0. ([#1448](https://github.com/GradleUp/shadow/pull/1448))  
+  The language level used in `9.0.0-beta14` is 2.2, which may cause compatibility issues for the plugins depending on
+  Shadow.
+
+## [9.0.0-beta14](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta14) - 2025-05-28
 
 **Changed**
 
 - Update start script templates. ([#1419](https://github.com/GradleUp/shadow/pull/1419))
 - In-development snapshots are now published to the Central Portal Snapshots repository at https://central.sonatype.com/repository/maven-snapshots/. ([#1414](https://github.com/GradleUp/shadow/pull/1414))
+
+**Fixed**
+
+- Allow using file trees of JARs together with the configuration cache. ([#1441](https://github.com/GradleUp/shadow/pull/1441))
+- Fallback `RelocateClassContext` and `RelocatePathContext` to data classes. ([#1445](https://github.com/GradleUp/shadow/pull/1445))
 
 ## [9.0.0-beta13](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta13) - 2025-04-29
 
@@ -109,12 +145,29 @@ Options:
 - Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 - **BREAKING CHANGE:** Move `DependencyFilter` from `com.github.jengelman.gradle.plugins.shadow.internal` into
   `com.github.jengelman.gradle.plugins.shadow.tasks`. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
+- **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
+  In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
+  issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip
+  the files, only copy the files as-is. If you still want to shadow the unzipped files, try out something like:
+  ```kotlin
+    tasks.shadowJar {
+      from(zipTree(files('path/to/your/file.zip')))
+    }
+  ```
+  or
+  ```kotlin
+    dependencies {
+      implementation(files('path/to/your/file.zip'))
+    }
+  ```
 - Refactor file visiting logic in `StreamAction`, handle file unzipping via
   `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 **Fixed**
 
-- Honor `DuplicatesStrategy`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- Honor `DuplicatesStrategy`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
+  Shadow recognized `DuplicatesStrategy.EXCLUDE` as the default, but the other strategies didn't work properly.
+  Now we honor `DuplicatesStrategy.INCLUDE` as the default, and align all the strategy behaviors with the Gradle side.
 - Honor unzipped jars via `from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 **Removed**
@@ -123,6 +176,7 @@ Options:
 - **BREAKING CHANGE:** Remove `ShadowStats`. ([#1264](https://github.com/GradleUp/shadow/pull/1264))
 - **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and
   `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- **BREAKING CHANGE:** Remove `TransformerContext.getEntryTimestamp`. ([#1245](https://github.com/GradleUp/shadow/pull/1245))
 
 ## [9.0.0-beta8](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8) - 2025-02-08
 
@@ -249,6 +303,22 @@ Options:
 **Fixed**
 
 - Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039))
+
+## [8.3.8](https://github.com/GradleUp/shadow/releases/tag/8.3.8) - 2025-07-01
+
+**Fixed**
+
+- Fix the regression of `PropertiesFileTransformer` in `8.3.7`. ([#1493](https://github.com/GradleUp/shadow/pull/1493))
+
+**Changed**
+
+- Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
+
+## [8.3.7](https://github.com/GradleUp/shadow/releases/tag/8.3.7) - 2025-06-24
+
+**Fixed**
+
+- Fix compatibility for Gradle 9.0.0 RC1. ([#1470](https://github.com/GradleUp/shadow/pull/1470))
 
 ## [8.3.6](https://github.com/GradleUp/shadow/releases/tag/8.3.6) - 2025-02-02
 
