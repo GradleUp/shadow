@@ -115,7 +115,7 @@ import static groovy.lang.Closure.IDENTITY
  * @author Andres Almiray
  * @author Marc Philipp
  */
-class PropertiesFileTransformer implements Transformer, Serializable {
+class PropertiesFileTransformer implements Transformer {
     private static final String PROPERTIES_SUFFIX = '.properties'
 
     private Map<String, CleanProperties> propertiesEntries = [:]
@@ -136,7 +136,9 @@ class PropertiesFileTransformer implements Transformer, Serializable {
     String charset = 'ISO_8859_1'
 
     @Internal
-    Closure<String> keyTransformer = IDENTITY
+    Closure<String> keyTransformer = new Closure<String>("") {
+        String doCall(Object arguments) { arguments }
+    }
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
