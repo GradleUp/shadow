@@ -109,9 +109,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         // Only proceed if the removal is successful.
         if (!api.dependencies.remove(gradleApi)) return@named
         // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
-        configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME) { co ->
-          co.dependencies.add(dependencies.gradleApi())
-        }
+        configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME)
+          .dependencies.add(dependencies.gradleApi())
       }
     }
   }
