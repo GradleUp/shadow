@@ -120,6 +120,17 @@ class PropertiesFileTransformer implements Transformer {
 
     private Map<String, CleanProperties> propertiesEntries = [:]
 
+    /**
+     * This is a copy of the Closure.IDENTITY from Groovy 4.
+     */
+    private static final Closure IDENTITY = new Closure<Object>((Object)null) {
+        private static final long serialVersionUID = 730973623329943963L
+
+        Object doCall(Object args) {
+            return args
+        }
+    }
+
     @Input
     List<String> paths = []
 
