@@ -5,6 +5,8 @@ on:
     branches:
       - 8.x
   pull_request:
+      branches:
+      - 8.x
   workflow_dispatch:
 
 jobs:

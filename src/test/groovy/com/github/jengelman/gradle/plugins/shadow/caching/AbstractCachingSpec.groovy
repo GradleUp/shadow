@@ -45,10 +45,6 @@ abstract class AbstractCachingSpec extends PluginSpecification {
         return runner.withProjectDir(alternateDir.toFile()).withArguments(cacheArguments).build()
     }
 
-    private String escapedPath(File file) {
-        file.path.replaceAll('\\\\', '\\\\\\\\')
-    }
-
     void assertShadowJarHasResult(TaskOutcome expectedOutcome) {
         def result = runWithCacheEnabled(shadowJarTask)
         assert result.task(shadowJarTask).outcome == expectedOutcome

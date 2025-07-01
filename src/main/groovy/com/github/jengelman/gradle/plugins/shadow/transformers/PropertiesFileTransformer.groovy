@@ -136,7 +136,9 @@ class PropertiesFileTransformer implements Transformer {
     String charset = 'ISO_8859_1'
 
     @Internal
-    Closure<String> keyTransformer = IDENTITY
+    Closure<String> keyTransformer = new Closure<String>("") {
+        String doCall(Object arguments) { arguments } // We can't use Closure#IDENTITY instead, as it is not compatible with Groovy 3 and 4.
+    }
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
@@ -192,6 +194,9 @@ class PropertiesFileTransformer implements Transformer {
     }
 
     private Properties transformKeys(Properties properties) {
+        if (keyTransformer == null) {
+            throw new IllegalStateException("keyTransformer must not be null.")
+        }
         if (keyTransformer == IDENTITY) {
             return properties
         }

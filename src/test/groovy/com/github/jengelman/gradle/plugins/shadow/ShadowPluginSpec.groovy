@@ -387,7 +387,7 @@ class ShadowPluginSpec extends PluginSpecification {
             package client;
             import junit.framework.TestCase;
             public class Client extends TestCase {
-                public static void main(String[] args) {} 
+                public static void main(String[] args) {}
             }
         """.stripIndent()
 
@@ -1029,7 +1029,7 @@ class ShadowPluginSpec extends PluginSpecification {
             version = '1.0'
             repositories { maven { url = "${repo.uri}" } }
             dependencies { api project(':api') }
-            
+
             shadowJar.minimize()
         """.stripIndent()
 
@@ -1246,9 +1246,5 @@ class ShadowPluginSpec extends PluginSpecification {
         and:
         JarFile jar = new JarFile(output)
         assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
-    }
-
-    private String escapedPath(File file) {
-        file.path.replaceAll('\\\\', '\\\\\\\\')
     }
 }

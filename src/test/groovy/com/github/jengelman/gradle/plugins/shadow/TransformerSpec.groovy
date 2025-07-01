@@ -251,7 +251,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
               implementation 'shadow:two:1.0'
               implementation files('${escapedPath(one)}')
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
               mergeServiceFiles()
             }
@@ -349,9 +349,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -386,9 +386,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -400,7 +400,7 @@ two # NOTE: No newline terminates this line/file
                    attributes 'Test-Entry': 'FAILED'
                }
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
@@ -430,7 +430,7 @@ two # NOTE: No newline terminates this line/file
         given:
         File xml1 = buildJar('xml1.jar').insertFile('properties.xml',
 '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            
+
 <properties version="1.0">
    <entry key="key1">val1</entry>
 </properties>
@@ -439,7 +439,7 @@ two # NOTE: No newline terminates this line/file
 
         File xml2 = buildJar('xml2.jar').insertFile('properties.xml',
 '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            
+
 <properties version="1.0">
    <entry key="key2">val2</entry>
 </properties>
@@ -485,9 +485,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -499,7 +499,7 @@ two # NOTE: No newline terminates this line/file
                    attributes 'Test-Entry': 'FAILED'
                }
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
@@ -545,9 +545,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -559,7 +559,7 @@ two # NOTE: No newline terminates this line/file
                    attributes 'Test-Entry': 'FAILED'
                }
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
@@ -762,12 +762,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         'Log4j2PluginsCacheFileTransformer' | ''
         'ManifestAppenderTransformer'       | ''
         'ManifestResourceTransformer'       | ''
-        'PropertiesFileTransformer'         | '{ keyTransformer = { it.toLowerCase() } }'
         'ServiceFileTransformer'            | ''
         'XmlAppendingTransformer'           | ''
-    }
-
-    private String escapedPath(File file) {
-        file.path.replaceAll('\\\\', '\\\\\\\\')
     }
 }

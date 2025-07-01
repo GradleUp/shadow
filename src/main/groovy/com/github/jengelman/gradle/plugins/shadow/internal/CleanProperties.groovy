@@ -1,5 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class CleanProperties extends Properties {
 
     private static class StripCommentsWithTimestampBufferedWriter extends BufferedWriter {

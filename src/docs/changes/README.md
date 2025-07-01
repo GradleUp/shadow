@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Fix the regression of `PropertiesFileTransformer` in `8.3.7`. ([#1493](https://github.com/GradleUp/shadow/pull/1493))
+
 **Changed**
 
 - Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
