@@ -303,6 +303,16 @@ Options:
 
 - Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039))
 
+## [8.3.8](https://github.com/GradleUp/shadow/releases/tag/8.3.8) - 2025-07-01
+
+**Fixed**
+
+- Fix the regression of `PropertiesFileTransformer` in `8.3.7`. ([#1493](https://github.com/GradleUp/shadow/pull/1493))
+
+**Changed**
+
+- Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
+
 ## [8.3.7](https://github.com/GradleUp/shadow/releases/tag/8.3.7) - 2025-06-24
 
 **Fixed**
