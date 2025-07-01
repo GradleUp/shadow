@@ -180,6 +180,10 @@ abstract class PluginSpecification extends Specification {
         return new File(this.class.classLoader.getResource(name).toURI())
     }
 
+    protected String escapedPath(File file) {
+        file.path.replaceAll('\\\\', '\\\\\\\\')
+    }
+
     static File getTestKitDir() {
         def gradleUserHome = System.getenv("GRADLE_USER_HOME")
         if (!gradleUserHome) {
