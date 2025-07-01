@@ -57,9 +57,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 ===! "Kotlin"
 
     <details>
-    <summary>Snapshots of the development version are available in 
-    <a href="https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-    Central Portal Snapshots</a>.
+    <summary>Snapshots of the development version are available in Central Portal Snapshots.
     </summary>
     <p>
 
@@ -84,9 +82,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 === "Groovy"
 
     <details>
-    <summary>Snapshots of the development version are available in 
-    <a href="https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-    Central Portal Snapshots</a>.
+    <summary>Snapshots of the development version are available in Central Portal Snapshots.
     </summary>
     <p>
 
