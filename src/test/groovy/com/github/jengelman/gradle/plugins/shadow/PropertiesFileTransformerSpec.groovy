@@ -12,11 +12,11 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         given:
         File one = buildJar('one.jar')
             .insertFile('test.properties',
-                'key1=val1\nkey2=val2\nkey3=val3').write()
+                'key1=one\nkey2=one').write()
 
         File two = buildJar('two.jar')
             .insertFile('test.properties',
-                'key1=VAL1\nkey2=VAL2\nkey4=val4').write()
+                'key2=two\nkey3=two').write()
 
         buildFile << """
             import ${PropertiesFileTransformer.name}
@@ -27,6 +27,7 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                 transform(PropertiesFileTransformer) {
                     paths = ['test.properties']
+                    mergeSeparator = ";"
                     mergeStrategy = '${mergeStrategy}'
                 }
             }
@@ -41,21 +42,19 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         and:
         String text = getJarFileContents(output, 'test.properties')
         def lines = text.replace('#', '').trim().split("\\r?\\n").toList()
+        assert lines.size() == 3
         switch (mergeStrategy) {
             case 'first':
-                assert lines.size() == 4
-                assert lines.containsAll(['key1=val1', 'key2=val2', 'key3=val3', 'key4=val4'])
+                assert lines.containsAll(['key1=one', 'key2=one', 'key3=two'])
                 break
             case 'latest':
-                assert lines.size() == 4
-                assert lines.containsAll(['key1=VAL1', 'key2=VAL2', 'key3=val3', 'key4=val4'])
+                assert lines.containsAll(['key1=one', 'key2=two', 'key3=two'])
                 break
             case 'append':
-                assert lines.size() == 4
-                assert lines.containsAll(['key1=val1,VAL1', 'key2=val2,VAL2', 'key3=val3', 'key4=val4'])
+                assert lines.containsAll(['key1=one', 'key2=one;two', 'key3=two'])
                 break
             default:
-                assert false : "Unknown mergeStrategy: $mergeStrategy"
+                assert false: "Unknown mergeStrategy: $mergeStrategy"
         }
 
         where:
