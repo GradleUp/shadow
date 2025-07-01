@@ -137,7 +137,7 @@ class PropertiesFileTransformer implements Transformer {
 
     @Internal
     Closure<String> keyTransformer = new Closure<String>("") {
-        String doCall(Object arguments) { arguments } // We can't use Closure#IDENTITY instead, for being compatible with Groovy 3 and 4.
+        String doCall(Object arguments) { arguments } // We can't use Closure#IDENTITY instead, as it is not compatible with Groovy 3 and 4.
     }
 
     @Override
