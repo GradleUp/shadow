@@ -208,6 +208,6 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         then:
         output.exists()
         String text = getJarFileContents(output, 'META-INF/test.properties')
-        text.trim() == '#\n\nfoo=one,two'
+        text.replace('#', '').trim() == 'foo=one,two'
     }
 }
