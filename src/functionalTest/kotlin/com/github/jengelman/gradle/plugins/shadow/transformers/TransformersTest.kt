@@ -195,7 +195,6 @@ class TransformersTest : BaseTransformerTest() {
       "{ resource.set(\"test.file\"); file.fileValue(file(\"test/some.file\")) }" to IncludeResourceTransformer::class,
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
-      "{ keyTransformer = { it.toLowerCase() } }" to PropertiesFileTransformer::class,
     )
   }
 }

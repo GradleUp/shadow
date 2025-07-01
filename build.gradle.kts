@@ -4,18 +4,19 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.android.lint)
-  alias(libs.plugins.jetbrains.bcv)
   alias(libs.plugins.jetbrains.dokka)
   alias(libs.plugins.mavenPublish)
+  alias(libs.plugins.pluginPublish)
   alias(libs.plugins.spotless)
-  `java-gradle-plugin`
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -28,13 +29,12 @@ dokka {
   }
 }
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
-}
-
 kotlin {
   explicitApi()
+  @OptIn(ExperimentalAbiValidation::class)
+  abiValidation {
+    enabled = true
+  }
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
@@ -42,6 +42,8 @@ kotlin {
     languageVersion = apiVersion
     jvmTarget = JvmTarget.JVM_11
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+    // Sync with `JavaCompile.options.release`.
+    freeCompilerArgs.add("-Xjdk-release=11")
   }
 }
 
@@ -96,7 +98,7 @@ publishing.publications.withType<MavenPublication>().configureEach {
 
 dependencies {
   compileOnly(libs.kotlin.kmp)
-  implementation(libs.apache.ant)
+  api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
   implementation(libs.asm)
@@ -206,6 +208,10 @@ kotlin.target.compilations {
   }
 }
 
+tasks.withType<JavaCompile>().configureEach {
+  options.release = 11
+}
+
 tasks.pluginUnderTestMetadata {
   // Plugins used in tests could be resolved in classpath.
   pluginClasspath.from(
@@ -219,7 +225,11 @@ tasks.validatePlugins {
 }
 
 tasks.check {
-  dependsOn(tasks.withType<Test>())
+  dependsOn(
+    tasks.withType<Test>(),
+    // TODO: https://youtrack.jetbrains.com/issue/KT-78525
+    tasks.checkLegacyAbi,
+  )
 }
 
 tasks.register<Copy>("downloadStartScripts") {

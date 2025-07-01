@@ -1,6 +1,5 @@
 <div style="text-align: center;">
-  <img src="images/logo.svg" alt="Shadow Gradle Plugin" width="300"/>
-  <h1><strong>Shadow Gradle Plugin</strong></h1>
+  <img src="images/logo%2Btype.svg" alt="Shadow" height="300"/>
 </div>
 
 # Introduction
@@ -13,13 +12,22 @@ dependent libraries into the output jar without incurring the I/O overhead of ex
 !!! warning "Plugin ID Change"
 
     Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the ID [
-    `com.github.johnrengelman.shadow`](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow)
+    `com.github.johnrengelman.shadow`][johnrengelman's]
     before maintenance was transferred to the [GradleUp organization](https://github.com/GradleUp) to ensure future
     development, see [#908](https://github.com/GradleUp/shadow/issues/908).
     
     If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID [
-    `com.gradleup.shadow`](https://plugins.gradle.org/plugin/com.gradleup.shadow)
+    `com.gradleup.shadow`][gradleup's] 
     and update to the latest version to receive all the latest bug fixes and improvements.
+
+| Shadow Version | Min Gradle Version | Min Java Version | Plugin ID                                            |
+|----------------|--------------------|------------------|------------------------------------------------------|
+| 5.2.0 - 6.1.0  | 5.x - 6.x          | 7                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
+| 6.1.0+         | 6.x                | 8                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
+| 7.0.0+         | 7.x                | 8                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
+| 8.0.0+         | 8.0                | 8                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
+| 8.3.0+         | 8.3                | 8                | [`com.gradleup.shadow`][gradleup's]                  |
+| 9.0.0+         | 8.3                | 11               | [`com.gradleup.shadow`][gradleup's]                  |
 
 ## Benefits of Shadow
 
@@ -61,3 +69,5 @@ library's dependencies will not conflict with the same dependency being declared
 
 [JarInputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarInputStream.html
 [JarOutputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarOutputStream.html
+[johnrengelman's]: https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
+[gradleup's]: https://plugins.gradle.org/plugin/com.gradleup.shadow
