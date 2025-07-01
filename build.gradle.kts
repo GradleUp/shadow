@@ -85,7 +85,7 @@ dependencies {
   implementation("org.apache.logging.log4j:log4j-core:2.24.1")
   implementation("org.vafer:jdependency:2.13")
 
-  testImplementation("org.spockframework:spock-core:2.3-groovy-4.0") {
+  testImplementation("org.spockframework:spock-core:2.3-groovy-3.0") {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
