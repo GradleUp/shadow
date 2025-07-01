@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
@@ -251,7 +252,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
               implementation 'shadow:two:1.0'
               implementation files('${escapedPath(one)}')
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
               mergeServiceFiles()
             }
@@ -349,9 +350,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -386,9 +387,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -400,7 +401,7 @@ two # NOTE: No newline terminates this line/file
                    attributes 'Test-Entry': 'FAILED'
                }
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
@@ -430,7 +431,7 @@ two # NOTE: No newline terminates this line/file
         given:
         File xml1 = buildJar('xml1.jar').insertFile('properties.xml',
 '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            
+
 <properties version="1.0">
    <entry key="key1">val1</entry>
 </properties>
@@ -439,7 +440,7 @@ two # NOTE: No newline terminates this line/file
 
         File xml2 = buildJar('xml2.jar').insertFile('properties.xml',
 '''<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-            
+
 <properties version="1.0">
    <entry key="key2">val2</entry>
 </properties>
@@ -485,9 +486,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -499,7 +500,7 @@ two # NOTE: No newline terminates this line/file
                    attributes 'Test-Entry': 'FAILED'
                }
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
@@ -545,9 +546,9 @@ two # NOTE: No newline terminates this line/file
         File main = file('src/main/java/shadow/Main.java')
         main << '''
             package shadow;
-            
+
             public class Main {
-            
+
                public static void main(String[] args) { }
             }
         '''.stripIndent()
@@ -559,7 +560,7 @@ two # NOTE: No newline terminates this line/file
                    attributes 'Test-Entry': 'FAILED'
                }
             }
-            
+
             tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
                manifest {
                    attributes 'Test-Entry': 'PASSED'
@@ -765,6 +766,61 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         'PropertiesFileTransformer'         | '{ keyTransformer = { it.toLowerCase() } }'
         'ServiceFileTransformer'            | ''
         'XmlAppendingTransformer'           | ''
+    }
+
+    @Unroll
+    def 'merge properties with different strategies: #mergeStrategy'() {
+        given:
+        File one = buildJar('one.jar')
+            .insertFile('test.properties',
+                'key1=val1\nkey2=val2\nkey3=val3').write()
+
+        File two = buildJar('two.jar')
+            .insertFile('test.properties',
+                'key1=VAL1\nkey2=VAL2\nkey4=val4').write()
+
+        buildFile << """
+            import ${PropertiesFileTransformer.name}
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+                from('${escapedPath(one)}')
+                from('${escapedPath(two)}')
+            }
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+                transform(PropertiesFileTransformer) {
+                    paths = ['test.properties']
+                    mergeStrategy = '${mergeStrategy}'
+                }
+            }
+        """.stripIndent()
+
+        when:
+        run('shadowJar')
+
+        then:
+        assert output.exists()
+
+        and:
+        String text = getJarFileContents(output, 'test.properties')
+        def lines = text.replace('#', '').trim().split("\\r?\\n").toList()
+        switch (mergeStrategy) {
+            case 'first':
+                assert lines.size() == 4
+                assert lines.containsAll(['key1=val1', 'key2=val2', 'key3=val3', 'key4=val4'])
+                break
+            case 'latest':
+                assert lines.size() == 4
+                assert lines.containsAll(['key1=VAL1', 'key2=VAL2', 'key3=val3', 'key4=val4'])
+                break
+            case 'append':
+                assert lines.size() == 4
+                assert lines.containsAll(['key1=val1,VAL1', 'key2=val2,VAL2', 'key3=val3', 'key4=val4'])
+                break
+            default:
+                assert false : "Unknown mergeStrategy: $mergeStrategy"
+        }
+
+        where:
+        mergeStrategy << ['first', 'latest', 'append']
     }
 
     private String escapedPath(File file) {
