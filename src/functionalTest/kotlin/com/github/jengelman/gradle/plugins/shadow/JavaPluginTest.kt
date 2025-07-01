@@ -38,8 +38,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledForJreRange
-import org.junit.jupiter.api.condition.JRE
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -90,35 +88,6 @@ class JavaPluginTest : BasePluginTest() {
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
-  }
-
-  @Test
-  @DisabledForJreRange(
-    min = JRE.JAVA_21,
-    disabledReason = "Gradle 8.3 doesn't support Java 21.",
-  )
-  fun compatibleWithMinGradleVersion() {
-    val mainClassEntry = writeClass(withImports = true)
-    projectScriptPath.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask) {
-      it.withGradleVersion("8.3")
-    }
-
-    assertThat(outputShadowJar).useAll {
-      containsOnly(
-        "my/",
-        mainClassEntry,
-        *junitEntries,
-        *manifestEntries,
-      )
-    }
   }
 
   @Test

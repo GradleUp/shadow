@@ -15,10 +15,10 @@ jobs:
         # Always test on the latest version and some LTS.
         java: [ 17, 21, 24 ]
         # Test on the minimum Gradle version and the latest.
-        gradle: [ 8.3, current ]
+        gradle: [ 8.11, current ]
         exclude:
-          # Gradle 8.3 doesn't support Java 24.
-          - gradle: 8.3
+          # Gradle 8.11 doesn't support Java 24.
+          - gradle: 8.11
             java: 24
     runs-on: ${{ matrix.os }}
     steps:
