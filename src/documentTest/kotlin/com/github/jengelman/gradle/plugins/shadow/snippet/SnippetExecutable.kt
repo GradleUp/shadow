@@ -65,6 +65,7 @@ sealed class SnippetExecutable : Executable {
 
     try {
       GradleRunner.create()
+        .withGradleVersion(testGradleVersion)
         .withProjectDir(projectRoot.toFile())
         .withPluginClasspath()
         .forwardOutput()
@@ -97,6 +98,9 @@ sealed class SnippetExecutable : Executable {
   }
 
   companion object {
+    private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
+      ?: error("TEST_GRADLE_VERSION system property is not set.")
+
     fun create(
       lang: DslLang,
       snippet: String,

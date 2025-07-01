@@ -31,6 +31,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
@@ -40,8 +41,6 @@ import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledForJreRange
-import org.junit.jupiter.api.condition.JRE
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -92,35 +91,6 @@ class JavaPluginTest : BasePluginTest() {
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
-  }
-
-  @Test
-  @DisabledForJreRange(
-    min = JRE.JAVA_21,
-    disabledReason = "Gradle 8.3 doesn't support Java 21.",
-  )
-  fun compatibleWithMinGradleVersion() {
-    val mainClassEntry = writeClass(withImports = true)
-    projectScriptPath.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask) {
-      it.withGradleVersion("8.3")
-    }
-
-    assertThat(outputShadowJar).useAll {
-      containsOnly(
-        "my/",
-        mainClassEntry,
-        *junitEntries,
-        *manifestEntries,
-      )
-    }
   }
 
   @Test
@@ -692,7 +662,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          from(file('${artifactAJar.toUri().toURL().path}')) {
+          from(file('${artifactAJar.invariantSeparatorsPathString}')) {
             into('META-INF')
           }
           from('Foo') {
@@ -766,6 +736,46 @@ class JavaPluginTest : BasePluginTest() {
         // It's the compiled class instead of the original content.
         isNotEqualTo("module myModuleName {}")
       }
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1441",
+  )
+  @Test
+  fun includeFilesInTaskOutputDirectory() {
+    // Create a build that has a task with jars in the output directory
+    projectScriptPath.appendText(
+      """
+      def createJars = tasks.register('createJars') {
+        def artifactAJar = file('${artifactAJar.invariantSeparatorsPathString}')
+        def artifactBJar = file('${artifactBJar.invariantSeparatorsPathString}')
+        inputs.files(artifactAJar, artifactBJar)
+        def outputDir = file('${'$'}{buildDir}/jars')
+        outputs.dir(outputDir)
+        doLast {
+          artifactAJar.withInputStream { input ->
+              new File(outputDir, 'jarA.jar').withOutputStream { output ->
+                  output << input
+              }
+          }
+          artifactBJar.withInputStream { input ->
+              new File(outputDir, 'jarB.jar').withOutputStream { output ->
+                  output << input
+              }
+          }
+        }
+      }
+      $shadowJar {
+        includedDependencies.from(files(createJars).asFileTree)
+      }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(*entriesInAB, *manifestEntries)
     }
   }
 

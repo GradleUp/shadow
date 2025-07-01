@@ -10,7 +10,6 @@ import org.junit.jupiter.api.io.TempDir
 
 class DocCodeSnippetTest {
 
-  @OptIn(ExperimentalStdlibApi::class)
   @TestFactory
   fun provideDynamicTests(@TempDir root: Path): List<DynamicTest> {
     val langExecutables = DslLang.entries.map { executor ->

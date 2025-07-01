@@ -57,9 +57,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 ===! "Kotlin"
 
     <details>
-    <summary>Snapshots of the development version are available in 
-    <a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-    Sonatype's snapshots repository</a>.
+    <summary>Snapshots of the development version are available in Central Portal Snapshots.
     </summary>
     <p>
 
@@ -67,7 +65,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     buildscript {
       repositories {
         mavenCentral()
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
+        maven("https://central.sonatype.com/repository/maven-snapshots/")
       }
       dependencies {
         classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
@@ -84,9 +82,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 === "Groovy"
 
     <details>
-    <summary>Snapshots of the development version are available in 
-    <a href="https://oss.sonatype.org/content/repositories/snapshots/com/gradleup/shadow/shadow-gradle-plugin/">
-    Sonatype's snapshots repository</a>.
+    <summary>Snapshots of the development version are available in Central Portal Snapshots.
     </summary>
     <p>
 
@@ -94,7 +90,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     buildscript {
       repositories {
         mavenCentral()
-        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
       }
       dependencies {
         classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
