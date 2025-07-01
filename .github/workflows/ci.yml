@@ -3,12 +3,13 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - 8.x
   pull_request:
   workflow_dispatch:
 
 jobs:
   build:
+    name: OS=${{ matrix.os }}, Java=${{ matrix.java }}, Gradle=${{ matrix.gradle }}
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
