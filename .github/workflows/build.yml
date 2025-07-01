@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: OS=${{ matrix.os }}, Java=${{ matrix.java }}, Gradle=${{ matrix.gradle }}
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
