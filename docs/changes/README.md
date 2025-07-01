@@ -4,6 +4,7 @@
 
 **Changed**
 
+- Don't re-add suppressed Gradle API to `compileOnly` configuration. ([#1422](https://github.com/GradleUp/shadow/pull/1422))
 - Bump the min Gradle requirement to 8.11. ([#1479](https://github.com/GradleUp/shadow/pull/1479))
 - Expose Ant as `compile` scope. ([#1488](https://github.com/GradleUp/shadow/pull/1488))
 
