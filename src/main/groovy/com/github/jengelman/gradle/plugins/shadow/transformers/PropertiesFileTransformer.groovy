@@ -115,7 +115,7 @@ import static groovy.lang.Closure.IDENTITY
  * @author Andres Almiray
  * @author Marc Philipp
  */
-class PropertiesFileTransformer implements Transformer {
+class PropertiesFileTransformer implements Transformer, Serializable {
     private static final String PROPERTIES_SUFFIX = '.properties'
 
     private Map<String, CleanProperties> propertiesEntries = [:]
