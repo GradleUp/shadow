@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc1...HEAD) - 2025-xx-xx
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta17...HEAD) - 2025-xx-xx
 
 > This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
 significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
