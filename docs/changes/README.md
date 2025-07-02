@@ -5,6 +5,7 @@
 **BREAKING**
 
 - Rewrite this plugin in Kotlin. ([#1012](https://github.com/GradleUp/shadow/pull/1012))
+  Some APIs are marked as `internal`, and there are serial ABI changes.
 - Remove Develocity integration. ([#1014](https://github.com/GradleUp/shadow/pull/1014))
 - Migrate `Transformer`s to using lazy properties. ([#1036](https://github.com/GradleUp/shadow/pull/1036))
 - Migrate `ShadowJar` to using lazy properties. `isEnableRelocation` is removed, use `enableRelocation` instead. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
