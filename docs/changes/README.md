@@ -725,7 +725,7 @@ type.
 - [Chris Rankin](https://github.com/chrisr3) - Add `ManifestAppenderTransformer` to support appending to Jar
   manifest [#474](https://github.com/GradleUp/shadow/pull/474)
 - [Min-Ken Lai](https://github.com/minkenlai) - Additional escaping fixes in start
-  script [#487](httpshttps://github.com/GradleUp/shadow/pull/487)
+  script [#487](https://github.com/GradleUp/shadow/pull/487)
 - [Alan D. Cabrera](https://github.com/maguro) - Automatically remove `gradleApi` from `compile` scope in the presence
   of `shadow` [#459](https://github.com/GradleUp/shadow/pull/459)
 - [Christian Stein](https://github.com/sormuras) - Do not initialize `UnusedTracker` when not
