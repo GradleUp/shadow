@@ -1,5 +1,7 @@
 # Change Log
 
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc1...HEAD) - 2025-xx-xx
+
 ## [9.0.0-rc1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc1) - 2025-07-02
 
 > This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
