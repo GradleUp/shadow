@@ -9,7 +9,6 @@
 - Migrate `Transformer`s to using lazy properties. ([#1036](https://github.com/GradleUp/shadow/pull/1036))
 - Migrate `ShadowJar` to using lazy properties. `isEnableRelocation` is removed, use `enableRelocation` instead. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
 - Resolve `Configuration` directly in `DependencyFilter`. ([#1045](https://github.com/GradleUp/shadow/pull/1045))
-- Migrate `SimpleRelocator` to using lazy properties. ([#1047](https://github.com/GradleUp/shadow/pull/1047))
 - Some public getters are removed from `SimpleRelocator`, `includes` and `excludes` are exposed as `SetProperty`s. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
 - Migrate all `ListProperty` usages to `SetProperty`. Some public `List` parameters are also changed to `Set`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))
 - Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow` task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
@@ -70,7 +69,6 @@
 **Fixed**
 
 - Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039))
-- Revert "Migrate SimpleRelocator to using lazy properties". This fixes the relocation not working in `v9.0.0-beta1`. ([#1052](https://github.com/GradleUp/shadow/pull/1052))
 - Adjust property initializations and modifiers in `ShadowJar`. This fixes the regression for registering custom `ShadowJar` tasks. ([#1090](https://github.com/GradleUp/shadow/pull/1090))
 - Fail builds if processing bad jars. ([#1146](https://github.com/GradleUp/shadow/pull/1146))
 - Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1175](https://github.com/GradleUp/shadow/pull/1175))
