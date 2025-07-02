@@ -1,6 +1,11 @@
 # Change Log
 
-## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-beta17...HEAD) - 2025-xx-xx
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc1...HEAD) - 2025-xx-xx
+
+> This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
+significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
+enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
+the [new doc site](https://gradleup.com/shadow/) before upgrading.
 
 **BREAKING**
 
@@ -718,7 +723,7 @@ type.
 - [Chris Rankin](https://github.com/chrisr3) - Add `ManifestAppenderTransformer` to support appending to Jar
   manifest [#474](https://github.com/GradleUp/shadow/pull/474)
 - [Min-Ken Lai](https://github.com/minkenlai) - Additional escaping fixes in start
-  script [#487](https://github.com/GradleUp/shadow/pull/487)
+  script [#487](httpshttps://github.com/GradleUp/shadow/pull/487)
 - [Alan D. Cabrera](https://github.com/maguro) - Automatically remove `gradleApi` from `compile` scope in the presence
   of `shadow` [#459](https://github.com/GradleUp/shadow/pull/459)
 - [Christian Stein](https://github.com/sormuras) - Do not initialize `UnusedTracker` when not
