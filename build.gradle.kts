@@ -228,7 +228,7 @@ tasks.check {
   dependsOn(
     tasks.withType<Test>(),
     // TODO: https://youtrack.jetbrains.com/issue/KT-78525
-    tasks.checkLegacyAbi,
+//    tasks.checkLegacyAbi,
   )
 }
 
