@@ -170,6 +170,38 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
     assertThat(transformedContent).contains(expectedContent)
   }
 
+  @Test
+  fun handleEmptyValues() {
+    val relocator = SimpleRelocator("com.example", "com.relocated.example")
+    val content = "key.with.empty.value="
+    val context = createContext("META-INF/spring.factories", content, relocator)
+    
+    transformer.transform(context)
+
+    tempJar.outputStream().zipOutputStream().use { zos ->
+      transformer.modifyOutputStream(zos, false)
+    }
+
+    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent("META-INF/spring.factories") }
+    assertThat(transformedContent).contains("key.with.empty.value=")
+  }
+
+  @Test
+  fun handleWhitespaceInCommaSeparatedValues() {
+    val relocator = SimpleRelocator("com.example", "com.relocated.example")
+    val content = "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.Config1, com.example.Config2 ,com.example.Config3"
+    val context = createContext("META-INF/spring.factories", content, relocator)
+    
+    transformer.transform(context)
+
+    tempJar.outputStream().zipOutputStream().use { zos ->
+      transformer.modifyOutputStream(zos, false)
+    }
+
+    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent("META-INF/spring.factories") }
+    assertThat(transformedContent).contains("com.relocated.example.Config1,com.relocated.example.Config2,com.relocated.example.Config3")
+  }
+
   private fun createContext(path: String, content: String, vararg relocators: Relocator): TransformerContext {
     return TransformerContext(path, content.byteInputStream(), relocators = relocators.toSet())
   }

@@ -89,11 +89,15 @@ public open class SpringFileTransformer @Inject constructor(
         val relocatedValue = value.split(",")
           .map { className ->
             val trimmed = className.trim()
-            context.relocators.fold(trimmed) { acc, relocator ->
-              if (relocator.canRelocateClass(acc)) {
-                relocator.relocateClass(acc)
-              } else {
-                acc
+            if (trimmed.isEmpty()) {
+              trimmed
+            } else {
+              context.relocators.fold(trimmed) { acc, relocator ->
+                if (relocator.canRelocateClass(acc)) {
+                  relocator.relocateClass(acc)
+                } else {
+                  acc
+                }
               }
             }
           }
