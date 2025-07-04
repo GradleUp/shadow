@@ -53,7 +53,7 @@ public open class SpringFileTransformer @Inject constructor(
   override fun transform(context: TransformerContext) {
     val props = springEntries[context.path]
     val incoming = loadProperties(context.inputStream)
-    
+
     if (props == null) {
       // First time seeing this file
       springEntries[context.path] = applyRelocation(incoming, context)
@@ -82,7 +82,7 @@ public open class SpringFileTransformer @Inject constructor(
   private fun applyRelocation(properties: CleanProperties, context: TransformerContext): CleanProperties {
     val result = CleanProperties()
     val isClassValueFile = CLASS_VALUE_FILES.any { context.path.endsWith(it) }
-    
+
     properties.forEach { (key, value) ->
       if (isClassValueFile && value is String) {
         // Apply relocation to comma-separated class names
@@ -134,13 +134,13 @@ public open class SpringFileTransformer @Inject constructor(
       "META-INF/spring.factories",
       "META-INF/spring.handlers",
       "META-INF/spring.schemas",
-      "META-INF/spring.tooling"
+      "META-INF/spring.tooling",
     )
 
     private val CLASS_VALUE_FILES = setOf(
       "spring-autoconfigure-metadata.properties",
       "spring.factories",
-      "spring.handlers"
+      "spring.handlers",
     )
   }
 }

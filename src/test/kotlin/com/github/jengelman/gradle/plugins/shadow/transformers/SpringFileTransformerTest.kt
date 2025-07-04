@@ -8,9 +8,7 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import java.io.InputStream
 import java.nio.file.Path
-import java.util.Properties
 import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
@@ -60,7 +58,7 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
     val content = "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.Config,com.example.AnotherConfig"
     val context = createContext("META-INF/spring.factories", content, relocator)
-    
+
     transformer.transform(context)
 
     tempJar.outputStream().zipOutputStream().use { zos ->
@@ -77,7 +75,7 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
     val content = "http\\://example.com/schema=com.example.SchemaHandler"
     val context = createContext("META-INF/spring.handlers", content, relocator)
-    
+
     transformer.transform(context)
 
     tempJar.outputStream().zipOutputStream().use { zos ->
@@ -94,7 +92,7 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
     val content = "http\\://example.com/schema=META-INF/schema.xsd"
     val context = createContext("META-INF/spring.schemas", content, relocator)
-    
+
     transformer.transform(context)
 
     tempJar.outputStream().zipOutputStream().use { zos ->
@@ -109,12 +107,12 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
   @Test
   fun mergeMultipleSpringFactoriesFiles() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
-    
+
     // First file
     val content1 = "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.Config1"
     val context1 = createContext("META-INF/spring.factories", content1, relocator)
     transformer.transform(context1)
-    
+
     // Second file with same key
     val content2 = "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.Config2"
     val context2 = createContext("META-INF/spring.factories", content2, relocator)
@@ -132,12 +130,12 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
   @Test
   fun mergeMultipleSpringFactoriesFilesWithDifferentKeys() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
-    
+
     // First file
     val content1 = "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.Config1"
     val context1 = createContext("META-INF/spring.factories", content1, relocator)
     transformer.transform(context1)
-    
+
     // Second file with different key
     val content2 = "org.springframework.context.ApplicationContextInitializer=com.example.Initializer"
     val context2 = createContext("META-INF/spring.factories", content2, relocator)
@@ -158,7 +156,7 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
     val content = "com.example.Config.ConditionalOnClass=com.example.Service"
     val context = createContext("META-INF/spring-autoconfigure-metadata.properties", content, relocator)
-    
+
     transformer.transform(context)
 
     tempJar.outputStream().zipOutputStream().use { zos ->
@@ -175,7 +173,7 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
     val content = "key.with.empty.value="
     val context = createContext("META-INF/spring.factories", content, relocator)
-    
+
     transformer.transform(context)
 
     tempJar.outputStream().zipOutputStream().use { zos ->
@@ -191,7 +189,7 @@ class SpringFileTransformerTest : BaseTransformerTest<SpringFileTransformer>() {
     val relocator = SimpleRelocator("com.example", "com.relocated.example")
     val content = "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.Config1, com.example.Config2 ,com.example.Config3"
     val context = createContext("META-INF/spring.factories", content, relocator)
-    
+
     transformer.transform(context)
 
     tempJar.outputStream().zipOutputStream().use { zos ->
