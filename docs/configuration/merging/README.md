@@ -246,6 +246,41 @@ The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add thi
     }
     ```
 
+## Merging Spring Metadata Files
+
+Spring Framework applications often contain metadata files that need special handling during shading.
+The [`SpringFileTransformer`][SpringFileTransformer] handles these files and applies class relocation where appropriate.
+
+Spring metadata files supported:
+- `META-INF/spring.factories` - Maps Spring Boot interfaces to implementation classes (class values)
+- `META-INF/spring.handlers` - Maps XML namespace URIs to handler classes (class values)
+- `META-INF/spring-autoconfigure-metadata.properties` - Autoconfiguration metadata (class values)
+- `META-INF/spring.schemas` - Maps XML namespace URIs to XSD locations (path values)
+- `META-INF/spring.tooling` - IDE tooling support (path values)
+
+Files with class values will have their values relocated using the configured relocators.
+Files with path values will be merged as-is without relocation.
+All files support comma-separated values that are properly merged.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      mergeSpringFiles()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      mergeSpringFiles()
+    }
+    ```
+
+This transformer complements the [`ServiceFileTransformer`][ServiceFileTransformer] which handles
+`META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` files.
+
 ## Merging Log4j2 Plugin Cache Files (`Log4j2Plugins.dat`)
 
 [`Log4j2PluginsCacheFileTransformer`][Log4j2PluginsCacheFileTransformer] is a
@@ -428,6 +463,7 @@ duplicated files.
 [Log4j2PluginsCacheFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-log4j2-plugins-cache-file-transformer/index.html
 [ResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
+[SpringFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-spring-file-transformer/index.html
 [ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
 [ShadowJar.transform]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

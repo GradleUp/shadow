@@ -19,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.SpringFileTransformer
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
@@ -214,6 +215,20 @@ public abstract class ShadowJar :
    */
   override fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, null)
+  }
+
+  /**
+   * Merge Spring metadata files and apply class relocation.
+   */
+  override fun mergeSpringFiles() {
+    transform(SpringFileTransformer::class.java, null)
+  }
+
+  /**
+   * Merge Spring metadata files with [action].
+   */
+  override fun mergeSpringFiles(action: Action<SpringFileTransformer>?) {
+    transform(SpringFileTransformer::class.java, action)
   }
 
   /**
