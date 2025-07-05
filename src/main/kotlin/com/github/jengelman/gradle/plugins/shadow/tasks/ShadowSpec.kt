@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.SpringFileTransformer
 import org.gradle.api.Action
 
 @JvmDefaultWithCompatibility
@@ -22,6 +23,10 @@ public interface ShadowSpec {
   public fun mergeServiceFiles(action: Action<ServiceFileTransformer>?)
 
   public fun mergeGroovyExtensionModules()
+
+  public fun mergeSpringFiles()
+
+  public fun mergeSpringFiles(action: Action<SpringFileTransformer>?)
 
   public fun append(resourcePath: String) {
     append(resourcePath, AppendingTransformer.DEFAULT_SEPARATOR)
