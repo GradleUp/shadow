@@ -128,7 +128,7 @@ class PublishingTest : BasePluginTest() {
       """.trimIndent() + System.lineSeparator(),
     )
     publish()
-    // release flag is considered.
+    // options.release flag is honored.
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
