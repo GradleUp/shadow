@@ -16,10 +16,59 @@ should process a particular entry and apply any modifications before writing the
 This ordering is crucial when merging configuration files where you want to preserve project-specific values while
 merging in additional data from dependencies.
 
-### Example: Merging Configuration Files
+### Example: Merging fabric.mod.json Files
 
-When merging files like `fabric.mod.json`, `plugin.yml`, or other configuration files, you can rely on the first
-file being from your project:
+A common use case is merging Fabric mod configuration files while preserving the project's identity:
+
+=== "Kotlin"
+
+    ```kotlin
+    import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
+    import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+    import org.apache.tools.zip.ZipOutputStream
+    import org.gradle.api.file.FileTreeElement
+
+    class FabricModJsonTransformer : ResourceTransformer {
+      private var projectContent: String? = null
+      private val allMixins = mutableSetOf<String>()
+
+      override fun canTransformResource(element: FileTreeElement): Boolean = 
+        element.path == "fabric.mod.json"
+
+      override fun transform(context: TransformerContext) {
+        val content = context.inputStream.reader().readText()
+        
+        if (projectContent == null) {
+          // First file is guaranteed to be from the project - preserve ID and base structure
+          projectContent = content
+        }
+        
+        // Extract mixins from all files (simple regex for example)
+        val mixinMatches = Regex(""""mixins":\s*\[\s*"([^"]+)"\s*\]""").findAll(content)
+        mixinMatches.forEach { allMixins.add(it.groupValues[1]) }
+      }
+
+      override fun hasTransformedResource(): Boolean = projectContent != null
+
+      override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        if (projectContent != null) {
+          // Merge mixins while preserving project's id and other fields
+          val mixinsJson = allMixins.joinToString("\", \"", "[\"", "\"]")
+          val merged = projectContent!!.replace(
+            Regex(""""mixins":\s*\[[^\]]*\]"""),
+            """"mixins": $mixinsJson"""
+          )
+          
+          // Write the merged content
+          // ... implementation details ...
+        }
+      }
+    }
+    ```
+
+### Example: General Configuration Merging
+
+For other configuration files, you can use a similar pattern:
 
 === "Kotlin"
 
