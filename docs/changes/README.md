@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc1...HEAD) - 2025-xx-xx
 
+**Fixed**
+- JVM version in module metadata for published jar was wrong when target was set via `options.release` ([#1502](https://github.com/GradleUp/shadow/pull/1502))
+
 ## [9.0.0-rc1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc1) - 2025-07-02
 
 > This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
