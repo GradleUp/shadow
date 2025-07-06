@@ -1,3 +1,4 @@
+
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
@@ -9,18 +10,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 
 /**
- * A resource processor that allows customization of how entries in JAR files are processed during shadow JAR creation.
- *
- * **Processing Order Guarantee**
- *
- * The `transform` method is called with a guaranteed processing order:
- * 1. **Project files first**: All files in projects are processed before any dependency files.
- * 2. **Dependency files second**: Files from configurations (runtime dependencies) or added via [com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.from] are processed after project files.
- *
- * This ordering allows transformers to distinguish between project and dependency resources. For example, when merging
- * configuration files, you can preserve the project's original content by relying on the first encountered file being
- * from the project itself.
- *
  * Modified from [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java).
  *
  * @author Jason van Zyl
