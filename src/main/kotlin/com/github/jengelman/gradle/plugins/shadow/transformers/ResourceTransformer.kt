@@ -1,4 +1,3 @@
-
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
