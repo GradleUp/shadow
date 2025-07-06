@@ -12,11 +12,11 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
-  // alias(libs.plugins.android.lint)
-  // alias(libs.plugins.jetbrains.dokka)
-  // alias(libs.plugins.mavenPublish)
-  // alias(libs.plugins.pluginPublish)
-  // alias(libs.plugins.spotless)
+  alias(libs.plugins.android.lint)
+  alias(libs.plugins.jetbrains.dokka)
+  alias(libs.plugins.mavenPublish)
+  alias(libs.plugins.pluginPublish)
+  alias(libs.plugins.spotless)
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()

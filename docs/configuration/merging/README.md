@@ -6,6 +6,114 @@ Maven Shade implementation. A [`ResourceTransformer`][ResourceTransformer] is in
 being written to the final output JAR. This allows a [`ResourceTransformer`][ResourceTransformer] to determine if it
 should process a particular entry and apply any modifications before writing the stream to the output.
 
+## Resource Processing Order
+
+**Important**: [`ResourceTransformer`][ResourceTransformer] follows a guaranteed processing order:
+
+1. **Project files first**: All files added via `shadowJar { from(...) }` are processed before any dependency files
+2. **Dependency files second**: Files from configurations (runtime dependencies) are processed after project files
+
+This ordering is crucial when merging configuration files where you want to preserve project-specific values while
+merging in additional data from dependencies.
+
+### Example: Merging Configuration Files
+
+When merging files like `fabric.mod.json`, `plugin.yml`, or other configuration files, you can rely on the first
+file being from your project:
+
+=== "Kotlin"
+
+    ```kotlin
+    import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
+    import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+    import org.apache.tools.zip.ZipOutputStream
+    import org.gradle.api.file.FileTreeElement
+
+    class ConfigMergingTransformer : ResourceTransformer {
+      private var projectConfig: String? = null
+      private val allConfigs = mutableListOf<String>()
+
+      override fun canTransformResource(element: FileTreeElement): Boolean = 
+        element.path == "config.json"
+
+      override fun transform(context: TransformerContext) {
+        val content = context.inputStream.reader().readText()
+        
+        if (projectConfig == null) {
+          // First file is guaranteed to be from the project
+          projectConfig = content
+        }
+        allConfigs.add(content)
+      }
+
+      override fun hasTransformedResource(): Boolean = projectConfig != null
+
+      override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+        // Merge all configs while preserving project's base structure
+        val merged = mergeConfigs(projectConfig!!, allConfigs)
+        // ... write merged content to output stream ...
+      }
+
+      private fun mergeConfigs(project: String, all: List<String>): String {
+        // Implementation depends on your specific config format
+        return project // Simplified for example
+      }
+    }
+
+    tasks.shadowJar {
+      transform<ConfigMergingTransformer>()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
+    import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+    import org.apache.tools.zip.ZipOutputStream
+    import org.gradle.api.file.FileTreeElement
+
+    class ConfigMergingTransformer implements ResourceTransformer {
+      private String projectConfig = null
+      private List<String> allConfigs = []
+
+      @Override boolean canTransformResource(FileTreeElement element) { 
+        return element.path == "config.json"
+      }
+
+      @Override void transform(TransformerContext context) {
+        def content = context.inputStream.reader.text
+        
+        if (projectConfig == null) {
+          // First file is guaranteed to be from the project
+          projectConfig = content
+        }
+        allConfigs.add(content)
+      }
+
+      @Override boolean hasTransformedResource() { return projectConfig != null }
+
+      @Override void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
+        // Merge all configs while preserving project's base structure
+        def merged = mergeConfigs(projectConfig, allConfigs)
+        // ... write merged content to output stream ...
+      }
+
+      private String mergeConfigs(String project, List<String> all) {
+        // Implementation depends on your specific config format
+        return project // Simplified for example
+      }
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(ConfigMergingTransformer.class)
+    }
+    ```
+
+## Basic ResourceTransformer Usage
+
+For simpler use cases, you can create a basic transformer:
+
 === "Kotlin"
 
     ```kotlin

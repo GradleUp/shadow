@@ -9,6 +9,36 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 
 /**
+ * A resource processor that allows customization of how entries in JAR files are processed during shadow JAR creation.
+ * 
+ * ## Processing Order Guarantee
+ * 
+ * The `transform` method is called with a guaranteed processing order:
+ * 1. **Project files first**: All files added via `shadowJar { from(...) }` are processed before any dependency files
+ * 2. **Dependency files second**: Files from configurations (runtime dependencies) are processed after project files
+ * 
+ * This ordering allows transformers to distinguish between project and dependency resources. For example, when merging
+ * configuration files, you can preserve the project's original content by relying on the first encountered file being
+ * from the project itself.
+ * 
+ * **Example use case**: Merging `fabric.mod.json` files while preserving the project's `id` field:
+ * ```kotlin
+ * class FabricModTransformer : ResourceTransformer {
+ *   private var projectContent: String? = null
+ *   
+ *   override fun transform(context: TransformerContext) {
+ *     val content = context.inputStream.reader().readText()
+ *     if (projectContent == null) {
+ *       // First file is always from the project
+ *       projectContent = content
+ *     } else {
+ *       // Subsequent files are from dependencies - merge as needed
+ *       // Implementation depends on your specific JSON merging strategy
+ *     }
+ *   }
+ * }
+ * ```
+ * 
  * Modified from [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java).
  *
  * @author Jason van Zyl
