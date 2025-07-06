@@ -87,6 +87,7 @@ class PublishingTest : BasePluginTest() {
     }.toTypedArray()
     val targetJvmAttr17 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "17"
     val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
+    val targetJvmAttr8 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "8"
 
     projectScriptPath.appendText(
       """
@@ -118,6 +119,17 @@ class PublishingTest : BasePluginTest() {
     publish()
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
+
+    projectScriptPath.appendText(
+      """
+        tasks.named('compileJava') {
+          options.release = 8
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    publish()
+    // options.release flag is honored.
+    assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
   @Test
