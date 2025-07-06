@@ -86,22 +86,20 @@ public open class SpringFileTransformer @Inject constructor(
     properties.forEach { (key, value) ->
       if (isClassValueFile && value is String) {
         // Apply relocation to comma-separated class names
-        val relocatedValue = value.split(",")
-          .map { className ->
-            val trimmed = className.trim()
-            if (trimmed.isEmpty()) {
-              trimmed
-            } else {
-              context.relocators.fold(trimmed) { acc, relocator ->
-                if (relocator.canRelocateClass(acc)) {
-                  relocator.relocateClass(acc)
-                } else {
-                  acc
-                }
+        val relocatedValue = value.split(",").joinToString(",") { className ->
+          val trimmed = className.trim()
+          if (trimmed.isEmpty()) {
+            trimmed
+          } else {
+            context.relocators.fold(trimmed) { acc, relocator ->
+              if (relocator.canRelocateClass(acc)) {
+                relocator.relocateClass(acc)
+              } else {
+                acc
               }
             }
           }
-          .joinToString(",")
+        }
         result[key] = relocatedValue
       } else {
         // Path values or non-class values - no relocation

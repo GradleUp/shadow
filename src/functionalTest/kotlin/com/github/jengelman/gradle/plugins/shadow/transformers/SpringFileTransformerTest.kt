@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.contains
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
-import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
 class SpringFileTransformerTest : BaseTransformerTest() {
@@ -13,14 +13,14 @@ class SpringFileTransformerTest : BaseTransformerTest() {
     writeClass()
 
     // Create first JAR with spring.factories
-    val jarA = createJar("jarA") {
-      writeText(
+    val jarA = buildJar("jarA") {
+      insert(
         "META-INF/spring.factories",
         """
         org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
         com.example.autoconfigure.ConfigA,\
         com.example.autoconfigure.AnotherConfigA
-        
+
         org.springframework.context.ApplicationContextInitializer=\
         com.example.initializer.InitializerA
         """.trimIndent(),
@@ -28,13 +28,13 @@ class SpringFileTransformerTest : BaseTransformerTest() {
     }
 
     // Create second JAR with spring.factories
-    val jarB = createJar("jarB") {
-      writeText(
+    val jarB = buildJar("jarB") {
+      insert(
         "META-INF/spring.factories",
         """
         org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
         com.example.autoconfigure.ConfigB
-        
+
         org.springframework.context.ApplicationListener=\
         com.example.listener.ListenerB
         """.trimIndent(),
@@ -44,8 +44,7 @@ class SpringFileTransformerTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation files('${jarA.toAbsolutePath()}')
-          implementation files('${jarB.toAbsolutePath()}')
+          ${implementationFiles(jarA, jarB)}
         }
         $shadowJar {
           mergeSpringFiles()
@@ -61,13 +60,14 @@ class SpringFileTransformerTest : BaseTransformerTest() {
         "META-INF/spring.factories",
       )
 
-      val springFactoriesContent = getContent("META-INF/spring.factories")
       // Should contain merged and relocated configurations
-      assertThat(springFactoriesContent).contains("com.relocated.example.autoconfigure.ConfigA")
-      assertThat(springFactoriesContent).contains("com.relocated.example.autoconfigure.ConfigB")
-      assertThat(springFactoriesContent).contains("com.relocated.example.autoconfigure.AnotherConfigA")
-      assertThat(springFactoriesContent).contains("com.relocated.example.initializer.InitializerA")
-      assertThat(springFactoriesContent).contains("com.relocated.example.listener.ListenerB")
+      getContent("META-INF/spring.factories").contains(
+        "com.relocated.example.autoconfigure.ConfigA",
+        "com.relocated.example.autoconfigure.ConfigB",
+        "com.relocated.example.autoconfigure.AnotherConfigA",
+        "com.relocated.example.initializer.InitializerA",
+        "com.relocated.example.listener.ListenerB",
+      )
     }
   }
 
@@ -76,8 +76,8 @@ class SpringFileTransformerTest : BaseTransformerTest() {
     writeClass()
 
     // Create JAR with spring.handlers and spring.schemas
-    val jar = createJar("spring-jar") {
-      writeText(
+    val jar = buildJar("spring-jar") {
+      insert(
         "META-INF/spring.handlers",
         """
         http\://www.example.com/schema/config=com.example.schema.ConfigNamespaceHandler
@@ -85,7 +85,7 @@ class SpringFileTransformerTest : BaseTransformerTest() {
         """.trimIndent(),
       )
 
-      writeText(
+      insert(
         "META-INF/spring.schemas",
         """
         http\://www.example.com/schema/config=META-INF/config.xsd
@@ -97,7 +97,7 @@ class SpringFileTransformerTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation files('${jar.toAbsolutePath()}')
+          ${implementationFiles(jar)}
         }
         $shadowJar {
           mergeSpringFiles()
@@ -113,16 +113,16 @@ class SpringFileTransformerTest : BaseTransformerTest() {
         "META-INF/spring.handlers",
         "META-INF/spring.schemas",
       )
-
-      val handlersContent = getContent("META-INF/spring.handlers")
       // Handlers should have relocated class names
-      assertThat(handlersContent).contains("com.relocated.example.schema.ConfigNamespaceHandler")
-      assertThat(handlersContent).contains("com.relocated.example.schema.SecurityNamespaceHandler")
-
-      val schemasContent = getContent("META-INF/spring.schemas")
+      getContent("META-INF/spring.handlers").contains(
+        "com.relocated.example.schema.ConfigNamespaceHandler",
+        "com.relocated.example.schema.SecurityNamespaceHandler",
+      )
       // Schemas should NOT have relocated paths
-      assertThat(schemasContent).contains("META-INF/config.xsd")
-      assertThat(schemasContent).contains("META-INF/security.xsd")
+      getContent("META-INF/spring.schemas").contains(
+        "META-INF/config.xsd",
+        "META-INF/security.xsd",
+      )
     }
   }
 
@@ -130,8 +130,8 @@ class SpringFileTransformerTest : BaseTransformerTest() {
   fun mergeSpringAutoconfigureMetadataWithRelocation() {
     writeClass()
 
-    val jar = createJar("autoconfigure-jar") {
-      writeText(
+    val jar = buildJar("autoconfigure-jar") {
+      insert(
         "META-INF/spring-autoconfigure-metadata.properties",
         """
         com.example.autoconfigure.MyAutoConfiguration.ConditionalOnClass=com.example.service.MyService,com.example.service.AnotherService
@@ -144,7 +144,7 @@ class SpringFileTransformerTest : BaseTransformerTest() {
     projectScriptPath.appendText(
       """
         dependencies {
-          implementation files('${jar.toAbsolutePath()}')
+          ${implementationFiles(jar)}
         }
         $shadowJar {
           mergeSpringFiles()
@@ -157,12 +157,12 @@ class SpringFileTransformerTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).useAll {
       containsAtLeast("META-INF/spring-autoconfigure-metadata.properties")
-
-      val metadataContent = getContent("META-INF/spring-autoconfigure-metadata.properties")
       // All class names should be relocated
-      assertThat(metadataContent).contains("com.relocated.example.autoconfigure.MyAutoConfiguration.ConditionalOnClass=com.relocated.example.service.MyService,com.relocated.example.service.AnotherService")
-      assertThat(metadataContent).contains("com.relocated.example.autoconfigure.MyAutoConfiguration.Configuration=")
-      assertThat(metadataContent).contains("com.relocated.example.autoconfigure.AnotherAutoConfiguration.ConditionalOnProperty.name=my.property")
+      getContent("META-INF/spring-autoconfigure-metadata.properties").contains(
+        "com.relocated.example.autoconfigure.MyAutoConfiguration.ConditionalOnClass=com.relocated.example.service.MyService,com.relocated.example.service.AnotherService",
+        "com.relocated.example.autoconfigure.MyAutoConfiguration.Configuration=",
+        "com.relocated.example.autoconfigure.AnotherAutoConfiguration.ConditionalOnProperty.name=my.property",
+      )
     }
   }
 }
