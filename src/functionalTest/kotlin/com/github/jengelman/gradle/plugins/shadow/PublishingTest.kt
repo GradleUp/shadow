@@ -122,13 +122,7 @@ class PublishingTest : BasePluginTest() {
 
     projectScriptPath.appendText(
       """
-        java {
-          toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
-          }
-        }
-
-        tasks.compileJava {
+        tasks.named('compileJava') {
           options.release = 8
         }
       """.trimIndent() + System.lineSeparator(),
