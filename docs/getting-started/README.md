@@ -68,6 +68,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
         maven("https://central.sonatype.com/repository/maven-snapshots/")
       }
       dependencies {
+        // You can get the latest snapshot version from `VERSION_NAME` declared in https://github.com/GradleUp/shadow/blob/main/gradle.properties
         classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
       }
     }
@@ -93,6 +94,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
         maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
       }
       dependencies {
+        // You can get the latest snapshot version from `VERSION_NAME` declared in https://github.com/GradleUp/shadow/blob/main/gradle.properties
         classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
       }
     }
