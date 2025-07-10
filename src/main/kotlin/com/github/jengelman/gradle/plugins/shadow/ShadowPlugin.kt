@@ -39,8 +39,9 @@ public abstract class ShadowPlugin : Plugin<Project> {
 
   private fun configureBuildScan(project: Project) {
     val shadowTasks = project.tasks.withType(ShadowJar::class.java)
-    val buildScan = project.extensions.getByType(BuildScanConfiguration::class.java)
-    buildScan.buildFinished {
+    val buildScan = project.extensions.findByType(BuildScanConfiguration::class.java)
+    // Skip if extension not available at the subproject-level (pre-Develocity plugin 4.0.0)
+    buildScan?.buildFinished {
       shadowTasks.forEach { task ->
         // TODO Add actual Shadow stats as custom values
         buildScan.value("shadow.${task.path}.executed", "true")
