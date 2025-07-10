@@ -32,14 +32,14 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
 
-    project.rootProject.plugins.withId("com.gradle.develocity") {
+    project.plugins.withId("com.gradle.develocity") {
       configureBuildScan(project)
     }
   }
 
   private fun configureBuildScan(project: Project) {
     val shadowTasks = project.tasks.withType(ShadowJar::class.java)
-    val buildScan = project.rootProject.extensions.getByType(BuildScanConfiguration::class.java)
+    val buildScan = project.extensions.getByType(BuildScanConfiguration::class.java)
     buildScan.buildFinished {
       shadowTasks.forEach { task ->
         // TODO Add actual Shadow stats as custom values
