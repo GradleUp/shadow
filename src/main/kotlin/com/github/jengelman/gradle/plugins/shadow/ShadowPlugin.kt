@@ -2,6 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_PLUGIN_ID
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.gradle.develocity.agent.gradle.scan.BuildScanConfiguration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
@@ -29,5 +31,20 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // If the user applies shadow before those plugins. However, this is fine, because this was also
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
+
+    project.rootProject.plugins.withId("com.gradle.develocity") {
+      configureBuildScan(project)
+    }
+  }
+
+  private fun configureBuildScan(project: Project) {
+    val shadowTasks = project.tasks.withType(ShadowJar::class.java)
+    val buildScan = project.rootProject.extensions.getByType(BuildScanConfiguration::class.java)
+    buildScan.buildFinished {
+      shadowTasks.forEach { task ->
+        // TODO Add actual Shadow stats as custom values
+        buildScan.value("shadow.${task.path}.executed", "true")
+      }
+    }
   }
 }
