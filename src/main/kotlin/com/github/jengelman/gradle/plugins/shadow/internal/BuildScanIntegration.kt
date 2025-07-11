@@ -5,14 +5,13 @@ import com.gradle.develocity.agent.gradle.DevelocityConfiguration
 import org.gradle.api.Project
 
 public fun Project.addBuildScanCustomValues() {
-  extensions.configure<DevelocityConfiguration>("develocity") {
-    val buildScan = it.buildScan
-    val shadowTasks = tasks.withType(ShadowJar::class.java)
-    shadowTasks.configureEach { task ->
-      buildScan.buildFinished {
-        // TODO: add actual Shadow stats as custom values.
-        buildScan.value("shadow.${task.path}.executed", "true")
-      }
+  val develocity = extensions.findByType(DevelocityConfiguration::class.java)
+    ?: return
+  val buildScan = develocity.buildScan
+  val shadowTasks = tasks.withType(ShadowJar::class.java)
+  shadowTasks.configureEach { task ->
+    buildScan.buildFinished {
+      buildScan.value("shadow.${task.path}.executed", "true")
     }
   }
 }
