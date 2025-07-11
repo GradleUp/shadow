@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_PLUGIN_ID
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.gradle.develocity.agent.gradle.DevelocityConfiguration
 import com.gradle.develocity.agent.gradle.scan.BuildScanConfiguration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -32,12 +33,12 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
 
-    withId("com.gradle.develocity") {
-      project.configureBuildScan()
+    project.extensions.configure<DevelocityConfiguration>("develocity") {
+      project.configureBuildScan(it.buildScan)
     }
   }
 
-  private fun Project.configureBuildScan() {
+  private fun Project.configureBuildScan(buildScan: BuildScanConfiguration) {
     val enableDevelocityIntegration = providers.gradleProperty(
       ENABLE_DEVELOCITY_INTEGRATION_PROPERTY,
     ).map { it.toBoolean() }.getOrElse(false)
@@ -50,10 +51,9 @@ public abstract class ShadowPlugin : Plugin<Project> {
     }
 
     val shadowTasks = tasks.withType(ShadowJar::class.java)
-    val buildScan = extensions.findByType(BuildScanConfiguration::class.java)
     // Skip if extension not available at the subproject-level (pre-Develocity plugin 4.0.0).
-    buildScan?.buildFinished {
-      shadowTasks.forEach { task ->
+    shadowTasks.configureEach { task ->
+      buildScan.buildFinished {
         // TODO: add actual Shadow stats as custom values.
         buildScan.value("shadow.${task.path}.executed", "true")
       }
