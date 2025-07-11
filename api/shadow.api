@@ -66,9 +66,14 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : org/gradle/api/Plugin {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowPlugin$Companion;
+	public static final field ENABLE_DEVELOCITY_INTEGRATION_PROPERTY Ljava/lang/String;
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin$Companion {
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/legacy/LegacyShadowPlugin : org/gradle/api/Plugin {

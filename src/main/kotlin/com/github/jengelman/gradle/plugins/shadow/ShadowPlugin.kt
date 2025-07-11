@@ -32,20 +32,35 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
 
-    project.plugins.withId("com.gradle.develocity") {
-      configureBuildScan(project)
+    withId("com.gradle.develocity") {
+      project.configureBuildScan()
     }
   }
 
-  private fun configureBuildScan(project: Project) {
-    val shadowTasks = project.tasks.withType(ShadowJar::class.java)
-    val buildScan = project.extensions.findByType(BuildScanConfiguration::class.java)
-    // Skip if extension not available at the subproject-level (pre-Develocity plugin 4.0.0)
+  private fun Project.configureBuildScan() {
+    val enableDevelocityIntegration = providers.gradleProperty(
+      ENABLE_DEVELOCITY_INTEGRATION_PROPERTY,
+    ).map { it.toBoolean() }.getOrElse(false)
+
+    if (enableDevelocityIntegration) {
+      logger.info("Enabling Develocity integration for Shadow plugin.")
+    } else {
+      logger.info("Skipping Develocity integration for Shadow plugin.")
+      return
+    }
+
+    val shadowTasks = tasks.withType(ShadowJar::class.java)
+    val buildScan = extensions.findByType(BuildScanConfiguration::class.java)
+    // Skip if extension not available at the subproject-level (pre-Develocity plugin 4.0.0).
     buildScan?.buildFinished {
       shadowTasks.forEach { task ->
-        // TODO Add actual Shadow stats as custom values
+        // TODO: add actual Shadow stats as custom values.
         buildScan.value("shadow.${task.path}.executed", "true")
       }
     }
+  }
+
+  public companion object {
+    public const val ENABLE_DEVELOCITY_INTEGRATION_PROPERTY: String = "com.gradleup.shadow.enableDevelocityIntegration"
   }
 }

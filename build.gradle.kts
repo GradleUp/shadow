@@ -97,7 +97,7 @@ publishing.publications.withType<MavenPublication>().configureEach {
 }
 
 dependencies {
-  compileOnly(libs.gradle.develocity)
+  compileOnly(libs.develocity)
   compileOnly(libs.kotlin.kmp)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.commonsIo)
@@ -109,7 +109,7 @@ dependencies {
   implementation(libs.plexus.xml)
 
   testPluginClasspath(libs.foojayResolver)
-  testPluginClasspath(libs.gradle.develocity)
+  testPluginClasspath(libs.develocity)
   testPluginClasspath(libs.kotlin.kmp)
   testPluginClasspath(libs.pluginPublish)
 

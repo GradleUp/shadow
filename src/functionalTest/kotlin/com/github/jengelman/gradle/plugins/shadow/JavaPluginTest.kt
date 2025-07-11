@@ -16,6 +16,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
@@ -34,6 +35,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
@@ -776,6 +778,36 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
+    }
+  }
+
+  @Test
+  fun applyToProjectWithIsolatedProjectsEnabled() {
+    writeClientAndServerModules()
+    settingsScriptPath.writeText(
+      """
+        plugins {
+          id 'com.gradle.develocity'
+        }
+        develocity {
+          buildScan {
+            termsOfUseUrl = 'https://gradle.com/terms-of-service'
+            termsOfUseAgree = 'yes'
+            publishing.onlyIf { true }
+          }
+        }
+        ${settingsScriptPath.readText()}
+      """.trimIndent(),
+    )
+
+    val result = run(serverShadowJarTask, IP_ARGUMENT, "--info", "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true")
+
+    assertThat(result.output).all {
+      contains(
+        "Enabling Develocity integration for Shadow plugin.",
+        "Publishing Build Scan...",
+      )
+      doesNotContain("Configuration cache problems")
     }
   }
 
