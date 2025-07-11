@@ -12,6 +12,7 @@ public fun Project.addBuildScanCustomValues() {
   shadowTasks.configureEach { task ->
     buildScan.buildFinished {
       buildScan.value("shadow.${task.path}.executed", "true")
+      buildScan.value("shadow.${task.path}.didWork", task.didWork.toString())
     }
   }
 }
