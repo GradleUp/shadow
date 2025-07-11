@@ -1,5 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.gradle.develocity.agent.gradle.DevelocityConfiguration
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.distribution.DistributionContainer
@@ -41,6 +43,20 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
+
+@Suppress("GradleProjectIsolation") // TODO: we can't call 'providers.gradleProperty' instead due to https://github.com/gradle/gradle/issues/23572.
+internal fun Project.findOptionalProperty(propertyName: String): String? = findProperty(propertyName)?.toString()
+
+internal fun Project.addBuildScanCustomValues() {
+  val develocity = extensions.findByType(DevelocityConfiguration::class.java) ?: return
+  val buildScan = develocity.buildScan
+  tasks.withType(ShadowJar::class.java).configureEach { task ->
+    buildScan.buildFinished {
+      buildScan.value("shadow.${task.path}.executed", "true")
+      buildScan.value("shadow.${task.path}.didWork", task.didWork.toString())
+    }
+  }
+}
 
 internal inline val TaskContainer.jar: TaskProvider<Jar>
   get() = named("jar", Jar::class.java)

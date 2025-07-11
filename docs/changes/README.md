@@ -5,6 +5,10 @@
 **Fixed**
 - Honor `options.release` for target JVM attribute. ([#1502](https://github.com/GradleUp/shadow/pull/1502))
 
+**Changed**
+- Restore Develocity Build Scan integration. ([#1505](https://github.com/GradleUp/shadow/pull/1505))  
+  It is still disabled by default, you can enable it by setting `com.gradleup.shadow.enableDevelocityIntegration = true`.
+
 ## [9.0.0-rc1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc1) - 2025-07-02
 
 > This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing

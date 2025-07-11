@@ -1,6 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_PLUGIN_ID
+import com.github.jengelman.gradle.plugins.shadow.internal.addBuildScanCustomValues
+import com.github.jengelman.gradle.plugins.shadow.internal.findOptionalProperty
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -22,6 +24,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
     withId(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
       apply(ShadowKmpPlugin::class.java)
     }
+    project.configureBuildScan()
 
     // Apply the legacy plugin last.
     // Because we apply the ShadowJavaPlugin/ShadowApplication plugin in a withType callback for the
@@ -29,5 +32,20 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // If the user applies shadow before those plugins. However, this is fine, because this was also
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
+  }
+
+  private fun Project.configureBuildScan() {
+    val enableDevelocityIntegration = findOptionalProperty(ENABLE_DEVELOCITY_INTEGRATION_PROPERTY)?.toBoolean() ?: false
+    if (enableDevelocityIntegration) {
+      logger.info("Enabling Develocity integration for Shadow plugin.")
+    } else {
+      logger.info("Skipping Develocity integration for Shadow plugin.")
+      return
+    }
+    addBuildScanCustomValues()
+  }
+
+  public companion object {
+    public const val ENABLE_DEVELOCITY_INTEGRATION_PROPERTY: String = "com.gradleup.shadow.enableDevelocityIntegration"
   }
 }

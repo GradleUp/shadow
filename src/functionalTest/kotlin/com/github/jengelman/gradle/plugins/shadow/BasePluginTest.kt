@@ -427,6 +427,10 @@ abstract class BasePluginTest {
       "-Dorg.gradle.configuration-cache.parallel=true",
     )
 
+    // TODO: enable this flag for all tests once we have fixed all issues with isolated projects.
+    //  See https://github.com/GradleUp/shadow/pull/1139.
+    const val IP_ARGUMENT = "-Dorg.gradle.unsafe.isolated-projects=true"
+
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
