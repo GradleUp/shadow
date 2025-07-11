@@ -800,12 +800,13 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(serverShadowJarTask, IP_ARGUMENT, "--info", "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true")
+    // scan.dump avoids actually publishing a Build Scan, writing it to a file instead
+    val result = run(serverShadowJarTask, IP_ARGUMENT, "--info", "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true", "-Dscan.dump")
 
     assertThat(result.output).all {
       contains(
         "Enabling Develocity integration for Shadow plugin.",
-        "Publishing Build Scan...",
+        "Build scan written",
       )
       doesNotContain("Configuration cache problems")
     }
