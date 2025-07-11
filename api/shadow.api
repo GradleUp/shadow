@@ -76,10 +76,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin : 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowPlugin$Companion {
 }
 
-public final class com/github/jengelman/gradle/plugins/shadow/internal/BuildScanIntegrationKt {
-	public static final fun addBuildScanCustomValues (Lorg/gradle/api/Project;)V
-}
-
 public abstract class com/github/jengelman/gradle/plugins/shadow/legacy/LegacyShadowPlugin : org/gradle/api/Plugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V

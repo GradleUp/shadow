@@ -23,6 +23,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
     withId(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
       apply(ShadowKmpPlugin::class.java)
     }
+    project.configureBuildScan()
 
     // Apply the legacy plugin last.
     // Because we apply the ShadowJavaPlugin/ShadowApplication plugin in a withType callback for the
@@ -30,8 +31,6 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // If the user applies shadow before those plugins. However, this is fine, because this was also
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
-
-    project.configureBuildScan()
   }
 
   private fun Project.configureBuildScan() {

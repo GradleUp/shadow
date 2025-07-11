@@ -789,19 +789,18 @@ class JavaPluginTest : BasePluginTest() {
         plugins {
           id 'com.gradle.develocity'
         }
-        develocity {
-          buildScan {
-            termsOfUseUrl = 'https://gradle.com/terms-of-service'
-            termsOfUseAgree = 'yes'
-            publishing.onlyIf { true }
-          }
-        }
         ${settingsScriptPath.readText()}
       """.trimIndent(),
     )
 
     // scan.dump avoids actually publishing a Build Scan, writing it to a file instead
-    val result = run(serverShadowJarTask, IP_ARGUMENT, "--info", "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true", "-Dscan.dump")
+    val result = run(
+      serverShadowJarTask,
+      IP_ARGUMENT,
+      "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
+      "-Dscan.dump",
+      "--info",
+    )
 
     assertThat(result.output).all {
       contains(
