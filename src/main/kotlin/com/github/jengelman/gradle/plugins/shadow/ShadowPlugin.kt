@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_PLUGIN_ID
 import com.github.jengelman.gradle.plugins.shadow.internal.addBuildScanCustomValues
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
