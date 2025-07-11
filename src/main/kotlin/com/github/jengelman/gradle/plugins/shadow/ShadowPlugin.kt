@@ -31,9 +31,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
 
-    project.extensions.findByName("develocity")?.let {
-      project.configureBuildScan()
-    }
+    project.configureBuildScan()
   }
 
   private fun Project.configureBuildScan() {
