@@ -782,7 +782,7 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun applyToProjectWithIsolatedProjectsEnabled() {
+  fun integrateWithDevelocityBuildScan() {
     writeClientAndServerModules()
     settingsScriptPath.writeText(
       """
@@ -793,12 +793,11 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    // scan.dump avoids actually publishing a Build Scan, writing it to a file instead
     val result = run(
       serverShadowJarTask,
       IP_ARGUMENT,
       "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
-      "-Dscan.dump",
+      "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
       "--info",
     )
 

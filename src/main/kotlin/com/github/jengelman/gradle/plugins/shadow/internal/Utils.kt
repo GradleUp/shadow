@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.gradle.develocity.agent.gradle.DevelocityConfiguration
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -13,7 +11,6 @@ import java.util.Properties
 import java.util.jar.Attributes.Name as JarAttributeName
 import kotlin.io.path.toPath
 import org.apache.tools.zip.ZipEntry
-import org.gradle.api.Project
 
 /**
  * Known as `Main-Class` in the manifest file.
@@ -50,20 +47,6 @@ internal inline fun zipEntry(
     time = ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
   }
   block()
-}
-
-@Suppress("GradleProjectIsolation") // TODO: we can't call 'providers.gradleProperty' instead due to https://github.com/gradle/gradle/issues/23572.
-internal fun Project.findOptionalProperty(propertyName: String): String? = findProperty(propertyName)?.toString()
-
-internal fun Project.addBuildScanCustomValues() {
-  val develocity = extensions.findByType(DevelocityConfiguration::class.java) ?: return
-  val buildScan = develocity.buildScan
-  tasks.withType(ShadowJar::class.java).configureEach { task ->
-    buildScan.buildFinished {
-      buildScan.value("shadow.${task.path}.executed", "true")
-      buildScan.value("shadow.${task.path}.didWork", task.didWork.toString())
-    }
-  }
 }
 
 internal fun Properties.inputStream(
