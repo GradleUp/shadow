@@ -52,6 +52,9 @@ internal inline fun zipEntry(
   block()
 }
 
+@Suppress("GradleProjectIsolation") // TODO: we can't call 'providers.gradleProperty' instead due to https://github.com/gradle/gradle/issues/23572.
+internal fun Project.findOptionalProperty(propertyName: String): String? = findProperty(propertyName)?.toString()
+
 internal fun Project.addBuildScanCustomValues() {
   val develocity = extensions.findByType(DevelocityConfiguration::class.java) ?: return
   val buildScan = develocity.buildScan

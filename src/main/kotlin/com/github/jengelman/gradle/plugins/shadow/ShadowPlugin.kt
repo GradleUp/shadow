@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_PLUGIN_ID
 import com.github.jengelman.gradle.plugins.shadow.internal.addBuildScanCustomValues
+import com.github.jengelman.gradle.plugins.shadow.internal.findOptionalProperty
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -34,10 +35,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
   }
 
   private fun Project.configureBuildScan() {
-    val enableDevelocityIntegration = providers.gradleProperty(
-      ENABLE_DEVELOCITY_INTEGRATION_PROPERTY,
-    ).map { it.toBoolean() }.getOrElse(false)
-
+    val enableDevelocityIntegration = findOptionalProperty(ENABLE_DEVELOCITY_INTEGRATION_PROPERTY)?.toBoolean() ?: false
     if (enableDevelocityIntegration) {
       logger.info("Enabling Develocity integration for Shadow plugin.")
     } else {
