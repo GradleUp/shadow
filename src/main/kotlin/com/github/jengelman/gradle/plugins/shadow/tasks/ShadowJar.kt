@@ -22,12 +22,13 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
+import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
-import org.gradle.api.UncheckedIOException
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.internal.file.FileResolver
@@ -53,10 +54,6 @@ public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-
-  private val includedZipTrees = project.provider {
-    includedDependencies.files.map { project.zipTree(it) }
-  }
 
   init {
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
@@ -163,6 +160,9 @@ public abstract class ShadowJar :
 
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
+
+  @get:Inject
+  protected abstract val archiveOperations: ArchiveOperations
 
   /**
    * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
@@ -311,7 +311,7 @@ public abstract class ShadowJar :
 
   @TaskAction
   override fun copy() {
-    from(includedZipTrees.get())
+    from(includedDependencies.files.map { archiveOperations.zipTree(it) })
     injectMultiReleaseAttrIfPresent()
     super.copy()
   }
@@ -329,11 +329,15 @@ public abstract class ShadowJar :
           setMethod(entryCompressionMethod)
         }
       } catch (e: Exception) {
-        throw UncheckedIOException("Unable to create ZIP output stream for file $destination.", e)
+        throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }
     }
     val unusedClasses = if (minimizeJar.get()) {
-      val unusedTracker = UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+      val unusedTracker = UnusedTracker(
+        sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+        classJars = apiJars,
+        toMinimize = toMinimize,
+      )
       includedDependencies.files.forEach {
         unusedTracker.addDependency(it)
       }

@@ -16,7 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
-import com.github.jengelman.gradle.plugins.shadow.util.gavs
+import com.github.jengelman.gradle.plugins.shadow.util.coordinate
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -29,6 +29,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.gradle.api.JavaVersion
@@ -87,6 +88,7 @@ class PublishingTest : BasePluginTest() {
     }.toTypedArray()
     val targetJvmAttr17 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "17"
     val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
+    val targetJvmAttr8 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "8"
 
     projectScriptPath.appendText(
       """
@@ -118,6 +120,17 @@ class PublishingTest : BasePluginTest() {
     publish()
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
+
+    projectScriptPath.appendText(
+      """
+        tasks.named('compileJava') {
+          options.release = 8
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    publish()
+    // options.release flag is honored.
+    assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
   @Test
@@ -349,11 +362,11 @@ class PublishingTest : BasePluginTest() {
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      assertThat(gmm.runtimeElementsVariant.gavs).containsOnly(
+      assertThat(gmm.runtimeElementsVariant.coordinates).containsOnly(
         "example:client:1.0",
       )
-      assertThat(gmm.shadowRuntimeElementsVariant.gavs).isEmpty()
-      assertShadowVariantCommon(gmm, gavs = emptyArray()) {
+      assertThat(gmm.shadowRuntimeElementsVariant.coordinates).isEmpty()
+      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
         transform { it.fileNames }.single().isEqualTo("server-1.0-all.jar")
       }
     }
@@ -361,7 +374,7 @@ class PublishingTest : BasePluginTest() {
       assertThat(gmm.variantNames).containsOnly(
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      assertShadowVariantCommon(gmm, gavs = emptyArray()) {
+      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
         transform { it.fileNames }.single().isEqualTo("client-1.0-all.jar")
       }
     }
@@ -418,7 +431,7 @@ class PublishingTest : BasePluginTest() {
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
         )
-        transform { it.gavs }.isEmpty()
+        transform { it.coordinates }.isEmpty()
       }
       assertThat(gmm.runtimeElementsVariant).all {
         transform { it.attributes }.containsOnly(
@@ -426,7 +439,7 @@ class PublishingTest : BasePluginTest() {
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
         )
-        transform { it.gavs }.containsOnly(
+        transform { it.coordinates }.containsOnly(
           "my:a:1.0",
           "my:b:1.0",
         )
@@ -492,9 +505,7 @@ class PublishingTest : BasePluginTest() {
           $publicationsBlock
         }
         repositories {
-          maven {
-            url = '${remoteRepoPath.toUri()}'
-          }
+          maven { url = '${remoteRepoPath.toUri()}' }
         }
       }
     """.trimIndent()
@@ -502,20 +513,24 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertPomCommon(
     pomPath: Path,
-    gavs: Array<String> = arrayOf("my:b:1.0"),
+    coordinates: Array<String> = arrayOf("my:b:1.0"),
   ) {
-    assertThat(pomReader.read(pomPath).gavs).containsOnly(*gavs)
+    assertThat(pomReader.read(pomPath)).all {
+      transform { it.dependencies.map(Dependency::coordinate) }.containsOnly(*coordinates)
+      // All scopes should be runtime.
+      transform { it.dependencies.map(Dependency::getScope).distinct() }.single().isEqualTo("runtime")
+    }
   }
 
   private fun assertShadowVariantCommon(
     gmm: GradleModuleMetadata,
     variantAttrs: Array<Pair<String, String>> = shadowVariantAttrs,
-    gavs: Array<String> = arrayOf("my:b:1.0"),
+    coordinates: Array<String> = arrayOf("my:b:1.0"),
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {
       transform { it.attributes }.containsOnly(*variantAttrs)
-      transform { it.gavs }.containsOnly(*gavs)
+      transform { it.coordinates }.containsOnly(*coordinates)
       body()
     }
   }

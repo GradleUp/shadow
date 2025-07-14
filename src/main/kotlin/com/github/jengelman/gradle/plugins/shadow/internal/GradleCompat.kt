@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -18,7 +17,6 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.util.GradleVersion
 
 /**
  * Return `runtimeClasspath` or `runtime` configuration.
@@ -83,28 +81,9 @@ internal inline fun <reified V : Any> ObjectFactory.mapProperty(
   }
 }
 
-/**
- * TODO: this could be removed after bumping the min Gradle requirement to 8.8 or above.
- */
 internal inline fun ObjectFactory.fileCollection(
   path: () -> Any,
 ): ConfigurableFileCollection = fileCollection().apply {
   @Suppress("UnstableApiUsage")
-  if (GradleVersion.current() >= GradleVersion.version("8.8")) {
-    convention(path())
-  } else {
-    setFrom(path())
-  }
-}
-
-/**
- * TODO: this could be removed after bumping the min Gradle requirement to 8.11 or above.
- */
-internal fun ProjectDependency.dependencyProjectCompat(project: Project): Project {
-  return if (GradleVersion.current() >= GradleVersion.version("8.11")) {
-    project.project(path)
-  } else {
-    @Suppress("DEPRECATION")
-    dependencyProject
-  }
+  convention(path())
 }

@@ -6,6 +6,18 @@ Maven Shade implementation. A [`ResourceTransformer`][ResourceTransformer] is in
 being written to the final output JAR. This allows a [`ResourceTransformer`][ResourceTransformer] to determine if it
 should process a particular entry and apply any modifications before writing the stream to the output.
 
+**Important**: [`ResourceTransformer`][ResourceTransformer] follows a guaranteed processing order:
+
+1. **Project files first**: All files in projects are processed before any dependency files.
+2. **Dependency files second**: Files from configurations (runtime dependencies) or added via [`ShadowJar.from`][ShadowJar.from] are processed after project files.
+
+This ordering is crucial when merging configuration files where you want to preserve project-specific values while
+merging in additional data from dependencies.
+
+## Basic ResourceTransformer Usage
+
+For simpler use cases, you can create a basic transformer:
+
 === "Kotlin"
 
     ```kotlin
@@ -429,6 +441,7 @@ duplicated files.
 [ResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
 [ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
+[ShadowJar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [ShadowJar.transform]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html

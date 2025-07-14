@@ -21,7 +21,9 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
-import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -41,7 +43,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   protected open fun Project.configureShadowJar() {
     val jarTask = tasks.jar
     val taskProvider = registerShadowJarCommon { task ->
-      @Suppress("EagerGradleConfiguration")
+      @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
       task.manifest.inheritFrom(jarTask.get().manifest)
       val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
       val files = files(configurations.shadow)
@@ -59,9 +61,10 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
   protected open fun Project.configureConfigurations() {
     val shadowConfiguration = configurations.shadow.get()
-    configurations.named(JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME) {
-      it.extendsFrom(shadowConfiguration)
+    configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
+      compileClasspath.extendsFrom(shadowConfiguration)
     }
+    @Suppress("EagerGradleConfiguration") // this should be created eagerly.
     configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
       it.extendsFrom(shadowConfiguration)
       it.isCanBeConsumed = true
@@ -74,9 +77,12 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
         attr.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
-        val targetJvmVersion = provider {
-          javaPluginExtension.targetCompatibility.majorVersion.toInt()
-        }
+        val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME)
+          .map { compileClasspath ->
+            compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
+              ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
+          }
+
         // Track JavaPluginExtension to update targetJvmVersion when it changes.
         attr.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
       }
@@ -100,15 +106,16 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
   protected open fun Project.configureJavaGradlePlugin() {
     plugins.withType(JavaGradlePluginPlugin::class.java).configureEach {
+      val gradleApi = dependencies.gradleApi()
       // Remove the gradleApi so it isn't merged into the jar file.
       // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
       // See https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161.
-      configurations.named(JavaPlugin.API_CONFIGURATION_NAME) {
-        it.dependencies.remove(dependencies.gradleApi())
-      }
-      // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
-      configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME) {
-        it.dependencies.add(dependencies.gradleApi())
+      configurations.named(API_CONFIGURATION_NAME) { api ->
+        // Only proceed if the removal is successful.
+        if (!api.dependencies.remove(gradleApi)) return@named
+        // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
+        configurations.getByName(COMPILE_ONLY_CONFIGURATION_NAME)
+          .dependencies.add(dependencies.gradleApi())
       }
     }
   }
