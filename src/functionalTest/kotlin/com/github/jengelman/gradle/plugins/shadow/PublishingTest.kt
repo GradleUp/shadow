@@ -517,7 +517,7 @@ class PublishingTest : BasePluginTest() {
   ) {
     assertThat(pomReader.read(pomPath)).all {
       transform { it.dependencies.map(Dependency::coordinate) }.containsOnly(*coordinates)
-      // All scopes should be runtime, since we are publishing a shadow JAR.
+      // All scopes should be runtime.
       transform { it.dependencies.map(Dependency::getScope).distinct() }.single().isEqualTo("runtime")
     }
   }
