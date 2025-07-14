@@ -27,7 +27,14 @@ internal class RelocatorRemapper(
 
   override fun map(internalName: String): String = mapName(internalName)
 
-  fun mapPath(path: String): String = map(path.substring(0, path.indexOf('.')))
+  fun mapPath(path: String): String {
+    val dotIndex = path.indexOf('.')
+    return if (dotIndex == -1) {
+      path // Return the original path if no period is found
+    } else {
+      map(path.substring(0, dotIndex))
+    }
+  }
 
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
     var newName = name
