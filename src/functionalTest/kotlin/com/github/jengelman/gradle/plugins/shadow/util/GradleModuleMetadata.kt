@@ -22,8 +22,7 @@ data class GradleModuleMetadata(
     private val dependencies: List<Dependency> = emptyList(),
     private val files: List<File> = emptyList(),
   ) {
-    @Suppress("SpellCheckingInspection")
-    val gavs: List<String> get() = dependencies.map { it.coordinate }
+    val coordinates: List<String> get() = dependencies.map { it.coordinate }
     val fileNames: List<String> get() = files.map { it.name }
 
     data class Dependency(
