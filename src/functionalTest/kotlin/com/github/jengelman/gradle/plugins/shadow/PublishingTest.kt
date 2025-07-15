@@ -65,7 +65,8 @@ class PublishingTest : BasePluginTest() {
           archiveClassifier = ''
           archiveBaseName = 'maven-all'
         """.trimIndent(),
-      ) + System.lineSeparator(),
+      ) +
+        System.lineSeparator(),
     )
 
     publish()
@@ -554,10 +555,11 @@ class PublishingTest : BasePluginTest() {
       TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion,
     )
 
-    val shadowVariantAttrs = commonVariantAttrs + arrayOf(
-      Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
-      Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
-    )
+    val shadowVariantAttrs = commonVariantAttrs +
+      arrayOf(
+        Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
+        Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+      )
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
