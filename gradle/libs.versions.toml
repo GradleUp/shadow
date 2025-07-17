@@ -6,8 +6,8 @@ pluginPublish = "1.3.1"
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
 apache-commonsIo = "commons-io:commons-io:2.19.0"
-apache-log4j = "org.apache.logging.log4j:log4j-core:2.25.0"
-apache-maven-modelBuilder = "org.apache.maven:maven-model-builder:3.9.10"
+apache-log4j = "org.apache.logging.log4j:log4j-core:2.25.1"
+apache-maven-modelBuilder = "org.apache.maven:maven-model:3.9.11"
 asm = "org.ow2.asm:asm-commons:9.8"
 # jdependency should be updated together with ASM, see https://github.com/tcurdt/jdependency/issues/325.
 jdependency = "org.vafer:jdependency:2.13"
@@ -25,7 +25,7 @@ pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.r
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha05"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.6.0"
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.0"
 
 junit-bom = "org.junit:junit-bom:5.13.3"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
@@ -34,6 +34,6 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 android-lint = "com.android.lint:8.11.1"
 jetbrains-dokka = "org.jetbrains.dokka:2.0.0"
-mavenPublish = "com.vanniktech.maven.publish:0.33.0"
+mavenPublish = "com.vanniktech.maven.publish:0.34.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 spotless = "com.diffplug.spotless:7.1.0"

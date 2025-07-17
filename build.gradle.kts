@@ -96,6 +96,16 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
 }
 
+val testGradleVersion: String = providers.gradleProperty("testGradleVersion").orNull.let {
+  val value = if (it == null || it == "current") GradleVersion.current().version else it
+  logger.info("Using test Gradle version: $value")
+  value
+}
+
+develocity {
+  buildScan.value("testGradleVersion", testGradleVersion)
+}
+
 dependencies {
   compileOnly(libs.develocity)
   compileOnly(libs.kotlin.kmp)
@@ -169,12 +179,7 @@ testing.suites {
     }
     targets.configureEach {
       testTask {
-        val testGradleVersion = providers.gradleProperty("testGradleVersion").orNull.let {
-          if (it == null || it == "current") GradleVersion.current().version else it
-        }
-        logger.info("Using test Gradle version: $testGradleVersion")
         systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
-
         maxParallelForks = Runtime.getRuntime().availableProcessors()
       }
     }
