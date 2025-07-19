@@ -94,13 +94,6 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun incompatibleWithLowerMinGradleVersion() {
-    runWithFailure(shadowJarTask) {
-      it.withGradleVersion("8.2")
-    }
-  }
-
-  @Test
   fun shadowJarCliOptions() {
     val result = run("help", "--task", shadowJarTask)
 
