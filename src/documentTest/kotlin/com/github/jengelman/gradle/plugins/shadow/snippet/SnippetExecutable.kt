@@ -2,7 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.snippet
 
 import java.lang.System.lineSeparator
 import java.nio.file.Path
+import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
+import kotlin.io.path.createFile
+import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.function.Executable
@@ -62,6 +65,14 @@ sealed class SnippetExecutable : Executable {
       append(lineSeparator())
     }.trimIndent()
     projectRoot.addSubProject("main", mainScript)
+    projectRoot.resolve("main/foo.jar").createFile().also {
+      // Dummy JAR file to ensure the project can be built.
+      JarOutputStream(it.outputStream()).use {}
+    }
+    projectRoot.resolve("main/bar.jar").createFile().also {
+      // Dummy JAR file to ensure the project can be built.
+      JarOutputStream(it.outputStream()).use {}
+    }
 
     try {
       GradleRunner.create()

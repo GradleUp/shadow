@@ -69,7 +69,7 @@ Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closu
     import org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
-    class MyTransformer(var enabled: Boolean = false) : ResourceTransformer {
+    class MyTransformer(@get:Input var enabled: Boolean = false) : ResourceTransformer {
       override fun canTransformResource(element: FileTreeElement): Boolean = true
       override fun transform(context: TransformerContext) {}
       override fun hasTransformedResource(): Boolean = true
@@ -92,7 +92,7 @@ Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closu
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer implements ResourceTransformer {
-      boolean enabled
+      @Input boolean enabled
       @Override boolean canTransformResource(FileTreeElement element) { return true }
       @Override void transform(TransformerContext context) {}
       @Override boolean hasTransformedResource() { return true }
@@ -116,7 +116,7 @@ An instantiated instance of a [`ResourceTransformer`][ResourceTransformer] can a
     import org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
-    class MyTransformer(val enabled: Boolean) : ResourceTransformer {
+    class MyTransformer(@get:Input val enabled: Boolean) : ResourceTransformer {
       override fun canTransformResource(element: FileTreeElement): Boolean = true
       override fun transform(context: TransformerContext) {}
       override fun hasTransformedResource(): Boolean = true
@@ -137,7 +137,7 @@ An instantiated instance of a [`ResourceTransformer`][ResourceTransformer] can a
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer implements ResourceTransformer {
-      final boolean enabled
+      @Input final boolean enabled
       MyTransformer(boolean enabled) { this.enabled = enabled }
       @Override boolean canTransformResource(FileTreeElement element) { return true }
       @Override void transform(TransformerContext context) {}
