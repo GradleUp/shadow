@@ -2,7 +2,12 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc1...HEAD) - 2025-xx-xx
 
+**Added**
+
+- Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
+
 **Fixed**
+
 - Honor `options.release` for target JVM attribute. ([#1502](https://github.com/GradleUp/shadow/pull/1502))
 
 ## [9.0.0-rc1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc1) - 2025-07-02
