@@ -147,6 +147,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
+        tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
         action.execute(task)
       }
     }

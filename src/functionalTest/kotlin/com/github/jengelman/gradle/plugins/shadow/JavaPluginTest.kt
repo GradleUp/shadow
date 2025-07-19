@@ -39,6 +39,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -62,6 +63,8 @@ class JavaPluginTest : BasePluginTest() {
     project.plugins.apply(JavaPlugin::class.java)
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+    val assembleTask = project.tasks.getByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)
+    assertThat(assembleTask.dependsOn).contains(shadowTask)
 
     // Check extended properties.
     with(shadowTask as Jar) {
