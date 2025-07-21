@@ -597,6 +597,26 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
+  fun failBuildIfProcessingAar() {
+    val fooAarPath = path("foo.aar")
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(fooAarPath)}
+        }
+      """.trimIndent(),
+    )
+
+    val result = runWithFailure(shadowJarTask)
+
+    assertThat(result.output).contains(
+      "Shadowing AAR file is not supported.",
+      "Please exclude dependency artifact:",
+    )
+  }
+
+  @Test
   fun worksWithArchiveFileName() {
     val mainClassEntry = writeClass()
     projectScriptPath.appendText(
