@@ -18,6 +18,7 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
@@ -77,6 +78,10 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
         attr.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
+        attr.attribute(
+          TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+          objects.named(TargetJvmEnvironment::class.java, TargetJvmEnvironment.STANDARD_JVM),
+        )
         val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME)
           .map { compileClasspath ->
             compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
