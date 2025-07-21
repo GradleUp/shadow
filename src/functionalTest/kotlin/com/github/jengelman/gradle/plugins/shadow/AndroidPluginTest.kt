@@ -12,7 +12,7 @@ class AndroidPluginTest : BasePluginTest() {
     super.setup()
     settingsScriptPath.writeText(
       // Add Google's Maven repository for AGP.
-      getDefaultSettingsBuildScript("google()"),
+      getDefaultSettingsBuildScript(repositories = "google()"),
     )
   }
 
