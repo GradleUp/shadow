@@ -317,7 +317,7 @@ public abstract class ShadowJar :
           val message = """
             Shadowing AAR file is not supported.
             Please exclude dependency artifact: $file
-            or use Android Fused Library plugin instead. See See https://developer.android.com/build/publish-library/fused-library.
+            or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
           """.trimIndent()
           error(message)
         }
