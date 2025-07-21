@@ -128,7 +128,6 @@ abstract class BasePluginTest {
 
   fun getDefaultSettingsBuildScript(
     startBlock: String = "",
-    repositories: String = "",
     // Use a test-specific build cache directory. This ensures that we'll only use cached outputs generated during
     // this test, and we won't accidentally use cached outputs from a different test or a different build.
     // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
@@ -141,7 +140,6 @@ abstract class BasePluginTest {
         repositories {
           maven { url = '${localRepo.root.toUri()}' }
           mavenCentral()
-          $repositories
         }
       }
       buildCache {
