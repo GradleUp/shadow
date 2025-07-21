@@ -5,6 +5,7 @@
 **Added**
 
 - Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
+- Inject `TargetJvmEnvironment` attribute for Gradle Module Metadata. ([#1529](https://github.com/GradleUp/shadow/pull/1529))
 - Fail build when inputting AAR files or using Shadow with AGP. ([#1530](https://github.com/GradleUp/shadow/pull/1530))
 
 **Fixed**
