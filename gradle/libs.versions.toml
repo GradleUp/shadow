@@ -27,7 +27,7 @@ agp = "com.android.tools.build:gradle:8.8.0"
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha05"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.0"
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.1"
 
 junit-bom = "org.junit:junit-bom:5.13.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
