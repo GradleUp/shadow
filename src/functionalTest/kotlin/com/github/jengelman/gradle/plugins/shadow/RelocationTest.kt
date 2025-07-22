@@ -614,6 +614,31 @@ class RelocationTest : BasePluginTest() {
     )
   }
 
+  @Test
+  fun relocateCaseSensitiveAndInsensitiveClasses() {
+    val fooClass1 = writeClass(className = "foo")
+    val fooClass2 = writeClass(className = "Foo")
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          relocate('my', 'foo.my')
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(
+        "foo/",
+        "foo/my",
+        fooClass1,
+        fooClass2,
+        *manifestEntries,
+      )
+    }
+  }
+
   private companion object {
     @JvmStatic
     fun prefixProvider() = listOf(
