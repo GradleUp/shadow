@@ -631,7 +631,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "bar/",
-        "bar/my",
+        "bar/my/",
         "bar/$fooClass1",
         "bar/$fooClass2",
         *manifestEntries,
