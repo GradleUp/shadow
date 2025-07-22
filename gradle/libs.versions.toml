@@ -5,7 +5,7 @@ pluginPublish = "1.3.1"
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
-apache-commonsIo = "commons-io:commons-io:2.19.0"
+apache-commonsIo = "commons-io:commons-io:2.20.0"
 apache-log4j = "org.apache.logging.log4j:log4j-core:2.25.1"
 apache-maven-modelBuilder = "org.apache.maven:maven-model:3.9.11"
 asm = "org.ow2.asm:asm-commons:9.8"
@@ -22,12 +22,15 @@ foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.to
 develocity = "com.gradle:develocity-gradle-plugin:4.0.2"
 kotlin-kmp = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "pluginPublish" }
+# AGP version should match the min Gradle version used in tests.
+# https://developer.android.com/build/releases/gradle-plugin#updating-gradle
+agp = "com.android.tools.build:gradle:8.8.0"
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha05"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.0"
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.1"
 
-junit-bom = "org.junit:junit-bom:5.13.3"
+junit-bom = "org.junit:junit-bom:5.13.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
@@ -36,4 +39,4 @@ android-lint = "com.android.lint:8.11.1"
 jetbrains-dokka = "org.jetbrains.dokka:2.0.0"
 mavenPublish = "com.vanniktech.maven.publish:0.34.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
-spotless = "com.diffplug.spotless:7.1.0"
+spotless = "com.diffplug.spotless:7.2.1"
