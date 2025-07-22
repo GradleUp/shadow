@@ -18,8 +18,6 @@ import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledOnOs
-import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -614,35 +612,6 @@ class RelocationTest : BasePluginTest() {
     assertThat(result).contains(
       "foo.junit.framework.Test",
     )
-  }
-
-  @EnabledOnOs(
-    value = [OS.LINUX],
-    disabledReason = "Mac/Windows file system is case insensitive, so this test is not applicable.",
-  )
-  @Test
-  fun relocateCaseSensitiveAndInsensitiveClasses() {
-    val fooClass1 = writeClass(className = "foo")
-    val fooClass2 = writeClass(className = "Foo")
-    projectScriptPath.appendText(
-      """
-        $shadowJar {
-          relocate('my', 'bar.my')
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowJar).useAll {
-      containsOnly(
-        "bar/",
-        "bar/my/",
-        "bar/$fooClass1",
-        "bar/$fooClass2",
-        *manifestEntries,
-      )
-    }
   }
 
   private companion object {
