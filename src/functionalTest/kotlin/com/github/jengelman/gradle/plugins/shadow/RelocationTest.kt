@@ -621,7 +621,7 @@ class RelocationTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          relocate('my', 'foo.my')
+          relocate('my', 'bar.my')
         }
       """.trimIndent(),
     )
@@ -630,10 +630,10 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
-        "foo/",
-        "foo/my",
-        fooClass1,
-        fooClass2,
+        "bar/",
+        "bar/my",
+        "bar/$fooClass1",
+        "bar/$fooClass2",
         *manifestEntries,
       )
     }
