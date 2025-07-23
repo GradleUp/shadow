@@ -4,7 +4,7 @@
 
 **Added**
 
-- Support disabling of string constant remapping. ([#1401](https://github.com/GradleUp/shadow/pull/1401))
+- Support skipping string constant remapping. ([#1401](https://github.com/GradleUp/shadow/pull/1401))
 - Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
 - Fail build when inputting AAR files or using Shadow with AGP. ([#1530](https://github.com/GradleUp/shadow/pull/1530))
 
