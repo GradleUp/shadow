@@ -112,7 +112,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/reloc
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun canRelocateClass (Ljava/lang/String;)Z
 	public abstract fun canRelocatePath (Ljava/lang/String;)Z
-	public abstract fun getSkipStringLiteral ()Z
+	public fun getSkipStringLiteral ()Z
 	public abstract fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public abstract fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
