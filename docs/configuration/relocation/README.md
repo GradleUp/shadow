@@ -125,7 +125,7 @@ in your project, and you configure the relocation like:
     }
     ```
 
-the string constant `"foo.Bar"` will be relocated to `"my.foo.Bar"` by default. This may not be want you want, you can
+the string constant `"foo.Bar"` will be relocated to `"my.foo.Bar"` by default. This may not be what you want, you can
 skip relocating string constants in the classes like:
 
 === "Kotlin"
