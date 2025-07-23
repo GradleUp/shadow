@@ -23,10 +23,7 @@ import org.gradle.api.tasks.Optional
 public open class AppendingTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : ResourceTransformer {
-  /**
-   * Defer initialization, see [issue 763](https://github.com/GradleUp/shadow/issues/763).
-   */
-  private var _data: ByteArrayOutputStream? = null
+  private var _data: ByteArrayOutputStream? = null // It's nullable to allow lazy initialization to support CC.
   private inline val data get() = _data ?: ByteArrayOutputStream().also { _data = it }
 
   @get:Optional
