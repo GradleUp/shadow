@@ -87,9 +87,6 @@ public open class ShadowCopyAction(
     }
   }
 
-  /**
-   * Handles cases like [issue 53](https://github.com/GradleUp/shadow/issues/53).
-   */
   private fun addDirs(zos: ZipOutputStream) {
     @Suppress("UNCHECKED_CAST")
     val entries = zos::class.java.getDeclaredField("entries").apply { isAccessible = true }
@@ -173,8 +170,6 @@ public open class ShadowCopyAction(
     /**
      * Applies remapping to the given class with the specified relocation path. The remapped class is then written
      * to the zip file.
-     *
-     * See [issue 364](https://github.com/GradleUp/shadow/issues/364) and [issue 408](https://github.com/GradleUp/shadow/issues/408).
      */
     private fun FileCopyDetails.remapClass() = file.inputStream().use { inputStream ->
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.

@@ -48,9 +48,7 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
   /**
    * @return `true` if any dat file collected.
    */
-  override fun hasTransformedResource(): Boolean {
-    return tempFiles.isNotEmpty()
-  }
+  override fun hasTransformedResource(): Boolean = tempFiles.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     try {
