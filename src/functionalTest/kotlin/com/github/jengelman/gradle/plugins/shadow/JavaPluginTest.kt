@@ -16,6 +16,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
@@ -34,6 +35,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
@@ -792,6 +794,35 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
+    }
+  }
+
+  @Test
+  fun integrateWithDevelocityBuildScan() {
+    writeClientAndServerModules()
+    settingsScriptPath.writeText(
+      """
+        plugins {
+          id 'com.gradle.develocity'
+        }
+        ${settingsScriptPath.readText()}
+      """.trimIndent(),
+    )
+
+    val result = run(
+      serverShadowJarTask,
+      IP_ARGUMENT,
+      "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
+      "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
+      "--info",
+    )
+
+    assertThat(result.output).all {
+      contains(
+        "Enabling Develocity integration for Shadow plugin.",
+        "Build scan written",
+      )
+      doesNotContain("Configuration cache problems")
     }
   }
 

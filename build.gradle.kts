@@ -107,6 +107,7 @@ develocity {
 }
 
 dependencies {
+  compileOnly(libs.develocity)
   compileOnly(libs.kotlin.kmp)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.commonsIo)
@@ -119,6 +120,7 @@ dependencies {
 
   testPluginClasspath(libs.agp)
   testPluginClasspath(libs.foojayResolver)
+  testPluginClasspath(libs.develocity)
   testPluginClasspath(libs.kotlin.kmp)
   testPluginClasspath(libs.pluginPublish)
 
