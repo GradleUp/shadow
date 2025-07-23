@@ -8,22 +8,25 @@
 - Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
 - Fail build when inputting AAR files or using Shadow with AGP. ([#1530](https://github.com/GradleUp/shadow/pull/1530))
 
-**Fixed**
-
-- Honor `options.release` for target JVM attribute. ([#1502](https://github.com/GradleUp/shadow/pull/1502))
-
 **Changed**
+
 - Restore Develocity Build Scan integration. ([#1505](https://github.com/GradleUp/shadow/pull/1505))  
   It is still disabled by default, you can enable it by setting `com.gradleup.shadow.enableDevelocityIntegration = true`.
 - Expose `AbstractDependencyFilter` from `internal` to `public`. ([#1538](https://github.com/GradleUp/shadow/pull/1538))  
   You can access it via `com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter.AbstractDependencyFilter`.
 
+**Fixed**
+
+- Honor `options.release` for target JVM attribute. ([#1502](https://github.com/GradleUp/shadow/pull/1502))
+
 ## [9.0.0-rc1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc1) - 2025-07-02
 
-> This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
-significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
-enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
-the [new doc site](https://gradleup.com/shadow/) before upgrading.
+!!! warning
+
+    This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
+    significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
+    enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
+    the [new doc site](https://gradleup.com/shadow/) before upgrading.
 
 **BREAKING**
 
