@@ -45,9 +45,7 @@ public open class AppendingTransformer @Inject constructor(
     context.inputStream.copyTo(data)
   }
 
-  override fun hasTransformedResource(): Boolean {
-    return data.size() > 0
-  }
+  override fun hasTransformedResource(): Boolean = data.size() > 0
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
