@@ -93,6 +93,63 @@ expression in `%regex[]` before passing it to `include`/`exclude`.
     }
     ```
 
+## Skipping Relocation for String Constants
+
+If there is a class like:
+
+```java
+package foo;
+
+public class Bar {
+  public static void main(String[] args) {
+    System.out.println("foo.Bar");
+  }
+}
+```
+
+in your project, and you configure the relocation like:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      relocate("foo", "my.foo")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      relocate 'foo', 'my.foo'
+    }
+    ```
+
+the string constant `"foo.Bar"` will be relocated to `"my.foo.Bar"` by default. This may not be what you want, you can
+skip relocating string constants in the classes like:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      relocate("foo", "my.foo") {
+        // Optionally, defaults to `false`.
+        skipStringConstants = true
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      relocate('foo', 'my.foo') {
+        // Optionally, defaults to `false`.
+        skipStringConstants = true
+      }
+    }
+    ```
+
 ## Automatically Relocating Dependencies
 
 Shadow is shipped with a task that can be used to automatically configure all packages from all dependencies to be

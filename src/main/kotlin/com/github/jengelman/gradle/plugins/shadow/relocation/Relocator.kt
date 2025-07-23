@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
+import org.gradle.api.tasks.Input
 
 /**
  * Modified from [org.apache.maven.plugins.shade.relocation.Relocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/Relocator.java).
@@ -18,6 +19,14 @@ public interface Relocator {
   public fun relocateClass(context: RelocateClassContext): String
 
   public fun applyToSourceContent(sourceContent: String): String
+
+  /**
+   * Indicates whether this relocator should skip relocating string constants.
+   *
+   * Defaults to `false`.
+   */
+  @get:Input
+  public val skipStringConstants: Boolean get() = false
 
   public companion object {
     public val ROLE: String = Relocator::class.java.name

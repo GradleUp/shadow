@@ -19,13 +19,20 @@ internal class RelocatorRemapper(
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
-      map(value)
+      mapName(value, mapLiterals = true)
     } else {
       super.mapValue(value)
     }
   }
 
-  override fun map(name: String): String {
+  override fun map(internalName: String): String = mapName(internalName)
+
+  fun mapPath(path: String): String {
+    val dotIndex = path.indexOf('.')
+    return if (dotIndex == -1) path else map(path.take(dotIndex))
+  }
+
+  private fun mapName(name: String, mapLiterals: Boolean = false): String {
     var newName = name
     var prefix = ""
     var suffix = ""
@@ -38,7 +45,9 @@ internal class RelocatorRemapper(
     }
 
     for (relocator in relocators) {
-      if (relocator.canRelocateClass(newName)) {
+      if (mapLiterals && relocator.skipStringConstants) {
+        return name
+      } else if (relocator.canRelocateClass(newName)) {
         return prefix + relocator.relocateClass(newName) + suffix
       } else if (relocator.canRelocatePath(newName)) {
         return prefix + relocator.relocatePath(newName) + suffix
@@ -46,9 +55,5 @@ internal class RelocatorRemapper(
     }
 
     return name
-  }
-
-  fun mapPath(path: String): String {
-    return map(path.substringBefore('.'))
   }
 }
