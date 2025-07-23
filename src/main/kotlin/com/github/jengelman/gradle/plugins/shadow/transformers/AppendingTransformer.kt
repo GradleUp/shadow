@@ -19,10 +19,10 @@ import org.gradle.api.tasks.Optional
  * @author John Engelman
  */
 @CacheableTransformer
-@Suppress("ktlint:standard:backing-property-naming")
 public open class AppendingTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : ResourceTransformer {
+  @Suppress("ktlint:standard:backing-property-naming")
   private var _data: ByteArrayOutputStream? = null // It's nullable to allow lazy initialization to support CC.
   private inline val data get() = _data ?: ByteArrayOutputStream().also { _data = it }
 
@@ -38,21 +38,24 @@ public open class AppendingTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    if (data.size() > 0) {
-      // Append the separator before the new content to ensure the separator is not at the end of the file.
-      data.write(separator.get().toByteArray())
+    data.let {
+      if (it.size() > 0) {
+        // Append the separator before the new content to ensure the separator is not at the end of the file.
+        it.write(separator.get().toByteArray())
+      }
+      context.inputStream.copyTo(it)
     }
-    context.inputStream.copyTo(data)
   }
 
   override fun hasTransformedResource(): Boolean = data.size() > 0
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
-
-    // Closing a ByteArrayOutputStream has no effect, so we don't use a use block here.
-    data.toByteArray().inputStream().copyTo(os)
-    data.reset()
+    data.let {
+      // Closing a ByteArrayOutputStream has no effect, so we don't use a use block here.
+      it.toByteArray().inputStream().copyTo(os)
+      it.reset()
+    }
   }
 
   public companion object {
