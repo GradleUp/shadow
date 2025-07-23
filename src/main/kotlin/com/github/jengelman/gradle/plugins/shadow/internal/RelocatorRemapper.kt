@@ -28,7 +28,8 @@ internal class RelocatorRemapper(
   override fun map(internalName: String): String = mapName(internalName)
 
   fun mapPath(path: String): String {
-    return path.substringBefore('.')
+    val dotIndex = path.indexOf('.')
+    return if (dotIndex == -1) path else map(path.take(dotIndex))
   }
 
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
