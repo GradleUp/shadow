@@ -112,7 +112,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/reloc
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun canRelocateClass (Ljava/lang/String;)Z
 	public abstract fun canRelocatePath (Ljava/lang/String;)Z
-	public fun getSkipStringLiteral ()Z
+	public fun getSkipStringConstants ()Z
 	public abstract fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public abstract fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
@@ -137,12 +137,12 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun exclude (Ljava/lang/String;)V
 	public final fun getExcludes ()Ljava/util/Set;
 	public final fun getIncludes ()Ljava/util/Set;
-	public fun getSkipStringLiteral ()Z
+	public fun getSkipStringConstants ()Z
 	public fun hashCode ()I
 	public fun include (Ljava/lang/String;)V
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
-	public fun setSkipStringLiteral (Z)V
+	public fun setSkipStringConstants (Z)V
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {

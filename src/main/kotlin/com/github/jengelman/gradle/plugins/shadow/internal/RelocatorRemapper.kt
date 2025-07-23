@@ -45,7 +45,7 @@ internal class RelocatorRemapper(
     }
 
     for (relocator in relocators) {
-      if (mapLiterals && relocator.skipStringLiteral) {
+      if (mapLiterals && relocator.skipStringConstants) {
         return name
       } else if (relocator.canRelocateClass(newName)) {
         return prefix + relocator.relocateClass(newName) + suffix

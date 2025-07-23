@@ -610,7 +610,7 @@ class RelocationTest : BasePluginTest() {
   )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun canDisableRelocateStringConstants(skipStringLiteral: Boolean) {
+  fun canDisableRelocateStringConstants(skipStringConstants: Boolean) {
     writeClassWithStringRef()
     projectScriptPath.appendText(
       """
@@ -619,7 +619,7 @@ class RelocationTest : BasePluginTest() {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
           relocate('junit', 'foo.junit') {
-            skipStringLiteral = $skipStringLiteral
+            skipStringConstants = $skipStringConstants
           }
         }
       """.trimIndent(),
@@ -628,13 +628,8 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
     val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
 
-    assertThat(result).contains(
-      if (skipStringLiteral) {
-        "junit.framework.Test"
-      } else {
-        "foo.junit.framework.Test"
-      },
-    )
+    val expected = if (skipStringConstants) "junit.framework.Test" else "foo.junit.framework.Test"
+    assertThat(result).contains(expected)
   }
 
   private fun writeClassWithStringRef() {

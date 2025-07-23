@@ -20,8 +20,13 @@ public interface Relocator {
 
   public fun applyToSourceContent(sourceContent: String): String
 
+  /**
+   * Indicates whether this relocator should skip relocating string constants.
+   *
+   * Defaults to `false`.
+   */
   @get:Input
-  public val skipStringLiteral: Boolean get() = false
+  public val skipStringConstants: Boolean get() = false
 
   public companion object {
     public val ROLE: String = Relocator::class.java.name
