@@ -22,10 +22,8 @@ import org.gradle.jvm.toolchain.JavaToolchainService
  * Return `runtimeClasspath` or `runtime` configuration.
  */
 internal inline val Project.runtimeConfiguration: Configuration
-  get() {
-    return configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
-      ?: configurations.getByName("runtime")
-  }
+  get() = configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
+    ?: configurations.getByName("runtime")
 
 internal inline val Project.sourceSets: SourceSetContainer
   get() = extensions.getByType(SourceSetContainer::class.java)

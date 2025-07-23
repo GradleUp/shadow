@@ -49,6 +49,6 @@ internal class RelocatorRemapper(
   }
 
   fun mapPath(path: String): String {
-    return map(path.substring(0, path.indexOf('.')))
+    return map(path.substringBefore('.'))
   }
 }
