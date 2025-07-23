@@ -25,6 +25,22 @@ import org.gradle.api.tasks.Internal
 public open class ComponentsXmlResourceTransformer : ResourceTransformer {
   private val components = mutableMapOf<String, Xpp3Dom>()
 
+  @get:Internal
+  internal val transformedResource: ByteArray
+    get() {
+      val os = ByteArrayOutputStream(1024 * 4)
+      XmlStreamWriter(os).use { writer ->
+        val dom = Xpp3Dom("component-set")
+        val componentDom = Xpp3Dom("components")
+        dom.addChild(componentDom)
+        for (component in components.values) {
+          componentDom.addChild(component)
+        }
+        Xpp3DomWriter.write(writer, dom)
+      }
+      return os.toByteArray()
+    }
+
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return COMPONENTS_XML_PATH == element.path
   }
@@ -84,22 +100,6 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
   }
 
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()
-
-  @get:Internal
-  internal val transformedResource: ByteArray
-    get() {
-      val os = ByteArrayOutputStream(1024 * 4)
-      XmlStreamWriter(os).use { writer ->
-        val dom = Xpp3Dom("component-set")
-        val componentDom = Xpp3Dom("components")
-        dom.addChild(componentDom)
-        for (component in components.values) {
-          componentDom.addChild(component)
-        }
-        Xpp3DomWriter.write(writer, dom)
-      }
-      return os.toByteArray()
-    }
 
   public companion object {
     public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"

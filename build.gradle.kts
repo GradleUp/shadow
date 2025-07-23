@@ -4,7 +4,7 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
-import org.gradle.kotlin.dsl.kotlin
+import org.jetbrains.kotlin.daemon.common.OSKind
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
@@ -96,6 +96,16 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
 }
 
+val testGradleVersion: String = providers.gradleProperty("testGradleVersion").orNull.let {
+  val value = if (it == null || it == "current") GradleVersion.current().version else it
+  logger.info("Using test Gradle version: $value")
+  value
+}
+
+develocity {
+  buildScan.value("testGradleVersion", testGradleVersion)
+}
+
 dependencies {
   compileOnly(libs.kotlin.kmp)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
@@ -107,6 +117,7 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
+  testPluginClasspath(libs.agp)
   testPluginClasspath(libs.foojayResolver)
   testPluginClasspath(libs.kotlin.kmp)
   testPluginClasspath(libs.pluginPublish)
@@ -167,12 +178,7 @@ testing.suites {
     }
     targets.configureEach {
       testTask {
-        val testGradleVersion = providers.gradleProperty("testGradleVersion").orNull.let {
-          if (it == null || it == "current") GradleVersion.current().version else it
-        }
-        logger.info("Using test Gradle version: $testGradleVersion")
         systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
-
         maxParallelForks = Runtime.getRuntime().availableProcessors()
       }
     }
@@ -222,6 +228,13 @@ tasks.pluginUnderTestMetadata {
 tasks.validatePlugins {
   // TODO: https://github.com/gradle/gradle/issues/22600
   enableStricterValidation = true
+}
+
+tasks.whenTaskAdded {
+  if (name.contains("lint") && this::class.java.name.contains("com.android.build")) {
+    // Disable lint tasks for Windows due to ExceptionInInitializerError.
+    enabled = OSKind.current != OSKind.Windows
+  }
 }
 
 tasks.check {
