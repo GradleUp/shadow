@@ -29,11 +29,7 @@ internal class RelocatorRemapper(
 
   fun mapPath(path: String): String {
     val dotIndex = path.indexOf('.')
-    return if (dotIndex == -1) {
-      path // Return the original path if no period is found
-    } else {
-      map(path.substring(0, dotIndex))
-    }
+    return if (dotIndex == -1) path else map(path.take(dotIndex))
   }
 
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
