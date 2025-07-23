@@ -159,6 +159,21 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter$AbstractDependencyFilter : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
+	public fun <init> (Lorg/gradle/api/Project;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Lorg/gradle/api/Project;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
+	public fun exclude (Lorg/gradle/api/specs/Spec;)V
+	protected final fun getExcludeSpecs ()Ljava/util/List;
+	protected final fun getIncludeSpecs ()Ljava/util/List;
+	public fun include (Lorg/gradle/api/specs/Spec;)V
+	protected final fun isIncluded (Lorg/gradle/api/artifacts/ResolvedDependency;)Z
+	public fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
+	public fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
+	protected abstract fun resolve (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
+}
+
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest : org/gradle/api/java/archives/Manifest {
 	public fun inheritFrom ([Ljava/lang/Object;)V
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
