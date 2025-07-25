@@ -135,21 +135,25 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Enable relocation of packages in the jar.
+   * Enable auto relocation of packages in the dependencies.
    *
    * Defaults to `false`.
+   *
+   * @see relocationPrefix
    */
   @get:Input
-  @get:Option(option = "enable-relocation", description = "Enable relocation of packages in the jar")
+  @get:Option(option = "enable-relocation", description = "Enable auto relocation of packages in the dependencies")
   public open val enableRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
-   * Prefix to use for relocated packages.
+   * Prefix used for auto relocation of packages in the dependencies.
    *
    * Defaults to `shadow`.
+   *
+   * @see enableRelocation
    */
   @get:Input
-  @get:Option(option = "relocation-prefix", description = "Prefix to use for relocated packages")
+  @get:Option(option = "relocation-prefix", description = "Prefix used for auto relocation of packages in the dependencies")
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   @Internal
