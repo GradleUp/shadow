@@ -3,6 +3,18 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc2...HEAD) - 2025-xx-xx
 
+**Changed**
+
+- **BREAKING CHANGE:** Rename `ShadowJar`'s `enableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))  
+  The Command Line options are also updated:
+  ```
+  --enable-auto-relocation      Enables auto relocation of packages in the dependencies.
+  --no-enable-auto-relocation   Disables option --enable-auto-relocation.
+  --minimize-jar                Minimizes the jar by removing unused classes.
+  --no-minimize-jar             Disables option --minimize-jar.
+  --relocation-prefix           Prefix used for auto relocation of packages in the dependencies.
+  --rerun                       Causes the task to be re-run even if up-to-date.
+  ```
 
 ## [9.0.0-rc2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc2) - 2025-07-23
 

@@ -156,14 +156,14 @@ Shadow is shipped with a task that can be used to automatically configure all pa
 relocated. This feature was formally shipped into a 2nd plugin (`com.github.johnrengelman.plugin-shadow`) but has been
 removed for clarity reasons in version 4.0.0.
 
-To configure automatic dependency relocation, set `enableRelocation = true` and optionally specify a custom
+To configure automatic dependency relocation, set `enableAutoRelocation = true` and optionally specify a custom
 `relocationPrefix` to override the default value of `"shadow"`.
 
 === "Kotlin"
 
     ```kotlin
     tasks.shadowJar {
-      enableRelocation = true
+      enableAutoRelocation = true
       relocationPrefix = "myapp"
     }
     ```
@@ -172,7 +172,7 @@ To configure automatic dependency relocation, set `enableRelocation = true` and 
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      enableRelocation = true
+      enableAutoRelocation = true
       relocationPrefix = "myapp"
     }
     ```

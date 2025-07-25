@@ -29,7 +29,7 @@ task for relocation.
     }
 
     tasks.shadowJar {
-      enableRelocation = true
+      enableAutoRelocation = true
       archiveClassifier = ""
     }
     ```
@@ -52,7 +52,7 @@ task for relocation.
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      enableRelocation = true
+      enableAutoRelocation = true
       archiveClassifier = ''
     }
     ```
