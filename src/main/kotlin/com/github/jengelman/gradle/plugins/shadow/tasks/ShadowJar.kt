@@ -67,12 +67,12 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Minimize the jar by removing unused classes.
+   * Minimizes the jar by removing unused classes.
    *
    * Defaults to `false`.
    */
   @get:Input
-  @get:Option(option = "minimize-jar", description = "Minimize the jar by removing unused classes")
+  @get:Option(option = "minimize-jar", description = "Minimizes the jar by removing unused classes")
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @get:Classpath
@@ -135,14 +135,14 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Enable auto relocation of packages in the dependencies.
+   * Enables auto relocation of packages in the dependencies.
    *
    * Defaults to `false`.
    *
    * @see relocationPrefix
    */
   @get:Input
-  @get:Option(option = "enable-relocation", description = "Enable auto relocation of packages in the dependencies")
+  @get:Option(option = "enable-auto-relocation", description = "Enables auto relocation of packages in the dependencies")
   public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**

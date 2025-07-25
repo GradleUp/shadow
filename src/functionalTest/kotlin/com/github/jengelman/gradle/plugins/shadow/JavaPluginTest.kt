@@ -103,11 +103,11 @@ class JavaPluginTest : BasePluginTest() {
     val result = run("help", "--task", shadowJarTask)
 
     assertThat(result.output).contains(
-      "--enable-auto-relocation     Enable relocation of packages in the jar",
-      "--no-enable-relocation     Disables option --enable-auto-relocation",
-      "--minimize-jar     Minimize the jar by removing unused classes",
-      " --no-minimize-jar     Disables option --minimize-jar",
-      "--relocation-prefix     Prefix to use for relocated packages",
+      "--enable-auto-relocation     Enables auto relocation of packages in the dependencies",
+      "--no-enable-auto-relocation     Disables option --enable-auto-relocation",
+      "--minimize-jar     Minimizes the jar by removing unused classes",
+      "--no-minimize-jar     Disables option --minimize-jar",
+      "--relocation-prefix     Prefix used for auto relocation of packages in the dependencies",
     )
   }
 
