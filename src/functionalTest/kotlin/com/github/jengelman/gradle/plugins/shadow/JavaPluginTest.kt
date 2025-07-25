@@ -87,7 +87,7 @@ class JavaPluginTest : BasePluginTest() {
     // Check self properties.
     with(shadowTask) {
       assertThat(minimizeJar.get()).isFalse()
-      assertThat(enableRelocation.get()).isFalse()
+      assertThat(enableAutoRelocation.get()).isFalse()
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
       assertThat(configurations.get()).all {
         isNotEmpty()
@@ -103,8 +103,8 @@ class JavaPluginTest : BasePluginTest() {
     val result = run("help", "--task", shadowJarTask)
 
     assertThat(result.output).contains(
-      "--enable-relocation     Enable relocation of packages in the jar",
-      "--no-enable-relocation     Disables option --enable-relocation",
+      "--enable-auto-relocation     Enable relocation of packages in the jar",
+      "--no-enable-relocation     Disables option --enable-auto-relocation",
       "--minimize-jar     Minimize the jar by removing unused classes",
       " --no-minimize-jar     Disables option --minimize-jar",
       "--relocation-prefix     Prefix to use for relocated packages",

@@ -143,14 +143,14 @@ public abstract class ShadowJar :
    */
   @get:Input
   @get:Option(option = "enable-relocation", description = "Enable auto relocation of packages in the dependencies")
-  public open val enableRelocation: Property<Boolean> = objectFactory.property(false)
+  public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
    * Prefix used for auto relocation of packages in the dependencies.
    *
    * Defaults to `shadow`.
    *
-   * @see enableRelocation
+   * @see enableAutoRelocation
    */
   @get:Input
   @get:Option(option = "relocation-prefix", description = "Prefix used for auto relocation of packages in the dependencies")
@@ -384,7 +384,7 @@ public abstract class ShadowJar :
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
-      if (!enableRelocation.get()) return emptyList()
+      if (!enableAutoRelocation.get()) return emptyList()
       val prefix = relocationPrefix.get()
       return includedDependencies.files.flatMap { file ->
         JarFile(file).use { jarFile ->

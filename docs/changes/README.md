@@ -177,8 +177,8 @@
 ```
 Options:
 
---enable-relocation       Enable relocation of packages in the jar
---no-enable-relocation    Disables option --enable-relocation
+--enable-auto-relocation       Enable relocation of packages in the jar
+--no-enable-relocation    Disables option --enable-auto-relocation
 --minimize-jar            Minimize the jar by removing unused classes
 --no-minimize-jar         Disables option --minimize-jar
 --relocation-prefix       Prefix to use for relocated packages
@@ -552,7 +552,7 @@ For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct
 
 **BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle
 configuration caching.
-Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task
+Instead, use the `enableAutoRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task
 type.
 
 ### What's Changed

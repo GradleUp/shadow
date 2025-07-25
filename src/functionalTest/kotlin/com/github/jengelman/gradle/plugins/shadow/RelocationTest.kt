@@ -35,7 +35,7 @@ class RelocationTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
         }
         $shadowJar {
-          enableRelocation = true
+          enableAutoRelocation = true
           relocationPrefix = '$relocationPrefix'
         }
       """.trimIndent(),
@@ -357,7 +357,7 @@ class RelocationTest : BasePluginTest() {
 
   @ParameterizedTest
   @MethodSource("preserveLastModifiedProvider")
-  fun preserveLastModifiedCorrectly(enableRelocation: Boolean, preserveFileTimestamps: Boolean) {
+  fun preserveLastModifiedCorrectly(enableAutoRelocation: Boolean, preserveFileTimestamps: Boolean) {
     // Minus 3 sec to avoid the time difference between the file system and the JVM.
     val currentTimeMillis = System.currentTimeMillis() - 3.seconds.inWholeMilliseconds
     val junitEntryTimeRange = junitRawEntries.map { it.time }.let { it.min()..it.max() }
@@ -368,7 +368,7 @@ class RelocationTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
         }
         $shadowJar {
-          enableRelocation = $enableRelocation
+          enableAutoRelocation = $enableAutoRelocation
           preserveFileTimestamps = $preserveFileTimestamps
         }
       """.trimIndent(),
@@ -376,7 +376,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarTask)
 
-    if (enableRelocation) {
+    if (enableAutoRelocation) {
       val (relocatedEntries, otherEntries) = outputShadowJar.use {
         it.entries().toList().partition { entry -> entry.name.startsWith("shadow/") }
       }
@@ -544,7 +544,7 @@ class RelocationTest : BasePluginTest() {
 
   @ParameterizedTest
   @MethodSource("relocationCliOptionProvider")
-  fun enableRelocationByCliOption(enableRelocation: Boolean, relocationPrefix: String) {
+  fun enableAutoRelocationByCliOption(enableAutoRelocation: Boolean, relocationPrefix: String) {
     val mainClassEntry = writeClass()
     projectScriptPath.appendText(
       """
@@ -557,14 +557,14 @@ class RelocationTest : BasePluginTest() {
       .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
       .toTypedArray()
 
-    if (enableRelocation) {
-      run(shadowJarTask, "--enable-relocation", "--relocation-prefix=$relocationPrefix")
+    if (enableAutoRelocation) {
+      run(shadowJarTask, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
     } else {
       run(shadowJarTask, "--relocation-prefix=$relocationPrefix")
     }
 
     assertThat(outputShadowJar).useAll {
-      if (enableRelocation) {
+      if (enableAutoRelocation) {
         containsOnly(
           "my/",
           "$relocationPrefix/",
