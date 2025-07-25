@@ -148,7 +148,7 @@ build script. Passing property values on the command line is particularly helpfu
 Here are the options that can be passed to the `shadowJar`:
 
 ```
---enable-auto-relocation      Enable auto relocation of packages in the dependencies.
+--enable-auto-relocation      Enables auto relocation of packages in the dependencies.
 --no-enable-auto-relocation   Disables option --enable-auto-relocation.
 --minimize-jar                Minimizes the jar by removing unused classes.
 --no-minimize-jar             Disables option --minimize-jar.

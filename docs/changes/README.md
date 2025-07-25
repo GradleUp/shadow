@@ -8,12 +8,12 @@
 - **BREAKING CHANGE:** Rename `ShadowJar`'s `enableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))  
   The Command Line options are also updated:
   ```
-  --enable-auto-relocation      Enables auto relocation of packages in the dependencies
-  --no-enable-auto-relocation   Disables option --enable-auto-relocation
-  --minimize-jar                Minimizes the jar by removing unused classes
-  --no-minimize-jar             Disables option --minimize-jar
-  --relocation-prefix           Prefix to use for relocated packages
-  --rerun                       Causes the task to be re-run even if up-to-date
+  --enable-auto-relocation      Enables auto relocation of packages in the dependencies.
+  --no-enable-auto-relocation   Disables option --enable-auto-relocation.
+  --minimize-jar                Minimizes the jar by removing unused classes.
+  --no-minimize-jar             Disables option --minimize-jar.
+  --relocation-prefix           Prefix used for auto relocation of packages in the dependencies.
+  --rerun                       Causes the task to be re-run even if up-to-date.
   ```
 
 ## [9.0.0-rc2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc2) - 2025-07-23
@@ -189,7 +189,7 @@
 ```
 Options:
 
---enable-relocation       Enables relocation of packages in the jar
+--enable-relocation       Enable relocation of packages in the jar
 --no-enable-relocation    Disables option --enable-relocation
 --minimize-jar            Minimize the jar by removing unused classes
 --no-minimize-jar         Disables option --minimize-jar
@@ -564,7 +564,7 @@ For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct
 
 **BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle
 configuration caching.
-Instead, use the `enableAutoRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task
+Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task
 type.
 
 ### What's Changed
