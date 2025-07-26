@@ -111,9 +111,9 @@
   and to distinguish itself from `org.gradle.api.Transformer.java`.
 - **BREAKING CHANGE:** Mark `DefaultInheritManifest` as `internal`. ([#1303](https://github.com/GradleUp/shadow/pull/1303))
 - **BREAKING CHANGE:** Polish `ShadowSpec`. ([#1307](https://github.com/GradleUp/shadow/pull/1307))
-  - Return values of `ShadowSpec` functions are changed to `Unit` to avoid confusion.
-  - `ShadowSpec` no longer extends `CopySpec`.
-  - Overload `relocate`, `transform` and things for better usability in Kotlin.
+    - Return values of `ShadowSpec` functions are changed to `Unit` to avoid confusion.
+    - `ShadowSpec` no longer extends `CopySpec`.
+    - Overload `relocate`, `transform` and things for better usability in Kotlin.
 - **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
 - Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
 - Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
@@ -229,9 +229,9 @@
 ### Changed
 
 - **BREAKING CHANGE:** Polish `ShadowSpec`. ([#1307](https://github.com/GradleUp/shadow/pull/1307))
-  - Return values of `ShadowSpec` functions are changed to `Unit` to avoid confusion.
-  - `ShadowSpec` no longer extends `CopySpec`.
-  - Overload `relocate`, `transform` and things for better usability in Kotlin.
+    - Return values of `ShadowSpec` functions are changed to `Unit` to avoid confusion.
+    - `ShadowSpec` no longer extends `CopySpec`.
+    - Overload `relocate`, `transform` and things for better usability in Kotlin.
 - **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
 - `runShadow` no longer depends on `installShadowDist`. ([#1353](https://github.com/GradleUp/shadow/pull/1353))
 
