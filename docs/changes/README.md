@@ -83,7 +83,7 @@
 - **BREAKING CHANGE:** `ShadowJar`'s `isEnableRelocation` has been renamed to `enableRelocation`. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
 - **BREAKING CHANGE:** Resolve `Configuration` directly in `DependencyFilter`. ([#1045](https://github.com/GradleUp/shadow/pull/1045))
 - **BREAKING CHANGE:** Migrate `SimpleRelocator` to using lazy properties. ([#1047](https://github.com/GradleUp/shadow/pull/1047))
-- **BREAKING CHANGE:** Some public getter have been updated in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
+- **BREAKING CHANGE:** Some public getters have been updated in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
 - **BREAKING CHANGE:** Migrate all `ListProperty` usages to `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
   Some public `List` parameters are also changed to `Set`.
 - **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
