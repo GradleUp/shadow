@@ -144,7 +144,7 @@
 ### Removed
 
 - **BREAKING CHANGE:** Remove Develocity integration. ([#1014](https://github.com/GradleUp/shadow/pull/1014))
-- **BREAKING CHANGE:** Some public getter and setters have been removed in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
+- **BREAKING CHANGE:** Some public getters and setters have been removed in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
 - **BREAKING CHANGE:** Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow` task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
 - **BREAKING CHANGE:** `ServiceFileTransformer.ServiceStream` has been removed. ([#1218](https://github.com/GradleUp/shadow/pull/1218))
 - **BREAKING CHANGE:** Remove `KnowsTask` as it's useless. ([#1236](https://github.com/GradleUp/shadow/pull/1236))
