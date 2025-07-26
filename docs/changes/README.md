@@ -163,7 +163,7 @@
 ### Changed
 
 - Update start script templates. ([#1419](https://github.com/GradleUp/shadow/pull/1419))
-- In-development snapshots are now published to the Central Portal Snapshots repository at https://central.sonatype.com/repository/maven-snapshots/. ([#1414](https://github.com/GradleUp/shadow/pull/1414))
+- In-development snapshots are now published to the Central Portal Snapshots repository. ([#1414](https://github.com/GradleUp/shadow/pull/1414))
 
 ### Fixed
 
@@ -185,17 +185,14 @@
 ### Added
 
 - Support command line options for `ShadowJar`. ([#1365](https://github.com/GradleUp/shadow/pull/1365))
-
-```
-Options:
-
---enable-relocation       Enable relocation of packages in the jar
---no-enable-relocation    Disables option --enable-relocation
---minimize-jar            Minimize the jar by removing unused classes
---no-minimize-jar         Disables option --minimize-jar
---relocation-prefix       Prefix to use for relocated packages
---rerun                   Causes the task to be re-run even if up-to-date
-```
+  ```
+  --enable-relocation       Enable relocation of packages in the jar
+  --no-enable-relocation    Disables option --enable-relocation
+  --minimize-jar            Minimize the jar by removing unused classes
+  --no-minimize-jar         Disables option --minimize-jar
+  --relocation-prefix       Prefix to use for relocated packages
+  --rerun                   Causes the task to be re-run even if up-to-date
+  ```
 
 ### Changed
 
@@ -206,8 +203,7 @@ Options:
 ### Added
 
 - Add Kotlin DSL examples in docs. ([#1306](https://github.com/GradleUp/shadow/pull/1306))
-- Support using type-safe dependency accessors in
-  `ShadowJar.dependencies`. ([#1322](https://github.com/GradleUp/shadow/pull/1322))
+- Support using type-safe dependency accessors in `ShadowJar.dependencies`. ([#1322](https://github.com/GradleUp/shadow/pull/1322))
 - Set `Main-Class` attr for KMP 2.1.0 or above. ([#1337](https://github.com/GradleUp/shadow/pull/1337))
 
 ### Changed
@@ -216,38 +212,30 @@ Options:
   - Return values of `ShadowSpec` functions are changed to `Unit` to avoid confusion.
   - `ShadowSpec` no longer extends `CopySpec`.
   - Overload `relocate`, `transform` and things for better usability in Kotlin.
-- **BREAKING CHANGE:** Remove redundant types from function
-  returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
+- **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
 - `runShadow` no longer depends on `installShadowDist`. ([#1353](https://github.com/GradleUp/shadow/pull/1353))
 
 ### Fixed
 
-- Fix relocation exclusion for file patterns like
-  `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
+- Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
 
 ### Removed
 
-- **BREAKING CHANGE:** Reduce dependency and project overloads in
-  `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
+- **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
 
 ## [9.0.0-beta10](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta10) - 2025-03-05
 
 ### Added
 
 - Compat Kotlin Multiplatform plugin. ([#1280](https://github.com/GradleUp/shadow/pull/1280))  
-  You still need to manually configure `manifest.attributes` (e.g. `Main-Class` attr) in the `shadowJar` task if
-  necessary.
+  You still need to manually configure `manifest.attributes` (e.g. `Main-Class` attr) in the `shadowJar` task if necessary.
 
 ### Changed
 
-- **BREAKING CHANGE:** Rename `Transformer` to
-  `ResourceTransformer`. ([#1288](https://github.com/GradleUp/shadow/pull/1288))  
-  Aims to better align with the name
-  of [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java)
-  and to distinguish itself
-  from [org.gradle.api.Transformer.java](https://docs.gradle.org/current/javadoc/org/gradle/api/Transformer.html).
-- **BREAKING CHANGE:** Mark `DefaultInheritManifest` as
-  `internal`. ([#1303](https://github.com/GradleUp/shadow/pull/1303))
+- **BREAKING CHANGE:** Rename `Transformer` to `ResourceTransformer`. ([#1288](https://github.com/GradleUp/shadow/pull/1288))  
+  Aims to better align with the name `org.apache.maven.plugins.shade.resource.ResourceTransformer.java`
+  and to distinguish itself from `org.gradle.api.Transformer.java`.
+- **BREAKING CHANGE:** Mark `DefaultInheritManifest` as `internal`. ([#1303](https://github.com/GradleUp/shadow/pull/1303))
 - Migrate doc sites to MkDocs. ([#1302](https://github.com/GradleUp/shadow/pull/1302))
 
 ### Fixed
@@ -256,8 +244,7 @@ Options:
 
 ### Removed
 
-- **BREAKING CHANGE:** Remove `Named` from the parents of
-  `Transformer`. ([#1289](https://github.com/GradleUp/shadow/pull/1289))
+- **BREAKING CHANGE:** Remove `Named` from the parents of `Transformer`. ([#1289](https://github.com/GradleUp/shadow/pull/1289))
 
 ## [9.0.0-beta9](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta9) - 2025-02-24
 
@@ -267,11 +254,9 @@ Options:
 
 ### Changed
 
-- **BREAKING CHANGE:** Move tracking unused classes logic out of
-  `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
+- **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
 - Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
-- **BREAKING CHANGE:** Move `DependencyFilter` from `com.github.jengelman.gradle.plugins.shadow.internal` into
-  `com.github.jengelman.gradle.plugins.shadow.tasks`. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
+- **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
   issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip
@@ -287,8 +272,7 @@ Options:
       implementation(files('path/to/your/file.zip'))
     }
   ```
-- Refactor file visiting logic in `StreamAction`, handle file unzipping via
-  `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- Refactor file visiting logic in `StreamAction`, handle file unzipping via `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 
 ### Fixed
 
@@ -301,8 +285,7 @@ Options:
 
 - **BREAKING CHANGE:** Remove `BaseStreamAction`. ([#1258](https://github.com/GradleUp/shadow/pull/1258))
 - **BREAKING CHANGE:** Remove `ShadowStats`. ([#1264](https://github.com/GradleUp/shadow/pull/1264))
-- **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and
-  `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 - **BREAKING CHANGE:** Remove `TransformerContext.getEntryTimestamp`. ([#1245](https://github.com/GradleUp/shadow/pull/1245))
 
 ## [9.0.0-beta8](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta8) - 2025-02-08
@@ -310,8 +293,7 @@ Options:
 ### Added
 
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
-- Inject `Multi-Release` manifest attribute if any dependency contains
-  it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
+- Inject `Multi-Release` manifest attribute if any dependency contains it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
 
 ### Changed
 
@@ -320,16 +302,14 @@ Options:
 
 ### Removed
 
-- **BREAKING CHANGE:** `ServiceFileTransformer.ServiceStream` has been
-  removed. ([#1218](https://github.com/GradleUp/shadow/pull/1218))
+- **BREAKING CHANGE:** `ServiceFileTransformer.ServiceStream` has been removed. ([#1218](https://github.com/GradleUp/shadow/pull/1218))
 - **BREAKING CHANGE:** Remove `KnowsTask` as it's useless. ([#1236](https://github.com/GradleUp/shadow/pull/1236))
 
 ## [9.0.0-beta7](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta7) - 2025-02-02
 
 ### Added
 
-- Inject `TargetJvmVersion` attribute for Gradle Module
-  Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
+- Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
 - Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
 
 ### Changed
@@ -343,25 +323,21 @@ Options:
 ### Fixed
 
 - Support overriding `mainClass` provided by `JavaApplication`. ([#1182](https://github.com/GradleUp/shadow/pull/1182))
-- Fix `ShadowJar` not being successful after `includes` or `excludes` are
-  changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
+- Fix `ShadowJar` not being successful after `includes` or `excludes` are changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
 
 ### Removed
 
-- **BREAKING CHANGE:** Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow`
-  task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
+- **BREAKING CHANGE:** Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow` task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
 
 ## [9.0.0-beta6](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta6) - 2025-01-23
 
 ### Added
 
-- Exclude `module-info.class` in Multi-Release folders by
-  default. ([#1177](https://github.com/GradleUp/shadow/pull/1177))
+- Exclude `module-info.class` in Multi-Release folders by default. ([#1177](https://github.com/GradleUp/shadow/pull/1177))
 
 ### Fixed
 
-- Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat`
-  files. ([#1175](https://github.com/GradleUp/shadow/pull/1175))
+- Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1175](https://github.com/GradleUp/shadow/pull/1175))
 
 ## [9.0.0-beta5](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta5) - 2025-01-21
 
@@ -372,29 +348,25 @@ Options:
 ### Changed
 
 - Exclude kotlin-stdlib from plugin dependencies. ([#1093](https://github.com/GradleUp/shadow/pull/1093))
-- **BREAKING CHANGE:** Migrate all `ListProperty` usages to
-  `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
+- **BREAKING CHANGE:** Migrate all `ListProperty` usages to `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
   Some public `List` parameters are also changed to `Set`.
-- Replace deprecated `SelfResolvingDependency` with
-  `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
+- Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
 - Support configuring `separator` in `AppendingTransformer`. ([#1169](https://github.com/GradleUp/shadow/pull/1169))  
   This is useful for handling files like `resources/application.yml`.
 
 ### Fixed
 
-- Fail builds if processing bad jars.  ([#1146](https://github.com/GradleUp/shadow/pull/1146))
+- Fail builds if processing bad jars. ([#1146](https://github.com/GradleUp/shadow/pull/1146))
 
 ## [9.0.0-beta4](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta4) - 2024-12-06
 
 ### Changed
 
-- **BREAKING CHANGE:** Some public getters are removed from `SimpleRelocator`, `includes` and `excludes` are exposed as
-  `SetProperty`s. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
+- **BREAKING CHANGE:** Some public getters are removed and updated in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
 
 ### Fixed
 
-- Adjust property initializations and modifiers in
-  `ShadowJar`. ([#1090](https://github.com/GradleUp/shadow/pull/1090))  
+- Adjust property initializations and modifiers in `ShadowJar`. ([#1090](https://github.com/GradleUp/shadow/pull/1090))  
   This fixes the regression for registering custom `ShadowJar` tasks.
 
 ## [9.0.0-beta2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta2) - 2024-11-28
@@ -413,15 +385,11 @@ Options:
 ### Changed
 
 - **BREAKING CHANGE:** Rewrite this plugin in Kotlin. ([#1012](https://github.com/GradleUp/shadow/pull/1012))
-- **BREAKING CHANGE:** Migrate `Transformer`s to using lazy
-  properties. ([#1036](https://github.com/GradleUp/shadow/pull/1036))
-- **BREAKING CHANGE:** Migrate `ShadowJar` to using lazy
-  properties. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
+- **BREAKING CHANGE:** Migrate `Transformer`s to using lazy properties. ([#1036](https://github.com/GradleUp/shadow/pull/1036))
+- **BREAKING CHANGE:** Migrate `ShadowJar` to using lazy properties. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
   `isEnableRelocation` is removed, use `enableRelocation` instead.
-- **BREAKING CHANGE:** Resolve `Configuration` directly in
-  `DependencyFilter`. ([#1045](https://github.com/GradleUp/shadow/pull/1045))
-- **BREAKING CHANGE:** Migrate `SimpleRelocator` to using lazy
-  properties. ([#1047](https://github.com/GradleUp/shadow/pull/1047))
+- **BREAKING CHANGE:** Resolve `Configuration` directly in `DependencyFilter`. ([#1045](https://github.com/GradleUp/shadow/pull/1045))
+- **BREAKING CHANGE:** Migrate `SimpleRelocator` to using lazy properties. ([#1047](https://github.com/GradleUp/shadow/pull/1047))
 
 ### Removed
 
