@@ -57,15 +57,12 @@
 - Sync `SimpleRelocator` changes from maven-shade-plugin. ([#1076](https://github.com/GradleUp/shadow/pull/1076))
 - Exclude `module-info.class` in Multi-Release folders by default. ([#1177](https://github.com/GradleUp/shadow/pull/1177))
 - Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
-- Support Java 24. ([#1222](https://github.com/GradleUp/shadow/pull/1222))
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
 - Inject `Multi-Release` manifest attribute if any dependency contains it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
 - Mark `Transformer` as throwing `IOException`. ([#1248](https://github.com/GradleUp/shadow/pull/1248))
-- Compat Kotlin Multiplatform plugin. ([#1280](https://github.com/GradleUp/shadow/pull/1280))  
-  You still need to manually configure `manifest.attributes` (e.g. `Main-Class` attr) in the `shadowJar` task if necessary.
+- Compat Kotlin Multiplatform plugin. ([#1280](https://github.com/GradleUp/shadow/pull/1280))
 - Add Kotlin DSL examples in docs. ([#1306](https://github.com/GradleUp/shadow/pull/1306))
 - Support using type-safe dependency accessors in `ShadowJar.dependencies`. ([#1322](https://github.com/GradleUp/shadow/pull/1322))
-- Set `Main-Class` attr for KMP 2.1.0 or above. ([#1337](https://github.com/GradleUp/shadow/pull/1337))
 - Support command line options for `ShadowJar`. ([#1365](https://github.com/GradleUp/shadow/pull/1365))
   ```
   --enable-relocation       Enable relocation of packages in the jar
@@ -80,7 +77,7 @@
 
 - **BREAKING CHANGE:** Rewrite this plugin in Kotlin. ([#1012](https://github.com/GradleUp/shadow/pull/1012))
 - **BREAKING CHANGE:** Migrate `Transformer`s to using lazy properties. ([#1036](https://github.com/GradleUp/shadow/pull/1036))
-- **BREAKING CHANGE:** Migrate `ShadowJar` to using lazy properties. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
+- **BREAKING CHANGE:** Migrate `ShadowJar` to using lazy properties. ([#1044](https://github.com/GradleUp/shadow/pull/1044))  
   `isEnableRelocation` is removed, use `enableRelocation` instead.
 - **BREAKING CHANGE:** Resolve `Configuration` directly in `DependencyFilter`. ([#1045](https://github.com/GradleUp/shadow/pull/1045))
 - **BREAKING CHANGE:** Migrate `SimpleRelocator` to using lazy properties. ([#1047](https://github.com/GradleUp/shadow/pull/1047))
@@ -97,7 +94,7 @@
   `ShadowSpec.stats` is removed and `ShadowJar.stats` is `internal` for now.
 - Polish `startShadowScripts` task registering. ([#1216](https://github.com/GradleUp/shadow/pull/1216))
 - **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
-- Bump min Java requirement to 11. ([#1242](https://github.com/GradleUp/shadow/pull/1242))
+- **BREAKING CHANGE:** Bump min Java requirement to 11. ([#1242](https://github.com/GradleUp/shadow/pull/1242))
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
 - Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 - **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
@@ -129,9 +126,7 @@
 - **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
 - `runShadow` no longer depends on `installShadowDist`. ([#1353](https://github.com/GradleUp/shadow/pull/1353))
 - Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
-- Update start script templates. ([#1419](https://github.com/GradleUp/shadow/pull/1419))
 - In-development snapshots are now published to the Central Portal Snapshots repository. ([#1414](https://github.com/GradleUp/shadow/pull/1414))
-- Update ASM to 9.8 to support Java 25. ([#1380](https://github.com/GradleUp/shadow/pull/1380))
 
 ### Fixed
 
@@ -146,15 +141,8 @@
 - Honor unzipped jars via `from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 - Fix the last modified time of shadowed directories. ([#1277](https://github.com/GradleUp/shadow/pull/1277))
 - Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
-- Avoid creating jvm targets eagerly for KMP. ([#1378](https://github.com/GradleUp/shadow/pull/1378))
-- Set `Main-Class` attr for KMP 1.9.0 or above. ([#1410](https://github.com/GradleUp/shadow/pull/1410))
 - Allow using file trees of JARs together with the configuration cache. ([#1441](https://github.com/GradleUp/shadow/pull/1441))
 - Fallback `RelocateClassContext` and `RelocatePathContext` to data classes. ([#1445](https://github.com/GradleUp/shadow/pull/1445))
-- Pin the plugin's Kotlin language level on 2.0. ([#1448](https://github.com/GradleUp/shadow/pull/1448))  
-  The language level used in `9.0.0-beta14` is 2.2, which may cause compatibility issues for the plugins depending on
-  Shadow.
-- Restore removed `Named` from `ResourceTransformer`. ([#1449](https://github.com/GradleUp/shadow/pull/1449))
-- Fix compatibility for Gradle 9.0.0 RC1. ([#1468](https://github.com/GradleUp/shadow/pull/1468))
 
 ### Removed
 
@@ -166,7 +154,6 @@
 - **BREAKING CHANGE:** Remove `ShadowStats`. ([#1264](https://github.com/GradleUp/shadow/pull/1264))
 - **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 - **BREAKING CHANGE:** Remove `TransformerContext.getEntryTimestamp`. ([#1245](https://github.com/GradleUp/shadow/pull/1245))
-- **BREAKING CHANGE:** Remove `Named` from the parents of `Transformer`. ([#1289](https://github.com/GradleUp/shadow/pull/1289))
 - **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
 
 ## [9.0.0-beta17](https://github.com/GradleUp/shadow/releases/tag/9.0.0-beta17) - 2025-06-18
