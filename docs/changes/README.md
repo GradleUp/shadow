@@ -86,11 +86,6 @@
 - **BREAKING CHANGE:** Some public getter have been updated in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
 - **BREAKING CHANGE:** Migrate all `ListProperty` usages to `SetProperty`. ([#1103](https://github.com/GradleUp/shadow/pull/1103))  
   Some public `List` parameters are also changed to `Set`.
-- Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
-- Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
-- Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
-- Mark `ShadowJar.dependencyFilter` as `@Input`. ([#1206](https://github.com/GradleUp/shadow/pull/1206))  
-- Polish `startShadowScripts` task registering. ([#1216](https://github.com/GradleUp/shadow/pull/1216))
 - **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
 - **BREAKING CHANGE:** Bump min Java requirement to 11. ([#1242](https://github.com/GradleUp/shadow/pull/1242))
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
@@ -111,17 +106,22 @@
       implementation(files('path/to/your/file.zip'))
     }
   ```
-- Refactor file visiting logic in `StreamAction`, handle file unzipping via `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 - **BREAKING CHANGE:** Rename `Transformer` to `ResourceTransformer`. ([#1288](https://github.com/GradleUp/shadow/pull/1288))  
   Aims to better align with the name `org.apache.maven.plugins.shade.resource.ResourceTransformer.java`
   and to distinguish itself from `org.gradle.api.Transformer.java`.
 - **BREAKING CHANGE:** Mark `DefaultInheritManifest` as `internal`. ([#1303](https://github.com/GradleUp/shadow/pull/1303))
-- Migrate doc sites to MkDocs. ([#1302](https://github.com/GradleUp/shadow/pull/1302))
 - **BREAKING CHANGE:** Polish `ShadowSpec`. ([#1307](https://github.com/GradleUp/shadow/pull/1307))
   - Return values of `ShadowSpec` functions are changed to `Unit` to avoid confusion.
   - `ShadowSpec` no longer extends `CopySpec`.
   - Overload `relocate`, `transform` and things for better usability in Kotlin.
 - **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
+- Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
+- Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
+- Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
+- Mark `ShadowJar.dependencyFilter` as `@Input`. ([#1206](https://github.com/GradleUp/shadow/pull/1206))
+- Polish `startShadowScripts` task registering. ([#1216](https://github.com/GradleUp/shadow/pull/1216))
+- Refactor file visiting logic in `StreamAction`, handle file unzipping via `Project.zipTree`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
+- Migrate doc sites to MkDocs. ([#1302](https://github.com/GradleUp/shadow/pull/1302))
 - `runShadow` no longer depends on `installShadowDist`. ([#1353](https://github.com/GradleUp/shadow/pull/1353))
 - Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
 - In-development snapshots are now published to the Central Portal Snapshots repository. ([#1414](https://github.com/GradleUp/shadow/pull/1414))
