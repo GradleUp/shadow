@@ -64,6 +64,7 @@ spotless {
 
 val testPluginClasspath by configurations.registering {
   isCanBeResolved = true
+  description = "Plugins used in integration tests could be resolved in classpath."
 }
 
 configurations.configureEach {
@@ -221,7 +222,6 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.pluginUnderTestMetadata {
-  // Plugins used in tests could be resolved in classpath.
   pluginClasspath.from(
     testPluginClasspath,
   )
