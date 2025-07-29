@@ -19,6 +19,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
   includes: List<String>? = null,
   excludes: List<String>? = null,
   private val rawString: Boolean = false,
+  @get:Input override var skipStringConstants: Boolean = false,
 ) : Relocator {
   private val pattern: String
   private val pathPattern: String
@@ -137,6 +138,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
     if (this === other) return true
     if (other !is SimpleRelocator) return false
     return rawString == other.rawString &&
+      skipStringConstants == other.skipStringConstants &&
       pattern == other.pattern &&
       pathPattern == other.pathPattern &&
       shadedPattern == other.shadedPattern &&
@@ -149,6 +151,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun hashCode(): Int {
     var result = rawString.hashCode()
+    result = 31 * result + skipStringConstants.hashCode()
     result = 31 * result + pattern.hashCode()
     result = 31 * result + pathPattern.hashCode()
     result = 31 * result + shadedPattern.hashCode()
@@ -212,7 +215,7 @@ public open class SimpleRelocator @JvmOverloads constructor(
         // Actually, class patterns should just use 'foo.bar.*' ending with a single asterisk, but some users
         // mistake them for path patterns like 'my/path/**', so let us be a bit more lenient here.
         if (filePattern.endsWith("/*") || filePattern.endsWith("/**")) {
-          val packagePattern = filePattern.substring(0, filePattern.lastIndexOf('/'))
+          val packagePattern = filePattern.take(filePattern.lastIndexOf('/'))
           add(packagePattern)
         }
       }

@@ -1,7 +1,7 @@
 # About This Project
 
-I (John Engelman) started this project in December 2012. We were working on converting from a monolithic application into the
-new hot jazz of "microservices" using Dropwizard.
+I (John Engelman) started this project in December 2012. We were working on converting from a monolithic application
+into the new hot jazz of "microservices" using Dropwizard.
 I had also just started learning about Gradle and I knew that the incremental build system it provided would benefit
 our development team greatly.
 Unfortunately, the closest thing that Gradle had to Maven's Shade plugin was its ability to create application TARs and

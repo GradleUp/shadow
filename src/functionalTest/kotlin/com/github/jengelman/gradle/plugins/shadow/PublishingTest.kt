@@ -16,7 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
-import com.github.jengelman.gradle.plugins.shadow.util.gavs
+import com.github.jengelman.gradle.plugins.shadow.util.coordinate
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -29,6 +29,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.gradle.api.JavaVersion
@@ -87,6 +88,7 @@ class PublishingTest : BasePluginTest() {
     }.toTypedArray()
     val targetJvmAttr17 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "17"
     val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
+    val targetJvmAttr8 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "8"
 
     projectScriptPath.appendText(
       """
@@ -118,6 +120,17 @@ class PublishingTest : BasePluginTest() {
     publish()
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
+
+    projectScriptPath.appendText(
+      """
+        tasks.named('compileJava') {
+          options.release = 8
+        }
+      """.trimIndent() + System.lineSeparator(),
+    )
+    publish()
+    // options.release flag is honored.
+    assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
   @Test
@@ -169,7 +182,10 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("my/maven/1.0/maven-1.0-tests.jar")).useAll {
-      containsAtLeast(*junitEntries)
+      containsOnly(
+        *junitEntries,
+        *manifestEntries,
+      )
     }
   }
 
@@ -211,26 +227,55 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Issue(
+    "https://github.com/GradleUp/shadow/issues/614",
     "https://github.com/GradleUp/shadow/issues/860",
     "https://github.com/GradleUp/shadow/issues/945",
   )
   @Test
-  fun publishShadowJarWithCustomClassifierAndExtension() {
+  fun publishShadowJarWithCustomArtifactName() {
     projectScriptPath.appendText(
       publishConfiguration(
+        projectBlock = """
+          group = 'my-group'
+          version = '2.0'
+        """.trimIndent(),
         shadowBlock = """
           archiveClassifier = 'my-classifier'
           archiveExtension = 'my-ext'
           archiveBaseName = 'maven-all'
+        """.trimIndent(),
+        publicationsBlock = """
+        shadow(MavenPublication) {
+          from components.shadow
+          artifactId = 'my-artifact'
+        }
         """.trimIndent(),
       ),
     )
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("my/maven-all/1.0/maven-all-1.0-my-classifier.my-ext"))
-    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")))
+    assertThat(repoPath("my-group/my-artifact/2.0/").listDirectoryEntries().map { it.name }).containsOnly(
+      "my-artifact-2.0-my-classifier.my-ext.sha512",
+      "my-artifact-2.0-my-classifier.my-ext",
+      "my-artifact-2.0.pom.sha256",
+      "my-artifact-2.0.module",
+      "my-artifact-2.0.pom",
+      "my-artifact-2.0.module.sha256",
+      "my-artifact-2.0.module.sha1",
+      "my-artifact-2.0.module.md5",
+      "my-artifact-2.0.pom.sha512",
+      "my-artifact-2.0-my-classifier.my-ext.sha256",
+      "my-artifact-2.0.module.sha512",
+      "my-artifact-2.0-my-classifier.my-ext.sha1",
+      "my-artifact-2.0-my-classifier.my-ext.md5",
+      "my-artifact-2.0.pom.md5",
+      "my-artifact-2.0.pom.sha1",
+    )
+
+    assertShadowJarCommon(repoJarPath("my-group/my-artifact/2.0/my-artifact-2.0-my-classifier.my-ext"))
+    assertPomCommon(repoPath("my-group/my-artifact/2.0/my-artifact-2.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my-group/my-artifact/2.0/my-artifact-2.0.module")))
   }
 
   @Test
@@ -278,7 +323,7 @@ class PublishingTest : BasePluginTest() {
       containsOnly(
         "aa.properties",
         "aa2.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
     assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
@@ -317,11 +362,11 @@ class PublishingTest : BasePluginTest() {
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      assertThat(gmm.runtimeElementsVariant.gavs).containsOnly(
+      assertThat(gmm.runtimeElementsVariant.coordinates).containsOnly(
         "example:client:1.0",
       )
-      assertThat(gmm.shadowRuntimeElementsVariant.gavs).isEmpty()
-      assertShadowVariantCommon(gmm, gavs = emptyArray()) {
+      assertThat(gmm.shadowRuntimeElementsVariant.coordinates).isEmpty()
+      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
         transform { it.fileNames }.single().isEqualTo("server-1.0-all.jar")
       }
     }
@@ -329,7 +374,7 @@ class PublishingTest : BasePluginTest() {
       assertThat(gmm.variantNames).containsOnly(
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
-      assertShadowVariantCommon(gmm, gavs = emptyArray()) {
+      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
         transform { it.fileNames }.single().isEqualTo("client-1.0-all.jar")
       }
     }
@@ -368,7 +413,7 @@ class PublishingTest : BasePluginTest() {
     assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
       containsOnly(
         *entriesInAB,
-        manifestEntry,
+        *manifestEntries,
       )
     }
 
@@ -386,7 +431,7 @@ class PublishingTest : BasePluginTest() {
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
         )
-        transform { it.gavs }.isEmpty()
+        transform { it.coordinates }.isEmpty()
       }
       assertThat(gmm.runtimeElementsVariant).all {
         transform { it.attributes }.containsOnly(
@@ -394,7 +439,7 @@ class PublishingTest : BasePluginTest() {
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
         )
-        transform { it.gavs }.containsOnly(
+        transform { it.coordinates }.containsOnly(
           "my:a:1.0",
           "my:b:1.0",
         )
@@ -460,9 +505,7 @@ class PublishingTest : BasePluginTest() {
           $publicationsBlock
         }
         repositories {
-          maven {
-            url = '${remoteRepoPath.toUri()}'
-          }
+          maven { url = '${remoteRepoPath.toUri()}' }
         }
       }
     """.trimIndent()
@@ -470,20 +513,24 @@ class PublishingTest : BasePluginTest() {
 
   private fun assertPomCommon(
     pomPath: Path,
-    gavs: Array<String> = arrayOf("my:b:1.0"),
+    coordinates: Array<String> = arrayOf("my:b:1.0"),
   ) {
-    assertThat(pomReader.read(pomPath).gavs).containsOnly(*gavs)
+    assertThat(pomReader.read(pomPath)).all {
+      transform { it.dependencies.map(Dependency::coordinate) }.containsOnly(*coordinates)
+      // All scopes should be runtime.
+      transform { it.dependencies.map(Dependency::getScope).distinct() }.single().isEqualTo("runtime")
+    }
   }
 
   private fun assertShadowVariantCommon(
     gmm: GradleModuleMetadata,
     variantAttrs: Array<Pair<String, String>> = shadowVariantAttrs,
-    gavs: Array<String> = arrayOf("my:b:1.0"),
+    coordinates: Array<String> = arrayOf("my:b:1.0"),
     body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
   ) {
     assertThat(gmm.shadowRuntimeElementsVariant).all {
       transform { it.attributes }.containsOnly(*variantAttrs)
-      transform { it.gavs }.containsOnly(*gavs)
+      transform { it.coordinates }.containsOnly(*coordinates)
       body()
     }
   }

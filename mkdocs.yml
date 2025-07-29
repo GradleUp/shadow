@@ -71,9 +71,14 @@ nav:
   - 'Application Plugin': application-plugin/README.md
   - 'Kotlin Plugins': kotlin-plugins/README.md
   - 'Groovy and Scala Plugins': groovy-and-scala-plugins/README.md
+  - 'Android Plugins': android-plugins/README.md
   - 'Publishing': publishing/README.md
   - 'Multi-Project': multi-project/README.md
   - 'Gradle Plugins': gradle-plugins/README.md
   - 'Changes': changes/README.md
   - 'API': api/index.html
   - 'About': about/README.md
+
+validation:
+  unrecognized_links: warn
+  anchors: warn

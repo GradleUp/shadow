@@ -10,13 +10,14 @@ import org.gradle.util.GradleVersion
 
 public abstract class ShadowBasePlugin : Plugin<Project> {
 
-  override fun apply(project: Project) {
-    if (GradleVersion.current() < GradleVersion.version("8.3")) {
-      throw GradleException("This version of Shadow supports Gradle 8.3+ only. Please upgrade.")
+  override fun apply(project: Project): Unit = with(project) {
+    if (GradleVersion.current() < GradleVersion.version("8.11")) {
+      throw GradleException("This version of Shadow supports Gradle 8.11+ only. Please upgrade.")
     }
     @Suppress("DEPRECATION")
-    project.extensions.create(EXTENSION_NAME, ShadowExtension::class.java, project)
-    project.configurations.create(CONFIGURATION_NAME)
+    extensions.create(EXTENSION_NAME, ShadowExtension::class.java, project)
+    @Suppress("EagerGradleConfiguration") // this should be created eagerly.
+    configurations.create(CONFIGURATION_NAME)
   }
 
   public companion object {

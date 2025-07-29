@@ -22,12 +22,13 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
+import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
-import org.gradle.api.UncheckedIOException
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.internal.file.FileResolver
@@ -46,16 +47,13 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.gradle.api.tasks.options.Option
 
 @CacheableTask
 public abstract class ShadowJar :
   Jar(),
   ShadowSpec {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-
-  private val includedZipTrees = project.provider {
-    includedDependencies.files.map { project.zipTree(it) }
-  }
 
   init {
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
@@ -69,11 +67,12 @@ public abstract class ShadowJar :
   }
 
   /**
-   * Minimize the jar by removing unused classes.
+   * Minimizes the jar by removing unused classes.
    *
    * Defaults to `false`.
    */
   @get:Input
+  @get:Option(option = "minimize-jar", description = "Minimizes the jar by removing unused classes.")
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @get:Classpath
@@ -102,12 +101,23 @@ public abstract class ShadowJar :
     }
   }
 
+  /**
+   * [ResourceTransformer]s to be applied in the shadow steps.
+   */
   @get:Nested
   public open val transformers: SetProperty<ResourceTransformer> = objectFactory.setProperty()
 
+  /**
+   * [Relocator]s to be applied in the shadow steps.
+   */
   @get:Nested
   public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
 
+  /**
+   * The configurations to include dependencies from.
+   *
+   * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
+   */
   @get:Classpath
   @get:Optional
   public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
@@ -116,25 +126,34 @@ public abstract class ShadowJar :
   public open val dependencyFilter: Property<DependencyFilter> =
     objectFactory.property(DefaultDependencyFilter(project))
 
+  /**
+   * Final dependencies to be shadowed.
+   */
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
     dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
   }
 
   /**
-   * Enable relocation of packages in the jar.
+   * Enables auto relocation of packages in the dependencies.
    *
    * Defaults to `false`.
+   *
+   * @see relocationPrefix
    */
   @get:Input
-  public open val enableRelocation: Property<Boolean> = objectFactory.property(false)
+  @get:Option(option = "enable-auto-relocation", description = "Enables auto relocation of packages in the dependencies.")
+  public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
-   * Prefix to use for relocated packages.
+   * Prefix used for auto relocation of packages in the dependencies.
    *
-   * Defaults to [ShadowBasePlugin.SHADOW].
+   * Defaults to `shadow`.
+   *
+   * @see enableAutoRelocation
    */
   @get:Input
+  @get:Option(option = "relocation-prefix", description = "Prefix used for auto relocation of packages in the dependencies.")
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   @Internal
@@ -146,33 +165,57 @@ public abstract class ShadowJar :
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
+  @get:Inject
+  protected abstract val archiveOperations: ArchiveOperations
+
+  /**
+   * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
+   */
   override fun minimize() {
     minimizeJar.set(true)
   }
 
+  /**
+   * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
+   */
   override fun minimize(action: Action<DependencyFilter>?) {
     minimize()
     action?.execute(dependencyFilterForMinimize)
   }
 
+  /**
+   * Extra dependency operations to be applied in the shadow steps.
+   */
   override fun dependencies(action: Action<DependencyFilter>?) {
     action?.execute(dependencyFilter.get())
   }
 
+  /**
+   * Merge Java services files.
+   */
   override fun mergeServiceFiles() {
     transform(ServiceFileTransformer::class.java, null)
   }
 
+  /**
+   * Merge Java services files with [rootPath].
+   */
   override fun mergeServiceFiles(rootPath: String) {
     transform(ServiceFileTransformer::class.java) {
       it.path = rootPath
     }
   }
 
+  /**
+   * Merge Java services files with [action].
+   */
   override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?) {
     transform(ServiceFileTransformer::class.java, action)
   }
 
+  /**
+   * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
+   */
   override fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, null)
   }
@@ -193,6 +236,9 @@ public abstract class ShadowJar :
     }
   }
 
+  /**
+   * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
+   */
   override fun relocate(
     pattern: String,
     destination: String,
@@ -202,42 +248,86 @@ public abstract class ShadowJar :
     addRelocator(relocator, action)
   }
 
+  /**
+   * Relocate classes and resources using a [Relocator].
+   */
   override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
 
+  /**
+   * Relocate classes and resources using a [Relocator].
+   */
   override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
     addRelocator(relocator, action)
   }
 
+  /**
+   * Relocate classes and resources using a [Relocator].
+   *
+   * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified R : Relocator> relocate() {
     relocate(R::class.java, null)
   }
 
+  /**
+   * Relocate classes and resources using a [Relocator].
+   *
+   * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified R : Relocator> relocate(action: Action<R>?) {
     relocate(R::class.java, action)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   */
   override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?) {
     addTransform(clazz.create(objectFactory), action)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   */
   override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
     addTransform(transformer, action)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   *
+   * This is a convenience method for [transform] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified T : ResourceTransformer> transform() {
     transform(T::class.java, null)
   }
 
+  /**
+   * Transform resources using a [ResourceTransformer].
+   *
+   * This is a convenience method for [transform] with a reified type parameter for Kotlin.
+   */
   public inline fun <reified T : ResourceTransformer> transform(action: Action<T>?) {
     transform(T::class.java, action)
   }
 
   @TaskAction
   override fun copy() {
-    from(includedZipTrees.get())
+    from(
+      includedDependencies.files.map { file ->
+        if (file.extension.equals("aar", ignoreCase = true)) {
+          val message = """
+            Shadowing AAR file is not supported.
+            Please exclude dependency artifact: $file
+            or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
+          """.trimIndent()
+          error(message)
+        }
+        archiveOperations.zipTree(file)
+      },
+    )
     injectMultiReleaseAttrIfPresent()
     super.copy()
   }
@@ -255,11 +345,15 @@ public abstract class ShadowJar :
           setMethod(entryCompressionMethod)
         }
       } catch (e: Exception) {
-        throw UncheckedIOException("Unable to create ZIP output stream for file $destination.", e)
+        throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }
     }
     val unusedClasses = if (minimizeJar.get()) {
-      val unusedTracker = UnusedTracker.forProject(apiJars, sourceSetsClassesDirs.files, toMinimize)
+      val unusedTracker = UnusedTracker(
+        sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+        classJars = apiJars,
+        toMinimize = toMinimize,
+      )
       includedDependencies.files.forEach {
         unusedTracker.addDependency(it)
       }
@@ -290,7 +384,7 @@ public abstract class ShadowJar :
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
-      if (!enableRelocation.get()) return emptyList()
+      if (!enableAutoRelocation.get()) return emptyList()
       val prefix = relocationPrefix.get()
       return includedDependencies.files.flatMap { file ->
         JarFile(file).use { jarFile ->

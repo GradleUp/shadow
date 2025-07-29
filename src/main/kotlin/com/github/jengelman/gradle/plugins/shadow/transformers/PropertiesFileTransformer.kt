@@ -212,9 +212,7 @@ public open class PropertiesFileTransformer @Inject constructor(
     return mergeSeparator
   }
 
-  override fun hasTransformedResource(): Boolean {
-    return propertiesEntries.isNotEmpty()
-  }
+  override fun hasTransformedResource(): Boolean = propertiesEntries.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     // Cannot close the writer as the OutputStream needs to remain open.
@@ -238,7 +236,6 @@ public open class PropertiesFileTransformer @Inject constructor(
     public companion object {
       @JvmStatic
       public fun from(value: String): MergeStrategy {
-        @OptIn(ExperimentalStdlibApi::class)
         return entries.find { it.name.equals(value, ignoreCase = true) }
           ?: throw IllegalArgumentException("Unknown merge strategy: $value")
       }

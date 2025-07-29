@@ -8,8 +8,10 @@ import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
-class MinimizeTest : BasePluginTest() {
+class MinimizationTest : BasePluginTest() {
   /**
    * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
    * The minimize step shall remove 'junit', but not 'api'.
@@ -23,14 +25,14 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
       containsAtLeast(
+        "api/",
+        "lib/",
+        "impl/",
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
-      )
-      containsNone(
-        "junit/framework/Test.class",
-        "lib/UnusedLibEntity.class",
+        *manifestEntries,
       )
     }
   }
@@ -57,12 +59,15 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
       containsOnly(
+        "api/",
+        "impl/",
+        "lib/",
         "impl/SimpleEntity.class",
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -147,9 +152,13 @@ class MinimizeTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
         "client/Client.class",
         "server/Server.class",
+        *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -201,6 +210,39 @@ class MinimizeTest : BasePluginTest() {
         "server/Server.class",
         *junitEntries,
       )
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun enableMinimizationByCliOption(enable: Boolean) {
+    writeClientAndServerModules()
+
+    if (enable) {
+      run(serverShadowJarTask, "--minimize-jar")
+    } else {
+      run(serverShadowJarTask)
+    }
+
+    assertThat(outputServerShadowJar).useAll {
+      if (enable) {
+        containsAtLeast(
+          "server/Server.class",
+          *manifestEntries,
+        )
+        containsNone(
+          "client/Client.class",
+        )
+      } else {
+        containsOnly(
+          "client/",
+          "server/",
+          "client/Client.class",
+          "server/Server.class",
+          *junitEntries,
+          *manifestEntries,
+        )
+      }
     }
   }
 

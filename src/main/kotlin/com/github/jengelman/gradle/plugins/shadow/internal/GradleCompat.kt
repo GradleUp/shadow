@@ -1,8 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.gradle.develocity.agent.gradle.DevelocityConfiguration
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -18,16 +19,13 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.util.GradleVersion
 
 /**
  * Return `runtimeClasspath` or `runtime` configuration.
  */
 internal inline val Project.runtimeConfiguration: Configuration
-  get() {
-    return configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
-      ?: configurations.getByName("runtime")
-  }
+  get() = configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
+    ?: configurations.getByName("runtime")
 
 internal inline val Project.sourceSets: SourceSetContainer
   get() = extensions.getByType(SourceSetContainer::class.java)
@@ -43,6 +41,20 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
+
+@Suppress("GradleProjectIsolation") // TODO: we can't call 'providers.gradleProperty' instead due to https://github.com/gradle/gradle/issues/23572.
+internal fun Project.findOptionalProperty(propertyName: String): String? = findProperty(propertyName)?.toString()
+
+internal fun Project.addBuildScanCustomValues() {
+  val develocity = extensions.findByType(DevelocityConfiguration::class.java) ?: return
+  val buildScan = develocity.buildScan
+  tasks.withType(ShadowJar::class.java).configureEach { task ->
+    buildScan.buildFinished {
+      buildScan.value("shadow.${task.path}.executed", "true")
+      buildScan.value("shadow.${task.path}.didWork", task.didWork.toString())
+    }
+  }
+}
 
 internal inline val TaskContainer.jar: TaskProvider<Jar>
   get() = named("jar", Jar::class.java)
@@ -83,28 +95,9 @@ internal inline fun <reified V : Any> ObjectFactory.mapProperty(
   }
 }
 
-/**
- * TODO: this could be removed after bumping the min Gradle requirement to 8.8 or above.
- */
 internal inline fun ObjectFactory.fileCollection(
   path: () -> Any,
 ): ConfigurableFileCollection = fileCollection().apply {
   @Suppress("UnstableApiUsage")
-  if (GradleVersion.current() >= GradleVersion.version("8.8")) {
-    convention(path())
-  } else {
-    setFrom(path())
-  }
-}
-
-/**
- * TODO: this could be removed after bumping the min Gradle requirement to 8.11 or above.
- */
-internal fun ProjectDependency.dependencyProjectCompat(project: Project): Project {
-  return if (GradleVersion.current() >= GradleVersion.version("8.11")) {
-    project.project(path)
-  } else {
-    @Suppress("DEPRECATION")
-    dependencyProject
-  }
+  convention(path())
 }

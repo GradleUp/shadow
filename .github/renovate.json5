@@ -13,7 +13,14 @@
       "matchPackageNames": [
         "org.vafer:jdependency",
         "org.ow2.asm:asm-commons"
-      ]
-    }
+      ],
+    },
+    {
+      // AGP version should match the min Gradle version used in tests.
+      "enabled": false,
+      "matchPackageNames": [
+        'com.android.tools.build:gradle',
+      ],
+    },
   ]
 }

@@ -4,7 +4,10 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
+import assertk.assertions.containsOnly
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -13,10 +16,12 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -30,14 +35,18 @@ import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.copyToRecursively
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
+import org.gradle.api.tasks.bundling.Jar
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledForJreRange
-import org.junit.jupiter.api.condition.JRE
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -60,48 +69,50 @@ class JavaPluginTest : BasePluginTest() {
     project.plugins.apply(JavaPlugin::class.java)
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+    val assembleTask = project.tasks.getByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)
+    assertThat(assembleTask.dependsOn).contains(shadowTask)
 
-    assertThat(shadowTask.archiveBaseName.get()).isEqualTo(projectName)
-    assertThat(shadowTask.destinationDirectory.get().asFile)
-      .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
-    assertThat(shadowTask.archiveVersion.get()).isEqualTo(version)
-    assertThat(shadowTask.archiveClassifier.get()).isEqualTo("all")
-    assertThat(shadowTask.archiveExtension.get()).isEqualTo("jar")
+    // Check extended properties.
+    with(shadowTask as Jar) {
+      assertThat(archiveAppendix.orNull).isNull()
+      assertThat(archiveBaseName.get()).isEqualTo(projectName)
+      assertThat(archiveClassifier.get()).isEqualTo("all")
+      assertThat(archiveExtension.get()).isEqualTo("jar")
+      assertThat(archiveFileName.get()).isEqualTo("my-shadow-1.0.0-all.jar")
+      assertThat(archiveVersion.get()).isEqualTo(version)
+      assertThat(archiveFile.get().asFile).all {
+        isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
+        isEqualTo(project.projectDir.resolve("build/libs/my-shadow-1.0.0-all.jar"))
+      }
+      assertThat(destinationDirectory.get().asFile)
+        .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
+    }
+
+    // Check self properties.
+    with(shadowTask) {
+      assertThat(minimizeJar.get()).isFalse()
+      assertThat(enableAutoRelocation.get()).isFalse()
+      assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
+      assertThat(configurations.get()).all {
+        isNotEmpty()
+        containsOnly(project.runtimeConfiguration)
+      }
+    }
+
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
   }
 
   @Test
-  @DisabledForJreRange(
-    min = JRE.JAVA_21,
-    disabledReason = "Gradle 8.3 doesn't support Java 21.",
-  )
-  fun compatibleWithMinGradleVersion() {
-    val mainClassEntry = writeClass(withImports = true)
-    projectScriptPath.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """.trimIndent(),
+  fun shadowJarCliOptions() {
+    val result = run("help", "--task", shadowJarTask)
+
+    assertThat(result.output).contains(
+      "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
+      "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
+      "--minimize-jar     Minimizes the jar by removing unused classes.",
+      "--no-minimize-jar     Disables option --minimize-jar.",
+      "--relocation-prefix     Prefix used for auto relocation of packages in the dependencies.",
     )
-
-    run(shadowJarTask) {
-      it.withGradleVersion("8.3")
-    }
-
-    assertThat(outputShadowJar).useAll {
-      containsAtLeast(
-        mainClassEntry,
-        *junitEntries,
-      )
-    }
-  }
-
-  @Test
-  fun incompatibleWithLowerMinGradleVersion() {
-    runWithFailure(shadowJarTask) {
-      it.withGradleVersion("8.2")
-    }
   }
 
   @Test
@@ -111,10 +122,13 @@ class JavaPluginTest : BasePluginTest() {
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -127,14 +141,19 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
       containsOnly(
+        "server/",
         "server/Server.class",
-        manifestEntry,
+        *manifestEntries,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsAtLeast(
+        "client/",
         "client/Client.class",
         "client/junit/framework/Test.class",
+      )
+      containsNone(
+        "server/Server.class",
       )
     }
   }
@@ -142,25 +161,29 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun shadowProjectShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
-    val shadowedEntries = junitEntries
+    val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
     run(serverShadowJarTask)
 
     assertThat(outputServerShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "client/",
+        "server/",
+        "client/junit/",
         "client/Client.class",
         "server/Server.class",
-        *shadowedEntries,
-      )
-      containsNone(
-        *junitEntries.filter { it.startsWith("junit/framework/") }.toTypedArray(),
+        *relocatedEntries,
+        *manifestEntries,
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsAtLeast(
         "client/Client.class",
         "client/junit/framework/Test.class",
+      )
+      containsNone(
+        "server/Server.class",
       )
     }
   }
@@ -227,10 +250,11 @@ class JavaPluginTest : BasePluginTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
+        "my/",
         "my/Passed.class",
         "a.properties",
         "META-INF/a.properties",
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -251,7 +275,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -291,11 +315,12 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "api.properties",
         "implementation.properties",
         "runtimeOnly.properties",
         "implementation-dep.properties",
+        *manifestEntries,
       )
     }
   }
@@ -316,7 +341,7 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
   }
@@ -458,12 +483,56 @@ class JavaPluginTest : BasePluginTest() {
       getMainAttr(classPathAttributeKey).isNull()
 
       containsOnly(
+        "my/",
+        "my/plugin/",
         "my/plugin/MyPlugin.class",
+        "META-INF/gradle-plugins/",
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
-        manifestEntry,
+        *manifestEntries,
       )
     }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1422",
+  )
+  @Test
+  fun movesLocalGradleApiToCompileOnly() {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin")}
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    val outputCompileOnly = dependencies(COMPILE_ONLY_CONFIGURATION_NAME)
+    val outputApi = dependencies(API_CONFIGURATION_NAME)
+
+    // "unspecified" is the local Gradle API.
+    assertThat(outputCompileOnly).contains("unspecified")
+    assertThat(outputApi).doesNotContain("unspecified")
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1422",
+  )
+  @ParameterizedTest
+  @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
+  fun doesNotReAddSuppressedGradleApi(configuration: String) {
+    projectScriptPath.writeText(
+      """
+        ${getDefaultProjectBuildScript("java-gradle-plugin")}
+      """.trimIndent() + System.lineSeparator(),
+    )
+
+    val output = dependencies(
+      configuration = configuration,
+      // Internal flag added in 8.14 to experiment with suppressing local Gradle API.
+      "-Dorg.gradle.unsafe.suppress-gradle-api=true",
+    )
+
+    // "unspecified" is the local Gradle API.
+    assertThat(output).doesNotContain("unspecified")
   }
 
   @Issue(
@@ -494,9 +563,11 @@ class JavaPluginTest : BasePluginTest() {
     run(testShadowJarTask)
 
     assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
@@ -532,6 +603,26 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
+  fun failBuildIfProcessingAar() {
+    val fooAarPath = path("foo.aar")
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(fooAarPath)}
+        }
+      """.trimIndent(),
+    )
+
+    val result = runWithFailure(shadowJarTask)
+
+    assertThat(result.output).contains(
+      "Shadowing AAR file is not supported.",
+      "Please exclude dependency artifact:",
+    )
+  }
+
+  @Test
   fun worksWithArchiveFileName() {
     val mainClassEntry = writeClass()
     projectScriptPath.appendText(
@@ -548,9 +639,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         mainClassEntry,
         *junitEntries,
+        *manifestEntries,
       )
     }
   }
@@ -591,7 +684,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         $shadowJar {
-          from(file('${artifactAJar.toUri().toURL().path}')) {
+          from(file('${artifactAJar.invariantSeparatorsPathString}')) {
             into('META-INF')
           }
           from('Foo') {
@@ -606,13 +699,11 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(outputShadowJar).useAll {
       containsOnly(
         "my/",
-        mainClassEntry,
         "Bar/",
         "Bar/Foo",
-        "META-INF/",
         "META-INF/a-1.0.jar",
-        manifestEntry,
-        includeDirs = true,
+        mainClassEntry,
+        *manifestEntries,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
@@ -656,9 +747,11 @@ class JavaPluginTest : BasePluginTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(
-        mainClassEntry,
+      containsOnly(
         "module-info.class",
+        "my/",
+        mainClassEntry,
+        *manifestEntries,
       )
       getContent("module-info.class").all {
         isNotEmpty()
@@ -689,5 +782,78 @@ class JavaPluginTest : BasePluginTest() {
         manifestEntry,
       )
     }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1441",
+  )
+  @Test
+  fun includeFilesInTaskOutputDirectory() {
+    // Create a build that has a task with jars in the output directory
+    projectScriptPath.appendText(
+      """
+      def createJars = tasks.register('createJars') {
+        def artifactAJar = file('${artifactAJar.invariantSeparatorsPathString}')
+        def artifactBJar = file('${artifactBJar.invariantSeparatorsPathString}')
+        inputs.files(artifactAJar, artifactBJar)
+        def outputDir = file('${'$'}{buildDir}/jars')
+        outputs.dir(outputDir)
+        doLast {
+          artifactAJar.withInputStream { input ->
+              new File(outputDir, 'jarA.jar').withOutputStream { output ->
+                  output << input
+              }
+          }
+          artifactBJar.withInputStream { input ->
+              new File(outputDir, 'jarB.jar').withOutputStream { output ->
+                  output << input
+              }
+          }
+        }
+      }
+      $shadowJar {
+        includedDependencies.from(files(createJars).asFileTree)
+      }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(*entriesInAB, *manifestEntries)
+    }
+  }
+
+  @Test
+  fun integrateWithDevelocityBuildScan() {
+    writeClientAndServerModules()
+    settingsScriptPath.writeText(
+      """
+        plugins {
+          id 'com.gradle.develocity'
+        }
+        ${settingsScriptPath.readText()}
+      """.trimIndent(),
+    )
+
+    val result = run(
+      serverShadowJarTask,
+      IP_ARGUMENT,
+      "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
+      "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
+      "--info",
+    )
+
+    assertThat(result.output).all {
+      contains(
+        "Enabling Develocity integration for Shadow plugin.",
+        "Build scan written",
+      )
+      doesNotContain("Configuration cache problems")
+    }
+  }
+
+  private fun dependencies(configuration: String, vararg flags: String): String {
+    return run("dependencies", "--configuration", configuration, *flags).output
   }
 }

@@ -1,6 +1,7 @@
 # Minimizing
 
-Shadow can automatically remove all classes of dependencies that are not used by the project, thereby minimizing the resulting shadowed JAR.
+Shadow can automatically remove all classes of dependencies that are not used by the project, thereby minimizing the
+resulting shadowed JAR.
 
 === "Kotlin"
 
@@ -43,7 +44,8 @@ a `dependency` is interpreted as a regular expression.
     }
     ```
 
-> Dependencies scoped as `api` will be automatically excluded from minimization and used as "entry points" on minimization.
+> Dependencies scoped as `api` will be automatically excluded from minimization and used as "entry points" on
+> minimization.
 
 Similar to dependencies, projects can also be excluded.
 
@@ -68,4 +70,4 @@ Similar to dependencies, projects can also be excluded.
     ```
 
 > When excluding a `project`, all dependencies of the excluded `project` are automatically
-  excluded as well.
+> excluded as well.

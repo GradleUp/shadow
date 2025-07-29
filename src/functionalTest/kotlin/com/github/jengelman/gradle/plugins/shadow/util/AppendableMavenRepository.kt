@@ -5,12 +5,12 @@ import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
-import org.apache.maven.model.ModelBase
 import org.gradle.testkit.runner.GradleRunner
 
 class AppendableMavenRepository(
@@ -48,9 +48,7 @@ class AppendableMavenRepository(
             ${modules.joinToString(System.lineSeparator()) { createPublication(it) }}
           }
           repositories {
-            maven {
-              url = '${root.toUri()}'
-            }
+            maven { url = '${root.toUri()}' }
           }
         }
       """.trimIndent(),
@@ -81,7 +79,7 @@ class AppendableMavenRepository(
         artifactId = '$artifactId'
         groupId = '$groupId'
         version = '$version'
-        artifact '${outputJar.toUri().toURL().path}'
+        artifact '${outputJar.invariantSeparatorsPathString}'
         pom.withXml { xml ->
           def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
           $nodes
@@ -133,7 +131,4 @@ class AppendableMavenRepository(
   }
 }
 
-val Dependency.gav: String get() = "$groupId:$artifactId:$version"
-
-@Suppress("SpellCheckingInspection")
-val ModelBase.gavs: List<String> get() = dependencies.map { it.gav }
+val Dependency.coordinate: String get() = "$groupId:$artifactId:$version"

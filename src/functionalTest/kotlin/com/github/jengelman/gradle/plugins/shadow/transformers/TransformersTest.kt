@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
@@ -121,7 +122,10 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarTask)
 
     assertThat(outputShadowJar).useAll {
-      containsAtLeast(*entriesInAB)
+      containsOnly(
+        *entriesInAB,
+        *manifestEntries,
+      )
     }
   }
 
@@ -191,7 +195,6 @@ class TransformersTest : BaseTransformerTest() {
       "{ resource.set(\"test.file\"); file.fileValue(file(\"test/some.file\")) }" to IncludeResourceTransformer::class,
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
-      "{ keyTransformer = { it.toLowerCase() } }" to PropertiesFileTransformer::class,
     )
   }
 }

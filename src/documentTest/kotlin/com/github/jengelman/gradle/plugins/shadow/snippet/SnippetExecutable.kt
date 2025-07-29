@@ -2,7 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.snippet
 
 import java.lang.System.lineSeparator
 import java.nio.file.Path
+import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
+import kotlin.io.path.createFile
+import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.function.Executable
@@ -62,9 +65,18 @@ sealed class SnippetExecutable : Executable {
       append(lineSeparator())
     }.trimIndent()
     projectRoot.addSubProject("main", mainScript)
+    projectRoot.resolve("main/foo.jar").createFile().also {
+      // Dummy JAR file to ensure the project can be built.
+      JarOutputStream(it.outputStream()).use {}
+    }
+    projectRoot.resolve("main/bar.jar").createFile().also {
+      // Dummy JAR file to ensure the project can be built.
+      JarOutputStream(it.outputStream()).use {}
+    }
 
     try {
       GradleRunner.create()
+        .withGradleVersion(testGradleVersion)
         .withProjectDir(projectRoot.toFile())
         .withPluginClasspath()
         .forwardOutput()
@@ -97,6 +109,9 @@ sealed class SnippetExecutable : Executable {
   }
 
   companion object {
+    private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
+      ?: error("TEST_GRADLE_VERSION system property is not set.")
+
     fun create(
       lang: DslLang,
       snippet: String,

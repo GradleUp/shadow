@@ -80,7 +80,7 @@ class SimpleRelocatorTest {
     // Include with Regex
     var relocator = SimpleRelocator(
       "org.foo",
-      includes = listOf("%regex[org/foo/R(\\\$.*)?\$]"),
+      includes = listOf("%regex[org/foo/R(\\$.*)?$]"),
     )
     assertThat(relocator.canRelocatePath("org/foo/R.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/R\$string.class")).isTrue()
@@ -148,7 +148,7 @@ class SimpleRelocatorTest {
     var relocator = SimpleRelocator("org/foo", rawString = true)
     assertThat(relocator.canRelocatePath("(I)org/foo/bar/Class;")).isTrue()
 
-    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", rawString = true)
+    relocator = SimpleRelocator("^META-INF/org.foo.xml$", rawString = true)
     assertThat(relocator.canRelocatePath("META-INF/org.foo.xml")).isTrue()
   }
 
@@ -216,7 +216,7 @@ class SimpleRelocatorTest {
     assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class;"))
       .isEqualTo("(I)Lhidden/org/foo/bar/Class;")
 
-    relocator = SimpleRelocator("^META-INF/org.foo.xml\$", "META-INF/hidden.org.foo.xml", rawString = true)
+    relocator = SimpleRelocator("^META-INF/org.foo.xml$", "META-INF/hidden.org.foo.xml", rawString = true)
     assertThat(relocator.relocatePath("META-INF/org.foo.xml"))
       .isEqualTo("META-INF/hidden.org.foo.xml")
   }
@@ -243,7 +243,7 @@ class SimpleRelocatorTest {
       excludes = listOf("org/apache/iceberg/spark/parquet/**", "org/apache/spark/sql/execution/datasources/parquet/**"),
     )
     assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet\$.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
   }
@@ -255,7 +255,7 @@ class SimpleRelocatorTest {
       excludes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
     )
     assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet\$.class")).isFalse()
+    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
   }
@@ -266,7 +266,7 @@ class SimpleRelocatorTest {
       includes = listOf("org/apache/iceberg/spark/parquet/**", "org/apache/spark/sql/execution/datasources/parquet/**"),
     )
     assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet\$.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isFalse()
   }
@@ -277,7 +277,7 @@ class SimpleRelocatorTest {
       includes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
     )
     assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet\$.class")).isTrue()
+    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isFalse()
   }

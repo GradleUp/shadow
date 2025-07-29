@@ -30,6 +30,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
@@ -378,6 +379,7 @@ abstract class BasePluginTest {
     arguments: Iterable<String> = emptyList(),
     projectDir: Path? = projectRoot,
   ): GradleRunner = GradleRunner.create()
+    .withGradleVersion(testGradleVersion)
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())
@@ -390,6 +392,9 @@ abstract class BasePluginTest {
 
   @Suppress("ConstPropertyName")
   companion object {
+    private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
+      ?: error("TEST_GRADLE_VERSION system property is not set.")
+
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
       if (gradleUserHome == null) {
@@ -407,6 +412,7 @@ abstract class BasePluginTest {
       }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
     const val manifestEntry = "META-INF/MANIFEST.MF"
+    val manifestEntries = arrayOf("META-INF/", manifestEntry)
 
     val shadowJar: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
     const val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
@@ -421,10 +427,14 @@ abstract class BasePluginTest {
       "-Dorg.gradle.configuration-cache.parallel=true",
     )
 
+    // TODO: enable this flag for all tests once we have fixed all issues with isolated projects.
+    //  See https://github.com/GradleUp/shadow/pull/1139.
+    const val IP_ARGUMENT = "-Dorg.gradle.unsafe.isolated-projects=true"
+
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.toUri().toURL().path}')" }
+      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.invariantSeparatorsPathString}')" }
     }
 
     inline fun <reified T : ResourceTransformer> transform(

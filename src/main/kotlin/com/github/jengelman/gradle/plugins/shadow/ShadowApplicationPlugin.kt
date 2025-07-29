@@ -27,12 +27,12 @@ import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
  * @see [ApplicationPlugin]
  */
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
-  override fun apply(project: Project) {
-    project.addRunTask()
-    project.addCreateScriptsTask()
-    project.configureDistribution()
-    project.configureShadowJarMainClass()
-    project.configureInstallTask()
+  override fun apply(project: Project): Unit = with(project) {
+    addRunTask()
+    addCreateScriptsTask()
+    configureDistribution()
+    configureShadowJarMainClass()
+    configureInstallTask()
   }
 
   protected open fun Project.addRunTask() {

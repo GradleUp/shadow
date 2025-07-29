@@ -6,6 +6,9 @@ import java.io.Writer
 import java.util.Date
 import java.util.Properties
 
+/**
+ * Introduced in order to remove prepended timestamp when creating output stream.
+ */
 internal class CleanProperties : Properties() {
   @Throws(IOException::class)
   override fun store(writer: Writer, comments: String) {
