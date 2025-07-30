@@ -103,6 +103,16 @@ the `archiveClassifier` of the shadowed JAR like the following:
       publications {
         create<MavenPublication>("shadow") {
           from(components["shadow"])
+
+          // Optionally, you can add extra dependencies to the POM file like the following:
+          pom.withXml {
+            val dependenciesNode = asNode().get("dependencies") ?: asNode().appendNode("dependencies")
+            val node = (dependenciesNode as groovy.util.Node).appendNode("dependency")
+            node.appendNode("groupId", "com.squareup.retrofit2")
+            node.appendNode("artifactId", "converter-gson")
+            node.appendNode("version", "2.12.0")
+            node.appendNode("scope", "runtime")
+          }
         }
       }
       repositories {
@@ -142,6 +152,16 @@ the `archiveClassifier` of the shadowed JAR like the following:
       publications {
         shadow(MavenPublication) {
           from components.shadow
+
+          // Optionally, you can add extra dependencies to the POM file like the following:
+          pom.withXml { xml ->
+            def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
+            def node = dependenciesNode.appendNode('dependency')
+            node.appendNode('groupId', 'com.squareup.retrofit2')
+            node.appendNode('artifactId', 'converter-gson')
+            node.appendNode('version', '2.12.0')
+            node.appendNode('scope', 'runtime')
+          }
         }
       }
       repositories {
