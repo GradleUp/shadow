@@ -15,7 +15,7 @@ import org.gradle.api.tasks.PathSensitivity
 /**
  * A resource processor that allows the addition of an arbitrary file content into the shaded JAR.
  *
- * You can also use [com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.from] as instead.
+ * You can also use [com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.from] instead.
  *
  * Modified from [org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/IncludeResourceTransformer.java).
  *
