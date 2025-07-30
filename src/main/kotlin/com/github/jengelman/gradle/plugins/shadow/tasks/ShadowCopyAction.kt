@@ -55,6 +55,7 @@ public open class ShadowCopyAction(
         processTransformers(zos)
         // This must be called as the last step to ensure that directories are added after all files.
         addDirs(zos)
+        checkDuplicateEntries(zos)
       }
     } catch (e: Exception) {
       if (e is Zip64RequiredException || e.cause is Zip64RequiredException) {
@@ -114,6 +115,14 @@ public open class ShadowCopyAction(
 
     entries.forEach {
       addParent(it)
+    }
+  }
+
+  private fun checkDuplicateEntries(zos: ZipOutputStream) {
+    val entries = zos.entries.map { it.name }
+    val duplicates = entries.groupingBy { it }.eachCount().filter { it.value > 1 }
+    if (duplicates.isNotEmpty()) {
+      throw GradleException("Duplicate entries found in ZIP: $duplicates")
     }
   }
 
