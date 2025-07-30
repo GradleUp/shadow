@@ -26,8 +26,7 @@ public open class PreserveFirstFoundResourceTransformer @Inject constructor(
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val resources = resources.get()
     val path = element.path
-    return resources.contains(path) && !found.add(path)
+    return resources.get().contains(path) && !found.add(path)
   }
 }
