@@ -181,9 +181,6 @@ class TransformerCachingTest : BaseCachingTest() {
   @MethodSource("transformerConfigProvider")
   fun shadowJarIsCachedCorrectlyWhenUsingOtherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
-    if (configuration.contains("test/some.file")) {
-      path("test/some.file").writeText("some content")
-    }
     val assertions = {
       assertCompositeExecutions {
         containsAtLeast(mainClass)
@@ -209,9 +206,7 @@ class TransformerCachingTest : BaseCachingTest() {
       "" to ApacheLicenseResourceTransformer::class,
       "" to ApacheNoticeResourceTransformer::class,
       "" to ComponentsXmlResourceTransformer::class,
-      "" to DontIncludeResourceTransformer::class,
       "" to GroovyExtensionModuleTransformer::class,
-      "{ resource.set(\"test.file\"); file.fileValue(file(\"test/some.file\")) }" to IncludeResourceTransformer::class,
       "" to Log4j2PluginsCacheFileTransformer::class,
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,

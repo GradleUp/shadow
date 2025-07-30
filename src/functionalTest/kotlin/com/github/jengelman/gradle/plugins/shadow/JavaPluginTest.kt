@@ -37,6 +37,7 @@ import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
@@ -70,6 +71,7 @@ class JavaPluginTest : BasePluginTest() {
 
     // Check extended properties.
     with(shadowTask as Jar) {
+      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.INCLUDE)
       assertThat(archiveAppendix.orNull).isNull()
       assertThat(archiveBaseName.get()).isEqualTo(projectName)
       assertThat(archiveClassifier.get()).isEqualTo("all")
