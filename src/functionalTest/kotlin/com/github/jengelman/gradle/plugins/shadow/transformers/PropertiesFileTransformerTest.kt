@@ -6,7 +6,9 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
+import java.util.Properties
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -156,6 +158,43 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
         foo=one,two
       """.trimIndent(),
     )
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/439",
+  )
+  @Test
+  fun multiTransformersOnSingleFile() {
+    val one = buildJarOne {
+      insert("test.properties", "key1Before=foo\nkey2Before=bar")
+    }
+    projectScriptPath.appendText(
+      """
+        import ${PropertiesFileTransformer::class.java.name}
+        dependencies {
+          ${implementationFiles(one)}
+        }
+        $shadowJar {
+          transform(PropertiesFileTransformer) {
+            paths = ["test.properties"]
+            keyTransformer = { it.replace("key1Before", "key1After") }
+          }
+          transform(PropertiesFileTransformer) {
+            paths = ["test.properties"]
+            keyTransformer = { it.replace("key2Before", "key2After") }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    val props = Properties().apply {
+      val text = outputShadowJar.use { it.getContent("test.properties") }
+      load(text.byteInputStream())
+    }
+    assertThat(props.containsKey("key1After")).isEqualTo(true)
+    assertThat(props.containsKey("key2After")).isEqualTo(true)
   }
 
   private companion object {
