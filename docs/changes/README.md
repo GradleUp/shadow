@@ -3,6 +3,12 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc2...HEAD) - 2025-xx-xx
 
+### Added
+
+- Add `PreserveFirstFoundResourceTransformer`. ([#1548](https://github.com/GradleUp/shadow/pull/1548))  
+  This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
+  want to ensure that only the first found resource is included in the final JAR.
+
 ### Changed
 
 - **BREAKING CHANGE:** Rename `ShadowJar`'s `enableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))  
