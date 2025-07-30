@@ -108,12 +108,12 @@ class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun canIncludeResource() {
-    val resourceFile = path("foo").apply { writeText("foo") }
+    val foo = path("foo").apply { writeText("foo") }
     projectScriptPath.appendText(
       transform<IncludeResourceTransformer>(
         transformerBlock = """
           resource = 'bar'
-          file = file('${resourceFile.invariantSeparatorsPathString}')
+          file = file('${foo.invariantSeparatorsPathString}')
         """.trimIndent(),
       ),
     )
@@ -122,18 +122,18 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
-        *manifestEntries,
         "bar",
+        *manifestEntries,
       )
-      getContent("bar")
+      getContent("bar").isEqualTo("foo")
     }
   }
 
   @Test
   fun canExcludeResource() {
     val one = buildJarOne {
-      insert("foo", "foo")
-      insert("bar", "bar")
+      insert("foo", "bar")
+      insert("bar", "foo")
     }
     projectScriptPath.appendText(
       transform<DontIncludeResourceTransformer>(
@@ -146,10 +146,10 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
-        *manifestEntries,
         "bar",
+        *manifestEntries,
       )
-      getContent("bar").isEqualTo("bar")
+      getContent("bar").isEqualTo("foo")
     }
   }
 
@@ -182,9 +182,6 @@ class TransformersTest : BaseTransformerTest() {
   @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
-    if (configuration.contains("test/some.file")) {
-      path("test/some.file").writeText("some content")
-    }
     projectScriptPath.appendText(
       """
         dependencies {
