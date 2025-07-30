@@ -429,7 +429,8 @@ exclude the duplicated service files beforehand. However, this behavior might be
 Want `ResourceTransformer`s and `duplicatesStrategy` to work together? There is a way to achieve this, leave the
 `duplicatesStrategy` as `INCLUDE` and declare a custom [`ResourceTransformer`][ResourceTransformer] to handle the
 duplicated files.
-
+If you just want to keep the current behavior and preserve the first found resource, there is a simple built-in one to
+handle this called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
 
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
@@ -440,6 +441,7 @@ duplicated files.
 [Log4j2PluginsCacheFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-log4j2-plugins-cache-file-transformer/index.html
 [ResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
+[PreserveFirstFoundResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-preserve-first-found-resource-transformer/index.html
 [ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
 [ShadowJar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [ShadowJar.transform]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html

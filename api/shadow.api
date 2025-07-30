@@ -394,6 +394,18 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public class com/github/jengelman/gradle/plugins/shadow/transformers/PreserveFirstFoundResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	protected final fun getFound ()Ljava/util/Set;
+	public fun getName ()Ljava/lang/String;
+	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public fun getResources ()Lorg/gradle/api/provider/SetProperty;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z

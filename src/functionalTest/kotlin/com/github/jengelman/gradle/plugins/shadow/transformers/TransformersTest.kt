@@ -154,6 +154,39 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
+  fun canPreserveFirstFoundResource() {
+    path("src/main/resources/foo/bar").writeText("bar1")
+    path("src/main/resources/foo/baz").writeText("baz1")
+    val one = buildJarOne {
+      insert("foo/bar", "bar2")
+      insert("foo/baz", "baz2")
+    }
+    val two = buildJarTwo {
+      insert("foo/bar", "bar3")
+      insert("foo/baz", "baz3")
+    }
+    projectScriptPath.appendText(
+      transform<PreserveFirstFoundResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = "resources = ['foo/bar']",
+      ),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(
+        "foo/",
+        "foo/bar",
+        "foo/baz",
+        *manifestEntries,
+      )
+      getContent("foo/bar").isEqualTo("bar1")
+      getContent("foo/baz").isEqualTo("baz3")
+    }
+  }
+
+  @Test
   fun canUseCustomTransformer() {
     projectScriptPath.appendText(
       """
