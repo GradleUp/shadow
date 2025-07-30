@@ -430,7 +430,7 @@ Want `ResourceTransformer`s and `duplicatesStrategy` to work together? There is 
 `duplicatesStrategy` as `INCLUDE` and declare a custom [`ResourceTransformer`][ResourceTransformer] to handle the
 duplicated files.
 If you just want to keep the current behavior and preserve the first found resource, there is a simple built-in one to
-handle so called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
+handle this called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
 
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
