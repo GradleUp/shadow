@@ -177,11 +177,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
         $shadowJar {
           transform(PropertiesFileTransformer) {
             paths = ["test.properties"]
-            keyTransformer = { it.replace("key1Before", "key1After") }
-          }
-          transform(PropertiesFileTransformer) {
-            paths = ["test.properties"]
-            keyTransformer = { it.replace("key2Before", "key2After") }
+            keyTransformer = {
+              it.replace("key1Before", "key1After").replace("key2Before", "key2After")
+            }
           }
         }
       """.trimIndent(),
