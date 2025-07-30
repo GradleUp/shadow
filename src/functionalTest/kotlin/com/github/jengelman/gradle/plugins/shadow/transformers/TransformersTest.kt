@@ -11,9 +11,11 @@ import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
@@ -105,6 +107,53 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
+  fun canIncludeResource() {
+    val resourceFile = path("foo").apply { writeText("foo") }
+    projectScriptPath.appendText(
+      transform<IncludeResourceTransformer>(
+        transformerBlock = """
+          resource = 'bar'
+          file = file('${resourceFile.invariantSeparatorsPathString}')
+        """.trimIndent(),
+      ),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(
+        *manifestEntries,
+        "bar",
+      )
+      getContent("bar")
+    }
+  }
+
+  @Test
+  fun canExcludeResource() {
+    val one = buildJarOne {
+      insert("foo", "foo")
+      insert("bar", "bar")
+    }
+    projectScriptPath.appendText(
+      transform<DontIncludeResourceTransformer>(
+        dependenciesBlock = implementationFiles(one),
+        transformerBlock = "resource = 'foo'",
+      ),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(
+        *manifestEntries,
+        "bar",
+      )
+      getContent("bar").isEqualTo("bar")
+    }
+  }
+
+  @Test
   fun canUseCustomTransformer() {
     projectScriptPath.appendText(
       """
@@ -191,8 +240,6 @@ class TransformersTest : BaseTransformerTest() {
       "" to ApacheLicenseResourceTransformer::class,
       "" to ApacheNoticeResourceTransformer::class,
       "" to ComponentsXmlResourceTransformer::class,
-      "" to DontIncludeResourceTransformer::class,
-      "{ resource.set(\"test.file\"); file.fileValue(file(\"test/some.file\")) }" to IncludeResourceTransformer::class,
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
     )
