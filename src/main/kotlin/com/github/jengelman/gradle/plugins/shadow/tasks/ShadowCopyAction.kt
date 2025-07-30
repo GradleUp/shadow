@@ -89,8 +89,7 @@ public open class ShadowCopyAction(
 
   private fun addDirs(zos: ZipOutputStream) {
     @Suppress("UNCHECKED_CAST")
-    val entries = zos::class.java.getDeclaredField("entries").apply { isAccessible = true }
-      .get(zos).cast<List<ZipEntry>>().map { it.name }
+    val entries = zos.entries.map { it.name }
     val added = entries.toMutableSet()
     val currentTimeMillis = System.currentTimeMillis()
 
@@ -237,5 +236,11 @@ public open class ShadowCopyAction(
      * 1980-02-01 00:00:00 (318182400000).
      */
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+
+    private val ZipOutputStream.entries: List<ZipEntry>
+      get() {
+        return this::class.java.getDeclaredField("entries").apply { isAccessible = true }
+          .get(this).cast<List<ZipEntry>>()
+      }
   }
 }
