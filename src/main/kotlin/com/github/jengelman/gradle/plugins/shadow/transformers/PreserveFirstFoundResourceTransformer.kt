@@ -1,36 +1,33 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import javax.inject.Inject
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.Internal
 
 /**
  * A resource processor that preserves the first resource matched and excludes all others.
  *
- * @author John Engelman
+ * This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` and want to ensure that only
+ * the first found resource is included in the final JAR. If there are multiple resources with the same path in a
+ * project and its dependencies, the first one found should be the projects'.
  */
 @CacheableTransformer
 public open class PreserveFirstFoundResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : ResourceTransformer by ResourceTransformer.Companion {
-  @get:Optional
-  @get:Input
-  public open val resource: Property<String> = objectFactory.property()
-
   @get:Internal
   protected val found: MutableSet<String> = mutableSetOf()
 
+  @get:Input
+  public open val resources: SetProperty<String> = objectFactory.setProperty()
+
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val resourcePath = resource.orNull
-    if (!resourcePath.isNullOrEmpty() && element.path.endsWith(resourcePath)) {
-      return !found.add(resourcePath)
-    }
-    return false
+    val resources = resources.get()
+    val path = element.path
+    return resources.contains(path) && !found.add(path)
   }
 }
-
