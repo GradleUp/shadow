@@ -182,7 +182,6 @@ public abstract class ShadowJar :
   /**
    * Defaults to [DuplicatesStrategy.INCLUDE]
    */
-  @Input // Trigger task executions after this property changed.
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
   @get:Inject
