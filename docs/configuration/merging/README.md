@@ -426,10 +426,13 @@ Different strategies will lead to different results for `foo/bar` files in the J
 The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
 as expected because the `duplicatesStrategy` will exclude the duplicate service files beforehand. However, this behavior might be what you expected for duplicate
 `foo/bar` files, preventing them from being included.
+
 Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several ways to
 do it:
-- Use ['eachFile'][Jar.eachFile] or ['filesMatching'][Jar.filesMatching] to override the strategy for specific files.
-- Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates.
+
+- Use [`eachFile`][Jar.eachFile] or [`filesMatching`][Jar.filesMatching] to override the strategy for specific files.
+- Keep `duplicatesStrategy = INCLUDE` and write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates.
+
 If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
 called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
 
