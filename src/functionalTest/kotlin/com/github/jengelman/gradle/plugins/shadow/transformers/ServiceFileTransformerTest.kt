@@ -225,7 +225,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun strategyExcludeCanBeOverrideByEachFile() {
+  fun strategyExcludeCanBeOverriddenByEachFile() {
     writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     projectScriptPath.appendText(
       """
@@ -246,7 +246,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun strategyExcludeCanBeOverrideByFileMatching() {
+  fun strategyExcludeCanBeOverriddenByFileMatching() {
     writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     projectScriptPath.appendText(
       """
