@@ -185,7 +185,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManif
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
-	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ZLjava/lang/String;)V
+	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ZZLjava/lang/String;)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
 }
 
@@ -205,6 +205,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getEnableAutoRelocation ()Lorg/gradle/api/provider/Property;
 	public fun getExcludes ()Ljava/util/Set;
+	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludes ()Ljava/util/Set;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;

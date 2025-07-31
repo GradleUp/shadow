@@ -38,6 +38,7 @@ public open class ShadowCopyAction(
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
   private val preserveFileTimestamps: Boolean,
+  private val failOnDuplicateEntries: Boolean,
   private val encoding: String?,
 ) : CopyAction {
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
@@ -53,8 +54,8 @@ public open class ShadowCopyAction(
       zipOutStream.use { zos ->
         stream.process(StreamAction(zos))
         processTransformers(zos)
-        // This must be called as the last step to ensure that directories are added after all files.
-        addDirs(zos)
+        addDirs(zos) // This must be called after adding all file entries to avoid duplicate directories being added.
+        checkDuplicateEntries(zos)
       }
     } catch (e: Exception) {
       if (e is Zip64RequiredException || e.cause is Zip64RequiredException) {
@@ -89,8 +90,7 @@ public open class ShadowCopyAction(
 
   private fun addDirs(zos: ZipOutputStream) {
     @Suppress("UNCHECKED_CAST")
-    val entries = zos::class.java.getDeclaredField("entries").apply { isAccessible = true }
-      .get(zos).cast<List<ZipEntry>>().map { it.name }
+    val entries = zos.entries.map { it.name }
     val added = entries.toMutableSet()
     val currentTimeMillis = System.currentTimeMillis()
 
@@ -115,6 +115,22 @@ public open class ShadowCopyAction(
 
     entries.forEach {
       addParent(it)
+    }
+  }
+
+  private fun checkDuplicateEntries(zos: ZipOutputStream) {
+    val entries = zos.entries.map { it.name }
+    val duplicates = entries.groupingBy { it }.eachCount().filter { it.value > 1 }
+    if (duplicates.isNotEmpty()) {
+      val dupEntries = duplicates.entries.joinToString(separator = "\n") {
+        "${it.key} (${it.value} times)"
+      }
+      val message = "Duplicate entries found in the shadowed JAR: \n$dupEntries"
+      if (failOnDuplicateEntries) {
+        throw GradleException(message)
+      } else {
+        logger.info(message)
+      }
     }
   }
 
@@ -237,5 +253,11 @@ public open class ShadowCopyAction(
      * 1980-02-01 00:00:00 (318182400000).
      */
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+
+    private val ZipOutputStream.entries: List<ZipEntry>
+      get() {
+        return this::class.java.getDeclaredField("entries").apply { isAccessible = true }
+          .get(this).cast<List<ZipEntry>>()
+      }
   }
 }

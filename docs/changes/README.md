@@ -8,18 +8,26 @@
 - Add `PreserveFirstFoundResourceTransformer`. ([#1548](https://github.com/GradleUp/shadow/pull/1548))  
   This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
   want to ensure that only the first found resource is included in the final JAR.
+- Fail build if the ZIP entries in the shadowed JAR are duplicate. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
+  This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
+  Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
+    - It only checks the entries in the shadowed jar, not the input files.
+    - It works with setting `duplicatesStrategy` to any value.
+    - It provides a more strict check before the JAR is created.
 
 ### Changed
 
 - **BREAKING CHANGE:** Rename `ShadowJar`'s `enableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))  
   The Command Line options are also updated:
   ```
-  --enable-auto-relocation      Enables auto relocation of packages in the dependencies.
-  --no-enable-auto-relocation   Disables option --enable-auto-relocation.
-  --minimize-jar                Minimizes the jar by removing unused classes.
-  --no-minimize-jar             Disables option --minimize-jar.
-  --relocation-prefix           Prefix used for auto relocation of packages in the dependencies.
-  --rerun                       Causes the task to be re-run even if up-to-date.
+  --enable-auto-relocation          Enables auto relocation of packages in the dependencies.
+  --no-enable-auto-relocation       Disables option --enable-auto-relocation.
+  --fail-on-duplicate-entries       Fails build if the ZIP entries in the shadowed JAR are duplicate.
+  --no-fail-on-duplicate-entries    Disables option --fail-on-duplicate-entries.
+  --minimize-jar                    Minimizes the jar by removing unused classes.
+  --no-minimize-jar                 Disables option --minimize-jar.
+  --relocation-prefix               Prefix used for auto relocation of packages in the dependencies.
+  --rerun                           Causes the task to be re-run even if up-to-date.
   ```
 
 ## [9.0.0-rc2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc2) - 2025-07-23
@@ -95,7 +103,7 @@
 - **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
 - **BREAKING CHANGE:** Bump min Java requirement to 11. ([#1242](https://github.com/GradleUp/shadow/pull/1242))
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
-- Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
+- Reduce duplicate `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 - **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
     - `ShadowJar` recognized `DuplicatesStrategy.EXCLUDE` as the default, but the other strategies didn't work properly.
@@ -282,7 +290,7 @@
 ### Changed
 
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
-- Reduce duplicated `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
+- Reduce duplicate `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 - **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
     - `ShadowJar` recognized `DuplicatesStrategy.EXCLUDE` as the default, but the other strategies didn't work properly.

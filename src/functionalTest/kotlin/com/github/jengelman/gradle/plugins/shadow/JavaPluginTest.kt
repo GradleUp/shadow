@@ -95,6 +95,7 @@ class JavaPluginTest : BasePluginTest() {
         isNotEmpty()
         containsOnly(project.runtimeConfiguration)
       }
+      assertThat(failOnDuplicateEntries.get()).isFalse()
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
@@ -107,6 +108,8 @@ class JavaPluginTest : BasePluginTest() {
     assertThat(result.output).contains(
       "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
       "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
+      "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
+      "--no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries",
       "--minimize-jar     Minimizes the jar by removing unused classes.",
       "--no-minimize-jar     Disables option --minimize-jar.",
       "--relocation-prefix     Prefix used for auto relocation of packages in the dependencies.",
@@ -826,6 +829,57 @@ class JavaPluginTest : BasePluginTest() {
       )
       doesNotContain("Configuration cache problems")
     }
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun failBuildIfDuplicateEntries(enable: Boolean) {
+    path("src/main/resources/a.properties").writeText("invalid a")
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(artifactAJar)}
+        }
+        $shadowJar {
+          failOnDuplicateEntries = $enable
+        }
+      """.trimIndent(),
+    )
+
+    val result = if (enable) {
+      runWithFailure(shadowJarTask)
+    } else {
+      run(shadowJarTask, "--info")
+    }
+
+    assertThat(result.output).contains(
+      "Duplicate entries found in the shadowed JAR:",
+      "a.properties (2 times)",
+    )
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun failBuildIfDuplicateEntriesByCliOption(enable: Boolean) {
+    path("src/main/resources/a.properties").writeText("invalid a")
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          ${implementationFiles(artifactAJar)}
+        }
+      """.trimIndent(),
+    )
+
+    val result = if (enable) {
+      runWithFailure(shadowJarTask, "--fail-on-duplicate-entries")
+    } else {
+      run(shadowJarTask, "--info")
+    }
+
+    assertThat(result.output).contains(
+      "Duplicate entries found in the shadowed JAR:",
+      "a.properties (2 times)",
+    )
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {
