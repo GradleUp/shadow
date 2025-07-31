@@ -16,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
@@ -30,7 +31,13 @@ import org.gradle.api.Action
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.CopySpec
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+import org.gradle.api.file.DuplicatesStrategy.FAIL
+import org.gradle.api.file.DuplicatesStrategy.INCLUDE
+import org.gradle.api.file.DuplicatesStrategy.INHERIT
+import org.gradle.api.file.DuplicatesStrategy.WARN
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.provider.Property
@@ -57,7 +64,7 @@ public abstract class ShadowJar :
 
   init {
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    duplicatesStrategy = INCLUDE
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
@@ -159,7 +166,7 @@ public abstract class ShadowJar :
   /**
    * Fails build if the ZIP entries in the shadowed JAR are duplicate.
    *
-   * This is related to setting [getDuplicatesStrategy] to [DuplicatesStrategy.FAIL] but there are some differences:
+   * This is related to setting [getDuplicatesStrategy] to [FAIL] but there are some differences:
    * - It only checks the entries in the shadowed jar, not the input files.
    * - It works with setting [getDuplicatesStrategy] to any value.
    * - It provides a more strict check before the JAR is created.
@@ -184,28 +191,30 @@ public abstract class ShadowJar :
    *
    * This strategy can be overridden for individual files by using [eachFile] or [filesMatching].
    *
-   * The default value is [DuplicatesStrategy.INCLUDE]. Different strategies will lead to different results for
+   * The default value is [INCLUDE]. Different strategies will lead to different results for
    * `foo/bar` files in the JARs to be merged:
-   * - [DuplicatesStrategy.EXCLUDE]: The **first** `foo/bar` file will be included in the final JAR.
-   * - [DuplicatesStrategy.FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
-   * - [DuplicatesStrategy.INCLUDE]: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
-   * - [DuplicatesStrategy.INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
-   * - [DuplicatesStrategy.WARN]: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
+   *
+   * - [EXCLUDE]: The **first** `foo/bar` file will be included in the final JAR.
+   * - [FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
+   * - [INCLUDE]: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
+   * - [INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+   * - [WARN]: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
    *
    * **NOTE:** The strategy takes precedence over transforming and relocating.
    * Some [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the strategy to
-   * [DuplicatesStrategy.EXCLUDE], as the service files are excluded beforehand. Want [ResourceTransformer]s and the
-   * strategy to work together? There are several ways to do it:
+   * [EXCLUDE], as the service files are excluded beforehand. Want [ResourceTransformer]s and the strategy to work
+   * together? There are several ways to do it:
+   *
    * - Use [eachFile] or [filesMatching] to override the strategy for specific files.
    * - Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates.
    *
    * If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
-   * called [com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer].
+   * called [PreserveFirstFoundResourceTransformer].
    *
    * @see [eachFile]
    * @see [filesMatching]
    * @see [DuplicatesStrategy]
-   * @see [org.gradle.api.file.CopySpec.getDuplicatesStrategy]
+   * @see [CopySpec.duplicatesStrategy]
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
