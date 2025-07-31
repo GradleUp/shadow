@@ -32,7 +32,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
         classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
       }
     }
-    // `apply plugin` stuffs are used with `buildscript`.
+    // `apply plugin` stuff are used with `buildscript`.
     apply(plugin = "java")
     apply(plugin = "com.gradleup.shadow")
     ```
@@ -49,7 +49,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
         classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
       }
     }
-    // `apply plugin` stuffs are used with `buildscript`.
+    // `apply plugin` stuff are used with `buildscript`.
     apply plugin: 'java'
     apply plugin: 'com.gradleup.shadow'
     ```
@@ -72,7 +72,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
         classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
       }
     }
-    // `apply plugin` stuffs are used with `buildscript`.
+    // `apply plugin` stuff are used with `buildscript`.
     apply(plugin = "java")
     apply(plugin = "com.gradleup.shadow")
     ```
@@ -98,7 +98,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
         classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
       }
     }
-    // `apply plugin` stuffs are used with `buildscript`.
+    // `apply plugin` stuff are used with `buildscript`.
     apply plugin: 'java'
     apply plugin: 'com.gradleup.shadow'
     ```
