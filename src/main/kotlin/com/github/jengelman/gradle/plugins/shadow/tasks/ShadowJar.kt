@@ -167,6 +167,7 @@ public abstract class ShadowJar :
    * Defaults to `false`.
    */
   @get:Input
+  @get:Option(option = "fail-on-duplicate-entries", description = "Fail build if the ZIP entries in the shadowed JAR are duplicated.")
   public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(false)
 
   @Internal
