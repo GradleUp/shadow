@@ -224,6 +224,48 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
+  @Test
+  fun strategyExcludeCanBeOverriddenByEachFile() {
+    writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          eachFile {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one\ntwo")
+    }
+  }
+
+  @Test
+  fun strategyExcludeCanBeOverriddenByFileMatching() {
+    writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          filesMatching('$ENTRY_SERVICES_SHADE') {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+    }
+  }
+
   private fun writeDuplicatesStrategy(strategy: DuplicatesStrategy) {
     projectScriptPath.appendText(
       """
@@ -234,7 +276,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           duplicatesStrategy = DuplicatesStrategy.$strategy
           mergeServiceFiles()
         }
-      """.trimIndent(),
+      """.trimIndent() + System.lineSeparator(),
     )
   }
 

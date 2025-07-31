@@ -203,6 +203,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
 	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
+	public fun getDuplicatesStrategy ()Lorg/gradle/api/file/DuplicatesStrategy;
 	public fun getEnableAutoRelocation ()Lorg/gradle/api/provider/Property;
 	public fun getExcludes ()Ljava/util/Set;
 	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
