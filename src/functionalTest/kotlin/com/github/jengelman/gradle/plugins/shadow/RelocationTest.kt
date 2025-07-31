@@ -544,7 +544,7 @@ class RelocationTest : BasePluginTest() {
 
   @ParameterizedTest
   @MethodSource("relocationCliOptionProvider")
-  fun enableAutoRelocationByCliOption(enableAutoRelocation: Boolean, relocationPrefix: String) {
+  fun enableAutoRelocationByCliOption(enable: Boolean, relocationPrefix: String) {
     val mainClassEntry = writeClass()
     projectScriptPath.appendText(
       """
@@ -557,14 +557,14 @@ class RelocationTest : BasePluginTest() {
       .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
       .toTypedArray()
 
-    if (enableAutoRelocation) {
+    if (enable) {
       run(shadowJarTask, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
     } else {
       run(shadowJarTask, "--relocation-prefix=$relocationPrefix")
     }
 
     assertThat(outputShadowJar).useAll {
-      if (enableAutoRelocation) {
+      if (enable) {
         containsOnly(
           "my/",
           "$relocationPrefix/",

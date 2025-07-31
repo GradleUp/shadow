@@ -119,11 +119,15 @@ public open class ShadowCopyAction(
   }
 
   private fun checkDuplicateEntries(zos: ZipOutputStream) {
-    if (!failOnDuplicateEntries) return
     val entries = zos.entries.map { it.name }
     val duplicates = entries.groupingBy { it }.eachCount().filter { it.value > 1 }
     if (duplicates.isNotEmpty()) {
-      throw GradleException("Duplicate entries found in ZIP: $duplicates")
+      val message = "Duplicate entries found in ZIP: $duplicates"
+      if (failOnDuplicateEntries) {
+        throw GradleException(message)
+      } else {
+        logger.info(message)
+      }
     }
   }
 
