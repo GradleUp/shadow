@@ -7,7 +7,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import org.gradle.api.Action
 
-@JvmDefaultWithCompatibility
 public interface ShadowSpec {
   public fun minimize()
 
