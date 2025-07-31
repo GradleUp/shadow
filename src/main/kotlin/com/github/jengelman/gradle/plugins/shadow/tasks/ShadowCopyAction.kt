@@ -16,7 +16,6 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
-import org.gradle.api.internal.file.archive.ZipCopyAction
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.internal.file.copy.CopyActionProcessingStream
 import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
@@ -29,8 +28,6 @@ import org.objectweb.asm.commons.ClassRemapper
 
 /**
  * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
- *
- * @see [ZipCopyAction]
  */
 public open class ShadowCopyAction(
   private val zipFile: File,
