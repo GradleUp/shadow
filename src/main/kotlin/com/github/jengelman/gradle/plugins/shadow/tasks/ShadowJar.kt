@@ -159,9 +159,9 @@ public abstract class ShadowJar :
   /**
    * Fails build if the ZIP entries in the shadowed JAR are duplicate.
    *
-   * This is related to setting [duplicatesStrategy] to [DuplicatesStrategy.FAIL] but there are some differences:
+   * This is related to setting [getDuplicatesStrategy] to [DuplicatesStrategy.FAIL] but there are some differences:
    * - It only checks the entries in the shadowed jar, not the input files.
-   * - It works with setting [duplicatesStrategy] to any value.
+   * - It works with setting [getDuplicatesStrategy] to any value.
    * - It provides a more strict check before the JAR is created.
    *
    * Defaults to `false`.
@@ -180,7 +180,27 @@ public abstract class ShadowJar :
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
   /**
-   * Defaults to [DuplicatesStrategy.INCLUDE]
+   * Returns the strategy to use when trying to copy more than one file to the same destination.
+   *
+   * This strategy can be overridden for individual files by using [eachFile] or [filesMatching].
+   *
+   * The default value is [DuplicatesStrategy.INCLUDE]. Different strategies will lead to different results for
+   * `foo/bar` files in the JARs to be merged:
+   * - [DuplicatesStrategy.EXCLUDE]: The **first** `foo/bar` file will be included in the final JAR.
+   * - [DuplicatesStrategy.FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
+   * - [DuplicatesStrategy.INCLUDE]: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
+   * - [DuplicatesStrategy.INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+   * - [DuplicatesStrategy.WARN]: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
+   *
+   * If you set this property to [DuplicatesStrategy.EXCLUDE] may not work with some [ResourceTransformer]s like
+   * [ServiceFileTransformer] or [GroovyExtensionModuleTransformer], as the service files or extension modules are
+   * excluded. Want to use [DuplicatesStrategy.EXCLUDE] with these transformers? There are several ways to do it:
+   * - Use [eachFile] or [filesMatching] to override the strategy for specific files.
+   * - Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates. e.g. [com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer].
+   *
+   * @return the strategy to use for files included by this copy spec.
+   * @see [DuplicatesStrategy]
+   * @see [org.gradle.api.file.CopySpec.getDuplicatesStrategy]
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
