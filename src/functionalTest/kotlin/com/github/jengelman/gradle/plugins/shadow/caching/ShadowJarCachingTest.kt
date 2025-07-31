@@ -117,12 +117,13 @@ class ShadowJarCachingTest : BaseCachingTest() {
       DuplicatesStrategy.INCLUDE,
       DuplicatesStrategy.WARN,
     ).forEach { strategy ->
-      projectScriptPath.appendText(
-        """
-          $shadowJar {
-            duplicatesStrategy = DuplicatesStrategy.$strategy
-          }
-        """.trimIndent() + System.lineSeparator(),
+      projectScriptPath.writeText(
+        getDefaultProjectBuildScript(withGroup = true, withVersion = true) +
+          """
+            $shadowJar {
+              duplicatesStrategy = DuplicatesStrategy.$strategy
+            }
+          """.trimIndent(),
       )
 
       assertCompositeExecutions()
