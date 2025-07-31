@@ -179,6 +179,12 @@ public abstract class ShadowJar :
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = super.getExcludes()
 
+  /**
+   * Defaults to [DuplicatesStrategy.INCLUDE]
+   */
+  @Input // Trigger task executions after this property changed.
+  override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
+
   @get:Inject
   protected abstract val archiveOperations: ArchiveOperations
 
