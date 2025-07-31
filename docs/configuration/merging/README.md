@@ -396,7 +396,7 @@ override it like:
 Different strategies will lead to different results for `foo/bar` files in the JARs to be merged:
 
 - `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
-- `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicated `foo/bar` files.
+- `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
 - `INCLUDE`: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
 - `INHERIT`: **Fail** the build with an exception like
   `Entry .* is a duplicate but no duplicate handling strategy has been set`.
@@ -424,11 +424,11 @@ Different strategies will lead to different results for `foo/bar` files in the J
     ```
 
 The [`ServiceFileTransformer`][ServiceFileTransformer] will not work as expected because the `duplicatesStrategy` will
-exclude the duplicated service files beforehand. However, this behavior might be what you expected for duplicated
+exclude the duplicate service files beforehand. However, this behavior might be what you expected for duplicate
 `foo/bar` files, preventing them from being included.
 Want `ResourceTransformer`s and `duplicatesStrategy` to work together? There is a way to achieve this, leave the
 `duplicatesStrategy` as `INCLUDE` and declare a custom [`ResourceTransformer`][ResourceTransformer] to handle the
-duplicated files.
+duplicate files.
 If you just want to keep the current behavior and preserve the first found resource, there is a simple built-in one to
 handle this called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
 

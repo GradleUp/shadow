@@ -157,7 +157,7 @@ public abstract class ShadowJar :
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
-   * Fail build if the ZIP entries in the shadowed JAR are duplicated.
+   * Fail build if the ZIP entries in the shadowed JAR are duplicate.
    *
    * This is related to setting [duplicatesStrategy] to [DuplicatesStrategy.FAIL] but there are some differences:
    * - It only checks the entries in the shadowed jar, not the input files.
@@ -167,7 +167,7 @@ public abstract class ShadowJar :
    * Defaults to `false`.
    */
   @get:Input
-  @get:Option(option = "fail-on-duplicate-entries", description = "Fail build if the ZIP entries in the shadowed JAR are duplicated.")
+  @get:Option(option = "fail-on-duplicate-entries", description = "Fail build if the ZIP entries in the shadowed JAR are duplicate.")
   public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(false)
 
   @Internal
