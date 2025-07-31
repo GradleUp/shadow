@@ -29,7 +29,10 @@
   --relocation-prefix               Prefix used for auto relocation of packages in the dependencies.
   --rerun                           Causes the task to be re-run even if up-to-date.
   ```
-- Remove JVM default stuffs. ([#1556](https://github.com/GradleUp/shadow/pull/1556))
+
+### Removed
+
+- Remove JVM default compat stuff. ([#1556](https://github.com/GradleUp/shadow/pull/1556))
 
 ## [9.0.0-rc2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc2) - 2025-07-23
 
