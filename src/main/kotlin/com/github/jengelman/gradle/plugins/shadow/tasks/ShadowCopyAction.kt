@@ -38,6 +38,7 @@ public open class ShadowCopyAction(
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
   private val preserveFileTimestamps: Boolean,
+  private val failOnDuplicateEntries: Boolean,
   private val encoding: String?,
 ) : CopyAction {
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
@@ -119,6 +120,7 @@ public open class ShadowCopyAction(
   }
 
   private fun checkDuplicateEntries(zos: ZipOutputStream) {
+    if (!failOnDuplicateEntries) return
     val entries = zos.entries.map { it.name }
     val duplicates = entries.groupingBy { it }.eachCount().filter { it.value > 1 }
     if (duplicates.isNotEmpty()) {

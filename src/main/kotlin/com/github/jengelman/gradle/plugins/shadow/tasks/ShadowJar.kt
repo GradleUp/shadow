@@ -156,6 +156,19 @@ public abstract class ShadowJar :
   @get:Option(option = "relocation-prefix", description = "Prefix used for auto relocation of packages in the dependencies.")
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
+  /**
+   * Fail build if the ZIP entries in the shadowed JAR are duplicated.
+   *
+   * This is related to setting [duplicatesStrategy] to [DuplicatesStrategy.FAIL] but there are some differences:
+   * - It only checks the entries in the shadowed jar, not the input files.
+   * - It works with setting [duplicatesStrategy] to any value.
+   * - It provides a more strict check before the JAR is created.
+   *
+   * Defaults to `false`.
+   */
+  @get:Input
+  public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(false)
+
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
@@ -362,12 +375,13 @@ public abstract class ShadowJar :
       emptySet()
     }
     return ShadowCopyAction(
-      archiveFile.get().asFile,
-      zosProvider,
-      transformers.get(),
-      relocators.get() + packageRelocators,
-      unusedClasses,
-      isPreserveFileTimestamps,
+      zipFile = archiveFile.get().asFile,
+      zosProvider = zosProvider,
+      transformers = transformers.get(),
+      relocators = relocators.get() + packageRelocators,
+      unusedClasses = unusedClasses,
+      preserveFileTimestamps = isPreserveFileTimestamps,
+      failOnDuplicateEntries = failOnDuplicateEntries.get(),
       metadataCharset,
     )
   }
