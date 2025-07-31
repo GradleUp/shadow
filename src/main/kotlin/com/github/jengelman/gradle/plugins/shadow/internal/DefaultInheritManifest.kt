@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.InheritManifest
 import org.gradle.api.Action
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.java.archives.Manifest
+import org.gradle.api.java.archives.ManifestMergeSpec
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
@@ -16,13 +17,12 @@ internal class DefaultInheritManifest @JvmOverloads constructor(
 
   override fun inheritFrom(
     vararg inheritPaths: Any,
-    action: Action<*>,
+    action: Action<ManifestMergeSpec>,
   ) {
     val mergeSpec = DefaultManifestMergeSpec()
     mergeSpec.from(*inheritPaths)
     inheritMergeSpecs.add(mergeSpec)
-    @Suppress("UNCHECKED_CAST")
-    (action as? Action<DefaultManifestMergeSpec>)?.execute(mergeSpec)
+    action.execute(mergeSpec)
   }
 
   override fun getEffectiveManifest(): DefaultManifest {
