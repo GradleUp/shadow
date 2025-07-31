@@ -202,7 +202,8 @@ public abstract class ShadowJar :
    * If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
    * called [com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer].
    *
-   * @return the strategy to use for files included by this copy spec.
+   * @see [eachFile]
+   * @see [filesMatching]
    * @see [DuplicatesStrategy]
    * @see [org.gradle.api.file.CopySpec.getDuplicatesStrategy]
    */
