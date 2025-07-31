@@ -853,7 +853,8 @@ class JavaPluginTest : BasePluginTest() {
     }
 
     assertThat(result.output).contains(
-      "Duplicate entries found in ZIP: {a.properties=2}",
+      "Duplicate entries found in the shadowed JAR:",
+      "a.properties (2 times)",
     )
   }
 
@@ -876,7 +877,8 @@ class JavaPluginTest : BasePluginTest() {
     }
 
     assertThat(result.output).contains(
-      "Duplicate entries found in ZIP: {a.properties=2}",
+      "Duplicate entries found in the shadowed JAR:",
+      "a.properties (2 times)",
     )
   }
 

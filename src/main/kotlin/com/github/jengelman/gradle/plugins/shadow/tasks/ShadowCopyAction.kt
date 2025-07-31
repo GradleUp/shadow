@@ -122,7 +122,10 @@ public open class ShadowCopyAction(
     val entries = zos.entries.map { it.name }
     val duplicates = entries.groupingBy { it }.eachCount().filter { it.value > 1 }
     if (duplicates.isNotEmpty()) {
-      val message = "Duplicate entries found in ZIP: $duplicates"
+      val dupEntries = duplicates.entries.joinToString(separator = "\n") {
+        "${it.key} (${it.value} times)"
+      }
+      val message = "Duplicate entries found in the shadowed JAR: \n$dupEntries"
       if (failOnDuplicateEntries) {
         throw GradleException(message)
       } else {
