@@ -29,6 +29,7 @@
   --relocation-prefix               Prefix used for auto relocation of packages in the dependencies.
   --rerun                           Causes the task to be re-run even if up-to-date.
   ```
+- Mark `Action` parameters as non-null. ([#1555](https://github.com/GradleUp/shadow/pull/1555))
 
 ### Removed
 
