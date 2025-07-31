@@ -5,8 +5,8 @@ import org.gradle.api.java.archives.Manifest
 
 public interface InheritManifest : Manifest {
   public fun inheritFrom(vararg inheritPaths: Any) {
-    inheritFrom(inheritPaths = inheritPaths, action = null)
+    inheritFrom(inheritPaths = inheritPaths, action = {})
   }
 
-  public fun inheritFrom(vararg inheritPaths: Any, action: Action<*>?)
+  public fun inheritFrom(vararg inheritPaths: Any, action: Action<*>)
 }

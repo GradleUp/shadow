@@ -231,23 +231,23 @@ public abstract class ShadowJar :
   /**
    * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
    */
-  override fun minimize(action: Action<DependencyFilter>?) {
+  override fun minimize(action: Action<DependencyFilter>) {
     minimize()
-    action?.execute(dependencyFilterForMinimize)
+    action.execute(dependencyFilterForMinimize)
   }
 
   /**
    * Extra dependency operations to be applied in the shadow steps.
    */
-  override fun dependencies(action: Action<DependencyFilter>?) {
-    action?.execute(dependencyFilter.get())
+  override fun dependencies(action: Action<DependencyFilter>) {
+    action.execute(dependencyFilter.get())
   }
 
   /**
    * Merge Java services files.
    */
   override fun mergeServiceFiles() {
-    transform(ServiceFileTransformer::class.java, null)
+    transform(ServiceFileTransformer::class.java, action = {})
   }
 
   /**
@@ -262,7 +262,7 @@ public abstract class ShadowJar :
   /**
    * Merge Java services files with [action].
    */
-  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>?) {
+  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>) {
     transform(ServiceFileTransformer::class.java, action)
   }
 
@@ -270,7 +270,7 @@ public abstract class ShadowJar :
    * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
    */
   override fun mergeGroovyExtensionModules() {
-    transform(GroovyExtensionModuleTransformer::class.java, null)
+    transform(GroovyExtensionModuleTransformer::class.java, action = {})
   }
 
   /**
@@ -295,7 +295,7 @@ public abstract class ShadowJar :
   override fun relocate(
     pattern: String,
     destination: String,
-    action: Action<SimpleRelocator>?,
+    action: Action<SimpleRelocator>,
   ) {
     val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
@@ -304,7 +304,7 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>?) {
+  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
@@ -312,7 +312,7 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  override fun <R : Relocator> relocate(relocator: R, action: Action<R>?) {
+  override fun <R : Relocator> relocate(relocator: R, action: Action<R>) {
     addRelocator(relocator, action)
   }
 
@@ -322,7 +322,7 @@ public abstract class ShadowJar :
    * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
    */
   public inline fun <reified R : Relocator> relocate() {
-    relocate(R::class.java, null)
+    relocate(R::class.java, action = {})
   }
 
   /**
@@ -330,21 +330,21 @@ public abstract class ShadowJar :
    *
    * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
    */
-  public inline fun <reified R : Relocator> relocate(action: Action<R>?) {
+  public inline fun <reified R : Relocator> relocate(action: Action<R>) {
     relocate(R::class.java, action)
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>?) {
+  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>) {
     addTransform(clazz.create(objectFactory), action)
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>?) {
+  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>) {
     addTransform(transformer, action)
   }
 
@@ -354,7 +354,7 @@ public abstract class ShadowJar :
    * This is a convenience method for [transform] with a reified type parameter for Kotlin.
    */
   public inline fun <reified T : ResourceTransformer> transform() {
-    transform(T::class.java, null)
+    transform(T::class.java, action = {})
   }
 
   /**
@@ -362,7 +362,7 @@ public abstract class ShadowJar :
    *
    * This is a convenience method for [transform] with a reified type parameter for Kotlin.
    */
-  public inline fun <reified T : ResourceTransformer> transform(action: Action<T>?) {
+  public inline fun <reified T : ResourceTransformer> transform(action: Action<T>) {
     transform(T::class.java, action)
   }
 
@@ -426,13 +426,13 @@ public abstract class ShadowJar :
     )
   }
 
-  private fun <R : Relocator> addRelocator(relocator: R, action: Action<R>?) {
-    action?.execute(relocator)
+  private fun <R : Relocator> addRelocator(relocator: R, action: Action<R>) {
+    action.execute(relocator)
     relocators.add(relocator)
   }
 
-  private fun <T : ResourceTransformer> addTransform(transformer: T, action: Action<T>?) {
-    action?.execute(transformer)
+  private fun <T : ResourceTransformer> addTransform(transformer: T, action: Action<T>) {
+    action.execute(transformer)
     transformers.add(transformer)
   }
 
