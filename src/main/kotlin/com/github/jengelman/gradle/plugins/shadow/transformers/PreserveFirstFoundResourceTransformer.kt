@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.inject.Inject
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileTreeElement
@@ -17,7 +18,7 @@ import org.gradle.api.tasks.Internal
  * the same path in a project and its dependencies, the first one found should be the projects'.
  *
  * @see [DuplicatesStrategy]
- * @see [com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.getDuplicatesStrategy]
+ * @see [ShadowJar.getDuplicatesStrategy]
  */
 @CacheableTransformer
 public open class PreserveFirstFoundResourceTransformer @Inject constructor(

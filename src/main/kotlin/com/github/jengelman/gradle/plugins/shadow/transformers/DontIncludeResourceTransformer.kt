@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.inject.Inject
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
@@ -11,7 +12,7 @@ import org.gradle.api.tasks.Optional
 /**
  * A resource processor that prevents the inclusion of an arbitrary resource into the shaded JAR.
  *
- * You can also use [com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.exclude] instead.
+ * You can also use [ShadowJar.exclude] instead.
  *
  * Modified from [org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/DontIncludeResourceTransformer.java).
  *
