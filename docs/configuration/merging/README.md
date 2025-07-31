@@ -423,17 +423,20 @@ Different strategies will lead to different results for `foo/bar` files in the J
     }
     ```
 
-The [`ServiceFileTransformer`][ServiceFileTransformer] will not work as expected because the `duplicatesStrategy` will
-exclude the duplicate service files beforehand. However, this behavior might be what you expected for duplicate
+The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
+as expected because the `duplicatesStrategy` will exclude the duplicate service files beforehand. However, this behavior might be what you expected for duplicate
 `foo/bar` files, preventing them from being included.
-Want `ResourceTransformer`s and `duplicatesStrategy` to work together? There is a way to achieve this, leave the
-`duplicatesStrategy` as `INCLUDE` and declare a custom [`ResourceTransformer`][ResourceTransformer] to handle the
-duplicate files.
-If you just want to keep the current behavior and preserve the first found resource, there is a simple built-in one to
-handle this called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
+Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several ways to
+do it:
+- Use ['eachFile'][Jar.eachFile] or ['filesMatching'][Jar.filesMatching] to override the strategy for specific files.
+- Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates.
+If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
+called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
 
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
+[Jar.eachFile]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:eachFile(groovy.lang.Closure)
+[Jar.filesMatching]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:filesMatching(java.lang.Iterable,%20org.gradle.api.Action)
 [AppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/index.html
 [DuplicatesStrategy]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html
 [GroovyExtensionModuleTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-groovy-extension-module-transformer/index.html

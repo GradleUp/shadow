@@ -192,11 +192,15 @@ public abstract class ShadowJar :
    * - [DuplicatesStrategy.INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
    * - [DuplicatesStrategy.WARN]: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
    *
-   * If you set this property to [DuplicatesStrategy.EXCLUDE] may not work with some [ResourceTransformer]s like
-   * [ServiceFileTransformer] or [GroovyExtensionModuleTransformer], as the service files or extension modules are
-   * excluded. Want to use [DuplicatesStrategy.EXCLUDE] with these transformers? There are several ways to do it:
+   * **NOTE:** The strategy takes precedence over transforming and relocating.
+   * Some [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the strategy to
+   * [DuplicatesStrategy.EXCLUDE], as the service files are excluded beforehand. Want [ResourceTransformer]s and the
+   * strategy to work together? There are several ways to do it:
    * - Use [eachFile] or [filesMatching] to override the strategy for specific files.
-   * - Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates. e.g. [com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer].
+   * - Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates.
+   *
+   * If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
+   * called [com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer].
    *
    * @return the strategy to use for files included by this copy spec.
    * @see [DuplicatesStrategy]
