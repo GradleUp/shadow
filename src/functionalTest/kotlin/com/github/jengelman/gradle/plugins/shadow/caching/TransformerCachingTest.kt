@@ -6,9 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseReso
 import com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.DontIncludeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.IncludeResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
