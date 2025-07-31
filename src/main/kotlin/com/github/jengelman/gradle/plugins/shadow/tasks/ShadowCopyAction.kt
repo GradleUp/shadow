@@ -54,8 +54,7 @@ public open class ShadowCopyAction(
       zipOutStream.use { zos ->
         stream.process(StreamAction(zos))
         processTransformers(zos)
-        // This must be called as the last step to ensure that directories are added after all files.
-        addDirs(zos)
+        addDirs(zos) // This must be called after adding all file entries to avoid duplicated directories are added.
         checkDuplicateEntries(zos)
       }
     } catch (e: Exception) {

@@ -8,8 +8,8 @@
 - Add `PreserveFirstFoundResourceTransformer`. ([#1548](https://github.com/GradleUp/shadow/pull/1548))  
   This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
   want to ensure that only the first found resource is included in the final JAR.
-- Fail build if multiple ZIP entries with the same path are added. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
-  This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.
+- Fail build if the ZIP entries in the shadowed JAR are duplicated. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
+  This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
     - It only checks the entries in the shadowed jar, not the input files.
     - It works with setting `duplicatesStrategy` to any value.
