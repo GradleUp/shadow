@@ -70,55 +70,10 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    val assertions = { variantAttrs: Array<Pair<String, String>>? ->
-      assertShadowJarCommon(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar"))
-      assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
-      val gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module"))
-      if (variantAttrs == null) {
-        assertShadowVariantCommon(gmm)
-      } else {
-        assertShadowVariantCommon(gmm, variantAttrs = variantAttrs)
-      }
-    }
-
-    assertions(null)
-
-    val attrsWithoutTargetJvm = shadowVariantAttrs.filterNot { (name, _) ->
-      name == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
-    }.toTypedArray()
-    val targetJvmAttr17 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "17"
-    val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
-
-    projectScriptPath.appendText(
-      """
-        java {
-          toolchain.languageVersion = JavaLanguageVersion.of(17)
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-    publish()
-    assertions(attrsWithoutTargetJvm + targetJvmAttr17)
-
-    projectScriptPath.appendText(
-      """
-        java {
-          targetCompatibility = JavaVersion.VERSION_11
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-    publish()
-    assertions(attrsWithoutTargetJvm + targetJvmAttr11)
-
-    projectScriptPath.appendText(
-      """
-        java {
-          sourceCompatibility = JavaVersion.VERSION_1_8
-        }
-      """.trimIndent() + System.lineSeparator(),
-    )
-    publish()
-    // sourceCompatibility doesn't affect the target JVM version.
-    assertions(attrsWithoutTargetJvm + targetJvmAttr11)
+    assertShadowJarCommon(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar"))
+    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
+    val gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module"))
+    assertShadowVariantCommon(gmm)
   }
 
   @Test
@@ -542,7 +497,10 @@ class PublishingTest : BasePluginTest() {
       TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion,
     )
 
-    val shadowVariantAttrs = commonVariantAttrs + arrayOf(
+    val shadowVariantAttrs = commonVariantAttrs.filter {
+      // Exclude the TargetJvmVersion attribute, as it is not set for shadow variants.
+      it.first != TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
+    }.toTypedArray() + arrayOf(
       Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
       Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
     )
