@@ -73,12 +73,14 @@
   the files, only copy the files as-is. If you still want to shadow the unzipped files, try out something like:
   ```kotlin
     tasks.shadowJar {
+      // Unzip the files before pass them to `from` by using `zipTree`.
       from(zipTree(files('path/to/your/file.zip')))
     }
   ```
   or
   ```kotlin
     dependencies {
+      // Add the files to `implementation` configuration, Shadow will unzip them automatically.
       implementation(files('path/to/your/file.zip'))
     }
   ```
