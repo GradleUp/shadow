@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.jar
-import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -18,7 +17,6 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
@@ -77,11 +75,6 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
         attr.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
-        val targetJvmVersion = provider {
-          javaPluginExtension.targetCompatibility.majorVersion.toInt()
-        }
-        // Track JavaPluginExtension to update targetJvmVersion when it changes.
-        attr.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
       }
       it.outgoing.artifact(tasks.shadowJar)
     }

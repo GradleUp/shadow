@@ -17,7 +17,6 @@
 - Support configuring `separator` in `AppendingTransformer`. ([#1169](https://github.com/GradleUp/shadow/pull/1169))  
   This is useful for handling files like `resources/application.yml`.
 - Exclude `module-info.class` in Multi-Release folders by default. ([#1177](https://github.com/GradleUp/shadow/pull/1177))
-- Inject `TargetJvmVersion` attribute for Gradle Module Metadata. ([#1199](https://github.com/GradleUp/shadow/pull/1199))
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
 - Inject `Multi-Release` manifest attribute if any dependency contains it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
 - Mark `Transformer` as throwing `IOException`. ([#1248](https://github.com/GradleUp/shadow/pull/1248))
