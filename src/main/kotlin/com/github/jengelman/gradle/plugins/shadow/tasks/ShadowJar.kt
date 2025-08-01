@@ -263,8 +263,7 @@ public abstract class ShadowJar : Jar() {
    * e.g. `append("resources/application.yml", "\n---\n")` for merging `resources/application.yml` files.
    *
    * @param resourcePath The path to the resource in the jar.
-   * @param separator The separator to use between the original content and the appended content,
-   * defaults to `\n` ([AppendingTransformer.DEFAULT_SEPARATOR]).
+   * @param separator The separator to use between the original content and the appended content, defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
    */
   @JvmOverloads
   public open fun append(resourcePath: String, separator: String = AppendingTransformer.DEFAULT_SEPARATOR) {
