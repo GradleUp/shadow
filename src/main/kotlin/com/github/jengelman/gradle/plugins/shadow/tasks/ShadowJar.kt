@@ -57,9 +57,7 @@ import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
 
 @CacheableTask
-public abstract class ShadowJar :
-  Jar(),
-  ShadowSpec {
+public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
   init {
@@ -222,54 +220,40 @@ public abstract class ShadowJar :
   protected abstract val archiveOperations: ArchiveOperations
 
   /**
-   * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
-   */
-  override fun minimize() {
-    minimizeJar.set(true)
-  }
-
-  /**
    * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
    */
-  override fun minimize(action: Action<DependencyFilter>) {
-    minimize()
+  @JvmOverloads
+  public open fun minimize(action: Action<DependencyFilter> = Action {}) {
+    minimizeJar.set(true)
     action.execute(dependencyFilterForMinimize)
   }
 
   /**
    * Extra dependency operations to be applied in the shadow steps.
    */
-  override fun dependencies(action: Action<DependencyFilter>) {
+  public open fun dependencies(action: Action<DependencyFilter>) {
     action.execute(dependencyFilter.get())
-  }
-
-  /**
-   * Merge Java services files.
-   */
-  override fun mergeServiceFiles() {
-    transform(ServiceFileTransformer::class.java, action = {})
   }
 
   /**
    * Merge Java services files with [rootPath].
    */
-  override fun mergeServiceFiles(rootPath: String) {
-    transform(ServiceFileTransformer::class.java) {
-      it.path = rootPath
-    }
+  public open fun mergeServiceFiles(rootPath: String) {
+    mergeServiceFiles { it.path = rootPath }
   }
 
   /**
    * Merge Java services files with [action].
    */
-  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>) {
+  @JvmOverloads
+  public open fun mergeServiceFiles(action: Action<ServiceFileTransformer> = Action {}) {
     transform(ServiceFileTransformer::class.java, action)
   }
 
   /**
    * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
    */
-  override fun mergeGroovyExtensionModules() {
+  public open fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, action = {})
   }
 
@@ -279,10 +263,10 @@ public abstract class ShadowJar :
    * e.g. `append("resources/application.yml", "\n---\n")` for merging `resources/application.yml` files.
    *
    * @param resourcePath The path to the resource in the jar.
-   * @param separator The separator to use between the original content and the appended content,
-   * defaults to `\n` ([AppendingTransformer.DEFAULT_SEPARATOR]).
+   * @param separator The separator to use between the original content and the appended content, defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
    */
-  override fun append(resourcePath: String, separator: String) {
+  @JvmOverloads
+  public open fun append(resourcePath: String, separator: String = AppendingTransformer.DEFAULT_SEPARATOR) {
     transform(AppendingTransformer::class.java) {
       it.resource.set(resourcePath)
       it.separator.set(separator)
@@ -292,10 +276,11 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
    */
-  override fun relocate(
+  @JvmOverloads
+  public open fun relocate(
     pattern: String,
     destination: String,
-    action: Action<SimpleRelocator>,
+    action: Action<SimpleRelocator> = Action {},
   ) {
     val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
@@ -304,7 +289,8 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>) {
+  @JvmOverloads
+  public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
@@ -312,7 +298,8 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  override fun <R : Relocator> relocate(relocator: R, action: Action<R>) {
+  @JvmOverloads
+  public open fun <R : Relocator> relocate(relocator: R, action: Action<R> = Action {}) {
     addRelocator(relocator, action)
   }
 
@@ -327,14 +314,16 @@ public abstract class ShadowJar :
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>) {
+  @JvmOverloads
+  public open fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T> = Action {}) {
     addTransform(clazz.create(objectFactory), action)
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>) {
+  @JvmOverloads
+  public open fun <T : ResourceTransformer> transform(transformer: T, action: Action<T> = Action {}) {
     addTransform(transformer, action)
   }
 
