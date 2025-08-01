@@ -21,6 +21,7 @@
 - Sync `ShadowApplicationPlugin` with `ApplicationPlugin`. ([#1224](https://github.com/GradleUp/shadow/pull/1224))
 - Inject `Multi-Release` manifest attribute if any dependency contains it. ([#1239](https://github.com/GradleUp/shadow/pull/1239))
 - Mark `Transformer` as throwing `IOException`. ([#1248](https://github.com/GradleUp/shadow/pull/1248))
+- Reduce duplicate `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 - Compat Kotlin Multiplatform plugin. ([#1280](https://github.com/GradleUp/shadow/pull/1280))
 - Add Kotlin DSL examples in docs. ([#1306](https://github.com/GradleUp/shadow/pull/1306))
 - Support using type-safe dependency accessors in `ShadowJar.dependencies`. ([#1322](https://github.com/GradleUp/shadow/pull/1322))
@@ -61,7 +62,6 @@
 - **BREAKING CHANGE:** Mark `RelocatorRemapper` as `internal`. ([#1227](https://github.com/GradleUp/shadow/pull/1227))
 - **BREAKING CHANGE:** Bump min Java requirement to 11. ([#1242](https://github.com/GradleUp/shadow/pull/1242))
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
-- Reduce duplicate `SimpleRelocator` to improve performance. ([#1271](https://github.com/GradleUp/shadow/pull/1271))
 - **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
   - `ShadowJar` recognized `DuplicatesStrategy.EXCLUDE` as the default, but the other strategies didn't work properly.
@@ -90,6 +90,7 @@
   - `ShadowSpec` no longer extends `CopySpec`.
   - Overload `relocate`, `transform` and things for better usability in Kotlin.
 - **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
+- **BREAKING CHANGE:** Rename `ShadowJar`'s `isEnableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))
 - Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
 - Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
 - Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
@@ -102,7 +103,6 @@
 - In-development snapshots are now published to the Central Portal Snapshots repository. ([#1414](https://github.com/GradleUp/shadow/pull/1414))
 - Expose `AbstractDependencyFilter` from `internal` to `public`. ([#1538](https://github.com/GradleUp/shadow/pull/1538))  
   You can access it via `com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter.AbstractDependencyFilter`.
-- **BREAKING CHANGE:** Rename `ShadowJar`'s `isEnableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))
 - Mark `Action` parameters as non-null. ([#1555](https://github.com/GradleUp/shadow/pull/1555))
 
 ### Fixed
