@@ -222,6 +222,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
    */
+  @JvmOverloads
   public open fun minimize(action: Action<DependencyFilter> = Action {}) {
     minimizeJar.set(true)
     action.execute(dependencyFilterForMinimize)
@@ -246,6 +247,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Merge Java services files with [action].
    */
+  @JvmOverloads
   public open fun mergeServiceFiles(action: Action<ServiceFileTransformer> = Action {}) {
     transform(ServiceFileTransformer::class.java, action)
   }
@@ -266,6 +268,7 @@ public abstract class ShadowJar : Jar() {
    * @param separator The separator to use between the original content and the appended content,
    * defaults to `\n` ([AppendingTransformer.DEFAULT_SEPARATOR]).
    */
+  @JvmOverloads
   public open fun append(resourcePath: String, separator: String = AppendingTransformer.DEFAULT_SEPARATOR) {
     transform(AppendingTransformer::class.java) {
       it.resource.set(resourcePath)
@@ -276,6 +279,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
    */
+  @JvmOverloads
   public open fun relocate(
     pattern: String,
     destination: String,
@@ -288,6 +292,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Relocate classes and resources using a [Relocator].
    */
+  @JvmOverloads
   public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
@@ -296,6 +301,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Relocate classes and resources using a [Relocator].
    */
+  @JvmOverloads
   public open fun <R : Relocator> relocate(relocator: R, action: Action<R> = Action {}) {
     addRelocator(relocator, action)
   }
@@ -313,6 +319,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Transform resources using a [ResourceTransformer].
    */
+  @JvmOverloads
   public open fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T> = Action {}) {
     addTransform(clazz.create(objectFactory), action)
   }
@@ -320,6 +327,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Transform resources using a [ResourceTransformer].
    */
+  @JvmOverloads
   public open fun <T : ResourceTransformer> transform(transformer: T, action: Action<T> = Action {}) {
     addTransform(transformer, action)
   }

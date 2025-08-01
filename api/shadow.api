@@ -191,6 +191,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar {
 	public fun <init> ()V
+	public final fun append (Ljava/lang/String;)V
 	public fun append (Ljava/lang/String;Ljava/lang/String;)V
 	public static synthetic fun append$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)V
 	protected fun copy ()V
@@ -215,18 +216,25 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
 	public fun mergeGroovyExtensionModules ()V
+	public final fun mergeServiceFiles ()V
 	public fun mergeServiceFiles (Ljava/lang/String;)V
 	public fun mergeServiceFiles (Lorg/gradle/api/Action;)V
 	public static synthetic fun mergeServiceFiles$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
+	public final fun minimize ()V
 	public fun minimize (Lorg/gradle/api/Action;)V
 	public static synthetic fun minimize$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
+	public final fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)V
 	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)V
+	public final fun relocate (Ljava/lang/Class;)V
 	public fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)V
+	public final fun relocate (Ljava/lang/String;Ljava/lang/String;)V
 	public fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)V
 	public static synthetic fun relocate$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;ILjava/lang/Object;)V
 	public static synthetic fun relocate$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Ljava/lang/Class;Lorg/gradle/api/Action;ILjava/lang/Object;)V
 	public static synthetic fun relocate$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;ILjava/lang/Object;)V
+	public final fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;Lorg/gradle/api/Action;)V
+	public final fun transform (Ljava/lang/Class;)V
 	public fun transform (Ljava/lang/Class;Lorg/gradle/api/Action;)V
 	public static synthetic fun transform$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;Lorg/gradle/api/Action;ILjava/lang/Object;)V
 	public static synthetic fun transform$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Ljava/lang/Class;Lorg/gradle/api/Action;ILjava/lang/Object;)V
