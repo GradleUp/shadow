@@ -1,7 +1,7 @@
 # Change Log
 
 
-## [9.0.0](https://github.com/GradleUp/shadow/compare/9.0.0) - Unreleased
+## [9.0.0](https://github.com/GradleUp/shadow/compare/9.0.0-rc3...HEAD) - Unreleased
 
 !!! warning
 
