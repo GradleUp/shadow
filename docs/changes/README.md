@@ -116,13 +116,6 @@
 
 ## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
 
-!!! warning
-
-    This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
-    significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
-    enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
-    the [new doc site](https://gradleup.com/shadow/) before upgrading.
-
 ### Added
 
 - Add `PreserveFirstFoundResourceTransformer`. ([#1548](https://github.com/GradleUp/shadow/pull/1548))  
@@ -157,13 +150,6 @@
 
 ## [9.0.0-rc2](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc2) - 2025-07-23
 
-!!! warning
-
-    This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
-    significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
-    enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
-    the [new doc site](https://gradleup.com/shadow/) before upgrading.
-
 ### Added
 
 - Support skipping string constant remapping. ([#1401](https://github.com/GradleUp/shadow/pull/1401))
@@ -182,13 +168,6 @@
 - Honor `options.release` for target JVM attribute. ([#1502](https://github.com/GradleUp/shadow/pull/1502))
 
 ## [9.0.0-rc1](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc1) - 2025-07-02
-
-!!! warning
-
-    This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
-    significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
-    enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
-    the [new doc site](https://gradleup.com/shadow/) before upgrading.
 
 ### Added
 
