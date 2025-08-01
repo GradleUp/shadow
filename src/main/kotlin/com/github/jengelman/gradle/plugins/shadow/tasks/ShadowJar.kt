@@ -239,9 +239,7 @@ public abstract class ShadowJar : Jar() {
    * Merge Java services files with [rootPath].
    */
   public open fun mergeServiceFiles(rootPath: String) {
-    transform(ServiceFileTransformer::class.java) {
-      it.path = rootPath
-    }
+    mergeServiceFiles { it.path = rootPath }
   }
 
   /**
