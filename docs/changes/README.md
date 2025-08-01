@@ -26,12 +26,14 @@
 - Support using type-safe dependency accessors in `ShadowJar.dependencies`. ([#1322](https://github.com/GradleUp/shadow/pull/1322))
 - Support command line options for `ShadowJar`. ([#1365](https://github.com/GradleUp/shadow/pull/1365))
   ```
-  --enable-relocation       Enable relocation of packages in the jar
-  --no-enable-relocation    Disables option --enable-relocation
-  --minimize-jar            Minimize the jar by removing unused classes
-  --no-minimize-jar         Disables option --minimize-jar
-  --relocation-prefix       Prefix to use for relocated packages
-  --rerun                   Causes the task to be re-run even if up-to-date
+  --enable-auto-relocation          Enables auto relocation of packages in the dependencies.
+  --no-enable-auto-relocation       Disables option --enable-auto-relocation.
+  --fail-on-duplicate-entries       Fails build if the ZIP entries in the shadowed JAR are duplicate.
+  --no-fail-on-duplicate-entries    Disables option --fail-on-duplicate-entries.
+  --minimize-jar                    Minimizes the jar by removing unused classes.
+  --no-minimize-jar                 Disables option --minimize-jar.
+  --relocation-prefix               Prefix used for auto relocation of packages in the dependencies.
+  --rerun                           Causes the task to be re-run even if up-to-date.
   ```
 - Support skipping string constant remapping. ([#1401](https://github.com/GradleUp/shadow/pull/1401))
 - Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
@@ -51,7 +53,6 @@
 - **BREAKING CHANGE:** Rewrite this plugin in Kotlin. ([#1012](https://github.com/GradleUp/shadow/pull/1012))
 - **BREAKING CHANGE:** Migrate `Transformer`s to using lazy properties. ([#1036](https://github.com/GradleUp/shadow/pull/1036))
 - **BREAKING CHANGE:** Migrate `ShadowJar` to using lazy properties. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
-- **BREAKING CHANGE:** `ShadowJar`'s `isEnableRelocation` has been renamed to `enableRelocation`. ([#1044](https://github.com/GradleUp/shadow/pull/1044))
 - **BREAKING CHANGE:** Resolve `Configuration` directly in `DependencyFilter`. ([#1045](https://github.com/GradleUp/shadow/pull/1045))
 - **BREAKING CHANGE:** Migrate `SimpleRelocator` to using lazy properties. ([#1047](https://github.com/GradleUp/shadow/pull/1047))
 - **BREAKING CHANGE:** Some public getters have been updated in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
@@ -99,22 +100,9 @@
 - `runShadow` no longer depends on `installShadowDist`. ([#1353](https://github.com/GradleUp/shadow/pull/1353))
 - Move the group of `ShadowJar` from `shadow` to `build`. ([#1355](https://github.com/GradleUp/shadow/pull/1355))
 - In-development snapshots are now published to the Central Portal Snapshots repository. ([#1414](https://github.com/GradleUp/shadow/pull/1414))
-- Restore Develocity Build Scan integration. ([#1505](https://github.com/GradleUp/shadow/pull/1505))  
-  It is still disabled by default, you can enable it by setting `com.gradleup.shadow.enableDevelocityIntegration = true`.
 - Expose `AbstractDependencyFilter` from `internal` to `public`. ([#1538](https://github.com/GradleUp/shadow/pull/1538))  
   You can access it via `com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter.AbstractDependencyFilter`.
-- **BREAKING CHANGE:** Rename `ShadowJar`'s `enableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))  
-  The Command Line options are also updated:
-  ```
-  --enable-auto-relocation          Enables auto relocation of packages in the dependencies.
-  --no-enable-auto-relocation       Disables option --enable-auto-relocation.
-  --fail-on-duplicate-entries       Fails build if the ZIP entries in the shadowed JAR are duplicate.
-  --no-fail-on-duplicate-entries    Disables option --fail-on-duplicate-entries.
-  --minimize-jar                    Minimizes the jar by removing unused classes.
-  --no-minimize-jar                 Disables option --minimize-jar.
-  --relocation-prefix               Prefix used for auto relocation of packages in the dependencies.
-  --rerun                           Causes the task to be re-run even if up-to-date.
-  ```
+- **BREAKING CHANGE:** Rename `ShadowJar`'s `isEnableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))
 - Mark `Action` parameters as non-null. ([#1555](https://github.com/GradleUp/shadow/pull/1555))
 
 ### Fixed
@@ -129,11 +117,9 @@
 - Fix the last modified time of shadowed directories. ([#1277](https://github.com/GradleUp/shadow/pull/1277))
 - Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
 - Allow using file trees of JARs together with the configuration cache. ([#1441](https://github.com/GradleUp/shadow/pull/1441))
-- Honor `options.release` for target JVM attribute. ([#1502](https://github.com/GradleUp/shadow/pull/1502))
 
 ### Removed
 
-- **BREAKING CHANGE:** Remove Develocity integration. ([#1014](https://github.com/GradleUp/shadow/pull/1014))
 - **BREAKING CHANGE:** Some public getters and setters have been removed in `SimpleRelocator`. ([#1079](https://github.com/GradleUp/shadow/pull/1079))
 - **BREAKING CHANGE:** Remove `JavaJarExec`, now use `JavaExec` directly for `runShadow` task. ([#1197](https://github.com/GradleUp/shadow/pull/1197))
 - **BREAKING CHANGE:** `ServiceFileTransformer.ServiceStream` has been removed. ([#1218](https://github.com/GradleUp/shadow/pull/1218))
@@ -143,7 +129,6 @@
 - **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 - **BREAKING CHANGE:** Remove `TransformerContext.getEntryTimestamp`. ([#1245](https://github.com/GradleUp/shadow/pull/1245))
 - **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
-- Remove JVM default compat stuff. ([#1556](https://github.com/GradleUp/shadow/pull/1556))
 
 ## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
 
