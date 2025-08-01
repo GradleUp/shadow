@@ -36,6 +36,15 @@
 - Support skipping string constant remapping. ([#1401](https://github.com/GradleUp/shadow/pull/1401))
 - Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
 - Fail build when inputting AAR files or using Shadow with AGP. ([#1530](https://github.com/GradleUp/shadow/pull/1530))
+- Add `PreserveFirstFoundResourceTransformer`. ([#1548](https://github.com/GradleUp/shadow/pull/1548))  
+  This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
+  want to ensure that only the first found resource is included in the final JAR.
+- Fail build if the ZIP entries in the shadowed JAR are duplicate. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
+  This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
+  Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
+  - It only checks the entries in the shadowed jar, not the input files.
+  - It works with setting `duplicatesStrategy` to any value.
+  - It provides a more strict check before the JAR is created.
 
 ### Changed
 
@@ -94,6 +103,19 @@
   It is still disabled by default, you can enable it by setting `com.gradleup.shadow.enableDevelocityIntegration = true`.
 - Expose `AbstractDependencyFilter` from `internal` to `public`. ([#1538](https://github.com/GradleUp/shadow/pull/1538))  
   You can access it via `com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter.AbstractDependencyFilter`.
+- **BREAKING CHANGE:** Rename `ShadowJar`'s `enableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))  
+  The Command Line options are also updated:
+  ```
+  --enable-auto-relocation          Enables auto relocation of packages in the dependencies.
+  --no-enable-auto-relocation       Disables option --enable-auto-relocation.
+  --fail-on-duplicate-entries       Fails build if the ZIP entries in the shadowed JAR are duplicate.
+  --no-fail-on-duplicate-entries    Disables option --fail-on-duplicate-entries.
+  --minimize-jar                    Minimizes the jar by removing unused classes.
+  --no-minimize-jar                 Disables option --minimize-jar.
+  --relocation-prefix               Prefix used for auto relocation of packages in the dependencies.
+  --rerun                           Causes the task to be re-run even if up-to-date.
+  ```
+- Mark `Action` parameters as non-null. ([#1555](https://github.com/GradleUp/shadow/pull/1555))
 
 ### Fixed
 
@@ -121,6 +143,7 @@
 - **BREAKING CHANGE:** Remove `ShadowCopyAction.ArchiveFileTreeElement` and `RelativeArchivePath`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
 - **BREAKING CHANGE:** Remove `TransformerContext.getEntryTimestamp`. ([#1245](https://github.com/GradleUp/shadow/pull/1245))
 - **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
+- Remove JVM default compat stuff. ([#1556](https://github.com/GradleUp/shadow/pull/1556))
 
 ## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
 
