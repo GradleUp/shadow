@@ -220,17 +220,10 @@ public abstract class ShadowJar : Jar() {
   protected abstract val archiveOperations: ArchiveOperations
 
   /**
-   * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
-   */
-  public open fun minimize() {
-    minimizeJar.set(true)
-  }
-
-  /**
    * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
    */
-  public open fun minimize(action: Action<DependencyFilter>) {
-    minimize()
+  public open fun minimize(action: Action<DependencyFilter> = Action {}) {
+    minimizeJar.set(true)
     action.execute(dependencyFilterForMinimize)
   }
 
@@ -239,13 +232,6 @@ public abstract class ShadowJar : Jar() {
    */
   public open fun dependencies(action: Action<DependencyFilter>) {
     action.execute(dependencyFilter.get())
-  }
-
-  /**
-   * Merge Java services files.
-   */
-  public open fun mergeServiceFiles() {
-    transform(ServiceFileTransformer::class.java, action = {})
   }
 
   /**
@@ -260,7 +246,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Merge Java services files with [action].
    */
-  public open fun mergeServiceFiles(action: Action<ServiceFileTransformer>) {
+  public open fun mergeServiceFiles(action: Action<ServiceFileTransformer> = Action {}) {
     transform(ServiceFileTransformer::class.java, action)
   }
 
@@ -320,17 +306,7 @@ public abstract class ShadowJar : Jar() {
    * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
    */
   @JvmSynthetic // For Groovy build scripts, hide from normal callers.
-  public inline fun <reified R : Relocator> relocate() {
-    relocate(R::class.java, action = {})
-  }
-
-  /**
-   * Relocate classes and resources using a [Relocator].
-   *
-   * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
-   */
-  @JvmSynthetic // For Groovy build scripts, hide from normal callers.
-  public inline fun <reified R : Relocator> relocate(action: Action<R>) {
+  public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
     relocate(R::class.java, action)
   }
 
@@ -354,17 +330,7 @@ public abstract class ShadowJar : Jar() {
    * This is a convenience method for [transform] with a reified type parameter for Kotlin.
    */
   @JvmSynthetic // For Groovy build scripts, hide from normal callers.
-  public inline fun <reified T : ResourceTransformer> transform() {
-    transform(T::class.java, action = {})
-  }
-
-  /**
-   * Transform resources using a [ResourceTransformer].
-   *
-   * This is a convenience method for [transform] with a reified type parameter for Kotlin.
-   */
-  @JvmSynthetic // For Groovy build scripts, hide from normal callers.
-  public inline fun <reified T : ResourceTransformer> transform(action: Action<T>) {
+  public inline fun <reified T : ResourceTransformer> transform(action: Action<T> = Action {}) {
     transform(T::class.java, action)
   }
 

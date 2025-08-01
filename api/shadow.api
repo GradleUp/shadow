@@ -215,11 +215,11 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
 	public fun mergeGroovyExtensionModules ()V
-	public fun mergeServiceFiles ()V
 	public fun mergeServiceFiles (Ljava/lang/String;)V
 	public fun mergeServiceFiles (Lorg/gradle/api/Action;)V
-	public fun minimize ()V
+	public static synthetic fun mergeServiceFiles$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
 	public fun minimize (Lorg/gradle/api/Action;)V
+	public static synthetic fun minimize$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
 	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)V
 	public fun relocate (Ljava/lang/Class;Lorg/gradle/api/Action;)V
 	public fun relocate (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)V
