@@ -57,9 +57,7 @@ import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
 
 @CacheableTask
-public abstract class ShadowJar :
-  Jar(),
-  ShadowSpec {
+public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
   init {
@@ -224,14 +222,14 @@ public abstract class ShadowJar :
   /**
    * Enable [minimizeJar], this equals to `minimizeJar.set(true)`.
    */
-  override fun minimize() {
+  public open fun minimize() {
     minimizeJar.set(true)
   }
 
   /**
    * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
    */
-  override fun minimize(action: Action<DependencyFilter>) {
+  public open fun minimize(action: Action<DependencyFilter>) {
     minimize()
     action.execute(dependencyFilterForMinimize)
   }
@@ -239,21 +237,21 @@ public abstract class ShadowJar :
   /**
    * Extra dependency operations to be applied in the shadow steps.
    */
-  override fun dependencies(action: Action<DependencyFilter>) {
+  public open fun dependencies(action: Action<DependencyFilter>) {
     action.execute(dependencyFilter.get())
   }
 
   /**
    * Merge Java services files.
    */
-  override fun mergeServiceFiles() {
+  public open fun mergeServiceFiles() {
     transform(ServiceFileTransformer::class.java, action = {})
   }
 
   /**
    * Merge Java services files with [rootPath].
    */
-  override fun mergeServiceFiles(rootPath: String) {
+  public open fun mergeServiceFiles(rootPath: String) {
     transform(ServiceFileTransformer::class.java) {
       it.path = rootPath
     }
@@ -262,14 +260,14 @@ public abstract class ShadowJar :
   /**
    * Merge Java services files with [action].
    */
-  override fun mergeServiceFiles(action: Action<ServiceFileTransformer>) {
+  public open fun mergeServiceFiles(action: Action<ServiceFileTransformer>) {
     transform(ServiceFileTransformer::class.java, action)
   }
 
   /**
    * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
    */
-  override fun mergeGroovyExtensionModules() {
+  public open fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, action = {})
   }
 
@@ -282,7 +280,7 @@ public abstract class ShadowJar :
    * @param separator The separator to use between the original content and the appended content,
    * defaults to `\n` ([AppendingTransformer.DEFAULT_SEPARATOR]).
    */
-  override fun append(resourcePath: String, separator: String) {
+  public open fun append(resourcePath: String, separator: String = AppendingTransformer.DEFAULT_SEPARATOR) {
     transform(AppendingTransformer::class.java) {
       it.resource.set(resourcePath)
       it.separator.set(separator)
@@ -292,10 +290,10 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
    */
-  override fun relocate(
+  public open fun relocate(
     pattern: String,
     destination: String,
-    action: Action<SimpleRelocator>,
+    action: Action<SimpleRelocator> = Action {},
   ) {
     val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
@@ -304,7 +302,7 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  override fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>) {
+  public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
@@ -312,7 +310,7 @@ public abstract class ShadowJar :
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  override fun <R : Relocator> relocate(relocator: R, action: Action<R>) {
+  public open fun <R : Relocator> relocate(relocator: R, action: Action<R> = Action {}) {
     addRelocator(relocator, action)
   }
 
@@ -339,14 +337,14 @@ public abstract class ShadowJar :
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  override fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>) {
+  public open fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T> = Action {}) {
     addTransform(clazz.create(objectFactory), action)
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  override fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>) {
+  public open fun <T : ResourceTransformer> transform(transformer: T, action: Action<T> = Action {}) {
     addTransform(transformer, action)
   }
 
