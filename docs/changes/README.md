@@ -1,7 +1,14 @@
 # Change Log
 
 
-## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0-rc2...HEAD) - 2025-xx-xx
+## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
+
+!!! warning
+
+    This release is a major update from the 8.3.x series. The plugin has been fully rewritten in Kotlin, bringing
+    significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
+    enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
+    the [new doc site](https://gradleup.com/shadow/) before upgrading.
 
 ### Added
 
