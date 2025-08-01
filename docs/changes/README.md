@@ -66,7 +66,7 @@
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
     - `ShadowJar` recognized `DuplicatesStrategy.EXCLUDE` as the default, but the other strategies didn't work properly.
     - Now `ShadowJar` honors `DuplicatesStrategy.INCLUDE` as the default, and align all the strategy behaviors with the Gradle side.
-    - See more details about the strategies [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+    - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
   issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip
