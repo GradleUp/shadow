@@ -27,10 +27,6 @@ public interface Relocator {
    */
   @get:Input
   public val skipStringConstants: Boolean get() = false
-
-  public companion object {
-    public val ROLE: String = Relocator::class.java.name
-  }
 }
 
 /**
