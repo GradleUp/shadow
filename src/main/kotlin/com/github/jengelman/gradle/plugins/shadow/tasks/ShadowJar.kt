@@ -308,8 +308,6 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Relocate classes and resources using a [Relocator].
-   *
-   * This is a convenience method for [relocate] with a reified type parameter for Kotlin.
    */
   @JvmSynthetic // For Groovy build scripts, hide from normal callers.
   public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
@@ -334,8 +332,6 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Transform resources using a [ResourceTransformer].
-   *
-   * This is a convenience method for [transform] with a reified type parameter for Kotlin.
    */
   @JvmSynthetic // For Groovy build scripts, hide from normal callers.
   public inline fun <reified T : ResourceTransformer> transform(action: Action<T> = Action {}) {
