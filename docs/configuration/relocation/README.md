@@ -93,6 +93,34 @@ expression in `%regex[]` before passing it to `include`/`exclude`.
     }
     ```
 
+It may be desirable to relocate all packages in a Shadow JAR except for a select few. This can be accomplished by
+specifying a relocation with an empty string `''` as the pattern to match on all packages. An `exclude` filter can then
+be used to prevent relocation of specific packages.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      relocate("", "my/shadow/prefix") {
+        exclude("META-INF/**")
+        // Exclude all JUnit packages.
+        exclude("junit/**")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      relocate('', 'my/shadow/prefix') {
+        exclude 'META-INF/**'
+        // Exclude all JUnit packages.
+        exclude 'junit/**'
+      }
+    }
+    ```
+
 ## Skipping Relocation for String Constants
 
 If there is a class like:
