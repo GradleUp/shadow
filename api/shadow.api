@@ -216,7 +216,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public final fun minimize ()V
 	public fun minimize (Lorg/gradle/api/Action;)V
 	public static synthetic fun minimize$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
-	public static final fun registerShadowJarCommon (Lorg/gradle/api/Project;Lorg/gradle/api/Action;)Lorg/gradle/api/tasks/TaskProvider;
 	public final fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)V
 	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)V
 	public final fun relocate (Ljava/lang/Class;)V
@@ -236,7 +235,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar$Companion {
 	public final fun getShadowJar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
-	public final fun registerShadowJarCommon (Lorg/gradle/api/Project;Lorg/gradle/api/Action;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {

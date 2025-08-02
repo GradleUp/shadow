@@ -450,9 +450,8 @@ public abstract class ShadowJar : Jar() {
     public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>
       get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
-    @JvmStatic
-    public fun Project.registerShadowJarCommon(
-      action: Action<ShadowJar>,
+    internal fun Project.registerShadowJarCommon(
+      action: (ShadowJar) -> Unit,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
         task.archiveClassifier.set("all")
@@ -467,7 +466,7 @@ public abstract class ShadowJar : Jar() {
         )
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
-        action.execute(task)
+        action(task)
       }
     }
   }
