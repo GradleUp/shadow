@@ -88,6 +88,8 @@ class JavaPluginTest : BasePluginTest() {
 
     // Check self properties.
     with(shadowTask) {
+      assertThat(group).isEqualTo(LifecycleBasePlugin.BUILD_GROUP)
+      assertThat(description).isEqualTo("Create a combined JAR of project and runtime dependencies")
       assertThat(minimizeJar.get()).isFalse()
       assertThat(enableAutoRelocation.get()).isFalse()
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
