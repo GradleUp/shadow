@@ -27,6 +27,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     public const val COMPONENT_NAME: String = SHADOW
     public const val DISTRIBUTION_NAME: String = SHADOW
 
+    @get:JvmSynthetic
     public inline val ConfigurationContainer.shadow: NamedDomainObjectProvider<Configuration>
       get() = named(CONFIGURATION_NAME)
   }

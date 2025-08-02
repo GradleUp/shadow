@@ -120,6 +120,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   public companion object {
     public const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
 
+    @get:JvmSynthetic
     public inline val ConfigurationContainer.shadowRuntimeElements: NamedDomainObjectProvider<Configuration>
       get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
   }
