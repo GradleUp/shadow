@@ -478,7 +478,7 @@ class RelocationTest : BasePluginTest() {
     val relocateConfig = if (exclude) {
       """
         exclude 'junit/**'
-        exclude '$manifestEntry'
+        exclude 'META-INF/**'
       """.trimIndent()
     } else {
       ""
