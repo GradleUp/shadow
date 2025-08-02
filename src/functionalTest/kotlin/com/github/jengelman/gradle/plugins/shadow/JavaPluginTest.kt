@@ -551,7 +551,6 @@ class JavaPluginTest : BasePluginTest() {
           testImplementation 'junit:junit:3.8.2'
         }
         def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
-          group = LifecycleBasePlugin.BUILD_GROUP
           description = 'Create a combined JAR of project and test dependencies'
           archiveClassifier = 'test'
           from sourceSets.named('test').map { it.output }

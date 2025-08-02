@@ -185,7 +185,6 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
     }
 
     val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
-      group = LifecycleBasePlugin.BUILD_GROUP
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
@@ -218,7 +217,6 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
     }
 
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      group = LifecycleBasePlugin.BUILD_GROUP
       description = 'Create a combined JAR of project and test dependencies'
       archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
