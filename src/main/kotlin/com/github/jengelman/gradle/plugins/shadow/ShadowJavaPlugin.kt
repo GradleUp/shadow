@@ -6,9 +6,9 @@ import com.github.jengelman.gradle.plugins.shadow.internal.jar
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import javax.inject.Inject
-import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -24,9 +24,6 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
-import org.gradle.api.tasks.TaskContainer
-import org.gradle.api.tasks.TaskProvider
-import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 public abstract class ShadowJavaPlugin @Inject constructor(
@@ -121,34 +118,9 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   }
 
   public companion object {
-    public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
     public const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
-
-    public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>
-      get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
     public inline val ConfigurationContainer.shadowRuntimeElements: NamedDomainObjectProvider<Configuration>
       get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
-
-    @JvmStatic
-    public fun Project.registerShadowJarCommon(
-      action: Action<ShadowJar>,
-    ): TaskProvider<ShadowJar> {
-      return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
-        task.archiveClassifier.set("all")
-        task.exclude(
-          "META-INF/INDEX.LIST",
-          "META-INF/*.SF",
-          "META-INF/*.DSA",
-          "META-INF/*.RSA",
-          // module-info.class in Multi-Release folders.
-          "META-INF/versions/**/module-info.class",
-          "module-info.class",
-        )
-        @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
-        tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
-        action.execute(task)
-      }
-    }
   }
 }

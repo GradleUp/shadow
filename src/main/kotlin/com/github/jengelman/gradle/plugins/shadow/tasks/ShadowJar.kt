@@ -28,6 +28,7 @@ import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
@@ -52,6 +53,8 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
@@ -438,6 +441,33 @@ public abstract class ShadowJar : Jar() {
     }
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
+    }
+  }
+
+  public companion object {
+    public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
+
+    public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>
+      get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
+
+    internal fun Project.registerShadowJarCommon(
+      action: (ShadowJar) -> Unit,
+    ): TaskProvider<ShadowJar> {
+      return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
+        task.archiveClassifier.set("all")
+        task.exclude(
+          "META-INF/INDEX.LIST",
+          "META-INF/*.SF",
+          "META-INF/*.DSA",
+          "META-INF/*.RSA",
+          // module-info.class in Multi-Release folders.
+          "META-INF/versions/**/module-info.class",
+          "module-info.class",
+        )
+        @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
+        tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
+        action(task)
+      }
     }
   }
 }
