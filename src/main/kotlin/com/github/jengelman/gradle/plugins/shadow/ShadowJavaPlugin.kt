@@ -135,8 +135,6 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       action: Action<ShadowJar>,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
-        task.group = LifecycleBasePlugin.BUILD_GROUP
-        task.description = "Create a combined JAR of project and runtime dependencies"
         task.archiveClassifier.set("all")
         task.exclude(
           "META-INF/INDEX.LIST",

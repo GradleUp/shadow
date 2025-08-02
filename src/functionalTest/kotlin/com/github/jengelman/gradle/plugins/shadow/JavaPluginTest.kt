@@ -88,6 +88,8 @@ class JavaPluginTest : BasePluginTest() {
 
     // Check self properties.
     with(shadowTask) {
+      assertThat(group).isEqualTo(LifecycleBasePlugin.BUILD_GROUP)
+      assertThat(description).isEqualTo("Create a combined JAR of project and runtime dependencies")
       assertThat(minimizeJar.get()).isFalse()
       assertThat(enableAutoRelocation.get()).isFalse()
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
@@ -549,7 +551,6 @@ class JavaPluginTest : BasePluginTest() {
           testImplementation 'junit:junit:3.8.2'
         }
         def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
-          group = LifecycleBasePlugin.BUILD_GROUP
           description = 'Create a combined JAR of project and test dependencies'
           archiveClassifier = 'tests'
           from sourceSets.named('test').map { it.output }

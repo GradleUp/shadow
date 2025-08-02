@@ -55,12 +55,16 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
 
   init {
+    group = LifecycleBasePlugin.BUILD_GROUP
+    description = "Create a combined JAR of project and runtime dependencies"
+
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
     duplicatesStrategy = INCLUDE
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))

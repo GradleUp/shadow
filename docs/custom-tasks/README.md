@@ -9,7 +9,6 @@ the output.
 
     ```kotlin
     val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
-      group = LifecycleBasePlugin.BUILD_GROUP
       description = "Create a combined JAR of project and test dependencies"
 
       archiveClassifier = "tests"
@@ -33,7 +32,6 @@ the output.
 
     ```groovy
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      group = LifecycleBasePlugin.BUILD_GROUP
       description = 'Create a combined JAR of project and test dependencies'
 
       archiveClassifier = 'tests'
