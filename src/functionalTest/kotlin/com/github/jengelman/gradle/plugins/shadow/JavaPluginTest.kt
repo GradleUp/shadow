@@ -553,7 +553,7 @@ class JavaPluginTest : BasePluginTest() {
         def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
           group = LifecycleBasePlugin.BUILD_GROUP
           description = 'Create a combined JAR of project and test dependencies'
-          archiveClassifier = 'tests'
+          archiveClassifier = 'test'
           from sourceSets.named('test').map { it.output }
           configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
           manifest {
@@ -565,7 +565,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(testShadowJarTask)
 
-    assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
+    assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
       containsOnly(
         "my/",
         mainClassEntry,
@@ -575,7 +575,7 @@ class JavaPluginTest : BasePluginTest() {
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
 
-    val pathString = path("build/libs/my-1.0-tests.jar").toString()
+    val pathString = path("build/libs/my-1.0-test.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
     assertThat(runningOutput).contains(
       "Hello, World! (foo) from Main",
