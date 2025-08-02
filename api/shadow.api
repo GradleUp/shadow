@@ -14,8 +14,8 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicati
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion {
-	public final fun getInstallShadowDist (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
-	public final fun getStartShadowScripts (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final synthetic fun getInstallShadowDist (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final synthetic fun getStartShadowScripts (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin : org/gradle/api/Plugin {
@@ -31,7 +31,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugi
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion {
-	public final fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
+	public final synthetic fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
@@ -52,7 +52,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugi
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {
-	public final fun getShadowRuntimeElements (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
+	public final synthetic fun getShadowRuntimeElements (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin : org/gradle/api/Plugin {
@@ -234,7 +234,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar$Companion {
-	public final fun getShadowJar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final synthetic fun getShadowJar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {

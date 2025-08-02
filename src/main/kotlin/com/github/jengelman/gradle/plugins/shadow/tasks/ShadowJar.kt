@@ -313,7 +313,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  @JvmSynthetic // For Groovy build scripts, hide from normal callers.
+  @JvmSynthetic
   public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
     relocate(R::class.java, action)
   }
@@ -337,7 +337,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  @JvmSynthetic // For Groovy build scripts, hide from normal callers.
+  @JvmSynthetic
   public inline fun <reified T : ResourceTransformer> transform(action: Action<T> = Action {}) {
     transform(T::class.java, action)
   }
@@ -447,6 +447,7 @@ public abstract class ShadowJar : Jar() {
   public companion object {
     public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
 
+    @get:JvmSynthetic
     public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>
       get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
