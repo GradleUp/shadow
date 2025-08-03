@@ -16,4 +16,10 @@ class KotlinBuildExecutable(
       id("com.gradleup.shadow")
     }
   """.trimIndent()
+
+  override val assembleDependsOn: String = """
+    tasks.named("assemble") {
+      dependsOn(tasks.withType(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class.java))
+    }
+  """.trimIndent()
 }
