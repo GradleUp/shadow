@@ -233,7 +233,7 @@ public abstract class ShadowJar : Jar() {
    */
   @JvmOverloads
   public open fun minimize(action: Action<DependencyFilter> = Action {}) {
-    minimizeJar.convention(true)
+    minimizeJar.set(true)
     action.execute(dependencyFilterForMinimize)
   }
 
