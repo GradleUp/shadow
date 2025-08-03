@@ -15,7 +15,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit = with(project) {
     extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target ->
       if (tasks.findByName(SHADOW_JAR_TASK_NAME) != null) {
-        // KMP plugin supports adding multiple targets, we only configure the first one (usually the default one named `jvm`).
+        // Declaring multiple Kotlin Targets of the same type is not supported. See https://kotl.in/declaring-multiple-targets for more details.
         logger.info("$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: ${target.name}")
         return@configureEach
       }

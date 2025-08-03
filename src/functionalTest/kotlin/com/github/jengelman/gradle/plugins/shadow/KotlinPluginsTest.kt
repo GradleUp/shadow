@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
@@ -240,14 +241,12 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    val result = runWithFailure(shadowJarTask, "--info")
 
-    assertThat(outputShadowJar).useAll {
-      containsOnly(
-        *manifestEntries,
-        *entriesInAB,
-      )
-    }
+    assertThat(result.output).contains(
+      "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
+      "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
+    )
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {
