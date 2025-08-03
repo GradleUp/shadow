@@ -55,6 +55,35 @@ The code snippet above will generate a shadowed JAR containing both the `main` a
 `testRuntimeOnly` and `testImplementation` dependencies. The file is output to
 `build/libs/<project>-<version>-test.jar`.
 
+## Creating a Dependencies-Only Shadow JAR
+
+It is also possible to create a shadow JAR that contains *only* the dependencies and none of the project's own
+source code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task and configuring the
+[`configurations`][ShadowJar.configurations] property, but **not** adding any project sources with `from(...)`.
+
+=== "Kotlin"
+
+    ```kotlin
+    val dependencyShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+      description = "Create a shadow JAR of all dependencies"
+      archiveClassifier = "dep"
+      configurations = project.configurations.runtimeClasspath.map { listOf(it) }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    def dependencyShadowJar = tasks.register('dependencyShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      description = 'Create a shadow JAR of all dependencies'
+      archiveClassifier = 'dep'
+      configurations = project.configurations.named('runtimeClasspath').map { [it] }
+    }
+    ```
+
+The above configuration will create a shadow JAR file that contains only the classes from the `runtimeClasspath`
+configuration. The standard `jar` task will still produce a JAR with only the project's sources.
+
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar.configurations]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html
