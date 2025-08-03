@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.bundling.Jar
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -28,7 +29,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
 
   private fun Project.configureShadowJar(target: KotlinJvmTarget) {
     val kotlinJvmMain = target.compilations.named("main")
-    registerShadowJarCommon { task ->
+    registerShadowJarCommon(tasks.named(target.artifactsTaskName, Jar::class.java)) { task ->
       task.from(kotlinJvmMain.map { it.output.allOutputs })
       task.configurations.convention(
         provider {
