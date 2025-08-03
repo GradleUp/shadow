@@ -749,7 +749,7 @@ class JavaPluginTest : BasePluginTest() {
       )
       getContent("Bar/Foo").isEqualTo("Foo")
     }
-    val unzipped = path("unzipped")
+    val unzipped = path("a-1.0.jar.copy")
     outputShadowJar.use {
       it.getStream("META-INF/a-1.0.jar").use { inputStream ->
         inputStream.copyTo(unzipped.outputStream())
