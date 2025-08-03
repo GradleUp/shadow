@@ -19,7 +19,7 @@ class GroovyBuildExecutable(
 
   override val assembleDependsOn: String = """
     tasks.named('assemble') {
-      dependsOn(tasks.withType(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar))
+      dependsOn tasks.withType(Jar) // ShadowJar is a subtype of Jar.
     }
   """.trimIndent()
 }
