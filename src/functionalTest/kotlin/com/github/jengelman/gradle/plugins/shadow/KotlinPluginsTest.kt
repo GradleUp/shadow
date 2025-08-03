@@ -235,7 +235,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarTask, INFO_ARGUMENT)
 
     assertThat(result.output).contains(
       "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.

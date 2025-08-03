@@ -860,6 +860,7 @@ class JavaPluginTest : BasePluginTest() {
       IP_ARGUMENT,
       "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
       "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
+      INFO_ARGUMENT,
     )
 
     assertThat(result.output).all {
@@ -889,7 +890,7 @@ class JavaPluginTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarTask)
     } else {
-      run(shadowJarTask)
+      run(shadowJarTask, INFO_ARGUMENT)
     }
 
     assertThat(result.output).contains(
@@ -913,7 +914,7 @@ class JavaPluginTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarTask, "--fail-on-duplicate-entries")
     } else {
-      run(shadowJarTask)
+      run(shadowJarTask, INFO_ARGUMENT)
     }
 
     assertThat(result.output).contains(

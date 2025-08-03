@@ -53,7 +53,7 @@ class RelocationTest : BasePluginTest() {
       }
     }.toTypedArray()
 
-    val result = run(shadowJarTask)
+    val result = run(shadowJarTask, INFO_ARGUMENT)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
