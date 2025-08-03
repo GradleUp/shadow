@@ -14,6 +14,7 @@ sealed class SnippetExecutable : Executable {
   abstract val lang: DslLang
   abstract val buildScriptName: String
   abstract val pluginsBlock: String
+  abstract val assembleDependsOn: String
 
   abstract val snippet: String
   abstract val displayName: String
@@ -46,7 +47,13 @@ sealed class SnippetExecutable : Executable {
         enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
       """.trimIndent(),
     )
-    projectRoot.addSubProject("api", pluginsBlock)
+
+    val apiScript = buildString {
+      append(pluginsBlock)
+      append(lineSeparator())
+      append(assembleDependsOn)
+    }
+    projectRoot.addSubProject("api", apiScript)
 
     val (imports, withoutImports) = importsExtractor(snippet)
     val mainScript = buildString {
@@ -62,6 +69,8 @@ sealed class SnippetExecutable : Executable {
         }
         append(withoutImports)
       }
+      append(lineSeparator())
+      append(assembleDependsOn)
       append(lineSeparator())
     }.trimIndent()
     projectRoot.addSubProject("main", mainScript)
