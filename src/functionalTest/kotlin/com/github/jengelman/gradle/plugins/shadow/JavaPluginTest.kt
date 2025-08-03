@@ -552,7 +552,7 @@ class JavaPluginTest : BasePluginTest() {
         }
         def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
           description = 'Create a combined JAR of project and test dependencies'
-          archiveClassifier = 'tests'
+          archiveClassifier = 'test'
           from sourceSets.named('test').map { it.output }
           configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
           manifest {
@@ -564,7 +564,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(testShadowJarTask)
 
-    assertThat(jarPath("build/libs/my-1.0-tests.jar")).useAll {
+    assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
       containsOnly(
         "my/",
         mainClassEntry,
@@ -574,12 +574,52 @@ class JavaPluginTest : BasePluginTest() {
       getMainAttr(mainClassAttributeKey).isNotNull()
     }
 
-    val pathString = path("build/libs/my-1.0-tests.jar").toString()
+    val pathString = path("build/libs/my-1.0-test.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
     assertThat(runningOutput).contains(
       "Hello, World! (foo) from Main",
       "Refs: junit.framework.Test",
     )
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/443",
+  )
+  @Test
+  fun registerCustomShadowJarTaskThatContainsDependenciesOnly() {
+    val mainClassEntry = writeClass()
+    val dependencyShadowJar = "dependencyShadowJar"
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
+          description = 'Create a shadow JAR of all dependencies'
+          archiveClassifier = 'dep'
+          configurations = project.configurations.named('runtimeClasspath').map { [it] }
+        }
+      """.trimIndent(),
+    )
+
+    run("jar", dependencyShadowJar)
+
+    assertThat(jarPath("build/libs/my-1.0.jar")).useAll {
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        *manifestEntries,
+      )
+      transform { it.mainAttrSize }.isEqualTo(1)
+    }
+    assertThat(jarPath("build/libs/my-1.0-dep.jar")).useAll {
+      containsOnly(
+        *junitEntries,
+        *manifestEntries,
+      )
+      transform { it.mainAttrSize }.isEqualTo(1)
+    }
   }
 
   @Issue(
