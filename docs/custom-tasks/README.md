@@ -11,7 +11,7 @@ the output.
     val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
       description = "Create a combined JAR of project and test dependencies"
 
-      archiveClassifier = "tests"
+      archiveClassifier = "test"
       from(sourceSets.test.map { it.output })
       configurations = project.configurations.testRuntimeClasspath.map { listOf(it) }
 
@@ -34,7 +34,7 @@ the output.
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       description = 'Create a combined JAR of project and test dependencies'
 
-      archiveClassifier = 'tests'
+      archiveClassifier = 'test'
       from sourceSets.named('test').map { it.output }
       configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
 
@@ -53,7 +53,7 @@ the output.
 
 The code snippet above will generate a shadowed JAR containing both the `main` and `test` sources as well as all
 `testRuntimeOnly` and `testImplementation` dependencies. The file is output to
-`build/libs/<project>-<version>-tests.jar`.
+`build/libs/<project>-<version>-test.jar`.
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
