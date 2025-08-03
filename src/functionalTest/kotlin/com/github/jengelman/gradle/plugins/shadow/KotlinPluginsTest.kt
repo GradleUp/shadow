@@ -211,8 +211,7 @@ class KotlinPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun createShadowJarForFirstJvmTarget() {
-    val stdlib = compileOnlyStdlib(true)
+  fun registerShadowJarForFirstJvmTarget() {
     val jvmTargetName = "newJvm"
     projectScriptPath.appendText(
       """
@@ -223,7 +222,6 @@ class KotlinPluginsTest : BasePluginTest() {
             commonMain {
               dependencies {
                 implementation 'my:a:1.0'
-                $stdlib
               }
             }
             jvmMain {
