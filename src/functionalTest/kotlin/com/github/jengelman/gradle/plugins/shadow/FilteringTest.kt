@@ -26,7 +26,7 @@ class FilteringTest : BasePluginTest() {
           implementation 'my:a:1.0'
           implementation 'my:b:1.0'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
   }
 

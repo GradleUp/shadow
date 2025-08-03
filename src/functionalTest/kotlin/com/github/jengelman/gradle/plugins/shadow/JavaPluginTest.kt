@@ -204,7 +204,7 @@ class JavaPluginTest : BasePluginTest() {
             attributes '$multiReleaseAttributeKey': 'true'
           }
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     run(serverShadowJarTask)
@@ -505,7 +505,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     val outputCompileOnly = dependencies(COMPILE_ONLY_CONFIGURATION_NAME)
@@ -525,7 +525,7 @@ class JavaPluginTest : BasePluginTest() {
     projectScriptPath.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     val output = dependencies(

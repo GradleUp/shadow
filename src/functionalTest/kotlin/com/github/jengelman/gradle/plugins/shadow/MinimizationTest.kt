@@ -250,7 +250,7 @@ class MinimizationTest : BasePluginTest() {
     settingsScriptPath.appendText(
       """
         include 'api', 'lib', 'impl'
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     projectScriptPath.writeText("")
 
@@ -271,7 +271,7 @@ class MinimizationTest : BasePluginTest() {
         plugins {
           id 'java'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     path("api/src/main/java/api/Entity.java").writeText(
@@ -296,7 +296,7 @@ class MinimizationTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
           implementation project(':lib')
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     path("impl/src/main/java/impl/SimpleEntity.java").writeText(
@@ -315,7 +315,7 @@ class MinimizationTest : BasePluginTest() {
         $shadowJar {
           minimize()
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
   }
 }

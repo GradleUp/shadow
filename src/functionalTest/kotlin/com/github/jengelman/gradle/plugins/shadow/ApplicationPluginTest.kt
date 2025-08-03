@@ -241,7 +241,7 @@ class ApplicationPluginTest : BasePluginTest() {
           args 'foo'
           $runShadowBlock
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     settingsScriptPath.writeText(
       getDefaultSettingsBuildScript(

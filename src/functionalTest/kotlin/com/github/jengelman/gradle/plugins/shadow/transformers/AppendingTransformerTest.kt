@@ -78,7 +78,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
           separator = '$APPLICATION_YML_SEPARATOR'
         """.trimIndent(),
       )
-      block1 + System.lineSeparator() + block2
+      block1 + lineSeparator + block2
     }
 
     projectScriptPath.appendText(config)

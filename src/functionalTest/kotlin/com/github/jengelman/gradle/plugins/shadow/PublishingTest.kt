@@ -54,7 +54,7 @@ class PublishingTest : BasePluginTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
-    settingsScriptPath.appendText("rootProject.name = 'maven'" + System.lineSeparator())
+    settingsScriptPath.appendText("rootProject.name = 'maven'" + lineSeparator)
   }
 
   @Test
@@ -65,7 +65,7 @@ class PublishingTest : BasePluginTest() {
           archiveClassifier = ''
           archiveBaseName = 'maven-all'
         """.trimIndent(),
-      ) + System.lineSeparator(),
+      ) + lineSeparator,
     )
 
     publish()
@@ -95,7 +95,7 @@ class PublishingTest : BasePluginTest() {
         java {
           toolchain.languageVersion = JavaLanguageVersion.of(17)
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     publish()
     assertions(attrsWithoutTargetJvm + targetJvmAttr17)
@@ -105,7 +105,7 @@ class PublishingTest : BasePluginTest() {
         java {
           targetCompatibility = JavaVersion.VERSION_11
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     publish()
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
@@ -115,7 +115,7 @@ class PublishingTest : BasePluginTest() {
         java {
           sourceCompatibility = JavaVersion.VERSION_1_8
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     publish()
     // sourceCompatibility doesn't affect the target JVM version.
@@ -126,7 +126,7 @@ class PublishingTest : BasePluginTest() {
         tasks.named('compileJava') {
           options.release = 8
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     publish()
     // options.release flag is honored.
