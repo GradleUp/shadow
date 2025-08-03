@@ -53,7 +53,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
     "https://github.com/GradleUp/shadow/issues/168",
   )
   @Test
-  fun canMergeNestedLevels() {
+  fun mergeNestedLevels() {
     val xmlEntry = "META-INF/nested.xml"
     val xmlContent = """
       <?xml version="1.0" encoding="UTF-8"?>

@@ -610,7 +610,7 @@ class RelocationTest : BasePluginTest() {
   )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun canDisableRelocateStringConstants(skipStringConstants: Boolean) {
+  fun disableRelocateStringConstants(skipStringConstants: Boolean) {
     writeClassWithStringRef()
     projectScriptPath.appendText(
       """

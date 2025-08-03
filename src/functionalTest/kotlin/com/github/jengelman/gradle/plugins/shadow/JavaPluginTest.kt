@@ -542,7 +542,7 @@ class JavaPluginTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/1070",
   )
   @Test
-  fun canRegisterCustomShadowJarTask() {
+  fun registerCustomShadowJarTask() {
     val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScriptPath.appendText(
@@ -691,7 +691,7 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun canInheritFromOtherManifest() {
+  fun inheritFromOtherManifest() {
     projectScriptPath.appendText(
       """
         jar {
@@ -720,7 +720,7 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun canAddExtraFilesIntoShadowJar() {
+  fun addExtraFilesIntoShadowJar() {
     val mainClassEntry = writeClass()
     path("Foo").writeText("Foo")
     projectScriptPath.appendText(
