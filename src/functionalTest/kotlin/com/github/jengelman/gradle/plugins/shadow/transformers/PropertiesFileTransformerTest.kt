@@ -129,7 +129,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     "https://github.com/GradleUp/shadow/issues/856",
   )
   @Test
-  fun mergedPropertiesDontContainDateComment() {
+  fun mergedPropertiesDoNotContainDateComment() {
     val one = buildJarOne {
       insert("META-INF/test.properties", "foo=one")
     }
