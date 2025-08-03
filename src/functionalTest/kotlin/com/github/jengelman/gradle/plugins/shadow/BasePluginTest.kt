@@ -425,8 +425,8 @@ abstract class BasePluginTest {
       "--build-cache",
       "--parallel",
       "--stacktrace",
-      // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:parallel
-      "-Dorg.gradle.configuration-cache.parallel=true",
+      "--info", // Show logs with info level, we assert some of them in the tests.
+      "-Dorg.gradle.configuration-cache.parallel=true", // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:parallel
     )
 
     // TODO: enable this flag for all tests once we have fixed all issues with isolated projects.
