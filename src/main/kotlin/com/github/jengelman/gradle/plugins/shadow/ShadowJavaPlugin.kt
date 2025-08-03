@@ -22,7 +22,7 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
-import org.gradle.jvm.tasks.Jar
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 public abstract class ShadowJavaPlugin @Inject constructor(

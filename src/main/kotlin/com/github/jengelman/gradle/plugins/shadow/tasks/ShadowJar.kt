@@ -454,7 +454,7 @@ public abstract class ShadowJar : Jar() {
       get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
     internal fun Project.registerShadowJarCommon(
-      jarTask: TaskProvider<org.gradle.jvm.tasks.Jar>,
+      jarTask: TaskProvider<Jar>,
       action: (ShadowJar) -> Unit,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
