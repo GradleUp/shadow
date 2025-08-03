@@ -598,7 +598,7 @@ class JavaPluginTest : BasePluginTest() {
         def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
           description = 'Create a shadow JAR of all dependencies'
           archiveClassifier = 'dep'
-          configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+          configurations = project.configurations.named('runtimeClasspath').map { [it] }
         }
       """.trimIndent(),
     )
