@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
-import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
-import com.github.jengelman.gradle.plugins.shadow.internal.jar
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
@@ -24,6 +22,7 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
+import org.gradle.jvm.tasks.Jar
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 public abstract class ShadowJavaPlugin @Inject constructor(
@@ -38,18 +37,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   }
 
   protected open fun Project.configureShadowJar() {
-    val jarTask = tasks.jar
-    val taskProvider = registerShadowJarCommon { task ->
-      @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
-      task.manifest.inheritFrom(jarTask.get().manifest)
-      val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
-      val files = files(configurations.shadow)
-      task.doFirst {
-        if (!files.isEmpty) {
-          val attrs = listOf(attrProvider.getOrElse("")) + files.map { it.name }
-          task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
-        }
-      }
+    val taskProvider = registerShadowJarCommon(tasks.named("jar", Jar::class.java)) { task ->
       task.from(sourceSets.named("main").map { it.output })
       task.configurations.convention(provider { listOf(runtimeConfiguration) })
     }

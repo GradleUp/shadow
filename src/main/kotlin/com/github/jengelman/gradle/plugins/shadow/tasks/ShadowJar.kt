@@ -1,10 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
+import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
@@ -452,6 +454,7 @@ public abstract class ShadowJar : Jar() {
       get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
     internal fun Project.registerShadowJarCommon(
+      jarTask: TaskProvider<org.gradle.jvm.tasks.Jar>,
       action: (ShadowJar) -> Unit,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
@@ -465,8 +468,21 @@ public abstract class ShadowJar : Jar() {
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
+
+        @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
+        task.manifest.inheritFrom(jarTask.get().manifest)
+        val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
+        val files = files(configurations.shadow)
+        task.doFirst {
+          if (!files.isEmpty) {
+            val attrs = listOf(attrProvider.getOrElse("")) + files.map { it.name }
+            task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
+          }
+        }
+
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
+
         action(task)
       }
     }
