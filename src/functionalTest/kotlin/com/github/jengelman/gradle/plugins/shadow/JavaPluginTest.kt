@@ -13,6 +13,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import assertk.assertions.isSameInstanceAs
 import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
@@ -580,6 +581,46 @@ class JavaPluginTest : BasePluginTest() {
       "Hello, World! (foo) from Main",
       "Refs: junit.framework.Test",
     )
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/443",
+  )
+  @Test
+  fun registerCustomShadowJarTaskThatContainsDependenciesOnly() {
+    val mainClassEntry = writeClass()
+    val dependencyShadowJar = "dependencyShadowJar"
+
+    projectScriptPath.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
+          description = 'Create a shadow JAR of all dependencies'
+          archiveClassifier = 'dep'
+          configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+        }
+      """.trimIndent(),
+    )
+
+    run("jar", dependencyShadowJar)
+
+    assertThat(jarPath("build/libs/my-1.0.jar")).useAll {
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        *manifestEntries,
+      )
+      transform { it.mainAttrSize }.isEqualTo(1)
+    }
+    assertThat(jarPath("build/libs/my-1.0-dep.jar")).useAll {
+      containsOnly(
+        *junitEntries,
+        *manifestEntries,
+      )
+      transform { it.mainAttrSize }.isEqualTo(1)
+    }
   }
 
   @Issue(
