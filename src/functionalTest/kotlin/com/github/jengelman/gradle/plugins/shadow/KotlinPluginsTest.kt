@@ -209,6 +209,47 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun createShadowJarForMainJvmTarget() {
+    val stdlib = compileOnlyStdlib(true)
+    val jvmTargetName = "newJvm"
+    projectScriptPath.appendText(
+      """
+        kotlin {
+          jvm() // Default JVM target.
+          jvm("$jvmTargetName")
+          sourceSets {
+            commonMain {
+              dependencies {
+                implementation 'my:a:1.0'
+                $stdlib
+              }
+            }
+            jvmMain {
+              dependencies {
+                implementation 'my:b:1.0'
+              }
+            }
+            ${jvmTargetName}Main {
+              dependencies {
+                implementation 'my:c:1.0'
+              }
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+
+    assertThat(outputShadowJar).useAll {
+      containsOnly(
+        *manifestEntries,
+        *entriesInAB,
+      )
+    }
+  }
+
   private fun compileOnlyStdlib(exclude: Boolean): String {
     return if (exclude) {
       // Disable the stdlib dependency added via `implementation`.
