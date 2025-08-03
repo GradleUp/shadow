@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
@@ -119,7 +120,7 @@ class KotlinPluginsTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         kotlin {
-          jvm("$jvmTargetName")
+          jvm('$jvmTargetName')
           sourceSets {
             commonMain {
               dependencies {
@@ -203,6 +204,43 @@ class KotlinPluginsTest : BasePluginTest() {
       )
       getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
     }
+  }
+
+  @Test
+  fun registerShadowJarForFirstJvmTarget() {
+    val jvmTargetName = "newJvm"
+    projectScriptPath.appendText(
+      """
+        kotlin {
+          jvm() // Default JVM target.
+          jvm('$jvmTargetName')
+          sourceSets {
+            commonMain {
+              dependencies {
+                implementation 'my:a:1.0'
+              }
+            }
+            jvmMain {
+              dependencies {
+                implementation 'my:b:1.0'
+              }
+            }
+            ${jvmTargetName}Main {
+              dependencies {
+                implementation 'my:c:1.0'
+              }
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = runWithFailure(shadowJarTask)
+
+    assertThat(result.output).contains(
+      "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
+      "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
+    )
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {
