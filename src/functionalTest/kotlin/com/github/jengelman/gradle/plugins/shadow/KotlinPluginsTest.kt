@@ -119,7 +119,7 @@ class KotlinPluginsTest : BasePluginTest() {
     projectScriptPath.appendText(
       """
         kotlin {
-          jvm("$jvmTargetName")
+          jvm('$jvmTargetName')
           sourceSets {
             commonMain {
               dependencies {
@@ -210,14 +210,14 @@ class KotlinPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun createShadowJarForMainJvmTarget() {
+  fun createShadowJarForFirstJvmTarget() {
     val stdlib = compileOnlyStdlib(true)
     val jvmTargetName = "newJvm"
     projectScriptPath.appendText(
       """
         kotlin {
           jvm() // Default JVM target.
-          jvm("$jvmTargetName")
+          jvm('$jvmTargetName')
           sourceSets {
             commonMain {
               dependencies {

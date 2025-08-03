@@ -17,6 +17,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       if (tasks.findByName(SHADOW_JAR_TASK_NAME) != null) {
         // KMP plugin supports adding multiple targets, we only configure the first one (usually the default one named `jvm`).
         logger.info("$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: ${target.name}")
+        return@configureEach
       }
       if (target !is KotlinJvmTarget) return@configureEach
 
