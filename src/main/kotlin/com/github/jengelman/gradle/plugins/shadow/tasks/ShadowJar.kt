@@ -277,8 +277,8 @@ public abstract class ShadowJar : Jar() {
   @JvmOverloads
   public open fun append(resourcePath: String, separator: String = AppendingTransformer.DEFAULT_SEPARATOR) {
     transform(AppendingTransformer::class.java) {
-      it.resource.convention(resourcePath)
-      it.separator.convention(separator)
+      it.resource.set(resourcePath)
+      it.separator.set(separator)
     }
   }
 
@@ -458,7 +458,7 @@ public abstract class ShadowJar : Jar() {
       action: (ShadowJar) -> Unit,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
-        task.archiveClassifier.convention("all")
+        task.archiveClassifier.set("all")
         task.exclude(
           "META-INF/INDEX.LIST",
           "META-INF/*.SF",
