@@ -255,7 +255,7 @@ public open class ShadowCopyAction(
     private val ZipOutputStream.entries: List<ZipEntry>
       get() {
         return this::class.java.getDeclaredField("entries").apply { isAccessible = true }
-          .get(this).cast<List<ZipEntry>>()
+          .get(this).cast()
       }
   }
 }
