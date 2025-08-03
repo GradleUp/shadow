@@ -276,7 +276,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           duplicatesStrategy = DuplicatesStrategy.$strategy
           mergeServiceFiles()
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
   }
 

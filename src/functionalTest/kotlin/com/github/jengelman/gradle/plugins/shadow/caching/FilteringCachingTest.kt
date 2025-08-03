@@ -74,7 +74,7 @@ class FilteringCachingTest : BaseCachingTest() {
           implementation 'my:a:1.0'
           implementation 'my:b:1.0'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions {
@@ -92,7 +92,7 @@ class FilteringCachingTest : BaseCachingTest() {
         $shadowJar {
           exclude '**.properties'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions {
@@ -109,7 +109,7 @@ class FilteringCachingTest : BaseCachingTest() {
         $shadowJar {
           include '$mainClassEntry'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions {
@@ -125,7 +125,7 @@ class FilteringCachingTest : BaseCachingTest() {
         $shadowJar {
           include '$main2ClassEntry'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions {
@@ -146,7 +146,7 @@ class FilteringCachingTest : BaseCachingTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions {

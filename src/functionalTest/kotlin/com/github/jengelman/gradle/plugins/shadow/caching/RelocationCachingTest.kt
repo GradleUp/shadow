@@ -15,7 +15,7 @@ class RelocationCachingTest : BaseCachingTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     val mainClassEntry = writeClass(withImports = true)
 

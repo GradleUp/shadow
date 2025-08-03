@@ -123,7 +123,7 @@ abstract class BasePluginTest {
       }
       $groupInfo
       $versionInfo
-    """.trimIndent() + System.lineSeparator()
+    """.trimIndent() + lineSeparator
   }
 
   fun getDefaultSettingsBuildScript(
@@ -147,7 +147,7 @@ abstract class BasePluginTest {
       }
       enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
       $endBlock
-    """.trimIndent() + System.lineSeparator()
+    """.trimIndent() + lineSeparator
   }
 
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
@@ -289,7 +289,7 @@ abstract class BasePluginTest {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     path("server/src/main/java/server/Server.java").writeText(
@@ -308,7 +308,7 @@ abstract class BasePluginTest {
         $shadowJar {
           $serverShadowBlock
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     if (!clientShadowed) return
@@ -317,7 +317,7 @@ abstract class BasePluginTest {
         $shadowJar {
           relocate 'junit.framework', 'client.junit.framework'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     path("server/src/main/java/server/Server.java").writeText(
       """
@@ -358,7 +358,7 @@ abstract class BasePluginTest {
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true)}
         $gradlePluginBlock
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     path("src/main/java/my/plugin/MyPlugin.java").writeText(
@@ -394,6 +394,8 @@ abstract class BasePluginTest {
   companion object {
     private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
       ?: error("TEST_GRADLE_VERSION system property is not set.")
+
+    val lineSeparator: String = System.lineSeparator()
 
     val testKitDir: Path = run {
       var gradleUserHome = System.getenv("GRADLE_USER_HOME")
@@ -434,7 +436,7 @@ abstract class BasePluginTest {
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(System.lineSeparator()) { "implementation files('${it.invariantSeparatorsPathString}')" }
+      return paths.joinToString(lineSeparator) { "implementation files('${it.invariantSeparatorsPathString}')" }
     }
 
     inline fun <reified T : ResourceTransformer> transform(

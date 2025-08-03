@@ -145,7 +145,7 @@ class TransformerCachingTest : BaseCachingTest() {
         $shadowJar {
           mergeServiceFiles()
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions()
@@ -155,7 +155,7 @@ class TransformerCachingTest : BaseCachingTest() {
         $shadowJar {
           mergeGroovyExtensionModules()
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions()

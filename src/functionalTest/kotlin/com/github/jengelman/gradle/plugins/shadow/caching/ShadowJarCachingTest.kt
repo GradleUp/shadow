@@ -32,7 +32,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
 
     val replaced = projectScriptPath.readText().lines()
       .filterNot { it == implementationFiles(artifactBJar) }
-      .joinToString(System.lineSeparator())
+      .joinToString(lineSeparator)
     projectScriptPath.writeText(replaced)
 
     assertCompositeExecutions {
@@ -50,7 +50,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         dependencies {
           ${implementationFiles(artifactAJar, artifactBJar)}
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
 
     assertCompositeExecutions {
@@ -85,7 +85,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
         dependencies {
           implementation 'my:d:1.0'
         }
-      """.trimIndent() + System.lineSeparator(),
+      """.trimIndent() + lineSeparator,
     )
     val assertions = {
       assertCompositeExecutions {

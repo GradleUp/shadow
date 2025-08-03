@@ -45,7 +45,7 @@ class AppendableMavenRepository(
         }
         publishing {
           publications {
-            ${modules.joinToString(System.lineSeparator()) { createPublication(it) }}
+            ${modules.joinToString(lineSeparator) { createPublication(it) }}
           }
           repositories {
             maven { url = '${root.toUri()}' }
@@ -62,7 +62,7 @@ class AppendableMavenRepository(
     val pubName = outputJar.name.replace(".", "")
 
     var index = -1
-    val nodes = dependencies.joinToString(System.lineSeparator()) {
+    val nodes = dependencies.joinToString(lineSeparator) {
       index++
       val node = "dependencyNode$index"
       """
@@ -85,7 +85,7 @@ class AppendableMavenRepository(
           $nodes
         }
       }
-    """.trimIndent() + System.lineSeparator()
+    """.trimIndent() + lineSeparator
   }
 
   inner class Module(
@@ -130,5 +130,7 @@ class AppendableMavenRepository(
     }
   }
 }
+
+private val lineSeparator = System.lineSeparator()
 
 val Dependency.coordinate: String get() = "$groupId:$artifactId:$version"
