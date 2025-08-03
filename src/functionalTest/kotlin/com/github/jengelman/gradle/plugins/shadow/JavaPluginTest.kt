@@ -329,7 +329,7 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun doesNotIncludeCompileOnlyConfigurationByDefault() {
+  fun doNotIncludeCompileOnlyConfigurationByDefault() {
     projectScriptPath.appendText(
       """
         dependencies {
@@ -521,7 +521,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @ParameterizedTest
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
-  fun doesNotReAddSuppressedGradleApi(configuration: String) {
+  fun doNotReAddSuppressedGradleApi(configuration: String) {
     projectScriptPath.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
