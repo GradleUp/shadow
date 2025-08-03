@@ -173,7 +173,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun canSetMainClassAttribute(useShadowAttr: Boolean) {
+  fun canSetMainClassAttributeFromMainRun(useShadowAttr: Boolean) {
     val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
     val main2ClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin, className = "Main2")
     val mainClassName = "my.Main"
@@ -201,11 +201,7 @@ class KotlinPluginsTest : BasePluginTest() {
         mainClassEntry,
         main2ClassEntry,
       )
-      if (useShadowAttr) {
-        getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName)
-      } else {
-        getMainAttr("Main-Class").isEqualTo(mainClassName)
-      }
+      getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
     }
   }
 
