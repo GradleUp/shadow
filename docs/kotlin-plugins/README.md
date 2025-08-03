@@ -127,12 +127,12 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       sourceSets {
         commonMain {
           dependencies {
-            implementation 'io.ktor:ktor-client-core:$ktorVersion'
+            implementation "io.ktor:ktor-client-core:$ktorVersion"
           }
         }
         jvmMain {
           dependencies {
-            implementation 'io.ktor:ktor-client-okhttp:$ktorVersion'
+            implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
           }
         }
       }
