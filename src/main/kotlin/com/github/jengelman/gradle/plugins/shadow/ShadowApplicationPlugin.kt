@@ -43,8 +43,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.classpath = files(tasks.shadowJar)
 
       with(applicationExtension) {
-        task.mainModule.set(mainModule)
-        task.mainClass.set(mainClass)
+        task.mainModule.convention(mainModule)
+        task.mainClass.convention(mainClass)
         task.jvmArguments.convention(provider { applicationDefaultJvmArgs })
       }
 
@@ -67,8 +67,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.classpath = files(tasks.shadowJar)
 
       with(applicationExtension) {
-        task.mainModule.set(mainModule)
-        task.mainClass.set(mainClass)
+        task.mainModule.convention(mainModule)
+        task.mainClass.convention(mainClass)
         task.conventionMapping.map("applicationName", ::getApplicationName)
         task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
         task.conventionMapping.map("executableDir", ::getExecutableDir)
