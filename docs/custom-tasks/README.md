@@ -64,7 +64,7 @@ source code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] 
 === "Kotlin"
 
     ```kotlin
-    val dependencyShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+    tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
       description = "Create a shadow JAR of all dependencies"
       archiveClassifier = "dep"
       configurations = project.configurations.runtimeClasspath.map { listOf(it) }
@@ -74,7 +74,7 @@ source code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] 
 === "Groovy"
 
     ```groovy
-    def dependencyShadowJar = tasks.register('dependencyShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    tasks.register('dependencyShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       description = 'Create a shadow JAR of all dependencies'
       archiveClassifier = 'dep'
       configurations = project.configurations.named('runtimeClasspath').map { [it] }
