@@ -90,7 +90,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-      "exec \"\$JAVACMD\" \"\$@\"",
+      "exec \"\$JAVACMD\" \"$@\"",
       "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
     )
     assertThat(winScript.readText()).contains(
