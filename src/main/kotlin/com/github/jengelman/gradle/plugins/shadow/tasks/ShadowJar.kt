@@ -22,7 +22,9 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoun
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.util.jar.JarFile
 import javax.inject.Inject
@@ -371,7 +373,12 @@ public abstract class ShadowJar : Jar() {
           ZipEntryCompression.STORED -> ZipOutputStream.STORED
           else -> throw IllegalArgumentException("Unknown Compression type $entryCompression.")
         }
-        ZipOutputStream(destination).apply {
+        val stream = if (entryCompressionMethod == ZipOutputStream.STORED) {
+          ZipOutputStream(destination)
+        } else {
+          ZipOutputStream(BufferedOutputStream(FileOutputStream(destination)))
+        }
+        stream.apply {
           setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
           setMethod(entryCompressionMethod)
         }
