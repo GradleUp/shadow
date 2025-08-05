@@ -10,6 +10,11 @@
     enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
     the [new doc site](https://gradleup.com/shadow/) before upgrading.
 
+!!! info
+
+    You can diff the shadowed JARs between upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
+    If there are any things missing in the changelog or the doc site, please report them to us.
+
 ### Added
 
 - Add .md support to the Apache License and Notice transformers. ([#1041](https://github.com/GradleUp/shadow/pull/1041))
