@@ -5,7 +5,7 @@
 
 **Changed**
 
-- Use BufferedOutputStream when writing the Zip file to improve performance. ([#1579](https://github.com/GradleUp/shadow/pull/1579))
+- Use `BufferedOutputStream` when writing the Zip file to improve performance. ([#1579](https://github.com/GradleUp/shadow/pull/1579))
 
 ## [v8.3.8] (2025-07-01)
 
