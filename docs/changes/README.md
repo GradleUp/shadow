@@ -12,7 +12,7 @@
 
 !!! info
 
-    You can diff the shadowed JARs between upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
+    You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
     If there are any things missing in the changelog or the doc site, please report them to us.
 
 ### Added
