@@ -31,8 +31,8 @@ class DefaultZipCompressor implements ZipCompressor {
     ZipOutputStream createArchiveOutputStream(File destination) {
         try {
             ZipOutputStream zipOutputStream = entryCompressionMethod == ZipOutputStream.STORED ?
-                // It is not possible to do this with STORED entries as the implementation requires a RandomAccessFile to update the CRC after write.
                 new ZipOutputStream(destination) :
+                // It is not possible to do this with STORED entries as the implementation requires a RandomAccessFile to update the CRC after write.
                 new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destination)))
             zipOutputStream.setUseZip64(zip64Mode)
             zipOutputStream.setMethod(entryCompressionMethod)
