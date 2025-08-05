@@ -22,9 +22,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoun
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.util.jar.JarFile
 import javax.inject.Inject
