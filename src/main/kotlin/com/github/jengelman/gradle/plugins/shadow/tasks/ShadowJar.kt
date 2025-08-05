@@ -376,7 +376,9 @@ public abstract class ShadowJar : Jar() {
         val stream = if (entryCompressionMethod == ZipOutputStream.STORED) {
           ZipOutputStream(destination)
         } else {
-          ZipOutputStream(BufferedOutputStream(FileOutputStream(destination)))
+          // Improve performance by avoiding lots of small writes to the file system.
+          // It is not possible to do this with STORED entries as the implementation requires a RandomAccessFile to update the CRC after write.
+          ZipOutputStream(destination.outputStream().buffered())
         }
         stream.apply {
           setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)

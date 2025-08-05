@@ -107,6 +107,7 @@
 - Expose `AbstractDependencyFilter` from `internal` to `public`. ([#1538](https://github.com/GradleUp/shadow/pull/1538))  
   You can access it via `com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter.AbstractDependencyFilter`.
 - Mark `Action` parameters as non-null. ([#1555](https://github.com/GradleUp/shadow/pull/1555))
+- Use `BufferedOutputStream` when writing the Zip file to improve performance. ([#1580](https://github.com/GradleUp/shadow/pull/1580))
 
 ### Fixed
 
