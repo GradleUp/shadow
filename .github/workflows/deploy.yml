@@ -23,7 +23,7 @@ jobs:
       - name: Build Site
         run: |
           # Don't cache it to track updates.
-          pip install mkdocs-material
+          pip install mkdocs-material mkdocs-callouts --include-deps
           mkdocs build
       - uses: actions/upload-pages-artifact@v3
         with:

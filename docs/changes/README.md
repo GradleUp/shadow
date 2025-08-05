@@ -3,17 +3,15 @@
 
 ## [9.0.0](https://github.com/GradleUp/shadow/compare/9.0.0-rc3...HEAD) - Unreleased
 
-!!! warning
+> [!WARNING]\
+> This release is a major update from the 8.x series. The plugin has been fully rewritten in Kotlin, bringing
+> significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
+> enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
+> the [new doc site](https://gradleup.com/shadow/) before upgrading.
 
-    This release is a major update from the 8.x series. The plugin has been fully rewritten in Kotlin, bringing
-    significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
-    enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
-    the [new doc site](https://gradleup.com/shadow/) before upgrading.
-
-!!! info
-
-    You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
-    If there are any things missing in the changelog or the doc site, please report them to us.
+> [!TIP]\
+> You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
+> If there are any things missing in the changelog or the doc site, please report them to us.
 
 ### Added
 

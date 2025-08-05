@@ -56,6 +56,10 @@ markdown_extensions:
   - attr_list
   - md_in_html
 
+plugins:
+  - search
+  - callouts # https://github.com/mkdocs/mkdocs/issues/3997
+
 nav:
   - 'Introduction': README.md
   - 'Getting Started': getting-started/README.md
