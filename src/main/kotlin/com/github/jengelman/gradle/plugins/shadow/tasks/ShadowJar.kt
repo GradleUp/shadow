@@ -369,7 +369,6 @@ public abstract class ShadowJar : Jar() {
         val entryCompressionMethod = when (entryCompression) {
           ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
           ZipEntryCompression.STORED -> ZipOutputStream.STORED
-          else -> throw IllegalArgumentException("Unknown Compression type $entryCompression.")
         }
         ZipOutputStream(destination).apply {
           setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
