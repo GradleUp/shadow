@@ -651,7 +651,7 @@ class RelocationTest : BasePluginTest() {
           public static void main(String[] args) {
             switch (1) {
               default:
-                System.out.println("foo.Foo");
+                System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
                 break;
             }
             System.out.println("foo.Bar");
