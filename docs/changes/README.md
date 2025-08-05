@@ -560,6 +560,12 @@
 
 - Fix single Log4j2Plugins.dat isn't included into fat jar. ([#1039](https://github.com/GradleUp/shadow/issues/1039))
 
+## [8.3.9](https://github.com/GradleUp/shadow/releases/tag/8.3.9) - 2025-08-05
+
+**Changed**
+
+- Use `BufferedOutputStream` when writing the Zip file to improve performance. ([#1579](https://github.com/GradleUp/shadow/pull/1579))
+
 ## [8.3.8](https://github.com/GradleUp/shadow/releases/tag/8.3.8) - 2025-07-01
 
 ### Fixed
