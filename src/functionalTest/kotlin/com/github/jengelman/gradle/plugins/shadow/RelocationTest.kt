@@ -632,6 +632,43 @@ class RelocationTest : BasePluginTest() {
     assertThat(result).contains(expected)
   }
 
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun canDisableRelocateStringConstantsInSwitchCase(skipStringConstants: Boolean) {
+    writeClass {
+      """
+        package my;
+        public class Main {
+          public static void main(String[] args) {
+            switch (1) {
+              default:
+                System.out.println("junit.framework.Test");
+                break;
+            }
+          }
+        }
+      """.trimIndent()
+    }
+    projectScriptPath.appendText(
+      """
+        $shadowJar {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+          relocate('junit', 'foo.junit') {
+            skipStringConstants = $skipStringConstants
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarTask)
+    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
+
+    val expected = if (skipStringConstants) "junit.framework.Test" else "foo.junit.framework.Test"
+    assertThat(result).contains(expected)
+  }
+
   private fun writeClassWithStringRef() {
     writeClass {
       """
