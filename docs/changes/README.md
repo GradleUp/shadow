@@ -8,9 +8,11 @@
     This release is a major update from the 8.x series. The plugin has been fully rewritten in Kotlin, bringing
     significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
     enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
-    the [new doc site](https://gradleup.com/shadow/) before upgrading.
+    the [new doc site](https://gradleup.com/shadow/) before upgrading.  
 
-!!! info
+    *If you really don't want to upgrade, you can still use the 8.3.x, which is also Gradle 9 compatible. But no additional features or crucial bug fixes will be included in the 8.x line.*
+
+!!! tip
 
     You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
     If there are any things missing in the changelog or the doc site, please report them to us.
