@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource
 class AndroidPluginTest : BasePluginTest() {
   @ParameterizedTest
   @MethodSource("androidIdsProvider")
-  fun doesNotCompatAgp(pluginId: String) {
+  fun doNotCompatAgp(pluginId: String) {
     projectScriptPath.writeText(getDefaultProjectBuildScript(plugin = pluginId))
 
     assertThat(runWithFailure().output).contains(

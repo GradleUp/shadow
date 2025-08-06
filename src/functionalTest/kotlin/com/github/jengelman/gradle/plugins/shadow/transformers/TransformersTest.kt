@@ -80,7 +80,7 @@ class TransformersTest : BaseTransformerTest() {
     "https://github.com/GradleUp/shadow/issues/427",
   )
   @Test
-  fun canMergeLog4j2PluginCacheFiles() {
+  fun mergeLog4j2PluginCacheFiles() {
     val content = requireResourceAsText(PLUGIN_CACHE_FILE)
     val one = buildJarOne {
       insert(PLUGIN_CACHE_FILE, content)
@@ -107,7 +107,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
-  fun canIncludeResource() {
+  fun includeResource() {
     val foo = path("foo").apply { writeText("foo") }
     projectScriptPath.appendText(
       transform<IncludeResourceTransformer>(
@@ -130,7 +130,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
-  fun canExcludeResource() {
+  fun excludeResource() {
     val one = buildJarOne {
       insert("foo", "bar")
       insert("bar", "foo")
@@ -154,7 +154,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
-  fun canPreserveFirstFoundResource() {
+  fun preserveFirstFoundResource() {
     path("src/main/resources/foo/bar").writeText("bar1")
     path("src/main/resources/foo/baz").writeText("baz1")
     val one = buildJarOne {
@@ -187,7 +187,7 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
-  fun canUseCustomTransformer() {
+  fun useCustomTransformer() {
     projectScriptPath.appendText(
       """
         dependencies {

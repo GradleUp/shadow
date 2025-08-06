@@ -325,7 +325,7 @@ class RelocationTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/294",
   )
   @Test
-  fun doesNotErrorOnRelocatingJava9Classes() {
+  fun doNotErrorOnRelocatingJava9Classes() {
     projectScriptPath.appendText(
       """
         dependencies {
@@ -612,7 +612,7 @@ class RelocationTest : BasePluginTest() {
   )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun canDisableRelocateStringConstants(skipStringConstants: Boolean) {
+  fun disableRelocateStringConstants(skipStringConstants: Boolean) {
     writeClassWithStringRef()
     projectScriptPath.appendText(
       """

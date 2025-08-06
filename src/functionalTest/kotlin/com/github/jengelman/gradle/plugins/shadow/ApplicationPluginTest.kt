@@ -122,7 +122,7 @@ class ApplicationPluginTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/613",
   )
   @Test
-  fun canOverrideMainClassAttrInManifestBlock() {
+  fun overrideMainClassAttrInManifestBlock() {
     val main2ClassEntry = writeClass(className = "Main2")
     prepare(
       projectBlock = """
@@ -159,7 +159,7 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun canAddExtraFilesIntoDistribution() {
+  fun addExtraFilesIntoDistribution() {
     path("extra/echo.sh").writeText("echo 'Hello, World!'")
     path("some/dir/hello.txt").writeText("'Hello, World!'")
     prepare(
@@ -197,7 +197,7 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun canIncludeSrcDistByDefault() {
+  fun includeSrcDistByDefault() {
     path("src/dist/echo.sh").writeText("echo 'Hello, World!'")
     prepare()
 
