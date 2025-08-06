@@ -54,7 +54,7 @@ class PublishingTest : BasePluginTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
-    settingsScriptPath.appendText("rootProject.name = 'maven'" + lineSeparator)
+    settingsScriptPath.appendText("rootProject.name = 'maven'$lineSeparator")
   }
 
   @Test

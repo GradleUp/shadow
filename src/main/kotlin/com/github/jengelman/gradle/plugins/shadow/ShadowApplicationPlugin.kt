@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHADOW
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
@@ -109,18 +110,18 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureDistribution() {
-    distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
-      distributions.contents { distSpec ->
-        distSpec.from(file("src/dist"))
-        distSpec.into("lib") { lib ->
+    distributions.register(DISTRIBUTION_NAME) {
+      it.contents { shadowDist ->
+        shadowDist.from(file("src/dist"))
+        shadowDist.into("lib") { lib ->
           lib.from(tasks.shadowJar)
           lib.from(configurations.shadow)
         }
-        distSpec.into("bin") { bin ->
+        shadowDist.into("bin") { bin ->
           bin.from(tasks.startShadowScripts)
           bin.filePermissions { it.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
-        distSpec.with(applicationExtension.applicationDistribution)
+        shadowDist.with(applicationExtension.applicationDistribution)
       }
     }
   }
@@ -143,6 +144,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
      * Reflects the number of 755.
      */
     private const val UNIX_SCRIPT_PERMISSIONS = "rwxr-xr-x"
+
+    public const val DISTRIBUTION_NAME: String = SHADOW
 
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
     public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"

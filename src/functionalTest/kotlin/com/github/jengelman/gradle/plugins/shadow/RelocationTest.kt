@@ -592,7 +592,7 @@ class RelocationTest : BasePluginTest() {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
-          relocate('junit', 'foo.junit')
+          relocate('foo', 'shadow.foo')
         }
       """.trimIndent(),
     )
@@ -601,12 +601,14 @@ class RelocationTest : BasePluginTest() {
     val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
 
     assertThat(result).contains(
-      "foo.junit.framework.Test",
+      "shadow.foo.Foo",
+      "shadow.foo.Bar",
     )
   }
 
   @Issue(
     "https://github.com/GradleUp/shadow/issues/232",
+    "https://github.com/GradleUp/shadow/issues/606",
   )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
@@ -618,7 +620,7 @@ class RelocationTest : BasePluginTest() {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
-          relocate('junit', 'foo.junit') {
+          relocate('foo', 'shadow.foo') {
             skipStringConstants = $skipStringConstants
           }
         }
@@ -628,8 +630,17 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarTask)
     val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
 
-    val expected = if (skipStringConstants) "junit.framework.Test" else "foo.junit.framework.Test"
-    assertThat(result).contains(expected)
+    if (skipStringConstants) {
+      assertThat(result).contains(
+        "foo.Foo",
+        "foo.Bar",
+      )
+    } else {
+      assertThat(result).contains(
+        "shadow.foo.Foo",
+        "shadow.foo.Bar",
+      )
+    }
   }
 
   private fun writeClassWithStringRef() {
@@ -638,7 +649,12 @@ class RelocationTest : BasePluginTest() {
         package my;
         public class Main {
           public static void main(String[] args) {
-            System.out.println("junit.framework.Test");
+            switch (1) {
+              default:
+                System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
+                break;
+            }
+            System.out.println("foo.Bar");
           }
         }
       """.trimIndent()

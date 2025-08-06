@@ -245,17 +245,14 @@ public open class ShadowCopyAction(
   public companion object {
     private val logger = Logging.getLogger(ShadowCopyAction::class.java)
 
+    private val ZipOutputStream.entries: List<ZipEntry>
+      get() = this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
+
     /**
      * A copy of [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
      *
      * 1980-02-01 00:00:00 (318182400000).
      */
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
-
-    private val ZipOutputStream.entries: List<ZipEntry>
-      get() {
-        return this::class.java.getDeclaredField("entries").apply { isAccessible = true }
-          .get(this).cast()
-      }
   }
 }

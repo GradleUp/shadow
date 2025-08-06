@@ -6,7 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.DISTRIBUTION_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.DISTRIBUTION_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -90,7 +90,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     assertThat(unixScript.readText()).contains(
       "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-      "exec \"\$JAVACMD\" \"\$@\"",
+      "exec \"\$JAVACMD\" \"$@\"",
       "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
     )
     assertThat(winScript.readText()).contains(

@@ -1,5 +1,6 @@
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin : org/gradle/api/Plugin {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion;
+	public static final field DISTRIBUTION_NAME Ljava/lang/String;
 	public static final field SHADOW_INSTALL_TASK_NAME Ljava/lang/String;
 	public static final field SHADOW_RUN_TASK_NAME Ljava/lang/String;
 	public static final field SHADOW_SCRIPTS_TASK_NAME Ljava/lang/String;
@@ -19,10 +20,8 @@ public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationP
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin : org/gradle/api/Plugin {
-	public static final field COMPONENT_NAME Ljava/lang/String;
 	public static final field CONFIGURATION_NAME Ljava/lang/String;
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion;
-	public static final field DISTRIBUTION_NAME Ljava/lang/String;
 	public static final field EXTENSION_NAME Ljava/lang/String;
 	public static final field SHADOW Ljava/lang/String;
 	public fun <init> ()V
@@ -34,12 +33,11 @@ public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$C
 	public final synthetic fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
-public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
-	public fun <init> (Lorg/gradle/api/Project;)V
-	public final fun component (Lorg/gradle/api/publish/maven/MavenPublication;)V
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin : org/gradle/api/Plugin {
+	public static final field COMPONENT_NAME Ljava/lang/String;
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion;
 	public static final field SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME Ljava/lang/String;
 	public fun <init> (Lorg/gradle/api/component/SoftwareComponentFactory;)V

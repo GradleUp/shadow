@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHADOW
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
@@ -82,7 +83,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         variant.mapToOptional()
       }
     }
-    val shadowComponent = softwareComponentFactory.adhoc(ShadowBasePlugin.COMPONENT_NAME)
+    val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
     shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
@@ -106,6 +107,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   }
 
   public companion object {
+    public const val COMPONENT_NAME: String = SHADOW
     public const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
 
     @get:JvmSynthetic
