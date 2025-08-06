@@ -68,6 +68,30 @@ method can be used to add extra files.
     }
     ```
 
+Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Project.zipTree]
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      from(zipTree("bar.jar")) {
+        // Copy unzipped bar.jar files into META-INF/ in the shadowed JAR.
+        into("META-INF")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      from(zipTree('bar.jar')) {
+        // Copy unzipped bar.jar files into META-INF/ in the shadowed JAR.
+        into('META-INF')
+      }
+    }
+    ```
+
 See also [Adding Extra Files](../README.md#adding-extra-files)
 
 ## Filtering Dependencies
@@ -349,3 +373,4 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [Project.configurations]: https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:configurations
+[Project.zipTree]: https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:zipTree(java.lang.Object)
