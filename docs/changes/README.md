@@ -169,7 +169,7 @@ tasks.shadowJar {
   enableAutoRelocation = true
 
   // The default `duplicatesStrategy` has been changed from `EXCLUDE` to `INCLUDE`.
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  duplicatesStrategy = DuplicatesStrategy.INCLUDE
   // If you want to make `mergeServiceFiles` work, should leave the `duplicatesStrategy` as `INCLUDE`.
   // `EXCLUDE` will exclude extra service files to be merged.
   mergeServiceFiles()
