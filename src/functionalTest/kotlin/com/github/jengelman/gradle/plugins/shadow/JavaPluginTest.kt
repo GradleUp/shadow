@@ -720,7 +720,7 @@ class JavaPluginTest : BasePluginTest() {
   }
 
   @Test
-  fun canAddExtraFilesIntoShadowJar() {
+  fun addExtraFilesViaFrom() {
     val mainClassEntry = writeClass()
     path("Foo").writeText("Foo")
     projectScriptPath.appendText(
