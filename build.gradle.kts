@@ -183,6 +183,13 @@ testing.suites {
       testTask {
         systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
         maxParallelForks = Runtime.getRuntime().availableProcessors()
+
+        develocity {
+          testRetry {
+            maxRetries = 2
+            maxFailures = 10
+          }
+        }
       }
     }
   }
