@@ -180,7 +180,7 @@ tasks.shadowJar {
   // Optionally, you can enable the new `failOnDuplicateEntries` property to fail the build if there are duplicate entries.
   failOnDuplicateEntries = true
 
-  // If you want to keep the `foo.jar` unzipped, you can use the `from` method directly. This is different from the previous.
+  // If you want to keep the `foo.jar` as-is (zipped), you can use the `from` method directly. This is different from the previous.
   from("foo.jar")
   // If you want to unzip the `foo.jar` before processing, you can use `zipTree` to unzip it.
   from(zipTree("foo.jar"))
