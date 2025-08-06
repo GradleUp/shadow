@@ -284,16 +284,16 @@ class PublishingTest : BasePluginTest() {
         include 'a', 'b', 'c'
       """.trimIndent(),
     )
-    projectScriptPath.writeText(
-      """
-        subprojects {
-          apply plugin: 'java'
-          apply plugin: 'maven-publish'
-          version = '1.0'
-          group = 'my'
-        }
-      """.trimIndent(),
-    )
+    projectScriptPath.writeText("")
+    val subProjectCommon = """
+      plugins {
+        id 'java'
+      }
+      version = '1.0'
+      group = 'my'
+    """.trimIndent()
+    path("a/build.gradle").writeText(subProjectCommon)
+    path("b/build.gradle").writeText(subProjectCommon)
 
     path("a/src/main/resources/aa.properties").writeText("aa")
     path("a/src/main/resources/aa2.properties").writeText("aa2")
