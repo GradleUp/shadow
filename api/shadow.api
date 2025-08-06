@@ -34,9 +34,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$C
 	public final synthetic fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
-public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
-	public fun <init> (Lorg/gradle/api/Project;)V
-	public final fun component (Lorg/gradle/api/publish/maven/MavenPublication;)V
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin : org/gradle/api/Plugin {

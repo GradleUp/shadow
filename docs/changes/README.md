@@ -140,6 +140,7 @@
 - **BREAKING CHANGE:** Reduce dependency and project overloads in `DependencyFilter`. ([#1328](https://github.com/GradleUp/shadow/pull/1328))
 - **BREAKING CHANGE:** Remove `ShadowSpec`. ([#1560](https://github.com/GradleUp/shadow/pull/1560))
 - **BREAKING CHANGE:** Remove `Relocator.ROLE`. ([#1563](https://github.com/GradleUp/shadow/pull/1563))
+- **BREAKING CHANGE:** Remove deprecated `ShadowExtension.component`. ([#1586](https://github.com/GradleUp/shadow/pull/1586))
 
 ## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
 
