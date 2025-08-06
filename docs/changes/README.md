@@ -99,6 +99,8 @@
   - Overload `relocate`, `transform` and things for better usability in Kotlin.
 - **BREAKING CHANGE:** Remove redundant types from function returning. ([#1308](https://github.com/GradleUp/shadow/pull/1308))
 - **BREAKING CHANGE:** Rename `ShadowJar`'s `isEnableRelocation` to `enableAutoRelocation`. ([#1541](https://github.com/GradleUp/shadow/pull/1541))
+- **BREAKING CHANGE:** Some const values in `ShadowBasePlugin` and `ShadowJavaPlugin` are moved. ([#1589](https://github.com/GradleUp/shadow/pull/1589))  
+  You can find them in `ShadowJar`, `ShadowApplicationPlugin`, and `ShadowJavaPlugin`.
 - Replace deprecated `SelfResolvingDependency` with `FileCollectionDependency`. ([#1114](https://github.com/GradleUp/shadow/pull/1114))
 - Update start script templates. ([#1183](https://github.com/GradleUp/shadow/pull/1183))
 - Mark more `Transformer`s cacheable. ([#1210](https://github.com/GradleUp/shadow/pull/1210))
