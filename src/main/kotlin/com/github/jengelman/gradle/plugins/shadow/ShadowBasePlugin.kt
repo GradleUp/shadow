@@ -6,6 +6,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.component.SoftwareComponentContainer
+import org.gradle.api.distribution.DistributionContainer
+import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.util.GradleVersion
 
 public abstract class ShadowBasePlugin : Plugin<Project> {
@@ -20,11 +23,24 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
   }
 
   public companion object {
+    /**
+     * Most of the components registered by Shadow plugin will use this name (`shadow`).
+     *
+     * - [ExtensionContainer.create]
+     * - [ConfigurationContainer.register]
+     * - [SoftwareComponentContainer.register]
+     * - [DistributionContainer.register]
+     *
+     * and so on.
+     *
+     * @see [EXTENSION_NAME]
+     * @see [CONFIGURATION_NAME]
+     * @see [ShadowApplicationPlugin.DISTRIBUTION_NAME]
+     * @see [ShadowJavaPlugin.COMPONENT_NAME]
+     */
     public const val SHADOW: String = "shadow"
     public const val EXTENSION_NAME: String = SHADOW
     public const val CONFIGURATION_NAME: String = SHADOW
-    public const val COMPONENT_NAME: String = SHADOW
-    public const val DISTRIBUTION_NAME: String = SHADOW
 
     @get:JvmSynthetic
     public inline val ConfigurationContainer.shadow: NamedDomainObjectProvider<Configuration>
