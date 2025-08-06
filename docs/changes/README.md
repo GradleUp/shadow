@@ -52,7 +52,7 @@
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
     - It only checks the entries in the shadowed jar, not the input files.
     - It works with setting `duplicatesStrategy` to any value.
-    - It provides a more strict fallback check before the JAR is created.
+    - It provides a stricter fallback check before the JAR is created.
 
 ### Changed
 
@@ -199,7 +199,7 @@ tasks.shadowJar {
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
     - It only checks the entries in the shadowed jar, not the input files.
     - It works with setting `duplicatesStrategy` to any value.
-    - It provides a more strict check before the JAR is created.
+    - It provides a stricter check before the JAR is created.
 
 ### Changed
 
