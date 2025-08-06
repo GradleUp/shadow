@@ -14,7 +14,6 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     if (GradleVersion.current() < GradleVersion.version("8.11")) {
       throw GradleException("This version of Shadow supports Gradle 8.11+ only. Please upgrade.")
     }
-    @Suppress("DEPRECATION")
     extensions.create(EXTENSION_NAME, ShadowExtension::class.java)
     @Suppress("EagerGradleConfiguration") // this should be created eagerly.
     configurations.create(CONFIGURATION_NAME)
