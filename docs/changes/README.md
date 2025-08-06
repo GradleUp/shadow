@@ -50,9 +50,9 @@
 - Fail build if the ZIP entries in the shadowed JAR are duplicate. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
   This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
-  - It only checks the entries in the shadowed jar, not the input files.
-  - It works with setting `duplicatesStrategy` to any value.
-  - It provides a more strict check before the JAR is created.
+    - It only checks the entries in the shadowed jar, not the input files.
+    - It works with setting `duplicatesStrategy` to any value.
+    - It provides a stricter fallback check before the JAR is created.
 
 ### Changed
 
@@ -69,8 +69,12 @@
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
 - **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
-    - `ShadowJar` recognized `DuplicatesStrategy.EXCLUDE` as the default, but the other strategies didn't work properly.
-    - Now `ShadowJar` honors `DuplicatesStrategy.INCLUDE` as the default, and align all the strategy behaviors with the Gradle side.
+    - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
+    - Now `ShadowJar` honors `INCLUDE` as the default, and aligns all the strategy behaviors with the Gradle side.
+    - `mergeServiceFiles` and `ServiceFileTransformer` do not work with `EXCLUDE`, as it will exclude extra service files to be merged.
+    - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
+    - Use `filesMatching` to override the default strategy for specific files.
+    - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
     - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
@@ -144,6 +148,46 @@
 - **BREAKING CHANGE:** Remove `Relocator.ROLE`. ([#1563](https://github.com/GradleUp/shadow/pull/1563))
 - **BREAKING CHANGE:** Remove deprecated `ShadowExtension.component`. ([#1586](https://github.com/GradleUp/shadow/pull/1586))
 
+### Migration Example
+
+**8.x**
+
+```kt
+tasks.shadowJar {
+  isEnableRelocation = true
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  mergeServiceFiles()
+  from("foo.jar")
+}
+```
+
+**9.x**
+
+```kt
+tasks.shadowJar {
+  // `isEnableRelocation` has been renamed to `enableAutoRelocation`.
+  enableAutoRelocation = true
+
+  // The default `duplicatesStrategy` has been changed from `EXCLUDE` to `INCLUDE`.
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  // If you want to make `mergeServiceFiles` work, should leave the `duplicatesStrategy` as `INCLUDE`.
+  // `EXCLUDE` will exclude extra service files to be merged.
+  mergeServiceFiles()
+  // If you leave `duplicatesStrategy` as `INCLUDE`, you can use the new `PreserveFirstFoundResourceTransformer`
+  // to ensure that only the first found resource is included in the final JAR. Or duplicate entries will be bundled.
+  transform<PreserveFirstFoundResourceTransformer>() {
+    resources.add("META-INF/some-resource.txt")
+  }
+  // Optionally, you can enable the new `failOnDuplicateEntries` property to fail the build if there are duplicate entries.
+  failOnDuplicateEntries = true
+
+  // If you want to keep the `foo.jar` as-is (zipped), you can use the `from` method directly. This is different from the previous.
+  from("foo.jar")
+  // If you want to unzip the `foo.jar` before processing, you can use `zipTree` to unzip it.
+  from(zipTree("foo.jar"))
+}
+```
+
 ## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
 
 ### Added
@@ -156,7 +200,7 @@
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
     - It only checks the entries in the shadowed jar, not the input files.
     - It works with setting `duplicatesStrategy` to any value.
-    - It provides a more strict check before the JAR is created.
+    - It provides a stricter check before the JAR is created.
 
 ### Changed
 
