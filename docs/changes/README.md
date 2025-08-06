@@ -71,7 +71,7 @@
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
     - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
     - Now `ShadowJar` honors `INCLUDE` as the default, and align all the strategy behaviors with the Gradle side.
-    - `mergeServiceFiles` and `ServiceFileTransformer` must not work with `EXCLUDE`, as it will exclude extra service files to be merged.
+    - `mergeServiceFiles` and `ServiceFileTransformer` do not work with `EXCLUDE`, as it will exclude extra service files to be merged.
     - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
     - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
     - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
