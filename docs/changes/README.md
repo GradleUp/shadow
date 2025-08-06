@@ -10,8 +10,7 @@
     enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
     the [new doc site](https://gradleup.com/shadow/) before upgrading.  
 
-    *If you really don't want to upgrade, you can still use the 8.3.x, which is also Gradle 9 compatible. But there are
-    no additional features or crucial bug fixes will be included in the 8.x line.*
+    *If you really don't want to upgrade, you can still use the 8.3.x, which is also Gradle 9 compatible. But no additional features or crucial bug fixes will be included in the 8.x line.*
 
 !!! tip
 
