@@ -109,18 +109,18 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureDistribution() {
-    distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) { distributions ->
-      distributions.contents { distSpec ->
-        distSpec.from(file("src/dist"))
-        distSpec.into("lib") { lib ->
+    distributions.register(ShadowBasePlugin.DISTRIBUTION_NAME) {
+      it.contents { shadowDist ->
+        shadowDist.from(file("src/dist"))
+        shadowDist.into("lib") { lib ->
           lib.from(tasks.shadowJar)
           lib.from(configurations.shadow)
         }
-        distSpec.into("bin") { bin ->
+        shadowDist.into("bin") { bin ->
           bin.from(tasks.startShadowScripts)
           bin.filePermissions { it.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
-        distSpec.with(applicationExtension.applicationDistribution)
+        shadowDist.with(applicationExtension.applicationDistribution)
       }
     }
   }
