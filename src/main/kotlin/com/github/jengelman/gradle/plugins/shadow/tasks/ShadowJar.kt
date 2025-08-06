@@ -196,7 +196,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Returns the strategy to use when trying to copy more than one file to the same destination.
    *
-   * This strategy can be overridden for individual files by using [eachFile] or [filesMatching].
+   * This strategy can be overridden for individual files by using [filesMatching].
    *
    * The default value is [INCLUDE]. Different strategies will lead to different results for
    * `foo/bar` files in the JARs to be merged:
@@ -212,13 +212,12 @@ public abstract class ShadowJar : Jar() {
    * [EXCLUDE], as the service files are excluded beforehand. Want [ResourceTransformer]s and the strategy to work
    * together? There are several ways to do it:
    *
-   * - Use [eachFile] or [filesMatching] to override the strategy for specific files.
+   * - Use [filesMatching] to override the strategy for specific files.
    * - Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates.
    *
    * If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
    * called [PreserveFirstFoundResourceTransformer].
    *
-   * @see [eachFile]
    * @see [filesMatching]
    * @see [DuplicatesStrategy]
    * @see [CopySpec.duplicatesStrategy]
