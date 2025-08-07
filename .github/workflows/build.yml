@@ -12,7 +12,7 @@ jobs:
     name: OS=${{ matrix.os }}, Java=${{ matrix.java }}, Gradle=${{ matrix.gradle }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-24.04-arm ]
         # Always test on the latest version and some LTS.
         java: [ 17, 24 ]
         # Test on the minimum Gradle version and the latest.
@@ -38,7 +38,7 @@ jobs:
 
   publish-snapshot:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4

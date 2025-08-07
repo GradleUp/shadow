@@ -11,7 +11,7 @@ on:
 
 jobs:
   update-start-scripts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: github.event.repository.fork == false
     steps:
       - uses: actions/checkout@v4
