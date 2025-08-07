@@ -85,7 +85,7 @@ class FilteringCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun dependencyIncludesExcludesChanged() {
+  fun dependenciesIncludesExcludesChanged() {
     val mainClassEntry = writeClass(withImports = true)
     projectScriptPath.appendText(
       """
