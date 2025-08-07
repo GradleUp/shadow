@@ -1,8 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -127,6 +129,55 @@ class ShadowJarCachingTest : BaseCachingTest() {
       )
 
       assertCompositeExecutions()
+    }
+  }
+
+  @Test
+  fun shadowJarIsCachedCorrectlyAfterManifestAttrsChanged() {
+    projectScriptPath.appendText(
+      """
+        jar {
+          manifest {
+            attributes 'Foo': 'Foo1'
+          }
+        }
+        $shadowJar {
+          manifest {
+            attributes 'Bar': 'Bar1'
+          }
+        }
+      """.trimIndent(),
+    )
+
+    assertCompositeExecutions {
+      getMainAttr("Foo").isEqualTo("Foo1")
+      getMainAttr("Bar").isEqualTo("Bar1")
+    }
+
+    var replaced = projectScriptPath.readText().replace("'Foo': 'Foo1'", "'Foo': 'Foo2'")
+    projectScriptPath.writeText(replaced)
+
+    assertCompositeExecutions {
+      getMainAttr("Foo").isEqualTo("Foo2")
+      getMainAttr("Bar").isEqualTo("Bar1")
+    }
+
+    replaced = projectScriptPath.readText().replace("'Bar': 'Bar1'", "'Bar': 'Bar2'")
+    projectScriptPath.writeText(replaced)
+
+    assertCompositeExecutions {
+      getMainAttr("Foo").isEqualTo("Foo2")
+      getMainAttr("Bar").isEqualTo("Bar2")
+    }
+
+    replaced = projectScriptPath.readText()
+      .replace("'Foo': 'Foo2'", "'Foo': 'Foo3'")
+      .replace("'Bar': 'Bar2'", "'Bar': 'Bar3'")
+    projectScriptPath.writeText(replaced)
+
+    assertCompositeExecutions {
+      getMainAttr("Foo").isEqualTo("Foo3")
+      getMainAttr("Bar").isEqualTo("Bar3")
     }
   }
 }
