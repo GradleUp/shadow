@@ -12,18 +12,20 @@ jobs:
     name: OS=${{ matrix.os }}, Java=${{ matrix.java }}, Gradle=${{ matrix.gradle }}
     strategy:
       matrix:
-        os: [ ubuntu-24.04-arm, windows-11-arm ]
+        os: [ ubuntu-24.04-arm ]
         # Always test on the latest version and some LTS.
-        java: [ 17, 21, 24 ]
+        java: [ 17, 24 ]
         # Test on the minimum Gradle version and the latest.
         gradle: [ 8.11, current ]
         exclude:
           # Gradle 8.11 doesn't support Java 24.
           - gradle: 8.11
             java: 24
-          # There is no JDK 24 for Windows ARM64.
+        include:
+          # We just test one JDK version on Windows.
           - os: windows-11-arm
-            java: 24
+            gradle: current
+            java: 21
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
