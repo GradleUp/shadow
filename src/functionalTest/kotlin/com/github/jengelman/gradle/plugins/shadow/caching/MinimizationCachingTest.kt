@@ -11,7 +11,7 @@ class MinimizationCachingTest : BaseCachingTest() {
   override val outputShadowJar: JarPath get() = outputServerShadowJar
 
   @Test
-  fun shadowJarIsCachedCorrectlyWhenMinimizationIsAdded() {
+  fun minimizeChanged() {
     writeClientAndServerModules()
     path("server/src/main/java/server/Server.java").writeText(
       """

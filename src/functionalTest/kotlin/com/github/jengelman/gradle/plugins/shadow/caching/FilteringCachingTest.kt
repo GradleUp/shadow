@@ -65,7 +65,7 @@ class FilteringCachingTest : BaseCachingTest() {
     "https://github.com/GradleUp/shadow/issues/717",
   )
   @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingIncludesExcludes() {
+  fun jarIncludesExcludesChanged() {
     val mainClassEntry = writeClass(className = "Main")
     val main2ClassEntry = writeClass(className = "Main2")
     projectScriptPath.appendText(
@@ -139,7 +139,7 @@ class FilteringCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingDependencyIncludesExcludes() {
+  fun dependencyIncludesExcludesChanged() {
     val mainClassEntry = writeClass(withImports = true)
     projectScriptPath.appendText(
       """

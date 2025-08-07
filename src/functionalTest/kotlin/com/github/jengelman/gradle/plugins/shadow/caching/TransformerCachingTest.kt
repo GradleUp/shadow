@@ -37,7 +37,7 @@ class TransformerCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingServiceFileTransformer() {
+  fun serviceFileTransformerPropsChanged() {
     val assertions = {
       assertCompositeExecutions {
         containsOnly(
@@ -67,7 +67,7 @@ class TransformerCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingAppendingTransformer() {
+  fun appendingTransformerPropsChanged() {
     path("src/main/resources/foo/bar.properties").writeText("foo=bar")
     val assertions = { name: String ->
       assertCompositeExecutions {
@@ -103,7 +103,7 @@ class TransformerCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyWhenUsingXmlAppendingTransformer() {
+  fun xmlAppendingTransformerPropsChanged() {
     path("src/main/resources/foo/bar.xml").writeText("<foo>bar</foo>")
     val assertions = { name: String ->
       assertCompositeExecutions {
@@ -139,7 +139,7 @@ class TransformerCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarCacheDisabledIfAnyTransformerIsNotCacheable() {
+  fun disableCacheIfAnyTransformerIsNotCacheable() {
     projectScriptPath.appendText(
       """
         $shadowJar {
@@ -177,7 +177,7 @@ class TransformerCachingTest : BaseCachingTest() {
 
   @ParameterizedTest
   @MethodSource("transformerConfigProvider")
-  fun shadowJarIsCachedCorrectlyWhenUsingOtherTransformers(pair: Pair<String, KClass<*>>) {
+  fun otherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
     val assertions = {
       assertCompositeExecutions {

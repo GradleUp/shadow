@@ -8,7 +8,7 @@ class ApplicationCachingTest : BaseCachingTest() {
   override val taskPath: String = runShadowTask
 
   @Test
-  fun runShadowExecutedCorrectlyAfterShadowJarChanged() {
+  fun runShadowIsNotCacheable() {
     prepare()
     val resourcePath = path("src/main/resources/my/resource.txt")
     resourcePath.writeText(

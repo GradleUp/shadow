@@ -17,7 +17,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
    * Ensure that a basic usage reuses an output from cache and then gets a cache miss when the content changes.
    */
   @Test
-  fun shadowJarIsCachedCorrectlyWhenCopying() {
+  fun dependenciesChanged() {
     projectScriptPath.appendText(
       """
         dependencies {
@@ -47,7 +47,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyWhenOutputFileIsChanged() {
+  fun outputFileChanged() {
     projectScriptPath.appendText(
       """
         dependencies {
@@ -81,7 +81,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyAfterDependencyFilterChanged() {
+  fun dependencyFilterChanged() {
     publishArtifactCD()
     projectScriptPath.appendText(
       """
@@ -114,7 +114,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyAfterDuplicatesStrategyChanged() {
+  fun duplicatesStrategyChanged() {
     listOf(
       DuplicatesStrategy.EXCLUDE,
       DuplicatesStrategy.INCLUDE,
@@ -134,10 +134,10 @@ class ShadowJarCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyAfterManifestAttrsChanged() {
+  fun manifestAttrsChanged() {
     projectScriptPath.appendText(
       """
-        jar {
+        $jar {
           manifest {
             attributes 'Foo': 'Foo1'
           }
@@ -178,7 +178,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyAfterKotlinMainRunChanged() {
+  fun kotlinMainRunChanged() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
 
@@ -211,7 +211,7 @@ class ShadowJarCachingTest : BaseCachingTest() {
   }
 
   @Test
-  fun shadowJarIsCachedCorrectlyAfterApplicationChanged() {
+  fun applicationChanged() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
 
