@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class FilteringTest : BasePluginTest() {
@@ -73,8 +74,9 @@ class FilteringTest : BasePluginTest() {
     commonAssertions()
   }
 
-  @Test
-  fun excludeDependencyUsingWildcardSyntax() {
+  @ParameterizedTest
+  @MethodSource("wildcardDepProvider")
+  fun excludeDependencyUsingWildcardSyntax(wildcard: String) {
     projectScriptPath.appendText(
       """
         dependencies {
@@ -82,7 +84,7 @@ class FilteringTest : BasePluginTest() {
         }
         $shadowJar {
           dependencies {
-            exclude(dependency('my:d:.*'))
+            exclude(dependency('$wildcard'))
           }
         }
       """.trimIndent(),
@@ -239,5 +241,17 @@ class FilteringTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+  }
+
+  private companion object {
+    @JvmStatic
+    fun wildcardDepProvider() = listOf(
+      "my:d",
+      "m.*:d",
+      "my:d:.*",
+      "m.*:d:.*",
+      "m.*:d.*:.*",
+      ".*:d:.*",
+    )
   }
 }

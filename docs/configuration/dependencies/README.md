@@ -229,7 +229,14 @@ Any of the individual fields can be safely absent and will function as though a 
 
 The above code snippet is functionally equivalent to the previous example.
 
-This same pattern can be used for any of the dependency notation fields.
+This same pattern can be used for any of the dependency notation fields. e.g.
+
+- `org.apache.logging.log4j:.*`
+- `org.apache.logging.log4j:log4j.*`
+- `org.apache.logging.log4j:log4j-core:.*`
+- `org.apache.logging.*:log4j-core:.*`
+- `.*:log4j-core:.*`
+- ...
 
 === "Kotlin"
 
