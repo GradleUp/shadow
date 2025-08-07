@@ -29,7 +29,7 @@ class TransformersTest : BaseTransformerTest() {
     writeClass()
     projectScriptPath.appendText(
       """
-        jar {
+        $jar {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
             attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
@@ -251,7 +251,7 @@ class TransformersTest : BaseTransformerTest() {
     const val TEST_ENTRY_ATTR_KEY = "Test-Entry"
 
     val MANIFEST_ATTRS = """
-        jar {
+        $jar {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
             attributes '$TEST_ENTRY_ATTR_KEY': 'FAILED'

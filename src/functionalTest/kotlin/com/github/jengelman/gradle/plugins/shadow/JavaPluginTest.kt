@@ -199,7 +199,7 @@ class JavaPluginTest : BasePluginTest() {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
       """
-        jar {
+        $jar {
           manifest {
             attributes '$multiReleaseAttributeKey': 'true'
           }
@@ -402,7 +402,7 @@ class JavaPluginTest : BasePluginTest() {
         dependencies {
           shadow 'junit:junit:3.8.2'
         }
-        jar {
+        $jar {
           manifest {
             attributes '$classPathAttributeKey': '/libs/a.jar'
           }
@@ -694,7 +694,7 @@ class JavaPluginTest : BasePluginTest() {
   fun inheritFromOtherManifest() {
     projectScriptPath.appendText(
       """
-        jar {
+        $jar {
           manifest {
             attributes 'Foo-Attr': 'Foo-Value'
           }

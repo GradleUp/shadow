@@ -153,7 +153,7 @@ class CachingTest : BasePluginTest() {
   fun manifestAttrsChanged() {
     projectScriptPath.appendText(
       """
-        jar {
+        $jar {
           manifest {
             attributes 'Foo': 'Foo1'
           }

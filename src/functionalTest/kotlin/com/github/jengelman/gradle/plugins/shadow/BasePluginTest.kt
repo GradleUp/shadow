@@ -418,6 +418,7 @@ abstract class BasePluginTest {
 
     val shadowJar: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
     const val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
+    const val jar = "tasks.named('jar', Jar)"
 
     val commonArguments = listOf(
       "--warning-mode=fail",
