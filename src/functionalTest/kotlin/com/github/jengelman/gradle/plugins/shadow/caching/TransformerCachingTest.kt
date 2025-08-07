@@ -8,7 +8,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
-class TransformersCachingTest : BaseCachingTest() {
+class TransformerCachingTest : BaseCachingTest() {
   @Test
   fun serviceFileTransformerPropsChanged() {
     val mainClassEntry = writeClass()
