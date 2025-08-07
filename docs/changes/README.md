@@ -199,7 +199,7 @@ If you used Shadow for merging service files, the following steps are recommende
 2. Apply `mergeServiceFiles` or `ServiceFileTransformer` stuff as you did in your previous setup.
 3. Diff the JARs from upgrading or not.
 4. Remove the extra entries that are added by `INCLUDE` by `filesMatching` or `PreserveFirstFoundResourceTransformer`.
-5. Diff the JARs again, check if the extra entries that you want to preserve are removed.
+5. Diff the JARs again, and check that only the entries you want to preserve remain.
 6. Optionally, if you want a stricter check for the shadowed JAR entries, enable `failOnDuplicateEntries`.
 
 ## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
