@@ -202,7 +202,6 @@ If you used Shadow for merging service files, the following steps are recommende
 5. Check if the extra entries are removed.
 6. Optionally, if you want a stricter check before the JAR is created, enable `failOnDuplicateEntries`.
 
-Other users can also refer to the steps above.
 
 ## [9.0.0-rc3](https://github.com/GradleUp/shadow/releases/tag/9.0.0-rc3) - 2025-08-01
 
