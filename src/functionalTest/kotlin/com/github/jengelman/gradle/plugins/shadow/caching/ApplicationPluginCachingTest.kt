@@ -4,7 +4,7 @@ import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
-class ApplicationCachingTest : BaseCachingTest() {
+class ApplicationPluginCachingTest : BaseCachingTest() {
   override val taskPath: String = runShadowTask
 
   @Test

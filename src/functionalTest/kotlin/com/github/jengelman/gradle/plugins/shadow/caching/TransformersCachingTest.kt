@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-class TransformerCachingTest : BaseCachingTest() {
+class TransformersCachingTest : BaseCachingTest() {
   private lateinit var mainClass: String
 
   @BeforeEach

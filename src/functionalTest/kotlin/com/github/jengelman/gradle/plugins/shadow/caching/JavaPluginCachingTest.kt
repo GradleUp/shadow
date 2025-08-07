@@ -12,7 +12,7 @@ import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
 import org.junit.jupiter.api.Test
 
-class ShadowJarCachingTest : BaseCachingTest() {
+class JavaPluginCachingTest : BaseCachingTest() {
   /**
    * Ensure that a basic usage reuses an output from cache and then gets a cache miss when the content changes.
    */
