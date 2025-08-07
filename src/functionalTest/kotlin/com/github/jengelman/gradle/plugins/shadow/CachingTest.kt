@@ -15,7 +15,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
-import java.nio.file.NoSuchFileException
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.isDirectory
@@ -531,9 +530,6 @@ class CachingTest : BasePluginTest() {
 
   private fun cleanOutputs() {
     run("clean")
-    // Make sure the output shadow jar has been deleted.
-    assertFailure { outputShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
-    assertFailure { outputServerShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
     @OptIn(ExperimentalPathApi::class)
     val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
     // Make sure build folders are deleted by clean task.
