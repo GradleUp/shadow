@@ -7,11 +7,12 @@ import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
 class MinimizationCachingTest : BaseCachingTest() {
-  override val taskPath: String = serverShadowJarTask
   override val outputShadowJar: JarPath get() = outputServerShadowJar
 
   @Test
-  fun shadowJarIsCachedCorrectlyWhenMinimizationIsAdded() {
+  fun minimizeChanged() {
+    taskPath = serverShadowJarTask
+
     writeClientAndServerModules()
     path("server/src/main/java/server/Server.java").writeText(
       """

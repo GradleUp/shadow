@@ -19,7 +19,7 @@ import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 abstract class BaseCachingTest : BasePluginTest() {
-  open val taskPath: String = shadowJarTask
+  open var taskPath: String = shadowJarTask
 
   fun cleanOutputs() {
     run("clean")

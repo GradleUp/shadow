@@ -9,7 +9,7 @@ class RelocationCachingTest : BaseCachingTest() {
    * Ensure that we get a cache miss when relocation changes and that caching works with relocation
    */
   @Test
-  fun shadowJarIsCachedCorrectlyWhenRelocationIsAdded() {
+  fun relocatorAdded() {
     projectScriptPath.appendText(
       """
         dependencies {
