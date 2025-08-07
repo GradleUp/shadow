@@ -536,27 +536,26 @@ class CachingTest : BasePluginTest() {
     assertThat(buildDirs).isEmpty()
   }
 
-  private fun assertExecutionSuccess(vararg outputs: String) {
+  private fun assertExecutionSuccess() {
     // The task was executed and not pulled from cache.
-    assertRunWithResult(TaskOutcome.SUCCESS, outputs = outputs)
+    assertRunWithResult(TaskOutcome.SUCCESS)
   }
 
   /**
    * This should be called after [assertExecutionSuccess] to ensure that the [taskPath] is cached.
    */
-  private fun assertExecutionsFromCacheAndUpToDate(vararg outputs: String) {
+  private fun assertExecutionsFromCacheAndUpToDate() {
     cleanOutputs()
     // Run the task again to ensure it is pulled from cache.
-    assertRunWithResult(TaskOutcome.FROM_CACHE, outputs = outputs)
+    assertRunWithResult(TaskOutcome.FROM_CACHE)
     // Run the task again to ensure it is up-to-date.
-    assertRunWithResult(TaskOutcome.UP_TO_DATE, outputs = outputs)
+    assertRunWithResult(TaskOutcome.UP_TO_DATE)
   }
 
   /**
    * Combines [assertExecutionSuccess] and [assertExecutionsFromCacheAndUpToDate] for simplifying assertions.
    */
   private fun assertCompositeExecutions(
-    vararg outputs: String,
     jarPathProvider: () -> JarPath = { outputShadowJar },
     jarPathAssertions: Assert<JarPath>.() -> Unit = {},
   ) {
@@ -564,12 +563,11 @@ class CachingTest : BasePluginTest() {
     assertExecutionSuccess()
     assertThat(jarPathProvider()).useAll(jarPathAssertions)
     // Subsequent runs should be from cache and up-to-date after configurations changed.
-    assertExecutionsFromCacheAndUpToDate(outputs = outputs)
+    assertExecutionsFromCacheAndUpToDate()
   }
 
-  private fun assertRunWithResult(expectedOutcome: TaskOutcome, vararg outputs: String) {
+  private fun assertRunWithResult(expectedOutcome: TaskOutcome) {
     val result = run(taskPath)
     assertThat(result).taskOutcomeEquals(taskPath, expectedOutcome)
-    assertThat(result.output).contains(*outputs)
   }
 }
