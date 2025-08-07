@@ -165,7 +165,7 @@ class ApplicationPluginTest : BasePluginTest() {
     val result = runWithFailure(runShadowTask)
 
     assertThat(result.output).contains(
-      "The main class must be specified and not empty in `application.mainClass` or manifest attributes.",
+      "The main class must be specified and not left empty in `application.mainClass` or manifest attributes.",
     )
   }
 

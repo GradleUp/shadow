@@ -134,7 +134,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
           task.manifest.attributes[mainClassAttributeKey] = mainClassName.orNull.also { value ->
             if (value.isNullOrEmpty()) {
-              error("The main class must be specified and not empty in `application.mainClass` or manifest attributes.")
+              error("The main class must be specified and not left empty in `application.mainClass` or manifest attributes.")
             }
           }
         }
