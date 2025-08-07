@@ -159,6 +159,17 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   @Test
+  fun errorWhenMainClassNotSet() {
+    prepare(mainClassBlock = "")
+
+    val result = runWithFailure(runShadowTask)
+
+    assertThat(result.output).contains(
+      "The main class must be specified and not left empty in `application.mainClass` or manifest attributes.",
+    )
+  }
+
+  @Test
   fun addExtraFilesIntoDistribution() {
     path("extra/echo.sh").writeText("echo 'Hello, World!'")
     path("some/dir/hello.txt").writeText("'Hello, World!'")
@@ -220,6 +231,7 @@ class ApplicationPluginTest : BasePluginTest() {
   private fun prepare(
     mainClassWithImports: Boolean = false,
     projectBlock: String = "",
+    mainClassBlock: String = "mainClass = 'my.Main'",
     applicationBlock: String = "",
     settingsBlock: String = "",
     dependenciesBlock: String = "implementation 'my:a:1.0'",
@@ -231,7 +243,7 @@ class ApplicationPluginTest : BasePluginTest() {
         apply plugin: 'application'
         $projectBlock
         application {
-          mainClass = 'my.Main'
+          $mainClassBlock
           $applicationBlock
         }
         dependencies {
