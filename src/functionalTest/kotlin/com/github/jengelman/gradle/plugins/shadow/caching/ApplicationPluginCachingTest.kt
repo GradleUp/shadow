@@ -9,7 +9,7 @@ import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 
 class ApplicationPluginCachingTest : BaseCachingTest() {
-  override val taskPath: String = runShadowTask
+  override var taskPath: String = runShadowTask
 
   @Test
   fun runShadowIsNotCacheable() {
@@ -55,6 +55,8 @@ class ApplicationPluginCachingTest : BaseCachingTest() {
 
   @Test
   fun applicationChanged() {
+    taskPath = shadowJarTask
+
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
 
