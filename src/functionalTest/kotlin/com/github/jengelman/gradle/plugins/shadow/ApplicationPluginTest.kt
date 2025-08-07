@@ -141,7 +141,7 @@ class ApplicationPluginTest : BasePluginTest() {
       }
     }
 
-    assertions(run(runShadowTask, shadowJarTask).output, "foo")
+    assertions(run(runShadowTask).output, "foo")
     commonAssertions(
       jarPath("build/libs/myapp-1.0-all.jar"),
       entriesContained = entriesInA + arrayOf(mainClass, main2ClassEntry),
