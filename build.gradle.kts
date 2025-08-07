@@ -42,6 +42,7 @@ kotlin {
     languageVersion = apiVersion
     jvmTarget = JvmTarget.JVM_11
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+    // Sync with `JavaCompile.options.release`.
     freeCompilerArgs.add("-Xjdk-release=11")
   }
 }
@@ -221,6 +222,10 @@ kotlin.target.compilations {
     // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
     associateWith(main)
   }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+  options.release = 11
 }
 
 tasks.pluginUnderTestMetadata {
