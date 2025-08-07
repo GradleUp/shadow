@@ -129,7 +129,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   protected open fun Project.configureShadowJarMainClass() {
     val mainClassName = applicationExtension.mainClass
     tasks.shadowJar.configure { task ->
-      task.inputs.property("mainClassName", mainClassName)
       task.doFirst {
         // Inject the attribute if it is not already present.
         if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
