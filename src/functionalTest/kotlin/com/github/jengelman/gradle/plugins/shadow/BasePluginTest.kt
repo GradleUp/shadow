@@ -175,14 +175,16 @@ abstract class BasePluginTest {
     vararg arguments: String,
     runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runner(arguments.toList()).also(runnerBlock).build().assertNoDeprecationWarnings()
+    return runner(arguments = arguments.toList(), block = runnerBlock)
+      .build().assertNoDeprecationWarnings()
   }
 
   fun runWithFailure(
     vararg tasks: String,
-    runnerBlock: (GradleRunner) -> GradleRunner = { it },
+    runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runnerBlock(runner(tasks.toList())).buildAndFail().assertNoDeprecationWarnings()
+    return runner(arguments = tasks.toList(), block = runnerBlock)
+      .buildAndFail().assertNoDeprecationWarnings()
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
@@ -378,6 +380,7 @@ abstract class BasePluginTest {
   fun runner(
     arguments: Iterable<String> = emptyList(),
     projectDir: Path? = projectRoot,
+    block: (GradleRunner) -> Unit = {},
   ): GradleRunner = GradleRunner.create()
     .withGradleVersion(testGradleVersion)
     .forwardOutput()
@@ -388,6 +391,7 @@ abstract class BasePluginTest {
       if (projectDir != null) {
         withProjectDir(projectDir.toFile())
       }
+      block(this)
     }
 
   @Suppress("ConstPropertyName")
