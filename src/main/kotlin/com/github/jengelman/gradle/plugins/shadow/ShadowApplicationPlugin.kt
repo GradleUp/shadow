@@ -127,18 +127,17 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureShadowJarMainClass() {
-    // Wrap `mainClass` as a provider to avoid the error of it's value not being configured yet.
-    val mainClassName = provider { applicationExtension.mainClass }
+    val mainClassName = applicationExtension.mainClass
     tasks.shadowJar.configure { task ->
       task.inputs.property("mainClassName", mainClassName)
       task.doFirst {
         // Inject the attribute if it is not already present.
         if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
-          val realClass = mainClassName.get().orNull
-          if (realClass.isNullOrEmpty()) {
-            error("The main class must be specified and not left empty in `application.mainClass` or manifest attributes.")
+          task.manifest.attributes[mainClassAttributeKey] = mainClassName.orNull.also { value ->
+            if (value.isNullOrEmpty()) {
+              error("The main class must be specified and not left empty in `application.mainClass` or manifest attributes.")
+            }
           }
-          task.manifest.attributes[mainClassAttributeKey] = realClass
         }
       }
     }
