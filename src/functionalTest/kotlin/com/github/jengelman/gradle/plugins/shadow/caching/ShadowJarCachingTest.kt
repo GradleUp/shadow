@@ -10,7 +10,6 @@ import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ShadowJarCachingTest : BaseCachingTest() {
@@ -211,7 +210,6 @@ class ShadowJarCachingTest : BaseCachingTest() {
     }
   }
 
-  @Disabled("TODO: https://github.com/GradleUp/shadow/pull/1601#discussion_r2260096815")
   @Test
   fun shadowJarIsCachedCorrectlyAfterApplicationChanged() {
     val mainClassName = "my.Main"
