@@ -33,7 +33,7 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun includeAllDependencies() {
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -53,7 +53,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -69,7 +69,7 @@ class FilteringTest : BasePluginTest() {
   fun excludeDependency(useAccessor: Boolean) {
     dependOnAndExcludeArtifactD(useAccessor)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions()
   }
@@ -90,7 +90,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions()
   }
@@ -116,7 +116,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -140,7 +140,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsOnly(
@@ -162,7 +162,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsOnly(
@@ -187,7 +187,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -203,7 +203,7 @@ class FilteringTest : BasePluginTest() {
     publishArtifactCD(circular = true)
     dependOnAndExcludeArtifactD()
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions()
   }

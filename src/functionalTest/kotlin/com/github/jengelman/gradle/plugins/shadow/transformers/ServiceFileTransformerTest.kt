@@ -39,7 +39,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(config)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
@@ -75,7 +75,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(config)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val content = outputShadowJar.use { it.getContent(ENTRY_FOO_SHADE) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
@@ -133,7 +133,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       getContent("META-INF/services/java.sql.Driver").isEqualTo(
@@ -188,7 +188,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     )
     path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val content = outputShadowJar.use { it.getContent(servicesBarEntry) }
     assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
@@ -202,7 +202,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarPath)
 
     assertThat(result.output).containsMatch(outputRegex.toRegex())
   }
@@ -216,7 +216,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(firstValue)
@@ -237,7 +237,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)

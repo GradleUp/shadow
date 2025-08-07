@@ -32,7 +32,7 @@ class ScalaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(

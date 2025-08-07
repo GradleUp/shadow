@@ -53,7 +53,7 @@ class RelocationTest : BasePluginTest() {
       }
     }.toTypedArray()
 
-    val result = run(shadowJarTask, INFO_ARGUMENT)
+    val result = run(shadowJarPath, INFO_ARGUMENT)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -96,7 +96,7 @@ class RelocationTest : BasePluginTest() {
       .map { it.replace("junit/framework/", "b/") }.toTypedArray()
     val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -138,7 +138,7 @@ class RelocationTest : BasePluginTest() {
       .map { it.replace("junit/framework/", "b/") }.toTypedArray()
     val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -185,7 +185,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -308,7 +308,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -342,7 +342,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val entries = outputShadowJar.use { it.entries().toList() }
     val included = entries.filter { entry ->
@@ -374,7 +374,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     if (enableAutoRelocation) {
       val (relocatedEntries, otherEntries) = outputShadowJar.use {
@@ -461,7 +461,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -496,7 +496,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       if (exclude) {
@@ -529,7 +529,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -558,9 +558,9 @@ class RelocationTest : BasePluginTest() {
       .toTypedArray()
 
     if (enable) {
-      run(shadowJarTask, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
+      run(shadowJarPath, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
     } else {
-      run(shadowJarTask, "--relocation-prefix=$relocationPrefix")
+      run(shadowJarPath, "--relocation-prefix=$relocationPrefix")
     }
 
     assertThat(outputShadowJar).useAll {
@@ -597,7 +597,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
 
     assertThat(result).contains(
@@ -627,7 +627,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
 
     if (skipStringConstants) {

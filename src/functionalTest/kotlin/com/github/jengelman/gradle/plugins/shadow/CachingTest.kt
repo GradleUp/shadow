@@ -1,12 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.Assert
-import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -27,7 +24,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 
 class CachingTest : BasePluginTest() {
-  private var taskPath: String = shadowJarTask
+  private var taskPath: String = shadowJarPath
 
   /**
    * Ensure that a basic usage reuses an output from cache and then gets a cache miss when the content changes.
@@ -370,7 +367,7 @@ class CachingTest : BasePluginTest() {
 
   @Test
   fun minimizeChanged() {
-    taskPath = serverShadowJarTask
+    taskPath = serverShadowJarPath
 
     writeClientAndServerModules()
     path("server/src/main/java/server/Server.java").writeText(

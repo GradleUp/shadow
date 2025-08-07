@@ -34,7 +34,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
     assertThat(content).isEqualTo(
@@ -75,7 +75,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
     assertThat(content).isEqualTo(

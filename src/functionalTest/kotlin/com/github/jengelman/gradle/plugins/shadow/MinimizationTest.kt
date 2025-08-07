@@ -94,7 +94,7 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsAtLeast(
@@ -122,7 +122,7 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsAtLeast(
@@ -149,7 +149,7 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsOnly(
@@ -186,7 +186,7 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsAtLeast(
@@ -202,7 +202,7 @@ class MinimizationTest : BasePluginTest() {
         public class Client {}
       """.trimIndent(),
     )
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsAtLeast(
@@ -219,9 +219,9 @@ class MinimizationTest : BasePluginTest() {
     writeClientAndServerModules()
 
     if (enable) {
-      run(serverShadowJarTask, "--minimize-jar")
+      run(serverShadowJarPath, "--minimize-jar")
     } else {
-      run(serverShadowJarTask)
+      run(serverShadowJarPath)
     }
 
     assertThat(outputServerShadowJar).useAll {

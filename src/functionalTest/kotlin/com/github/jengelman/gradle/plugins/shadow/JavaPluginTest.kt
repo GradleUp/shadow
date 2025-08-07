@@ -105,7 +105,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun shadowJarCliOptions() {
-    val result = run("help", "--task", shadowJarTask)
+    val result = run("help", "--task", shadowJarPath)
 
     assertThat(result.output).contains(
       "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
@@ -122,7 +122,7 @@ class JavaPluginTest : BasePluginTest() {
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsOnly(
@@ -167,7 +167,7 @@ class JavaPluginTest : BasePluginTest() {
     val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       containsOnly(
@@ -207,7 +207,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent() + lineSeparator,
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
     assertThat(outputServerShadowJar).useAll {
       transform { it.mainAttrSize }.isGreaterThan(1)
@@ -249,7 +249,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -273,7 +273,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -315,7 +315,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -339,7 +339,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -370,7 +370,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val entries = outputShadowJar.use { it.entries().toList() }
     assertThat(entries.size).isEqualTo(2)
@@ -386,7 +386,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isNull()
@@ -410,7 +410,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
@@ -429,7 +429,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("junit-3.8.2.jar")
@@ -452,7 +452,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       transform { it.entries().toList() }.isNotEmpty()
@@ -476,7 +476,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
@@ -639,7 +639,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarPath)
 
     assertThat(result.output).containsMatch("Cannot expand ZIP '.*bad\\.jar'".toRegex())
   }
@@ -656,7 +656,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarPath)
 
     assertThat(result.output).contains(
       "Shadowing AAR file is not supported.",
@@ -678,7 +678,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
       containsOnly(
@@ -710,7 +710,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       transform { it.mainAttrSize }.isGreaterThan(2)
@@ -736,7 +736,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -786,7 +786,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -836,7 +836,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
@@ -856,7 +856,7 @@ class JavaPluginTest : BasePluginTest() {
     )
 
     val result = run(
-      serverShadowJarTask,
+      serverShadowJarPath,
       IP_ARGUMENT,
       "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
       "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
@@ -888,9 +888,9 @@ class JavaPluginTest : BasePluginTest() {
     )
 
     val result = if (enable) {
-      runWithFailure(shadowJarTask)
+      runWithFailure(shadowJarPath)
     } else {
-      run(shadowJarTask, INFO_ARGUMENT)
+      run(shadowJarPath, INFO_ARGUMENT)
     }
 
     assertThat(result.output).contains(
@@ -912,9 +912,9 @@ class JavaPluginTest : BasePluginTest() {
     )
 
     val result = if (enable) {
-      runWithFailure(shadowJarTask, "--fail-on-duplicate-entries")
+      runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
     } else {
-      run(shadowJarTask, INFO_ARGUMENT)
+      run(shadowJarPath, INFO_ARGUMENT)
     }
 
     assertThat(result.output).contains(

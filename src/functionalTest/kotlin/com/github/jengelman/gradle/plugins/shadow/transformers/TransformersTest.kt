@@ -38,7 +38,7 @@ class TransformersTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
@@ -52,7 +52,7 @@ class TransformersTest : BaseTransformerTest() {
 
     projectScriptPath.appendText(MANIFEST_ATTRS)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions()
   }
@@ -65,7 +65,7 @@ class TransformersTest : BaseTransformerTest() {
     writeClass()
     projectScriptPath.appendText(MANIFEST_ATTRS)
 
-    run("jar", shadowJarTask)
+    run("jar", shadowJarPath)
 
     commonAssertions()
 
@@ -94,7 +94,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val actualFileBytes = outputShadowJar.use { jar ->
       jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
@@ -118,7 +118,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -142,7 +142,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -172,7 +172,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -201,7 +201,7 @@ class TransformersTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsOnly(
@@ -227,7 +227,7 @@ class TransformersTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsAtLeast(*entriesInAB)

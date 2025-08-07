@@ -45,7 +45,7 @@ class KotlinPluginsTest : BasePluginTest() {
     )
     val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Kotlin)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       val entries = arrayOf(
@@ -90,7 +90,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       val entries = arrayOf(
@@ -138,7 +138,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       val entries = arrayOf(
@@ -165,7 +165,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarPath)
 
     assertThat(result.output).contains(
       "Cannot locate tasks that match ':shadowJar' as task 'shadowJar' not found in root project",
@@ -195,7 +195,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsAtLeast(
@@ -235,7 +235,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = runWithFailure(shadowJarTask, INFO_ARGUMENT)
+    val result = runWithFailure(shadowJarPath, INFO_ARGUMENT)
 
     assertThat(result.output).contains(
       "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
@@ -269,7 +269,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       containsAtLeast(

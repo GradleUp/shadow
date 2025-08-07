@@ -37,7 +37,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     }
     projectScriptPath.appendText(config)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
   }
@@ -53,7 +53,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
   }

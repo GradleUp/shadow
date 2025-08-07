@@ -33,7 +33,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val expected = when (strategy) {
       MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
@@ -63,7 +63,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content).contains("FOO=bar,baz")
@@ -88,7 +88,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val content = outputShadowJar.use { it.getContent("META-INF/utf8.properties") }
     assertThat(content).contains("foo=第一,第二")
@@ -116,7 +116,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(outputShadowJar).useAll {
       getContent("META-INF/foo.properties").contains("foo=1;3")
@@ -146,7 +146,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content.trimIndent()).isEqualTo(

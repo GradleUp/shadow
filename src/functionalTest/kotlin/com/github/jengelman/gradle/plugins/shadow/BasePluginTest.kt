@@ -55,11 +55,11 @@ abstract class BasePluginTest {
   lateinit var entriesInB: Array<String>
   lateinit var entriesInAB: Array<String>
 
-  val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
-  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
-  val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
-  val installShadowDistTask = ":$SHADOW_INSTALL_TASK_NAME"
-  val shadowDistZipTask = ":shadowDistZip"
+  val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
+  val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
+  val runShadowPath = ":$SHADOW_RUN_TASK_NAME"
+  val installShadowDistPath = ":$SHADOW_INSTALL_TASK_NAME"
+  val shadowDistZipPath = ":shadowDistZip"
 
   val projectScriptPath: Path get() = path("build.gradle")
   val settingsScriptPath: Path get() = path("settings.gradle")
@@ -172,10 +172,10 @@ abstract class BasePluginTest {
   }
 
   fun run(
-    vararg tasks: String,
-    runnerBlock: (GradleRunner) -> GradleRunner = { it },
+    vararg arguments: String,
+    runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runnerBlock(runner(tasks.toList())).build().assertNoDeprecationWarnings()
+    return runner(arguments.toList()).also(runnerBlock).build().assertNoDeprecationWarnings()
   }
 
   fun runWithFailure(
