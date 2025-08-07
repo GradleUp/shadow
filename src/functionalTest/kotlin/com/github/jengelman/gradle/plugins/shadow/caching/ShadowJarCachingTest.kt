@@ -1,12 +1,16 @@
 package com.github.jengelman.gradle.plugins.shadow.caching
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ShadowJarCachingTest : BaseCachingTest() {
@@ -127,6 +131,110 @@ class ShadowJarCachingTest : BaseCachingTest() {
       )
 
       assertCompositeExecutions()
+    }
+  }
+
+  @Test
+  fun shadowJarIsCachedCorrectlyAfterManifestAttrsChanged() {
+    projectScriptPath.appendText(
+      """
+        jar {
+          manifest {
+            attributes 'Foo': 'Foo1'
+          }
+        }
+        $shadowJar {
+          manifest {
+            attributes 'Bar': 'Bar1'
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val assertions = { valueFoo: String, valueBar: String ->
+      assertCompositeExecutions {
+        getMainAttr("Foo").isEqualTo(valueFoo)
+        getMainAttr("Bar").isEqualTo(valueBar)
+      }
+    }
+
+    assertions("Foo1", "Bar1")
+
+    var replaced = projectScriptPath.readText().replace("Foo1", "Foo2")
+    projectScriptPath.writeText(replaced)
+
+    assertions("Foo2", "Bar1")
+
+    replaced = projectScriptPath.readText().replace("Bar1", "Bar2")
+    projectScriptPath.writeText(replaced)
+
+    assertions("Foo2", "Bar2")
+
+    replaced = projectScriptPath.readText()
+      .replace("Foo2", "Foo3")
+      .replace("Bar2", "Bar3")
+    projectScriptPath.writeText(replaced)
+
+    assertions("Foo3", "Bar3")
+  }
+
+  @Test
+  fun shadowJarIsCachedCorrectlyAfterKotlinMainRunChanged() {
+    val mainClassName = "my.Main"
+    val main2ClassName = "my.Main2"
+
+    val projectBuildScript = getDefaultProjectBuildScript(
+      plugin = "org.jetbrains.kotlin.multiplatform",
+      withGroup = true,
+      withVersion = true,
+    )
+    projectScriptPath.writeText(
+      """
+        $projectBuildScript
+        kotlin {
+          jvm().mainRun {
+            it.mainClass.set('$mainClassName')
+          }
+        }
+      """.trimIndent(),
+    )
+
+    assertCompositeExecutions {
+      getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName)
+    }
+
+    val replaced = projectScriptPath.readText().replace(mainClassName, main2ClassName)
+    projectScriptPath.writeText(replaced)
+
+    assertCompositeExecutions {
+      getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName)
+    }
+  }
+
+  @Disabled("TODO: https://github.com/GradleUp/shadow/pull/1601#discussion_r2260096815")
+  @Test
+  fun shadowJarIsCachedCorrectlyAfterApplicationChanged() {
+    val mainClassName = "my.Main"
+    val main2ClassName = "my.Main2"
+
+    projectScriptPath.appendText(
+      """
+        apply plugin: 'application'
+        application {
+          mainClass = '$mainClassName'
+        }
+      """.trimIndent(),
+    )
+
+    assertCompositeExecutions {
+      getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName)
+    }
+
+    val replaced = projectScriptPath.readText().replace(mainClassName, main2ClassName)
+    projectScriptPath.writeText(replaced)
+
+    assertCompositeExecutions {
+      getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName)
     }
   }
 }
