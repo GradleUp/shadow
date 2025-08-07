@@ -381,7 +381,9 @@ class CachingTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    assertCompositeExecutions {
+    assertCompositeExecutions(
+      jarPathProvider = { outputServerShadowJar },
+    ) {
       containsOnly(
         "client/",
         "server/",
@@ -402,7 +404,9 @@ class CachingTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    assertCompositeExecutions {
+    assertCompositeExecutions(
+      jarPathProvider = { outputServerShadowJar },
+    ) {
       containsOnly(
         "server/",
         "server/Server.class",
@@ -529,6 +533,7 @@ class CachingTest : BasePluginTest() {
     run("clean")
     // Make sure the output shadow jar has been deleted.
     assertFailure { outputShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
+    assertFailure { outputServerShadowJar.close() }.isInstanceOf(NoSuchFileException::class)
     @OptIn(ExperimentalPathApi::class)
     val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
     // Make sure build folders are deleted by clean task.
