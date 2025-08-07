@@ -151,36 +151,31 @@ class ShadowJarCachingTest : BaseCachingTest() {
       """.trimIndent(),
     )
 
-    assertCompositeExecutions {
-      getMainAttr("Foo").isEqualTo("Foo1")
-      getMainAttr("Bar").isEqualTo("Bar1")
+    val assertions = { valueFoo: String, valueBar: String ->
+      assertCompositeExecutions {
+        getMainAttr("Foo").isEqualTo(valueFoo)
+        getMainAttr("Bar").isEqualTo(valueBar)
+      }
     }
 
-    var replaced = projectScriptPath.readText().replace("'Foo': 'Foo1'", "'Foo': 'Foo2'")
+    assertions("Foo1", "Bar1")
+
+    var replaced = projectScriptPath.readText().replace("Foo1", "Foo2")
     projectScriptPath.writeText(replaced)
 
-    assertCompositeExecutions {
-      getMainAttr("Foo").isEqualTo("Foo2")
-      getMainAttr("Bar").isEqualTo("Bar1")
-    }
+    assertions("Foo2", "Bar1")
 
-    replaced = projectScriptPath.readText().replace("'Bar': 'Bar1'", "'Bar': 'Bar2'")
+    replaced = projectScriptPath.readText().replace("Bar1", "Bar2")
     projectScriptPath.writeText(replaced)
 
-    assertCompositeExecutions {
-      getMainAttr("Foo").isEqualTo("Foo2")
-      getMainAttr("Bar").isEqualTo("Bar2")
-    }
+    assertions("Foo2", "Bar2")
 
     replaced = projectScriptPath.readText()
-      .replace("'Foo': 'Foo2'", "'Foo': 'Foo3'")
-      .replace("'Bar': 'Bar2'", "'Bar': 'Bar3'")
+      .replace("Foo2", "Foo3")
+      .replace("Bar2", "Bar3")
     projectScriptPath.writeText(replaced)
 
-    assertCompositeExecutions {
-      getMainAttr("Foo").isEqualTo("Foo3")
-      getMainAttr("Bar").isEqualTo("Bar3")
-    }
+    assertions("Foo3", "Bar3")
   }
 
   @Test
