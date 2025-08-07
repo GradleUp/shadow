@@ -21,6 +21,9 @@ jobs:
           # Gradle 8.11 doesn't support Java 24.
           - gradle: 8.11
             java: 24
+          # There is no JDK 24 for Windows ARM64.
+          - os: windows-11-arm
+            java: 24
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
