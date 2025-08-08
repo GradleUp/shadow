@@ -71,7 +71,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     // Check extended properties.
     with(shadowTask as Jar) {
-      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.INCLUDE)
+      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.EXCLUDE)
       assertThat(archiveAppendix.orNull).isNull()
       assertThat(archiveBaseName.get()).isEqualTo(projectName)
       assertThat(archiveClassifier.get()).isEqualTo("all")
