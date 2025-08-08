@@ -27,11 +27,18 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledOnOs
+import org.junit.jupiter.api.condition.OS
 
 @ExperimentalPathApi
 class ApplicationPluginTest : BasePluginTest() {
   private lateinit var mainClass: String
 
+  @DisabledOnOs(
+    OS.WINDOWS,
+    architectures = ["aarch64"],
+    disabledReason = "https://github.com/gradle/gradle/issues/29807",
+  )
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
