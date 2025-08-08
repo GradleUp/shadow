@@ -346,20 +346,22 @@ public abstract class ShadowJar : Jar() {
   @TaskAction
   override fun copy() {
     includedDependencies.files.map { file ->
-      if (file.isFile && file.extension.equals("aar", ignoreCase = true)) {
-        val message = """
+      when {
+        file.isDirectory -> {
+          from(file)
+        }
+        file.extension.equals("aar", ignoreCase = true) -> {
+          val message = """
             Shadowing AAR file is not supported.
             Please exclude dependency artifact: $file
             or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
-        """.trimIndent()
-        error(message)
+          """.trimIndent()
+          error(message)
+        }
+        else -> {
+          from(archiveOperations.zipTree(file))
+        }
       }
-      if (file.isDirectory) {
-        from(file)
-        return@map
-      }
-
-      from(archiveOperations.zipTree(file))
     }
     injectMultiReleaseAttrIfPresent()
     super.copy()
