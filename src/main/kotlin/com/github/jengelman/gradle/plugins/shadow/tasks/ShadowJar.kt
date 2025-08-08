@@ -345,7 +345,7 @@ public abstract class ShadowJar : Jar() {
 
   @TaskAction
   override fun copy() {
-    includedDependencies.files.map { file ->
+    includedDependencies.files.forEach { file ->
       when {
         file.isDirectory -> {
           from(file)
