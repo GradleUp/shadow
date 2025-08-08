@@ -13,7 +13,8 @@ internal class DefaultDependencyFilter(
     excludedDependencies: MutableSet<ResolvedDependency>,
   ) {
     dependencies.forEach {
-      if (if (it.isIncluded()) includedDependencies.add(it) else excludedDependencies.add(it)) {
+      val added = if (it.isIncluded()) includedDependencies.add(it) else excludedDependencies.add(it)
+      if (added) {
         resolve(it.children, includedDependencies, excludedDependencies)
       }
     }
