@@ -47,13 +47,20 @@ import org.junit.jupiter.api.io.TempDir
 abstract class BasePluginTest {
   @TempDir
   lateinit var projectRoot: Path
+    private set
   lateinit var localRepo: AppendableMavenRepository
+    private set
 
   lateinit var artifactAJar: Path
+    private set
   lateinit var artifactBJar: Path
+    private set
   lateinit var entriesInA: Array<String>
+    private set
   lateinit var entriesInB: Array<String>
+    private set
   lateinit var entriesInAB: Array<String>
+    private set
 
   val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
   val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
