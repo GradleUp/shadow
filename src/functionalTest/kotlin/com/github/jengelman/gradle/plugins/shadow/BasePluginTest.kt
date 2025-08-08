@@ -180,10 +180,10 @@ abstract class BasePluginTest {
   }
 
   fun runWithFailure(
-    vararg tasks: String,
+    vararg arguments: String,
     runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runner(arguments = tasks.toList(), block = runnerBlock)
+    return runner(arguments = arguments.toList(), block = runnerBlock)
       .buildAndFail().assertNoDeprecationWarnings()
   }
 
