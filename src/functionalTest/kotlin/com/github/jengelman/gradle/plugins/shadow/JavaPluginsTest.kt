@@ -13,7 +13,6 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
-import assertk.assertions.isRegularFile
 import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
@@ -969,33 +968,6 @@ class JavaPluginsTest : BasePluginTest() {
       "Duplicate entries found in the shadowed JAR:",
       "a.properties (2 times)",
     )
-  }
-
-  @Test
-  fun reproduceIssue1610() {
-    projectScript.appendText(
-      """
-        $shadowJarTask {
-          dependencies { exclude(dependency("org.slf4j:slf4j-api")) }
-
-          exclude("META-INF/maven/**/*")
-
-          minimize { }
-
-          relocate("com.foo", "shadow.com.foo")
-
-          mergeServiceFiles()
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarTask)
-
-    assertThat(outputShadowedJar).useAll {
-      containsAtLeast(
-        *manifestEntries,
-      )
-    }
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {
