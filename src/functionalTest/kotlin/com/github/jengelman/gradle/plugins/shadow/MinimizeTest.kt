@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class MinimizationTest : BasePluginTest() {
+class MinimizeTest : BasePluginTest() {
   /**
    * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
    * The minimize step shall remove 'junit', but not 'api'.
@@ -94,9 +94,9 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "client/Client.class",
         "server/Server.class",
@@ -122,9 +122,9 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "server/Server.class",
         *junitEntries,
@@ -149,9 +149,9 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "client/",
         "server/",
@@ -186,9 +186,9 @@ class MinimizationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "client/Client.class",
         "server/Server.class",
@@ -202,9 +202,9 @@ class MinimizationTest : BasePluginTest() {
         public class Client {}
       """.trimIndent(),
     )
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "client/Client.class",
         "server/Server.class",
@@ -219,12 +219,12 @@ class MinimizationTest : BasePluginTest() {
     writeClientAndServerModules()
 
     if (enable) {
-      run(serverShadowJarTask, "--minimize-jar")
+      run(serverShadowJarPath, "--minimize-jar")
     } else {
-      run(serverShadowJarTask)
+      run(serverShadowJarPath)
     }
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       if (enable) {
         containsAtLeast(
           "server/Server.class",
@@ -247,12 +247,12 @@ class MinimizationTest : BasePluginTest() {
   }
 
   private fun writeApiLibAndImplModules() {
-    settingsScriptPath.appendText(
+    settingsScript.appendText(
       """
         include 'api', 'lib', 'impl'
       """.trimIndent() + lineSeparator,
     )
-    projectScriptPath.writeText("")
+    projectScript.writeText("")
 
     path("lib/src/main/java/lib/LibEntity.java").writeText(
       """
@@ -312,7 +312,7 @@ class MinimizationTest : BasePluginTest() {
         dependencies {
           api project(':api')
         }
-        $shadowJar {
+        $shadowJarTask {
           minimize()
         }
       """.trimIndent() + lineSeparator,

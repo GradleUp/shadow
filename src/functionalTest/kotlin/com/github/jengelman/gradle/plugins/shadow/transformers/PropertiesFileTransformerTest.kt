@@ -22,7 +22,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo {
       insert("META-INF/test.properties", "key2=two\nkey3=two")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
@@ -33,14 +33,14 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     val expected = when (strategy) {
       MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
       MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
       MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
     }
-    val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
+    val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content).contains(*expected)
   }
 
@@ -52,7 +52,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo {
       insert("META-INF/test.properties", "FOO=baz")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
@@ -63,9 +63,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
+    val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content).contains("FOO=bar,baz")
   }
 
@@ -77,7 +77,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo {
       insert("META-INF/utf8.properties", "foo=第二")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
@@ -88,9 +88,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent("META-INF/utf8.properties") }
+    val content = outputShadowedJar.use { it.getContent("META-INF/utf8.properties") }
     assertThat(content).contains("foo=第一,第二")
   }
 
@@ -104,7 +104,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       insert("META-INF/foo.properties", "foo=3")
       insert("META-INF/bar.properties", "bar=4")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
@@ -116,9 +116,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       getContent("META-INF/foo.properties").contains("foo=1;3")
       getContent("META-INF/bar.properties").contains("bar=4")
     }
@@ -136,7 +136,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo {
       insert("META-INF/test.properties", "foo=two")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
@@ -146,9 +146,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent("META-INF/test.properties") }
+    val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content.trimIndent()).isEqualTo(
       """
         #

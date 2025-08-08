@@ -54,7 +54,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(runShadowTask)
+    val result = run(runShadowPath)
 
     assertThat(result.output).contains(
       "Running application with JDK 17",
@@ -71,7 +71,7 @@ class ApplicationPluginTest : BasePluginTest() {
       applicationBlock = "applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']",
     )
 
-    run(installShadowDistTask)
+    run(installShadowDistPath)
 
     val installPath = path("build/install/")
     assertThat(installPath.walkEntries()).containsOnly(
@@ -113,7 +113,7 @@ class ApplicationPluginTest : BasePluginTest() {
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 
-    run(installShadowDistTask)
+    run(installShadowDistPath)
 
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
@@ -141,14 +141,14 @@ class ApplicationPluginTest : BasePluginTest() {
       }
     }
 
-    assertions(run(runShadowTask, shadowJarTask).output, "foo")
+    assertions(run(runShadowPath).output, "foo")
     commonAssertions(
       jarPath("build/libs/myapp-1.0-all.jar"),
       entriesContained = entriesInA + arrayOf(mainClass, main2ClassEntry),
       mainClassAttr = "my.Main2",
     )
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         run {
           args 'bar'
@@ -162,7 +162,7 @@ class ApplicationPluginTest : BasePluginTest() {
   fun errorWhenMainClassNotSet() {
     prepare(mainClassBlock = "")
 
-    val result = runWithFailure(runShadowTask)
+    val result = runWithFailure(runShadowPath)
 
     assertThat(result.output).contains(
       "The main class must be specified and not left empty in `application.mainClass` or manifest attributes.",
@@ -188,7 +188,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowDistZipTask)
+    run(shadowDistZipPath)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
@@ -212,7 +212,7 @@ class ApplicationPluginTest : BasePluginTest() {
     path("src/dist/echo.sh").writeText("echo 'Hello, World!'")
     prepare()
 
-    run(shadowDistZipTask)
+    run(shadowDistZipPath)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
@@ -238,7 +238,7 @@ class ApplicationPluginTest : BasePluginTest() {
     runShadowBlock: String = "",
   ) {
     mainClass = writeClass(withImports = mainClassWithImports)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         apply plugin: 'application'
         $projectBlock
@@ -249,13 +249,13 @@ class ApplicationPluginTest : BasePluginTest() {
         dependencies {
           $dependenciesBlock
         }
-        $runShadow {
+        $runShadowTask {
           args 'foo'
           $runShadowBlock
         }
       """.trimIndent() + lineSeparator,
     )
-    settingsScriptPath.writeText(
+    settingsScript.writeText(
       getDefaultSettingsBuildScript(
         startBlock = settingsBlock,
         endBlock = "rootProject.name = 'myapp'",

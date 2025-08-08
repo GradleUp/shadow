@@ -48,7 +48,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class JavaPluginTest : BasePluginTest() {
+class JavaPluginsTest : BasePluginTest() {
   @Test
   fun applyPlugin() {
     val projectName = "my-shadow"
@@ -105,7 +105,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun shadowJarCliOptions() {
-    val result = run("help", "--task", shadowJarTask)
+    val result = run("help", "--task", shadowJarPath)
 
     assertThat(result.output).contains(
       "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
@@ -122,9 +122,9 @@ class JavaPluginTest : BasePluginTest() {
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "client/",
         "server/",
@@ -167,9 +167,9 @@ class JavaPluginTest : BasePluginTest() {
     val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "client/",
         "server/",
@@ -199,7 +199,7 @@ class JavaPluginTest : BasePluginTest() {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
       """
-        jar {
+        $jarTask {
           manifest {
             attributes '$multiReleaseAttributeKey': 'true'
           }
@@ -207,9 +207,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent() + lineSeparator,
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       transform { it.mainAttrSize }.isGreaterThan(1)
       getMainAttr(multiReleaseAttributeKey).isEqualTo("true")
     }
@@ -241,7 +241,7 @@ class JavaPluginTest : BasePluginTest() {
         public class Passed {}
       """.trimIndent(),
     )
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -249,9 +249,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         "my/Passed.class",
@@ -264,7 +264,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun includeRuntimeConfigurationByDefault() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           runtimeOnly 'my:a:1.0'
@@ -273,9 +273,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         *entriesInA,
         *manifestEntries,
@@ -304,7 +304,7 @@ class JavaPluginTest : BasePluginTest() {
       }
     }.publish()
 
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-library", withGroup = true, withVersion = true)}
         dependencies {
@@ -315,9 +315,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "api.properties",
         "implementation.properties",
@@ -330,7 +330,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun doNotIncludeCompileOnlyConfigurationByDefault() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           runtimeOnly 'my:a:1.0'
@@ -339,9 +339,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         *entriesInA,
         *manifestEntries,
@@ -361,7 +361,7 @@ class JavaPluginTest : BasePluginTest() {
       }
     }.publish()
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           runtimeOnly 'my:a:1.0'
@@ -370,15 +370,15 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val entries = outputShadowJar.use { it.entries().toList() }
+    val entries = outputShadowedJar.use { it.entries().toList() }
     assertThat(entries.size).isEqualTo(2)
   }
 
   @Test
   fun classPathInManifestNotAddedIfEmpty() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -386,9 +386,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
+    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isNull()
   }
 
@@ -397,12 +397,12 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun addShadowConfigurationToClassPathInManifest() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           shadow 'junit:junit:3.8.2'
         }
-        jar {
+        $jarTask {
           manifest {
             attributes '$classPathAttributeKey': '/libs/a.jar'
           }
@@ -410,9 +410,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
+    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
@@ -421,7 +421,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun doNotIncludeNullValueInClassPathWhenJarFileDoesNotContainClassPath() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           shadow 'junit:junit:3.8.2'
@@ -429,9 +429,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
+    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 
@@ -440,21 +440,21 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun supportZipCompressionStored() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           shadow 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           zip64 = true
           entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
         }
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       transform { it.entries().toList() }.isNotEmpty()
     }
   }
@@ -467,7 +467,7 @@ class JavaPluginTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun excludeGradleApiByDefault(legacy: Boolean) {
     writeGradlePluginModule(legacy)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -476,9 +476,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
       transform { it.mainAttrSize }.isGreaterThan(0)
@@ -502,7 +502,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun movesLocalGradleApiToCompileOnly() {
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
       """.trimIndent() + lineSeparator,
@@ -522,7 +522,7 @@ class JavaPluginTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
   fun doNotReAddSuppressedGradleApi(configuration: String) {
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
       """.trimIndent() + lineSeparator,
@@ -545,7 +545,7 @@ class JavaPluginTest : BasePluginTest() {
   fun registerCustomShadowJarTask() {
     val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           testImplementation 'junit:junit:3.8.2'
@@ -590,7 +590,7 @@ class JavaPluginTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     val dependencyShadowJar = "dependencyShadowJar"
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -631,7 +631,7 @@ class JavaPluginTest : BasePluginTest() {
       writeText("A bad jar.")
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(badJarPath)}
@@ -639,7 +639,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarPath)
 
     assertThat(result.output).containsMatch("Cannot expand ZIP '.*bad\\.jar'".toRegex())
   }
@@ -648,7 +648,7 @@ class JavaPluginTest : BasePluginTest() {
   fun failBuildIfProcessingAar() {
     val fooAarPath = path("foo.aar")
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(fooAarPath)}
@@ -656,7 +656,7 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarPath)
 
     assertThat(result.output).contains(
       "Shadowing AAR file is not supported.",
@@ -667,18 +667,18 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun worksWithArchiveFileName() {
     val mainClassEntry = writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           archiveFileName = 'my-shadow.tar'
         }
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
       containsOnly(
@@ -692,9 +692,9 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun inheritFromOtherManifest() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        jar {
+        $jarTask {
           manifest {
             attributes 'Foo-Attr': 'Foo-Value'
           }
@@ -704,15 +704,15 @@ class JavaPluginTest : BasePluginTest() {
             attributes 'Bar-Attr': 'Bar-Value'
           }
         }
-        $shadowJar {
+        $shadowJarTask {
           manifest.inheritFrom(testJar.get().manifest)
         }
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       transform { it.mainAttrSize }.isGreaterThan(2)
       getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
       getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
@@ -723,9 +723,9 @@ class JavaPluginTest : BasePluginTest() {
   fun addExtraFilesViaFrom() {
     val mainClassEntry = writeClass()
     path("Foo").writeText("Foo")
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           from(file('${artifactAJar.invariantSeparatorsPathString}')) {
             into('META-INF')
           }
@@ -736,9 +736,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         "Bar/",
@@ -750,7 +750,7 @@ class JavaPluginTest : BasePluginTest() {
       getContent("Bar/Foo").isEqualTo("Foo")
     }
     val unzipped = path("unzipped")
-    outputShadowJar.use {
+    outputShadowedJar.use {
       it.getStream("META-INF/a-1.0.jar").use { inputStream ->
         inputStream.copyTo(unzipped.outputStream())
       }
@@ -772,12 +772,12 @@ class JavaPluginTest : BasePluginTest() {
     writeClass(className = "module-info") {
       "module myModuleName {}"
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(fooJar)}
         }
-        $shadowJar {
+        $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.EXCLUDE
           excludes.remove(
             'module-info.class'
@@ -786,9 +786,9 @@ class JavaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "module-info.class",
         "my/",
@@ -809,7 +809,7 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun includeFilesInTaskOutputDirectory() {
     // Create a build that has a task with jars in the output directory
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
       def createJars = tasks.register('createJars') {
         def artifactAJar = file('${artifactAJar.invariantSeparatorsPathString}')
@@ -830,15 +830,15 @@ class JavaPluginTest : BasePluginTest() {
           }
         }
       }
-      $shadowJar {
+      $shadowJarTask {
         includedDependencies.from(files(createJars).asFileTree)
       }
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
     }
   }
@@ -846,17 +846,17 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun integrateWithDevelocityBuildScan() {
     writeClientAndServerModules()
-    settingsScriptPath.writeText(
+    settingsScript.writeText(
       """
         plugins {
           id 'com.gradle.develocity'
         }
-        ${settingsScriptPath.readText()}
+        ${settingsScript.readText()}
       """.trimIndent(),
     )
 
     val result = run(
-      serverShadowJarTask,
+      serverShadowJarPath,
       IP_ARGUMENT,
       "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
       "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
@@ -876,21 +876,21 @@ class JavaPluginTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun failBuildIfDuplicateEntries(enable: Boolean) {
     path("src/main/resources/a.properties").writeText("invalid a")
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(artifactAJar)}
         }
-        $shadowJar {
+        $shadowJarTask {
           failOnDuplicateEntries = $enable
         }
       """.trimIndent(),
     )
 
     val result = if (enable) {
-      runWithFailure(shadowJarTask)
+      runWithFailure(shadowJarPath)
     } else {
-      run(shadowJarTask, INFO_ARGUMENT)
+      run(shadowJarPath, INFO_ARGUMENT)
     }
 
     assertThat(result.output).contains(
@@ -903,7 +903,7 @@ class JavaPluginTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun failBuildIfDuplicateEntriesByCliOption(enable: Boolean) {
     path("src/main/resources/a.properties").writeText("invalid a")
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(artifactAJar)}
@@ -912,9 +912,9 @@ class JavaPluginTest : BasePluginTest() {
     )
 
     val result = if (enable) {
-      runWithFailure(shadowJarTask, "--fail-on-duplicate-entries")
+      runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
     } else {
-      run(shadowJarTask, INFO_ARGUMENT)
+      run(shadowJarPath, INFO_ARGUMENT)
     }
 
     assertThat(result.output).contains(

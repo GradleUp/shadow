@@ -1,12 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.Assert
-import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -27,14 +24,14 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 
 class CachingTest : BasePluginTest() {
-  private var taskPath: String = shadowJarTask
+  private var taskPath: String = shadowJarPath
 
   /**
    * Ensure that a basic usage reuses an output from cache and then gets a cache miss when the content changes.
    */
   @Test
   fun dependenciesChanged() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(artifactAJar, artifactBJar)}
@@ -49,10 +46,8 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    val replaced = projectScriptPath.readText().lines()
-      .filterNot { it == implementationFiles(artifactBJar) }
-      .joinToString(lineSeparator)
-    projectScriptPath.writeText(replaced)
+    val replaced = projectScript.readText().replace(implementationFiles(artifactBJar), "")
+    projectScript.writeText(replaced)
 
     assertCompositeExecutions {
       containsOnly(
@@ -64,7 +59,7 @@ class CachingTest : BasePluginTest() {
 
   @Test
   fun outputFileChanged() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(artifactAJar, artifactBJar)}
@@ -79,9 +74,9 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           archiveBaseName = "foo"
         }
       """.trimIndent(),
@@ -99,7 +94,7 @@ class CachingTest : BasePluginTest() {
   @Test
   fun dependencyFilterChanged() {
     publishArtifactCD()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:d:1.0'
@@ -118,9 +113,9 @@ class CachingTest : BasePluginTest() {
 
     assertions()
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           dependencyFilter = new ${MinimizeDependencyFilter::class.java.name}(project)
         }
       """.trimIndent(),
@@ -136,10 +131,10 @@ class CachingTest : BasePluginTest() {
       DuplicatesStrategy.INCLUDE,
       DuplicatesStrategy.WARN,
     ).forEach { strategy ->
-      projectScriptPath.writeText(
+      projectScript.writeText(
         getDefaultProjectBuildScript(withGroup = true, withVersion = true) +
           """
-            $shadowJar {
+            $shadowJarTask {
               duplicatesStrategy = DuplicatesStrategy.$strategy
             }
           """.trimIndent(),
@@ -151,14 +146,14 @@ class CachingTest : BasePluginTest() {
 
   @Test
   fun manifestAttrsChanged() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        jar {
+        $jarTask {
           manifest {
             attributes 'Foo': 'Foo1'
           }
         }
-        $shadowJar {
+        $shadowJarTask {
           manifest {
             attributes 'Bar': 'Bar1'
           }
@@ -175,20 +170,20 @@ class CachingTest : BasePluginTest() {
 
     assertions("Foo1", "Bar1")
 
-    var replaced = projectScriptPath.readText().replace("Foo1", "Foo2")
-    projectScriptPath.writeText(replaced)
+    var replaced = projectScript.readText().replace("Foo1", "Foo2")
+    projectScript.writeText(replaced)
 
     assertions("Foo2", "Bar1")
 
-    replaced = projectScriptPath.readText().replace("Bar1", "Bar2")
-    projectScriptPath.writeText(replaced)
+    replaced = projectScript.readText().replace("Bar1", "Bar2")
+    projectScript.writeText(replaced)
 
     assertions("Foo2", "Bar2")
 
-    replaced = projectScriptPath.readText()
+    replaced = projectScript.readText()
       .replace("Foo2", "Foo3")
       .replace("Bar2", "Bar3")
-    projectScriptPath.writeText(replaced)
+    projectScript.writeText(replaced)
 
     assertions("Foo3", "Bar3")
   }
@@ -203,7 +198,7 @@ class CachingTest : BasePluginTest() {
       withGroup = true,
       withVersion = true,
     )
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         $projectBuildScript
         kotlin {
@@ -218,8 +213,8 @@ class CachingTest : BasePluginTest() {
       getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName)
     }
 
-    val replaced = projectScriptPath.readText().replace(mainClassName, main2ClassName)
-    projectScriptPath.writeText(replaced)
+    val replaced = projectScript.readText().replace(mainClassName, main2ClassName)
+    projectScript.writeText(replaced)
 
     assertCompositeExecutions {
       getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName)
@@ -231,7 +226,7 @@ class CachingTest : BasePluginTest() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         apply plugin: 'application'
         application {
@@ -244,8 +239,8 @@ class CachingTest : BasePluginTest() {
       getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName)
     }
 
-    val replaced = projectScriptPath.readText().replace(mainClassName, main2ClassName)
-    projectScriptPath.writeText(replaced)
+    val replaced = projectScript.readText().replace(mainClassName, main2ClassName)
+    projectScript.writeText(replaced)
 
     assertCompositeExecutions {
       getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName)
@@ -259,7 +254,7 @@ class CachingTest : BasePluginTest() {
   fun jarIncludesExcludesChanged() {
     val mainClassEntry = writeClass(className = "Main")
     val main2ClassEntry = writeClass(className = "Main2")
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -278,9 +273,9 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           exclude '**.properties'
         }
       """.trimIndent() + lineSeparator,
@@ -295,9 +290,9 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           include '$mainClassEntry'
         }
       """.trimIndent() + lineSeparator,
@@ -311,9 +306,9 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           include '$main2ClassEntry'
         }
       """.trimIndent() + lineSeparator,
@@ -332,7 +327,7 @@ class CachingTest : BasePluginTest() {
   @Test
   fun dependenciesIncludesExcludesChanged() {
     val mainClassEntry = writeClass(withImports = true)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -349,9 +344,9 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             exclude(dependency('junit:junit'))
           }
@@ -370,7 +365,7 @@ class CachingTest : BasePluginTest() {
 
   @Test
   fun minimizeChanged() {
-    taskPath = serverShadowJarTask
+    taskPath = serverShadowJarPath
 
     writeClientAndServerModules()
     path("server/src/main/java/server/Server.java").writeText(
@@ -381,7 +376,7 @@ class CachingTest : BasePluginTest() {
     )
 
     assertCompositeExecutions(
-      jarPathProvider = { outputServerShadowJar },
+      jarPathProvider = { outputServerShadowedJar },
     ) {
       containsOnly(
         "client/",
@@ -395,7 +390,7 @@ class CachingTest : BasePluginTest() {
 
     path("server/build.gradle").appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           minimize {
             exclude(dependency('junit:junit:.*'))
           }
@@ -404,7 +399,7 @@ class CachingTest : BasePluginTest() {
     )
 
     assertCompositeExecutions(
-      jarPathProvider = { outputServerShadowJar },
+      jarPathProvider = { outputServerShadowedJar },
     ) {
       containsOnly(
         "server/",
@@ -420,7 +415,7 @@ class CachingTest : BasePluginTest() {
    */
   @Test
   fun relocatorAdded() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -438,9 +433,9 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           relocate 'junit.framework', 'foo.junit.framework'
         }
       """.trimIndent(),
@@ -475,7 +470,7 @@ class CachingTest : BasePluginTest() {
 
     assertions()
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<ServiceFileTransformer>(
         transformerBlock = """
           path = 'META-INF/foo'
@@ -485,17 +480,17 @@ class CachingTest : BasePluginTest() {
 
     assertions()
 
-    val replaced = projectScriptPath.readText().replace("META-INF/foo", "META-INF/bar")
-    projectScriptPath.writeText(replaced)
+    val replaced = projectScript.readText().replace("META-INF/foo", "META-INF/bar")
+    projectScript.writeText(replaced)
 
     assertions()
   }
 
   @Test
   fun disableCacheIfAnyTransformerIsNotCacheable() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles()
         }
       """.trimIndent() + lineSeparator,
@@ -503,9 +498,9 @@ class CachingTest : BasePluginTest() {
 
     assertCompositeExecutions()
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           mergeGroovyExtensionModules()
         }
       """.trimIndent() + lineSeparator,
@@ -513,9 +508,9 @@ class CachingTest : BasePluginTest() {
 
     assertCompositeExecutions()
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
           transform(${ResourceTransformer.Companion::class.java.name})
         }
@@ -556,7 +551,7 @@ class CachingTest : BasePluginTest() {
    * Combines [assertExecutionSuccess] and [assertExecutionsFromCacheAndUpToDate] for simplifying assertions.
    */
   private fun assertCompositeExecutions(
-    jarPathProvider: () -> JarPath = { outputShadowJar },
+    jarPathProvider: () -> JarPath = { outputShadowedJar },
     jarPathAssertions: Assert<JarPath>.() -> Unit = {},
   ) {
     // First run should execute.

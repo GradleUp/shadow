@@ -21,7 +21,7 @@ class FilteringTest : BasePluginTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -33,9 +33,9 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun includeAllDependencies() {
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         *entriesInAB,
         *manifestEntries,
@@ -45,17 +45,17 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun excludeFiles() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           exclude 'a2.properties'
         }
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "a.properties",
         "b.properties",
@@ -69,7 +69,7 @@ class FilteringTest : BasePluginTest() {
   fun excludeDependency(useAccessor: Boolean) {
     dependOnAndExcludeArtifactD(useAccessor)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions()
   }
@@ -77,12 +77,12 @@ class FilteringTest : BasePluginTest() {
   @ParameterizedTest
   @MethodSource("wildcardDepProvider")
   fun excludeDependencyUsingWildcardSyntax(wildcard: String) {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:d:1.0'
         }
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             exclude(dependency('$wildcard'))
           }
@@ -90,19 +90,19 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions()
   }
 
   @Test
   fun includeDependencyAndExcludeOthers() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:d:1.0'
         }
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             include(dependency('my:d:1.0'))
           }
@@ -116,9 +116,9 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "d.properties",
         "my/",
@@ -140,9 +140,9 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "server/",
         "server/Server.class",
@@ -162,9 +162,9 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarTask)
+    run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "client/",
         "server/",
@@ -177,9 +177,9 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun verifyExcludePrecedenceOverInclude() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           include '*.jar'
           include '*.properties'
           exclude 'a2.properties'
@@ -187,9 +187,9 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "a.properties",
         "b.properties",
@@ -203,13 +203,13 @@ class FilteringTest : BasePluginTest() {
     publishArtifactCD(circular = true)
     dependOnAndExcludeArtifactD()
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
     commonAssertions()
   }
 
   private fun dependOnAndExcludeArtifactD(useAccessor: Boolean = false) {
-    settingsScriptPath.appendText(
+    settingsScript.appendText(
       """
         dependencyResolutionManagement {
           versionCatalogs.create('libs') {
@@ -219,12 +219,12 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
     val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation $dependency
         }
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             exclude(dependency($dependency))
           }
@@ -234,7 +234,7 @@ class FilteringTest : BasePluginTest() {
   }
 
   private fun commonAssertions() {
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "c.properties",
         *entriesInAB,

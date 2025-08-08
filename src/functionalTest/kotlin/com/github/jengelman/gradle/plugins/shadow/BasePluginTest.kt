@@ -47,24 +47,31 @@ import org.junit.jupiter.api.io.TempDir
 abstract class BasePluginTest {
   @TempDir
   lateinit var projectRoot: Path
+    private set
   lateinit var localRepo: AppendableMavenRepository
+    private set
 
   lateinit var artifactAJar: Path
+    private set
   lateinit var artifactBJar: Path
+    private set
   lateinit var entriesInA: Array<String>
+    private set
   lateinit var entriesInB: Array<String>
+    private set
   lateinit var entriesInAB: Array<String>
+    private set
 
-  val shadowJarTask = ":$SHADOW_JAR_TASK_NAME"
-  val serverShadowJarTask = ":server:$SHADOW_JAR_TASK_NAME"
-  val runShadowTask = ":$SHADOW_RUN_TASK_NAME"
-  val installShadowDistTask = ":$SHADOW_INSTALL_TASK_NAME"
-  val shadowDistZipTask = ":shadowDistZip"
+  val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
+  val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
+  val runShadowPath = ":$SHADOW_RUN_TASK_NAME"
+  val installShadowDistPath = ":$SHADOW_INSTALL_TASK_NAME"
+  val shadowDistZipPath = ":shadowDistZip"
 
-  val projectScriptPath: Path get() = path("build.gradle")
-  val settingsScriptPath: Path get() = path("settings.gradle")
-  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
-  val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
+  val projectScript: Path get() = path("build.gradle")
+  val settingsScript: Path get() = path("settings.gradle")
+  open val outputShadowedJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
+  val outputServerShadowedJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   @BeforeAll
   open fun doFirst() {
@@ -94,13 +101,13 @@ abstract class BasePluginTest {
 
   @BeforeEach
   open fun setup() {
-    projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
-    settingsScriptPath.writeText(getDefaultSettingsBuildScript())
+    projectScript.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
+    settingsScript.writeText(getDefaultSettingsBuildScript())
   }
 
   @AfterEach
   fun cleanup() {
-    println(projectScriptPath.readText())
+    println(projectScript.readText())
   }
 
   @AfterAll
@@ -172,17 +179,19 @@ abstract class BasePluginTest {
   }
 
   fun run(
-    vararg tasks: String,
-    runnerBlock: (GradleRunner) -> GradleRunner = { it },
+    vararg arguments: String,
+    runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runnerBlock(runner(tasks.toList())).build().assertNoDeprecationWarnings()
+    return runner(arguments = arguments.toList(), block = runnerBlock)
+      .build().assertNoDeprecationWarnings()
   }
 
   fun runWithFailure(
-    vararg tasks: String,
-    runnerBlock: (GradleRunner) -> GradleRunner = { it },
+    vararg arguments: String,
+    runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runnerBlock(runner(tasks.toList())).buildAndFail().assertNoDeprecationWarnings()
+    return runner(arguments = arguments.toList(), block = runnerBlock)
+      .buildAndFail().assertNoDeprecationWarnings()
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
@@ -270,12 +279,12 @@ abstract class BasePluginTest {
     clientShadowed: Boolean = false,
     serverShadowBlock: String = "",
   ) {
-    settingsScriptPath.appendText(
+    settingsScript.appendText(
       """
         include 'client', 'server'
       """.trimIndent(),
     )
-    projectScriptPath.writeText("")
+    projectScript.writeText("")
 
     path("client/src/main/java/client/Client.java").writeText(
       """
@@ -305,7 +314,7 @@ abstract class BasePluginTest {
         dependencies {
           implementation project(':client')
         }
-        $shadowJar {
+        $shadowJarTask {
           $serverShadowBlock
         }
       """.trimIndent() + lineSeparator,
@@ -314,7 +323,7 @@ abstract class BasePluginTest {
     if (!clientShadowed) return
     path("client/build.gradle").appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           relocate 'junit.framework', 'client.junit.framework'
         }
       """.trimIndent() + lineSeparator,
@@ -354,7 +363,7 @@ abstract class BasePluginTest {
       """.trimIndent()
     }
 
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true)}
         $gradlePluginBlock
@@ -378,6 +387,7 @@ abstract class BasePluginTest {
   fun runner(
     arguments: Iterable<String> = emptyList(),
     projectDir: Path? = projectRoot,
+    block: (GradleRunner) -> Unit = {},
   ): GradleRunner = GradleRunner.create()
     .withGradleVersion(testGradleVersion)
     .forwardOutput()
@@ -388,6 +398,7 @@ abstract class BasePluginTest {
       if (projectDir != null) {
         withProjectDir(projectDir.toFile())
       }
+      block(this)
     }
 
   @Suppress("ConstPropertyName")
@@ -416,8 +427,9 @@ abstract class BasePluginTest {
     const val manifestEntry = "META-INF/MANIFEST.MF"
     val manifestEntries = arrayOf("META-INF/", manifestEntry)
 
-    val shadowJar: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
-    const val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
+    val shadowJarTask: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
+    const val runShadowTask = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
+    const val jarTask = "tasks.named('jar', Jar)"
 
     val commonArguments = listOf(
       "--warning-mode=fail",
@@ -449,7 +461,7 @@ abstract class BasePluginTest {
         dependencies {
           $dependenciesBlock
         }
-        $shadowJar {
+        $shadowJarTask {
           transform(${T::class.java.name}) {
             $transformerBlock
           }

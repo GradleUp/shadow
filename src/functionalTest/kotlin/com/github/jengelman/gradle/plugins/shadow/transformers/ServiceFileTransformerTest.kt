@@ -23,7 +23,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(buildJarOne(), buildJarTwo())}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles {
             exclude 'META-INF/services/com.acme.*'
           }
@@ -37,11 +37,11 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         """.trimIndent(),
       )
     }
-    projectScriptPath.appendText(config)
+    projectScript.appendText(config)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
       getContent(ENTRY_SERVICES_FOO).isEqualTo("two")
     }
@@ -61,7 +61,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(one, two)}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles("META-INF/foo")
         }
       """.trimIndent()
@@ -73,11 +73,11 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         """.trimIndent(),
       )
     }
-    projectScriptPath.appendText(config)
+    projectScript.appendText(config)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent(ENTRY_FOO_SHADE) }
+    val content = outputShadowedJar.use { it.getContent(ENTRY_FOO_SHADE) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
@@ -118,12 +118,12 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       )
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(one, two)}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles()
           relocate("org.apache", "myapache") {
             exclude 'org.apache.axis.components.compiler.Jikes'
@@ -133,9 +133,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       getContent("META-INF/services/java.sql.Driver").isEqualTo(
         """
           oracle.jdbc.OracleDriver
@@ -175,22 +175,22 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       }
     }.publish()
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'foo:bar:1.0'
           ${implementationFiles(one)}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles()
         }
       """.trimIndent(),
     )
     path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent(servicesBarEntry) }
+    val content = outputShadowedJar.use { it.getContent(servicesBarEntry) }
     assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
   }
 
@@ -202,7 +202,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    val result = runWithFailure(shadowJarTask)
+    val result = runWithFailure(shadowJarPath)
 
     assertThat(result.output).containsMatch(outputRegex.toRegex())
   }
@@ -216,9 +216,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(firstValue)
       getContent(ENTRY_SERVICES_FOO).isEqualTo(secondValue)
     }
@@ -227,9 +227,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   @Test
   fun strategyExcludeCanBeOverriddenByFilesMatching() {
     writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           filesMatching('$ENTRY_SERVICES_SHADE') {
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
           }
@@ -237,21 +237,21 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarTask)
+    run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
       getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
     }
   }
 
   private fun writeDuplicatesStrategy(strategy: DuplicatesStrategy) {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(buildJarOne(), buildJarTwo())}
         }
-        $shadowJar {
+        $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.$strategy
           mergeServiceFiles()
         }
