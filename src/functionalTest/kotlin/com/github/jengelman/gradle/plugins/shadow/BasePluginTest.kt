@@ -42,8 +42,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
-import org.junit.platform.commons.logging.Logger
-import org.junit.platform.commons.logging.LoggerFactory
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
@@ -63,8 +61,6 @@ abstract class BasePluginTest {
     private set
   lateinit var entriesInAB: Array<String>
     private set
-
-  val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
   val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
   val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
@@ -111,13 +107,7 @@ abstract class BasePluginTest {
 
   @AfterEach
   fun cleanup() {
-    logger.info {
-      """
-        build.gradle:
-
-        ${projectScript.readText()}
-      """.trimIndent()
-    }
+    println(projectScript.readText())
   }
 
   @AfterAll
