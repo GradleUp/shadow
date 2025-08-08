@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class MinimizationTest : BasePluginTest() {
+class MinimizeTest : BasePluginTest() {
   /**
    * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
    * The minimize step shall remove 'junit', but not 'api'.
