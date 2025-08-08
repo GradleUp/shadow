@@ -346,7 +346,7 @@ public abstract class ShadowJar : Jar() {
   @TaskAction
   override fun copy() {
     includedDependencies.files.map { file ->
-      if (file.extension.equals("aar", ignoreCase = true)) {
+      if (file.isFile && file.extension.equals("aar", ignoreCase = true)) {
         val message = """
             Shadowing AAR file is not supported.
             Please exclude dependency artifact: $file
