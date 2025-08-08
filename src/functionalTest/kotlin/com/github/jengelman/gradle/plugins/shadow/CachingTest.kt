@@ -46,9 +46,7 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    val replaced = projectScript.readText().lines()
-      .filterNot { it == implementationFiles(artifactBJar) }
-      .joinToString(lineSeparator)
+    val replaced = projectScript.readText().replace(implementationFiles(artifactBJar), "")
     projectScript.writeText(replaced)
 
     assertCompositeExecutions {
