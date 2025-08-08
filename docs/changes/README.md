@@ -7,6 +7,10 @@
 
 - Improve the error message for empty `mainClassName`. ([#1601](https://github.com/GradleUp/shadow/pull/1601))
 
+### Fixed
+
+- Fix the regression of can't shadow directory inputs. ([#1606](https://github.com/GradleUp/shadow/pull/1606))
+
 ## [9.0.0](https://github.com/GradleUp/shadow/compare/9.0.0) - 2025-08-07
 
 !!! warning

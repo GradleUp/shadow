@@ -192,6 +192,53 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Issue(
+    "https://github.com/GradleUp/shadow/issues/1606",
+  )
+  @Test
+  fun shadowExposedCustomSourceSetOutput() {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        sourceSets {
+          custom
+        }
+        dependencies {
+          implementation sourceSets.custom.output
+        }
+      """.trimIndent(),
+    )
+    path("client/src/custom/java/client/Custom1.java").writeText(
+      """
+        package client;
+        public class Custom1 {}
+      """.trimIndent(),
+    )
+    path("client/src/custom/java/client/Custom2.java").writeText(
+      """
+        package client;
+        public class Custom2 {}
+      """.trimIndent(),
+    )
+    path("client/src/custom/resources/Foo.bar").writeText("Foo=Bar")
+
+    run(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsOnly(
+        "Foo.bar",
+        "client/",
+        "server/",
+        "client/Client.class",
+        "client/Custom1.class",
+        "client/Custom2.class",
+        "server/Server.class",
+        *junitEntries,
+        *manifestEntries,
+      )
+    }
+  }
+
+  @Issue(
     "https://github.com/GradleUp/shadow/issues/449",
   )
   @Test
