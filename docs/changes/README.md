@@ -3,7 +3,7 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0...HEAD) - 2025-xx-xx
 
-### Added
+### Changed
 
 - Improve the error message for empty `mainClassName`. ([#1601](https://github.com/GradleUp/shadow/pull/1601))
 
