@@ -203,7 +203,7 @@ class JavaPluginsTest : BasePluginTest() {
           custom
         }
         dependencies {
-          api sourceSets.custom.output
+          implementation sourceSets.custom.output
         }
       """.trimIndent(),
     )
@@ -225,12 +225,12 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
+        "Foo.bar",
         "client/",
         "server/",
         "client/Client.class",
         "client/Custom1.class",
         "client/Custom2.class",
-        "client/Foo.bar",
         "server/Server.class",
         *junitEntries,
         *manifestEntries,

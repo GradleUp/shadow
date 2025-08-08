@@ -354,6 +354,10 @@ public abstract class ShadowJar : Jar() {
         """.trimIndent()
         error(message)
       }
+      if (file.isDirectory) {
+        from(file)
+        return@map
+      }
 
       from(archiveOperations.zipTree(file))
     }
