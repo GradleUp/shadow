@@ -312,7 +312,7 @@ class MinimizationTest : BasePluginTest() {
         dependencies {
           api project(':api')
         }
-        $shadowJar {
+        $shadowJarTask {
           minimize()
         }
       """.trimIndent() + lineSeparator,

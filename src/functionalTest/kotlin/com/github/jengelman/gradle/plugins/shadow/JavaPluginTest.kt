@@ -199,7 +199,7 @@ class JavaPluginTest : BasePluginTest() {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
       """
-        $jar {
+        $jarTask {
           manifest {
             attributes '$multiReleaseAttributeKey': 'true'
           }
@@ -402,7 +402,7 @@ class JavaPluginTest : BasePluginTest() {
         dependencies {
           shadow 'junit:junit:3.8.2'
         }
-        $jar {
+        $jarTask {
           manifest {
             attributes '$classPathAttributeKey': '/libs/a.jar'
           }
@@ -445,7 +445,7 @@ class JavaPluginTest : BasePluginTest() {
         dependencies {
           shadow 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           zip64 = true
           entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
         }
@@ -672,7 +672,7 @@ class JavaPluginTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           archiveFileName = 'my-shadow.tar'
         }
       """.trimIndent(),
@@ -694,7 +694,7 @@ class JavaPluginTest : BasePluginTest() {
   fun inheritFromOtherManifest() {
     projectScript.appendText(
       """
-        $jar {
+        $jarTask {
           manifest {
             attributes 'Foo-Attr': 'Foo-Value'
           }
@@ -704,7 +704,7 @@ class JavaPluginTest : BasePluginTest() {
             attributes 'Bar-Attr': 'Bar-Value'
           }
         }
-        $shadowJar {
+        $shadowJarTask {
           manifest.inheritFrom(testJar.get().manifest)
         }
       """.trimIndent(),
@@ -725,7 +725,7 @@ class JavaPluginTest : BasePluginTest() {
     path("Foo").writeText("Foo")
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           from(file('${artifactAJar.invariantSeparatorsPathString}')) {
             into('META-INF')
           }
@@ -777,7 +777,7 @@ class JavaPluginTest : BasePluginTest() {
         dependencies {
           ${implementationFiles(fooJar)}
         }
-        $shadowJar {
+        $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.EXCLUDE
           excludes.remove(
             'module-info.class'
@@ -830,7 +830,7 @@ class JavaPluginTest : BasePluginTest() {
           }
         }
       }
-      $shadowJar {
+      $shadowJarTask {
         includedDependencies.from(files(createJars).asFileTree)
       }
       """.trimIndent(),
@@ -881,7 +881,7 @@ class JavaPluginTest : BasePluginTest() {
         dependencies {
           ${implementationFiles(artifactAJar)}
         }
-        $shadowJar {
+        $shadowJarTask {
           failOnDuplicateEntries = $enable
         }
       """.trimIndent(),

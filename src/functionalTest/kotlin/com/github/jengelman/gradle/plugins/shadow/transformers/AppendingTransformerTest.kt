@@ -22,7 +22,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(one, two)}
         }
-        $shadowJar {
+        $shadowJarTask {
           append('$ENTRY_TEST_PROPERTIES')
         }
       """.trimIndent()
@@ -58,7 +58,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(one, two)}
         }
-        $shadowJar {
+        $shadowJarTask {
           append('resources/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
           append('resources/config/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
         }

@@ -485,7 +485,7 @@ class PublishingTest : BasePluginTest() {
         dependencies {
           $dependenciesBlock
         }
-        $shadowJar {
+        $shadowJarTask {
           $shadowBlock
         }
         ${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}

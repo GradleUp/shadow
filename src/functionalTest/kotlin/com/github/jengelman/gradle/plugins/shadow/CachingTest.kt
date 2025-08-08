@@ -78,7 +78,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           archiveBaseName = "foo"
         }
       """.trimIndent(),
@@ -117,7 +117,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           dependencyFilter = new ${MinimizeDependencyFilter::class.java.name}(project)
         }
       """.trimIndent(),
@@ -136,7 +136,7 @@ class CachingTest : BasePluginTest() {
       projectScript.writeText(
         getDefaultProjectBuildScript(withGroup = true, withVersion = true) +
           """
-            $shadowJar {
+            $shadowJarTask {
               duplicatesStrategy = DuplicatesStrategy.$strategy
             }
           """.trimIndent(),
@@ -150,12 +150,12 @@ class CachingTest : BasePluginTest() {
   fun manifestAttrsChanged() {
     projectScript.appendText(
       """
-        $jar {
+        $jarTask {
           manifest {
             attributes 'Foo': 'Foo1'
           }
         }
-        $shadowJar {
+        $shadowJarTask {
           manifest {
             attributes 'Bar': 'Bar1'
           }
@@ -277,7 +277,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           exclude '**.properties'
         }
       """.trimIndent() + lineSeparator,
@@ -294,7 +294,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           include '$mainClassEntry'
         }
       """.trimIndent() + lineSeparator,
@@ -310,7 +310,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           include '$main2ClassEntry'
         }
       """.trimIndent() + lineSeparator,
@@ -348,7 +348,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             exclude(dependency('junit:junit'))
           }
@@ -392,7 +392,7 @@ class CachingTest : BasePluginTest() {
 
     path("server/build.gradle").appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           minimize {
             exclude(dependency('junit:junit:.*'))
           }
@@ -437,7 +437,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           relocate 'junit.framework', 'foo.junit.framework'
         }
       """.trimIndent(),
@@ -492,7 +492,7 @@ class CachingTest : BasePluginTest() {
   fun disableCacheIfAnyTransformerIsNotCacheable() {
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles()
         }
       """.trimIndent() + lineSeparator,
@@ -502,7 +502,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           mergeGroovyExtensionModules()
         }
       """.trimIndent() + lineSeparator,
@@ -512,7 +512,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
           transform(${ResourceTransformer.Companion::class.java.name})
         }

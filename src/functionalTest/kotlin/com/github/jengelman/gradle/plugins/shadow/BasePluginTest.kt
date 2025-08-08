@@ -314,7 +314,7 @@ abstract class BasePluginTest {
         dependencies {
           implementation project(':client')
         }
-        $shadowJar {
+        $shadowJarTask {
           $serverShadowBlock
         }
       """.trimIndent() + lineSeparator,
@@ -323,7 +323,7 @@ abstract class BasePluginTest {
     if (!clientShadowed) return
     path("client/build.gradle").appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           relocate 'junit.framework', 'client.junit.framework'
         }
       """.trimIndent() + lineSeparator,
@@ -427,9 +427,9 @@ abstract class BasePluginTest {
     const val manifestEntry = "META-INF/MANIFEST.MF"
     val manifestEntries = arrayOf("META-INF/", manifestEntry)
 
-    val shadowJar: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
-    const val runShadow = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
-    const val jar = "tasks.named('jar', Jar)"
+    val shadowJarTask: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
+    const val runShadowTask = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
+    const val jarTask = "tasks.named('jar', Jar)"
 
     val commonArguments = listOf(
       "--warning-mode=fail",
@@ -461,7 +461,7 @@ abstract class BasePluginTest {
         dependencies {
           $dependenciesBlock
         }
-        $shadowJar {
+        $shadowJarTask {
           transform(${T::class.java.name}) {
             $transformerBlock
           }

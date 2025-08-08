@@ -249,7 +249,7 @@ class ApplicationPluginTest : BasePluginTest() {
         dependencies {
           $dependenciesBlock
         }
-        $runShadow {
+        $runShadowTask {
           args 'foo'
           $runShadowBlock
         }

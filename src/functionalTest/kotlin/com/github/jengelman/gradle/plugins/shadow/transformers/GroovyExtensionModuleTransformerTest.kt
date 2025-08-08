@@ -26,7 +26,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(buildJarFoo(), buildJarBar())}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeGroovyExtensionModules()
         }
       """.trimIndent()

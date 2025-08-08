@@ -29,7 +29,7 @@ class TransformersTest : BaseTransformerTest() {
     writeClass()
     projectScript.appendText(
       """
-        $jar {
+        $jarTask {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
             attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
@@ -194,7 +194,7 @@ class TransformersTest : BaseTransformerTest() {
           implementation 'my:a:1.0'
           implementation 'my:b:1.0'
         }
-        $shadowJar {
+        $shadowJarTask {
           // Use Transformer.Companion (no-op) to mock a custom transformer here.
           transform(${ResourceTransformer.Companion::class.java.name})
         }
@@ -221,7 +221,7 @@ class TransformersTest : BaseTransformerTest() {
           implementation 'my:a:1.0'
           implementation 'my:b:1.0'
         }
-        $shadowJar {
+        $shadowJarTask {
           transform(${transformer.java.name}) $configuration
         }
       """.trimIndent(),
@@ -251,13 +251,13 @@ class TransformersTest : BaseTransformerTest() {
     const val TEST_ENTRY_ATTR_KEY = "Test-Entry"
 
     val MANIFEST_ATTRS = """
-        $jar {
+        $jarTask {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
             attributes '$TEST_ENTRY_ATTR_KEY': 'FAILED'
           }
         }
-        $shadowJar {
+        $shadowJarTask {
           manifest {
             attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
             attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'

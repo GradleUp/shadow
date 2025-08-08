@@ -34,7 +34,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           enableAutoRelocation = true
           relocationPrefix = '$relocationPrefix'
         }
@@ -80,7 +80,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           relocate 'junit.runner', 'a'
           relocate 'junit.framework', 'b'
         }
@@ -118,7 +118,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           relocate('junit.runner', 'a') {
             exclude 'junit.runner.BaseTestRunner'
           }
@@ -165,7 +165,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           relocate 'junit.framework', 'shadow.junit'
         }
       """.trimIndent(),
@@ -242,7 +242,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation project(':core')
         }
-        $shadowJar {
+        $shadowJarTask {
           relocate 'core', 'app.core'
           relocate 'junit.framework', 'app.junit.framework'
         }
@@ -302,7 +302,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'my:dep:1.0'
         }
-        $shadowJar {
+        $shadowJarTask {
           relocate 'foo', 'bar'
         }
       """.trimIndent(),
@@ -334,7 +334,7 @@ class RelocationTest : BasePluginTest() {
           implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
           implementation group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6'
         }
-        $shadowJar {
+        $shadowJarTask {
           zip64 = true
           relocate 'com.google.protobuf', 'shaded.com.google.protobuf'
           relocate 'io.netty', 'shaded.io.netty'
@@ -367,7 +367,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           enableAutoRelocation = $enableAutoRelocation
           preserveFileTimestamps = $preserveFileTimestamps
         }
@@ -453,7 +453,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           ${implementationFiles(kotlinJar)}
         }
-        $shadowJar {
+        $shadowJarTask {
           relocate('kotlin.', 'foo.kotlin.') {
             exclude('kotlin/kotlin.kotlin_builtins')
           }
@@ -488,7 +488,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           relocate('', 'foo/') {
             $relocateConfig
           }
@@ -522,7 +522,7 @@ class RelocationTest : BasePluginTest() {
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        $shadowJar {
+        $shadowJarTask {
           configurations = []
           relocate('', 'foo/')
         }
@@ -588,7 +588,7 @@ class RelocationTest : BasePluginTest() {
     writeClassWithStringRef()
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
@@ -616,7 +616,7 @@ class RelocationTest : BasePluginTest() {
     writeClassWithStringRef()
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }

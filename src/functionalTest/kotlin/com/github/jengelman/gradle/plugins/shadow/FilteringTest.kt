@@ -47,7 +47,7 @@ class FilteringTest : BasePluginTest() {
   fun excludeFiles() {
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           exclude 'a2.properties'
         }
       """.trimIndent(),
@@ -82,7 +82,7 @@ class FilteringTest : BasePluginTest() {
         dependencies {
           implementation 'my:d:1.0'
         }
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             exclude(dependency('$wildcard'))
           }
@@ -102,7 +102,7 @@ class FilteringTest : BasePluginTest() {
         dependencies {
           implementation 'my:d:1.0'
         }
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             include(dependency('my:d:1.0'))
           }
@@ -179,7 +179,7 @@ class FilteringTest : BasePluginTest() {
   fun verifyExcludePrecedenceOverInclude() {
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           include '*.jar'
           include '*.properties'
           exclude 'a2.properties'
@@ -224,7 +224,7 @@ class FilteringTest : BasePluginTest() {
         dependencies {
           implementation $dependency
         }
-        $shadowJar {
+        $shadowJarTask {
           dependencies {
             exclude(dependency($dependency))
           }

@@ -23,7 +23,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(buildJarOne(), buildJarTwo())}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles {
             exclude 'META-INF/services/com.acme.*'
           }
@@ -61,7 +61,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(one, two)}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles("META-INF/foo")
         }
       """.trimIndent()
@@ -123,7 +123,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(one, two)}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles()
           relocate("org.apache", "myapache") {
             exclude 'org.apache.axis.components.compiler.Jikes'
@@ -181,7 +181,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           implementation 'foo:bar:1.0'
           ${implementationFiles(one)}
         }
-        $shadowJar {
+        $shadowJarTask {
           mergeServiceFiles()
         }
       """.trimIndent(),
@@ -229,7 +229,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     projectScript.appendText(
       """
-        $shadowJar {
+        $shadowJarTask {
           filesMatching('$ENTRY_SERVICES_SHADE') {
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
           }
@@ -251,7 +251,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         dependencies {
           ${implementationFiles(buildJarOne(), buildJarTwo())}
         }
-        $shadowJar {
+        $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.$strategy
           mergeServiceFiles()
         }

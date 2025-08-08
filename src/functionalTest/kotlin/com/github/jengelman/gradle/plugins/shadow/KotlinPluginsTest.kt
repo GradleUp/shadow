@@ -185,7 +185,7 @@ class KotlinPluginsTest : BasePluginTest() {
             it.mainClass.set('$mainClassName')
           }
         }
-        $shadowJar {
+        $shadowJarTask {
           manifest {
             $mainAttr
           }
@@ -216,7 +216,7 @@ class KotlinPluginsTest : BasePluginTest() {
             attributes '$mainClassAttributeKey': '$mainClassName'
           }
         }
-        $shadowJar {
+        $shadowJarTask {
           manifest {
             $mainAttr
           }
