@@ -124,7 +124,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "client/",
         "server/",
@@ -169,7 +169,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "client/",
         "server/",
@@ -209,7 +209,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       transform { it.mainAttrSize }.isGreaterThan(1)
       getMainAttr(multiReleaseAttributeKey).isEqualTo("true")
     }
@@ -241,7 +241,7 @@ class JavaPluginTest : BasePluginTest() {
         public class Passed {}
       """.trimIndent(),
     )
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -251,7 +251,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         "my/Passed.class",
@@ -264,7 +264,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun includeRuntimeConfigurationByDefault() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           runtimeOnly 'my:a:1.0'
@@ -275,7 +275,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         *entriesInA,
         *manifestEntries,
@@ -304,7 +304,7 @@ class JavaPluginTest : BasePluginTest() {
       }
     }.publish()
 
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-library", withGroup = true, withVersion = true)}
         dependencies {
@@ -317,7 +317,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "api.properties",
         "implementation.properties",
@@ -330,7 +330,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun doNotIncludeCompileOnlyConfigurationByDefault() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           runtimeOnly 'my:a:1.0'
@@ -341,7 +341,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         *entriesInA,
         *manifestEntries,
@@ -361,7 +361,7 @@ class JavaPluginTest : BasePluginTest() {
       }
     }.publish()
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           runtimeOnly 'my:a:1.0'
@@ -372,13 +372,13 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val entries = outputShadowJar.use { it.entries().toList() }
+    val entries = outputShadowedJar.use { it.entries().toList() }
     assertThat(entries.size).isEqualTo(2)
   }
 
   @Test
   fun classPathInManifestNotAddedIfEmpty() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -388,7 +388,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
+    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isNull()
   }
 
@@ -397,7 +397,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun addShadowConfigurationToClassPathInManifest() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           shadow 'junit:junit:3.8.2'
@@ -412,7 +412,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
+    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
   }
 
@@ -421,7 +421,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun doNotIncludeNullValueInClassPathWhenJarFileDoesNotContainClassPath() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           shadow 'junit:junit:3.8.2'
@@ -431,7 +431,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val value = outputShadowJar.use { it.getMainAttr(classPathAttributeKey) }
+    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 
@@ -440,7 +440,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun supportZipCompressionStored() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           shadow 'junit:junit:3.8.2'
@@ -454,7 +454,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       transform { it.entries().toList() }.isNotEmpty()
     }
   }
@@ -467,7 +467,7 @@ class JavaPluginTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun excludeGradleApiByDefault(legacy: Boolean) {
     writeGradlePluginModule(legacy)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -478,7 +478,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
       transform { it.mainAttrSize }.isGreaterThan(0)
@@ -502,7 +502,7 @@ class JavaPluginTest : BasePluginTest() {
   )
   @Test
   fun movesLocalGradleApiToCompileOnly() {
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
       """.trimIndent() + lineSeparator,
@@ -522,7 +522,7 @@ class JavaPluginTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
   fun doNotReAddSuppressedGradleApi(configuration: String) {
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
       """.trimIndent() + lineSeparator,
@@ -545,7 +545,7 @@ class JavaPluginTest : BasePluginTest() {
   fun registerCustomShadowJarTask() {
     val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           testImplementation 'junit:junit:3.8.2'
@@ -590,7 +590,7 @@ class JavaPluginTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     val dependencyShadowJar = "dependencyShadowJar"
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -631,7 +631,7 @@ class JavaPluginTest : BasePluginTest() {
       writeText("A bad jar.")
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(badJarPath)}
@@ -648,7 +648,7 @@ class JavaPluginTest : BasePluginTest() {
   fun failBuildIfProcessingAar() {
     val fooAarPath = path("foo.aar")
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(fooAarPath)}
@@ -667,7 +667,7 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun worksWithArchiveFileName() {
     val mainClassEntry = writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -692,7 +692,7 @@ class JavaPluginTest : BasePluginTest() {
 
   @Test
   fun inheritFromOtherManifest() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         $jar {
           manifest {
@@ -712,7 +712,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       transform { it.mainAttrSize }.isGreaterThan(2)
       getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
       getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
@@ -723,7 +723,7 @@ class JavaPluginTest : BasePluginTest() {
   fun addExtraFilesViaFrom() {
     val mainClassEntry = writeClass()
     path("Foo").writeText("Foo")
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         $shadowJar {
           from(file('${artifactAJar.invariantSeparatorsPathString}')) {
@@ -738,7 +738,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         "Bar/",
@@ -750,7 +750,7 @@ class JavaPluginTest : BasePluginTest() {
       getContent("Bar/Foo").isEqualTo("Foo")
     }
     val unzipped = path("unzipped")
-    outputShadowJar.use {
+    outputShadowedJar.use {
       it.getStream("META-INF/a-1.0.jar").use { inputStream ->
         inputStream.copyTo(unzipped.outputStream())
       }
@@ -772,7 +772,7 @@ class JavaPluginTest : BasePluginTest() {
     writeClass(className = "module-info") {
       "module myModuleName {}"
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(fooJar)}
@@ -788,7 +788,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "module-info.class",
         "my/",
@@ -809,7 +809,7 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun includeFilesInTaskOutputDirectory() {
     // Create a build that has a task with jars in the output directory
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
       def createJars = tasks.register('createJars') {
         def artifactAJar = file('${artifactAJar.invariantSeparatorsPathString}')
@@ -838,7 +838,7 @@ class JavaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
     }
   }
@@ -846,12 +846,12 @@ class JavaPluginTest : BasePluginTest() {
   @Test
   fun integrateWithDevelocityBuildScan() {
     writeClientAndServerModules()
-    settingsScriptPath.writeText(
+    settingsScript.writeText(
       """
         plugins {
           id 'com.gradle.develocity'
         }
-        ${settingsScriptPath.readText()}
+        ${settingsScript.readText()}
       """.trimIndent(),
     )
 
@@ -876,7 +876,7 @@ class JavaPluginTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun failBuildIfDuplicateEntries(enable: Boolean) {
     path("src/main/resources/a.properties").writeText("invalid a")
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(artifactAJar)}
@@ -903,7 +903,7 @@ class JavaPluginTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun failBuildIfDuplicateEntriesByCliOption(enable: Boolean) {
     path("src/main/resources/a.properties").writeText("invalid a")
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(artifactAJar)}

@@ -54,12 +54,12 @@ class PublishingTest : BasePluginTest() {
   @BeforeEach
   override fun setup() {
     super.setup()
-    settingsScriptPath.appendText("rootProject.name = 'maven'$lineSeparator")
+    settingsScript.appendText("rootProject.name = 'maven'$lineSeparator")
   }
 
   @Test
   fun publishShadowJar() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       publishConfiguration(
         shadowBlock = """
           archiveClassifier = ''
@@ -90,7 +90,7 @@ class PublishingTest : BasePluginTest() {
     val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
     val targetJvmAttr8 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "8"
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         java {
           toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -100,7 +100,7 @@ class PublishingTest : BasePluginTest() {
     publish()
     assertions(attrsWithoutTargetJvm + targetJvmAttr17)
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         java {
           targetCompatibility = JavaVersion.VERSION_11
@@ -110,7 +110,7 @@ class PublishingTest : BasePluginTest() {
     publish()
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         java {
           sourceCompatibility = JavaVersion.VERSION_1_8
@@ -121,7 +121,7 @@ class PublishingTest : BasePluginTest() {
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         tasks.named('compileJava') {
           options.release = 8
@@ -135,7 +135,7 @@ class PublishingTest : BasePluginTest() {
 
   @Test
   fun publishShadowJarInsteadOfJar() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       publishConfiguration(
         shadowBlock = """
           archiveClassifier = ''
@@ -157,7 +157,7 @@ class PublishingTest : BasePluginTest() {
 
   @Test
   fun publishCustomShadowJar() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       publishConfiguration(
         projectBlock = """
           def testShadowJar = tasks.register('testShadowJar', ${ShadowJar::class.java.name}) {
@@ -192,7 +192,7 @@ class PublishingTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun publishShadowedGradlePlugin(legacy: Boolean) {
     writeGradlePluginModule(legacy)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       publishConfiguration(
         projectBlock = """
           apply plugin: 'com.gradle.plugin-publish'
@@ -232,7 +232,7 @@ class PublishingTest : BasePluginTest() {
   )
   @Test
   fun publishShadowJarWithCustomArtifactName() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       publishConfiguration(
         projectBlock = """
           group = 'my-group'
@@ -279,12 +279,12 @@ class PublishingTest : BasePluginTest() {
 
   @Test
   fun publishMultiProjectShadowJar() {
-    settingsScriptPath.appendText(
+    settingsScript.appendText(
       """
         include 'a', 'b', 'c'
       """.trimIndent(),
     )
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         subprojects {
           apply plugin: 'java'
@@ -381,7 +381,7 @@ class PublishingTest : BasePluginTest() {
 
   @Test
   fun publishShadowJarWithGradleMetadata() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       publishConfiguration(
         projectBlock = """
           group = 'com.acme'

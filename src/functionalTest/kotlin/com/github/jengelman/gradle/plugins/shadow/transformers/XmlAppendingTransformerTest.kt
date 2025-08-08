@@ -25,7 +25,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       insert(xmlEntry, xmlContent.format("key2", "val2"))
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<XmlAppendingTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
@@ -36,7 +36,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
+    val content = outputShadowedJar.use { it.getContent(xmlEntry) }.trimIndent()
     assertThat(content).isEqualTo(
       """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -66,7 +66,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       insert(xmlEntry, xmlContent.format("<c />"))
     }
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<XmlAppendingTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
@@ -77,7 +77,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent(xmlEntry) }.trimIndent()
+    val content = outputShadowedJar.use { it.getContent(xmlEntry) }.trimIndent()
     assertThat(content).isEqualTo(
       """
         <?xml version="1.0" encoding="UTF-8"?>

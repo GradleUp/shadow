@@ -96,7 +96,7 @@ class MinimizationTest : BasePluginTest() {
 
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "client/Client.class",
         "server/Server.class",
@@ -124,7 +124,7 @@ class MinimizationTest : BasePluginTest() {
 
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "server/Server.class",
         *junitEntries,
@@ -151,7 +151,7 @@ class MinimizationTest : BasePluginTest() {
 
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsOnly(
         "client/",
         "server/",
@@ -188,7 +188,7 @@ class MinimizationTest : BasePluginTest() {
 
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "client/Client.class",
         "server/Server.class",
@@ -204,7 +204,7 @@ class MinimizationTest : BasePluginTest() {
     )
     run(serverShadowJarPath)
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
         "client/Client.class",
         "server/Server.class",
@@ -224,7 +224,7 @@ class MinimizationTest : BasePluginTest() {
       run(serverShadowJarPath)
     }
 
-    assertThat(outputServerShadowJar).useAll {
+    assertThat(outputServerShadowedJar).useAll {
       if (enable) {
         containsAtLeast(
           "server/Server.class",
@@ -247,12 +247,12 @@ class MinimizationTest : BasePluginTest() {
   }
 
   private fun writeApiLibAndImplModules() {
-    settingsScriptPath.appendText(
+    settingsScript.appendText(
       """
         include 'api', 'lib', 'impl'
       """.trimIndent() + lineSeparator,
     )
-    projectScriptPath.writeText("")
+    projectScript.writeText("")
 
     path("lib/src/main/java/lib/LibEntity.java").writeText(
       """

@@ -148,7 +148,7 @@ class ApplicationPluginTest : BasePluginTest() {
       mainClassAttr = "my.Main2",
     )
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         run {
           args 'bar'
@@ -238,7 +238,7 @@ class ApplicationPluginTest : BasePluginTest() {
     runShadowBlock: String = "",
   ) {
     mainClass = writeClass(withImports = mainClassWithImports)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         apply plugin: 'application'
         $projectBlock
@@ -255,7 +255,7 @@ class ApplicationPluginTest : BasePluginTest() {
         }
       """.trimIndent() + lineSeparator,
     )
-    settingsScriptPath.writeText(
+    settingsScript.writeText(
       getDefaultSettingsBuildScript(
         startBlock = settingsBlock,
         endBlock = "rootProject.name = 'myapp'",

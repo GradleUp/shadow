@@ -27,7 +27,7 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun manifestRetained() {
     writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         $jar {
           manifest {
@@ -50,7 +50,7 @@ class TransformersTest : BaseTransformerTest() {
   fun manifestTransformed() {
     writeClass()
 
-    projectScriptPath.appendText(MANIFEST_ATTRS)
+    projectScript.appendText(MANIFEST_ATTRS)
 
     run(shadowJarPath)
 
@@ -63,7 +63,7 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun shadowManifestLeaksToJarManifest() {
     writeClass()
-    projectScriptPath.appendText(MANIFEST_ATTRS)
+    projectScript.appendText(MANIFEST_ATTRS)
 
     run("jar", shadowJarPath)
 
@@ -88,7 +88,7 @@ class TransformersTest : BaseTransformerTest() {
     val two = buildJarOne {
       insert(PLUGIN_CACHE_FILE, content)
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<Log4j2PluginsCacheFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
       ),
@@ -96,7 +96,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    val actualFileBytes = outputShadowJar.use { jar ->
+    val actualFileBytes = outputShadowedJar.use { jar ->
       jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
     }
     assertThat(actualFileBytes.contentHashCode()).all {
@@ -109,7 +109,7 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun includeResource() {
     val foo = path("foo").apply { writeText("foo") }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<IncludeResourceTransformer>(
         transformerBlock = """
           resource = 'bar'
@@ -120,7 +120,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "bar",
         *manifestEntries,
@@ -135,7 +135,7 @@ class TransformersTest : BaseTransformerTest() {
       insert("foo", "bar")
       insert("bar", "foo")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<DontIncludeResourceTransformer>(
         dependenciesBlock = implementationFiles(one),
         transformerBlock = "resource = 'foo'",
@@ -144,7 +144,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "bar",
         *manifestEntries,
@@ -165,7 +165,7 @@ class TransformersTest : BaseTransformerTest() {
       insert("foo/bar", "bar3")
       insert("foo/baz", "baz3")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<PreserveFirstFoundResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "resources = ['foo/bar']",
@@ -174,7 +174,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "foo/",
         "foo/bar",
@@ -188,7 +188,7 @@ class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun useCustomTransformer() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -203,7 +203,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         *entriesInAB,
         *manifestEntries,
@@ -215,7 +215,7 @@ class TransformersTest : BaseTransformerTest() {
   @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
     val (configuration, transformer) = pair
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
@@ -229,7 +229,7 @@ class TransformersTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsAtLeast(*entriesInAB)
     }
   }
@@ -241,7 +241,7 @@ class TransformersTest : BaseTransformerTest() {
       assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
     },
   ) {
-    val mf = outputShadowJar.use { it.manifest }
+    val mf = outputShadowedJar.use { it.manifest }
     assertThat(mf).isNotNull()
     mainAttributesBlock(mf.mainAttributes)
   }

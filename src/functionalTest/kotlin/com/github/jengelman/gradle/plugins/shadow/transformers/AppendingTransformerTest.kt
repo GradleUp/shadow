@@ -34,11 +34,11 @@ class AppendingTransformerTest : BaseTransformerTest() {
         """.trimIndent(),
       )
     }
-    projectScriptPath.appendText(config)
+    projectScript.appendText(config)
 
     run(shadowJarPath)
 
-    val content = outputShadowJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
+    val content = outputShadowedJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
 
@@ -81,11 +81,11 @@ class AppendingTransformerTest : BaseTransformerTest() {
       block1 + lineSeparator + block2
     }
 
-    projectScriptPath.appendText(config)
+    projectScript.appendText(config)
 
     run(shadowJarPath)
 
-    val content1 = outputShadowJar.use { it.getContent("resources/$APPLICATION_YML_FILE") }
+    val content1 = outputShadowedJar.use { it.getContent("resources/$APPLICATION_YML_FILE") }
     assertThat(content1).isEqualTo(
       """
       $CONTENT_ONE
@@ -93,7 +93,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
       $CONTENT_TWO
       """.trimIndent(),
     )
-    val content2 = outputShadowJar.use { it.getContent("resources/config/$APPLICATION_YML_FILE") }
+    val content2 = outputShadowedJar.use { it.getContent("resources/config/$APPLICATION_YML_FILE") }
     assertThat(content2).isEqualTo(
       """
       $CONTENT_TWO

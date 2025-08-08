@@ -29,7 +29,7 @@ class RelocationTest : BasePluginTest() {
   @MethodSource("prefixProvider")
   fun autoRelocation(relocationPrefix: String) {
     val mainClassEntry = writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -55,7 +55,7 @@ class RelocationTest : BasePluginTest() {
 
     val result = run(shadowJarPath, INFO_ARGUMENT)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         mainClassEntry,
@@ -75,7 +75,7 @@ class RelocationTest : BasePluginTest() {
   @Test
   fun relocateDependencyFiles() {
     val mainClassEntry = writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -98,7 +98,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         mainClassEntry,
@@ -113,7 +113,7 @@ class RelocationTest : BasePluginTest() {
   @Test
   fun relocateDependencyFilesWithFiltering() {
     val mainClassEntry = writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -140,7 +140,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "b/",
         "my/",
@@ -160,7 +160,7 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun remapClassNamesForRelocatedFilesInProjectSource() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -187,7 +187,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         "shadow/",
@@ -197,7 +197,7 @@ class RelocationTest : BasePluginTest() {
       )
     }
 
-    val url = outputShadowJar.use { it.toUri().toURL() }
+    val url = outputShadowedJar.use { it.toUri().toURL() }
     URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
       assertFailure {
         // check that the class can be loaded. If the file was not relocated properly, we should get a NoDefClassFound
@@ -210,7 +210,7 @@ class RelocationTest : BasePluginTest() {
 
   @Test
   fun relocateDoesNotDropDependencyResources() {
-    settingsScriptPath.appendText(
+    settingsScript.appendText(
       """
         include 'core', 'app'
       """.trimIndent(),
@@ -297,7 +297,7 @@ class RelocationTest : BasePluginTest() {
     )
     path("src/main/resources/foo/foo.properties").writeText("name=foo")
 
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'my:dep:1.0'
@@ -310,7 +310,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "bar/",
         "bar/Foo.class",
@@ -326,7 +326,7 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun doNotErrorOnRelocatingJava9Classes() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'org.slf4j:slf4j-api:1.7.21'
@@ -344,7 +344,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val entries = outputShadowJar.use { it.entries().toList() }
+    val entries = outputShadowedJar.use { it.entries().toList() }
     val included = entries.filter { entry ->
       entry.name.startsWith("shaded/com/google/protobuf") || entry.name.startsWith("shaded/io/netty")
     }
@@ -362,7 +362,7 @@ class RelocationTest : BasePluginTest() {
     val currentTimeMillis = System.currentTimeMillis() - 3.seconds.inWholeMilliseconds
     val junitEntryTimeRange = junitRawEntries.map { it.time }.let { it.min()..it.max() }
     writeClass(withImports = true)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -377,7 +377,7 @@ class RelocationTest : BasePluginTest() {
     run(shadowJarPath)
 
     if (enableAutoRelocation) {
-      val (relocatedEntries, otherEntries) = outputShadowJar.use {
+      val (relocatedEntries, otherEntries) = outputShadowedJar.use {
         it.entries().toList().partition { entry -> entry.name.startsWith("shadow/") }
       }
       assertThat(relocatedEntries).isNotEmpty()
@@ -408,7 +408,7 @@ class RelocationTest : BasePluginTest() {
         }
       }
     } else {
-      val (shadowedEntries, otherEntries) = outputShadowJar.use {
+      val (shadowedEntries, otherEntries) = outputShadowedJar.use {
         it.entries().toList().partition { entry -> entry.name.startsWith("junit/") }
       }
       assertThat(shadowedEntries).isNotEmpty()
@@ -448,7 +448,7 @@ class RelocationTest : BasePluginTest() {
     val kotlinJar = buildJar("kotlin.jar") {
       insert("kotlin/kotlin.kotlin_builtins", "This is a Kotlin builtins file.")
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           ${implementationFiles(kotlinJar)}
@@ -463,7 +463,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "kotlin/",
         "kotlin/kotlin.kotlin_builtins",
@@ -483,7 +483,7 @@ class RelocationTest : BasePluginTest() {
     } else {
       ""
     }
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -498,7 +498,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       if (exclude) {
         containsOnly(
           *junitEntries,
@@ -517,7 +517,7 @@ class RelocationTest : BasePluginTest() {
   @Test
   fun relocateProjectResourcesOnly() {
     val mainClassEntry = writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -531,7 +531,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "foo/",
         "foo/my/",
@@ -546,7 +546,7 @@ class RelocationTest : BasePluginTest() {
   @MethodSource("relocationCliOptionProvider")
   fun enableAutoRelocationByCliOption(enable: Boolean, relocationPrefix: String) {
     val mainClassEntry = writeClass()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
@@ -563,7 +563,7 @@ class RelocationTest : BasePluginTest() {
       run(shadowJarPath, "--relocation-prefix=$relocationPrefix")
     }
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       if (enable) {
         containsOnly(
           "my/",
@@ -586,7 +586,7 @@ class RelocationTest : BasePluginTest() {
   @Test
   fun relocateStringConstantsByDefault() {
     writeClassWithStringRef()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         $shadowJar {
           manifest {
@@ -598,7 +598,7 @@ class RelocationTest : BasePluginTest() {
     )
 
     run(shadowJarPath)
-    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     assertThat(result).contains(
       "shadow.foo.Foo",
@@ -614,7 +614,7 @@ class RelocationTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun disableRelocateStringConstants(skipStringConstants: Boolean) {
     writeClassWithStringRef()
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         $shadowJar {
           manifest {
@@ -628,7 +628,7 @@ class RelocationTest : BasePluginTest() {
     )
 
     run(shadowJarPath)
-    val result = runProcess("java", "-jar", outputShadowJar.use { it.toString() })
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     if (skipStringConstants) {
       assertThat(result).contains(

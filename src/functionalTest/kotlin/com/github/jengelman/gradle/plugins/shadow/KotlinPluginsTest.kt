@@ -26,7 +26,7 @@ class KotlinPluginsTest : BasePluginTest() {
       withGroup = true,
       withVersion = true,
     )
-    projectScriptPath.writeText(projectBuildScript)
+    projectScript.writeText(projectBuildScript)
   }
 
   @ParameterizedTest
@@ -34,7 +34,7 @@ class KotlinPluginsTest : BasePluginTest() {
   fun compatKotlinJvmPlugin(excludeStdlib: Boolean) {
     val stdlib = compileOnlyStdlib(excludeStdlib)
 
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm", withGroup = true, withVersion = true)}
         dependencies {
@@ -47,7 +47,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       val entries = arrayOf(
         "my/",
         "META-INF/my.kotlin_module",
@@ -69,7 +69,7 @@ class KotlinPluginsTest : BasePluginTest() {
     val stdlib = compileOnlyStdlib(excludeStdlib)
 
     val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         kotlin {
           jvm()
@@ -92,7 +92,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       val entries = arrayOf(
         "my/",
         "META-INF/my.kotlin_module",
@@ -117,7 +117,7 @@ class KotlinPluginsTest : BasePluginTest() {
     val jvmTargetMain = "${jvmTargetName}Main"
     val stdlib = compileOnlyStdlib(true)
     val mainClassEntry = writeClass(sourceSet = jvmTargetMain, jvmLang = JvmLang.Kotlin)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         kotlin {
           jvm('$jvmTargetName')
@@ -140,7 +140,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       val entries = arrayOf(
         "my/",
         "META-INF/my.kotlin_module",
@@ -157,7 +157,7 @@ class KotlinPluginsTest : BasePluginTest() {
   )
   @Test
   fun doNotCreateJvmTargetEagerly() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         kotlin {
           mingwX64()
@@ -180,7 +180,7 @@ class KotlinPluginsTest : BasePluginTest() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
     val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         kotlin {
           jvm().mainRun {
@@ -197,7 +197,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsAtLeast(
         mainClassEntry,
         main2ClassEntry,
@@ -209,7 +209,7 @@ class KotlinPluginsTest : BasePluginTest() {
   @Test
   fun registerShadowJarForFirstJvmTarget() {
     val jvmTargetName = "newJvm"
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         kotlin {
           jvm() // Default JVM target.
@@ -251,7 +251,7 @@ class KotlinPluginsTest : BasePluginTest() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
     val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         kotlin {
           jvm()
@@ -271,7 +271,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsAtLeast(
         mainClassEntry,
         main2ClassEntry,

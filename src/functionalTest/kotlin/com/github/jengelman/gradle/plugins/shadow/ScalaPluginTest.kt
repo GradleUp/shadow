@@ -17,13 +17,13 @@ class ScalaPluginTest : BasePluginTest() {
       withGroup = true,
       withVersion = true,
     )
-    projectScriptPath.writeText(projectBuildScript)
+    projectScript.writeText(projectBuildScript)
   }
 
   @Test
   fun compatScala() {
     val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Scala)
-    projectScriptPath.appendText(
+    projectScript.appendText(
       """
         dependencies {
           compileOnly 'org.scala-lang:scala-library:2.13.16'
@@ -34,7 +34,7 @@ class ScalaPluginTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    assertThat(outputShadowJar).useAll {
+    assertThat(outputShadowedJar).useAll {
       containsOnly(
         "my/",
         "my/Main$.class",

@@ -68,10 +68,10 @@ abstract class BasePluginTest {
   val installShadowDistPath = ":$SHADOW_INSTALL_TASK_NAME"
   val shadowDistZipPath = ":shadowDistZip"
 
-  val projectScriptPath: Path get() = path("build.gradle")
-  val settingsScriptPath: Path get() = path("settings.gradle")
-  open val outputShadowJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
-  val outputServerShadowJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
+  val projectScript: Path get() = path("build.gradle")
+  val settingsScript: Path get() = path("settings.gradle")
+  open val outputShadowedJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
+  val outputServerShadowedJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   @BeforeAll
   open fun doFirst() {
@@ -101,13 +101,13 @@ abstract class BasePluginTest {
 
   @BeforeEach
   open fun setup() {
-    projectScriptPath.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
-    settingsScriptPath.writeText(getDefaultSettingsBuildScript())
+    projectScript.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
+    settingsScript.writeText(getDefaultSettingsBuildScript())
   }
 
   @AfterEach
   fun cleanup() {
-    println(projectScriptPath.readText())
+    println(projectScript.readText())
   }
 
   @AfterAll
@@ -279,12 +279,12 @@ abstract class BasePluginTest {
     clientShadowed: Boolean = false,
     serverShadowBlock: String = "",
   ) {
-    settingsScriptPath.appendText(
+    settingsScript.appendText(
       """
         include 'client', 'server'
       """.trimIndent(),
     )
-    projectScriptPath.writeText("")
+    projectScript.writeText("")
 
     path("client/src/main/java/client/Client.java").writeText(
       """
@@ -363,7 +363,7 @@ abstract class BasePluginTest {
       """.trimIndent()
     }
 
-    projectScriptPath.writeText(
+    projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true)}
         $gradlePluginBlock

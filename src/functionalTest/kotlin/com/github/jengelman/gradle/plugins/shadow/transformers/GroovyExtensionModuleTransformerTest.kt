@@ -35,7 +35,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
         dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar()),
       )
     }
-    projectScriptPath.appendText(config)
+    projectScript.appendText(config)
 
     run(shadowJarPath)
 
@@ -44,7 +44,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
   @Test
   fun groovyExtensionModuleTransformerWorksForLegacyGroovy() {
-    projectScriptPath.appendText(
+    projectScript.appendText(
       transform<GroovyExtensionModuleTransformer>(
         dependenciesBlock = implementationFiles(
           buildJarFoo(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
@@ -87,7 +87,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   }
 
   private fun commonAssertions(entry: String) {
-    val properties = outputShadowJar.use { it.getContent(entry) }.toProperties()
+    val properties = outputShadowedJar.use { it.getContent(entry) }.toProperties()
 
     assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
     assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)

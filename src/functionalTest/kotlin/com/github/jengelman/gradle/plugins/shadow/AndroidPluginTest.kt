@@ -10,7 +10,7 @@ class AndroidPluginTest : BasePluginTest() {
   @ParameterizedTest
   @MethodSource("androidIdsProvider")
   fun doNotCompatAgp(pluginId: String) {
-    projectScriptPath.writeText(getDefaultProjectBuildScript(plugin = pluginId))
+    projectScript.writeText(getDefaultProjectBuildScript(plugin = pluginId))
 
     assertThat(runWithFailure().output).contains(
       "Shadow does not support using with AGP, you may need Android Fused Library plugin instead.",
