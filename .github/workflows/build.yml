@@ -36,6 +36,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}"
 
+  # Status check that is required in branch protection rules.
+  build-status:
+    needs: build
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - run: |
+          echo all build jobs completed successfully.
+
   publish-snapshot:
     needs: build
     runs-on: ubuntu-24.04-arm
