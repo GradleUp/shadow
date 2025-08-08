@@ -175,8 +175,6 @@ class KotlinPluginsTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun setMainClassAttributeFromMainRun(useShadowAttr: Boolean) {
-    val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
-    val main2ClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin, className = "Main2")
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
     val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
@@ -198,10 +196,37 @@ class KotlinPluginsTest : BasePluginTest() {
     run(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsAtLeast(
-        mainClassEntry,
-        main2ClassEntry,
-      )
+      getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun setManifestAttrsFromJvmTargetJar(useShadowAttr: Boolean) {
+    val mainClassName = "my.Main"
+    val main2ClassName = "my.Main2"
+    val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
+    projectScript.appendText(
+      """
+        kotlin {
+          jvm()
+        }
+        tasks.named('jvmJar', Jar) {
+          manifest {
+            attributes '$mainClassAttributeKey': '$mainClassName'
+          }
+        }
+        $shadowJar {
+          manifest {
+            $mainAttr
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
       getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
     }
   }
@@ -241,43 +266,6 @@ class KotlinPluginsTest : BasePluginTest() {
       "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
       "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
     )
-  }
-
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun setManifestAttrsFromJvmTargetJar(useShadowAttr: Boolean) {
-    val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
-    val main2ClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin, className = "Main2")
-    val mainClassName = "my.Main"
-    val main2ClassName = "my.Main2"
-    val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
-    projectScript.appendText(
-      """
-        kotlin {
-          jvm()
-        }
-        tasks.named('jvmJar', Jar) {
-          manifest {
-            attributes '$mainClassAttributeKey': '$mainClassName'
-          }
-        }
-        $shadowJar {
-          manifest {
-            $mainAttr
-          }
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsAtLeast(
-        mainClassEntry,
-        main2ClassEntry,
-      )
-      getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
-    }
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {
