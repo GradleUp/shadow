@@ -825,7 +825,6 @@ class JavaPluginsTest : BasePluginTest() {
           ${implementationFiles(fooJar)}
         }
         $shadowJarTask {
-          duplicatesStrategy = DuplicatesStrategy.EXCLUDE
           excludes.remove(
             'module-info.class'
           )
