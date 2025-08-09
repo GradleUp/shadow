@@ -13,7 +13,7 @@ internal class MinimizeDependencyFilter(
     excludedDependencies: MutableSet<ResolvedDependency>,
   ) {
     dependencies.forEach { dep ->
-      val added = if (dep.isIncluded() && !excludedDependencies.any(dep.parents::contains)) {
+      val added = if (dep.isIncluded() && !excludedDependencies.any { it in dep.parents }) {
         includedDependencies.add(dep)
       } else {
         excludedDependencies.add(dep)
