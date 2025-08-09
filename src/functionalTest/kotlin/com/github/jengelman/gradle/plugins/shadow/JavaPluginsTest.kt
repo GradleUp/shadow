@@ -71,7 +71,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     // Check extended properties.
     with(shadowTask as Jar) {
-      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.INCLUDE)
+      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.EXCLUDE)
       assertThat(archiveAppendix.orNull).isNull()
       assertThat(archiveBaseName.get()).isEqualTo(projectName)
       assertThat(archiveClassifier.get()).isEqualTo("all")
@@ -825,7 +825,6 @@ class JavaPluginsTest : BasePluginTest() {
           ${implementationFiles(fooJar)}
         }
         $shadowJarTask {
-          duplicatesStrategy = DuplicatesStrategy.EXCLUDE
           excludes.remove(
             'module-info.class'
           )
@@ -929,6 +928,7 @@ class JavaPluginsTest : BasePluginTest() {
           ${implementationFiles(artifactAJar)}
         }
         $shadowJarTask {
+          duplicatesStrategy = DuplicatesStrategy.INCLUDE
           failOnDuplicateEntries = $enable
         }
       """.trimIndent(),
@@ -954,6 +954,9 @@ class JavaPluginsTest : BasePluginTest() {
       """
         dependencies {
           ${implementationFiles(artifactAJar)}
+        }
+        $shadowJarTask {
+          duplicatesStrategy = DuplicatesStrategy.INCLUDE
         }
       """.trimIndent(),
     )
