@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
@@ -209,6 +210,38 @@ class MinimizeTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
+      )
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1610",
+  )
+  @Test
+  fun excludeCircularDependencies() {
+    publishArtifactCD(circular = true)
+
+    val dependency = "'my:d:1.0'"
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation $dependency
+        }
+        $shadowJarTask {
+          minimize {
+            exclude(dependency($dependency))
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "c.properties",
+        "d.properties",
+        *manifestEntries,
       )
     }
   }

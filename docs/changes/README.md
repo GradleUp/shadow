@@ -14,6 +14,7 @@
 ### Fixed
 
 - Fix the regression of can't shadow directory inputs. ([#1606](https://github.com/GradleUp/shadow/pull/1606))
+- Fix the regression of `MinimizeDependencyFilter`. ([#1611](https://github.com/GradleUp/shadow/pull/1611))
 
 ## [9.0.0](https://github.com/GradleUp/shadow/compare/9.0.0) - 2025-08-07
 
