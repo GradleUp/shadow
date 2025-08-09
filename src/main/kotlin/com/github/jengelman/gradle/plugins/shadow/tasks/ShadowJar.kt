@@ -176,7 +176,7 @@ public abstract class ShadowJar : Jar() {
    * This is related to setting [getDuplicatesStrategy] to [FAIL] but there are some differences:
    * - It only checks the entries in the shadowed jar, not the input files.
    * - It works with setting [getDuplicatesStrategy] to any value.
-   * - It provides a more strict check before the JAR is created.
+   * - It provides a stricter check before the JAR is created.
    *
    * Defaults to `false`.
    */
