@@ -12,22 +12,15 @@ internal class MinimizeDependencyFilter(
     includedDependencies: MutableSet<ResolvedDependency>,
     excludedDependencies: MutableSet<ResolvedDependency>,
   ) {
-    dependencies.forEach {
-      val added = if (it.isIncluded() && !isParentExcluded(excludedDependencies, it)) {
-        includedDependencies.add(it)
+    dependencies.forEach { dep ->
+      val added = if (dep.isIncluded() && !excludedDependencies.any(dep.parents::contains)) {
+        includedDependencies.add(dep)
       } else {
-        excludedDependencies.add(it)
+        excludedDependencies.add(dep)
       }
       if (added) {
-        resolve(it.children, includedDependencies, excludedDependencies)
+        resolve(dep.children, includedDependencies, excludedDependencies)
       }
     }
-  }
-
-  private fun isParentExcluded(
-    excludedDependencies: Set<ResolvedDependency>,
-    dependency: ResolvedDependency,
-  ): Boolean {
-    return excludedDependencies.any { it in dependency.parents }
   }
 }
