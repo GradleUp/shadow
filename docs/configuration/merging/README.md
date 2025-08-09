@@ -397,10 +397,10 @@ Different strategies will lead to different results for `foo/bar` files in the J
 
 - `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
 - `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
-- `INCLUDE`: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
+- `INCLUDE`: Duplicate `foo/bar` entries will be included in the final JAR.
 - `INHERIT`: **Fail** the build with an exception like
   `Entry .* is a duplicate but no duplicate handling strategy has been set`.
-- `WARN`: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
+- `WARN`: **Warn** about duplicates in the build log, this behaves exactly as `INHERIT` otherwise.
 
 **NOTE:** The `duplicatesStrategy` takes precedence over transforming and relocating. If you mix the usages of
 `duplicatesStrategy` and [`ResourceTransformer`][ResourceTransformer] like below:
