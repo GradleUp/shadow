@@ -63,7 +63,7 @@
 - Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
 - Fail build when inputting AAR files or using Shadow with AGP. ([#1530](https://github.com/GradleUp/shadow/pull/1530))
 - Add `PreserveFirstFoundResourceTransformer`. ([#1548](https://github.com/GradleUp/shadow/pull/1548))  
- This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` and
+  This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` and
   want to ensure that only the first found resource is included in the final JAR.
 - Fail build if the ZIP entries in the shadowed JAR are duplicate. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
   This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
