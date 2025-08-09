@@ -56,11 +56,15 @@ public interface DependencyFilter : Serializable {
     )
 
     override fun resolve(configuration: Configuration): FileCollection {
-      val included = mutableSetOf<ResolvedDependency>()
-      val excluded = mutableSetOf<ResolvedDependency>()
-      resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, included, excluded)
+      val includes = mutableSetOf<ResolvedDependency>()
+      val excludes = mutableSetOf<ResolvedDependency>()
+      resolve(
+        dependencies = configuration.resolvedConfiguration.firstLevelModuleDependencies,
+        includedDependencies = includes,
+        excludedDependencies = excludes,
+      )
       return project.files(configuration.files) -
-        project.files(excluded.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
+        project.files(excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
     }
 
     override fun resolve(configurations: Collection<Configuration>): FileCollection {
