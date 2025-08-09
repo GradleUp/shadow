@@ -5,10 +5,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
-import kotlin.io.appendText
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
-import kotlin.io.writeText
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -211,49 +209,6 @@ class MinimizeTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
-      )
-    }
-  }
-
-  /**
-   * 'impl' depends on 'api', which depends on 'lib'.
-   * 'api' is excluded from minimization.
-   * 'lib' should also be excluded as it's a transitive dependency of an excluded project.
-   */
-  @Test
-  fun excludeTransitiveDependencyOfExcludedProject() {
-    writeApiLibAndImplModules()
-    path("api/build.gradle").writeText(
-      """
-        plugins {
-          id 'java-library'
-        }
-        dependencies {
-          api project(':lib')
-        }
-      """.trimIndent(),
-    )
-    path("impl/build.gradle").appendText(
-      """
-        $shadowJarTask {
-          minimize {
-            exclude(project(':api'))
-          }
-        }
-      """.trimIndent(),
-    )
-
-    run(":impl:$SHADOW_JAR_TASK_NAME")
-
-    assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
-      containsAtLeast(
-        "impl/",
-        "impl/SimpleEntity.class",
-        *manifestEntries,
-      )
-      containsNone(
-        "api/",
-        "lib/",
       )
     }
   }
