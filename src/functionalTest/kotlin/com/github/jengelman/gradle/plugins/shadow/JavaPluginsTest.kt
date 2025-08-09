@@ -929,6 +929,7 @@ class JavaPluginsTest : BasePluginTest() {
           ${implementationFiles(artifactAJar)}
         }
         $shadowJarTask {
+          duplicatesStrategy = DuplicatesStrategy.INCLUDE
           failOnDuplicateEntries = $enable
         }
       """.trimIndent(),
@@ -954,6 +955,9 @@ class JavaPluginsTest : BasePluginTest() {
       """
         dependencies {
           ${implementationFiles(artifactAJar)}
+        }
+        $shadowJarTask {
+          duplicatesStrategy = DuplicatesStrategy.INCLUDE
         }
       """.trimIndent(),
     )
