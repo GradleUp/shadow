@@ -3,8 +3,23 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import java.nio.file.Path
+import kotlin.io.path.appendText
+import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseTransformerTest : BasePluginTest() {
+  @BeforeEach
+  override fun setup() {
+    super.setup()
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          // Most transformers in tests require this to handle duplicate resources.
+          duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
+      """.trimIndent() + lineSeparator,
+    )
+  }
+
   fun buildJarOne(
     builder: JarBuilder.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_ONE)

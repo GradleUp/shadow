@@ -14,6 +14,82 @@ should process a particular entry and apply any modifications before writing the
 This ordering is crucial when merging configuration files where you want to preserve project-specific values while
 merging in additional data from dependencies.
 
+## Handling Duplicates Strategy
+
+`ShadowJar` is a subclass of [`org.gradle.api.tasks.AbstractCopyTask`][AbstractCopyTask], which means it honors the
+`duplicatesStrategy` property as its parent classes do. There are several strategies to handle:
+
+- `EXCLUDE`: Do not allow duplicates by ignoring subsequent items to be created at the same path.
+- `FAIL`: Throw a `DuplicateFileCopyingException` when subsequent items are to be created at the same path.
+- `INCLUDE`: Do not attempt to prevent duplicates.
+- `INHERIT`: Use the same strategy as the parent copy specification.
+- `WARN`: Do not attempt to prevent duplicates, but log a warning message when multiple items are to be created at the
+  same path.
+
+see more details about them in [`DuplicatesStrategy`][DuplicatesStrategy].
+
+`ShadowJar` recognizes `EXCLUDE` as the default, if you want to change the strategy, you can override it like:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or something else.
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or something else.
+    }
+    ```
+
+Different strategies will lead to different results for `foo/bar` files in the JARs to be merged:
+
+- `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
+- `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
+- `INCLUDE`: **Duplicate** `foo/bar` entries will be included in the final JAR.
+- `INHERIT`: **Fail** the build with an exception like
+  `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+- `WARN`: **Warn** about duplicates in the build log, this behaves exactly as `INHERIT` otherwise.
+
+**NOTE:** The `duplicatesStrategy` takes precedence over transforming and relocating. If you mix the usages of
+`duplicatesStrategy` and [`ResourceTransformer`][ResourceTransformer] like below:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      mergeServiceFiles()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      mergeServiceFiles()
+    }
+    ```
+
+The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
+as expected as the duplicate resource files fed for them are excluded beforehand. However, this behavior might be what you expected for duplicate `foo/bar` files, preventing them from being included.
+
+Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several steps
+to take:
+
+1. Set the strategy to `INCLUDE` or `WARN`.
+2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
+3. Remove duplicate entries by
+    - overriding the default strategy for specific files using [`filesMatching`][Jar.filesMatching]
+    - applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer]
+    - or something similar.
+4. Optionally, enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
+
 ## Basic ResourceTransformer Usage
 
 For simpler use cases, you can create a basic transformer:
@@ -360,81 +436,6 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
     }
     ```
 
-## Handling Duplicates Strategy
-
-`ShadowJar` is a subclass of [`org.gradle.api.tasks.AbstractCopyTask`][AbstractCopyTask], which means it honors the
-`duplicatesStrategy` property as its parent classes do. There are several strategies to handle:
-
-- `EXCLUDE`: Do not allow duplicates by ignoring subsequent items to be created at the same path.
-- `FAIL`: Throw a `DuplicateFileCopyingException` when subsequent items are to be created at the same path.
-- `INCLUDE`: Do not attempt to prevent duplicates.
-- `INHERIT`: Uses the same strategy as the parent copy specification.
-- `WARN`: Do not attempt to prevent duplicates, but log a warning message when multiple items are to be created at the
-  same path.
-
-see more details about them in [`DuplicatesStrategy`][DuplicatesStrategy].
-
-`ShadowJar` recognizes `DuplicatesStrategy.INCLUDE` as the default, if you want to change the strategy, you can
-override it like:
-
-=== "Kotlin"
-
-    ```kotlin
-    tasks.shadowJar {
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or something else.
-    }
-    ```
-
-=== "Groovy"
-
-    ```groovy
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or something else.
-    }
-    ```
-
-Different strategies will lead to different results for `foo/bar` files in the JARs to be merged:
-
-- `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
-- `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
-- `INCLUDE`: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
-- `INHERIT`: **Fail** the build with an exception like
-  `Entry .* is a duplicate but no duplicate handling strategy has been set`.
-- `WARN`: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
-
-**NOTE:** The `duplicatesStrategy` takes precedence over transforming and relocating. If you mix the usages of
-`duplicatesStrategy` and [`ResourceTransformer`][ResourceTransformer] like below:
-
-=== "Kotlin"
-
-    ```kotlin
-    tasks.shadowJar {
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-      mergeServiceFiles()
-    }
-    ```
-
-=== "Groovy"
-
-    ```groovy
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-      mergeServiceFiles()
-    }
-    ```
-
-The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
-as expected because the `duplicatesStrategy` will exclude the duplicate service files beforehand. However, this behavior might be what you expected for duplicate
-`foo/bar` files, preventing them from being included.
-
-Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several ways to
-do it:
-
-- Use [`filesMatching`][Jar.filesMatching] to override the strategy for specific files.
-- Keep `duplicatesStrategy = INCLUDE` and write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates.
-
-If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
-called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer].
 
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
@@ -448,6 +449,7 @@ called [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTrans
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
 [PreserveFirstFoundResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-preserve-first-found-resource-transformer/index.html
 [ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
+[ShadowJar.failOnDuplicateEntries]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html
 [ShadowJar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [ShadowJar.transform]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

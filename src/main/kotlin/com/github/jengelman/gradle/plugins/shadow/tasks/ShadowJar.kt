@@ -71,7 +71,7 @@ public abstract class ShadowJar : Jar() {
     description = "Create a combined JAR of project and runtime dependencies"
 
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
-    duplicatesStrategy = INCLUDE
+    duplicatesStrategy = EXCLUDE
     manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
@@ -176,7 +176,8 @@ public abstract class ShadowJar : Jar() {
    * This is related to setting [getDuplicatesStrategy] to [FAIL] but there are some differences:
    * - It only checks the entries in the shadowed jar, not the input files.
    * - It works with setting [getDuplicatesStrategy] to any value.
-   * - It provides a more strict check before the JAR is created.
+   * - Usually used with setting [getDuplicatesStrategy] to [INCLUDE] or [WARN].
+   * - It provides a stricter check before the JAR is created.
    *
    * Defaults to `false`.
    */
@@ -196,27 +197,28 @@ public abstract class ShadowJar : Jar() {
   /**
    * Returns the strategy to use when trying to copy more than one file to the same destination.
    *
-   * This strategy can be overridden for individual files by using [filesMatching].
+   * This global strategy can be overridden for individual files by using [filesMatching].
    *
-   * The default value is [INCLUDE]. Different strategies will lead to different results for
-   * `foo/bar` files in the JARs to be merged:
+   * The default value is [EXCLUDE]. Different strategies will lead to different results for `foo/bar` files in the JARs to be merged:
    *
    * - [EXCLUDE]: The **first** `foo/bar` file will be included in the final JAR.
    * - [FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
-   * - [INCLUDE]: The **last** `foo/bar` file will be included in the final JAR (the default behavior).
+   * - [INCLUDE]: **Duplicate** `foo/bar` entries will be included in the final JAR.
    * - [INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
-   * - [WARN]: The **last** `foo/bar` file will be included in the final JAR, and a warning message will be logged.
+   * - [WARN]: **Warn** about duplicates in the build log, this behaves exactly as [INHERIT] otherwise.
    *
    * **NOTE:** The strategy takes precedence over transforming and relocating.
-   * Some [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the strategy to
-   * [EXCLUDE], as the service files are excluded beforehand. Want [ResourceTransformer]s and the strategy to work
-   * together? There are several ways to do it:
+   * Some [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the strategy to [EXCLUDE],
+   * as the duplicate resource files fed for them are excluded beforehand.
+   * Want [ResourceTransformer]s and the strategy to work together? There are several steps to take:
    *
-   * - Use [filesMatching] to override the strategy for specific files.
-   * - Keep `duplicatesStrategy = INCLUDE` and write your own [ResourceTransformer] to handle duplicates.
-   *
-   * If you just want to keep the current behavior and preserve the first found resources, there is a simple built-in one
-   * called [PreserveFirstFoundResourceTransformer].
+   * 1. Set the strategy to [INCLUDE] or [WARN].
+   * 2. Apply your [ResourceTransformer]s.
+   * 3. Remove duplicate entries by
+   *     - overriding the default strategy for specific files using [filesMatching]
+   *     - applying [PreserveFirstFoundResourceTransformer]
+   *     - or something similar.
+   * 4. Optionally, enable [failOnDuplicateEntries] to check duplicate entries in the final JAR.
    *
    * @see [filesMatching]
    * @see [DuplicatesStrategy]
