@@ -3,7 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0...HEAD) - 2025-xx-xx
 
-**Note:** if you are upgrading from 8.x versions, please read 9.0.0 release notes first.
+!!! note
+
+    If you are upgrading from 8.x versions, please read 9.0.0 release notes first.
 
 ### Changed
 
