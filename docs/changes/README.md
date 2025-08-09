@@ -3,6 +3,8 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0...HEAD) - 2025-xx-xx
 
+**Note:** if you are upgrading from 8.x versions, please read [9.0.0 release notes](#900---2025-08-07) first.
+
 ### Changed
 
 - Improve the error message for empty `mainClassName`. ([#1601](https://github.com/GradleUp/shadow/pull/1601))
