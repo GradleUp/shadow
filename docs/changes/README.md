@@ -3,12 +3,17 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.0...HEAD) - 2025-xx-xx
 
+!!! note
+
+    If you are upgrading from 8.x versions, please read 9.0.0 release notes first.
+
 ### Changed
 
 - Improve the error message for empty `mainClassName`. ([#1601](https://github.com/GradleUp/shadow/pull/1601))
 - Default `duplicatesStrategy` back to `EXCLUDE`. ([#1617](https://github.com/GradleUp/shadow/pull/1617))
     - This strategy is consistent with 8.x series behavior, which is more compatible for most users upgrading.
     - For most `ResourceTransformer` users, you need to override the strategy to `INCLUDE` to make them work.
+    - Strongly suggest declaring the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
     - See more details about the strategies at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
 ### Fixed
@@ -62,7 +67,7 @@
 - Let `assemble` depend on `shadowJar`. ([#1524](https://github.com/GradleUp/shadow/pull/1524))
 - Fail build when inputting AAR files or using Shadow with AGP. ([#1530](https://github.com/GradleUp/shadow/pull/1530))
 - Add `PreserveFirstFoundResourceTransformer`. ([#1548](https://github.com/GradleUp/shadow/pull/1548))  
-  This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
+  This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` and
   want to ensure that only the first found resource is included in the final JAR.
 - Fail build if the ZIP entries in the shadowed JAR are duplicate. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
   This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
@@ -88,11 +93,12 @@
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
     - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
     - Now `ShadowJar` honors `INCLUDE` as the default, and aligns all the strategy behaviors with the Gradle side.
-    - `mergeServiceFiles` and `ServiceFileTransformer` do not work with `EXCLUDE`, as it will exclude extra service files to be merged.
+    - Some `ResourceTransformer`s (e.g. `ServiceFileTransformer`) do not work with `EXCLUDE`, as it will exclude duplicate resources to be merged.
     - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
     - Use `filesMatching` to override the default strategy for specific files.
     - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
     - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+    - **Note:** The default `duplicatesStrategy` is changed back to `EXCLUDE` in 9.0.1 release.
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
   issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip
@@ -185,10 +191,9 @@ tasks.shadowJar {
   // `isEnableRelocation` has been renamed to `enableAutoRelocation`.
   enableAutoRelocation = true
 
-  // The default `duplicatesStrategy` has been changed from `EXCLUDE` to `INCLUDE`.
-  duplicatesStrategy = DuplicatesStrategy.INCLUDE
-  // If you want to make `mergeServiceFiles` work, should leave the `duplicatesStrategy` as `INCLUDE`.
+  // If you want to make `mergeServiceFiles` work, should set the `duplicatesStrategy` as `INCLUDE`.
   // `EXCLUDE` will exclude extra service files to be merged.
+  duplicatesStrategy = DuplicatesStrategy.INCLUDE
   mergeServiceFiles()
   // If you leave `duplicatesStrategy` as `INCLUDE`, you can use the new `PreserveFirstFoundResourceTransformer`
   // to ensure that only the first found resource is included in the final JAR. Or duplicate entries will be bundled.
@@ -207,7 +212,7 @@ tasks.shadowJar {
 
 If you used Shadow for merging service files, the following steps are recommended:
 
-1. Make sure to leave `duplicatesStrategy` as default (`INCLUDE`) or `WARN`.
+1. Make sure to leave `duplicatesStrategy` as `INCLUDE` or `WARN`.
 2. Apply `mergeServiceFiles` or `ServiceFileTransformer` stuff as you did in your previous setup.
 3. Diff the JARs from upgrading or not.
 4. Remove the extra entries that are added by `INCLUDE` by `filesMatching` or `PreserveFirstFoundResourceTransformer`.
