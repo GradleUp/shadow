@@ -9,7 +9,7 @@
 - Default `duplicatesStrategy` back to `EXCLUDE`. ([#1617](https://github.com/GradleUp/shadow/pull/1617))
     - This strategy is consistent with 8.x series behavior, which is more compatible for most users upgrading.
     - For most `ResourceTransformer` users, you need to override the strategy to `INCLUDE` to make them work.
-    - Strongly declare the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
+    - Strongly suggest declaring the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
     - See more details about the strategies at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
 ### Fixed
