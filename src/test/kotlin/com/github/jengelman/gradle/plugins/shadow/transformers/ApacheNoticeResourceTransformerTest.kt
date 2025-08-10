@@ -1,9 +1,15 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import assertk.fail
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.nio.charset.Charset
+import java.util.zip.ZipInputStream
+import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
 
 /**
@@ -23,6 +29,28 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
     assertThat(transformer.canTransformResource("META-INF/NOTICE.md")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/Notice.md")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
+  }
+
+  @Test
+  fun preamble1ShouldHaveATrailingSpace() {
+    val baos = ByteArrayOutputStream()
+    val zos = ZipOutputStream(baos)
+
+    transformer.projectName.set("test-project")
+    transformer.transform(
+      TransformerContext(
+        path = NOTICE_RESOURCE,
+        inputStream = "".byteInputStream(),
+      ),
+    )
+    transformer.modifyOutputStream(zos, false)
+    zos.close()
+
+    val zis = ZipInputStream(ByteArrayInputStream(baos.toByteArray()))
+    zis.nextEntry
+    val output = zis.readAllBytes().toString(Charset.forName(transformer.charsetName.get()))
+
+    assertThat(output).contains("in this case for test-project")
   }
 
   @Test

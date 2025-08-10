@@ -43,7 +43,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
       // ------------------------------------------------------------------
       // NOTICE file corresponding to the section 4d of The Apache License,
       // Version 2.0, in this case for
-    """.trimIndent(),
+    """.trimIndent() + " ", // The space is important for formatting.
   )
 
   @get:Input
