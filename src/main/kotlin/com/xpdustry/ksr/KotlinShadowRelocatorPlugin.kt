@@ -32,8 +32,8 @@ import org.gradle.api.Project
 
 internal class KotlinShadowRelocatorPlugin : Plugin<Project> {
   override fun apply(target: Project) {
-    target.plugins.withType(ShadowJavaPlugin::class.java) {
-      target.tasks.withType(ShadowJar::class.java) { task ->
+    target.plugins.withType(ShadowJavaPlugin::class.java).configureEach {
+      target.tasks.withType(ShadowJar::class.java).configureEach { task ->
         task.doLast("relocateMetadata") {
           relocateMetadata(task)
         }
