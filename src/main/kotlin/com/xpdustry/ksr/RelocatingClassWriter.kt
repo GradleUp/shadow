@@ -34,7 +34,7 @@ internal class RelocatingClassWriter(
   relocators: List<KotlinRelocator>,
 ) : ClassWriter(reader, flags) {
 
-  internal var wasRelocated = false
+  internal var isRelocated = false
 
   init {
     val symbolTable = symbolTableField.get(this)
@@ -47,7 +47,7 @@ internal class RelocatingClassWriter(
           val newValue = relocators.applyPathRelocation(value)
           if (value != newValue) {
             symbolValueField.set(entryObj, newValue)
-            wasRelocated = true
+            isRelocated = true
           }
         }
       }
@@ -55,14 +55,15 @@ internal class RelocatingClassWriter(
   }
 
   companion object {
-    private val classWriterClass = Class.forName("org.objectweb.asm.ClassWriter")
-    private val symbolTableClass = Class.forName("org.objectweb.asm.SymbolTable")
-    private val symbolTableField =
-      classWriterClass.getDeclaredField("symbolTable").apply { isAccessible = true }
-    private val entriesField =
-      symbolTableClass.getDeclaredField("entries").apply { isAccessible = true }
-    private val symbolClass = Class.forName("org.objectweb.asm.Symbol")
-    private val symbolValueField =
-      symbolClass.getDeclaredField("value").apply { isAccessible = true }
+    private val classWriterClass = ClassWriter::class.java
+    private val symbolTableClass = Class.forName("org.objectweb.asm.SymbolTable") // Package private.
+    private val symbolClass = Class.forName("org.objectweb.asm.Symbol") // Package private.
+
+    private val symbolTableField = classWriterClass.getDeclaredField("symbolTable")
+      .apply { isAccessible = true }
+    private val entriesField = symbolTableClass.getDeclaredField("entries")
+      .apply { isAccessible = true }
+    private val symbolValueField = symbolClass.getDeclaredField("value")
+      .apply { isAccessible = true }
   }
 }
