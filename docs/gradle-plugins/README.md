@@ -15,7 +15,7 @@ task for relocation.
 
     ```kotlin
     plugins {
-      `java-gradle-plugin` // May have to apply the latest `com.gradle.plugin-publish` for better publishing support.
+      id("com.gradle.plugin-publish") version "latest"
       id("com.gradleup.shadow")
     }
 
@@ -38,7 +38,7 @@ task for relocation.
 
     ```groovy
     plugins {
-      id 'java-gradle-plugin' // May have to apply the latest `com.gradle.plugin-publish` for better publishing support.
+      id 'com.gradle.plugin-publish' version 'latest'
       id 'com.gradleup.shadow'
     }
 
