@@ -34,28 +34,38 @@ internal class MetadataAnnotationScanner(
   private val cw: ClassWriter,
   private val relocators: List<KotlinRelocator>,
 ) : ClassVisitor(Opcodes.ASM9, cw) {
-  internal var wasRelocated = false
+  internal var isRelocated = false
 
-  override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor = if (descriptor == "Lkotlin/Metadata;") {
-    MetadataVisitor(cw.visitAnnotation(descriptor, visible))
-  } else {
-    cw.visitAnnotation(descriptor, visible)
+  override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor {
+    return if (descriptor == "Lkotlin/Metadata;") {
+      MetadataVisitor(cw.visitAnnotation(descriptor, visible))
+    } else {
+      cw.visitAnnotation(descriptor, visible)
+    }
   }
 
-  inner class MetadataVisitor(av: AnnotationVisitor, private val thatArray: Boolean = false) : AnnotationVisitor(Opcodes.ASM9, av) {
+  inner class MetadataVisitor(
+    av: AnnotationVisitor,
+    private val thatArray: Boolean = false,
+  ) : AnnotationVisitor(Opcodes.ASM9, av) {
     override fun visit(name: String?, value: Any) {
-      val newValue =
-        when {
-          thatArray && value is String && value.startsWith("(") -> {
-            relocators.applyPathRelocation(value).also {
-              if (it != value) wasRelocated = true
-            }
+      val newValue = when {
+        thatArray && value is String && value.startsWith("(") -> {
+          relocators.applyPathRelocation(value).also {
+            if (it != value) isRelocated = true
           }
-          else -> value
         }
+        else -> value
+      }
       av.visit(name, newValue)
     }
 
-    override fun visitArray(name: String): AnnotationVisitor = if (name == "d2") MetadataVisitor(av.visitArray(name), true) else av.visitArray(name)
+    override fun visitArray(name: String): AnnotationVisitor {
+      return if (name == "d2") {
+        MetadataVisitor(av.visitArray(name), thatArray = true)
+      } else {
+        av.visitArray(name)
+      }
+    }
   }
 }

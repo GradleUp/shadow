@@ -49,18 +49,27 @@ import org.objectweb.asm.ClassReader
 internal fun ShadowJar.kotlinRelocate(
   pattern: String,
   shadedPattern: String,
-  action: Action<SimpleRelocator>? = null,
+  action: Action<SimpleRelocator> = Action { },
 ) {
   val relocator = KotlinRelocator(pattern, shadedPattern)
-  val intersections =
-    relocators.get().filterIsInstance<KotlinRelocator>().filter { it.canRelocatePath(pattern) }
+  val intersections = relocators.get()
+    .filterIsInstance<KotlinRelocator>()
+    .filter { it.canRelocatePath(pattern) }
   require(intersections.isEmpty()) {
     "Can't relocate from $pattern to $shadedPattern as it clashes with another paths: ${intersections.joinToString()}"
   }
-  if (action != null) {
-    relocate(relocator, action)
-  } else {
-    relocate(relocator)
+  relocate(relocator, action)
+}
+
+internal fun relocateMetadata(task: ShadowJar) {
+  val relocators = task.relocators.get().filterIsInstance<KotlinRelocator>()
+  val zip = task.archiveFile.get().asFile.toPath()
+  FileSystems.newFileSystem(zip, null as ClassLoader?).use { fs ->
+    Files.walk(fs.getPath("/")).forEach { path ->
+      if (!Files.isRegularFile(path)) return@forEach
+      if (path.name.endsWith(".class")) relocateClass(path, relocators)
+      if (path.name.endsWith(".kotlin_module")) relocateKotlinModule(path, relocators)
+    }
   }
 }
 
@@ -83,25 +92,13 @@ internal class KotlinRelocator(pattern: String, shadedPattern: String) : SimpleR
   override fun relocatePath(context: RelocatePathContext): String = context.path.replace(pathPattern.toRegex(), shadedPathPattern)
 }
 
-internal fun relocateMetadata(task: ShadowJar) {
-  val relocators = task.relocators.get().filterIsInstance<KotlinRelocator>()
-  val zip = task.archiveFile.get().asFile.toPath()
-  FileSystems.newFileSystem(zip, null as ClassLoader?).use { fs ->
-    Files.walk(fs.getPath("/")).forEach { path ->
-      if (!Files.isRegularFile(path)) return@forEach
-      if (path.name.endsWith(".class")) relocateClass(path, relocators)
-      if (path.name.endsWith(".kotlin_module")) relocateKotlinModule(path, relocators)
-    }
-  }
-}
-
 private fun relocateClass(file: Path, relocators: List<KotlinRelocator>) {
   Files.newInputStream(file).use { ins ->
     val cr = ClassReader(ins)
     val cw = RelocatingClassWriter(cr, 0, relocators)
     val scanner = MetadataAnnotationScanner(cw, relocators)
     cr.accept(scanner, 0)
-    if (scanner.wasRelocated || cw.wasRelocated) {
+    if (scanner.isRelocated || cw.isRelocated) {
       ins.close()
       Files.delete(file)
       Files.write(file, cw.toByteArray())
