@@ -4,8 +4,8 @@
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.1...HEAD) - 2025-xx-xx
 
 ### Fixed
-- Fix missing space in `ApacheNoticeResourceTransformer` preamble causing malformed NOTICE header. ([#1623]
-(https://github.com/GradleUp/shadow/pull/1623)).
+
+- Fix missing space in `ApacheNoticeResourceTransformer` preamble causing malformed NOTICE header. ([#1623](https://github.com/GradleUp/shadow/pull/1623)).
 
 ## [9.0.1](https://github.com/GradleUp/shadow/releases/tag/9.0.1) - 2025-08-09
 
