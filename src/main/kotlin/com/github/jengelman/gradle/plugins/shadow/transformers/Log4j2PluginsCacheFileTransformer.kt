@@ -60,6 +60,7 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
       aggregator.writeCache(CloseShieldOutputStream.wrap(os))
     } finally {
       deleteTempFiles()
+      os.closeEntry()
     }
   }
 
