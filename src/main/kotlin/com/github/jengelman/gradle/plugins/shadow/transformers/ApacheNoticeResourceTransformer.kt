@@ -163,35 +163,35 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val copyright = copyright.orNull ?: fallbackCopyright
 
-    os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
-
-    val writer = PrintWriter(os.writer(charset))
-
-    var count = 0
-    for (line in entries) {
-      count++
-      if (line == copyright && count != 2) continue
-      if (count == 2 && copyright != null) {
-        writer.print(copyright)
-        writer.print('\n')
-      } else {
-        writer.print(line)
-        writer.print('\n')
-      }
-      if (count == 3) {
-        // Do org stuff.
-        for ((key, value) in organizationEntries) {
-          writer.print(key)
-          writer.print('\n')
-          for (l in value) {
-            writer.print(l)
+    val notice = buildString {
+      var count = 0
+      for (line in entries) {
+        count++
+        if (line == copyright && count != 2) continue
+        if (count == 2 && copyright != null) {
+          append(copyright)
+          append('\n')
+        } else {
+          append(line)
+          append('\n')
+        }
+        if (count == 3) {
+          // Do org stuff.
+          for ((key, value) in organizationEntries) {
+            append(key)
+            append('\n')
+            for (l in value) {
+              append(l)
+            }
+            append('\n')
           }
-          writer.print('\n')
         }
       }
     }
 
-    writer.flush()
+    os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
+    os.write(notice.toByteArray(charset))
+
     entries.clear()
   }
 
