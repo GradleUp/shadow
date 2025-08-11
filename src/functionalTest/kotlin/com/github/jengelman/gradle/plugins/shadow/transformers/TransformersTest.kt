@@ -211,6 +211,25 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
+  @Test
+  fun apacheNoticeTransformerWithRealDependencies() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'org.apache.commons:commons-dbcp2:2.13.0'
+          implementation 'org.apache.commons:commons-pool2:2.12.0'
+        }
+        $shadowJarTask {
+          transform(${ApacheNoticeResourceTransformer::class.java.name}) {
+            addHeader = false
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath) // This will fail
+  }
+
   @ParameterizedTest
   @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
@@ -268,7 +287,6 @@ class TransformersTest : BaseTransformerTest() {
     @JvmStatic
     fun transformerConfigProvider() = listOf(
       "" to ApacheLicenseResourceTransformer::class,
-      "" to ApacheNoticeResourceTransformer::class,
       "" to ComponentsXmlResourceTransformer::class,
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
