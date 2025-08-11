@@ -426,6 +426,24 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(entries.size).isEqualTo(2)
   }
 
+  @Test
+  fun classPathInManifestNotAddedIfEmpty() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      transform { it.mainAttrSize }.isEqualTo(1)
+      getMainAttr(classPathAttributeKey).isNull()
+    }
+  }
+
   @Issue(
     "https://github.com/GradleUp/shadow/issues/65",
   )
