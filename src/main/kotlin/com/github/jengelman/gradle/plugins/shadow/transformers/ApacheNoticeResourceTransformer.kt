@@ -190,7 +190,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
     }
 
     os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
-    os.write(notice.toByteArray(charset))
+    os.write(notice.trim().toByteArray(charset))
 
     entries.clear()
   }
