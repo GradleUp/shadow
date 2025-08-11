@@ -255,7 +255,7 @@ class TransformersTest : BaseTransformerTest() {
         noticeEntry,
         *manifestEntries,
       )
-      getContent(noticeEntry).transform { it.trim() }.isEqualTo(
+      getContent(noticeEntry).isEqualTo(
         """
         Apache Commons Pool
         Copyright 2001-2025 The Apache Software Foundation
