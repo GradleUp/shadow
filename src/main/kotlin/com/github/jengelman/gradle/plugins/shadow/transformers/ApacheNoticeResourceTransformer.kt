@@ -31,6 +31,11 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
   private inline val charset get() = Charset.forName(charsetName.get())
 
+  /**
+   * Fallback [copyright] as the [Property] value can't be changed in execution phase.
+   */
+  private var fallbackCopyright: String? = null
+
   @get:Input
   public open val projectName: Property<String> = objectFactory.property("")
 
@@ -129,7 +134,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
         } else {
           val entry = sb.toString()
           if (entry.startsWith(projectName) && entry.contains("Copyright ")) {
-            copyright.set(entry)
+            fallbackCopyright = entry
           }
           if (currentOrg == null) {
             entries.add(entry)
@@ -156,7 +161,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   override fun hasTransformedResource(): Boolean = true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val copyright = copyright.orNull
+    val copyright = copyright.orNull ?: fallbackCopyright
 
     os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
 
