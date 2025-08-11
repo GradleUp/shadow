@@ -445,12 +445,12 @@ class JavaPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
-    val actual = when (configuration) {
+    val actual = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
+    val expected = when (configuration) {
       ShadowBasePlugin.CONFIGURATION_NAME -> "/libs/foo.jar junit-3.8.2.jar"
       else -> "/libs/foo.jar"
     }
-    assertThat(value).isEqualTo(actual)
+    assertThat(actual).isEqualTo(expected)
   }
 
   @Issue(
