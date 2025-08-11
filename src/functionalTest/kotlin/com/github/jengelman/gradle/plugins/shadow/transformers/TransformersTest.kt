@@ -211,19 +211,63 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1626",
+  )
   @Test
-  fun apacheNoticeTransformerWithRealDependencies() {
+  fun useApacheNoticeTransformerWithoutProjectName() {
+    val noticeEntry = "META-INF/NOTICE"
+    val one = buildJarOne {
+      insert(
+        noticeEntry,
+        """
+        Apache Commons DBCP
+        Copyright 2001-2024 The Apache Software Foundation
+
+        This product includes software developed at
+        The Apache Software Foundation (https://www.apache.org/).
+        """.trimIndent(),
+      )
+    }
+    val two = buildJarTwo {
+      insert(
+        noticeEntry,
+        """
+        Apache Commons Pool
+        Copyright 2001-2025 The Apache Software Foundation
+
+        This product includes software developed at
+        The Apache Software Foundation (https://www.apache.org/).
+        """.trimIndent(),
+      )
+    }
     projectScript.appendText(
       transform<ApacheNoticeResourceTransformer>(
-        dependenciesBlock = """
-          implementation 'org.apache.commons:commons-dbcp2:2.13.0'
-          implementation 'org.apache.commons:commons-pool2:2.12.0'
-        """.trimIndent(),
+        dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "addHeader = false",
       ),
     )
 
-    run(shadowJarPath) // This will fail
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        noticeEntry,
+        *manifestEntries,
+      )
+      getContent(noticeEntry).transform { it.trim() }.isEqualTo(
+        """
+        Apache Commons Pool
+        Copyright 2001-2025 The Apache Software Foundation
+
+        This product includes software developed at
+        The Apache Software Foundation (https://www.apache.org/).
+
+        Apache Commons DBCP
+        Copyright 2001-2024 The Apache Software Foundation
+        """.trimIndent(),
+      )
+    }
   }
 
   @ParameterizedTest
