@@ -451,7 +451,7 @@ class JavaPluginsTest : BasePluginTest() {
         }
         $jarTask {
           manifest {
-            attributes '$classPathAttributeKey': '/libs/a.jar'
+            attributes '$classPathAttributeKey': '/libs/foo.jar'
           }
         }
       """.trimIndent(),
@@ -460,7 +460,7 @@ class JavaPluginsTest : BasePluginTest() {
     run(shadowJarPath)
 
     val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
-    assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
+    assertThat(value).isEqualTo("/libs/foo.jar junit-3.8.2.jar")
   }
 
   @Issue(

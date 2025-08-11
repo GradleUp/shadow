@@ -101,7 +101,7 @@ will propagate to the [`ShadowJar`][ShadowJar] tasks.
     ```kotlin
     tasks.jar {
       manifest {
-        attributes["Class-Path"] = "/libs/a.jar"
+        attributes["Class-Path"] = "/libs/foo.jar"
       }
     }
     ```
@@ -111,7 +111,7 @@ will propagate to the [`ShadowJar`][ShadowJar] tasks.
     ```groovy
     tasks.named('jar', Jar) {
       manifest {
-        attributes 'Class-Path': '/libs/a.jar'
+        attributes 'Class-Path': '/libs/foo.jar'
       }
     }
     ```
@@ -119,7 +119,7 @@ will propagate to the [`ShadowJar`][ShadowJar] tasks.
 Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the following attribute:
 
 ```property
-Class-Path: /libs/a.jar
+Class-Path: /libs/foo.jar
 ```
 
 If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`][Jar] task, the `inheritFrom`
