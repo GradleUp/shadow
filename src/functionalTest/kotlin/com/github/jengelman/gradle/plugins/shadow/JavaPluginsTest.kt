@@ -38,14 +38,17 @@ import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.internal.tasks.JvmConstants
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
@@ -435,23 +438,26 @@ class JavaPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
-    assertThat(value).isNull()
+    assertThat(outputShadowedJar).useAll {
+      transform { it.mainAttrSize }.isEqualTo(1)
+      getMainAttr(classPathAttributeKey).isNull()
+    }
   }
 
   @Issue(
     "https://github.com/GradleUp/shadow/issues/65",
   )
-  @Test
-  fun addShadowConfigurationToClassPathInManifest() {
+  @ParameterizedTest
+  @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME])
+  fun addShadowConfigurationToClassPathInManifest(configuration: String) {
     projectScript.appendText(
       """
         dependencies {
-          shadow 'junit:junit:3.8.2'
+          $configuration 'junit:junit:3.8.2'
         }
         $jarTask {
           manifest {
-            attributes '$classPathAttributeKey': '/libs/a.jar'
+            attributes '$classPathAttributeKey': '/libs/foo.jar'
           }
         }
       """.trimIndent(),
@@ -459,8 +465,12 @@ class JavaPluginsTest : BasePluginTest() {
 
     run(shadowJarPath)
 
-    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
-    assertThat(value).isEqualTo("/libs/a.jar junit-3.8.2.jar")
+    val actual = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
+    val expected = when (configuration) {
+      ShadowBasePlugin.CONFIGURATION_NAME -> "/libs/foo.jar junit-3.8.2.jar"
+      else -> "/libs/foo.jar"
+    }
+    assertThat(actual).isEqualTo(expected)
   }
 
   @Issue(
@@ -485,16 +495,17 @@ class JavaPluginsTest : BasePluginTest() {
   @Issue(
     "https://github.com/GradleUp/shadow/issues/203",
   )
-  @Test
-  fun supportZipCompressionStored() {
+  @ParameterizedTest
+  @EnumSource(ZipEntryCompression::class)
+  fun supportZipCompressions(method: ZipEntryCompression) {
     projectScript.appendText(
       """
         dependencies {
-          shadow 'junit:junit:3.8.2'
+          implementation 'junit:junit:3.8.2'
         }
         $shadowJarTask {
           zip64 = true
-          entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
+          entryCompression = ${ZipEntryCompression::class.java.canonicalName}.$method
         }
       """.trimIndent(),
     )
@@ -502,7 +513,10 @@ class JavaPluginsTest : BasePluginTest() {
     run(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      transform { it.entries().toList() }.isNotEmpty()
+      containsOnly(
+        *junitEntries,
+        *manifestEntries,
+      )
     }
   }
 
