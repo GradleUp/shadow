@@ -214,17 +214,13 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun apacheNoticeTransformerWithRealDependencies() {
     projectScript.appendText(
-      """
-        dependencies {
+      transform<ApacheNoticeResourceTransformer>(
+        dependenciesBlock = """
           implementation 'org.apache.commons:commons-dbcp2:2.13.0'
           implementation 'org.apache.commons:commons-pool2:2.12.0'
-        }
-        $shadowJarTask {
-          transform(${ApacheNoticeResourceTransformer::class.java.name}) {
-            addHeader = false
-          }
-        }
-      """.trimIndent(),
+        """.trimIndent(),
+        transformerBlock = "addHeader = false",
+      ),
     )
 
     run(shadowJarPath) // This will fail
