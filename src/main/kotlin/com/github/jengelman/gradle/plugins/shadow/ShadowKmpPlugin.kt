@@ -44,7 +44,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         // Fix cannot serialize object of type 'org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun'.
         val mainClassName = provider { mainClass }
         task.inputs.property("mainClassName", mainClassName)
-        task.doFirst {
+        task.doFirst("Set $mainClassAttributeKey attribute in the manifest") {
           val realClass = mainClassName.get().orNull
           if (!task.manifest.attributes.contains(mainClassAttributeKey) && !realClass.isNullOrEmpty()) {
             task.manifest.attributes[mainClassAttributeKey] = realClass
