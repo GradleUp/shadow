@@ -38,6 +38,7 @@ import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.internal.tasks.JvmConstants
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
@@ -423,31 +424,16 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(entries.size).isEqualTo(2)
   }
 
-  @Test
-  fun classPathInManifestNotAddedIfEmpty() {
-    projectScript.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
-    assertThat(value).isNull()
-  }
-
   @Issue(
     "https://github.com/GradleUp/shadow/issues/65",
   )
-  @Test
-  fun addShadowConfigurationToClassPathInManifest() {
+  @ParameterizedTest
+  @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME])
+  fun addShadowConfigurationToClassPathInManifest(configuration: String) {
     projectScript.appendText(
       """
         dependencies {
-          shadow 'junit:junit:3.8.2'
+          $configuration 'junit:junit:3.8.2'
         }
         $jarTask {
           manifest {
@@ -460,7 +446,11 @@ class JavaPluginsTest : BasePluginTest() {
     run(shadowJarPath)
 
     val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
-    assertThat(value).isEqualTo("/libs/foo.jar junit-3.8.2.jar")
+    val actual = when (configuration) {
+      ShadowBasePlugin.CONFIGURATION_NAME -> "/libs/foo.jar junit-3.8.2.jar"
+      else -> "/libs/foo.jar"
+    }
+    assertThat(value).isEqualTo(actual)
   }
 
   @Issue(
