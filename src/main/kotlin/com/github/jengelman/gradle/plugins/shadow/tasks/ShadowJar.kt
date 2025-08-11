@@ -483,11 +483,11 @@ public abstract class ShadowJar : Jar() {
 
         @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
         task.manifest.inheritFrom(jarTask.get().manifest)
-        val attrProvider = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
-        val files = files(configurations.shadow)
+        val classPathAttr = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
+        val shadowFiles = files(configurations.shadow)
         task.doFirst {
-          if (!files.isEmpty) {
-            val attrs = listOf(attrProvider.getOrElse("")) + files.map { it.name }
+          if (!shadowFiles.isEmpty) {
+            val attrs = listOf(classPathAttr.get()) + shadowFiles.map { it.name }
             task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
           }
         }
