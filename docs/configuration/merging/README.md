@@ -62,7 +62,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
 
     ```kotlin
     tasks.shadowJar {
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // The default strategy.
       mergeServiceFiles()
     }
     ```
@@ -71,7 +71,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // The default strategy.
       mergeServiceFiles()
     }
     ```
@@ -86,9 +86,11 @@ to take:
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Remove duplicate entries by
     - overriding the default strategy for specific files using [`filesMatching`][Jar.filesMatching]
-    - applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer]
-    - or something similar.
+    - or applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] for specific files
+    - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
+    - or mechanism similar.
 4. Optionally, enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
+5. Optionally, use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
 
 ## Basic ResourceTransformer Usage
 

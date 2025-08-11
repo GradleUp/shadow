@@ -18,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
@@ -208,17 +207,19 @@ public abstract class ShadowJar : Jar() {
    * - [WARN]: **Warn** about duplicates in the build log, this behaves exactly as [INHERIT] otherwise.
    *
    * **NOTE:** The strategy takes precedence over transforming and relocating.
-   * Some [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the strategy to [EXCLUDE],
-   * as the duplicate resource files fed for them are excluded beforehand.
+   * Some [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the strategy to
+   * [EXCLUDE] (the default), as the duplicate resource files fed for them are excluded beforehand.
    * Want [ResourceTransformer]s and the strategy to work together? There are several steps to take:
    *
    * 1. Set the strategy to [INCLUDE] or [WARN].
    * 2. Apply your [ResourceTransformer]s.
    * 3. Remove duplicate entries by
    *     - overriding the default strategy for specific files using [filesMatching]
-   *     - applying [PreserveFirstFoundResourceTransformer]
-   *     - or something similar.
+   *     - or applying `PreserveFirstFoundResourceTransformer` for specific files
+   *     - or write your own `ResourceTransformer`s to handle duplicates
+   *     - or mechanism similar.
    * 4. Optionally, enable [failOnDuplicateEntries] to check duplicate entries in the final JAR.
+   * 5. Optionally, use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
    *
    * @see [filesMatching]
    * @see [DuplicatesStrategy]
