@@ -15,6 +15,11 @@
 
     If you are upgrading from 8.x versions, please read 9.0.0 release notes first.
 
+!!! tip
+
+    You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
+    If there are any things missing in the changelog or the doc site, please report them to us.
+
 ### Changed
 
 - Improve the error message for empty `mainClassName`. ([#1601](https://github.com/GradleUp/shadow/pull/1601))
