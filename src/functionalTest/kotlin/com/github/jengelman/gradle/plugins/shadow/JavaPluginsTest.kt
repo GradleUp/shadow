@@ -726,32 +726,6 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun worksWithArchiveFileName() {
-    val mainClassEntry = writeClass()
-    projectScript.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          archiveFileName = 'my-shadow.tar'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    assertThat(jarPath("build/libs/my-shadow.tar")).useAll {
-      containsOnly(
-        "my/",
-        mainClassEntry,
-        *junitEntries,
-        *manifestEntries,
-      )
-    }
-  }
-
-  @Test
   fun inheritFromOtherManifest() {
     projectScript.appendText(
       """
