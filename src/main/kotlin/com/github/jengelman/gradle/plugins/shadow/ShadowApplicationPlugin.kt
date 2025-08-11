@@ -84,7 +84,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     tasks.installShadowDist.configure { task ->
       val applicationName = providers.provider { applicationExtension.applicationName }
 
-      task.doFirst {
+      task.doFirst("Check installation directory") {
         if (
           !task.destinationDir.listFiles().isNullOrEmpty() &&
           (
@@ -99,7 +99,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           )
         }
       }
-      task.doLast {
+      task.doLast("Set permissions for the start scripts") {
         task.eachFile {
           if (it.path == "bin/${applicationName.get()}") {
             it.permissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
@@ -131,7 +131,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     val mainClassName = applicationExtension.mainClass.convention("")
     tasks.shadowJar.configure { task ->
       task.inputs.property("mainClassName", mainClassName)
-      task.doFirst {
+      task.doFirst("Set $mainClassAttributeKey attribute in the manifest") {
         // Inject the attribute if it is not already present.
         if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
           val realClass = mainClassName.orNull

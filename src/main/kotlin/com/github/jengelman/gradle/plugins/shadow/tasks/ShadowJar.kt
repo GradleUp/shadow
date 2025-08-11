@@ -485,7 +485,7 @@ public abstract class ShadowJar : Jar() {
         task.manifest.inheritFrom(jarTask.get().manifest)
         val classPathAttr = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
         val shadowFiles = files(configurations.shadow)
-        task.doFirst {
+        task.doFirst("Set $classPathAttributeKey attribute in the manifest") {
           if (!shadowFiles.isEmpty) {
             val attrs = listOf(classPathAttr.get()) + shadowFiles.map { it.name }
             task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
