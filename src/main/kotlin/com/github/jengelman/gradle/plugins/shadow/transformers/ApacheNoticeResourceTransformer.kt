@@ -107,7 +107,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
 
     val reader = context.inputStream.bufferedReader(charset)
     var line = reader.readLine()
-    val sb = StringBuffer()
+    val sb = StringBuilder()
     var currentOrg: MutableSet<String>? = null
     var lineCount = 0
     while (line != null) {
