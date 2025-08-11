@@ -43,10 +43,12 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
@@ -475,9 +477,9 @@ class JavaPluginsTest : BasePluginTest() {
   @Issue(
     "https://github.com/GradleUp/shadow/issues/203",
   )
-  @Test
-  fun supportZipCompressionStored() {
-    val mainClassEntry = writeClass()
+  @ParameterizedTest
+  @EnumSource(ZipEntryCompression::class)
+  fun supportZipCompressions(method: ZipEntryCompression) {
     projectScript.appendText(
       """
         dependencies {
@@ -485,7 +487,7 @@ class JavaPluginsTest : BasePluginTest() {
         }
         $shadowJarTask {
           zip64 = true
-          entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
+          entryCompression = ${ZipEntryCompression::class.java.canonicalName}.$method
         }
       """.trimIndent(),
     )
@@ -494,8 +496,6 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        "my/",
-        mainClassEntry,
         *junitEntries,
         *manifestEntries,
       )
