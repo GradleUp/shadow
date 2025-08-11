@@ -79,6 +79,7 @@ public open class ManifestResourceTransformer @Inject constructor(
 
     os.putNextEntry(zipEntry(JarFile.MANIFEST_NAME, preserveFileTimestamps))
     manifest!!.write(os)
+    os.closeEntry()
   }
 
   public open fun attributes(attributes: Map<String, JarAttribute>) {

@@ -78,6 +78,7 @@ public open class XmlAppendingTransformer @Inject constructor(
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
     XMLOutputter(Format.getPrettyFormat()).output(doc, os)
+    os.closeEntry()
     doc = null
   }
 }

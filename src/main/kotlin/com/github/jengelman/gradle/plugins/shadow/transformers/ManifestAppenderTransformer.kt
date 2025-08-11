@@ -62,6 +62,8 @@ public open class ManifestAppenderTransformer @Inject constructor(
       os.write(EOL)
       attributes.empty()
     }
+
+    os.closeEntry()
   }
 
   public open fun append(name: String, value: Comparable<*>) {

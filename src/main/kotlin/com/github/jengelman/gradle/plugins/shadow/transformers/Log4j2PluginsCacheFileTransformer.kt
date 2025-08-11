@@ -59,6 +59,7 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
       // Prevent the aggregator to close the jar output.
       aggregator.writeCache(CloseShieldOutputStream.wrap(os))
     } finally {
+      os.closeEntry()
       deleteTempFiles()
     }
   }

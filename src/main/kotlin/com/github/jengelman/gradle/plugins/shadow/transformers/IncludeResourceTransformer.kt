@@ -41,5 +41,7 @@ public open class IncludeResourceTransformer @Inject constructor(
     file.get().asFile.inputStream().use { inputStream ->
       inputStream.copyTo(os)
     }
+
+    os.closeEntry()
   }
 }

@@ -97,6 +97,7 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
     os.putNextEntry(zipEntry(COMPONENTS_XML_PATH, preserveFileTimestamps))
     os.write(transformedResource)
     components.clear()
+    os.closeEntry()
   }
 
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()

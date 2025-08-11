@@ -56,6 +56,7 @@ public open class AppendingTransformer @Inject constructor(
       it.toByteArray().inputStream().copyTo(os)
       it.reset()
     }
+    os.closeEntry()
   }
 
   public companion object {
