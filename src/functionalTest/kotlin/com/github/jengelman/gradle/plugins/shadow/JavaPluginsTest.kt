@@ -487,10 +487,11 @@ class JavaPluginsTest : BasePluginTest() {
   )
   @Test
   fun supportZipCompressionStored() {
+    val mainClassEntry = writeClass()
     projectScript.appendText(
       """
         dependencies {
-          shadow 'junit:junit:3.8.2'
+          implementation 'junit:junit:3.8.2'
         }
         $shadowJarTask {
           zip64 = true
@@ -502,7 +503,12 @@ class JavaPluginsTest : BasePluginTest() {
     run(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      transform { it.entries().toList() }.isNotEmpty()
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        *junitEntries,
+        *manifestEntries,
+      )
     }
   }
 
