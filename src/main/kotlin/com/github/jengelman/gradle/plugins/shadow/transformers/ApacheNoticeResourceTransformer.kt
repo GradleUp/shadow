@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import java.io.PrintWriter
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -162,35 +161,33 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val copyright = copyright.orNull ?: fallbackCopyright
-
-    val notice = buildString {
-      var count = 0
-      for (line in entries) {
-        count++
-        if (line == copyright && count != 2) continue
-        if (count == 2 && copyright != null) {
-          append(copyright)
-          append('\n')
-        } else {
-          append(line)
-          append('\n')
-        }
-        if (count == 3) {
-          // Do org stuff.
-          for ((key, value) in organizationEntries) {
-            append(key)
-            append('\n')
-            for (l in value) {
-              append(l)
-            }
-            append('\n')
+    val sb = StringBuilder()
+    var count = 0
+    for (line in entries) {
+      count++
+      if (line == copyright && count != 2) continue
+      if (count == 2 && copyright != null) {
+        sb.append(copyright)
+        sb.append('\n')
+      } else {
+        sb.append(line)
+        sb.append('\n')
+      }
+      if (count == 3) {
+        // Do org stuff.
+        for ((key, value) in organizationEntries) {
+          sb.append(key)
+          sb.append('\n')
+          for (l in value) {
+            sb.append(l)
           }
+          sb.append('\n')
         }
       }
     }
 
     os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
-    os.write(notice.trim().toByteArray(charset))
+    os.write(sb.toString().trim().toByteArray(charset))
 
     entries.clear()
   }
