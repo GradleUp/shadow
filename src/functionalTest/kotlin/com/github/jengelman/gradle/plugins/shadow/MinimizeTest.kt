@@ -279,6 +279,34 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun minimizeBomDependency() {
+    writeApiLibAndImplModules()
+    path("impl/build.gradle").appendText(
+      """
+        dependencies {
+          api platform('org.jetbrains.kotlin:kotlin-bom:2.2.0')
+          implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+        }
+      """.trimIndent() + lineSeparator,
+    )
+
+    run(":impl:$SHADOW_JAR_TASK_NAME")
+
+    assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
+      containsAtLeast(
+        "api/",
+        "lib/",
+        "impl/",
+        "impl/SimpleEntity.class",
+        "api/Entity.class",
+        "api/UnusedEntity.class",
+        "lib/LibEntity.class",
+        *manifestEntries,
+      )
+    }
+  }
+
   private fun writeApiLibAndImplModules() {
     settingsScript.appendText(
       """
