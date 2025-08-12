@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.commonArguments
 import java.nio.file.Path
-import kotlin.io.path.createDirectories
+import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
@@ -17,98 +17,156 @@ class AppendableMavenRepository(
   val root: Path,
   private val gradleRunner: GradleRunner,
 ) {
-  private val projectBuildScript: Path
   private val modules = mutableListOf<Module>()
+  private val jarsDir: Path
 
   init {
-    root.resolve("temp").createDirectories()
+    check(root.exists()) { "Maven repository root directory does not exist: $root" }
+
     root.resolve("settings.gradle").createFile()
       .writeText("rootProject.name = '${root.name}'")
-    projectBuildScript = root.resolve("build.gradle").createFile()
+    root.resolve("build.gradle").createFile()
+    jarsDir = root.resolve("jars").createDirectory()
   }
 
-  fun module(
+  fun jarModule(
     groupId: String,
     artifactId: String,
     version: String,
-    action: Module.() -> Unit,
+    action: JarModule.() -> Unit,
   ) = apply {
-    modules += Module(groupId, artifactId, version).also(action)
+    modules += JarModule(groupId, artifactId, version).also(action)
+  }
+
+  fun bomModule(
+    groupId: String,
+    artifactId: String,
+    version: String,
+    action: BomModule.() -> Unit,
+  ) = apply {
+    modules += BomModule(groupId, artifactId, version).also(action)
   }
 
   fun publish() {
-    if (modules.isEmpty()) return
-    projectBuildScript.writeText(
-      """
+    check(modules.isNotEmpty()) {
+      "No modules to publish. Please add at least one module."
+    }
+    val groups = modules.groupBy { it::class }.entries
+    check(groups.size == 1) {
+      "Only one type of module can be published at a time."
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    when (val type = groups.first().key) {
+      JarModule::class -> {
+        publishJarModules(modules as List<JarModule>)
+      }
+      BomModule::class -> {
+        publishBomModules(modules as List<BomModule>)
+      }
+      else -> error("Unsupported module type: $type")
+    }
+  }
+
+  private fun publishJarModules(jarModules: List<JarModule>) {
+    val mavenPublications = jarModules.joinToString(lineSeparator) { module ->
+      var index = -1
+      val nodes = module.dependencies.joinToString(lineSeparator) {
+        index++
+        val node = "dependencyNode$index"
+        """
+          def $node = dependenciesNode.appendNode('dependency')
+          $node.appendNode('groupId', '${it.groupId}')
+          $node.appendNode('artifactId', '${it.artifactId}')
+          $node.appendNode('version', '${it.version}')
+          $node.appendNode('scope', '${it.scope}')
+        """.trimIndent()
+      }
+      module.createMavenPublication(
+        """
+          artifact '${module.artifactPath}'
+          pom.withXml { xml ->
+            def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
+            $nodes
+          }
+        """.trimIndent(),
+      )
+    }
+    val scriptContent = """
+      plugins {
+        id 'maven-publish'
+      }
+      publishing {
+        publications {
+          $mavenPublications
+        }
+        repositories {
+          maven { url = '${root.toUri()}' }
+        }
+      }
+    """.trimIndent()
+    runPublish(scriptContent)
+    modules.clear()
+  }
+
+  private fun publishBomModules(bomModules: List<BomModule>) {
+    // BOM modules are published one by one.
+    bomModules.forEach { module ->
+      val scriptContent = """
         plugins {
           id 'maven-publish'
+          id 'java-platform'
+        }
+        dependencies {
+          constraints {
+            ${module.dependencies.joinToString(lineSeparator) { "api '${it.coordinate}'" }}
+          }
         }
         publishing {
           publications {
-            ${modules.joinToString(lineSeparator) { createPublication(it) }}
+            ${module.createMavenPublication("from components.javaPlatform")}
           }
           repositories {
             maven { url = '${root.toUri()}' }
           }
         }
-      """.trimIndent(),
-    )
-    gradleRunner.withProjectDir(root.toFile()).withArguments(commonArguments + "publish").build()
+      """.trimIndent()
+      runPublish(scriptContent)
+    }
     modules.clear()
   }
 
-  private fun createPublication(module: Module) = with(module) {
-    val outputJar = build()
-    val pubName = outputJar.name.replace(".", "")
-
-    var index = -1
-    val nodes = dependencies.joinToString(lineSeparator) {
-      index++
-      val node = "dependencyNode$index"
-      """
-        def $node = dependenciesNode.appendNode('dependency')
-        $node.appendNode('groupId', '${it.groupId}')
-        $node.appendNode('artifactId', '${it.artifactId}')
-        $node.appendNode('version', '${it.version}')
-        $node.appendNode('scope', '${it.scope}')
-      """.trimIndent()
-    }
-
-    """
-      create('$pubName', MavenPublication) {
+  private fun Module.createMavenPublication(
+    block: String,
+  ): String {
+    return """
+      create('${coordinate.replace(":", "")}', MavenPublication) {
         artifactId = '$artifactId'
         groupId = '$groupId'
         version = '$version'
-        artifact '${outputJar.invariantSeparatorsPathString}'
-        pom.withXml { xml ->
-          def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
-          $nodes
-        }
+        $block
       }
-    """.trimIndent() + lineSeparator
+    """.trimIndent()
   }
 
-  inner class Module(
+  private fun runPublish(scriptContent: String) {
+    root.resolve("build.gradle").writeText(scriptContent)
+    gradleRunner.withProjectDir(root.toFile())
+      .withArguments(commonArguments + "publish")
+      .build()
+  }
+
+  sealed class Module(
     groupId: String,
     artifactId: String,
     version: String,
   ) : Model() {
-    private val coordinate = "$groupId:$artifactId:$version"
-    private lateinit var existingJar: Path
+    val coordinate = "$groupId:$artifactId:$version"
 
     init {
       this.groupId = groupId
       this.artifactId = artifactId
       this.version = version
-    }
-
-    fun useJar(existingJar: Path) {
-      this.existingJar = existingJar
-    }
-
-    fun buildJar(builder: JarBuilder.() -> Unit) {
-      val jarName = coordinate.replace(":", "-") + ".jar"
-      existingJar = JarBuilder(root.resolve("temp/$jarName")).apply(builder).write()
     }
 
     fun addDependency(groupId: String, artifactId: String, version: String, scope: String = "runtime") {
@@ -120,13 +178,37 @@ class AppendableMavenRepository(
       }
       addDependency(dependency)
     }
+  }
 
-    fun build(): Path {
-      check(::existingJar.isInitialized) { "No jar file provided for $coordinate" }
-      return existingJar.also {
-        check(it.exists()) { "Jar file doesn't exist for $coordinate in: $it" }
-        check(it.isRegularFile()) { "Jar is not a regular file for $coordinate in: $it" }
-      }
+  inner class JarModule(
+    groupId: String,
+    artifactId: String,
+    version: String,
+  ) : Module(groupId, artifactId, version) {
+    private var existingJar: Path? = null
+
+    val artifactPath: String
+      get() = existingJar?.also {
+        check(it.exists() && it.isRegularFile()) { "Jar file does not exist or is not a regular file: $it" }
+      }?.invariantSeparatorsPathString ?: error("No jar file provided for $coordinate")
+
+    fun useJar(existingJar: Path) {
+      this.existingJar = existingJar
+    }
+
+    fun buildJar(builder: JarBuilder.() -> Unit) {
+      val jarPath = jarsDir.resolve(coordinate.replace(":", "-") + ".jar")
+      existingJar = JarBuilder(jarPath).apply(builder).write()
+    }
+  }
+
+  class BomModule(
+    groupId: String,
+    artifactId: String,
+    version: String,
+  ) : Module(groupId, artifactId, version) {
+    init {
+      packaging = "pom"
     }
   }
 }

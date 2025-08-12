@@ -284,7 +284,7 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateResourceFiles() {
-    localRepo.module("my", "dep", "1.0") {
+    localRepo.jarModule("my", "dep", "1.0") {
       buildJar {
         insert("foo/dep.properties", "c")
       }

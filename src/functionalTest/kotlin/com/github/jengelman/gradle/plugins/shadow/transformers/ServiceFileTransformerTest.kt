@@ -169,7 +169,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val one = buildJarOne {
       insert(servicesBarEntry, CONTENT_ONE)
     }
-    localRepo.module("foo", "bar", "1.0") {
+    localRepo.jarModule("foo", "bar", "1.0") {
       buildJar {
         insert(servicesBarEntry, CONTENT_TWO)
       }
