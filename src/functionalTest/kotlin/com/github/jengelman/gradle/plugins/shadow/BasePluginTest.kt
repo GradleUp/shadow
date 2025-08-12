@@ -48,11 +48,6 @@ abstract class BasePluginTest {
   lateinit var projectRoot: Path
     private set
 
-  lateinit var artifactAJar: Path
-    private set
-  lateinit var artifactBJar: Path
-    private set
-
   val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
   val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
   val runShadowPath = ":$SHADOW_RUN_TASK_NAME"
@@ -66,25 +61,7 @@ abstract class BasePluginTest {
 
   @BeforeAll
   open fun doFirst() {
-    localRepo.jarModule("junit", "junit", "3.8.2") {
-      useJar(junitJar)
-    }.jarModule("my", "a", "1.0") {
-      buildJar {
-        insert("a.properties", "a")
-        insert("a2.properties", "a2")
-      }
-    }.jarModule("my", "b", "1.0") {
-      buildJar {
-        insert("b.properties", "b")
-      }
-    }.publish()
-    localRepo.bomModule("my", "bom", "1.0") {
-      addDependency("my", "a", "1.0")
-      addDependency("my", "b", "1.0")
-    }.publish()
-
-    artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
-    artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
+    localRepo // Call this to ensure the local repository is initialized before any tests run.
   }
 
   @BeforeEach
@@ -393,9 +370,12 @@ abstract class BasePluginTest {
       Path(gradleUserHome, "testkit")
     }
 
+    val artifactAJar: Path get() = localRepo.root.resolve("my/a/1.0/a-1.0.jar")
+    val artifactBJar: Path get() = localRepo.root.resolve("my/b/1.0/b-1.0.jar")
     val entriesInA = arrayOf("a.properties", "a2.properties")
     val entriesInB = arrayOf("b.properties")
     val entriesInAB = entriesInA + entriesInB
+
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
     val junitRawEntries: List<JarEntry> = JarPath(junitJar)
       .use { it.entries().toList() }
@@ -404,6 +384,7 @@ abstract class BasePluginTest {
         it.name == "junit3.8.2/"
       }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
+
     const val manifestEntry = "META-INF/MANIFEST.MF"
     val manifestEntries = arrayOf("META-INF/", manifestEntry)
 
@@ -431,7 +412,24 @@ abstract class BasePluginTest {
       AppendableMavenRepository(
         createTempDirectory().resolve("local-maven-repo").createDirectories(),
         runner(),
-      )
+      ).also { repo ->
+        repo.jarModule("junit", "junit", "3.8.2") {
+          useJar(junitJar)
+        }.jarModule("my", "a", "1.0") {
+          buildJar {
+            insert("a.properties", "a")
+            insert("a2.properties", "a2")
+          }
+        }.jarModule("my", "b", "1.0") {
+          buildJar {
+            insert("b.properties", "b")
+          }
+        }.publish()
+        repo.bomModule("my", "bom", "1.0") {
+          addDependency("my", "a", "1.0")
+          addDependency("my", "b", "1.0")
+        }.publish()
+      }
     }
 
     fun runner(

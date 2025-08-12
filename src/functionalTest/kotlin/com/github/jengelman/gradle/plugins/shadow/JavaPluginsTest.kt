@@ -271,7 +271,7 @@ class JavaPluginsTest : BasePluginTest() {
   )
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
-    localRepo.jarModule("my", "a", "1.0") {
+    localRepo.jarModule("my", "meta-inf", "1.0") {
       buildJar {
         insert("a.properties", "a")
         insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
@@ -294,7 +294,7 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          implementation 'my:a:1.0'
+          implementation 'my:meta-inf:1.0'
         }
       """.trimIndent(),
     )
