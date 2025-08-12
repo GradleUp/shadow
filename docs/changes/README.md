@@ -8,7 +8,7 @@
 - Fix missing space in `ApacheNoticeResourceTransformer` preamble causing malformed NOTICE header. ([#1623](https://github.com/GradleUp/shadow/pull/1623)).
 - Fix using `ApacheNoticeResourceTransformer` without `projectName`. ([#1627](https://github.com/GradleUp/shadow/pull/1627)).
 - Fix extra indents of `ApacheNoticeResourceTransformer` output. ([#1628](https://github.com/GradleUp/shadow/pull/1628)).
-- Fix resolving BOM dependencies when enable `minimize`. ([#1637](https://github.com/GradleUp/shadow/pull/1637)).
+- Fix resolving BOM dependencies when `minimize` is enabled. ([#1637](https://github.com/GradleUp/shadow/pull/1637)).
 
 ## [9.0.1](https://github.com/GradleUp/shadow/releases/tag/9.0.1) - 2025-08-09
 
