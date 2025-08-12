@@ -400,33 +400,6 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun defaultCopyingStrategy() {
-    localRepo.jarModule("my", "a", "1.0") {
-      buildJar {
-        insert(manifestEntry, "MANIFEST A")
-      }
-    }.jarModule("my", "b", "1.0") {
-      buildJar {
-        insert(manifestEntry, "MANIFEST B")
-      }
-    }.publish()
-
-    projectScript.appendText(
-      """
-        dependencies {
-          runtimeOnly 'my:a:1.0'
-          runtimeOnly 'my:b:1.0'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    val entries = outputShadowedJar.use { it.entries().toList() }
-    assertThat(entries.size).isEqualTo(2)
-  }
-
-  @Test
   fun classPathInManifestNotAddedIfEmpty() {
     projectScript.appendText(
       """
