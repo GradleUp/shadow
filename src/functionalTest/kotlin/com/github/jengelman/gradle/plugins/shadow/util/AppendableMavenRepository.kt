@@ -56,26 +56,58 @@ class AppendableMavenRepository(
 
     @Suppress("UNCHECKED_CAST")
     val scriptContent = when (val type = groups.first().key) {
-      JarModule::class -> """
-        plugins {
-          id 'maven-publish'
-        }
-        publishing {
-          publications {
-            ${(modules as List<JarModule>).createMavenPublications()}
+      JarModule::class -> {
+        val scriptContent = """
+          plugins {
+            id 'maven-publish'
           }
-          repositories {
-            maven { url = '${root.toUri()}' }
+          publishing {
+            publications {
+              ${(modules as List<JarModule>).createMavenPublications()}
+            }
+            repositories {
+              maven { url = '${root.toUri()}' }
+            }
           }
+        """.trimIndent()
+        projectBuildScript.writeText(scriptContent)
+        gradleRunner.withProjectDir(root.toFile())
+          .withArguments(commonArguments + "publish")
+          .build()
+        modules.clear()
+      }
+      BomModule::class -> {
+        for (module in modules) {
+          module as BomModule
+          val mavenPublication = module.createMavenPublication { "from components.javaPlatform" }
+          val scriptContent = """
+          plugins {
+            id 'maven-publish'
+            id 'java-platform'
+          }
+          dependencies {
+            constraints {
+              ${module.dependencies.joinToString(lineSeparator) { "api '${it.coordinate}'" }}
+            }
+          }
+          publishing {
+            publications {
+              $mavenPublication
+            }
+            repositories {
+              maven { url = '${root.toUri()}' }
+            }
+          }
+          """.trimIndent()
+          projectBuildScript.writeText(scriptContent)
+          gradleRunner.withProjectDir(root.toFile())
+            .withArguments(commonArguments + "publish")
+            .build()
         }
-      """.trimIndent()
-      BomModule::class -> TODO()
+        modules.clear()
+      }
       else -> error("Unsupported module type: $type")
     }
-
-    projectBuildScript.writeText(scriptContent)
-    gradleRunner.withProjectDir(root.toFile()).withArguments(commonArguments + "publish").build()
-    modules.clear()
   }
 
   private fun List<JarModule>.createMavenPublications() = joinToString(lineSeparator) { module ->
