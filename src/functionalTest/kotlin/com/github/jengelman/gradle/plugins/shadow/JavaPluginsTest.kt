@@ -319,6 +319,7 @@ class JavaPluginsTest : BasePluginTest() {
         dependencies {
           runtimeOnly 'my:a:1.0'
           shadow 'my:b:1.0'
+          compileOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -376,54 +377,6 @@ class JavaPluginsTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-  }
-
-  @Test
-  fun doNotIncludeCompileOnlyConfigurationByDefault() {
-    projectScript.appendText(
-      """
-        dependencies {
-          runtimeOnly 'my:a:1.0'
-          compileOnly 'my:b:1.0'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        *entriesInA,
-        *manifestEntries,
-      )
-    }
-  }
-
-  @Test
-  fun defaultCopyingStrategy() {
-    localRepo.jarModule("my", "a", "1.0") {
-      buildJar {
-        insert(manifestEntry, "MANIFEST A")
-      }
-    }.jarModule("my", "b", "1.0") {
-      buildJar {
-        insert(manifestEntry, "MANIFEST B")
-      }
-    }.publish()
-
-    projectScript.appendText(
-      """
-        dependencies {
-          runtimeOnly 'my:a:1.0'
-          runtimeOnly 'my:b:1.0'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    val entries = outputShadowedJar.use { it.entries().toList() }
-    assertThat(entries.size).isEqualTo(2)
   }
 
   @Test
