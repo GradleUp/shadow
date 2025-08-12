@@ -714,7 +714,10 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.appendText(
       """
         $shadowJarTask {
-          from(file('${artifactAJar.invariantSeparatorsPathString}')) {
+          from(file('${artifactAJar.invariantSeparatorsPathString}')) { // Without unzipping.
+            into('META-INF')
+          }
+          from(zipTree(file('${artifactBJar.invariantSeparatorsPathString}'))) { // With unzipping.
             into('META-INF')
           }
           from('Foo') {
@@ -732,10 +735,12 @@ class JavaPluginsTest : BasePluginTest() {
         "Bar/",
         "Bar/Foo",
         "META-INF/a-1.0.jar",
+        "META-INF/b.properties",
         mainClassEntry,
         *manifestEntries,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
+      getContent("META-INF/b.properties").isEqualTo("b")
     }
     val unzipped = path("unzipped")
     outputShadowedJar.use {

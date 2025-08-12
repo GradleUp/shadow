@@ -47,7 +47,7 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    val replaced = projectScript.readText().replace(implementationFiles(artifactBJar), "")
+    val replaced = projectScript.readText().replace("implementation 'my:b:1.0'", "")
     projectScript.writeText(replaced)
 
     assertCompositeExecutions {

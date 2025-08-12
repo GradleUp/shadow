@@ -215,7 +215,7 @@ abstract class BasePluginTest {
       when (jvmLang) {
         JvmLang.Groovy,
         JvmLang.Java,
-          -> {
+        -> {
           val imports = if (withImports) "import junit.framework.Test;" else ""
           val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
           """
