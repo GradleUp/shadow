@@ -714,7 +714,10 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.appendText(
       """
         $shadowJarTask {
-          from(file('${artifactAJar.invariantSeparatorsPathString}')) {
+          from(file('${artifactAJar.invariantSeparatorsPathString}')) { // Without unzipping.
+            into('META-INF')
+          }
+          from(zipTree(file('${artifactBJar.invariantSeparatorsPathString}'))) { // With unzipping.
             into('META-INF')
           }
           from('Foo') {
@@ -732,10 +735,12 @@ class JavaPluginsTest : BasePluginTest() {
         "Bar/",
         "Bar/Foo",
         "META-INF/a-1.0.jar",
+        "META-INF/b.properties",
         mainClassEntry,
         *manifestEntries,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
+      getContent("META-INF/b.properties").isEqualTo("b")
     }
     val unzipped = path("unzipped")
     outputShadowedJar.use {
@@ -866,7 +871,7 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar)}
+          implementation 'my:a:1.0'
         }
         $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.INCLUDE
@@ -890,11 +895,11 @@ class JavaPluginsTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun failBuildIfDuplicateEntriesByCliOption(enable: Boolean) {
-    path("src/main/resources/a.properties").writeText("invalid a")
+    path("src/main/resources/a.properties").writeText("project a")
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar)}
+          implementation 'my:a:1.0'
         }
         $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.INCLUDE

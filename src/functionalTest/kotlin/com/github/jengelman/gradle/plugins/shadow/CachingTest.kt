@@ -34,7 +34,8 @@ class CachingTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar, artifactBJar)}
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -46,7 +47,7 @@ class CachingTest : BasePluginTest() {
       )
     }
 
-    val replaced = projectScript.readText().replace(implementationFiles(artifactBJar), "")
+    val replaced = projectScript.readText().replace("implementation 'my:b:1.0'", "")
     projectScript.writeText(replaced)
 
     assertCompositeExecutions {
@@ -62,7 +63,8 @@ class CachingTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar, artifactBJar)}
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
       """.trimIndent() + lineSeparator,
     )

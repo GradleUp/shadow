@@ -55,12 +55,6 @@ abstract class BasePluginTest {
     private set
   lateinit var artifactBJar: Path
     private set
-  lateinit var entriesInA: Array<String>
-    private set
-  lateinit var entriesInB: Array<String>
-    private set
-  lateinit var entriesInAB: Array<String>
-    private set
 
   val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
   val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
@@ -98,9 +92,6 @@ abstract class BasePluginTest {
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
-    entriesInA = arrayOf("a.properties", "a2.properties")
-    entriesInB = arrayOf("b.properties")
-    entriesInAB = entriesInA + entriesInB
   }
 
   @BeforeEach
@@ -420,6 +411,9 @@ abstract class BasePluginTest {
       Path(gradleUserHome, "testkit")
     }
 
+    val entriesInA = arrayOf("a.properties", "a2.properties")
+    val entriesInB = arrayOf("b.properties")
+    val entriesInAB = entriesInA + entriesInB
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
     val junitRawEntries: List<JarEntry> = JarPath(junitJar)
       .use { it.entries().toList() }
