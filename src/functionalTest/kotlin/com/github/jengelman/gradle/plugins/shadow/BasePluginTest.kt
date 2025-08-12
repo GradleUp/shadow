@@ -20,6 +20,7 @@ import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.JarEntry
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
@@ -27,6 +28,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
@@ -366,6 +368,18 @@ abstract class BasePluginTest {
 
   @Suppress("ConstPropertyName")
   companion object {
+    init {
+      // Do cleanups after all tests are done.
+      Runtime.getRuntime().addShutdownHook(
+        Thread {
+          if (localRepo.root.exists()) {
+            @OptIn(ExperimentalPathApi::class)
+            localRepo.root.deleteRecursively()
+          }
+        },
+      )
+    }
+
     private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
       ?: error("TEST_GRADLE_VERSION system property is not set.")
 
