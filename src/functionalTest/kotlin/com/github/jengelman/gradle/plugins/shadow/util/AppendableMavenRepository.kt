@@ -27,13 +27,13 @@ class AppendableMavenRepository(
     projectBuildScript = root.resolve("build.gradle").createFile()
   }
 
-  fun module(
+  fun jarModule(
     groupId: String,
     artifactId: String,
     version: String,
-    action: Module.() -> Unit,
+    action: JarModule.() -> Unit,
   ) = apply {
-    modules += Module(groupId, artifactId, version).also(action)
+    modules += JarModule(groupId, artifactId, version).also(action)
   }
 
   fun publish() {
@@ -58,7 +58,7 @@ class AppendableMavenRepository(
   }
 
   private fun createPublication(module: Module) = with(module) {
-    val outputJar = build()
+    val outputJar = (module as JarModule).build()
     val pubName = outputJar.name.replace(".", "")
 
     var index = -1
@@ -88,27 +88,17 @@ class AppendableMavenRepository(
     """.trimIndent() + lineSeparator
   }
 
-  inner class Module(
+  sealed class Module(
     groupId: String,
     artifactId: String,
     version: String,
   ) : Model() {
-    private val coordinate = "$groupId:$artifactId:$version"
-    private lateinit var existingJar: Path
+    val coordinate = "$groupId:$artifactId:$version"
 
     init {
       this.groupId = groupId
       this.artifactId = artifactId
       this.version = version
-    }
-
-    fun useJar(existingJar: Path) {
-      this.existingJar = existingJar
-    }
-
-    fun buildJar(builder: JarBuilder.() -> Unit) {
-      val jarName = coordinate.replace(":", "-") + ".jar"
-      existingJar = JarBuilder(root.resolve("temp/$jarName")).apply(builder).write()
     }
 
     fun addDependency(groupId: String, artifactId: String, version: String, scope: String = "runtime") {
@@ -119,6 +109,23 @@ class AppendableMavenRepository(
         it.scope = scope
       }
       addDependency(dependency)
+    }
+  }
+
+  inner class JarModule(
+    groupId: String,
+    artifactId: String,
+    version: String,
+  ) : Module(groupId, artifactId, version) {
+    private lateinit var existingJar: Path
+
+    fun useJar(existingJar: Path) {
+      this.existingJar = existingJar
+    }
+
+    fun buildJar(builder: JarBuilder.() -> Unit) {
+      val jarName = coordinate.replace(":", "-") + ".jar"
+      existingJar = JarBuilder(root.resolve("temp/$jarName")).apply(builder).write()
     }
 
     fun build(): Path {

@@ -271,7 +271,7 @@ class JavaPluginsTest : BasePluginTest() {
   )
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
-    localRepo.module("my", "a", "1.0") {
+    localRepo.jarModule("my", "a", "1.0") {
       buildJar {
         insert("a.properties", "a")
         insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
@@ -335,20 +335,20 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
-    localRepo.module("my", "api", "1.0") {
+    localRepo.jarModule("my", "api", "1.0") {
       buildJar {
         insert("api.properties", "api")
       }
-    }.module("my", "implementation-dep", "1.0") {
+    }.jarModule("my", "implementation-dep", "1.0") {
       buildJar {
         insert("implementation-dep.properties", "implementation-dep")
       }
-    }.module("my", "implementation", "1.0") {
+    }.jarModule("my", "implementation", "1.0") {
       buildJar {
         insert("implementation.properties", "implementation")
       }
       addDependency("my", "implementation-dep", "1.0")
-    }.module("my", "runtimeOnly", "1.0") {
+    }.jarModule("my", "runtimeOnly", "1.0") {
       buildJar {
         insert("runtimeOnly.properties", "runtimeOnly")
       }
@@ -401,11 +401,11 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun defaultCopyingStrategy() {
-    localRepo.module("my", "a", "1.0") {
+    localRepo.jarModule("my", "a", "1.0") {
       buildJar {
         insert(manifestEntry, "MANIFEST A")
       }
-    }.module("my", "b", "1.0") {
+    }.jarModule("my", "b", "1.0") {
       buildJar {
         insert(manifestEntry, "MANIFEST B")
       }

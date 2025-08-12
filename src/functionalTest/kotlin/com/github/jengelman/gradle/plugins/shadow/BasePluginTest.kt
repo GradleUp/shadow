@@ -79,14 +79,14 @@ abstract class BasePluginTest {
       createTempDirectory().resolve("local-maven-repo"),
       runner(projectDir = null),
     )
-    localRepo.module("junit", "junit", "3.8.2") {
+    localRepo.jarModule("junit", "junit", "3.8.2") {
       useJar(junitJar)
-    }.module("my", "a", "1.0") {
+    }.jarModule("my", "a", "1.0") {
       buildJar {
         insert("a.properties", "a")
         insert("a2.properties", "a2")
       }
-    }.module("my", "b", "1.0") {
+    }.jarModule("my", "b", "1.0") {
       buildJar {
         insert("b.properties", "b")
       }
@@ -195,14 +195,14 @@ abstract class BasePluginTest {
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.module("my", "c", "1.0") {
+    localRepo.jarModule("my", "c", "1.0") {
       buildJar {
         insert("c.properties", "c")
       }
       if (circular) {
         addDependency("my", "d", "1.0")
       }
-    }.module("my", "d", "1.0") {
+    }.jarModule("my", "d", "1.0") {
       buildJar {
         insert("d.properties", "d")
       }
