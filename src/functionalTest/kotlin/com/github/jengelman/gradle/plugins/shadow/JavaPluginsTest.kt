@@ -866,7 +866,7 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar)}
+          implementation 'my:a:1.0'
         }
         $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.INCLUDE
@@ -890,11 +890,11 @@ class JavaPluginsTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun failBuildIfDuplicateEntriesByCliOption(enable: Boolean) {
-    path("src/main/resources/a.properties").writeText("invalid a")
+    path("src/main/resources/a.properties").writeText("project a")
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar)}
+          implementation 'my:a:1.0'
         }
         $shadowJarTask {
           duplicatesStrategy = DuplicatesStrategy.INCLUDE

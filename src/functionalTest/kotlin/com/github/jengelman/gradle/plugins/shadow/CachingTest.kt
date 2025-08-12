@@ -34,7 +34,8 @@ class CachingTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar, artifactBJar)}
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -62,7 +63,8 @@ class CachingTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(artifactAJar, artifactBJar)}
+          implementation 'my:a:1.0'
+          implementation 'my:b:1.0'
         }
       """.trimIndent() + lineSeparator,
     )
