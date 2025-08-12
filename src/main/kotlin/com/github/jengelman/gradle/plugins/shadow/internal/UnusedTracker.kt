@@ -4,7 +4,6 @@ import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
@@ -55,12 +54,9 @@ internal class UnusedTracker(
           is FileCollectionDependency -> {
             apiJars.addAll(dep.files)
           }
-          // Skip BOM dependencies and other non-JAR dependencies.
-          is ExternalModuleDependency -> Unit
           else -> {
             addJar(runtimeConfiguration, dep, apiJars)
-            val jarFile = runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } ?: return@forEach
-            apiJars.add(jarFile)
+            apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
           }
         }
       }
