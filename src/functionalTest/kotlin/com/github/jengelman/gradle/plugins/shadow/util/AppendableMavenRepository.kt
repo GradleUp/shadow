@@ -46,32 +46,41 @@ class AppendableMavenRepository(
   }
 
   fun publish() {
-    if (modules.isEmpty()) return
-    projectBuildScript.writeText(
-      """
+    check(modules.isNotEmpty()) {
+      "No modules to publish. Please add at least one module."
+    }
+    val groups = modules.groupBy { it::class }.entries
+    check(groups.size == 1) {
+      "Only one type of module can be published at a time."
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    val scriptContent = when (val type = groups.first().key) {
+      JarModule::class -> """
         plugins {
           id 'maven-publish'
         }
         publishing {
           publications {
-            ${modules.joinToString(lineSeparator) { createPublication(it) }}
+            ${(modules as List<JarModule>).createMavenPublications()}
           }
           repositories {
             maven { url = '${root.toUri()}' }
           }
         }
-      """.trimIndent(),
-    )
+      """.trimIndent()
+      BomModule::class -> TODO()
+      else -> error("Unsupported module type: $type")
+    }
+
+    projectBuildScript.writeText(scriptContent)
     gradleRunner.withProjectDir(root.toFile()).withArguments(commonArguments + "publish").build()
     modules.clear()
   }
 
-  private fun createPublication(module: Module) = with(module) {
-    val outputJar = (module as JarModule).build()
-    val pubName = outputJar.name.replace(".", "")
-
+  private fun List<JarModule>.createMavenPublications() = joinToString(lineSeparator) { module ->
     var index = -1
-    val nodes = dependencies.joinToString(lineSeparator) {
+    val nodes = module.dependencies.joinToString(lineSeparator) {
       index++
       val node = "dependencyNode$index"
       """
@@ -82,19 +91,28 @@ class AppendableMavenRepository(
         $node.appendNode('scope', '${it.scope}')
       """.trimIndent()
     }
-
-    """
-      create('$pubName', MavenPublication) {
-        artifactId = '$artifactId'
-        groupId = '$groupId'
-        version = '$version'
-        artifact '${outputJar.invariantSeparatorsPathString}'
+    module.createMavenPublication {
+      """
+        artifact '${module.build().invariantSeparatorsPathString}'
         pom.withXml { xml ->
           def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
           $nodes
         }
+      """.trimIndent()
+    }
+  }
+
+  private fun Module.createMavenPublication(
+    block: () -> String,
+  ): String {
+    return """
+      create('${coordinate.replace(":", "")}', MavenPublication) {
+        artifactId = '$artifactId'
+        groupId = '$groupId'
+        version = '$version'
+        ${block()}
       }
-    """.trimIndent() + lineSeparator
+    """.trimIndent()
   }
 
   sealed class Module(
