@@ -59,7 +59,8 @@ internal class UnusedTracker(
           is ExternalModuleDependency -> Unit
           else -> {
             addJar(runtimeConfiguration, dep, apiJars)
-            apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
+            val jarFile = runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } ?: return@forEach
+            apiJars.add(jarFile)
           }
         }
       }
