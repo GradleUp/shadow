@@ -21,6 +21,8 @@ class AppendableMavenRepository(
   private val jarsDir: Path
 
   init {
+    check(root.exists()) { "Maven repository root directory does not exist: $root" }
+
     root.resolve("settings.gradle").createFile()
       .writeText("rootProject.name = '${root.name}'")
     root.resolve("build.gradle").createFile()
