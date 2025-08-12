@@ -5,7 +5,7 @@
 
 **Fixed**
 
-- Fix resolving BOM dependencies when enable `minimize`. ([#1638](https://github.com/GradleUp/shadow/pull/1638))
+- Fix resolving BOM dependencies when `minimize` is enabled. ([#1638](https://github.com/GradleUp/shadow/pull/1638))
 
 ## [v8.3.9] (2025-08-05)
 
