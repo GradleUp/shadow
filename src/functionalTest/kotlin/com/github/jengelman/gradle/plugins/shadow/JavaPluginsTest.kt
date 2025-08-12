@@ -481,6 +481,14 @@ class JavaPluginsTest : BasePluginTest() {
   @ValueSource(booleans = [false, true])
   fun excludeGradleApiByDefault(legacy: Boolean) {
     writeGradlePluginModule(legacy)
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'my:a:1.0'
+          compileOnly 'my:b:1.0'
+        }
+      """.trimIndent(),
+    )
 
     run(shadowJarPath)
 
@@ -497,6 +505,7 @@ class JavaPluginsTest : BasePluginTest() {
         "my/plugin/MyPlugin.class",
         "META-INF/gradle-plugins/",
         "META-INF/gradle-plugins/my.plugin.properties",
+        *entriesInA,
         *manifestEntries,
       )
     }
