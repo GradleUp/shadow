@@ -319,6 +319,7 @@ class JavaPluginsTest : BasePluginTest() {
         dependencies {
           runtimeOnly 'my:a:1.0'
           shadow 'my:b:1.0'
+          compileOnly 'my:b:1.0'
         }
       """.trimIndent(),
     )
@@ -373,27 +374,6 @@ class JavaPluginsTest : BasePluginTest() {
         "implementation.properties",
         "runtimeOnly.properties",
         "implementation-dep.properties",
-        *manifestEntries,
-      )
-    }
-  }
-
-  @Test
-  fun doNotIncludeCompileOnlyConfigurationByDefault() {
-    projectScript.appendText(
-      """
-        dependencies {
-          runtimeOnly 'my:a:1.0'
-          compileOnly 'my:b:1.0'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        *entriesInA,
         *manifestEntries,
       )
     }
