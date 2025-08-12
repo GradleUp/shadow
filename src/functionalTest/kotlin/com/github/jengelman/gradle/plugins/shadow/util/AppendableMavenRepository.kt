@@ -38,13 +38,10 @@ class AppendableMavenRepository(
 
   fun publish() {
     if (modules.isEmpty()) return
-    val javaPlatformPlugin = if (modules.any { it.isBom }) "id 'java-platform'" else ""
-
     projectBuildScript.writeText(
       """
         plugins {
           id 'maven-publish'
-          $javaPlatformPlugin
         }
         publishing {
           publications {
@@ -61,18 +58,6 @@ class AppendableMavenRepository(
   }
 
   private fun createPublication(module: Module) = with(module) {
-    if (isBom) {
-      val pubName = artifactId.replace(".", "")
-      return """
-        create('$pubName', MavenPublication) {
-          from components.javaPlatform
-          artifactId = '$artifactId'
-          groupId = '$groupId'
-          version = '$version'
-        }
-      """.trimIndent()
-    }
-
     val outputJar = build()
     val pubName = outputJar.name.replace(".", "")
 
@@ -107,7 +92,6 @@ class AppendableMavenRepository(
     groupId: String,
     artifactId: String,
     version: String,
-    val isBom: Boolean = false,
   ) : Model() {
     private val coordinate = "$groupId:$artifactId:$version"
     private lateinit var existingJar: Path
@@ -116,16 +100,13 @@ class AppendableMavenRepository(
       this.groupId = groupId
       this.artifactId = artifactId
       this.version = version
-      this.packaging = if (isBom) "pom" else "jar"
     }
 
     fun useJar(existingJar: Path) {
-      check(!isBom) { "Cannot use existing jar for BOM module: $coordinate" }
       this.existingJar = existingJar
     }
 
     fun buildJar(builder: JarBuilder.() -> Unit) {
-      check(!isBom) { "Cannot build jar for BOM module: $coordinate" }
       val jarName = coordinate.replace(":", "-") + ".jar"
       existingJar = JarBuilder(root.resolve("temp/$jarName")).apply(builder).write()
     }
