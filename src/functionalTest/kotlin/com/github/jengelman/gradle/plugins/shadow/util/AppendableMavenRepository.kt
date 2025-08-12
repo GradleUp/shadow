@@ -84,7 +84,7 @@ class AppendableMavenRepository(
       }
       module.createMavenPublication(
         """
-          artifact '${module.artifactPath()}'
+          artifact '${module.artifactPath}'
           pom.withXml { xml ->
             def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
             $nodes
@@ -185,7 +185,12 @@ class AppendableMavenRepository(
     artifactId: String,
     version: String,
   ) : Module(groupId, artifactId, version) {
-    private lateinit var existingJar: Path
+    private var existingJar: Path? = null
+
+    val artifactPath: String
+      get() = existingJar?.also {
+        check(it.exists() && it.isRegularFile()) { "Jar file does not exist or is not a regular file: $it" }
+      }?.invariantSeparatorsPathString ?: error("No jar file provided for $coordinate")
 
     fun useJar(existingJar: Path) {
       this.existingJar = existingJar
@@ -194,14 +199,6 @@ class AppendableMavenRepository(
     fun buildJar(builder: JarBuilder.() -> Unit) {
       val jarPath = jarsDir.resolve(coordinate.replace(":", "-") + ".jar")
       existingJar = JarBuilder(jarPath).apply(builder).write()
-    }
-
-    fun artifactPath(): String {
-      check(::existingJar.isInitialized) { "No jar file provided for $coordinate" }
-      return existingJar.also {
-        check(it.exists()) { "Jar file doesn't exist for $coordinate in: $it" }
-        check(it.isRegularFile()) { "Jar is not a regular file for $coordinate in: $it" }
-      }.invariantSeparatorsPathString
     }
   }
 
