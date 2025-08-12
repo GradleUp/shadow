@@ -288,7 +288,7 @@ class MinimizeTest : BasePluginTest() {
     path("impl/build.gradle").appendText(
       """
         dependencies {
-          api platform('org.jetbrains.kotlin:kotlin-bom:2.2.0')
+          api platform('my:bom:1.0')
         }
       """.trimIndent(),
     )
