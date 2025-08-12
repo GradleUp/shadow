@@ -36,6 +36,15 @@ class AppendableMavenRepository(
     modules += JarModule(groupId, artifactId, version).also(action)
   }
 
+  fun bomModule(
+    groupId: String,
+    artifactId: String,
+    version: String,
+    action: BomModule.() -> Unit,
+  ) = apply {
+    modules += BomModule(groupId, artifactId, version).also(action)
+  }
+
   fun publish() {
     if (modules.isEmpty()) return
     projectBuildScript.writeText(
@@ -134,6 +143,16 @@ class AppendableMavenRepository(
         check(it.exists()) { "Jar file doesn't exist for $coordinate in: $it" }
         check(it.isRegularFile()) { "Jar is not a regular file for $coordinate in: $it" }
       }
+    }
+  }
+
+  class BomModule(
+    groupId: String,
+    artifactId: String,
+    version: String,
+  ) : Module(groupId, artifactId, version) {
+    init {
+      packaging = "pom"
     }
   }
 }
