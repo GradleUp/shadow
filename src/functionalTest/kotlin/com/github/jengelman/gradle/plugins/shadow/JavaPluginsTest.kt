@@ -849,10 +849,10 @@ class JavaPluginsTest : BasePluginTest() {
 
     val result = run(
       serverShadowJarPath,
-      IP_ARGUMENT,
+      ipArgument,
       "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
       "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
-      INFO_ARGUMENT,
+      infoArgument,
     )
 
     assertThat(result.output).all {
@@ -883,7 +883,7 @@ class JavaPluginsTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarPath)
     } else {
-      run(shadowJarPath, INFO_ARGUMENT)
+      run(shadowJarPath, infoArgument)
     }
 
     assertThat(result.output).contains(
@@ -910,7 +910,7 @@ class JavaPluginsTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
     } else {
-      run(shadowJarPath, INFO_ARGUMENT)
+      run(shadowJarPath, infoArgument)
     }
 
     assertThat(result.output).contains(

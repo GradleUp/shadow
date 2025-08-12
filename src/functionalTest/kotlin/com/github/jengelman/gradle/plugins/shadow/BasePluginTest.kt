@@ -56,12 +56,6 @@ abstract class BasePluginTest {
   lateinit var artifactBJar: Path
     private set
 
-  val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
-  val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
-  val runShadowPath = ":$SHADOW_RUN_TASK_NAME"
-  val installShadowDistPath = ":$SHADOW_INSTALL_TASK_NAME"
-  val shadowDistZipPath = ":shadowDistZip"
-
   val projectScript: Path get() = path("build.gradle")
   val settingsScript: Path get() = path("settings.gradle")
   open val outputShadowedJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
@@ -411,6 +405,12 @@ abstract class BasePluginTest {
       Path(gradleUserHome, "testkit")
     }
 
+    const val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
+    const val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
+    const val runShadowPath = ":$SHADOW_RUN_TASK_NAME"
+    const val installShadowDistPath = ":$SHADOW_INSTALL_TASK_NAME"
+    const val shadowDistZipPath = ":shadowDistZip"
+
     val entriesInA = arrayOf("a.properties", "a2.properties")
     val entriesInB = arrayOf("b.properties")
     val entriesInAB = entriesInA + entriesInB
@@ -439,11 +439,10 @@ abstract class BasePluginTest {
       "-Dorg.gradle.configuration-cache.parallel=true",
     )
 
-    const val INFO_ARGUMENT = "--info"
-
     // TODO: enable this flag for all tests once we have fixed all issues with isolated projects.
     //  See https://github.com/GradleUp/shadow/pull/1139.
-    const val IP_ARGUMENT = "-Dorg.gradle.unsafe.isolated-projects=true"
+    const val ipArgument = "-Dorg.gradle.unsafe.isolated-projects=true"
+    const val infoArgument = "--info"
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
