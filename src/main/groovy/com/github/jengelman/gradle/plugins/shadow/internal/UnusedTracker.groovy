@@ -77,7 +77,10 @@ class UnusedTracker {
                 apiJars.addAll(dep.files)
             } else {
                 addJar(runtimeConfiguration, dep, apiJars)
-                apiJars.add(runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } as File)
+                def jarFile = runtimeConfiguration.find { it.name.startsWith("${dep.name}-") }
+                if (jarFile != null) {
+                    apiJars.add(jarFile)
+                }
             }
         }
 
