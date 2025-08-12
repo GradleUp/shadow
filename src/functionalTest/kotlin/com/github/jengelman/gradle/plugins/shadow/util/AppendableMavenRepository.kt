@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.commonArguments
 import java.nio.file.Path
-import kotlin.io.path.createDirectories
+import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
@@ -17,14 +17,14 @@ class AppendableMavenRepository(
   val root: Path,
   private val gradleRunner: GradleRunner,
 ) {
-  private val projectBuildScript: Path
   private val modules = mutableListOf<Module>()
+  private val jarsDir: Path
 
   init {
-    root.resolve("temp").createDirectories()
     root.resolve("settings.gradle").createFile()
       .writeText("rootProject.name = '${root.name}'")
-    projectBuildScript = root.resolve("build.gradle").createFile()
+    root.resolve("build.gradle").createFile()
+    jarsDir = root.resolve("jars").createDirectory()
   }
 
   fun jarModule(
@@ -55,96 +55,103 @@ class AppendableMavenRepository(
     }
 
     @Suppress("UNCHECKED_CAST")
-    val scriptContent = when (val type = groups.first().key) {
+    when (val type = groups.first().key) {
       JarModule::class -> {
-        val scriptContent = """
-          plugins {
-            id 'maven-publish'
-          }
-          publishing {
-            publications {
-              ${(modules as List<JarModule>).createMavenPublications()}
-            }
-            repositories {
-              maven { url = '${root.toUri()}' }
-            }
-          }
-        """.trimIndent()
-        projectBuildScript.writeText(scriptContent)
-        gradleRunner.withProjectDir(root.toFile())
-          .withArguments(commonArguments + "publish")
-          .build()
-        modules.clear()
+        publishJarModules(modules as List<JarModule>)
       }
       BomModule::class -> {
-        for (module in modules) {
-          module as BomModule
-          val mavenPublication = module.createMavenPublication { "from components.javaPlatform" }
-          val scriptContent = """
-          plugins {
-            id 'maven-publish'
-            id 'java-platform'
-          }
-          dependencies {
-            constraints {
-              ${module.dependencies.joinToString(lineSeparator) { "api '${it.coordinate}'" }}
-            }
-          }
-          publishing {
-            publications {
-              $mavenPublication
-            }
-            repositories {
-              maven { url = '${root.toUri()}' }
-            }
-          }
-          """.trimIndent()
-          projectBuildScript.writeText(scriptContent)
-          gradleRunner.withProjectDir(root.toFile())
-            .withArguments(commonArguments + "publish")
-            .build()
-        }
-        modules.clear()
+        publishBomModules(modules as List<BomModule>)
       }
       else -> error("Unsupported module type: $type")
     }
   }
 
-  private fun List<JarModule>.createMavenPublications() = joinToString(lineSeparator) { module ->
-    var index = -1
-    val nodes = module.dependencies.joinToString(lineSeparator) {
-      index++
-      val node = "dependencyNode$index"
-      """
-        def $node = dependenciesNode.appendNode('dependency')
-        $node.appendNode('groupId', '${it.groupId}')
-        $node.appendNode('artifactId', '${it.artifactId}')
-        $node.appendNode('version', '${it.version}')
-        $node.appendNode('scope', '${it.scope}')
-      """.trimIndent()
+  private fun publishJarModules(jarModules: List<JarModule>) {
+    val mavenPublications = jarModules.joinToString(lineSeparator) { module ->
+      var index = -1
+      val nodes = module.dependencies.joinToString(lineSeparator) {
+        index++
+        val node = "dependencyNode$index"
+        """
+          def $node = dependenciesNode.appendNode('dependency')
+          $node.appendNode('groupId', '${it.groupId}')
+          $node.appendNode('artifactId', '${it.artifactId}')
+          $node.appendNode('version', '${it.version}')
+          $node.appendNode('scope', '${it.scope}')
+        """.trimIndent()
+      }
+      module.createMavenPublication(
+        """
+          artifact '${module.artifactPath()}'
+          pom.withXml { xml ->
+            def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
+            $nodes
+          }
+        """.trimIndent(),
+      )
     }
-    module.createMavenPublication {
-      """
-        artifact '${module.build().invariantSeparatorsPathString}'
-        pom.withXml { xml ->
-          def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
-          $nodes
+    val scriptContent = """
+      plugins {
+        id 'maven-publish'
+      }
+      publishing {
+        publications {
+          $mavenPublications
+        }
+        repositories {
+          maven { url = '${root.toUri()}' }
+        }
+      }
+    """.trimIndent()
+    runPublish(scriptContent)
+    modules.clear()
+  }
+
+  private fun publishBomModules(bomModules: List<BomModule>) {
+    // BOM modules are published one by one.
+    bomModules.forEach { module ->
+      val scriptContent = """
+        plugins {
+          id 'maven-publish'
+          id 'java-platform'
+        }
+        dependencies {
+          constraints {
+            ${module.dependencies.joinToString(lineSeparator) { "api '${it.coordinate}'" }}
+          }
+        }
+        publishing {
+          publications {
+            ${module.createMavenPublication("from components.javaPlatform")}
+          }
+          repositories {
+            maven { url = '${root.toUri()}' }
+          }
         }
       """.trimIndent()
+      runPublish(scriptContent)
     }
+    modules.clear()
   }
 
   private fun Module.createMavenPublication(
-    block: () -> String,
+    block: String,
   ): String {
     return """
       create('${coordinate.replace(":", "")}', MavenPublication) {
         artifactId = '$artifactId'
         groupId = '$groupId'
         version = '$version'
-        ${block()}
+        $block
       }
     """.trimIndent()
+  }
+
+  private fun runPublish(scriptContent: String) {
+    root.resolve("build.gradle").writeText(scriptContent)
+    gradleRunner.withProjectDir(root.toFile())
+      .withArguments(commonArguments + "publish")
+      .build()
   }
 
   sealed class Module(
@@ -183,16 +190,16 @@ class AppendableMavenRepository(
     }
 
     fun buildJar(builder: JarBuilder.() -> Unit) {
-      val jarName = coordinate.replace(":", "-") + ".jar"
-      existingJar = JarBuilder(root.resolve("temp/$jarName")).apply(builder).write()
+      val jarPath = jarsDir.resolve(coordinate.replace(":", "-") + ".jar")
+      existingJar = JarBuilder(jarPath).apply(builder).write()
     }
 
-    fun build(): Path {
+    fun artifactPath(): String {
       check(::existingJar.isInitialized) { "No jar file provided for $coordinate" }
       return existingJar.also {
         check(it.exists()) { "Jar file doesn't exist for $coordinate in: $it" }
         check(it.isRegularFile()) { "Jar is not a regular file for $coordinate in: $it" }
-      }
+      }.invariantSeparatorsPathString
     }
   }
 

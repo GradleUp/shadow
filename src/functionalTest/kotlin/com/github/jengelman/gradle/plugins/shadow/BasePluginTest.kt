@@ -76,7 +76,7 @@ abstract class BasePluginTest {
   @BeforeAll
   open fun doFirst() {
     localRepo = AppendableMavenRepository(
-      createTempDirectory().resolve("local-maven-repo"),
+      createTempDirectory().resolve("local-maven-repo").createDirectories(),
       runner(projectDir = null),
     )
     localRepo.jarModule("junit", "junit", "3.8.2") {
