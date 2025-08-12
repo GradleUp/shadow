@@ -279,6 +279,9 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1636",
+  )
   @Test
   fun minimizeBomDependency() {
     writeApiLibAndImplModules()
@@ -286,9 +289,8 @@ class MinimizeTest : BasePluginTest() {
       """
         dependencies {
           api platform('org.jetbrains.kotlin:kotlin-bom:2.2.0')
-          implementation 'org.jetbrains.kotlin:kotlin-stdlib'
         }
-      """.trimIndent() + lineSeparator,
+      """.trimIndent(),
     )
 
     run(":impl:$SHADOW_JAR_TASK_NAME")
