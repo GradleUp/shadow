@@ -20,7 +20,6 @@ import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.JarEntry
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
@@ -28,7 +27,6 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
-import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
@@ -36,7 +34,6 @@ import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -47,8 +44,6 @@ import org.junit.jupiter.api.io.TempDir
 abstract class BasePluginTest {
   @TempDir
   lateinit var projectRoot: Path
-    private set
-  lateinit var localRepo: AppendableMavenRepository
     private set
 
   lateinit var artifactAJar: Path
@@ -69,10 +64,6 @@ abstract class BasePluginTest {
 
   @BeforeAll
   open fun doFirst() {
-    localRepo = AppendableMavenRepository(
-      createTempDirectory().resolve("local-maven-repo").createDirectories(),
-      runner(projectDir = null),
-    )
     localRepo.jarModule("junit", "junit", "3.8.2") {
       useJar(junitJar)
     }.jarModule("my", "a", "1.0") {
@@ -103,12 +94,6 @@ abstract class BasePluginTest {
   @AfterEach
   fun cleanup() {
     println(projectScript.readText())
-  }
-
-  @AfterAll
-  fun doLast() {
-    @OptIn(ExperimentalPathApi::class)
-    localRepo.root.deleteRecursively()
   }
 
   fun getDefaultProjectBuildScript(
@@ -177,7 +162,7 @@ abstract class BasePluginTest {
     vararg arguments: String,
     runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runner(arguments = arguments.toList(), block = runnerBlock)
+    return runner(arguments = arguments.toList(), projectDir = projectRoot, block = runnerBlock)
       .build().assertNoDeprecationWarnings()
   }
 
@@ -185,7 +170,7 @@ abstract class BasePluginTest {
     vararg arguments: String,
     runnerBlock: (GradleRunner) -> Unit = {},
   ): BuildResult {
-    return runner(arguments = arguments.toList(), block = runnerBlock)
+    return runner(arguments = arguments.toList(), projectDir = projectRoot, block = runnerBlock)
       .buildAndFail().assertNoDeprecationWarnings()
   }
 
@@ -379,23 +364,6 @@ abstract class BasePluginTest {
     )
   }
 
-  fun runner(
-    arguments: Iterable<String> = emptyList(),
-    projectDir: Path? = projectRoot,
-    block: (GradleRunner) -> Unit = {},
-  ): GradleRunner = GradleRunner.create()
-    .withGradleVersion(testGradleVersion)
-    .forwardOutput()
-    .withPluginClasspath()
-    .withTestKitDir(testKitDir.toFile())
-    .withArguments(commonArguments + arguments)
-    .apply {
-      if (projectDir != null) {
-        withProjectDir(projectDir.toFile())
-      }
-      block(this)
-    }
-
   @Suppress("ConstPropertyName")
   companion object {
     private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
@@ -444,6 +412,30 @@ abstract class BasePluginTest {
     // TODO: enable this flag for all tests once we have fixed all issues with isolated projects.
     //  See https://github.com/GradleUp/shadow/pull/1139.
     const val IP_ARGUMENT = "-Dorg.gradle.unsafe.isolated-projects=true"
+
+    val localRepo: AppendableMavenRepository by lazy {
+      AppendableMavenRepository(
+        createTempDirectory().resolve("local-maven-repo").createDirectories(),
+        runner(),
+      )
+    }
+
+    fun runner(
+      arguments: Iterable<String> = emptyList(),
+      projectDir: Path? = null,
+      block: (GradleRunner) -> Unit = {},
+    ): GradleRunner = GradleRunner.create()
+      .withGradleVersion(testGradleVersion)
+      .forwardOutput()
+      .withPluginClasspath()
+      .withTestKitDir(testKitDir.toFile())
+      .withArguments(commonArguments + arguments)
+      .apply {
+        if (projectDir != null) {
+          withProjectDir(projectDir.toFile())
+        }
+        block(this)
+      }
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
