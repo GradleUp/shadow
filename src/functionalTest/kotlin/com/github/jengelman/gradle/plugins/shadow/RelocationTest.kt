@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
@@ -639,6 +640,35 @@ class RelocationTest : BasePluginTest() {
       assertThat(result).contains(
         "shadow.foo.Foo",
         "shadow.foo.Bar",
+      )
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1640",
+  )
+  @Test
+  fun relocateGoogleCloudPubSub() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'com.google.cloud:google-cloud-pubsub:1.141.0'
+        }
+        $shadowJarTask {
+          enableAutoRelocation = true
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsAtLeast(
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+        "shadow/",
+        "shadow/com/google/api/",
+        "shadow/com/google/cloud/pubsub/",
       )
     }
   }
