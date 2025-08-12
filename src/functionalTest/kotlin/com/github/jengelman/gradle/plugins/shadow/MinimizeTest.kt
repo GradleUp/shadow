@@ -219,7 +219,7 @@ class MinimizeTest : BasePluginTest() {
   )
   @Test
   fun excludeCircularDependencies() {
-    publishArtifactCD(circular = true)
+    publishArtifactC(circular = true)
 
     val dependency = "'my:d:1.0'"
     projectScript.appendText(
