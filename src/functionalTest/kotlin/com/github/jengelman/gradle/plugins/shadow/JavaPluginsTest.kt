@@ -104,6 +104,8 @@ class JavaPluginsTest : BasePluginTest() {
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
+
+    error("This is intended to fail.")
   }
 
   @Test
