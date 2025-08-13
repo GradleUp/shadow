@@ -488,6 +488,7 @@ abstract class BasePluginTest {
       assertThat(output).doesNotContain(
         "has been deprecated and is scheduled to be removed in Gradle",
         "has been deprecated. This is scheduled to be removed in Gradle",
+        "will fail with an error in Gradle",
       )
     }
 
