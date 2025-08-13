@@ -41,8 +41,13 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04-arm
     steps:
-      - run: |
-          echo all build jobs completed successfully.
+      - name: Check build matrix result
+        run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Some build jobs failed."
+            exit 1
+          fi
+          echo "All build jobs completed successfully."
 
   publish-snapshot:
     needs: build
