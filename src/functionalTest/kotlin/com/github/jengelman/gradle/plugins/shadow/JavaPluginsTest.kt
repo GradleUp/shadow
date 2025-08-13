@@ -334,7 +334,7 @@ class JavaPluginsTest : BasePluginTest() {
         buildJar {
           insert("implementation.properties", "implementation")
         }
-        addDependency("my", "b", "1.0")
+        addDependency("my:b:1.0")
       }
       jarModule("my", "runtime-only", "1.0") {
         buildJar {

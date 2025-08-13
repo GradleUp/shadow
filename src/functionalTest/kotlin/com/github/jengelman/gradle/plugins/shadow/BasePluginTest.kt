@@ -98,7 +98,7 @@ abstract class BasePluginTest {
           insert("e.properties", "e")
         }
         // Circular dependency with f.
-        addDependency("my", "f", "1.0")
+        addDependency("my:f:1.0")
       }
       val f = jarModule("my", "f", "1.0") {
         buildJar {

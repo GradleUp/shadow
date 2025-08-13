@@ -183,7 +183,12 @@ class AppendableMavenRepository(
       this.version = version
     }
 
-    fun addDependency(groupId: String, artifactId: String, version: String, scope: String = "runtime") {
+    fun addDependency(coordinate: String, scope: String = "runtime") {
+      val parts = coordinate.split(":")
+      require(parts.size == 3) {
+        "Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'."
+      }
+      val (groupId, artifactId, version) = parts
       val dependency = Dependency().also {
         it.groupId = groupId
         it.artifactId = artifactId
@@ -191,15 +196,6 @@ class AppendableMavenRepository(
         it.scope = scope
       }
       addDependency(dependency)
-    }
-
-    fun addDependency(coordinate: String, scope: String = "runtime") {
-      val parts = coordinate.split(":")
-      require(parts.size == 3) {
-        "Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'."
-      }
-      val (groupId, artifactId, version) = parts
-      addDependency(groupId, artifactId, version, scope)
     }
   }
 
