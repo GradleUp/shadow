@@ -90,6 +90,7 @@ abstract class BasePluginTest {
         buildJar {
           insert("d.properties", "d")
         }
+        // Depends on c but c does not depend on d.
         addDependency("my", "c", "1.0")
       }
       jarModule("my", "e", "1.0") {
