@@ -188,18 +188,21 @@ abstract class BasePluginTest {
   }
 
   fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.jarModule("my", "c", "1.0") {
-      buildJar {
-        insert("c.properties", "c")
+    localRepo.apply {
+      jarModule("my", "c", "1.0") {
+        buildJar {
+          insert("c.properties", "c")
+        }
+        if (circular) {
+          addDependency("my", "d", "1.0")
+        }
       }
-      if (circular) {
-        addDependency("my", "d", "1.0")
+      jarModule("my", "d", "1.0") {
+        buildJar {
+          insert("d.properties", "d")
+        }
+        addDependency("my", "c", "1.0")
       }
-    }.jarModule("my", "d", "1.0") {
-      buildJar {
-        insert("d.properties", "d")
-      }
-      addDependency("my", "c", "1.0")
     }.publish()
   }
 
