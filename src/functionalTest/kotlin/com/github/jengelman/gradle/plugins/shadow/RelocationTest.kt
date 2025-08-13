@@ -655,7 +655,7 @@ class RelocationTest : BasePluginTest() {
           implementation 'com.google.cloud:google-cloud-pubsub:1.141.0'
         }
         $shadowJarTask {
-          enableAutoRelocation = true
+          relocate("com.google.api.client", "org.example.com.google.api.client")
         }
       """.trimIndent(),
     )
@@ -666,9 +666,7 @@ class RelocationTest : BasePluginTest() {
       containsAtLeast(
         "META-INF/",
         "META-INF/MANIFEST.MF",
-        "shadow/",
-        "shadow/com/google/api/",
-        "shadow/com/google/cloud/pubsub/",
+        "org/example/com/google/api/",
       )
     }
   }
