@@ -400,7 +400,21 @@ abstract class BasePluginTest {
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())
-    .withArguments(commonArguments + arguments)
+    .withArguments(
+      buildList {
+        val warningsAsErrors = try {
+          // TODO: https://youtrack.jetbrains.com/issue/KT-78620
+          !projectScript.readText().contains("org.jetbrains.kotlin.multiplatform")
+        } catch (_: UninitializedPropertyAccessException) {
+          true // Default warning mode if projectScript is not initialized yet.
+        }
+        if (warningsAsErrors) {
+          add("--warning-mode=fail")
+        }
+        addAll(commonArguments)
+        addAll(arguments)
+      },
+    )
     .apply {
       if (projectDir != null) {
         withProjectDir(projectDir.toFile())
@@ -448,7 +462,6 @@ abstract class BasePluginTest {
     const val jarTask = "tasks.named('jar', Jar)"
 
     val commonArguments = listOf(
-      "--warning-mode=fail",
       "--configuration-cache",
       "--build-cache",
       "--parallel",
