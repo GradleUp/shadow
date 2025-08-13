@@ -83,10 +83,13 @@ abstract class BasePluginTest {
       }
     }
     localRepo.publish()
-    localRepo.bomModule("my", "bom", "1.0") {
-      addDependency("my", "a", "1.0")
-      addDependency("my", "b", "1.0")
-    }.publish()
+    localRepo.apply {
+      bomModule("my", "bom", "1.0") {
+        addDependency("my", "a", "1.0")
+        addDependency("my", "b", "1.0")
+      }
+    }
+    localRepo.publish()
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
