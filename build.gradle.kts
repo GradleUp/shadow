@@ -48,6 +48,7 @@ kotlin {
 
 lint {
   baseline = file("gradle/lint-baseline.xml")
+  ignoreTestFixturesSources = true
   ignoreTestSources = true
   warningsAsErrors = true
 }
