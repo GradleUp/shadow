@@ -324,22 +324,27 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
-    localRepo.jarModule("my", "api", "1.0") {
-      buildJar {
-        insert("api.properties", "api")
+    localRepo.apply {
+      jarModule("my", "api", "1.0") {
+        buildJar {
+          insert("api.properties", "api")
+        }
       }
-    }.jarModule("my", "implementation-dep", "1.0") {
-      buildJar {
-        insert("implementation-dep.properties", "implementation-dep")
+      jarModule("my", "implementation-dep", "1.0") {
+        buildJar {
+          insert("implementation-dep.properties", "implementation-dep")
+        }
       }
-    }.jarModule("my", "implementation", "1.0") {
-      buildJar {
-        insert("implementation.properties", "implementation")
+      jarModule("my", "implementation", "1.0") {
+        buildJar {
+          insert("implementation.properties", "implementation")
+        }
+        addDependency("my", "implementation-dep", "1.0")
       }
-      addDependency("my", "implementation-dep", "1.0")
-    }.jarModule("my", "runtimeOnly", "1.0") {
-      buildJar {
-        insert("runtimeOnly.properties", "runtimeOnly")
+      jarModule("my", "runtimeOnly", "1.0") {
+        buildJar {
+          insert("runtimeOnly.properties", "runtimeOnly")
+        }
       }
     }.publish()
 
