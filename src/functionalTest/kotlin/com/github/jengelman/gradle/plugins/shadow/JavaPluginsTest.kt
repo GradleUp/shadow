@@ -270,8 +270,8 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/729",
   )
   @Test
-  fun excludeSomeMetaInfFilesByDefault() {
-    val metaInfJar = buildJar("meta-inf.jar") {
+  fun excludeSomeResourcesByDefault() {
+    val resJar = buildJar("meta-inf.jar") {
       insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
       insert("META-INF/a.SF", "Signature File")
       insert("META-INF/a.DSA", "DSA Signature Block")
@@ -285,7 +285,7 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          ${implementationFiles(metaInfJar)}
+          ${implementationFiles(resJar)}
         }
       """.trimIndent(),
     )
