@@ -24,6 +24,9 @@ jobs:
         include:
           # We just test one JDK version on Windows.
           - os: windows-11-arm
+            gradle: 8.11
+            java: 21
+          - os: windows-11-arm
             gradle: current
             java: 21
     runs-on: ${{ matrix.os }}
