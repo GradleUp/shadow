@@ -82,6 +82,6 @@ repositories {
     }
 
     private static String replaceTokens(String snippet) {
-        return snippet.replaceAll("@version@", PluginSpecification.SHADOW_VERSION + '-SNAPSHOT')
+        return snippet.replaceAll("@version@", 'latest')
     }
 }

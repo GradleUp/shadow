@@ -7,8 +7,8 @@ plugins {
   groovy
   `java-gradle-plugin`
   id("com.gradle.plugin-publish") version "1.3.1"
-  id("com.vanniktech.maven.publish") version "0.32.0"
-  id("com.diffplug.spotless") version "7.0.4"
+  id("com.vanniktech.maven.publish") version "0.34.0"
+  id("com.diffplug.spotless") version "7.2.1"
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -18,8 +18,6 @@ description = providers.gradleProperty("POM_DESCRIPTION").get()
 java {
   sourceCompatibility = JavaVersion.VERSION_1_8
   targetCompatibility = JavaVersion.VERSION_1_8
-  withSourcesJar()
-  withJavadocJar()
 }
 
 gradlePlugin {
@@ -40,8 +38,6 @@ gradlePlugin {
 spotless {
   kotlinGradle {
     ktlint()
-    target("**/*.kts")
-    targetExclude("build-logic/build/**")
   }
 }
 
@@ -97,34 +93,14 @@ dependencies {
   testImplementation("org.junit.platform:junit-platform-suite-engine")
 }
 
-tasks.withType<Javadoc>().configureEach {
-  (options as? StandardJavadocDocletOptions)?.let {
-    it.links(
-      "https://docs.oracle.com/en/java/javase/17/docs/api/",
-      "https://docs.groovy-lang.org/2.4.7/html/gapi/",
-    )
-    it.addStringOption("Xdoclint:none", "-quiet")
-  }
-}
-
-val isCI = providers.environmentVariable("CI").isPresent
-
 tasks.withType<Test>().configureEach {
   useJUnitPlatform()
 
   val testGradleVersion = providers.gradleProperty("testGradleVersion").orNull.let {
     if (it == null || it == "current") GradleVersion.current().version else it
   }
-  logger.info("Using test Gradle version: $testGradleVersion")
+  logger.lifecycle("Using test Gradle version: $testGradleVersion")
   systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
-
-  if (isCI) {
-    testLogging.showStandardStreams = true
-    minHeapSize = "1g"
-    maxHeapSize = "1g"
-  }
-
-  systemProperty("shadowVersion", version)
 
   // Required to test configuration cache in tests when using withDebug()
   // https://github.com/gradle/gradle/issues/22765#issuecomment-1339427241

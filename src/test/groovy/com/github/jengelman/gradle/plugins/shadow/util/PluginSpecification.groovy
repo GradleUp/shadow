@@ -16,8 +16,6 @@ abstract class PluginSpecification extends Specification {
 
     @TempDir Path dir
 
-    public static final String SHADOW_VERSION = System.getProperty("shadowVersion")
-
     public static final String TEST_GRADLE_VERSION = System.getProperty("TEST_GRADLE_VERSION")
 
     AppendableMavenFileRepository repo
@@ -41,7 +39,7 @@ abstract class PluginSpecification extends Specification {
         return """
         plugins {
             id '${javaPlugin}'
-            id 'com.gradleup.shadow' version '${SHADOW_VERSION}'
+            id 'com.gradleup.shadow'
         }
 
         version = "1.0"
