@@ -103,10 +103,6 @@ val testGradleVersion: String = providers.gradleProperty("testGradleVersion").or
   value
 }
 
-develocity {
-  buildScan.value("testGradleVersion", testGradleVersion)
-}
-
 dependencies {
   compileOnly(libs.develocity)
   compileOnly(libs.kotlin.kmp)
