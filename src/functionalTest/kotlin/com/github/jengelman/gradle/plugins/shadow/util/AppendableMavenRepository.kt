@@ -2,12 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.commonArguments
 import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.createParentDirectories
-import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
@@ -18,7 +16,6 @@ import org.apache.maven.model.Model
 import org.gradle.api.logging.Logging
 import org.gradle.testkit.runner.GradleRunner
 
-@OptIn(ExperimentalPathApi::class)
 class AppendableMavenRepository(
   val root: Path,
   private val gradleRunner: GradleRunner,
@@ -80,7 +77,6 @@ class AppendableMavenRepository(
       """.trimIndent(),
     )
     modules.clear()
-    root.deleteRecursively()
   }
 
   private fun configureJarModules(jarModules: List<JarModule>) {
