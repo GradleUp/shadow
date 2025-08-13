@@ -37,7 +37,7 @@ class AppendableMavenRepository(
     artifactId: String,
     version: String,
     action: JarModule.() -> Unit,
-  ) = apply {
+  ) {
     modules += JarModule(groupId, artifactId, version).also(action)
   }
 
@@ -46,7 +46,7 @@ class AppendableMavenRepository(
     artifactId: String,
     version: String,
     action: BomModule.() -> Unit,
-  ) = apply {
+  ) {
     modules += BomModule(groupId, artifactId, version).also(action)
   }
 

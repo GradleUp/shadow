@@ -270,31 +270,22 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/729",
   )
   @Test
-  fun excludeSomeMetaInfFilesByDefault() {
-    localRepo.jarModule("my", "a", "1.0") {
-      buildJar {
-        insert("a.properties", "a")
-        insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
-        insert("META-INF/a.SF", "Signature File")
-        insert("META-INF/a.DSA", "DSA Signature Block")
-        insert("META-INF/a.RSA", "RSA Signature Block")
-        insert("META-INF/a.properties", "key=value")
-        insert("META-INF/versions/9/module-info.class", "module myModuleName {}")
-        insert("META-INF/versions/16/module-info.class", "module myModuleName {}")
-        insert("module-info.class", "module myModuleName {}")
-      }
-    }.publish()
+  fun excludeSomeResourcesByDefault() {
+    val resJar = buildJar("meta-inf.jar") {
+      insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
+      insert("META-INF/a.SF", "Signature File")
+      insert("META-INF/a.DSA", "DSA Signature Block")
+      insert("META-INF/a.RSA", "RSA Signature Block")
+      insert("META-INF/a.properties", "key=value")
+      insert("META-INF/versions/9/module-info.class", "module myModuleName {}")
+      insert("META-INF/versions/16/module-info.class", "module myModuleName {}")
+      insert("module-info.class", "module myModuleName {}")
+    }
 
-    path("src/main/java/my/Passed.java").writeText(
-      """
-        package my;
-        public class Passed {}
-      """.trimIndent(),
-    )
     projectScript.appendText(
       """
         dependencies {
-          implementation 'my:a:1.0'
+          ${implementationFiles(resJar)}
         }
       """.trimIndent(),
     )
@@ -303,9 +294,6 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        "my/",
-        "my/Passed.class",
-        "a.properties",
         "META-INF/a.properties",
         *manifestEntries,
       )
@@ -336,22 +324,22 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun includeJavaLibraryConfigurationsByDefault() {
-    localRepo.jarModule("my", "api", "1.0") {
-      buildJar {
-        insert("api.properties", "api")
+    localRepo.apply {
+      jarModule("my", "api", "1.0") {
+        buildJar {
+          insert("api.properties", "api")
+        }
       }
-    }.jarModule("my", "implementation-dep", "1.0") {
-      buildJar {
-        insert("implementation-dep.properties", "implementation-dep")
+      jarModule("my", "implementation", "1.0") {
+        buildJar {
+          insert("implementation.properties", "implementation")
+        }
+        addDependency("my", "b", "1.0")
       }
-    }.jarModule("my", "implementation", "1.0") {
-      buildJar {
-        insert("implementation.properties", "implementation")
-      }
-      addDependency("my", "implementation-dep", "1.0")
-    }.jarModule("my", "runtimeOnly", "1.0") {
-      buildJar {
-        insert("runtimeOnly.properties", "runtimeOnly")
+      jarModule("my", "runtime-only", "1.0") {
+        buildJar {
+          insert("runtime-only.properties", "runtime-only")
+        }
       }
     }.publish()
 
@@ -361,7 +349,7 @@ class JavaPluginsTest : BasePluginTest() {
         dependencies {
           api 'my:api:1.0'
           implementation 'my:implementation:1.0'
-          runtimeOnly 'my:runtimeOnly:1.0'
+          runtimeOnly 'my:runtime-only:1.0'
         }
       """.trimIndent(),
     )
@@ -372,8 +360,8 @@ class JavaPluginsTest : BasePluginTest() {
       containsOnly(
         "api.properties",
         "implementation.properties",
-        "runtimeOnly.properties",
-        "implementation-dep.properties",
+        "runtime-only.properties",
+        *entriesInB,
         *manifestEntries,
       )
     }
