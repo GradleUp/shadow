@@ -219,9 +219,7 @@ class MinimizeTest : BasePluginTest() {
   )
   @Test
   fun excludeCircularDependencies() {
-    publishArtifactCD(circular = true)
-
-    val dependency = "'my:d:1.0'"
+    val dependency = "'my:e:1.0'"
     projectScript.appendText(
       """
         dependencies {
@@ -239,8 +237,8 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        "c.properties",
-        "d.properties",
+        "e.properties",
+        "f.properties",
         *manifestEntries,
       )
     }

@@ -70,23 +70,50 @@ abstract class BasePluginTest {
       jarModule("junit", "junit", "3.8.2") {
         useJar(junitJar)
       }
-      jarModule("my", "a", "1.0") {
+      val a = jarModule("my", "a", "1.0") {
         buildJar {
           insert("a.properties", "a")
           insert("a2.properties", "a2")
         }
       }
-      jarModule("my", "b", "1.0") {
+      val b = jarModule("my", "b", "1.0") {
         buildJar {
           insert("b.properties", "b")
         }
       }
-    }
-    localRepo.publish()
-    localRepo.apply {
+      val c = jarModule("my", "c", "1.0") {
+        buildJar {
+          insert("c.properties", "c")
+        }
+      }
+      val d = jarModule("my", "d", "1.0") {
+        buildJar {
+          insert("d.properties", "d")
+        }
+        // Depends on c but c does not depend on d.
+        addDependency(c)
+      }
+      val e = jarModule("my", "e", "1.0") {
+        buildJar {
+          insert("e.properties", "e")
+        }
+        // Circular dependency with f.
+        addDependency("my:f:1.0")
+      }
+      val f = jarModule("my", "f", "1.0") {
+        buildJar {
+          insert("f.properties", "f")
+        }
+        // Circular dependency with e.
+        addDependency(e)
+      }
       bomModule("my", "bom", "1.0") {
-        addDependency("my", "a", "1.0")
-        addDependency("my", "b", "1.0")
+        addDependency(a)
+        addDependency(b)
+        addDependency(c)
+        addDependency(d)
+        addDependency(e)
+        addDependency(f)
       }
     }
     localRepo.publish()
@@ -188,25 +215,6 @@ abstract class BasePluginTest {
   ): BuildResult {
     return runner(arguments = arguments.toList(), block = runnerBlock)
       .buildAndFail().assertNoDeprecationWarnings()
-  }
-
-  fun publishArtifactCD(circular: Boolean = false) {
-    localRepo.apply {
-      jarModule("my", "c", "1.0") {
-        buildJar {
-          insert("c.properties", "c")
-        }
-        if (circular) {
-          addDependency("my", "d", "1.0")
-        }
-      }
-      jarModule("my", "d", "1.0") {
-        buildJar {
-          insert("d.properties", "d")
-        }
-        addDependency("my", "c", "1.0")
-      }
-    }.publish()
   }
 
   fun writeClass(

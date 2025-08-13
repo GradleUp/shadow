@@ -4,7 +4,6 @@ import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -12,12 +11,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class FilteringTest : BasePluginTest() {
-  @BeforeAll
-  override fun doFirst() {
-    super.doFirst()
-    publishArtifactCD()
-  }
-
   @BeforeEach
   override fun setup() {
     super.setup()
@@ -67,7 +60,28 @@ class FilteringTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun excludeDependency(useAccessor: Boolean) {
-    dependOnAndExcludeArtifactD(useAccessor)
+    settingsScript.appendText(
+      """
+        dependencyResolutionManagement {
+          versionCatalogs.create('libs') {
+            library('my-d', 'my:d:1.0')
+          }
+        }
+      """.trimIndent(),
+    )
+    val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation $dependency
+        }
+        $shadowJarTask {
+          dependencies {
+            exclude(dependency($dependency))
+          }
+        }
+      """.trimIndent(),
+    )
 
     run(shadowJarPath)
 
@@ -200,25 +214,7 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun handleExcludeWithCircularDependency() {
-    publishArtifactCD(circular = true)
-    dependOnAndExcludeArtifactD()
-
-    run(shadowJarPath)
-
-    commonAssertions()
-  }
-
-  private fun dependOnAndExcludeArtifactD(useAccessor: Boolean = false) {
-    settingsScript.appendText(
-      """
-        dependencyResolutionManagement {
-          versionCatalogs.create('libs') {
-            library('my-d', 'my:d:1.0')
-          }
-        }
-      """.trimIndent(),
-    )
-    val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
+    val dependency = "'my:e:1.0'"
     projectScript.appendText(
       """
         dependencies {
@@ -231,6 +227,16 @@ class FilteringTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "f.properties",
+        *entriesInAB,
+        *manifestEntries,
+      )
+    }
   }
 
   private fun commonAssertions() {
