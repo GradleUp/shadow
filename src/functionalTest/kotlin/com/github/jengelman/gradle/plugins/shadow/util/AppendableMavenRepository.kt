@@ -188,7 +188,8 @@ class AppendableMavenRepository(
       require(parts.size == 3) {
         "Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'."
       }
-      val (groupId, artifactId, version) = parts
+      val (groupId, artifactId, version) = coordinate.split(":").takeIf { it.size == 3 }
+        ?: error("Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'.")
       val dependency = Dependency().also {
         it.groupId = groupId
         it.artifactId = artifactId
