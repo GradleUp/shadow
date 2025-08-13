@@ -40,6 +40,7 @@ jobs:
   build-status:
     needs: build
     runs-on: ubuntu-24.04-arm
+    if: always()
     steps:
       - name: Check build matrix result
         run: |
