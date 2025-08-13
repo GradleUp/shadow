@@ -66,23 +66,27 @@ abstract class BasePluginTest {
     localRepo = AppendableMavenRepository(
       createTempDirectory().resolve("local-maven-repo").createDirectories(),
       runner(projectDir = null),
-    )
-    localRepo.jarModule("junit", "junit", "3.8.2") {
-      useJar(junitJar)
-    }.jarModule("my", "a", "1.0") {
-      buildJar {
-        insert("a.properties", "a")
-        insert("a2.properties", "a2")
+    ).apply {
+      jarModule("junit", "junit", "3.8.2") {
+        useJar(junitJar)
       }
-    }.jarModule("my", "b", "1.0") {
-      buildJar {
-        insert("b.properties", "b")
+      jarModule("my", "a", "1.0") {
+        buildJar {
+          insert("a.properties", "a")
+          insert("a2.properties", "a2")
+        }
       }
-    }.publish()
-    localRepo.bomModule("my", "bom", "1.0") {
-      addDependency("my", "a", "1.0")
-      addDependency("my", "b", "1.0")
-    }.publish()
+      jarModule("my", "b", "1.0") {
+        buildJar {
+          insert("b.properties", "b")
+        }
+      }
+      bomModule("my", "bom", "1.0") {
+        addDependency("my", "a", "1.0")
+        addDependency("my", "b", "1.0")
+      }
+      publish()
+    }
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
