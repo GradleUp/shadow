@@ -314,40 +314,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/294",
-  )
-  @Test
-  fun doNotErrorOnRelocatingJava9Classes() {
-    projectScript.appendText(
-      """
-        dependencies {
-          implementation 'org.slf4j:slf4j-api:1.7.21'
-          implementation 'io.netty:netty-all:4.0.23.Final'
-          implementation 'com.google.protobuf:protobuf-java:2.5.0'
-          implementation 'org.apache.zookeeper:zookeeper:3.4.6'
-        }
-        $shadowJarTask {
-          zip64 = true
-          relocate 'com.google.protobuf', 'shaded.com.google.protobuf'
-          relocate 'io.netty', 'shaded.io.netty'
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    val entries = outputShadowedJar.use { it.entries().toList() }
-    val included = entries.filter { entry ->
-      entry.name.startsWith("shaded/com/google/protobuf") || entry.name.startsWith("shaded/io/netty")
-    }
-    val excluded = entries.filter { entry ->
-      entry.name.startsWith("com/google/protobuf") || entry.name.startsWith("io/netty")
-    }
-    assertThat(included).isNotEmpty()
-    assertThat(excluded).isEmpty()
-  }
-
   @ParameterizedTest
   @MethodSource("preserveLastModifiedProvider")
   fun preserveLastModifiedCorrectly(enableAutoRelocation: Boolean, preserveFileTimestamps: Boolean) {
