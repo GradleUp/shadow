@@ -37,7 +37,7 @@ class AppendableMavenRepository(
     artifactId: String,
     version: String,
     action: JarModule.() -> Unit,
-  ): Module.Coordinate {
+  ): String {
     val jarModule = JarModule(groupId, artifactId, version).also(action)
     modules += jarModule
     return jarModule.coordinate
@@ -48,7 +48,7 @@ class AppendableMavenRepository(
     artifactId: String,
     version: String,
     action: BomModule.() -> Unit,
-  ): Module.Coordinate {
+  ): String {
     val bomModule = BomModule(groupId, artifactId, version).also(action)
     modules += bomModule
     return bomModule.coordinate
@@ -77,7 +77,7 @@ class AppendableMavenRepository(
     logger.info(
       """
         Publish modules to Maven repository at ${root.toUri()}:
-        ${modules.joinToString(lineSeparator) { it.coordinate.toString() }}
+        ${modules.joinToString(lineSeparator) { it.coordinate }}
       """.trimIndent(),
     )
     modules.clear()
@@ -161,7 +161,7 @@ class AppendableMavenRepository(
     block: String,
   ): String {
     return """
-      create('${coordinate.toString().replace(":", "")}', MavenPublication) {
+      create('${coordinate.replace(":", "")}', MavenPublication) {
         artifactId = '$artifactId'
         groupId = '$groupId'
         version = '$version'
@@ -175,7 +175,7 @@ class AppendableMavenRepository(
     artifactId: String,
     version: String,
   ) : Model() {
-    val coordinate = Coordinate("$groupId:$artifactId:$version")
+    val coordinate = "$groupId:$artifactId:$version"
 
     init {
       this.groupId = groupId
@@ -193,18 +193,13 @@ class AppendableMavenRepository(
       addDependency(dependency)
     }
 
-    fun addDependency(coordinate: Coordinate, scope: String = "runtime") {
-      val (groupId, artifactId, version) = coordinate.value.split(":")
-      addDependency(groupId, artifactId, version, scope)
-    }
-
-    @JvmInline
-    value class Coordinate(val value: String) {
-      init {
-        require(value.count { it == ':' } == 2) {
-          "Invalid coordinate format: $value. Expected format is 'groupId:artifactId:version'."
-        }
+    fun addDependency(coordinate: String, scope: String = "runtime") {
+      val parts = coordinate.split(":")
+      require(parts.size == 3) {
+        "Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'."
       }
+      val (groupId, artifactId, version) = parts
+      addDependency(groupId, artifactId, version, scope)
     }
   }
 
@@ -225,7 +220,7 @@ class AppendableMavenRepository(
     }
 
     fun buildJar(builder: JarBuilder.() -> Unit) {
-      val jarPath = jarsDir.resolve(coordinate.toString().replace(":", "-") + ".jar")
+      val jarPath = jarsDir.resolve(coordinate.replace(":", "-") + ".jar")
       existingJar = JarBuilder(jarPath).apply(builder).write()
     }
   }
