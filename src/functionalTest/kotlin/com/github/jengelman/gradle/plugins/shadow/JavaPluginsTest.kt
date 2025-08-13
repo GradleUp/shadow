@@ -271,30 +271,21 @@ class JavaPluginsTest : BasePluginTest() {
   )
   @Test
   fun excludeSomeMetaInfFilesByDefault() {
-    localRepo.jarModule("my", "a", "1.0") {
-      buildJar {
-        insert("a.properties", "a")
-        insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
-        insert("META-INF/a.SF", "Signature File")
-        insert("META-INF/a.DSA", "DSA Signature Block")
-        insert("META-INF/a.RSA", "RSA Signature Block")
-        insert("META-INF/a.properties", "key=value")
-        insert("META-INF/versions/9/module-info.class", "module myModuleName {}")
-        insert("META-INF/versions/16/module-info.class", "module myModuleName {}")
-        insert("module-info.class", "module myModuleName {}")
-      }
-    }.publish()
+    val metaInfJar = buildJar("meta-inf.jar") {
+      insert("META-INF/INDEX.LIST", "JarIndex-Version: 1.0")
+      insert("META-INF/a.SF", "Signature File")
+      insert("META-INF/a.DSA", "DSA Signature Block")
+      insert("META-INF/a.RSA", "RSA Signature Block")
+      insert("META-INF/a.properties", "key=value")
+      insert("META-INF/versions/9/module-info.class", "module myModuleName {}")
+      insert("META-INF/versions/16/module-info.class", "module myModuleName {}")
+      insert("module-info.class", "module myModuleName {}")
+    }
 
-    path("src/main/java/my/Passed.java").writeText(
-      """
-        package my;
-        public class Passed {}
-      """.trimIndent(),
-    )
     projectScript.appendText(
       """
         dependencies {
-          implementation 'my:a:1.0'
+          ${implementationFiles(metaInfJar)}
         }
       """.trimIndent(),
     )
@@ -303,9 +294,6 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        "my/",
-        "my/Passed.class",
-        "a.properties",
         "META-INF/a.properties",
         *manifestEntries,
       )
