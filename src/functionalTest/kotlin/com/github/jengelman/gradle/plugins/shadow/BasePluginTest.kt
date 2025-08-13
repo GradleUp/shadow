@@ -393,7 +393,8 @@ abstract class BasePluginTest {
 
   fun runner(
     arguments: Iterable<String> = emptyList(),
-    projectDir: Path? = projectRoot,
+    // Defer projectRoot as the runner may be created before the projectRoot is initialized.
+    projectDir: (() -> Path)? = { projectRoot },
     block: (GradleRunner) -> Unit = {},
   ): GradleRunner = GradleRunner.create()
     .withGradleVersion(testGradleVersion)
@@ -403,7 +404,7 @@ abstract class BasePluginTest {
     .withArguments(commonArguments + arguments)
     .apply {
       if (projectDir != null) {
-        withProjectDir(projectDir.toFile())
+        withProjectDir(projectDir().toFile())
       }
       block(this)
     }
