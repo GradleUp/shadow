@@ -99,7 +99,7 @@ publishing.publications.withType<MavenPublication>().configureEach {
 
 val testGradleVersion: String = providers.gradleProperty("testGradleVersion").orNull.let {
   val value = if (it == null || it == "current") GradleVersion.current().version else it
-  logger.info("Using test Gradle version: $value")
+  logger.lifecycle("Using test Gradle version: $value")
   value
 }
 
