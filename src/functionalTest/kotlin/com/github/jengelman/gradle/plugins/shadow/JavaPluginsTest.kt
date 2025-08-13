@@ -330,20 +330,15 @@ class JavaPluginsTest : BasePluginTest() {
           insert("api.properties", "api")
         }
       }
-      jarModule("my", "implementation-dep", "1.0") {
-        buildJar {
-          insert("implementation-dep.properties", "implementation-dep")
-        }
-      }
       jarModule("my", "implementation", "1.0") {
         buildJar {
           insert("implementation.properties", "implementation")
         }
-        addDependency("my", "implementation-dep", "1.0")
+        addDependency("my", "b", "1.0")
       }
-      jarModule("my", "runtimeOnly", "1.0") {
+      jarModule("my", "runtime-only", "1.0") {
         buildJar {
-          insert("runtimeOnly.properties", "runtimeOnly")
+          insert("runtime-only.properties", "runtime-only")
         }
       }
     }.publish()
@@ -354,7 +349,7 @@ class JavaPluginsTest : BasePluginTest() {
         dependencies {
           api 'my:api:1.0'
           implementation 'my:implementation:1.0'
-          runtimeOnly 'my:runtimeOnly:1.0'
+          runtimeOnly 'my:runtime-only:1.0'
         }
       """.trimIndent(),
     )
@@ -365,8 +360,8 @@ class JavaPluginsTest : BasePluginTest() {
       containsOnly(
         "api.properties",
         "implementation.properties",
-        "runtimeOnly.properties",
-        "implementation-dep.properties",
+        "runtime-only.properties",
+        *entriesInB,
         *manifestEntries,
       )
     }
