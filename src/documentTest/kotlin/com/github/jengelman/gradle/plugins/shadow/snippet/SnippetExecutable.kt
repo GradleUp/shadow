@@ -82,13 +82,22 @@ sealed class SnippetExecutable : Executable {
       JarOutputStream(it.outputStream()).use {}
     }
 
+    val warningMode = if (mainScript.contains("org.jetbrains.kotlin.multiplatform")) {
+      "none" // TODO: https://youtrack.jetbrains.com/issue/KT-78620
+    } else {
+      "fail"
+    }
+
     try {
       GradleRunner.create()
         .withGradleVersion(testGradleVersion)
         .withProjectDir(projectRoot.toFile())
         .withPluginClasspath()
         .forwardOutput()
-        .withArguments("--warning-mode=fail", "build")
+        .withArguments(
+          "--warning-mode=$warningMode",
+          "build",
+        )
         .build()
     } catch (t: Throwable) {
       throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)

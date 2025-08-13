@@ -323,9 +323,9 @@ class RelocationTest : BasePluginTest() {
       """
         dependencies {
           implementation 'org.slf4j:slf4j-api:1.7.21'
-          implementation group: 'io.netty', name: 'netty-all', version: '4.0.23.Final'
-          implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
-          implementation group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6'
+          implementation 'io.netty:netty-all:4.0.23.Final'
+          implementation 'com.google.protobuf:protobuf-java:2.5.0'
+          implementation 'org.apache.zookeeper:zookeeper:3.4.6'
         }
         $shadowJarTask {
           zip64 = true

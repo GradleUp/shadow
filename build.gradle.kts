@@ -115,7 +115,6 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
-  testPluginClasspath(libs.agp)
   testPluginClasspath(libs.foojayResolver)
   testPluginClasspath(libs.develocity)
   testPluginClasspath(libs.kotlin.kmp)

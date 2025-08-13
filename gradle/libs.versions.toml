@@ -22,9 +22,6 @@ foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.to
 develocity = "com.gradle:develocity-gradle-plugin:4.1"
 kotlin-kmp = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "pluginPublish" }
-# AGP version should match the min Gradle version used in tests.
-# https://developer.android.com/build/releases/gradle-plugin#updating-gradle
-agp = "com.android.tools.build:gradle:8.8.0"
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha05"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
