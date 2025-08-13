@@ -70,50 +70,50 @@ abstract class BasePluginTest {
       jarModule("junit", "junit", "3.8.2") {
         useJar(junitJar)
       }
-      jarModule("my", "a", "1.0") {
+      val a = jarModule("my", "a", "1.0") {
         buildJar {
           insert("a.properties", "a")
           insert("a2.properties", "a2")
         }
       }
-      jarModule("my", "b", "1.0") {
+      val b = jarModule("my", "b", "1.0") {
         buildJar {
           insert("b.properties", "b")
         }
       }
-      jarModule("my", "c", "1.0") {
+      val c = jarModule("my", "c", "1.0") {
         buildJar {
           insert("c.properties", "c")
         }
       }
-      jarModule("my", "d", "1.0") {
+      val d = jarModule("my", "d", "1.0") {
         buildJar {
           insert("d.properties", "d")
         }
         // Depends on c but c does not depend on d.
-        addDependency("my", "c", "1.0")
+        addDependency(c)
       }
-      jarModule("my", "e", "1.0") {
+      val e = jarModule("my", "e", "1.0") {
         buildJar {
           insert("e.properties", "e")
         }
         // Circular dependency with f.
         addDependency("my", "f", "1.0")
       }
-      jarModule("my", "f", "1.0") {
+      val f = jarModule("my", "f", "1.0") {
         buildJar {
           insert("f.properties", "f")
         }
         // Circular dependency with e.
-        addDependency("my", "e", "1.0")
+        addDependency(e)
       }
       bomModule("my", "bom", "1.0") {
-        addDependency("my", "a", "1.0")
-        addDependency("my", "b", "1.0")
-        addDependency("my", "c", "1.0")
-        addDependency("my", "d", "1.0")
-        addDependency("my", "e", "1.0")
-        addDependency("my", "f", "1.0")
+        addDependency(a)
+        addDependency(b)
+        addDependency(c)
+        addDependency(d)
+        addDependency(e)
+        addDependency(f)
       }
     }
     localRepo.publish()
