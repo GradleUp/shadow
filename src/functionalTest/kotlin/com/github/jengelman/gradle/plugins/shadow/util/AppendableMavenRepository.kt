@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.commonArguments
 import java.nio.file.Path
+import kotlin.io.path.appendText
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
@@ -11,6 +12,7 @@ import kotlin.io.path.name
 import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
+import org.gradle.api.logging.Logging
 import org.gradle.testkit.runner.GradleRunner
 
 class AppendableMavenRepository(
@@ -24,7 +26,7 @@ class AppendableMavenRepository(
     check(root.exists()) { "Maven repository root directory does not exist: $root" }
 
     root.resolve("settings.gradle").createFile()
-      .writeText("rootProject.name = '${root.name}'")
+      .writeText("rootProject.name = '${root.name}'" + lineSeparator)
     root.resolve("build.gradle").createFile()
     jarsDir = root.resolve("jars").createDirectory()
   }
@@ -51,24 +53,32 @@ class AppendableMavenRepository(
     check(modules.isNotEmpty()) {
       "No modules to publish. Please add at least one module."
     }
-    val groups = modules.groupBy { it::class }.entries
-    check(groups.size == 1) {
-      "Only one type of module can be published at a time."
+    modules.groupBy { it::class }.forEach { (type, group) ->
+      @Suppress("UNCHECKED_CAST")
+      when (type) {
+        JarModule::class -> {
+          configureJarModules(group as List<JarModule>)
+        }
+        BomModule::class -> {
+          configureBomModules(group as List<BomModule>)
+        }
+        else -> error("Unsupported module type: $type")
+      }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    when (val type = groups.first().key) {
-      JarModule::class -> {
-        publishJarModules(modules as List<JarModule>)
-      }
-      BomModule::class -> {
-        publishBomModules(modules as List<BomModule>)
-      }
-      else -> error("Unsupported module type: $type")
-    }
+    gradleRunner.withProjectDir(root.toFile())
+      .withArguments(commonArguments + "publish")
+      .build()
+    logger.info(
+      """
+        Publish modules to Maven repository at ${root.toUri()}:
+        ${modules.joinToString(lineSeparator) { it.coordinate}}
+      """.trimIndent(),
+    )
+    modules.clear()
   }
 
-  private fun publishJarModules(jarModules: List<JarModule>) {
+  private fun configureJarModules(jarModules: List<JarModule>) {
     val mavenPublications = jarModules.joinToString(lineSeparator) { module ->
       var index = -1
       val nodes = module.dependencies.joinToString(lineSeparator) {
@@ -105,13 +115,14 @@ class AppendableMavenRepository(
         }
       }
     """.trimIndent()
-    runPublish(scriptContent)
-    modules.clear()
+    val jarsModule = "jars-module"
+    root.resolve("settings.gradle").appendText("include '$jarsModule'$lineSeparator")
+    root.resolve("$jarsModule/build.gradle").writeText(scriptContent)
   }
 
-  private fun publishBomModules(bomModules: List<BomModule>) {
+  private fun configureBomModules(bomModules: List<BomModule>) {
     // BOM modules are published one by one.
-    bomModules.forEach { module ->
+    bomModules.forEachIndexed { index, module ->
       val scriptContent = """
         plugins {
           id 'maven-publish'
@@ -131,9 +142,10 @@ class AppendableMavenRepository(
           }
         }
       """.trimIndent()
-      runPublish(scriptContent)
+      val pomModule = "pom-module-$index"
+      root.resolve("settings.gradle").appendText("include '$pomModule'$lineSeparator")
+      root.resolve("$pomModule/build.gradle").writeText(scriptContent)
     }
-    modules.clear()
   }
 
   private fun Module.createMavenPublication(
@@ -147,13 +159,6 @@ class AppendableMavenRepository(
         $block
       }
     """.trimIndent()
-  }
-
-  private fun runPublish(scriptContent: String) {
-    root.resolve("build.gradle").writeText(scriptContent)
-    gradleRunner.withProjectDir(root.toFile())
-      .withArguments(commonArguments + "publish")
-      .build()
   }
 
   sealed class Module(
@@ -212,6 +217,8 @@ class AppendableMavenRepository(
     }
   }
 }
+
+private val logger = Logging.getLogger(AppendableMavenRepository::class.java)
 
 private val lineSeparator = System.lineSeparator()
 
