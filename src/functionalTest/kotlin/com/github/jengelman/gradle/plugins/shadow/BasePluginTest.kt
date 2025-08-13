@@ -81,6 +81,17 @@ abstract class BasePluginTest {
           insert("b.properties", "b")
         }
       }
+      jarModule("my", "c", "1.0") {
+        buildJar {
+          insert("c.properties", "c")
+        }
+      }
+      jarModule("my", "d", "1.0") {
+        buildJar {
+          insert("d.properties", "d")
+        }
+        addDependency("my", "c", "1.0")
+      }
       bomModule("my", "bom", "1.0") {
         addDependency("my", "a", "1.0")
         addDependency("my", "b", "1.0")
@@ -187,7 +198,7 @@ abstract class BasePluginTest {
       .buildAndFail().assertNoDeprecationWarnings()
   }
 
-  fun publishArtifactCD(circular: Boolean = false) {
+  fun publishArtifactC(circular: Boolean = false) {
     localRepo.apply {
       jarModule("my", "c", "1.0") {
         buildJar {
@@ -196,12 +207,6 @@ abstract class BasePluginTest {
         if (circular) {
           addDependency("my", "d", "1.0")
         }
-      }
-      jarModule("my", "d", "1.0") {
-        buildJar {
-          insert("d.properties", "d")
-        }
-        addDependency("my", "c", "1.0")
       }
     }.publish()
   }

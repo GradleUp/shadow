@@ -4,7 +4,6 @@ import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -12,12 +11,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class FilteringTest : BasePluginTest() {
-  @BeforeAll
-  override fun doFirst() {
-    super.doFirst()
-    publishArtifactCD()
-  }
-
   @BeforeEach
   override fun setup() {
     super.setup()
@@ -200,7 +193,7 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun handleExcludeWithCircularDependency() {
-    publishArtifactCD(circular = true)
+    publishArtifactC(circular = true)
     dependOnAndExcludeArtifactD()
 
     run(shadowJarPath)

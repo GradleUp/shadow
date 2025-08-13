@@ -95,7 +95,6 @@ class CachingTest : BasePluginTest() {
 
   @Test
   fun dependencyFilterChanged() {
-    publishArtifactCD()
     projectScript.appendText(
       """
         dependencies {
