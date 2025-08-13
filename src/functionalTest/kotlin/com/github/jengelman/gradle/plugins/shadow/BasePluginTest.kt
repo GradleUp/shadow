@@ -92,9 +92,27 @@ abstract class BasePluginTest {
         }
         addDependency("my", "c", "1.0")
       }
+      jarModule("my", "e", "1.0") {
+        buildJar {
+          insert("e.properties", "e")
+        }
+        // Circular dependency with f.
+        addDependency("my", "f", "1.0")
+      }
+      jarModule("my", "f", "1.0") {
+        buildJar {
+          insert("f.properties", "f")
+        }
+        // Circular dependency with e.
+        addDependency("my", "e", "1.0")
+      }
       bomModule("my", "bom", "1.0") {
         addDependency("my", "a", "1.0")
         addDependency("my", "b", "1.0")
+        addDependency("my", "c", "1.0")
+        addDependency("my", "d", "1.0")
+        addDependency("my", "e", "1.0")
+        addDependency("my", "f", "1.0")
       }
     }
     localRepo.publish()
@@ -196,19 +214,6 @@ abstract class BasePluginTest {
   ): BuildResult {
     return runner(arguments = arguments.toList(), block = runnerBlock)
       .buildAndFail().assertNoDeprecationWarnings()
-  }
-
-  fun publishArtifactC(circular: Boolean = false) {
-    localRepo.apply {
-      jarModule("my", "c", "1.0") {
-        buildJar {
-          insert("c.properties", "c")
-        }
-        if (circular) {
-          addDependency("my", "d", "1.0")
-        }
-      }
-    }.publish()
   }
 
   fun writeClass(
