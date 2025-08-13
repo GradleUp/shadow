@@ -169,17 +169,13 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val one = buildJarOne {
       insert(servicesBarEntry, CONTENT_ONE)
     }
-    localRepo.jarModule("foo", "bar", "1.0") {
-      buildJar {
-        insert(servicesBarEntry, CONTENT_TWO)
-      }
-    }.publish()
-
+    val two = buildJarTwo {
+      insert(servicesBarEntry, CONTENT_TWO)
+    }
     projectScript.appendText(
       """
         dependencies {
-          implementation 'foo:bar:1.0'
-          ${implementationFiles(one)}
+          ${implementationFiles(one, two)}
         }
         $shadowJarTask {
           mergeServiceFiles()
