@@ -23,10 +23,10 @@ jobs:
             java: 24
         include:
           # We just test one JDK version on Windows.
-          - os: windows-11-arm
+          - os: windows-latest
             gradle: 8.11
             java: 21
-          - os: windows-11-arm
+          - os: windows-latest
             gradle: current
             java: 21
     runs-on: ${{ matrix.os }}
@@ -37,15 +37,21 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}"
+      - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}" --stacktrace
 
   # Status check that is required in branch protection rules.
   build-status:
     needs: build
     runs-on: ubuntu-24.04-arm
+    if: always()
     steps:
-      - run: |
-          echo all build jobs completed successfully.
+      - name: Check build matrix result
+        run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Some build jobs failed."
+            exit 1
+          fi
+          echo "All build jobs completed successfully."
 
   publish-snapshot:
     needs: build

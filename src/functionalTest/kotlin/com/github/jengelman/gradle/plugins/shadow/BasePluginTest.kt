@@ -48,12 +48,6 @@ abstract class BasePluginTest {
   lateinit var projectRoot: Path
     private set
 
-  val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
-  val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
-  val runShadowPath = ":$SHADOW_RUN_TASK_NAME"
-  val installShadowDistPath = ":$SHADOW_INSTALL_TASK_NAME"
-  val shadowDistZipPath = ":shadowDistZip"
-
   val projectScript: Path get() = path("build.gradle")
   val settingsScript: Path get() = path("settings.gradle")
   open val outputShadowedJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
@@ -151,17 +145,6 @@ abstract class BasePluginTest {
   ): BuildResult {
     return runner(arguments = arguments.toList(), projectDir = projectRoot, block = runnerBlock)
       .buildAndFail().assertNoDeprecationWarnings()
-  }
-
-  fun publishArtifactC(circular: Boolean = false) {
-    localRepo.jarModule("my", "c", "1.0") {
-      buildJar {
-        insert("c.properties", "c")
-      }
-      if (circular) {
-        addDependency("my", "d", "1.0")
-      }
-    }.publish()
   }
 
   fun writeClass(
@@ -365,6 +348,12 @@ abstract class BasePluginTest {
       Path(gradleUserHome, "testkit")
     }
 
+    const val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
+    const val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
+    const val runShadowPath = ":$SHADOW_RUN_TASK_NAME"
+    const val installShadowDistPath = ":$SHADOW_INSTALL_TASK_NAME"
+    const val shadowDistZipPath = ":shadowDistZip"
+
     val artifactAJar: Path get() = localRepo.root.resolve("my/a/1.0/a-1.0.jar")
     val artifactBJar: Path get() = localRepo.root.resolve("my/b/1.0/b-1.0.jar")
     val entriesInA = arrayOf("a.properties", "a2.properties")
@@ -397,42 +386,65 @@ abstract class BasePluginTest {
       "-Dorg.gradle.configuration-cache.parallel=true",
     )
 
-    const val INFO_ARGUMENT = "--info"
-
     // TODO: enable this flag for all tests once we have fixed all issues with isolated projects.
     //  See https://github.com/GradleUp/shadow/pull/1139.
-    const val IP_ARGUMENT = "-Dorg.gradle.unsafe.isolated-projects=true"
+    const val ipArgument = "-Dorg.gradle.unsafe.isolated-projects=true"
+    const val infoArgument = "--info"
 
     val localRepo: AppendableMavenRepository by lazy {
       AppendableMavenRepository(
         createTempDirectory().resolve("local-maven-repo").createDirectories(),
         runner(),
-      ).also { repo ->
-        repo.jarModule("junit", "junit", "3.8.2") {
+      ).apply {
+        jarModule("junit", "junit", "3.8.2") {
           useJar(junitJar)
-        }.jarModule("my", "a", "1.0") {
+        }
+        val a = jarModule("my", "a", "1.0") {
           buildJar {
             insert("a.properties", "a")
             insert("a2.properties", "a2")
           }
-        }.jarModule("my", "b", "1.0") {
+        }
+        val b = jarModule("my", "b", "1.0") {
           buildJar {
             insert("b.properties", "b")
           }
-        }.jarModule("my", "c", "1.0") {
+        }
+        val c = jarModule("my", "c", "1.0") {
           buildJar {
             insert("c.properties", "c")
           }
-        }.jarModule("my", "d", "1.0") {
+        }
+        val d = jarModule("my", "d", "1.0") {
           buildJar {
             insert("d.properties", "d")
           }
-          addDependency("my", "c", "1.0")
-        }.publish()
-        repo.bomModule("my", "bom", "1.0") {
-          addDependency("my", "a", "1.0")
-          addDependency("my", "b", "1.0")
-        }.publish()
+          // Depends on c but c does not depend on d.
+          addDependency(c)
+        }
+        val e = jarModule("my", "e", "1.0") {
+          buildJar {
+            insert("e.properties", "e")
+          }
+          // Circular dependency with f.
+          addDependency("my:f:1.0")
+        }
+        val f = jarModule("my", "f", "1.0") {
+          buildJar {
+            insert("f.properties", "f")
+          }
+          // Circular dependency with e.
+          addDependency(e)
+        }
+        bomModule("my", "bom", "1.0") {
+          addDependency(a)
+          addDependency(b)
+          addDependency(c)
+          addDependency(d)
+          addDependency(e)
+          addDependency(f)
+        }
+        publish()
       }
     }
 

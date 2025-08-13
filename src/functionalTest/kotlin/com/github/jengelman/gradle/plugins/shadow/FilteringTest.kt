@@ -60,7 +60,28 @@ class FilteringTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun excludeDependency(useAccessor: Boolean) {
-    dependOnAndExcludeArtifactD(useAccessor)
+    settingsScript.appendText(
+      """
+        dependencyResolutionManagement {
+          versionCatalogs.create('libs') {
+            library('my-d', 'my:d:1.0')
+          }
+        }
+      """.trimIndent(),
+    )
+    val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation $dependency
+        }
+        $shadowJarTask {
+          dependencies {
+            exclude(dependency($dependency))
+          }
+        }
+      """.trimIndent(),
+    )
 
     run(shadowJarPath)
 
@@ -193,25 +214,7 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun handleExcludeWithCircularDependency() {
-    publishArtifactC(circular = true)
-    dependOnAndExcludeArtifactD()
-
-    run(shadowJarPath)
-
-    commonAssertions()
-  }
-
-  private fun dependOnAndExcludeArtifactD(useAccessor: Boolean = false) {
-    settingsScript.appendText(
-      """
-        dependencyResolutionManagement {
-          versionCatalogs.create('libs') {
-            library('my-d', 'my:d:1.0')
-          }
-        }
-      """.trimIndent(),
-    )
-    val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
+    val dependency = "'my:e:1.0'"
     projectScript.appendText(
       """
         dependencies {
@@ -224,6 +227,16 @@ class FilteringTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "f.properties",
+        *entriesInAB,
+        *manifestEntries,
+      )
+    }
   }
 
   private fun commonAssertions() {

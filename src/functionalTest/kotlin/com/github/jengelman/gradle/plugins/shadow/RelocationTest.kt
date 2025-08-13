@@ -53,7 +53,7 @@ class RelocationTest : BasePluginTest() {
       }
     }.toTypedArray()
 
-    val result = run(shadowJarPath, INFO_ARGUMENT)
+    val result = run(shadowJarPath, infoArgument)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -284,23 +284,16 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateResourceFiles() {
-    localRepo.jarModule("my", "dep", "1.0") {
-      buildJar {
-        insert("foo/dep.properties", "c")
-      }
-    }.publish()
-    path("src/main/java/foo/Foo.java").writeText(
-      """
-        package foo;
-        class Foo {}
-      """.trimIndent(),
-    )
+    val depJar = buildJar("foo.jar") {
+      insert("foo/dep.properties", "c")
+    }
+    writeClass(packageName = "foo", className = "Foo")
     path("src/main/resources/foo/foo.properties").writeText("name=foo")
 
     projectScript.appendText(
       """
         dependencies {
-          implementation 'my:dep:1.0'
+          ${implementationFiles(depJar)}
         }
         $shadowJarTask {
           relocate 'foo', 'bar'
