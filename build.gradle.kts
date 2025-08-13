@@ -118,8 +118,6 @@ tasks.withType<Test>().configureEach {
   logger.info("Using test Gradle version: $testGradleVersion")
   systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
 
-  maxParallelForks = Runtime.getRuntime().availableProcessors()
-
   if (isCI) {
     testLogging.showStandardStreams = true
     minHeapSize = "1g"
