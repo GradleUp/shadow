@@ -184,10 +184,6 @@ class AppendableMavenRepository(
     }
 
     fun addDependency(coordinate: String, scope: String = "runtime") {
-      val parts = coordinate.split(":")
-      require(parts.size == 3) {
-        "Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'."
-      }
       val (groupId, artifactId, version) = coordinate.split(":").takeIf { it.size == 3 }
         ?: error("Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'.")
       val dependency = Dependency().also {
