@@ -85,8 +85,8 @@ abstract class BasePluginTest {
         addDependency("my", "a", "1.0")
         addDependency("my", "b", "1.0")
       }
-      publish()
     }
+    localRepo.publish()
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)

@@ -5,6 +5,7 @@ import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
@@ -26,7 +27,7 @@ class AppendableMavenRepository(
     check(root.exists()) { "Maven repository root directory does not exist: $root" }
 
     root.resolve("settings.gradle").createFile()
-      .writeText("rootProject.name = '${root.name}'" + lineSeparator)
+      .writeText("rootProject.name = '${root.name}'$lineSeparator")
     root.resolve("build.gradle").createFile()
     jarsDir = root.resolve("jars").createDirectory()
   }
@@ -72,7 +73,7 @@ class AppendableMavenRepository(
     logger.info(
       """
         Publish modules to Maven repository at ${root.toUri()}:
-        ${modules.joinToString(lineSeparator) { it.coordinate}}
+        ${modules.joinToString(lineSeparator) { it.coordinate }}
       """.trimIndent(),
     )
     modules.clear()
@@ -117,7 +118,9 @@ class AppendableMavenRepository(
     """.trimIndent()
     val jarsModule = "jars-module"
     root.resolve("settings.gradle").appendText("include '$jarsModule'$lineSeparator")
-    root.resolve("$jarsModule/build.gradle").writeText(scriptContent)
+    root.resolve("$jarsModule/build.gradle")
+      .createFileIfNotExists()
+      .writeText(scriptContent)
   }
 
   private fun configureBomModules(bomModules: List<BomModule>) {
@@ -144,7 +147,9 @@ class AppendableMavenRepository(
       """.trimIndent()
       val pomModule = "pom-module-$index"
       root.resolve("settings.gradle").appendText("include '$pomModule'$lineSeparator")
-      root.resolve("$pomModule/build.gradle").writeText(scriptContent)
+      root.resolve("$pomModule/build.gradle")
+        .createFileIfNotExists()
+        .writeText(scriptContent)
     }
   }
 
@@ -223,3 +228,11 @@ private val logger = Logging.getLogger(AppendableMavenRepository::class.java)
 private val lineSeparator = System.lineSeparator()
 
 val Dependency.coordinate: String get() = "$groupId:$artifactId:$version"
+
+private fun Path.createFileIfNotExists(): Path {
+  if (!exists()) {
+    createParentDirectories()
+    createFile()
+  }
+  return this
+}
