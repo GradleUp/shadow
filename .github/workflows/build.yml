@@ -68,7 +68,7 @@ jobs:
             echo "One or more required jobs failed"
             exit 1
           fi
-          echo "All jobs completed successfully."
+          echo "All required jobs completed successfully."
 
   publish-snapshot:
     needs: build-status
