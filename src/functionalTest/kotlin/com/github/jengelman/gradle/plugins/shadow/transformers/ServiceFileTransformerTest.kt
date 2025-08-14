@@ -226,9 +226,29 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     projectScript.appendText(
       """
         $shadowJarTask {
-          duplicatesStrategy = DuplicatesStrategy.EXCLUDE
           filesMatching('$ENTRY_SERVICES_SHADE') {
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+    }
+  }
+
+  @Test
+  fun strategyIncludeCanBeOverriddenByFilesNotMatching() {
+    writeDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          filesNotMatching('$ENTRY_SERVICES_SHADE') {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
           }
         }
       """.trimIndent(),
