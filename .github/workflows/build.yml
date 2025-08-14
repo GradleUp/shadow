@@ -55,20 +55,23 @@ jobs:
 
   # Status check that is required in branch protection rules.
   build-status:
-    needs: build
+    needs:
+      - build
+      - lint
     runs-on: ubuntu-24.04-arm
     if: always()
     steps:
-      - name: Check build matrix result
+      - name: Check
         run: |
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "Some build jobs failed."
+          results=$(tr -d '\n' <<< '${{ toJSON(needs.*.result) }}')
+          if ! grep -q -v -E '(failure|cancelled)' <<< "$results"; then
+            echo "One or more required jobs failed"
             exit 1
           fi
-          echo "All build jobs completed successfully."
+          echo "All required jobs completed successfully."
 
   publish-snapshot:
-    needs: build
+    needs: build-status
     runs-on: ubuntu-24.04-arm
     if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
     steps:
