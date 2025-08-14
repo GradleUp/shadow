@@ -55,17 +55,32 @@ jobs:
 
   # Status check that is required in branch protection rules.
   build-status:
-    needs: build
+    needs:
+      - build
+      - lint
     runs-on: ubuntu-24.04-arm
     if: always()
     steps:
-      - name: Check build matrix result
+      - name: Check results
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
         run: |
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "Some build jobs failed."
-            exit 1
-          fi
-          echo "All build jobs completed successfully."
+          python3 - <<'PY'
+          import json, os, sys
+          needs = json.loads(os.environ['NEEDS_JSON'] or "{}")
+          failures = []
+          for name, meta in needs.items():
+              result = (meta or {}).get("result")
+              print(f" - {name}: {result}")
+              if result == "failure":
+                  failures.append((name, result))
+          if failures:
+              print("One or more required jobs failed:", file=sys.stderr)
+              for name, result in failures:
+                  print(f"   {name}: {result}", file=sys.stderr)
+              sys.exit(1)
+          print("All required jobs passed (no failures detected).")
+          PY
 
   publish-snapshot:
     needs: build
