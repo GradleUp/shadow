@@ -37,7 +37,21 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}" --stacktrace
+      - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}" --stacktrace -x lint
+
+  # TODO: https://issuetracker.google.com/issues/438361087
+  lint:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+      - run: ./gradlew lint
 
   # Status check that is required in branch protection rules.
   build-status:
