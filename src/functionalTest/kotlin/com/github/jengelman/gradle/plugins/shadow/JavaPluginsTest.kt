@@ -66,6 +66,10 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(project.plugins.hasPlugin(LegacyShadowPlugin::class.java)).isTrue()
     assertThat(project.tasks.findByName(SHADOW_JAR_TASK_NAME)).isNull()
 
+    with(project.extensions.getByType(ShadowExtension::class.java)) {
+      assertThat(addOptionalJavaVariant.get()).isTrue()
+    }
+
     project.plugins.apply(JavaPlugin::class.java)
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)

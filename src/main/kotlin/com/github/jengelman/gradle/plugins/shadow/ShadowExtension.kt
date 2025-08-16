@@ -1,6 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-/**
- * TODO: haven't removed this as I want to address issues like https://github.com/GradleUp/shadow/issues/651 in it.
- */
-public interface ShadowExtension
+import org.gradle.api.provider.Property
+
+public interface ShadowExtension {
+  /**
+   * Controls whether the optional Java variant is added to the 'java' component.
+   * If true, the variant from the shadow runtime elements configuration will be mapped as optional.
+   * This affects how consumers resolve the published artifact.
+   */
+  public val addOptionalJavaVariant: Property<Boolean>
+}
