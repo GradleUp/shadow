@@ -502,12 +502,8 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/1422",
   )
   @Test
-  fun movesLocalGradleApiToCompileOnly() {
-    projectScript.writeText(
-      """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + lineSeparator,
-    )
+  fun moveLocalGradleApiToCompileOnly() {
+    projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
 
     val outputCompileOnly = dependencies(COMPILE_ONLY_CONFIGURATION_NAME)
     val outputApi = dependencies(API_CONFIGURATION_NAME)
@@ -523,11 +519,7 @@ class JavaPluginsTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
   fun doNotReAddSuppressedGradleApi(configuration: String) {
-    projectScript.writeText(
-      """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + lineSeparator,
-    )
+    projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
 
     val output = dependencies(
       configuration = configuration,
@@ -587,16 +579,16 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/443",
   )
   @Test
-  fun registerCustomShadowJarTaskThatContainsDependenciesOnly() {
+  fun registerCustomShadowJarThatContainsDependenciesOnly() {
     val mainClassEntry = writeClass()
-    val dependencyShadowJar = "dependencyShadowJar"
+    val depsShadowJar = "depsShadowJar"
 
     projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
+        def $depsShadowJar = tasks.register('$depsShadowJar', ${ShadowJar::class.java.name}) {
           description = 'Create a shadow JAR of all dependencies'
           archiveClassifier = 'dep'
           configurations = project.configurations.named('runtimeClasspath').map { [it] }
@@ -604,7 +596,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("jar", dependencyShadowJar)
+    run("jar", depsShadowJar)
 
     assertThat(jarPath("build/libs/my-1.0.jar")).useAll {
       containsOnly(
