@@ -581,14 +581,14 @@ class JavaPluginsTest : BasePluginTest() {
   @Test
   fun registerCustomShadowJarThatContainsDependenciesOnly() {
     val mainClassEntry = writeClass()
-    val depsShadowJar = "depsShadowJar"
+    val dependencyShadowJar = "dependencyShadowJar"
 
     projectScript.appendText(
       """
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-        def $depsShadowJar = tasks.register('$depsShadowJar', ${ShadowJar::class.java.name}) {
+        def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
           description = 'Create a shadow JAR of all dependencies'
           archiveClassifier = 'dep'
           configurations = project.configurations.named('runtimeClasspath').map { [it] }
@@ -596,7 +596,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("jar", depsShadowJar)
+    run("jar", dependencyShadowJar)
 
     assertThat(jarPath("build/libs/my-1.0.jar")).useAll {
       containsOnly(
