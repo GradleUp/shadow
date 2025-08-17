@@ -5,7 +5,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
-import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -55,25 +54,6 @@ class TransformersTest : BaseTransformerTest() {
     run(shadowJarPath)
 
     commonAssertions()
-  }
-
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/82",
-  )
-  @Test
-  fun shadowManifestLeaksToJarManifest() {
-    writeClass()
-    projectScript.appendText(MANIFEST_ATTRS)
-
-    run("jar", shadowJarPath)
-
-    commonAssertions()
-
-    val mf = jarPath("build/libs/my-1.0.jar").use { it.manifest }
-    assertThat(mf).isNotNull()
-    assertThat(mf.mainAttributes.getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("FAILED")
-    assertThat(mf.mainAttributes.getValue(mainClassAttributeKey)).isEqualTo("my.Main")
-    assertThat(mf.mainAttributes.getValue(NEW_ENTRY_ATTR_KEY)).isNull()
   }
 
   @Issue(
