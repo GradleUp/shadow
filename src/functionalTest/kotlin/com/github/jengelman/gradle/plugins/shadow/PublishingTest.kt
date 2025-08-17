@@ -63,7 +63,7 @@ class PublishingTest : BasePluginTest() {
     disabledReason = "Cannot use toolchain on Windows ARM64", // TODO: https://github.com/gradle/gradle/issues/29807
   )
   @Test
-  fun publishShadowJar() {
+  fun publishShadowJarWithCorrectTargetJvm() {
     projectScript.appendText(
       publishConfiguration(
         shadowBlock = """
@@ -73,20 +73,14 @@ class PublishingTest : BasePluginTest() {
       ) + lineSeparator,
     )
 
-    publish()
-
-    val assertions = { variantAttrs: Array<Pair<String, String>>? ->
-      assertShadowJarCommon(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar"))
+    val assertions = { variantAttrs: Array<Pair<String, String>> ->
+      publish()
       assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
       val gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module"))
-      if (variantAttrs == null) {
-        assertShadowVariantCommon(gmm)
-      } else {
-        assertShadowVariantCommon(gmm, variantAttrs = variantAttrs)
-      }
+      assertShadowVariantCommon(gmm, variantAttrs = variantAttrs)
     }
 
-    assertions(null)
+    assertions(shadowVariantAttrs)
 
     val attrsWithoutTargetJvm = shadowVariantAttrs.filterNot { (name, _) ->
       name == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
@@ -102,7 +96,6 @@ class PublishingTest : BasePluginTest() {
         }
       """.trimIndent() + lineSeparator,
     )
-    publish()
     assertions(attrsWithoutTargetJvm + targetJvmAttr17)
 
     projectScript.appendText(
@@ -112,7 +105,6 @@ class PublishingTest : BasePluginTest() {
         }
       """.trimIndent() + lineSeparator,
     )
-    publish()
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
     projectScript.appendText(
@@ -122,7 +114,6 @@ class PublishingTest : BasePluginTest() {
         }
       """.trimIndent() + lineSeparator,
     )
-    publish()
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
@@ -133,7 +124,6 @@ class PublishingTest : BasePluginTest() {
         }
       """.trimIndent() + lineSeparator,
     )
-    publish()
     // options.release flag is honored.
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
@@ -384,13 +374,9 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
-  fun publishShadowJarWithGradleMetadata() {
+  fun publishJarAndShadowJarWithGradleMetadata() {
     projectScript.appendText(
       publishConfiguration(
-        projectBlock = """
-          group = 'com.acme'
-          version = '1.0'
-        """.trimIndent(),
         dependenciesBlock = """
           implementation 'my:a:1.0'
           implementation 'my:b:1.0'
@@ -410,18 +396,18 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0.jar")).useAll {
+    assertThat(repoJarPath("my/maven/1.0/maven-1.0.jar")).useAll {
       containsNone(*entriesInAB)
     }
-    assertThat(repoJarPath("com/acme/maven/1.0/maven-1.0-all.jar")).useAll {
+    assertThat(repoJarPath("my/maven/1.0/maven-1.0-all.jar")).useAll {
       containsOnly(
         *entriesInAB,
         *manifestEntries,
       )
     }
 
-    assertPomCommon(repoPath("com/acme/maven/1.0/maven-1.0.pom"), arrayOf("my:a:1.0", "my:b:1.0"))
-    gmmAdapter.fromJson(repoPath("com/acme/maven/1.0/maven-1.0.module")).let { gmm ->
+    assertPomCommon(repoPath("my/maven/1.0/maven-1.0.pom"), arrayOf("my:a:1.0", "my:b:1.0"))
+    gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")).let { gmm ->
       // apiElements, runtimeElements, shadowRuntimeElements
       assertThat(gmm.variantNames).containsOnly(
         API_ELEMENTS_CONFIGURATION_NAME,
@@ -450,8 +436,8 @@ class PublishingTest : BasePluginTest() {
       assertShadowVariantCommon(gmm)
     }
 
-    assertPomCommon(repoPath("com/acme/maven-all/1.0/maven-all-1.0.pom"))
-    gmmAdapter.fromJson(repoPath("com/acme/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
+    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
+    gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
       assertThat(gmm.variantNames).containsOnly(
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
