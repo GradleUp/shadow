@@ -37,7 +37,7 @@ class ApplicationPluginTest : BasePluginTest() {
   @DisabledOnOs(
     OS.WINDOWS,
     architectures = ["aarch64"],
-    disabledReason = "https://github.com/gradle/gradle/issues/29807",
+    disabledReason = "Cannot use toolchain on Windows ARM64", // TODO: https://github.com/gradle/gradle/issues/29807
   )
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {

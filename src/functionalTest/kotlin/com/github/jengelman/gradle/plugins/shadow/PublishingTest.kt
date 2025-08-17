@@ -46,8 +46,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.io.TempDir
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
 class PublishingTest : BasePluginTest() {
   @TempDir
@@ -62,7 +60,7 @@ class PublishingTest : BasePluginTest() {
   @DisabledOnOs(
     OS.WINDOWS,
     architectures = ["aarch64"],
-    disabledReason = "https://github.com/gradle/gradle/issues/29807",
+    disabledReason = "Cannot use toolchain on Windows ARM64", // TODO: https://github.com/gradle/gradle/issues/29807
   )
   @Test
   fun publishShadowJar() {
