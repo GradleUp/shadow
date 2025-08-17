@@ -465,10 +465,9 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/459",
     "https://github.com/GradleUp/shadow/issues/852",
   )
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun excludeGradleApiByDefault(legacy: Boolean) {
-    writeGradlePluginModule(legacy)
+  @Test
+  fun excludeGradleApiByDefault() {
+    writeGradlePluginModule()
     projectScript.appendText(
       """
         dependencies {

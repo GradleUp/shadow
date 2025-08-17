@@ -195,10 +195,9 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun publishShadowedGradlePlugin(legacy: Boolean) {
-    writeGradlePluginModule(legacy)
+  @Test
+  fun publishShadowedGradlePlugin() {
+    writeGradlePluginModule()
     projectScript.appendText(
       publishConfiguration(
         projectBlock = """
