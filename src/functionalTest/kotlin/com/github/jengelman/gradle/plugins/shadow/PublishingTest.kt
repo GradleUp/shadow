@@ -462,6 +462,97 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun publishShadowVariantJar(addOptionalJavaVariant: Boolean) {
+    projectScript.appendText(
+      publishingBlock(
+        projectBlock = """
+          dependencies {
+            implementation 'my:a:1.0'
+            shadow 'my:b:1.0'
+          }
+          shadow {
+            addOptionalJavaVariant = $addOptionalJavaVariant
+          }
+        """.trimIndent(),
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            from components.java
+          }
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    if (addOptionalJavaVariant) {
+      assertThat(repoPath("my/maven/1.0/").listDirectoryEntries().map { it.name }).containsOnly(
+        "maven-1.0-all.jar",
+        "maven-1.0-all.jar.md5",
+        "maven-1.0-all.jar.sha1",
+        "maven-1.0-all.jar.sha256",
+        "maven-1.0-all.jar.sha512",
+        "maven-1.0.jar",
+        "maven-1.0.jar.md5",
+        "maven-1.0.jar.sha1",
+        "maven-1.0.jar.sha256",
+        "maven-1.0.jar.sha512",
+        "maven-1.0.module",
+        "maven-1.0.module.md5",
+        "maven-1.0.module.sha1",
+        "maven-1.0.module.sha256",
+        "maven-1.0.module.sha512",
+        "maven-1.0.pom",
+        "maven-1.0.pom.md5",
+        "maven-1.0.pom.sha1",
+        "maven-1.0.pom.sha256",
+        "maven-1.0.pom.sha512",
+      )
+      assertShadowJarCommon(repoJarPath("my/maven/1.0/maven-1.0-all.jar"))
+      assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")))
+      assertThat(pomReader.read(repoPath("my/maven/1.0/maven-1.0.pom"))).all {
+        transform { actual -> actual.dependencies.map { it.coordinate to it.scope } }
+          .containsOnly(
+            "my:a:1.0" to "runtime",
+            "my:b:1.0" to "compile",
+          )
+      }
+    } else {
+      assertThat(repoPath("my/maven/1.0/").listDirectoryEntries().map { it.name }).containsOnly(
+        "maven-1.0-all.jar",
+        "maven-1.0-all.jar.md5",
+        "maven-1.0-all.jar.sha1",
+        "maven-1.0-all.jar.sha256",
+        "maven-1.0-all.jar.sha512",
+        "maven-1.0.jar",
+        "maven-1.0.jar.md5",
+        "maven-1.0.jar.sha1",
+        "maven-1.0.jar.sha256",
+        "maven-1.0.jar.sha512",
+        "maven-1.0.module",
+        "maven-1.0.module.md5",
+        "maven-1.0.module.sha1",
+        "maven-1.0.module.sha256",
+        "maven-1.0.module.sha512",
+        "maven-1.0.pom",
+        "maven-1.0.pom.md5",
+        "maven-1.0.pom.sha1",
+        "maven-1.0.pom.sha256",
+        "maven-1.0.pom.sha512",
+      )
+      assertShadowJarCommon(repoJarPath("my/maven/1.0/maven-1.0-all.jar"))
+      assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")))
+      assertThat(pomReader.read(repoPath("my/maven/1.0/maven-1.0.pom"))).all {
+        transform { actual -> actual.dependencies.map { it.coordinate to it.scope } }
+          .containsOnly(
+            "my:a:1.0" to "runtime",
+            "my:b:1.0" to "compile",
+          )
+      }
+    }
+  }
+
   private fun repoPath(relative: String): Path {
     return remoteRepoPath.resolve(relative).also {
       check(it.exists()) { "Path not found: $it" }
