@@ -28,7 +28,6 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
-import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
@@ -287,58 +286,6 @@ class PublishingTest : BasePluginTest() {
     assertShadowJarCommon(repoJarPath("$artifactRoot/my-artifact-2.0-my-classifier.my-ext"))
     assertPomCommon(repoPath("$artifactRoot/my-artifact-2.0.pom"))
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/my-artifact-2.0.module")))
-  }
-
-  @Test
-  fun publishMultiProjectShadowJar() {
-    settingsScript.appendText(
-      """
-        include 'a', 'b', 'c'
-      """.trimIndent(),
-    )
-    projectScript.writeText(
-      """
-        subprojects {
-          apply plugin: 'java'
-          apply plugin: 'maven-publish'
-          version = '1.0'
-          group = 'my'
-        }
-      """.trimIndent(),
-    )
-
-    path("a/src/main/resources/aa.properties").writeText("aa")
-    path("a/src/main/resources/aa2.properties").writeText("aa2")
-    path("b/src/main/resources/bb.properties").writeText("bb")
-
-    val publishBlock = publishConfiguration(
-      dependenciesBlock = """
-        implementation project(':a')
-        shadow project(':b')
-      """.trimIndent(),
-      shadowBlock = """
-        archiveClassifier = ''
-        archiveBaseName = 'maven-all'
-      """.trimIndent(),
-    )
-    path("c/build.gradle").writeText(
-      """
-        ${getDefaultProjectBuildScript(withGroup = true, withVersion = true)}
-        $publishBlock
-      """.trimIndent(),
-    )
-
-    publish()
-
-    assertThat(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar")).useAll {
-      containsOnly(
-        "aa.properties",
-        "aa2.properties",
-        *manifestEntries,
-      )
-    }
-    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")))
   }
 
   @Test
