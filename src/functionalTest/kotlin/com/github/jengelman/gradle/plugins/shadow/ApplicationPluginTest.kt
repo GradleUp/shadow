@@ -140,6 +140,9 @@ class ApplicationPluginTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+
+    var result = run(runShadowPath)
+
     val assertions = { output: String, arg: String ->
       assertThat(output).all {
         // Prefer main class from `application.main` over the one in manifest attributes.
@@ -147,8 +150,7 @@ class ApplicationPluginTest : BasePluginTest() {
         doesNotContain("Hello, World! ($arg) from Main2")
       }
     }
-
-    assertions(run(runShadowPath).output, "foo")
+    assertions(result.output, "foo")
     commonAssertions(
       jarPath("build/libs/myapp-1.0-all.jar"),
       entriesContained = entriesInA + arrayOf(mainClass, main2ClassEntry),
@@ -162,7 +164,10 @@ class ApplicationPluginTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
-    assertions(run(":run").output, "bar")
+
+    result = run(":run")
+
+    assertions(result.output, "bar")
   }
 
   @Test
