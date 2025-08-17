@@ -67,6 +67,47 @@ class RelocationTest : BasePluginTest() {
     )
   }
 
+  @ParameterizedTest
+  @MethodSource("relocationCliOptionProvider")
+  fun enableAutoRelocationByCliOption(enable: Boolean, relocationPrefix: String) {
+    val mainClassEntry = writeClass()
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+      """.trimIndent(),
+    )
+    val relocatedEntries = junitEntries.map { "$relocationPrefix/$it" }
+      .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
+      .toTypedArray()
+
+    if (enable) {
+      run(shadowJarPath, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
+    } else {
+      run(shadowJarPath, "--relocation-prefix=$relocationPrefix")
+    }
+
+    assertThat(outputShadowedJar).useAll {
+      if (enable) {
+        containsOnly(
+          "my/",
+          "$relocationPrefix/",
+          mainClassEntry,
+          *relocatedEntries,
+          *manifestEntries,
+        )
+      } else {
+        containsOnly(
+          "my/",
+          mainClassEntry,
+          *junitEntries,
+          *manifestEntries,
+        )
+      }
+    }
+  }
+
   @Issue(
     "https://github.com/GradleUp/shadow/issues/58",
   )
@@ -331,7 +372,7 @@ class RelocationTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/884",
   )
   @Test
-  fun preserveKotlinBuiltins() {
+  fun excludeKotlinBuiltinsFromRelocation() {
     val kotlinJar = buildJar("kotlin.jar") {
       insert("kotlin/kotlin.kotlin_builtins", "This is a Kotlin builtins file.")
     }
@@ -429,47 +470,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @MethodSource("relocationCliOptionProvider")
-  fun enableAutoRelocationByCliOption(enable: Boolean, relocationPrefix: String) {
-    val mainClassEntry = writeClass()
-    projectScript.appendText(
-      """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """.trimIndent(),
-    )
-    val relocatedEntries = junitEntries.map { "$relocationPrefix/$it" }
-      .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
-      .toTypedArray()
-
-    if (enable) {
-      run(shadowJarPath, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
-    } else {
-      run(shadowJarPath, "--relocation-prefix=$relocationPrefix")
-    }
-
-    assertThat(outputShadowedJar).useAll {
-      if (enable) {
-        containsOnly(
-          "my/",
-          "$relocationPrefix/",
-          mainClassEntry,
-          *relocatedEntries,
-          *manifestEntries,
-        )
-      } else {
-        containsOnly(
-          "my/",
-          mainClassEntry,
-          *junitEntries,
-          *manifestEntries,
-        )
-      }
-    }
-  }
-
   @Test
   fun relocateStringConstantsByDefault() {
     writeClassWithStringRef()
@@ -499,7 +499,7 @@ class RelocationTest : BasePluginTest() {
   )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun disableRelocateStringConstants(skipStringConstants: Boolean) {
+  fun disableStringConstantsRelocation(skipStringConstants: Boolean) {
     writeClassWithStringRef()
     projectScript.appendText(
       """
