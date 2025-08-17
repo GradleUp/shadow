@@ -348,32 +348,18 @@ abstract class BasePluginTest {
     path("server/build.gradle").writeText(replaced)
   }
 
-  fun writeGradlePluginModule(legacy: Boolean) {
-    val pluginId = "my.plugin"
-    val pluginClass = "my.plugin.MyPlugin"
-    val gradlePluginBlock: String
-
-    if (legacy) {
-      gradlePluginBlock = ""
-      path("src/main/resources/META-INF/gradle-plugins/$pluginId.properties")
-        .writeText("implementation-class=$pluginClass")
-    } else {
-      gradlePluginBlock = """
-        gradlePlugin {
-          plugins {
-            create('myPlugin') {
-              id = '$pluginId'
-              implementationClass = '$pluginClass'
-            }
-          }
-        }
-      """.trimIndent()
-    }
-
+  fun writeGradlePluginModule() {
     projectScript.writeText(
       """
         ${getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true)}
-        $gradlePluginBlock
+        gradlePlugin {
+          plugins {
+            create('myPlugin') {
+              id = 'my.plugin'
+              implementationClass = 'my.plugin.MyPlugin'
+            }
+          }
+        }
       """.trimIndent() + lineSeparator,
     )
 

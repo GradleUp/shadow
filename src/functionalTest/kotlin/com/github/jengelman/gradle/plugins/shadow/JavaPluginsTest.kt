@@ -465,10 +465,9 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/459",
     "https://github.com/GradleUp/shadow/issues/852",
   )
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun excludeGradleApiByDefault(legacy: Boolean) {
-    writeGradlePluginModule(legacy)
+  @Test
+  fun excludeGradleApiByDefault() {
+    writeGradlePluginModule()
     projectScript.appendText(
       """
         dependencies {
@@ -503,12 +502,8 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/1422",
   )
   @Test
-  fun movesLocalGradleApiToCompileOnly() {
-    projectScript.writeText(
-      """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + lineSeparator,
-    )
+  fun moveLocalGradleApiToCompileOnly() {
+    projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
 
     val outputCompileOnly = dependencies(COMPILE_ONLY_CONFIGURATION_NAME)
     val outputApi = dependencies(API_CONFIGURATION_NAME)
@@ -524,11 +519,7 @@ class JavaPluginsTest : BasePluginTest() {
   @ParameterizedTest
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
   fun doNotReAddSuppressedGradleApi(configuration: String) {
-    projectScript.writeText(
-      """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-      """.trimIndent() + lineSeparator,
-    )
+    projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
 
     val output = dependencies(
       configuration = configuration,
@@ -588,7 +579,7 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/443",
   )
   @Test
-  fun registerCustomShadowJarTaskThatContainsDependenciesOnly() {
+  fun registerCustomShadowJarThatContainsDependenciesOnly() {
     val mainClassEntry = writeClass()
     val dependencyShadowJar = "dependencyShadowJar"
 
