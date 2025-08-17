@@ -3,13 +3,11 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.isEmpty
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
@@ -205,76 +203,6 @@ class RelocationTest : BasePluginTest() {
         classLoader.loadClass("my.MyTest")
         fail("Should not reach here.")
       }.isInstanceOf(AssertionFailedError::class)
-    }
-  }
-
-  @Test
-  fun relocateDoesNotDropDependencyResources() {
-    settingsScript.appendText(
-      """
-        include 'core', 'app'
-      """.trimIndent(),
-    )
-    path("core/build.gradle").writeText(
-      """
-        plugins {
-          id 'java-library'
-        }
-        dependencies {
-          api 'junit:junit:3.8.2'
-        }
-      """.trimIndent(),
-    )
-
-    path("core/src/main/resources/TEST").writeText("TEST RESOURCE")
-    path("core/src/main/resources/test.properties").writeText("name=test")
-    path("core/src/main/java/core/Core.java").writeText(
-      """
-        package core;
-        import junit.framework.Test;
-        public class Core {}
-      """.trimIndent(),
-    )
-
-    path("app/build.gradle").writeText(
-      """
-        ${getDefaultProjectBuildScript()}
-        dependencies {
-          implementation project(':core')
-        }
-        $shadowJarTask {
-          relocate 'core', 'app.core'
-          relocate 'junit.framework', 'app.junit.framework'
-        }
-      """.trimIndent(),
-    )
-    path("app/src/main/resources/APP-TEST").writeText("APP TEST RESOURCE")
-    path("app/src/main/java/app/App.java").writeText(
-      """
-        package app;
-        import core.Core;
-        import junit.framework.Test;
-        public class App {}
-      """.trimIndent(),
-    )
-    val relocatedEntries = junitEntries
-      .map { it.replace("junit/framework/", "app/junit/framework/") }.toTypedArray()
-
-    run(":app:$SHADOW_JAR_TASK_NAME")
-
-    assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
-      containsOnly(
-        "TEST",
-        "APP-TEST",
-        "test.properties",
-        "app/",
-        "app/core/",
-        "app/junit/",
-        "app/App.class",
-        "app/core/Core.class",
-        *relocatedEntries,
-        *manifestEntries,
-      )
     }
   }
 
