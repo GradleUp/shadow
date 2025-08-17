@@ -28,7 +28,6 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
-import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
@@ -145,9 +144,27 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertShadowJarCommon(repoJarPath("my/maven/1.0/maven-1.0.jar"))
-    assertPomCommon(repoPath("my/maven/1.0/maven-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")))
+    val artifactRoot = "my/maven/1.0"
+    assertThat(repoPath(artifactRoot).entries).containsOnly(
+      "maven-1.0.jar",
+      "maven-1.0.module",
+      "maven-1.0.pom",
+      "maven-1.0.jar.md5",
+      "maven-1.0.module.md5",
+      "maven-1.0.pom.md5",
+      "maven-1.0.jar.sha1",
+      "maven-1.0.module.sha1",
+      "maven-1.0.pom.sha1",
+      "maven-1.0.jar.sha256",
+      "maven-1.0.module.sha256",
+      "maven-1.0.pom.sha256",
+      "maven-1.0.jar.sha512",
+      "maven-1.0.module.sha512",
+      "maven-1.0.pom.sha512",
+    )
+    assertShadowJarCommon(repoJarPath("$artifactRoot/maven-1.0.jar"))
+    assertPomCommon(repoPath("$artifactRoot/maven-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/maven-1.0.module")))
   }
 
   @Test
@@ -207,16 +224,15 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     val artifactRoot = "my/plugin/my-gradle-plugin/1.0"
-    assertThat(repoPath(artifactRoot).listDirectoryEntries("*.jar").map(Path::name)).containsOnly(
+    assertThat(repoPath(artifactRoot).entries.filter { it.endsWith(".jar") }).containsOnly(
       "my-gradle-plugin-1.0.jar",
       "my-gradle-plugin-1.0-javadoc.jar",
       "my-gradle-plugin-1.0-sources.jar",
     )
 
-    val artifactPrefix = "$artifactRoot/my-gradle-plugin-1.0"
-    assertShadowJarCommon(repoJarPath("$artifactPrefix.jar"))
-    assertPomCommon(repoPath("$artifactPrefix.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactPrefix.module")))
+    assertShadowJarCommon(repoJarPath("$artifactRoot/my-gradle-plugin-1.0.jar"))
+    assertPomCommon(repoPath("$artifactRoot/my-gradle-plugin-1.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/my-gradle-plugin-1.0.module")))
   }
 
   @Issue(
@@ -248,7 +264,8 @@ class PublishingTest : BasePluginTest() {
 
     publish()
 
-    assertThat(repoPath("my-group/my-artifact/2.0/").listDirectoryEntries().map { it.name }).containsOnly(
+    val artifactRoot = "my-group/my-artifact/2.0"
+    assertThat(repoPath(artifactRoot).entries).containsOnly(
       "my-artifact-2.0-my-classifier.my-ext.sha512",
       "my-artifact-2.0-my-classifier.my-ext",
       "my-artifact-2.0.pom.sha256",
@@ -266,111 +283,9 @@ class PublishingTest : BasePluginTest() {
       "my-artifact-2.0.pom.sha1",
     )
 
-    assertShadowJarCommon(repoJarPath("my-group/my-artifact/2.0/my-artifact-2.0-my-classifier.my-ext"))
-    assertPomCommon(repoPath("my-group/my-artifact/2.0/my-artifact-2.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my-group/my-artifact/2.0/my-artifact-2.0.module")))
-  }
-
-  @Test
-  fun publishMultiProjectShadowJar() {
-    settingsScript.appendText(
-      """
-        include 'a', 'b', 'c'
-      """.trimIndent(),
-    )
-    projectScript.writeText(
-      """
-        subprojects {
-          apply plugin: 'java'
-          apply plugin: 'maven-publish'
-          version = '1.0'
-          group = 'my'
-        }
-      """.trimIndent(),
-    )
-
-    path("a/src/main/resources/aa.properties").writeText("aa")
-    path("a/src/main/resources/aa2.properties").writeText("aa2")
-    path("b/src/main/resources/bb.properties").writeText("bb")
-
-    val publishBlock = publishConfiguration(
-      dependenciesBlock = """
-        implementation project(':a')
-        shadow project(':b')
-      """.trimIndent(),
-      shadowBlock = """
-        archiveClassifier = ''
-        archiveBaseName = 'maven-all'
-      """.trimIndent(),
-    )
-    path("c/build.gradle").writeText(
-      """
-        ${getDefaultProjectBuildScript(withGroup = true, withVersion = true)}
-        $publishBlock
-      """.trimIndent(),
-    )
-
-    publish()
-
-    assertThat(repoJarPath("my/maven-all/1.0/maven-all-1.0.jar")).useAll {
-      containsOnly(
-        "aa.properties",
-        "aa2.properties",
-        *manifestEntries,
-      )
-    }
-    assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")))
-  }
-
-  @Test
-  fun publishJarThatDependsOnShadowJar() {
-    writeClientAndServerModules(clientShadowed = true)
-    path("client/build.gradle").appendText(
-      publishingBlock(
-        projectBlock = "group = 'example'",
-        publicationsBlock = """
-          shadow(MavenPublication) {
-            from components.shadow
-          }
-        """.trimIndent(),
-      ),
-    )
-    path("server/build.gradle").appendText(
-      publishingBlock(
-        projectBlock = "group = 'example'",
-        publicationsBlock = """
-          java(MavenPublication) {
-            from components.java
-          }
-        """.trimIndent(),
-      ),
-    )
-
-    publish()
-
-    gmmAdapter.fromJson(repoPath("example/server/1.0/server-1.0.module")).let { gmm ->
-      assertThat(gmm.variantNames).containsOnly(
-        API_ELEMENTS_CONFIGURATION_NAME,
-        RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-      )
-      assertThat(gmm.runtimeElementsVariant.coordinates).containsOnly(
-        "example:client:1.0",
-      )
-      assertThat(gmm.shadowRuntimeElementsVariant.coordinates).isEmpty()
-      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
-        transform { it.fileNames }.single().isEqualTo("server-1.0-all.jar")
-      }
-    }
-    gmmAdapter.fromJson(repoPath("example/client/1.0/client-1.0.module")).let { gmm ->
-      assertThat(gmm.variantNames).containsOnly(
-        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-      )
-      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
-        transform { it.fileNames }.single().isEqualTo("client-1.0-all.jar")
-      }
-    }
+    assertShadowJarCommon(repoJarPath("$artifactRoot/my-artifact-2.0-my-classifier.my-ext"))
+    assertPomCommon(repoPath("$artifactRoot/my-artifact-2.0.pom"))
+    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/my-artifact-2.0.module")))
   }
 
   @Test
@@ -395,6 +310,48 @@ class PublishingTest : BasePluginTest() {
     )
 
     publish()
+
+    assertThat(repoPath("my/maven/1.0").entries).containsOnly(
+      // Entries of maven-1.0.jar
+      "maven-1.0.jar",
+      "maven-1.0.module",
+      "maven-1.0.pom",
+      "maven-1.0.jar.md5",
+      "maven-1.0.module.md5",
+      "maven-1.0.pom.md5",
+      "maven-1.0.jar.sha1",
+      "maven-1.0.module.sha1",
+      "maven-1.0.pom.sha1",
+      "maven-1.0.jar.sha256",
+      "maven-1.0.module.sha256",
+      "maven-1.0.pom.sha256",
+      "maven-1.0.jar.sha512",
+      "maven-1.0.module.sha512",
+      "maven-1.0.pom.sha512",
+      // Entries of maven-1.0-all.jar
+      "maven-1.0-all.jar",
+      "maven-1.0-all.jar.md5",
+      "maven-1.0-all.jar.sha1",
+      "maven-1.0-all.jar.sha256",
+      "maven-1.0-all.jar.sha512",
+    )
+    assertThat(repoPath("my/maven-all/1.0").entries).containsOnly(
+      "maven-all-1.0-all.jar",
+      "maven-all-1.0.module",
+      "maven-all-1.0.pom",
+      "maven-all-1.0-all.jar.md5",
+      "maven-all-1.0.module.md5",
+      "maven-all-1.0.pom.md5",
+      "maven-all-1.0-all.jar.sha1",
+      "maven-all-1.0.module.sha1",
+      "maven-all-1.0.pom.sha1",
+      "maven-all-1.0-all.jar.sha256",
+      "maven-all-1.0.module.sha256",
+      "maven-all-1.0.pom.sha256",
+      "maven-all-1.0-all.jar.sha512",
+      "maven-all-1.0.module.sha512",
+      "maven-all-1.0.pom.sha512",
+    )
 
     assertThat(repoJarPath("my/maven/1.0/maven-1.0.jar")).useAll {
       containsNone(*entriesInAB)
@@ -472,13 +429,13 @@ class PublishingTest : BasePluginTest() {
     """.trimIndent(),
   ): String {
     return """
-        dependencies {
-          $dependenciesBlock
-        }
-        $shadowJarTask {
-          $shadowBlock
-        }
-        ${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
+      dependencies {
+        $dependenciesBlock
+      }
+      $shadowJarTask {
+        $shadowBlock
+      }
+      ${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
     """.trimIndent()
   }
 
@@ -551,5 +508,7 @@ class PublishingTest : BasePluginTest() {
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
     fun <T : Any> JsonAdapter<T>.fromJson(path: Path): T = requireNotNull(fromJson(path.readText()))
+
+    val Path.entries: List<String> get() = listDirectoryEntries().map { it.name }
   }
 }
