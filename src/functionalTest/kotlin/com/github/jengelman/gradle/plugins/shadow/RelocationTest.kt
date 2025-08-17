@@ -26,7 +26,7 @@ import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
   @ParameterizedTest
-  @MethodSource("prefixProvider")
+  @ValueSource(strings = ["foo", "new.pkg", "new/path"])
   fun autoRelocation(relocationPrefix: String) {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -621,13 +621,6 @@ class RelocationTest : BasePluginTest() {
   }
 
   private companion object {
-    @JvmStatic
-    fun prefixProvider() = listOf(
-      Arguments.of("foo"),
-      Arguments.of("new.pkg"),
-      Arguments.of("new/path"),
-    )
-
     @JvmStatic
     fun preserveLastModifiedProvider() = listOf(
       Arguments.of(false, false),

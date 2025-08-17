@@ -89,7 +89,16 @@ class FilteringTest : BasePluginTest() {
   }
 
   @ParameterizedTest
-  @MethodSource("wildcardDepProvider")
+  @ValueSource(
+    strings = [
+      "my:d",
+      "m.*:d",
+      "my:d:.*",
+      "m.*:d:.*",
+      "m.*:d.*:.*",
+      ".*:d:.*",
+    ],
+  )
   fun excludeDependencyUsingWildcardSyntax(wildcard: String) {
     projectScript.appendText(
       """
@@ -247,17 +256,5 @@ class FilteringTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-  }
-
-  private companion object {
-    @JvmStatic
-    fun wildcardDepProvider() = listOf(
-      "my:d",
-      "m.*:d",
-      "my:d:.*",
-      "m.*:d:.*",
-      "m.*:d.*:.*",
-      ".*:d:.*",
-    )
   }
 }
