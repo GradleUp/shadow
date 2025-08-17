@@ -46,6 +46,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class PublishingTest : BasePluginTest() {
   @TempDir
@@ -499,13 +501,13 @@ class PublishingTest : BasePluginTest() {
       "maven-1.0.pom.sha256",
       "maven-1.0.pom.sha512",
     )
-    val mavenEntries = repoPath("my/maven/1.0/").listDirectoryEntries().map { it.name }
+    val artifactEntries = repoPath("my/maven/1.0/").entries
     val gmm = gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module"))
     val pomDependencies = pomReader.read(repoPath("my/maven/1.0/maven-1.0.pom"))
       .dependencies.map { it.coordinate to it.scope }
 
     if (addOptionalJavaVariant) {
-      assertThat(mavenEntries).containsOnly(
+      assertThat(artifactEntries).containsOnly(
         "maven-1.0-all.jar",
         "maven-1.0-all.jar.md5",
         "maven-1.0-all.jar.sha1",
@@ -525,7 +527,7 @@ class PublishingTest : BasePluginTest() {
         "my:b:1.0" to "compile",
       )
     } else {
-      assertThat(mavenEntries).containsOnly(*entriesCommon)
+      assertThat(artifactEntries).containsOnly(*entriesCommon)
       assertThat(gmm.variantNames).containsOnly(
         API_ELEMENTS_CONFIGURATION_NAME,
         RUNTIME_ELEMENTS_CONFIGURATION_NAME,
