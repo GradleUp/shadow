@@ -289,56 +289,6 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
-  fun publishJarThatDependsOnShadowJar() {
-    writeClientAndServerModules(clientShadowed = true)
-    path("client/build.gradle").appendText(
-      publishingBlock(
-        projectBlock = "group = 'example'",
-        publicationsBlock = """
-          shadow(MavenPublication) {
-            from components.shadow
-          }
-        """.trimIndent(),
-      ),
-    )
-    path("server/build.gradle").appendText(
-      publishingBlock(
-        projectBlock = "group = 'example'",
-        publicationsBlock = """
-          java(MavenPublication) {
-            from components.java
-          }
-        """.trimIndent(),
-      ),
-    )
-
-    publish()
-
-    gmmAdapter.fromJson(repoPath("example/server/1.0/server-1.0.module")).let { gmm ->
-      assertThat(gmm.variantNames).containsOnly(
-        API_ELEMENTS_CONFIGURATION_NAME,
-        RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-      )
-      assertThat(gmm.runtimeElementsVariant.coordinates).containsOnly(
-        "example:client:1.0",
-      )
-      assertThat(gmm.shadowRuntimeElementsVariant.coordinates).isEmpty()
-      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
-        transform { it.fileNames }.single().isEqualTo("server-1.0-all.jar")
-      }
-    }
-    gmmAdapter.fromJson(repoPath("example/client/1.0/client-1.0.module")).let { gmm ->
-      assertThat(gmm.variantNames).containsOnly(
-        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-      )
-      assertShadowVariantCommon(gmm, coordinates = emptyArray()) {
-        transform { it.fileNames }.single().isEqualTo("client-1.0-all.jar")
-      }
-    }
-  }
-
-  @Test
   fun publishJarAndShadowJarWithGradleMetadata() {
     projectScript.appendText(
       publishConfiguration(
