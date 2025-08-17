@@ -520,11 +520,6 @@ class PublishingTest : BasePluginTest() {
       }
     } else {
       assertThat(repoPath("my/maven/1.0/").listDirectoryEntries().map { it.name }).containsOnly(
-        "maven-1.0-all.jar",
-        "maven-1.0-all.jar.md5",
-        "maven-1.0-all.jar.sha1",
-        "maven-1.0-all.jar.sha256",
-        "maven-1.0-all.jar.sha512",
         "maven-1.0.jar",
         "maven-1.0.jar.md5",
         "maven-1.0.jar.sha1",
@@ -541,13 +536,34 @@ class PublishingTest : BasePluginTest() {
         "maven-1.0.pom.sha256",
         "maven-1.0.pom.sha512",
       )
-      assertShadowJarCommon(repoJarPath("my/maven/1.0/maven-1.0-all.jar"))
-      assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")))
+      gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")).let { gmm ->
+        assertThat(gmm.variantNames).containsOnly(
+          API_ELEMENTS_CONFIGURATION_NAME,
+          RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+        )
+        assertThat(gmm.apiElementsVariant).all {
+          transform { it.attributes }.containsOnly(
+            *commonVariantAttrs,
+            Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
+            Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
+          )
+          transform { it.coordinates }.isEmpty()
+        }
+        assertThat(gmm.runtimeElementsVariant).all {
+          transform { it.attributes }.containsOnly(
+            *commonVariantAttrs,
+            Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
+            Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+          )
+          transform { it.coordinates }.containsOnly(
+            "my:a:1.0",
+          )
+        }
+      }
       assertThat(pomReader.read(repoPath("my/maven/1.0/maven-1.0.pom"))).all {
         transform { actual -> actual.dependencies.map { it.coordinate to it.scope } }
           .containsOnly(
             "my:a:1.0" to "runtime",
-            "my:b:1.0" to "compile",
           )
       }
     }
