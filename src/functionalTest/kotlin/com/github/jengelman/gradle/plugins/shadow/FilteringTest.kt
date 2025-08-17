@@ -167,7 +167,7 @@ class FilteringTest : BasePluginTest() {
   }
 
   @Test
-  fun excludeATransitiveProjectDependency() {
+  fun excludeTransitiveProjectDependency() {
     writeClientAndServerModules(
       serverShadowBlock = """
         dependencies {
