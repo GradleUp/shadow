@@ -127,6 +127,31 @@ class PublishingTest : BasePluginTest() {
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1665",
+  )
+  @Test
+  fun dontInjectTargetJvmVersionWhenAutoTargetJvmDisabled() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock = """
+          java {
+            disableAutoTargetJvm()
+          }
+        """.trimIndent(),
+        shadowBlock = """
+          archiveClassifier = ''
+          archiveBaseName = 'maven-all'
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    val gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module"))
+    assertShadowVariantCommon(gmm, variantAttrs = commonVariantAttrsWithoutTargetJvm)
+  }
+
   @Test
   fun publishShadowJarInsteadOfJar() {
     projectScript.appendText(
@@ -494,9 +519,13 @@ class PublishingTest : BasePluginTest() {
       .adapter(GradleModuleMetadata::class.java)
     val pomReader = MavenXpp3Reader()
 
-    val commonVariantAttrs = arrayOf(
+    val commonVariantAttrsWithoutTargetJvm = arrayOf(
       Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
       LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
+    )
+
+    val commonVariantAttrs = arrayOf(
+      *commonVariantAttrsWithoutTargetJvm,
       TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion,
     )
 
