@@ -55,14 +55,14 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       it.extendsFrom(shadowConfiguration)
       it.isCanBeConsumed = true
       it.isCanBeResolved = false
-      it.attributes { attr ->
-        attr.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
-        attr.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
-        attr.attribute(
+      it.attributes { attrs ->
+        attrs.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
+        attrs.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
+        attrs.attribute(
           LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
-        attr.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
+        attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
         val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME)
           .map { compileClasspath ->
             compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
@@ -70,7 +70,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           }
 
         // Track JavaPluginExtension to update targetJvmVersion when it changes.
-        attr.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+        attrs.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
       }
       it.outgoing.artifact(tasks.shadowJar)
     }
