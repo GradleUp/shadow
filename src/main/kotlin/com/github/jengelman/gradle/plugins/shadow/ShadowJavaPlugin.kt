@@ -63,19 +63,16 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
         attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
-        @Suppress("UPPER_BOUND_VIOLATED_BASED_ON_JAVA_ANNOTATIONS") // It should return Int? in the provider.
-        val targetJvmVersion = provider {
-          val defaultAttr = configurations.getByName(COMPILE_CLASSPATH_CONFIGURATION_NAME).attributes
-            .getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
-          when (defaultAttr) {
-            null -> javaPluginExtension.targetCompatibility.majorVersion.toInt()
-            // Fallback the case in https://github.com/gradle/gradle/blob/4198ab0670df14af9f77b9098dc892b199ac1f3f/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/jvm/internal/DefaultJvmLanguageUtilities.java#L85-L87
-            Int.MAX_VALUE -> null
-            else -> defaultAttr
+
+        val defaultTargetJvmAttr = configurations.getByName(COMPILE_CLASSPATH_CONFIGURATION_NAME).attributes
+          .getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
+        // Fallback the case in https://github.com/gradle/gradle/blob/4198ab0670df14af9f77b9098dc892b199ac1f3f/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/jvm/internal/DefaultJvmLanguageUtilities.java#L85-L87
+        if (defaultTargetJvmAttr != Int.MAX_VALUE) {
+          val targetJvmVersion = provider {
+            defaultTargetJvmAttr ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
           }
+          attrs.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
         }
-        // Track JavaPluginExtension to update targetJvmVersion when it changes.
-        attrs.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
       }
       it.outgoing.artifact(tasks.shadowJar)
     }
