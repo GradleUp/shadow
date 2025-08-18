@@ -65,8 +65,14 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
         val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME)
           .map { compileClasspath ->
-            compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
-              ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
+            val defaultAttr = compileClasspath.attributes
+              .getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
+            when (defaultAttr) {
+              null -> javaPluginExtension.targetCompatibility.majorVersion.toInt()
+              // Fallback the case in https://github.com/gradle/gradle/blob/4198ab0670df14af9f77b9098dc892b199ac1f3f/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/jvm/internal/DefaultJvmLanguageUtilities.java#L85-L87
+              Int.MAX_VALUE -> null
+              else -> defaultAttr
+            }
           }
 
         // Track JavaPluginExtension to update targetJvmVersion when it changes.
