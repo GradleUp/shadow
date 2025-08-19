@@ -67,6 +67,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       it.outgoing.artifact(tasks.shadowJar)
     }
 
+    // Must use afterEvaluate here as we need to check the value of targetJvmVersion and track its changes.
     afterEvaluate {
       val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME).map { compileClasspath ->
         compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
@@ -74,7 +75,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
       // https://github.com/gradle/gradle/blob/4198ab0670df14af9f77b9098dc892b199ac1f3f/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/jvm/internal/DefaultJvmLanguageUtilities.java#L85-L87
       if (targetJvmVersion == Int.MAX_VALUE) {
-        logger.info("We can't set the target JVM version to Int.MAX_VALUE in `java.autoTargetJvmDisabled` is enabled or some other case.")
+        logger.info("Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.")
       } else {
         shadowRuntimeElements.attributes { attrs ->
           attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)

@@ -147,12 +147,11 @@ class PublishingTest : BasePluginTest() {
       ),
     )
 
-    val result = publish("--info")
+    val result = publish(infoArgument)
 
     assertThat(result.output).contains(
-      "We can't set the target JVM version to Int.MAX_VALUE in `java.autoTargetJvmDisabled` is enabled or some other case.",
+      "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.",
     )
-
     assertShadowVariantCommon(
       gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
       variantAttrs = shadowVariantAttrs.filterNot { (name, _) ->
