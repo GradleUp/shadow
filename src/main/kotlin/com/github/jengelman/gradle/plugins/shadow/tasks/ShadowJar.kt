@@ -230,11 +230,14 @@ public abstract class ShadowJar : Jar() {
   @get:Inject
   protected abstract val archiveOperations: ArchiveOperations
 
+  public open fun minimize() {
+    minimize(action = {})
+  }
+
   /**
    * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
    */
-  @JvmOverloads
-  public open fun minimize(action: Action<DependencyFilter> = Action {}) {
+  public open fun minimize(action: Action<DependencyFilter>) {
     minimizeJar.set(true)
     action.execute(dependencyFilterForMinimize)
   }
@@ -244,6 +247,10 @@ public abstract class ShadowJar : Jar() {
    */
   public open fun dependencies(action: Action<DependencyFilter>) {
     action.execute(dependencyFilter.get())
+  }
+
+  public open fun mergeServiceFiles() {
+    mergeServiceFiles(action = {})
   }
 
   /**
@@ -256,8 +263,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Merge Java services files with [action].
    */
-  @JvmOverloads
-  public open fun mergeServiceFiles(action: Action<ServiceFileTransformer> = Action {}) {
+  public open fun mergeServiceFiles(action: Action<ServiceFileTransformer>) {
     transform(ServiceFileTransformer::class.java, action)
   }
 
@@ -268,6 +274,10 @@ public abstract class ShadowJar : Jar() {
     transform(GroovyExtensionModuleTransformer::class.java, action = {})
   }
 
+  public open fun append(resourcePath: String) {
+    append(resourcePath = resourcePath, separator = AppendingTransformer.DEFAULT_SEPARATOR)
+  }
+
   /**
    * Append contents to a resource in the jar.
    *
@@ -276,73 +286,100 @@ public abstract class ShadowJar : Jar() {
    * @param resourcePath The path to the resource in the jar.
    * @param separator The separator to use between the original content and the appended content, defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
    */
-  @JvmOverloads
-  public open fun append(resourcePath: String, separator: String = AppendingTransformer.DEFAULT_SEPARATOR) {
+  public open fun append(resourcePath: String, separator: String) {
     transform(AppendingTransformer::class.java) {
       it.resource.set(resourcePath)
       it.separator.set(separator)
     }
   }
 
-  /**
-   * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
-   */
-  @JvmOverloads
   public open fun relocate(
     pattern: String,
     destination: String,
-    action: Action<SimpleRelocator> = Action {},
+  ) {
+    relocate(pattern = pattern, destination = destination, action = {})
+  }
+
+  /**
+   * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
+   */
+  public open fun relocate(
+    pattern: String,
+    destination: String,
+    action: Action<SimpleRelocator>,
   ) {
     val relocator = SimpleRelocator(pattern, destination)
     addRelocator(relocator, action)
   }
 
+  public open fun <R : Relocator> relocate(clazz: Class<R>) {
+    relocate(clazz = clazz, action = {})
+  }
+
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  @JvmOverloads
-  public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
+  public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R>) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
 
+  public open fun <R : Relocator> relocate(relocator: R) {
+    relocate(relocator = relocator, action = {})
+  }
+
   /**
    * Relocate classes and resources using a [Relocator].
    */
-  @JvmOverloads
-  public open fun <R : Relocator> relocate(relocator: R, action: Action<R> = Action {}) {
+  public open fun <R : Relocator> relocate(relocator: R, action: Action<R>) {
     addRelocator(relocator, action)
   }
 
+  @JvmSynthetic
+  public inline fun <reified R : Relocator> relocate() {
+    relocate<R>(action = {})
+  }
+
   /**
    * Relocate classes and resources using a [Relocator].
    */
   @JvmSynthetic
-  public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
-    relocate(R::class.java, action)
+  public inline fun <reified R : Relocator> relocate(action: Action<R>) {
+    relocate(clazz = R::class.java, action = action)
+  }
+
+  public open fun <T : ResourceTransformer> transform(clazz: Class<T>) {
+    transform(clazz = clazz, action = {})
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  @JvmOverloads
-  public open fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T> = Action {}) {
+  public open fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T>) {
     addTransform(clazz.create(objectFactory), action)
   }
 
+  public open fun <T : ResourceTransformer> transform(transformer: T) {
+    transform(transformer = transformer, action = {})
+  }
+
   /**
    * Transform resources using a [ResourceTransformer].
    */
-  @JvmOverloads
-  public open fun <T : ResourceTransformer> transform(transformer: T, action: Action<T> = Action {}) {
+  public open fun <T : ResourceTransformer> transform(transformer: T, action: Action<T>) {
     addTransform(transformer, action)
+  }
+
+  @JvmSynthetic
+  public inline fun <reified T : ResourceTransformer> transform() {
+    transform<T>(action = {})
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    */
   @JvmSynthetic
-  public inline fun <reified T : ResourceTransformer> transform(action: Action<T> = Action {}) {
+  public inline fun <reified T : ResourceTransformer> transform(action: Action<T>) {
     transform(T::class.java, action)
   }
 
