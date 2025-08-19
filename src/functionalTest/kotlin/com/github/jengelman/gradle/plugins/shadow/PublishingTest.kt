@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -125,6 +126,38 @@ class PublishingTest : BasePluginTest() {
     )
     // options.release flag is honored.
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1665",
+  )
+  @Test
+  fun dontInjectTargetJvmVersionWhenAutoTargetJvmDisabled() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock = """
+          java {
+            disableAutoTargetJvm()
+          }
+        """.trimIndent(),
+        shadowBlock = """
+          archiveClassifier = ''
+          archiveBaseName = 'maven-all'
+        """.trimIndent(),
+      ),
+    )
+
+    val result = publish(infoArgument)
+
+    assertThat(result.output).contains(
+      "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.",
+    )
+    assertShadowVariantCommon(
+      gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
+      variantAttrs = shadowVariantAttrs.filterNot { (name, _) ->
+        name == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
+      }.toTypedArray(),
+    )
   }
 
   @Test
@@ -412,7 +445,7 @@ class PublishingTest : BasePluginTest() {
     return JarPath(remoteRepoPath.resolve(relative))
   }
 
-  private fun publish(): BuildResult = run("publish")
+  private fun publish(vararg arguments: String): BuildResult = run("publish", *arguments)
 
   private fun publishConfiguration(
     projectBlock: String = "",
