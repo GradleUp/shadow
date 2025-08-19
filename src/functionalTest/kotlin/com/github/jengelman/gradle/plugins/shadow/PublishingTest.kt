@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -146,10 +147,18 @@ class PublishingTest : BasePluginTest() {
       ),
     )
 
-    publish()
+    val result = publish("--info")
 
-    val gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module"))
-    assertShadowVariantCommon(gmm, variantAttrs = commonVariantAttrsWithoutTargetJvm)
+    assertThat(result.output).contains(
+      "We can't set the target JVM version to Int.MAX_VALUE in `java.autoTargetJvmDisabled` is enabled or some other case.",
+    )
+
+    assertShadowVariantCommon(
+      gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
+      variantAttrs = shadowVariantAttrs.filterNot { (name, _) ->
+        name == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
+      }.toTypedArray(),
+    )
   }
 
   @Test
@@ -437,7 +446,7 @@ class PublishingTest : BasePluginTest() {
     return JarPath(remoteRepoPath.resolve(relative))
   }
 
-  private fun publish(): BuildResult = run("publish")
+  private fun publish(vararg arguments: String): BuildResult = run("publish", *arguments)
 
   private fun publishConfiguration(
     projectBlock: String = "",
@@ -519,13 +528,9 @@ class PublishingTest : BasePluginTest() {
       .adapter(GradleModuleMetadata::class.java)
     val pomReader = MavenXpp3Reader()
 
-    val commonVariantAttrsWithoutTargetJvm = arrayOf(
+    val commonVariantAttrs = arrayOf(
       Category.CATEGORY_ATTRIBUTE.name to Category.LIBRARY,
       LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE.name to LibraryElements.JAR,
-    )
-
-    val commonVariantAttrs = arrayOf(
-      *commonVariantAttrsWithoutTargetJvm,
       TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to JavaVersion.current().majorVersion,
     )
 
