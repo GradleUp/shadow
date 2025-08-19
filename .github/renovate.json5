@@ -15,5 +15,12 @@
         "org.ow2.asm:asm-commons"
       ],
     },
+    {
+      "groupName": "Develocity",
+      "matchPackageNames": [
+        "com.gradle:develocity-gradle-plugin",
+        "com.gradle.develocity:com.gradle.develocity.gradle.plugin",
+      ],
+    },
   ]
 }
