@@ -14,7 +14,7 @@ public interface ShadowExtension {
 
   /**
    * If `true`, adds a [TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE] attribute to the Gradle Module Metadata of the
-   * shadowed JAR. This attribute indicates the target JVM version for which the shadow JAR is built.
+   * shadowed JAR. This affects how consumers resolve the published artifact based on the target JVM version.
    *
    * Defaults to `true`.
    */
