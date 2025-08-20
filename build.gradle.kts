@@ -41,8 +41,7 @@ kotlin {
     languageVersion = apiVersion
     jvmTarget = JvmTarget.JVM_11
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
-    // Sync with `JavaCompile.options.release`.
-    freeCompilerArgs.add("-Xjdk-release=11")
+    freeCompilerArgs.add("-Xjdk-release=${libs.versions.jdkRelease.get()}")
   }
 }
 
@@ -218,7 +217,7 @@ kotlin.target.compilations {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-  options.release = 11
+  options.release = libs.versions.jdkRelease.get().toInt()
 }
 
 tasks.pluginUnderTestMetadata {

@@ -1,4 +1,5 @@
 [versions]
+jdkRelease = "11"
 kotlin = "2.2.10"
 moshi = "1.15.2"
 pluginPublish = "1.3.1"
