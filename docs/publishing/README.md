@@ -107,6 +107,26 @@ the `shadow` extension to `false`. If you want to publish the standard JAR only,
     }
     ```
 
+The target JVM version attribute (`org.gradle.jvm.version`) of the shadowed variant is added by default, it is useful
+for consumers to select the correct variant based on their target JVM version. But it may cause issues in some cases,
+you can disable this by setting the `addTargetJvmVersionAttribute` property in the `shadow` extension to `false`:
+
+=== "Kotlin"
+
+    ```kotlin
+    shadow {
+      addTargetJvmVersionAttribute = false
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    shadow {
+      addTargetJvmVersionAttribute = false
+    }
+    ```
+
 ## Shadow Configuration and Publishing
 
 The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify

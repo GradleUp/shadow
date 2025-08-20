@@ -3,9 +3,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.2...HEAD) - 2025-xx-xx
 
-## Changed
+## Added
 
 - Allow opting out of `shadowRuntimeElements` variant. ([#1662](https://github.com/GradleUp/shadow/pull/1662))
+- Allow opting out of `TARGET_JVM_VERSION_ATTRIBUTE`. ([#1674](https://github.com/GradleUp/shadow/pull/1674))
 
 ## Changed
 
