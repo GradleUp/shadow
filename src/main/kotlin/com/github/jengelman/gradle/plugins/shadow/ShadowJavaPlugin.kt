@@ -69,6 +69,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
     // Must use afterEvaluate here as we need to check the value of targetJvmVersion and track its changes.
     afterEvaluate {
+      if (!shadow.addTargetJvmVersionAttribute.get()) return@afterEvaluate
       val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME).map { compileClasspath ->
         compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
       }.getOrElse(javaPluginExtension.targetCompatibility.majorVersion.toInt())
