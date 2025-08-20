@@ -67,7 +67,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(project.tasks.findByName(SHADOW_JAR_TASK_NAME)).isNull()
 
     with(project.extensions.getByType(ShadowExtension::class.java)) {
-      assertThat(addOptionalJavaVariant.get()).isTrue()
+      assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
     }
 
     project.plugins.apply(JavaPlugin::class.java)

@@ -442,7 +442,7 @@ class PublishingTest : BasePluginTest() {
   )
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun publishShadowVariantJar(addOptionalJavaVariant: Boolean) {
+  fun publishShadowVariantJar(addShadowVariant: Boolean) {
     projectScript.appendText(
       publishingBlock(
         projectBlock = """
@@ -451,7 +451,7 @@ class PublishingTest : BasePluginTest() {
             shadow 'my:b:1.0'
           }
           shadow {
-            addOptionalJavaVariant = $addOptionalJavaVariant
+            addShadowVariantIntoJavaComponent = $addShadowVariant
           }
         """.trimIndent(),
         publicationsBlock = """
@@ -506,7 +506,7 @@ class PublishingTest : BasePluginTest() {
     val pomDependencies = pomReader.read(repoPath("my/maven/1.0/maven-1.0.pom"))
       .dependencies.map { it.coordinate to it.scope }
 
-    if (addOptionalJavaVariant) {
+    if (addShadowVariant) {
       assertThat(artifactEntries).containsOnly(
         "maven-1.0-all.jar",
         "maven-1.0-all.jar.md5",

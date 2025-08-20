@@ -4,9 +4,10 @@ import org.gradle.api.provider.Property
 
 public interface ShadowExtension {
   /**
-   * Controls whether the optional Java variant is added to the 'java' component.
-   * If true, the variant from the shadow runtime elements configuration will be mapped as optional.
-   * This affects how consumers resolve the published artifact.
+   * If `true`, publishes the [ShadowJavaPlugin.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME] as an optional variant of
+   * the `java` component. This affects how consumers resolve the published artifact.
+   *
+   * Defaults to `true`.
    */
-  public val addOptionalJavaVariant: Property<Boolean>
+  public val addShadowVariantIntoJavaComponent: Property<Boolean>
 }
