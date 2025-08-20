@@ -22,6 +22,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     with(extensions.create(EXTENSION_NAME, ShadowExtension::class.java)) {
       addShadowVariantIntoJavaComponent.convention(true)
       addTargetJvmVersionAttribute.convention(true)
+      addMultiReleaseAttribute.convention(true)
     }
     @Suppress("EagerGradleConfiguration") // this should be created eagerly.
     configurations.create(CONFIGURATION_NAME)

@@ -35,6 +35,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$C
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
+	public abstract fun getAddMultiReleaseAttribute ()Lorg/gradle/api/provider/Property;
 	public abstract fun getAddShadowVariantIntoJavaComponent ()Lorg/gradle/api/provider/Property;
 	public abstract fun getAddTargetJvmVersionAttribute ()Lorg/gradle/api/provider/Property;
 }

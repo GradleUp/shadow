@@ -69,6 +69,7 @@ class JavaPluginsTest : BasePluginTest() {
     with(project.extensions.getByType(ShadowExtension::class.java)) {
       assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
       assertThat(addTargetJvmVersionAttribute.get()).isTrue()
+      assertThat(addMultiReleaseAttribute.get()).isTrue()
     }
 
     project.plugins.apply(JavaPlugin::class.java)

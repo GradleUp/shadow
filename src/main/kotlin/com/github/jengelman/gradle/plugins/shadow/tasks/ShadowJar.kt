@@ -443,6 +443,7 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectMultiReleaseAttrIfPresent() {
+    if (!project.shadow.addMultiReleaseAttribute.get()) return
     val includeMultiReleaseAttr = includedDependencies.files.any {
       try {
         JarFile(it).use { jarFile ->
