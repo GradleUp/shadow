@@ -7,7 +7,6 @@ import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class FilteringTest : BasePluginTest() {
@@ -89,7 +88,16 @@ class FilteringTest : BasePluginTest() {
   }
 
   @ParameterizedTest
-  @MethodSource("wildcardDepProvider")
+  @ValueSource(
+    strings = [
+      "my:d",
+      "m.*:d",
+      "my:d:.*",
+      "m.*:d:.*",
+      "m.*:d.*:.*",
+      ".*:d:.*",
+    ],
+  )
   fun excludeDependencyUsingWildcardSyntax(wildcard: String) {
     projectScript.appendText(
       """
@@ -167,7 +175,7 @@ class FilteringTest : BasePluginTest() {
   }
 
   @Test
-  fun excludeATransitiveProjectDependency() {
+  fun excludeTransitiveProjectDependency() {
     writeClientAndServerModules(
       serverShadowBlock = """
         dependencies {
@@ -247,17 +255,5 @@ class FilteringTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-  }
-
-  private companion object {
-    @JvmStatic
-    fun wildcardDepProvider() = listOf(
-      "my:d",
-      "m.*:d",
-      "my:d:.*",
-      "m.*:d:.*",
-      "m.*:d.*:.*",
-      ".*:d:.*",
-    )
   }
 }

@@ -3,15 +3,19 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.2...HEAD) - 2025-xx-xx
 
+## Changed
+
+- Don't inject `TargetJvmVersion` attribute when automatic JVM targeting is disabled. ([#1666](https://github.com/GradleUp/shadow/pull/1666))
+
 
 ## [9.0.2](https://github.com/GradleUp/shadow/releases/tag/9.0.2) - 2025-08-15
 
 ### Fixed
 
-- Fix missing space in `ApacheNoticeResourceTransformer` preamble causing malformed NOTICE header. ([#1623](https://github.com/GradleUp/shadow/pull/1623)).
-- Fix using `ApacheNoticeResourceTransformer` without `projectName`. ([#1627](https://github.com/GradleUp/shadow/pull/1627)).
-- Fix extra indents of `ApacheNoticeResourceTransformer` output. ([#1628](https://github.com/GradleUp/shadow/pull/1628)).
-- Fix resolving BOM dependencies when `minimize` is enabled. ([#1637](https://github.com/GradleUp/shadow/pull/1637)).
+- Fix missing space in `ApacheNoticeResourceTransformer` preamble causing malformed NOTICE header. ([#1623](https://github.com/GradleUp/shadow/pull/1623))
+- Fix using `ApacheNoticeResourceTransformer` without `projectName`. ([#1627](https://github.com/GradleUp/shadow/pull/1627))
+- Fix extra indents of `ApacheNoticeResourceTransformer` output. ([#1628](https://github.com/GradleUp/shadow/pull/1628))
+- Fix resolving BOM dependencies when `minimize` is enabled. ([#1637](https://github.com/GradleUp/shadow/pull/1637))
 
 ## [9.0.1](https://github.com/GradleUp/shadow/releases/tag/9.0.1) - 2025-08-09
 
@@ -693,7 +697,7 @@ If you used Shadow for merging service files, the following steps are recommende
 
 ### Fixed
 
-- Revert "Bump Java level to 11" ([#1011](https://github.com/GradleUp/shadow/issues/1011)).  
+- Revert "Bump Java level to 11". ([#1011](https://github.com/GradleUp/shadow/issues/1011))  
   This reverts the change to maintain compatibility with 8.x versions. The Java level will be bumped to 11 or above in
   the next major release.
 

@@ -51,28 +51,36 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       compileClasspath.extendsFrom(shadowConfiguration)
     }
     @Suppress("EagerGradleConfiguration") // this should be created eagerly.
-    configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
+    val shadowRuntimeElements = configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
       it.extendsFrom(shadowConfiguration)
       it.isCanBeConsumed = true
       it.isCanBeResolved = false
-      it.attributes { attr ->
-        attr.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
-        attr.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
-        attr.attribute(
+      it.attributes { attrs ->
+        attrs.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
+        attrs.attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
+        attrs.attribute(
           LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
-        attr.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
-        val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME)
-          .map { compileClasspath ->
-            compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
-              ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
-          }
-
-        // Track JavaPluginExtension to update targetJvmVersion when it changes.
-        attr.attributeProvider(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+        attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
       }
       it.outgoing.artifact(tasks.shadowJar)
+    }
+
+    // Must use afterEvaluate here as we need to check the value of targetJvmVersion and track its changes.
+    afterEvaluate {
+      val targetJvmVersion = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME).map { compileClasspath ->
+        compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
+      }.getOrElse(javaPluginExtension.targetCompatibility.majorVersion.toInt())
+
+      // https://github.com/gradle/gradle/blob/4198ab0670df14af9f77b9098dc892b199ac1f3f/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/jvm/internal/DefaultJvmLanguageUtilities.java#L85-L87
+      if (targetJvmVersion == Int.MAX_VALUE) {
+        logger.info("Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.")
+      } else {
+        shadowRuntimeElements.attributes { attrs ->
+          attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+        }
+      }
     }
   }
 

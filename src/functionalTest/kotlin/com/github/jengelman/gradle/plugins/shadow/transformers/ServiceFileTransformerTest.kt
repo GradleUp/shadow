@@ -82,7 +82,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun serviceResourceTransformerRelocation() {
+  fun serviceResourceTransformerWithRelocation() {
     val one = buildJarOne {
       insert(
         "META-INF/services/java.sql.Driver",
@@ -164,7 +164,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     "https://github.com/GradleUp/shadow/issues/71",
   )
   @Test
-  fun applyTransformersToProjectResources() {
+  fun transformProjectResources() {
     val servicesBarEntry = "META-INF/services/foo.Bar"
     val one = buildJarOne {
       insert(servicesBarEntry, CONTENT_ONE)

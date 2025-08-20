@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test
 class CachingTest : BasePluginTest() {
   private var taskPath: String = shadowJarPath
 
-  /**
-   * Ensure that a basic usage reuses an output from cache and then gets a cache miss when the content changes.
-   */
   @Test
   fun dependenciesChanged() {
     projectScript.appendText(
@@ -411,11 +408,8 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  /**
-   * Ensure that we get a cache miss when relocation changes and that caching works with relocation
-   */
   @Test
-  fun relocatorAdded() {
+  fun relocatorChanged() {
     projectScript.appendText(
       """
         dependencies {
