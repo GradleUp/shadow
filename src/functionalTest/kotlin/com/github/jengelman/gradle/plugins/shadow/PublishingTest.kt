@@ -46,6 +46,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class PublishingTest : BasePluginTest() {
   @TempDir
@@ -432,6 +434,108 @@ class PublishingTest : BasePluginTest() {
         SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
       )
       assertShadowVariantCommon(gmm)
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/651",
+  )
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun publishShadowVariantJar(addShadowVariant: Boolean) {
+    projectScript.appendText(
+      publishingBlock(
+        projectBlock = """
+          dependencies {
+            implementation 'my:a:1.0'
+            shadow 'my:b:1.0'
+          }
+          shadow {
+            addShadowVariantIntoJavaComponent = $addShadowVariant
+          }
+        """.trimIndent(),
+        publicationsBlock = """
+          shadow(MavenPublication) {
+            from components.java
+          }
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    val assertVariantsCommon = { gmm: GradleModuleMetadata ->
+      assertThat(gmm.apiElementsVariant).all {
+        transform { it.attributes }.containsOnly(
+          *commonVariantAttrs,
+          Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
+          Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_API,
+        )
+        transform { it.coordinates }.isEmpty()
+      }
+      assertThat(gmm.runtimeElementsVariant).all {
+        transform { it.attributes }.containsOnly(
+          *commonVariantAttrs,
+          Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
+          Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+        )
+        transform { it.coordinates }.containsOnly(
+          "my:a:1.0",
+        )
+      }
+    }
+    val entriesCommon = arrayOf(
+      "maven-1.0.jar",
+      "maven-1.0.jar.md5",
+      "maven-1.0.jar.sha1",
+      "maven-1.0.jar.sha256",
+      "maven-1.0.jar.sha512",
+      "maven-1.0.module",
+      "maven-1.0.module.md5",
+      "maven-1.0.module.sha1",
+      "maven-1.0.module.sha256",
+      "maven-1.0.module.sha512",
+      "maven-1.0.pom",
+      "maven-1.0.pom.md5",
+      "maven-1.0.pom.sha1",
+      "maven-1.0.pom.sha256",
+      "maven-1.0.pom.sha512",
+    )
+    val artifactEntries = repoPath("my/maven/1.0/").entries
+    val gmm = gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module"))
+    val pomDependencies = pomReader.read(repoPath("my/maven/1.0/maven-1.0.pom"))
+      .dependencies.map { it.coordinate to it.scope }
+
+    if (addShadowVariant) {
+      assertThat(artifactEntries).containsOnly(
+        "maven-1.0-all.jar",
+        "maven-1.0-all.jar.md5",
+        "maven-1.0-all.jar.sha1",
+        "maven-1.0-all.jar.sha256",
+        "maven-1.0-all.jar.sha512",
+        *entriesCommon,
+      )
+      assertThat(gmm.variantNames).containsOnly(
+        API_ELEMENTS_CONFIGURATION_NAME,
+        RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+        SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+      )
+      assertVariantsCommon(gmm)
+      assertShadowVariantCommon(gmm)
+      assertThat(pomDependencies).containsOnly(
+        "my:a:1.0" to "runtime",
+        "my:b:1.0" to "compile",
+      )
+    } else {
+      assertThat(artifactEntries).containsOnly(*entriesCommon)
+      assertThat(gmm.variantNames).containsOnly(
+        API_ELEMENTS_CONFIGURATION_NAME,
+        RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+      )
+      assertVariantsCommon(gmm)
+      assertThat(pomDependencies).containsOnly(
+        "my:a:1.0" to "runtime",
+      )
     }
   }
 

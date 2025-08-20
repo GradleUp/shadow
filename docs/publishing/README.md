@@ -49,6 +49,64 @@ artifact and dependencies in the POM file.
     }
     ```
 
+## Shadow Variant in Default Java Component
+
+The Shadow plugin adds an optional variant to the `java` component when publishing. This variant contains the shadowed
+JAR. This allows consumers of the published library to choose between the standard JAR and the shadowed JAR.
+
+This feature is enabled by default. It can be disabled by setting the `addShadowVariantIntoJavaComponent` property in
+the `shadow` extension to `false`. If you want to publish the standard JAR only, disable this feature like:
+
+=== "Kotlin"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    shadow {
+      addShadowVariantIntoJavaComponent = false
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    shadow {
+      addShadowVariantIntoJavaComponent = false
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.shadow
+        }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+    ```
+
 ## Shadow Configuration and Publishing
 
 The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify

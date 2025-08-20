@@ -30,10 +30,12 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugi
 }
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion {
+	public final synthetic fun getShadow (Lorg/gradle/api/Project;)Lcom/github/jengelman/gradle/plugins/shadow/ShadowExtension;
 	public final synthetic fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
+	public abstract fun getAddShadowVariantIntoJavaComponent ()Lorg/gradle/api/provider/Property;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin : org/gradle/api/Plugin {
