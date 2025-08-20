@@ -8,7 +8,6 @@
 - Allow opting out of `shadowRuntimeElements` variant. ([#1662](https://github.com/GradleUp/shadow/pull/1662))
 
 ## Changed
-
 - Don't inject `TargetJvmVersion` attribute when automatic JVM targeting is disabled. ([#1666](https://github.com/GradleUp/shadow/pull/1666))
 
 
