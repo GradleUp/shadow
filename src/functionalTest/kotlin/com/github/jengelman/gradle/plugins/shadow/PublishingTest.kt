@@ -164,6 +164,35 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun dontInjectTargetJvmVersionWhenOptingOut() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock = """
+          shadow {
+            addTargetJvmVersionAttribute = false
+          }
+        """.trimIndent(),
+        shadowBlock = """
+          archiveClassifier = ''
+          archiveBaseName = 'maven-all'
+        """.trimIndent(),
+      ),
+    )
+
+    val result = publish(infoArgument)
+
+    assertThat(result.output).contains(
+      "Skipping setting org.gradle.jvm.version attribute for shadowRuntimeElements configuration.",
+    )
+    assertShadowVariantCommon(
+      gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
+      variantAttrs = shadowVariantAttrs.filterNot { (name, _) ->
+        name == TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name
+      }.toTypedArray(),
+    )
+  }
+
+  @Test
   fun publishShadowJarInsteadOfJar() {
     projectScript.appendText(
       publishConfiguration(
