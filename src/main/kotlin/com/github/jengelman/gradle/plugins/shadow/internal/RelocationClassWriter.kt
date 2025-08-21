@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import java.lang.reflect.Field
 import org.objectweb.asm.AnnotationVisitor

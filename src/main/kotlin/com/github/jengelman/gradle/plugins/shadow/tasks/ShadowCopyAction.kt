@@ -1,15 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter.Companion.applyClassRelocation
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
+import kotlin.metadata.jvm.JvmMetadataVersion
+import kotlin.metadata.jvm.KmModule
+import kotlin.metadata.jvm.KmPackageParts
+import kotlin.metadata.jvm.KotlinModuleMetadata
+import kotlin.metadata.jvm.UnstableMetadataApi
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
@@ -156,17 +163,29 @@ public open class ShadowCopyAction(
 
     private fun visitFile(fileDetails: FileCopyDetails) {
       val path = fileDetails.path
-      if (path.endsWith(".class")) {
-        if (isUnused(path)) return
-        if (relocators.isEmpty()) {
-          fileDetails.writeToZip(path)
-          return
+      when {
+        path.endsWith(".class") -> {
+          if (isUnused(path)) return
+          if (relocators.isEmpty()) {
+            fileDetails.writeToZip(path)
+            return
+          }
+          fileDetails.remapClass(relocators)
         }
-        fileDetails.remapClass(relocators)
-      } else {
-        val mapped = RelocatorRemapper(relocators).map(path)
-        if (transform(fileDetails, mapped)) return
-        fileDetails.writeToZip(mapped)
+
+        path.endsWith(".kotlin_module") -> {
+          if (relocators.isEmpty()) {
+            fileDetails.writeToZip(path)
+            return
+          }
+          fileDetails.remapKotlinModule(relocators)
+        }
+
+        else -> {
+          val mapped = RelocatorRemapper(relocators).map(path)
+          if (transform(fileDetails, mapped)) return
+          fileDetails.writeToZip(mapped)
+        }
       }
     }
 
@@ -226,6 +245,39 @@ public open class ShadowCopyAction(
       }
     }
 
+    /**
+     * Applies remapping to the given kotlin module with the specified relocation path.
+     * The remapped module is then written to the zip file.
+     */
+    @OptIn(UnstableMetadataApi::class)
+    private fun FileCopyDetails.remapKotlinModule(relocators: Set<Relocator>) {
+      val mappedPath = RelocatorRemapper(relocators).mapPath(path)
+      file.inputStream().use { ins ->
+        val metadata = KotlinModuleMetadata.read(ins.readBytes())
+        val result = KmModule()
+        for ((pkg, parts) in metadata.kmModule.packageParts) {
+          result.packageParts[relocators.applyPathRelocation(pkg)] =
+            KmPackageParts(
+              parts.fileFacades.mapTo(mutableListOf()) {
+                relocators.applyPathRelocation(it)
+              },
+              parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
+                relocators.applyClassRelocation(name) to relocators.applyPathRelocation(facade)
+              },
+            )
+        }
+
+        val newMetadata = KotlinModuleMetadata(result, JvmMetadataVersion.LATEST_STABLE_SUPPORTED)
+
+        val entry = zipEntry(mappedPath, preserveFileTimestamps, lastModified) {
+          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+        }
+        zipOutStr.putNextEntry(entry)
+        zipOutStr.write(newMetadata.write())
+        zipOutStr.closeEntry()
+      }
+    }
+
     private fun transform(fileDetails: FileCopyDetails, mapped: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
       fileDetails.file.inputStream().use { inputStream ->
@@ -255,6 +307,10 @@ public open class ShadowCopyAction(
 
     private val ZipOutputStream.entries: List<ZipEntry>
       get() = this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
+
+    internal fun Iterable<Relocator>.applyPathRelocation(value: String): String = fold(value) { string, relocator ->
+      relocator.relocatePath(RelocatePathContext(string))
+    }
 
     /**
      * A copy of [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
