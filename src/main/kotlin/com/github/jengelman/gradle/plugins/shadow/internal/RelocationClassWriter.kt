@@ -13,12 +13,13 @@ internal class RelocationClassWriter(
   classReader: ClassReader,
   relocators: Set<Relocator>,
   flags: Int = 0,
+  isKotlinClass: Boolean = hasKotlinMetadataAnnotation(classReader),
 ) : ClassWriter(classReader, flags) {
   internal var isRelocated = false
 
   init {
     // If the class is a Kotlin class, we need to apply relocations to the symbol table.
-    if (classReader.isKotlinClass()) {
+    if (isKotlinClass) {
       val symbolTable = symbolTableField.get(this)
 
       @Suppress("UNCHECKED_CAST")
@@ -37,22 +38,6 @@ internal class RelocationClassWriter(
     }
   }
 
-  private fun ClassReader.isKotlinClass(): Boolean {
-    var flag = false
-    accept(
-      object : ClassVisitor(Opcodes.ASM9) {
-        override fun visitAnnotation(desc: String, visible: Boolean): AnnotationVisitor? {
-          if (desc == "Lkotlin/Metadata;") {
-            flag = true
-          }
-          return super.visitAnnotation(desc, visible)
-        }
-      },
-      ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES,
-    )
-    return flag
-  }
-
   companion object Companion {
     private val classWriterClass = ClassWriter::class.java
     private val symbolTableClass: Class<*> = Class.forName("org.objectweb.asm.SymbolTable") // Package private.
@@ -64,6 +49,42 @@ internal class RelocationClassWriter(
       .apply { isAccessible = true }
     private val symbolValueField: Field = symbolClass.getDeclaredField("value")
       .apply { isAccessible = true }
+
+    /**
+     * Efficiently checks if the class file contains the kotlin.Metadata annotation
+     * by scanning the constant pool for the annotation descriptor.
+     */
+    private fun hasKotlinMetadataAnnotation(classReader: ClassReader): Boolean {
+      val bytes = classReader.b
+      // Constant pool count is at byte 8 (u2)
+      val cpCount = ((bytes[8].toInt() and 0xFF) shl 8) or (bytes[9].toInt() and 0xFF)
+      var i = 10
+      for (cpIndex in 1 until cpCount) {
+        val tag = bytes[i].toInt() and 0xFF
+        when (tag) {
+          1 -> { // CONSTANT_Utf8
+            val length = ((bytes[i + 1].toInt() and 0xFF) shl 8) or (bytes[i + 2].toInt() and 0xFF)
+            val str = String(bytes, i + 3, length, Charsets.UTF_8)
+            if (str == "Lkotlin/Metadata;") {
+              return true
+            }
+            i += 3 + length
+          }
+          3, 4 -> i += 5 // Integer, Float
+          5, 6 -> i += 9 // Long, Double
+          7, 8, 16 -> i += 3 // Class, String, MethodType
+          15 -> i += 4 // MethodHandle
+          18 -> i += 5 // InvokeDynamic
+          9, 10, 11, 12 -> i += 5 // Field/Method/InterfaceMethod/NameAndType
+          else -> return false // Unknown tag, invalid class file
+        }
+        // Long and Double take up two entries in the constant pool
+        if (tag == 5 || tag == 6) {
+          cpIndex.inc()
+        }
+      }
+      return false
+    }
 
     fun Iterable<Relocator>.applyClassRelocation(value: String): String = fold(value) { string, relocator ->
       relocator.relocateClass(RelocateClassContext(string))
