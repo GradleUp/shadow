@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
@@ -23,7 +24,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
 /**
@@ -162,7 +162,7 @@ public open class ShadowCopyAction(
           fileDetails.writeToZip(path)
           return
         }
-        fileDetails.remapClass()
+        fileDetails.remapClass(relocators)
       } else {
         val mapped = RelocatorRemapper(relocators).map(path)
         if (transform(fileDetails, mapped)) return
@@ -183,7 +183,7 @@ public open class ShadowCopyAction(
      * Applies remapping to the given class with the specified relocation path. The remapped class is then written
      * to the zip file.
      */
-    private fun FileCopyDetails.remapClass() = file.readBytes().let { bytes ->
+    private fun FileCopyDetails.remapClass(relocators: Set<Relocator>) = file.readBytes().let { bytes ->
       var modified = false
       val remapper = RelocatorRemapper(relocators) { modified = true }
 
@@ -192,8 +192,8 @@ public open class ShadowCopyAction(
       // to the original class names. This is not a problem at runtime (because these entries in the
       // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
-      val cw = ClassWriter(0)
       val cr = ClassReader(bytes)
+      val cw = RelocationClassWriter(classReader = cr, relocators = relocators)
       val cv = ClassRemapper(cw, remapper)
 
       try {
