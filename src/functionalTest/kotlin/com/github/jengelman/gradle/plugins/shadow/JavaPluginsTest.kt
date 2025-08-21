@@ -69,7 +69,6 @@ class JavaPluginsTest : BasePluginTest() {
     with(project.extensions.getByType(ShadowExtension::class.java)) {
       assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
       assertThat(addTargetJvmVersionAttribute.get()).isTrue()
-      assertThat(addMultiReleaseAttribute.get()).isTrue()
     }
 
     project.plugins.apply(JavaPlugin::class.java)
@@ -107,6 +106,7 @@ class JavaPluginsTest : BasePluginTest() {
         containsOnly(project.runtimeConfiguration)
       }
       assertThat(failOnDuplicateEntries.get()).isFalse()
+      assertThat(addMultiReleaseAttribute.get()).isTrue()
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)

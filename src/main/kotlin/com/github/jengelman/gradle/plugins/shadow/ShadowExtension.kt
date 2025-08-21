@@ -19,11 +19,4 @@ public interface ShadowExtension {
    * Defaults to `true`.
    */
   public val addTargetJvmVersionAttribute: Property<Boolean>
-
-  /**
-   * If `true`, adds the [java.util.jar.Attributes.Name.MULTI_RELEASE] attribute to the manifest of the shadow JAR.
-   *
-   * Defaults to `true`.
-   */
-  public val addMultiReleaseAttribute: Property<Boolean>
 }
