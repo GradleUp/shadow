@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.snippet.CodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.snippet.DslLang
 import java.nio.file.Path
-import kotlin.io.path.createDirectory
+import kotlin.io.path.createDirectories
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.io.TempDir
@@ -27,8 +27,7 @@ class DocCodeSnippetTest {
     }
 
     return langExecutables.flatten().map {
-      // Create a temporary directory for each test, root will be deleted after all tests are run.
-      it.tempDir = root.resolve(it.displayName).createDirectory()
+      it.tempDir = root.resolve(it.displayName).createDirectories()
       DynamicTest.dynamicTest(it.displayName, it)
     }
   }
