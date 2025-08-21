@@ -1,14 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter.Companion.applyClassRelocation
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
+import kotlin.metadata.jvm.JvmMetadataVersion
+import kotlin.metadata.jvm.KmModule
+import kotlin.metadata.jvm.KmPackageParts
+import kotlin.metadata.jvm.KotlinModuleMetadata
+import kotlin.metadata.jvm.UnstableMetadataApi
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
@@ -23,7 +31,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
 /**
@@ -158,17 +165,29 @@ public open class ShadowCopyAction(
 
     private fun visitFile(fileDetails: FileCopyDetails) {
       val path = fileDetails.path
-      if (path.endsWith(".class")) {
-        if (isUnused(path)) return
-        if (relocators.isEmpty()) {
-          fileDetails.writeToZip(path)
-          return
+      when {
+        path.endsWith(".class") -> {
+          if (isUnused(path)) return
+          if (relocators.isEmpty()) {
+            fileDetails.writeToZip(path)
+            return
+          }
+          fileDetails.remapClass(relocators)
         }
-        fileDetails.remapClass()
-      } else {
-        val mapped = remapper.map(path)
-        if (transform(fileDetails, mapped)) return
-        fileDetails.writeToZip(mapped)
+
+        path.endsWith(".kotlin_module") -> {
+          if (relocators.isEmpty()) {
+            fileDetails.writeToZip(path)
+            return
+          }
+          fileDetails.remapKotlinModule(relocators)
+        }
+
+        else -> {
+          val mapped = remapper.map(path)
+          if (transform(fileDetails, mapped)) return
+          fileDetails.writeToZip(mapped)
+        }
       }
     }
 
@@ -185,14 +204,14 @@ public open class ShadowCopyAction(
      * Applies remapping to the given class with the specified relocation path. The remapped class is then written
      * to the zip file.
      */
-    private fun FileCopyDetails.remapClass() = file.inputStream().use { inputStream ->
+    private fun FileCopyDetails.remapClass(relocators: Set<Relocator>) = file.inputStream().use { inputStream ->
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
       // to the original class names. This is not a problem at runtime (because these entries in the
       // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
-      val cw = ClassWriter(0)
       val cr = ClassReader(inputStream)
+      val cw = RelocationClassWriter(classReader = cr, relocators = relocators)
       val cv = ClassRemapper(cw, remapper)
 
       try {
@@ -215,6 +234,39 @@ public open class ShadowCopyAction(
         zipOutStr.closeEntry()
       } catch (_: ZipException) {
         logger.warn("We have a duplicate $mappedName in source project")
+      }
+    }
+
+    /**
+     * Applies remapping to the given kotlin module with the specified relocation path.
+     * The remapped module is then written to the zip file.
+     */
+    @OptIn(UnstableMetadataApi::class)
+    private fun FileCopyDetails.remapKotlinModule(relocators: Set<Relocator>) {
+      val mappedPath = remapper.mapPath(path)
+      file.inputStream().use { ins ->
+        val metadata = KotlinModuleMetadata.read(ins.readBytes())
+        val result = KmModule()
+        for ((pkg, parts) in metadata.kmModule.packageParts) {
+          result.packageParts[relocators.applyPathRelocation(pkg)] =
+            KmPackageParts(
+              parts.fileFacades.mapTo(mutableListOf()) {
+                relocators.applyPathRelocation(it)
+              },
+              parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
+                relocators.applyClassRelocation(name) to relocators.applyPathRelocation(facade)
+              },
+            )
+        }
+
+        val newMetadata = KotlinModuleMetadata(result, JvmMetadataVersion.LATEST_STABLE_SUPPORTED)
+
+        val entry = zipEntry(mappedPath, preserveFileTimestamps, lastModified) {
+          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+        }
+        zipOutStr.putNextEntry(entry)
+        zipOutStr.write(newMetadata.write())
+        zipOutStr.closeEntry()
       }
     }
 
@@ -247,6 +299,10 @@ public open class ShadowCopyAction(
 
     private val ZipOutputStream.entries: List<ZipEntry>
       get() = this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
+
+    internal fun Iterable<Relocator>.applyPathRelocation(value: String): String = fold(value) { string, relocator ->
+      relocator.relocatePath(RelocatePathContext(string))
+    }
 
     /**
      * A copy of [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
