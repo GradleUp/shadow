@@ -99,14 +99,14 @@ class JavaPluginsTest : BasePluginTest() {
       assertThat(group).isEqualTo(LifecycleBasePlugin.BUILD_GROUP)
       assertThat(description).isEqualTo("Create a combined JAR of project and runtime dependencies")
       assertThat(minimizeJar.get()).isFalse()
+      assertThat(failOnDuplicateEntries.get()).isFalse()
+      assertThat(addMultiReleaseAttribute.get()).isTrue()
       assertThat(enableAutoRelocation.get()).isFalse()
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
       assertThat(configurations.get()).all {
         isNotEmpty()
         containsOnly(project.runtimeConfiguration)
       }
-      assertThat(failOnDuplicateEntries.get()).isFalse()
-      assertThat(addMultiReleaseAttribute.get()).isTrue()
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
@@ -940,7 +940,7 @@ class JavaPluginsTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
     } else {
-      run(shadowJarPath, infoArgument)
+      run(shadowJarPath, infoArgument, "--no-fail-on-duplicate-entries")
     }
 
     assertThat(result.output).contains(
