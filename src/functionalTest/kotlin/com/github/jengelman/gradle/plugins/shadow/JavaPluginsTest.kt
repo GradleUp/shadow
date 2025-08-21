@@ -117,6 +117,8 @@ class JavaPluginsTest : BasePluginTest() {
     val result = run("help", "--task", shadowJarPath)
 
     assertThat(result.output).contains(
+      "--add-multi-release-attribute     Adds the multi-release attribute to the manifest if any dependencies contain it.",
+      "--no-add-multi-release-attribute     Disables option --add-multi-release-attribute.",
       "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
       "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
       "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
