@@ -69,7 +69,9 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
     // Must use afterEvaluate here as we need to check the value of targetJvmVersion and track its changes.
     afterEvaluate {
-      if (!shadow.addTargetJvmVersionAttribute.get()) {
+      if (shadow.addTargetJvmVersionAttribute.get()) {
+        logger.info("Setting ${TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name} attribute for ${shadowRuntimeElements.name} configuration.")
+      } else {
         logger.info("Skipping setting ${TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name} attribute for ${shadowRuntimeElements.name} configuration.")
         return@afterEvaluate
       }
@@ -81,6 +83,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       if (targetJvmVersion == Int.MAX_VALUE) {
         logger.info("Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.")
       } else {
+        logger.info("Setting target JVM version to $targetJvmVersion for ${shadowRuntimeElements.name} configuration.")
         shadowRuntimeElements.attributes { attrs ->
           attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
         }
@@ -96,7 +99,9 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       variant.mapToMavenScope("runtime")
     }
     afterEvaluate {
-      if (!shadow.addShadowVariantIntoJavaComponent.get()) {
+      if (shadow.addShadowVariantIntoJavaComponent.get()) {
+        logger.info("Adding ${shadowRuntimeElements.name} variant to Java component.")
+      } else {
         logger.info("Skipping adding ${shadowRuntimeElements.name} variant to Java component.")
         return@afterEvaluate
       }

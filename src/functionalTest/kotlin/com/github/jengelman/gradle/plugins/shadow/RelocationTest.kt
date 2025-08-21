@@ -85,24 +85,25 @@ class RelocationTest : BasePluginTest() {
     if (enable) {
       run(shadowJarPath, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
     } else {
-      run(shadowJarPath, "--relocation-prefix=$relocationPrefix")
+      run(shadowJarPath, "--no-enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
     }
 
+    val commonEntries = arrayOf(
+      "my/",
+      mainClassEntry,
+      *manifestEntries,
+    )
     assertThat(outputShadowedJar).useAll {
       if (enable) {
         containsOnly(
-          "my/",
           "$relocationPrefix/",
-          mainClassEntry,
           *relocatedEntries,
-          *manifestEntries,
+          *commonEntries,
         )
       } else {
         containsOnly(
-          "my/",
-          mainClassEntry,
           *junitEntries,
-          *manifestEntries,
+          *commonEntries,
         )
       }
     }

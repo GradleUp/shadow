@@ -439,7 +439,12 @@ public abstract class ShadowJar : Jar() {
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
-      if (!enableAutoRelocation.get()) return emptyList()
+      if (enableAutoRelocation.get()) {
+        logger.info("Adding auto relocation packages in the dependencies with prefix '${relocationPrefix.get()}'.")
+      } else {
+        logger.info("Skipping package relocators as auto relocation is disabled.")
+        return emptyList()
+      }
       val prefix = relocationPrefix.get()
       return includedDependencies.files.flatMap { file ->
         JarFile(file).use { jarFile ->
@@ -453,7 +458,9 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectMultiReleaseAttrIfPresent() {
-    if (!addMultiReleaseAttribute.get()) {
+    if (addMultiReleaseAttribute.get()) {
+      logger.info("Adding $multiReleaseAttributeKey attribute to the manifest if any dependencies contain it.")
+    } else {
       logger.info("Skipping adding $multiReleaseAttributeKey attribute to the manifest as it is disabled.")
       return
     }

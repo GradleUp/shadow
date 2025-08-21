@@ -252,7 +252,7 @@ class MinimizeTest : BasePluginTest() {
     if (enable) {
       run(serverShadowJarPath, "--minimize-jar")
     } else {
-      run(serverShadowJarPath)
+      run(serverShadowJarPath, "--no-minimize-jar")
     }
 
     assertThat(outputServerShadowedJar).useAll {

@@ -77,9 +77,11 @@ class JavaPluginsTest : BasePluginTest() {
     val assembleTask = project.tasks.getByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)
     assertThat(assembleTask.dependsOn).contains(shadowTask)
 
-    // Check extended properties.
+    // Check inherited properties.
     with(shadowTask as Jar) {
-      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.EXCLUDE)
+      assertThat(group).isEqualTo(LifecycleBasePlugin.BUILD_GROUP)
+      assertThat(description).isEqualTo("Create a combined JAR of project and runtime dependencies")
+
       assertThat(archiveAppendix.orNull).isNull()
       assertThat(archiveBaseName.get()).isEqualTo(projectName)
       assertThat(archiveClassifier.get()).isEqualTo("all")
@@ -92,21 +94,22 @@ class JavaPluginsTest : BasePluginTest() {
       }
       assertThat(destinationDirectory.get().asFile)
         .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
+
+      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.EXCLUDE)
     }
 
     // Check self properties.
     with(shadowTask) {
-      assertThat(group).isEqualTo(LifecycleBasePlugin.BUILD_GROUP)
-      assertThat(description).isEqualTo("Create a combined JAR of project and runtime dependencies")
-      assertThat(minimizeJar.get()).isFalse()
+      assertThat(addMultiReleaseAttribute.get()).isTrue()
       assertThat(enableAutoRelocation.get()).isFalse()
+      assertThat(failOnDuplicateEntries.get()).isFalse()
+      assertThat(minimizeJar.get()).isFalse()
+
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
       assertThat(configurations.get()).all {
         isNotEmpty()
         containsOnly(project.runtimeConfiguration)
       }
-      assertThat(failOnDuplicateEntries.get()).isFalse()
-      assertThat(addMultiReleaseAttribute.get()).isTrue()
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
@@ -275,16 +278,15 @@ class JavaPluginsTest : BasePluginTest() {
 
     val result = run(serverShadowJarPath, infoArgument)
 
-    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
-    if (addAttribute) {
-      assertThat(result.output).doesNotContain(info)
-    } else {
-      assertThat(result.output).contains(info)
-    }
-
-    val expected = if (addAttribute) "true" else null
+    assertThat(result.output).contains(
+      if (addAttribute) {
+        "Adding Multi-Release attribute to the manifest if any dependencies contain it."
+      } else {
+        "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+      },
+    )
     assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
-      .isEqualTo(expected)
+      .isEqualTo(if (addAttribute) "true" else null)
   }
 
   @ParameterizedTest
@@ -301,19 +303,18 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent() + lineSeparator,
     )
 
-    val flag = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
-    val result = run(serverShadowJarPath, infoArgument, flag)
+    val arg = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
+    val result = run(serverShadowJarPath, infoArgument, arg)
 
-    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
-    if (enable) {
-      assertThat(result.output).doesNotContain(info)
-    } else {
-      assertThat(result.output).contains(info)
-    }
-
-    val expected = if (enable) "true" else null
+    assertThat(result.output).contains(
+      if (enable) {
+        "Adding Multi-Release attribute to the manifest if any dependencies contain it."
+      } else {
+        "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+      },
+    )
     assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
-      .isEqualTo(expected)
+      .isEqualTo(if (enable) "true" else null)
   }
 
   @Issue(
@@ -880,9 +881,9 @@ class JavaPluginsTest : BasePluginTest() {
     val result = run(
       serverShadowJarPath,
       ipArgument,
+      infoArgument,
       "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
       "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
-      infoArgument,
     )
 
     assertThat(result.output).all {
@@ -940,7 +941,7 @@ class JavaPluginsTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
     } else {
-      run(shadowJarPath, infoArgument)
+      run(shadowJarPath, infoArgument, "--no-fail-on-duplicate-entries")
     }
 
     assertThat(result.output).contains(
