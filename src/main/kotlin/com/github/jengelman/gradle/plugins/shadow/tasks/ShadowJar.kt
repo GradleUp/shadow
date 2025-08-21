@@ -224,13 +224,14 @@ public abstract class ShadowJar : Jar() {
    * 1. Set the strategy to [INCLUDE] or [WARN].
    * 2. Apply your [ResourceTransformer]s.
    * 3. Remove duplicate entries by
-   *     - overriding the default strategy for specific files using [filesMatching]
+   *     - overriding the default strategy for specific files using `filesMatching` or `eachFile` functions
    *     - or applying `PreserveFirstFoundResourceTransformer` for specific files
    *     - or write your own `ResourceTransformer`s to handle duplicates
    *     - or mechanism similar.
    * 4. Optionally, enable [failOnDuplicateEntries] to check duplicate entries in the final JAR.
    * 5. Optionally, use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
    *
+   * @see [eachFile]
    * @see [filesMatching]
    * @see [DuplicatesStrategy]
    * @see [CopySpec.duplicatesStrategy]
