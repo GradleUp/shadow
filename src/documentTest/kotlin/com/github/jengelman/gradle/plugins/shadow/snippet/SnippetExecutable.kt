@@ -100,6 +100,7 @@ sealed class SnippetExecutable : Executable {
         .forwardOutput()
         .withArguments(
           "--warning-mode=$warningMode",
+          "--stacktrace",
           "build",
         )
         .build()
