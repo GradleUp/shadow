@@ -25,6 +25,8 @@
  */
 package com.xpdustry.ksr
 
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter.Companion.applyClassRelocation
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
@@ -75,8 +77,6 @@ internal fun relocateMetadata(task: ShadowJar) {
 
 internal fun Iterable<KotlinRelocator>.applyPathRelocation(value: String): String = fold(value) { string, relocator -> relocator.relocatePath(RelocatePathContext(string)) }
 
-internal fun Iterable<KotlinRelocator>.applyClassRelocation(value: String): String = fold(value) { string, relocator -> relocator.relocateClass(RelocateClassContext(string)) }
-
 @CacheableRelocator
 internal class KotlinRelocator(pattern: String, shadedPattern: String) : SimpleRelocator(pattern, shadedPattern, emptyList(), emptyList()) {
   // I hate these hacks...
@@ -95,7 +95,7 @@ internal class KotlinRelocator(pattern: String, shadedPattern: String) : SimpleR
 private fun relocateClass(file: Path, relocators: List<KotlinRelocator>) {
   Files.newInputStream(file).use { ins ->
     val cr = ClassReader(ins)
-    val cw = RelocatingClassWriter(cr, 0, relocators)
+    val cw = RelocationClassWriter(cr, relocators.toSet())
     val scanner = MetadataAnnotationScanner(cw, relocators)
     cr.accept(scanner, 0)
     if (scanner.isRelocated || cw.isRelocated) {
