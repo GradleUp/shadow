@@ -285,6 +285,35 @@ class JavaPluginsTest : BasePluginTest() {
       .isEqualTo(expected)
   }
 
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun containsMultiReleaseAttrByCliOption(enable: Boolean) {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        $jarTask {
+          manifest {
+            attributes '$multiReleaseAttributeKey': 'true'
+          }
+        }
+      """.trimIndent() + lineSeparator,
+    )
+
+    val flag = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
+    val result = run(serverShadowJarPath, infoArgument, flag)
+
+    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+    if (enable) {
+      assertThat(result.output).doesNotContain(info)
+    } else {
+      assertThat(result.output).contains(info)
+    }
+
+    val expected = if (enable) "true" else null
+    assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
+      .isEqualTo(expected)
+  }
+
   @Issue(
     "https://github.com/GradleUp/shadow/issues/352",
     "https://github.com/GradleUp/shadow/issues/729",
