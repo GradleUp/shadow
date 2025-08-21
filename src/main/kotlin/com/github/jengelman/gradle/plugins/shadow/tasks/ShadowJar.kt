@@ -453,7 +453,10 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectMultiReleaseAttrIfPresent() {
-    if (!addMultiReleaseAttribute.get()) return
+    if (!addMultiReleaseAttribute.get()) {
+      logger.info("Skipping adding $multiReleaseAttributeKey attribute to the manifest as it is disabled.")
+      return
+    }
     val includeMultiReleaseAttr = includedDependencies.files.any {
       try {
         JarFile(it).use { jarFile ->

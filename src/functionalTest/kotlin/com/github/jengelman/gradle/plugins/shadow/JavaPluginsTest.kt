@@ -271,6 +271,37 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun doesNotContainMultiReleaseAttrIfDisabled() {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        $jarTask {
+          manifest {
+            attributes '$multiReleaseAttributeKey': 'true'
+          }
+        }
+      """.trimIndent() + lineSeparator,
+    )
+    path("server/build.gradle").appendText(
+      """
+        $shadowJarTask {
+          addMultiReleaseAttribute = false
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(serverShadowJarPath, infoArgument)
+
+    assertThat(result.output).contains(
+      "Skipping adding Multi-Release attribute to the manifest as it is disabled.",
+    )
+    assertThat(outputServerShadowedJar).useAll {
+      transform { it.mainAttrSize }.isEqualTo(1)
+      getMainAttr(multiReleaseAttributeKey).isNull()
+    }
+  }
+
   @Issue(
     "https://github.com/GradleUp/shadow/issues/352",
     "https://github.com/GradleUp/shadow/issues/729",
