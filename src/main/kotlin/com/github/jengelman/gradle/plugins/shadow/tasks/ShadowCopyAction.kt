@@ -176,7 +176,7 @@ public open class ShadowCopyAction(
       val className = classPath.substringBeforeLast(".").replace('/', '.')
       return unusedClasses.contains(className).also {
         if (it) {
-          logger.debug("Dropping unused class: $className")
+          logger.info("Dropping unused class: $className")
         }
       }
     }
