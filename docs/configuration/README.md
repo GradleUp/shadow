@@ -153,6 +153,36 @@ methods on the `shadowJar.manifest` object can be used to configure the upstream
     }
     ```
 
+## Adding Multi-Release Manifest Attribute
+
+The [`ShadowJar`][ShadowJar] task can automatically add the `Multi-Release` attribute to the JAR manifest if any of
+the included dependencies contain this attribute. This is controlled by the `addMultiReleaseAttribute` property.
+
+By default, `addMultiReleaseAttribute` is set to `true`. When enabled, Shadow will scan all dependencies being merged
+into the shadow JAR. If any dependency JAR has the `Multi-Release` manifest attribute set to `true`, Shadow will add
+`Multi-Release: true` to the manifest of the resulting shadow JAR.
+
+You can disable this behavior by setting `addMultiReleaseAttribute` to `false`:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      addMultiReleaseAttribute = false
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      addMultiReleaseAttribute = false
+    }
+    ```
+
+This is useful if you want to control the presence of the `Multi-Release` attribute manually or avoid inheriting it
+from dependencies.
+
 ## Adding Extra Files
 
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the[`Jar.from`][Jar.from]
