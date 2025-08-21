@@ -250,29 +250,9 @@ class JavaPluginsTest : BasePluginTest() {
   @Issue(
     "https://github.com/GradleUp/shadow/issues/449",
   )
-  @Test
-  fun containsMultiReleaseAttrIfAnyDependencyContainsIt() {
-    writeClientAndServerModules()
-    path("client/build.gradle").appendText(
-      """
-        $jarTask {
-          manifest {
-            attributes '$multiReleaseAttributeKey': 'true'
-          }
-        }
-      """.trimIndent() + lineSeparator,
-    )
-
-    run(serverShadowJarPath)
-
-    assertThat(outputServerShadowedJar).useAll {
-      transform { it.mainAttrSize }.isGreaterThan(1)
-      getMainAttr(multiReleaseAttributeKey).isEqualTo("true")
-    }
-  }
-
-  @Test
-  fun doesNotContainMultiReleaseAttrIfDisabled() {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun containsMultiReleaseAttrIfAnyDependencyContainsIt(addAttribute: Boolean) {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
       """
@@ -286,20 +266,23 @@ class JavaPluginsTest : BasePluginTest() {
     path("server/build.gradle").appendText(
       """
         $shadowJarTask {
-          addMultiReleaseAttribute = false
+          addMultiReleaseAttribute = $addAttribute
         }
       """.trimIndent(),
     )
 
     val result = run(serverShadowJarPath, infoArgument)
 
-    assertThat(result.output).contains(
-      "Skipping adding Multi-Release attribute to the manifest as it is disabled.",
-    )
-    assertThat(outputServerShadowedJar).useAll {
-      transform { it.mainAttrSize }.isEqualTo(1)
-      getMainAttr(multiReleaseAttributeKey).isNull()
+    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+    if (addAttribute) {
+      assertThat(result.output).doesNotContain(info)
+    } else {
+      assertThat(result.output).contains(info)
     }
+
+    val expected = if (addAttribute) "true" else null
+    assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
+      .isEqualTo(expected)
   }
 
   @Issue(
