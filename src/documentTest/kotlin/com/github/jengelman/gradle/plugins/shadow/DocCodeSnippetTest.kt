@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.snippet.CodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.snippet.DslLang
 import java.nio.file.Path
+import kotlin.io.path.createDirectory
 import kotlin.io.path.createTempDirectory
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
@@ -26,10 +27,10 @@ class DocCodeSnippetTest {
       "All languages must have the same number of code snippets."
     }
 
-    return langExecutables.flatten().map {
+    return langExecutables.flatten().mapIndexed { index, executable ->
       // Create a temporary directory for each test, root will be deleted after all tests are run.
-      it.tempDir = createTempDirectory(root)
-      DynamicTest.dynamicTest(it.displayName, it)
+      executable.tempDir = root.resolve(index.toString()).createDirectory()
+      DynamicTest.dynamicTest(executable.displayName, executable)
     }
   }
 }
