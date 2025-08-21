@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.snippet.CodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.snippet.DslLang
 import java.nio.file.Path
-import kotlin.io.path.createDirectories
+import kotlin.io.path.createDirectory
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.io.TempDir
@@ -27,8 +27,11 @@ class DocCodeSnippetTest {
     }
 
     return langExecutables.flatten().map {
-      it.tempDir = root.resolve(it.displayName).createDirectories()
+      val dirName = it.displayName.replace(nonAlphanumeric, "_")
+      it.tempDir = root.resolve(dirName).createDirectory()
       DynamicTest.dynamicTest(it.displayName, it)
     }
   }
 }
+
+private val nonAlphanumeric = "[^a-zA-Z0-9]".toRegex()
