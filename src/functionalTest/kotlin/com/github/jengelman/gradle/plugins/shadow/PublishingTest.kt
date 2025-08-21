@@ -5,7 +5,6 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsOnly
-import assertk.assertions.doesNotContain
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.single
@@ -494,12 +493,13 @@ class PublishingTest : BasePluginTest() {
 
     val result = publish(infoArgument)
 
-    val info = "Skipping adding shadowRuntimeElements variant to Java component."
-    if (addShadowVariant) {
-      assertThat(result.output).doesNotContain(info)
-    } else {
-      assertThat(result.output).contains(info)
-    }
+    assertThat(result.output).contains(
+      if (addShadowVariant) {
+        "Adding shadowRuntimeElements variant to Java component."
+      } else {
+        "Skipping adding shadowRuntimeElements variant to Java component."
+      },
+    )
     val assertVariantsCommon = { gmm: GradleModuleMetadata ->
       assertThat(gmm.apiElementsVariant).all {
         transform { it.attributes }.containsOnly(

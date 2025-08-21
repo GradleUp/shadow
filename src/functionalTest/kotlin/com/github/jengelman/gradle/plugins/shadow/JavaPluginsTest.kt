@@ -275,16 +275,15 @@ class JavaPluginsTest : BasePluginTest() {
 
     val result = run(serverShadowJarPath, infoArgument)
 
-    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
-    if (addAttribute) {
-      assertThat(result.output).doesNotContain(info)
-    } else {
-      assertThat(result.output).contains(info)
-    }
-
-    val expected = if (addAttribute) "true" else null
+    assertThat(result.output).contains(
+      if (addAttribute) {
+        "Adding Multi-Release attribute to the manifest if any dependencies contain it."
+      } else {
+        "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+      },
+    )
     assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
-      .isEqualTo(expected)
+      .isEqualTo(if (addAttribute) "true" else null)
   }
 
   @ParameterizedTest
@@ -304,16 +303,15 @@ class JavaPluginsTest : BasePluginTest() {
     val flag = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
     val result = run(serverShadowJarPath, infoArgument, flag)
 
-    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
-    if (enable) {
-      assertThat(result.output).doesNotContain(info)
-    } else {
-      assertThat(result.output).contains(info)
-    }
-
-    val expected = if (enable) "true" else null
+    assertThat(result.output).contains(
+      if (enable) {
+        "Adding Multi-Release attribute to the manifest if any dependencies contain it."
+      } else {
+        "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+      },
+    )
     assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
-      .isEqualTo(expected)
+      .isEqualTo(if (enable) "true" else null)
   }
 
   @Issue(
