@@ -7,6 +7,7 @@
 
 - Allow opting out of `shadowRuntimeElements` variant. ([#1662](https://github.com/GradleUp/shadow/pull/1662))
 - Allow opting out of `TARGET_JVM_VERSION_ATTRIBUTE`. ([#1674](https://github.com/GradleUp/shadow/pull/1674))
+- Allow opting out of `Multi-Release` attribute. ([#1675](https://github.com/GradleUp/shadow/pull/1675))
 
 ## Changed
 

@@ -106,6 +106,7 @@ class JavaPluginsTest : BasePluginTest() {
         containsOnly(project.runtimeConfiguration)
       }
       assertThat(failOnDuplicateEntries.get()).isFalse()
+      assertThat(addMultiReleaseAttribute.get()).isTrue()
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
@@ -116,6 +117,8 @@ class JavaPluginsTest : BasePluginTest() {
     val result = run("help", "--task", shadowJarPath)
 
     assertThat(result.output).contains(
+      "--add-multi-release-attribute     Adds the multi-release attribute to the manifest if any dependencies contain it.",
+      "--no-add-multi-release-attribute     Disables option --add-multi-release-attribute.",
       "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
       "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
       "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
@@ -249,8 +252,44 @@ class JavaPluginsTest : BasePluginTest() {
   @Issue(
     "https://github.com/GradleUp/shadow/issues/449",
   )
-  @Test
-  fun containsMultiReleaseAttrIfAnyDependencyContainsIt() {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun containsMultiReleaseAttrIfAnyDependencyContainsIt(addAttribute: Boolean) {
+    writeClientAndServerModules()
+    path("client/build.gradle").appendText(
+      """
+        $jarTask {
+          manifest {
+            attributes '$multiReleaseAttributeKey': 'true'
+          }
+        }
+      """.trimIndent() + lineSeparator,
+    )
+    path("server/build.gradle").appendText(
+      """
+        $shadowJarTask {
+          addMultiReleaseAttribute = $addAttribute
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(serverShadowJarPath, infoArgument)
+
+    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+    if (addAttribute) {
+      assertThat(result.output).doesNotContain(info)
+    } else {
+      assertThat(result.output).contains(info)
+    }
+
+    val expected = if (addAttribute) "true" else null
+    assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
+      .isEqualTo(expected)
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun containsMultiReleaseAttrByCliOption(enable: Boolean) {
     writeClientAndServerModules()
     path("client/build.gradle").appendText(
       """
@@ -262,12 +301,19 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent() + lineSeparator,
     )
 
-    run(serverShadowJarPath)
+    val flag = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
+    val result = run(serverShadowJarPath, infoArgument, flag)
 
-    assertThat(outputServerShadowedJar).useAll {
-      transform { it.mainAttrSize }.isGreaterThan(1)
-      getMainAttr(multiReleaseAttributeKey).isEqualTo("true")
+    val info = "Skipping adding Multi-Release attribute to the manifest as it is disabled."
+    if (enable) {
+      assertThat(result.output).doesNotContain(info)
+    } else {
+      assertThat(result.output).contains(info)
     }
+
+    val expected = if (enable) "true" else null
+    assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
+      .isEqualTo(expected)
   }
 
   @Issue(

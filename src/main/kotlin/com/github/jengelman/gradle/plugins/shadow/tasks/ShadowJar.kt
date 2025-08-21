@@ -184,6 +184,16 @@ public abstract class ShadowJar : Jar() {
   @get:Option(option = "fail-on-duplicate-entries", description = "Fails build if the ZIP entries in the shadowed JAR are duplicate.")
   public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(false)
 
+  /**
+   * Adds the [java.util.jar.Attributes.Name.MULTI_RELEASE] attribute to the manifest of the shadow JAR if any
+   * dependencies contain the attribute.
+   *
+   * Defaults to `true`.
+   */
+  @get:Input
+  @get:Option(option = "add-multi-release-attribute", description = "Adds the multi-release attribute to the manifest if any dependencies contain it.")
+  public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
+
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
@@ -443,6 +453,10 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectMultiReleaseAttrIfPresent() {
+    if (!addMultiReleaseAttribute.get()) {
+      logger.info("Skipping adding $multiReleaseAttributeKey attribute to the manifest as it is disabled.")
+      return
+    }
     val includeMultiReleaseAttr = includedDependencies.files.any {
       try {
         JarFile(it).use { jarFile ->
