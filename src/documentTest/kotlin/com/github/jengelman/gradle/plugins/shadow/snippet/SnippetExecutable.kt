@@ -16,6 +16,10 @@ sealed class SnippetExecutable : Executable {
   abstract val assembleDependsOn: String
 
   abstract val snippet: String
+
+  /**
+   * Unique name for the test, formatted as `publishing/README.md:10`.
+   */
   abstract val displayName: String
   abstract val exceptionTransformer: (Throwable) -> Throwable
 
