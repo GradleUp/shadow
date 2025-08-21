@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
@@ -23,7 +24,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
 /**
@@ -164,7 +164,7 @@ public open class ShadowCopyAction(
           fileDetails.writeToZip(path)
           return
         }
-        fileDetails.remapClass()
+        fileDetails.remapClass(relocators)
       } else {
         val mapped = remapper.map(path)
         if (transform(fileDetails, mapped)) return
@@ -185,14 +185,14 @@ public open class ShadowCopyAction(
      * Applies remapping to the given class with the specified relocation path. The remapped class is then written
      * to the zip file.
      */
-    private fun FileCopyDetails.remapClass() = file.inputStream().use { inputStream ->
+    private fun FileCopyDetails.remapClass(relocators: Set<Relocator>) = file.inputStream().use { inputStream ->
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
       // to the original class names. This is not a problem at runtime (because these entries in the
       // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
-      val cw = ClassWriter(0)
       val cr = ClassReader(inputStream)
+      val cw = RelocationClassWriter(classReader = cr, relocators = relocators)
       val cv = ClassRemapper(cw, remapper)
 
       try {
