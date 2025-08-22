@@ -255,7 +255,7 @@ Starting with this version, plugin projects that apply both Shadow and the Gradl
 automatically configured to publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the
 plugin. See the
 [Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies)
-for details. The only thing you need to do from Shadow side should be empty the `archiveClassifier` like:
+for details. The only thing you need to do from the Shadow side is to empty the `archiveClassifier` like:
 
 === "Kotlin"
 
