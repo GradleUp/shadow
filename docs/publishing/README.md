@@ -248,6 +248,49 @@ the `archiveClassifier` of the shadowed JAR like the following:
     }
     ```
 
+## Publishing shadowed Gradle plugins
+
+The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
+Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be
+automatically configured to publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the
+plugin. See the
+[Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies)
+for details. The only thing you need to do from Shadow side should be empty the `archiveClassifier` like:
+
+=== "Kotlin"
+
+    ```kotlin
+    plugins {
+      id("com.gradle.plugin-publish") version "latest"
+      id("com.gradleup.shadow")
+    }
+
+    dependencies {
+      // Your plugin dependencies.
+    }
+
+    tasks.shadowJar {
+      archiveClassifier = ""
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'com.gradle.plugin-publish' version 'latest'
+      id 'com.gradleup.shadow'
+    }
+
+    dependencies {
+      // Your plugin dependencies.
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+    ```
+
 ## Publish Custom ShadowJar Task Outputs
 
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the

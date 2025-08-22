@@ -74,7 +74,6 @@ nav:
   - 'Android Plugins': android-plugins/README.md
   - 'Publishing': publishing/README.md
   - 'Multi-Project': multi-project/README.md
-  - 'Gradle Plugins': gradle-plugins/README.md
   - 'Changes': changes/README.md
   - 'API': api/index.html
   - 'About': about/README.md
