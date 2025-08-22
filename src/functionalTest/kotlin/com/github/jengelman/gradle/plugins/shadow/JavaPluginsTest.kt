@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsAtLeast
 import assertk.assertions.containsMatch
 import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
@@ -19,11 +20,13 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsNone
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
@@ -948,6 +951,38 @@ class JavaPluginsTest : BasePluginTest() {
       "Duplicate entries found in the shadowed JAR:",
       "a.properties (2 times)",
     )
+  }
+
+  @Test
+  fun invalidTimestampForJarEntry() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'com.github.nscala-time:nscala-time_2.12:2.26.0'
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(shadowJarPath)
+
+    assertThat(result.output).contains(
+      "BUILD SUCCESSFUL",
+    )
+
+    val jarEntries = JarPath(requireResourceAsPath("nscala-time_2.12-2.26.0.jar"))
+      .entries()
+      .toList()
+    val negativeEntries = jarEntries.filter { it.time < 0 }
+
+    assertThat(negativeEntries).all {
+      isNotEmpty()
+      transform { actual -> actual.single { it.name == "com/github/nscala_time/PimpedType.class" }.time }
+        .isEqualTo(-32400000)
+    }
+
+    assertThat(outputShadowedJar).useAll {
+      containsAtLeast(*jarEntries.map { it.name }.toTypedArray())
+    }
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {
