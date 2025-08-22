@@ -145,10 +145,6 @@ This automatic configuration occurs _only_ when using the above methods for
 configuring publishing. If this behavior is not desirable, then publishing **must**
 be manually configured.
 
-## Publish the Shadowed JAR instead of the Original JAR
-
-You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
-the `archiveClassifier` of the shadowed JAR like the following:
 
 === "Kotlin"
 
@@ -241,6 +237,57 @@ the `archiveClassifier` of the shadowed JAR like the following:
             node.appendNode('scope', 'runtime')
           }
         }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+    ```
+
+## Publish the Shadowed JAR instead of the Original JAR
+
+You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
+the `archiveClassifier` of the shadowed JAR like the following:
+
+=== "Kotlin"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    tasks.shadowJar {
+      archiveClassifier = ""
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow")
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication)
       }
       repositories {
         maven { url = 'https://repo.myorg.com' }
