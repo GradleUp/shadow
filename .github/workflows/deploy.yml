@@ -25,7 +25,7 @@ jobs:
           # Don't cache it to track updates.
           pip install mkdocs-material
           mkdocs build
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: site
       - uses: actions/deploy-pages@v4
