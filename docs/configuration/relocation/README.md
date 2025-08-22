@@ -205,8 +205,6 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
     }
     ```
 
-In versions before 8.1.0 it was necessary to configure a separate `ConfigureShadowRelocation` task for this.
-
 > Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
 > in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
 > Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these

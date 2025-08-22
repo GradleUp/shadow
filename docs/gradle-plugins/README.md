@@ -66,19 +66,6 @@ plugin. See the
 [Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies)
 for details.
 
-## Automatic package relocation with Shadow prior to v8.1.0
-
-Prior to Shadow v8.1.0, Shadow handled this by introducing a new task type `ConfigureShadowRelocation`.
-Tasks of this type are configured to target an instance of a [`ShadowJar`][ShadowJar] task and run immediately before
-it.
-
-The `ConfigureShadowRelocation` task, scans the dependencies from the configurations specified on the associated
-`ShadowJar` task and collects the package names contained within them. It then configures relocation for these
-packages using the specified `prefix` on the associated [`ShadowJar`][ShadowJar] task.
-
-While this is useful for developing Gradle plugins, nothing about the `ConfigureShadowRelocation` task is tied to
-Gradle projects. It can be used for standard Java or Groovy projects.
-
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
