@@ -248,7 +248,7 @@ the `archiveClassifier` of the shadowed JAR like the following:
     }
     ```
 
-## Publishing shadowed Gradle plugins
+## Publishing the Shadowed Gradle Plugins
 
 The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
 Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be
