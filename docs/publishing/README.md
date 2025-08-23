@@ -145,10 +145,6 @@ This automatic configuration occurs _only_ when using the above methods for
 configuring publishing. If this behavior is not desirable, then publishing **must**
 be manually configured.
 
-## Publish the Shadowed JAR instead of the Original JAR
-
-You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
-the `archiveClassifier` of the shadowed JAR like the following:
 
 === "Kotlin"
 
@@ -159,11 +155,8 @@ the `archiveClassifier` of the shadowed JAR like the following:
       id("com.gradleup.shadow")
     }
 
-    group = "shadow"
-    version = "1.0"
-
+    val retrofitVersion = "2.12.0"
     dependencies {
-      val retrofitVersion = "2.12.0"
       // This will be bundled in the shadowed JAR and not declared in the POM.
       implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
@@ -171,10 +164,6 @@ the `archiveClassifier` of the shadowed JAR like the following:
       shadow("com.squareup.retrofit2:converter-java8:$retrofitVersion")
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
       compileOnly("com.squareup.retrofit2:converter-scalars:$retrofitVersion")
-    }
-
-    tasks.shadowJar {
-      archiveClassifier = ""
     }
 
     publishing {
@@ -188,7 +177,7 @@ the `archiveClassifier` of the shadowed JAR like the following:
             val node = (dependenciesNode as groovy.util.Node).appendNode("dependency")
             node.appendNode("groupId", "com.squareup.retrofit2")
             node.appendNode("artifactId", "converter-gson")
-            node.appendNode("version", "2.12.0")
+            node.appendNode("version", retrofitVersion)
             node.appendNode("scope", "runtime")
           }
         }
@@ -208,11 +197,8 @@ the `archiveClassifier` of the shadowed JAR like the following:
       id 'com.gradleup.shadow'
     }
 
-    group = 'shadow'
-    version = '1.0'
-
+    def retrofitVersion = '2.12.0'
     dependencies {
-      def retrofitVersion = '2.12.0'
       // This will be bundled in the shadowed JAR and not declared in the POM.
       implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
@@ -220,10 +206,6 @@ the `archiveClassifier` of the shadowed JAR like the following:
       shadow "com.squareup.retrofit2:converter-java8:$retrofitVersion"
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
       compileOnly "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
-    }
-
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      archiveClassifier = ''
     }
 
     publishing {
@@ -237,10 +219,61 @@ the `archiveClassifier` of the shadowed JAR like the following:
             def node = dependenciesNode.appendNode('dependency')
             node.appendNode('groupId', 'com.squareup.retrofit2')
             node.appendNode('artifactId', 'converter-gson')
-            node.appendNode('version', '2.12.0')
+            node.appendNode('version', retrofitVersion)
             node.appendNode('scope', 'runtime')
           }
         }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+    ```
+
+## Publishing the Shadowed JAR instead of the Original JAR
+
+You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
+the `archiveClassifier` of the shadowed JAR like the following:
+
+=== "Kotlin"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    tasks.shadowJar {
+      archiveClassifier = ""
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow")
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication)
       }
       repositories {
         maven { url = 'https://repo.myorg.com' }
@@ -291,7 +324,7 @@ for details. The only thing you need to do from the Shadow side is to empty the 
     }
     ```
 
-## Publish Custom ShadowJar Task Outputs
+## Publishing Custom ShadowJar Task Outputs
 
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
 [`MavenPublication.artifact()`][MavenPublication.artifact] method.
@@ -360,7 +393,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
     }
     ```
 
-## Publish the Shadowed JAR with Custom Artifact Name
+## Publishing the Shadowed JAR with Custom Artifact Name
 
 It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more
 customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name). e.g.
