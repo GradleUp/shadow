@@ -7,6 +7,7 @@ import assertk.assertions.containsAtLeast
 import assertk.assertions.containsMatch
 import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
@@ -958,7 +959,7 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.appendText(
       """
         dependencies {
-          implementation 'com.github.nscala-time:nscala-time_2.12:2.26.0'
+          implementation 'com.github.nscala-time:nscala-time_2.12:2.34.0'
         }
       """.trimIndent(),
     )
@@ -969,15 +970,13 @@ class JavaPluginsTest : BasePluginTest() {
       "BUILD SUCCESSFUL",
     )
 
-    val jarEntries = JarPath(requireResourceAsPath("nscala-time_2.12-2.26.0.jar"))
+    val jarEntries = JarPath(requireResourceAsPath("nscala-time_2.12-2.34.0.jar"))
       .entries()
       .toList()
     val negativeEntries = jarEntries.filter { it.time < 0 }
 
     assertThat(negativeEntries).all {
-      isNotEmpty()
-      transform { actual -> actual.single { it.name == "com/github/nscala_time/PimpedType.class" }.time }
-        .isEqualTo(-32400000)
+      isEmpty()
     }
 
     assertThat(outputShadowedJar).useAll {
