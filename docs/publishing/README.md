@@ -155,8 +155,8 @@ be manually configured.
       id("com.gradleup.shadow")
     }
 
+    val retrofitVersion = "2.12.0"
     dependencies {
-      val retrofitVersion = "2.12.0"
       // This will be bundled in the shadowed JAR and not declared in the POM.
       implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
@@ -177,7 +177,7 @@ be manually configured.
             val node = (dependenciesNode as groovy.util.Node).appendNode("dependency")
             node.appendNode("groupId", "com.squareup.retrofit2")
             node.appendNode("artifactId", "converter-gson")
-            node.appendNode("version", "2.12.0")
+            node.appendNode("version", retrofitVersion)
             node.appendNode("scope", "runtime")
           }
         }
@@ -197,8 +197,8 @@ be manually configured.
       id 'com.gradleup.shadow'
     }
 
+    def retrofitVersion = '2.12.0'
     dependencies {
-      def retrofitVersion = '2.12.0'
       // This will be bundled in the shadowed JAR and not declared in the POM.
       implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
@@ -219,7 +219,7 @@ be manually configured.
             def node = dependenciesNode.appendNode('dependency')
             node.appendNode('groupId', 'com.squareup.retrofit2')
             node.appendNode('artifactId', 'converter-gson')
-            node.appendNode('version', '2.12.0')
+            node.appendNode('version', retrofitVersion)
             node.appendNode('scope', 'runtime')
           }
         }
