@@ -155,9 +155,6 @@ be manually configured.
       id("com.gradleup.shadow")
     }
 
-    group = "shadow"
-    version = "1.0"
-
     dependencies {
       val retrofitVersion = "2.12.0"
       // This will be bundled in the shadowed JAR and not declared in the POM.
@@ -203,9 +200,6 @@ be manually configured.
       id 'maven-publish'
       id 'com.gradleup.shadow'
     }
-
-    group = 'shadow'
-    version = '1.0'
 
     dependencies {
       def retrofitVersion = '2.12.0'
