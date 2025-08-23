@@ -166,10 +166,6 @@ be manually configured.
       compileOnly("com.squareup.retrofit2:converter-scalars:$retrofitVersion")
     }
 
-    tasks.shadowJar {
-      archiveClassifier = ""
-    }
-
     publishing {
       publications {
         create<MavenPublication>("shadow") {
@@ -210,10 +206,6 @@ be manually configured.
       shadow "com.squareup.retrofit2:converter-java8:$retrofitVersion"
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
       compileOnly "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
-    }
-
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      archiveClassifier = ''
     }
 
     publishing {
