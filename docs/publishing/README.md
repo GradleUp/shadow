@@ -230,7 +230,7 @@ be manually configured.
     }
     ```
 
-## Publish the Shadowed JAR instead of the Original JAR
+## Publishing the Shadowed JAR instead of the Original JAR
 
 You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
 the `archiveClassifier` of the shadowed JAR like the following:
@@ -324,7 +324,7 @@ for details. The only thing you need to do from the Shadow side is to empty the 
     }
     ```
 
-## Publish Custom ShadowJar Task Outputs
+## Publishing Custom ShadowJar Task Outputs
 
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
 [`MavenPublication.artifact()`][MavenPublication.artifact] method.
@@ -393,7 +393,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
     }
     ```
 
-## Publish the Shadowed JAR with Custom Artifact Name
+## Publishing the Shadowed JAR with Custom Artifact Name
 
 It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more
 customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name). e.g.
