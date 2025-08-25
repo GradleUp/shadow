@@ -149,9 +149,9 @@ can also be provided.
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer(@get:Input var enabled: Boolean = false) : ResourceTransformer {
-      override fun canTransformResource(element: FileTreeElement): Boolean = true
+      override fun canTransformResource(element: FileTreeElement): Boolean = enabled
       override fun transform(context: TransformerContext) {}
-      override fun hasTransformedResource(): Boolean = true
+      override fun hasTransformedResource(): Boolean = enabled
       override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
     }
 
@@ -178,9 +178,9 @@ can also be provided.
 
     class MyTransformer implements ResourceTransformer {
       @Input boolean enabled
-      @Override boolean canTransformResource(FileTreeElement element) { return true }
+      @Override boolean canTransformResource(FileTreeElement element) { return enabled }
       @Override void transform(TransformerContext context) {}
-      @Override boolean hasTransformedResource() { return true }
+      @Override boolean hasTransformedResource() { return enabled }
       @Override void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
 
