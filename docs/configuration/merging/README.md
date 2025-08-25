@@ -132,12 +132,13 @@ For simpler use cases, you can create a basic transformer:
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(MyTransformer.class)
+      transform(MyTransformer)
     }
     ```
 
-Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closure` to configure the provided
-[`ResourceTransformer`][ResourceTransformer].
+Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a closure to configure the provided
+[`ResourceTransformer`][ResourceTransformer]. An instantiated instance of a [`ResourceTransformer`][ResourceTransformer]
+can also be provided.
 
 === "Kotlin"
 
@@ -148,14 +149,20 @@ Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closu
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer(@get:Input var enabled: Boolean = false) : ResourceTransformer {
-      override fun canTransformResource(element: FileTreeElement): Boolean = true
+      override fun canTransformResource(element: FileTreeElement): Boolean = enabled
       override fun transform(context: TransformerContext) {}
-      override fun hasTransformedResource(): Boolean = true
+      override fun hasTransformedResource(): Boolean = enabled
       override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
     }
 
     tasks.shadowJar {
+      // Initialize with default constructor and configure with closure.
       transform<MyTransformer>() {
+        enabled = true
+      }
+
+      // Or use the instantiated instance with closure.
+      transform(MyTransformer(false)) {
         enabled = true
       }
     }
@@ -171,60 +178,23 @@ Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closu
 
     class MyTransformer implements ResourceTransformer {
       @Input boolean enabled
-      @Override boolean canTransformResource(FileTreeElement element) { return true }
+      MyTransformer(boolean enabled = false) { this.enabled = enabled }
+      @Override boolean canTransformResource(FileTreeElement element) { return enabled }
       @Override void transform(TransformerContext context) {}
-      @Override boolean hasTransformedResource() { return true }
+      @Override boolean hasTransformedResource() { return enabled }
       @Override void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {}
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(MyTransformer.class) {
+      // Initialize with default constructor and configure with closure.
+      transform(MyTransformer) {
         enabled = true
       }
-    }
-    ```
 
-An instantiated instance of a [`ResourceTransformer`][ResourceTransformer] can also be provided.
-
-=== "Kotlin"
-
-    ```kotlin
-    import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
-    import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import org.apache.tools.zip.ZipOutputStream
-    import org.gradle.api.file.FileTreeElement
-
-    class MyTransformer(@get:Input val enabled: Boolean) : ResourceTransformer {
-      override fun canTransformResource(element: FileTreeElement): Boolean = true
-      override fun transform(context: TransformerContext) {}
-      override fun hasTransformedResource(): Boolean = true
-      override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {}
-    }
-
-    tasks.shadowJar {
-      transform(MyTransformer(true))
-    }
-    ```
-
-=== "Groovy"
-
-    ```groovy
-    import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
-    import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import org.apache.tools.zip.ZipOutputStream
-    import org.gradle.api.file.FileTreeElement
-
-    class MyTransformer implements ResourceTransformer {
-      @Input final boolean enabled
-      MyTransformer(boolean enabled) { this.enabled = enabled }
-      @Override boolean canTransformResource(FileTreeElement element) { return true }
-      @Override void transform(TransformerContext context) {}
-      @Override boolean hasTransformedResource() { return true }
-      @Override void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {}
-    }
-
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(new MyTransformer(true))
+      // Or use the instantiated instance with closure.
+      transform(new MyTransformer(false)) {
+        enabled = true
+      }
     }
     ```
 
@@ -238,12 +208,18 @@ Multiple dependencies may use the same service descriptor file name.
 In this case, it is generally desired to merge the content of each instance of the file into a single output file.
 The [`ServiceFileTransformer`][ServiceFileTransformer] class is used to perform this merging.
 By default, it will merge each copy of a file under `META-INF/services` into a single file in the output JAR.
+You can use either the short syntax method [`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax
+method [`transform`][ShadowJar.transform] to add the [`ServiceFileTransformer`][ServiceFileTransformer]:
 
 === "Kotlin"
 
     ```kotlin
     tasks.shadowJar {
+      // Short syntax.
       mergeServiceFiles()
+
+      // Full syntax.
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>()
     }
     ```
 
@@ -251,11 +227,13 @@ By default, it will merge each copy of a file under `META-INF/services` into a s
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Short syntax.
       mergeServiceFiles()
+
+      // Full syntax.
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
     }
     ```
-
-The above code snippet is a convenience syntax for calling `transform(ServiceFileTransformer.class)`.
 
 > Groovy Extension Module descriptor files (located at `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`)
 > are ignored by the [`ServiceFileTransformer`][ServiceFileTransformer].
@@ -272,7 +250,13 @@ This directory can be overridden to merge descriptor files in a different locati
 
     ```kotlin
     tasks.shadowJar {
+      // Short syntax.
       mergeServiceFiles {
+        path = "META-INF/custom"
+      }
+
+      // Full syntax.
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>() {
         path = "META-INF/custom"
       }
     }
@@ -282,7 +266,13 @@ This directory can be overridden to merge descriptor files in a different locati
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Short syntax.      
       mergeServiceFiles {
+        path = 'META-INF/custom'
+      }
+
+      // Full syntax.
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
         path = 'META-INF/custom'
       }
     }
@@ -297,7 +287,13 @@ from merging.
 
     ```kotlin
     tasks.shadowJar {
+      // Short syntax.
       mergeServiceFiles {
+        exclude("META-INF/services/com.acme.*")
+      }
+
+      // Full syntax.
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>() {
         exclude("META-INF/services/com.acme.*")
       }
     }
@@ -307,7 +303,13 @@ from merging.
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Short syntax.
       mergeServiceFiles {
+        exclude 'META-INF/services/com.acme.*'
+      }
+
+      // Full syntax.
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
         exclude 'META-INF/services/com.acme.*'
       }
     }
@@ -324,7 +326,11 @@ The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add thi
 
     ```kotlin
     tasks.shadowJar {
+      // Short syntax.
       mergeGroovyExtensionModules()
+
+      // Full syntax.
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer>()
     }
     ```
 
@@ -332,7 +338,11 @@ The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add thi
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Short syntax.
       mergeGroovyExtensionModules()
+
+      // Full syntax.
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer)
     }
     ```
 
@@ -356,7 +366,7 @@ containing Log4j 2.x Core components. It's a Gradle equivalent of
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer.class)
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
     }
     ```
 
@@ -404,7 +414,7 @@ this transformer.
       // short syntax
       append('resources/application.yml', '\n---\n')
       // full syntax
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer.class) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
         resource = 'resources/custom-config/application.yml'
         separator = '\n---\n'
       }
@@ -432,7 +442,7 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer.class) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer) {
         resource = 'properties.xml'
       }
     }
@@ -453,6 +463,7 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 [ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
 [ShadowJar.failOnDuplicateEntries]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html
 [ShadowJar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
+[ShadowJar.mergeServiceFiles]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-service-files.html
 [ShadowJar.transform]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
