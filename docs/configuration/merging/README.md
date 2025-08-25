@@ -85,7 +85,7 @@ to take:
 1. Set the strategy to `INCLUDE` or `WARN`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Remove duplicate entries by
-    - overriding the default strategy for specific files using [`filesMatching`][Jar.filesMatching]
+    - overriding the default strategy for specific files using [`filesMatching`][Jar.filesMatching] or [`eachFile`][Jar.eachFile] functions
     - or applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] for specific files
     - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
     - or mechanism similar.
@@ -451,6 +451,7 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
+[Jar.eachFile]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:eachFile(org.gradle.api.Action)
 [Jar.filesMatching]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:filesMatching(java.lang.Iterable,%20org.gradle.api.Action)
 [AppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/index.html
 [DuplicatesStrategy]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html
