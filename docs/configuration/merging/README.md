@@ -132,7 +132,7 @@ For simpler use cases, you can create a basic transformer:
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(MyTransformer.class)
+      transform(MyTransformer)
     }
     ```
 
@@ -178,7 +178,7 @@ Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closu
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(MyTransformer.class) {
+      transform(MyTransformer) {
         enabled = true
       }
     }
@@ -396,7 +396,7 @@ containing Log4j 2.x Core components. It's a Gradle equivalent of
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer.class)
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
     }
     ```
 
@@ -444,7 +444,7 @@ this transformer.
       // short syntax
       append('resources/application.yml', '\n---\n')
       // full syntax
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer.class) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
         resource = 'resources/custom-config/application.yml'
         separator = '\n---\n'
       }
@@ -472,7 +472,7 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer.class) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer) {
         resource = 'properties.xml'
       }
     }
