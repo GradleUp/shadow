@@ -136,7 +136,7 @@ For simpler use cases, you can create a basic transformer:
     }
     ```
 
-Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a `Closure` to configure the provided
+Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a closure to configure the provided
 [`ResourceTransformer`][ResourceTransformer].
 
 === "Kotlin"
