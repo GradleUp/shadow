@@ -178,6 +178,7 @@ can also be provided.
 
     class MyTransformer implements ResourceTransformer {
       @Input boolean enabled
+      MyTransformer(boolean enabled = false) { this.enabled = enabled }
       @Override boolean canTransformResource(FileTreeElement element) { return enabled }
       @Override void transform(TransformerContext context) {}
       @Override boolean hasTransformedResource() { return enabled }
