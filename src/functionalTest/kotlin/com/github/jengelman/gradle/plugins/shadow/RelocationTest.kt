@@ -3,12 +3,14 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
@@ -529,6 +531,27 @@ class RelocationTest : BasePluginTest() {
         "shadow.foo.Bar",
       )
     }
+  }
+
+  @Test
+  fun classBytesUnchangedIfPossible() {
+    val mainClassEntry = writeClass()
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'junit:junit:3.8.2'
+        }
+        $shadowJarTask {
+          relocate('junit', 'shadow.junit')
+        }
+      """.trimIndent(),
+    )
+
+    run(":jar", shadowJarPath)
+
+    val originalBytes = outputJar.getEntryBytes(mainClassEntry)
+    val relocatedBytes = outputShadowedJar.getEntryBytes(mainClassEntry)
+    assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
   private fun writeClassWithStringRef() {
