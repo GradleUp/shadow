@@ -309,7 +309,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     )
   }
 
-  companion object {
+  private companion object {
     @JvmStatic
     fun withThrowingProvider() = listOf(
       Arguments.of(FAIL, "Cannot copy zip entry .* to .* because zip entry .* has already been copied there"),
