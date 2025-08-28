@@ -285,6 +285,29 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
+  @Test
+  fun strategyIncludeCanBeOverriddenByEachFile() {
+    writeDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          eachFile {
+            if (path == '$ENTRY_SERVICES_FOO') {
+              duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+    }
+  }
+
   private fun writeDuplicatesStrategy(strategy: DuplicatesStrategy) {
     projectScript.appendText(
       """
