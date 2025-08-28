@@ -26,12 +26,11 @@ class JarPath(val path: Path) :
     return manifest.mainAttributes.getValue(name)
   }
 
-  fun getEntryBytes(entryName: String): ByteArray = use { jar ->
-    val entry = jar.entries().asSequence().single { it.name == entryName }
-    jar.getInputStream(entry).use { it.readBytes() }
-  }
-
   override fun toString(): String = path.toString()
+}
+
+fun ZipFile.getBytes(entryName: String): ByteArray {
+  return getStream(entryName).use { it.readBytes() }
 }
 
 fun ZipFile.getContent(entryName: String): String {

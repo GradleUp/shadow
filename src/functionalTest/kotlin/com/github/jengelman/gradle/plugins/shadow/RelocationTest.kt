@@ -10,8 +10,8 @@ import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.util.getBytes
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
@@ -542,15 +542,15 @@ class RelocationTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
         }
         $shadowJarTask {
-          relocate('junit', 'shadow.junit')
+          enableAutoRelocation = true
         }
       """.trimIndent(),
     )
 
     run(":jar", shadowJarPath)
 
-    val originalBytes = outputJar.getEntryBytes(mainClassEntry)
-    val relocatedBytes = outputShadowedJar.getEntryBytes(mainClassEntry)
+    val originalBytes = outputJar.use { it.getBytes(mainClassEntry) }
+    val relocatedBytes = outputShadowedJar.use { it.getBytes(mainClassEntry) }
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 

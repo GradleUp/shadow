@@ -183,10 +183,9 @@ public open class ShadowCopyAction(
      * Applies remapping to the given class with the specified relocation path. The remapped class is then written
      * to the zip file.
      */
-    private fun FileCopyDetails.remapClass() = file.inputStream().use { inputStream ->
-      val classBytes = inputStream.readBytes()
-      var hasModified = false
-      val remapper = RelocatorRemapper(relocators, modifiedCallback = { hasModified = true })
+    private fun FileCopyDetails.remapClass() = file.readBytes().let { bytes ->
+      var modified = false
+      val remapper = RelocatorRemapper(relocators) { modified = true }
 
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
@@ -194,7 +193,7 @@ public open class ShadowCopyAction(
       // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
       val cw = ClassWriter(0)
-      val cr = ClassReader(classBytes)
+      val cr = ClassReader(bytes)
       val cv = ClassRemapper(cw, remapper)
 
       try {
@@ -203,11 +202,11 @@ public open class ShadowCopyAction(
         throw GradleException("Error in ASM processing class $path", t)
       }
 
-      val newClassBytes = if (hasModified) {
+      val newBytes = if (modified) {
         cw.toByteArray()
       } else {
         // If we didn't need to change anything, keep the original bytes as-is
-        classBytes
+        bytes
       }
 
       // Temporarily remove the multi-release prefix.
@@ -220,7 +219,7 @@ public open class ShadowCopyAction(
         }
         // Now we put it back on so the class file is written out with the right extension.
         zipOutStr.putNextEntry(entry)
-        zipOutStr.write(newClassBytes)
+        zipOutStr.write(newBytes)
         zipOutStr.closeEntry()
       } catch (_: ZipException) {
         logger.warn("We have a duplicate $mappedName in source project")

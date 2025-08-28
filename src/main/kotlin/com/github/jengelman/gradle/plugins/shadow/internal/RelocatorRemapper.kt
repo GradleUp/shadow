@@ -14,7 +14,7 @@ import org.objectweb.asm.commons.Remapper
  */
 internal class RelocatorRemapper(
   private val relocators: Set<Relocator>,
-  private val modifiedCallback: () -> Unit = {},
+  private val onModified: () -> Unit = {},
 ) : Remapper() {
   private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
@@ -36,7 +36,7 @@ internal class RelocatorRemapper(
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
     val newName = mapNameImpl(name, mapLiterals)
     if (newName != name) {
-      modifiedCallback()
+      onModified()
     }
     return newName
   }
