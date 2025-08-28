@@ -77,18 +77,30 @@ Different strategies will lead to different results for `foo/bar` files in the J
     ```
 
 The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
-as expected as the duplicate resource files fed for them are excluded beforehand. However, this behavior might be what you expected for duplicate `foo/bar` files, preventing them from being included.
+as expected as the duplicate resource files fed for them are excluded beforehand. However, this behavior might be what
+you expected for duplicate `foo/bar` files, preventing them from being included.
 
-Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several steps
-to take:
+Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several common
+steps to take:
 
-1. Set the strategy to `INCLUDE` or `WARN`.
+1. Set the default strategy to `INCLUDE` or `WARN`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Remove duplicate entries by
-    - overriding the default strategy for specific files using [`filesMatching`][Jar.filesMatching] or [`eachFile`][Jar.eachFile] functions
+    - overriding the default strategy for specific files to `EXCLUDE` or `FAIL` using
+    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
     - or applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] for specific files
     - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
     - or mechanism similar.
+4. Optionally, enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
+5. Optionally, use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
+
+or the steps like:
+
+1. Set the default strategy to `EXCLUDE` or `FAIL`.
+2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
+3. Bypass the duplicate entries which should be handled by the [`ResourceTransformer`][ResourceTransformer]s using
+    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
+    to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 4. Optionally, enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
 5. Optionally, use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
 
@@ -453,6 +465,7 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
 [Jar.eachFile]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:eachFile(org.gradle.api.Action)
 [Jar.filesMatching]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:filesMatching(java.lang.Iterable,%20org.gradle.api.Action)
+[Jar.filesNotMatching]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:filesNotMatching(java.lang.Iterable,%20org.gradle.api.Action)
 [AppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/index.html
 [DuplicatesStrategy]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html
 [GroovyExtensionModuleTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-groovy-extension-module-transformer/index.html
