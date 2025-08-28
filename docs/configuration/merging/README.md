@@ -110,49 +110,31 @@ Here are some examples:
 === "Kotlin"
 
     ```kotlin
-    // Using `filesNotMatching`:
     tasks.shadowJar {
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
       // Step 2.
       mergeServiceFiles()
-      // Step 3.
+      // Step 3. Using `filesNotMatching`:
       filesNotMatching("META-INF/services/**") {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
       }
-    }
-
-    // Using `filesMatching`:
-    tasks.shadowJar {
-      // Step 1.
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
-      // Step 2.
-      mergeServiceFiles()
-      // Step 3.
-      filesMatching("META-INF/services/**") {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
-      }
-    }
-
-    // Using `PreserveFirstFoundResourceTransformer`:
-    tasks.shadowJar {
-      // Step 1.
-      duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
-      // Step 2.
-      mergeServiceFiles()
-      // Step 3.
+      // Step 3. Using `PreserveFirstFoundResourceTransformer`:
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer>() {
         resources.add("META-INF/foo/**") // Or something else where the first occurrence should be preserved.
       }
     }
 
-    // Using `eachFile`:
     tasks.shadowJar {
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
       // Step 2.
       mergeServiceFiles()
-      // Step 3.
+      // Step 3. Using `filesMatching`:
+      filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
+      }
+      // Step 3. Using `eachFile`:
       eachFile {
         if (path.startsWith("META-INF/services/")) {
           duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
@@ -164,49 +146,31 @@ Here are some examples:
 === "Groovy"
 
     ```groovy
-    // Using `filesNotMatching`:
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
       // Step 2.
       mergeServiceFiles()
-      // Step 3.
+      // Step 3. Using `filesNotMatching`:
       filesNotMatching('META-INF/services/**') {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
       }
-    }
-
-    // Using `filesMatching`:
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Step 1.
-      duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
-      // Step 2.
-      mergeServiceFiles()
-      // Step 3.
-      filesMatching('META-INF/services/**') {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
-      }
-    }
-
-    // Using `PreserveFirstFoundResourceTransformer`:
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Step 1.
-      duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
-      // Step 2.
-      mergeServiceFiles()
-      // Step 3.
+      // Step 3. Using `PreserveFirstFoundResourceTransformer`:
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer) {
         resources.add('META-INF/foo/**') // Or something else where the first occurrence should be preserved.
       }
     }
 
-    // Using `eachFile`:
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
       // Step 2.
       mergeServiceFiles()
-      // Step 3.
+      // Step 3. Using `filesMatching`:
+      filesMatching('META-INF/services/**') {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
+      }
+      // Step 3. Using `eachFile`:
       eachFile {
         if (it.path.startsWith('META-INF/services/')) {
           it.duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
