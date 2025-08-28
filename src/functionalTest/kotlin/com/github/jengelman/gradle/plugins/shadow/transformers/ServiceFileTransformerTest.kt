@@ -262,38 +262,20 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Test
-  fun strategyExcludeCanBeOverriddenByEachFile() {
-    writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+  @ParameterizedTest
+  @MethodSource("eachFileStrategyProvider")
+  fun strategyCanBeOverriddenByEachFile(
+    default: DuplicatesStrategy,
+    override: DuplicatesStrategy,
+    matchPath: String,
+  ) {
+    writeDuplicatesStrategy(default)
     projectScript.appendText(
       """
         $shadowJarTask {
           eachFile {
-            if (path == '$ENTRY_SERVICES_SHADE') {
-              duplicatesStrategy = DuplicatesStrategy.INCLUDE
-            }
-          }
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
-    }
-  }
-
-  @Test
-  fun strategyIncludeCanBeOverriddenByEachFile() {
-    writeDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
-    projectScript.appendText(
-      """
-        $shadowJarTask {
-          eachFile {
-            if (path == '$ENTRY_SERVICES_FOO') {
-              duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            if (path == '$matchPath') {
+              duplicatesStrategy = DuplicatesStrategy.$override
             }
           }
         }
@@ -322,7 +304,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     )
   }
 
-  private companion object {
+  companion object {
     @JvmStatic
     fun withThrowingProvider() = listOf(
       Arguments.of(
@@ -340,6 +322,20 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       Arguments.of(DuplicatesStrategy.EXCLUDE, CONTENT_ONE, "one"),
       Arguments.of(DuplicatesStrategy.INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
       Arguments.of(DuplicatesStrategy.WARN, CONTENT_ONE_TWO, "one\ntwo"),
+    )
+
+    @JvmStatic
+    fun eachFileStrategyProvider() = listOf(
+      Arguments.of(
+        DuplicatesStrategy.EXCLUDE,
+        DuplicatesStrategy.INCLUDE,
+        ENTRY_SERVICES_SHADE,
+      ),
+      Arguments.of(
+        DuplicatesStrategy.INCLUDE,
+        DuplicatesStrategy.EXCLUDE,
+        ENTRY_SERVICES_FOO,
+      ),
     )
   }
 }
