@@ -141,6 +141,11 @@ Here are some examples:
         }
       }
     }
+
+    tasks.shadowJar {
+      // Optional step.
+      failOnDuplicateEntries = true
+    }
     ```
 
 === "Groovy"
@@ -176,6 +181,11 @@ Here are some examples:
           it.duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
         }
       }
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Optional step.
+      failOnDuplicateEntries = true
     }
     ```
 
