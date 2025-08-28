@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
@@ -265,6 +266,47 @@ class KotlinPluginsTest : BasePluginTest() {
     assertThat(result.output).contains(
       "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
       "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
+    )
+  }
+
+  @Test
+  fun relocateKotlinMetadata() {
+    projectScript.writeText(
+      """
+        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm", withGroup = true, withVersion = true)}
+        dependencies {
+          implementation 'org.jetbrains.kotlin:kotlin-reflect'
+        }
+        $shadowJarTask {
+          enableAutoRelocation = true
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+        }
+      """.trimIndent(),
+    )
+    writeClass(jvmLang = JvmLang.Kotlin) {
+      """
+        @file:JvmName("Main")
+        package my
+        fun main(vararg args: String) {
+          val loadingStateSubClasses = LoadingState::class.sealedSubclasses
+          println("loadingStateSubClasses = " + loadingStateSubClasses)
+        }
+
+        sealed interface LoadingState {
+          data object Error : LoadingState
+          data object Idle : LoadingState
+          data object Loading : LoadingState
+        }
+      """.trimIndent()
+    }
+
+    run(shadowJarPath)
+    val runningOutput = runProcess("java", "-jar", outputShadowedJar.toString(), "foo")
+
+    assertThat(runningOutput).contains(
+      "loadingStateSubClasses = [class my.LoadingState\$Error, class my.LoadingState\$Idle, class my.LoadingState\$Loading]",
     )
   }
 
