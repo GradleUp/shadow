@@ -156,17 +156,20 @@ public open class ShadowCopyAction(
 
     private fun visitFile(fileDetails: FileCopyDetails) {
       val path = fileDetails.path
-      if (path.endsWith(".class")) {
-        if (isUnused(path)) return
-        if (relocators.isEmpty()) {
-          fileDetails.writeToZip(path)
-          return
+      when {
+        path.endsWith(".class") -> {
+          if (isUnused(path)) return
+          if (relocators.isEmpty()) {
+            fileDetails.writeToZip(path)
+          } else {
+            fileDetails.remapClass()
+          }
         }
-        fileDetails.remapClass()
-      } else {
-        val mapped = RelocatorRemapper(relocators).map(path)
-        if (transform(fileDetails, mapped)) return
-        fileDetails.writeToZip(mapped)
+        else -> {
+          val mapped = RelocatorRemapper(relocators).map(path)
+          if (transform(fileDetails, mapped)) return
+          fileDetails.writeToZip(mapped)
+        }
       }
     }
 
