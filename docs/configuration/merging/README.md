@@ -92,7 +92,7 @@ steps to take:
     - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
     - or mechanism similar.
 
-or the steps like:
+Alternatively, you can follow these steps:
 
 1. Set the default strategy to `EXCLUDE` or `FAIL`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
@@ -100,7 +100,7 @@ or the steps like:
     [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
     to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 
-then apply the optional steps if you want:
+Optional steps:
 
 - Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
 - Use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
