@@ -168,17 +168,17 @@ public open class ShadowCopyAction(
           if (isUnused(path)) return
           if (relocators.isEmpty()) {
             fileDetails.writeToZip(path)
-            return
+          } else {
+            fileDetails.remapClass(relocators)
           }
-          fileDetails.remapClass(relocators)
         }
 
         path.endsWith(".kotlin_module") -> {
           if (relocators.isEmpty()) {
             fileDetails.writeToZip(path)
-            return
+          } else {
+            fileDetails.remapKotlinModule(relocators)
           }
-          fileDetails.remapKotlinModule(relocators)
         }
 
         else -> {
