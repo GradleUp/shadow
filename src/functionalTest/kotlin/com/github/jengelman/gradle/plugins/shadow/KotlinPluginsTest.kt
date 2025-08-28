@@ -278,7 +278,6 @@ class KotlinPluginsTest : BasePluginTest() {
           implementation 'org.jetbrains.kotlin:kotlin-reflect'
         }
         $shadowJarTask {
-          enableAutoRelocation = true
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
