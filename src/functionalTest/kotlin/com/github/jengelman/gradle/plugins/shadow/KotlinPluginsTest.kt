@@ -279,6 +279,7 @@ class KotlinPluginsTest : BasePluginTest() {
         }
         $shadowJarTask {
           enableAutoRelocation = true
+          mergeServiceFiles()
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
