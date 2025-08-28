@@ -29,6 +29,10 @@ class JarPath(val path: Path) :
   override fun toString(): String = path.toString()
 }
 
+fun ZipFile.getBytes(entryName: String): ByteArray {
+  return getStream(entryName).use { it.readBytes() }
+}
+
 fun ZipFile.getContent(entryName: String): String {
   return getStream(entryName).bufferedReader().use { it.readText() }
 }

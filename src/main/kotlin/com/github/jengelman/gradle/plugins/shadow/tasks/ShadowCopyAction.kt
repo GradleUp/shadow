@@ -135,8 +135,6 @@ public open class ShadowCopyAction(
   private inner class StreamAction(
     private val zipOutStr: ZipOutputStream,
   ) : CopyActionProcessingStreamAction {
-    private val remapper = RelocatorRemapper(relocators)
-
     init {
       logger.info("Relocator count: ${relocators.size}.")
       if (encoding != null) {
@@ -166,7 +164,7 @@ public open class ShadowCopyAction(
         }
         fileDetails.remapClass()
       } else {
-        val mapped = remapper.map(path)
+        val mapped = RelocatorRemapper(relocators).map(path)
         if (transform(fileDetails, mapped)) return
         fileDetails.writeToZip(mapped)
       }
@@ -185,20 +183,30 @@ public open class ShadowCopyAction(
      * Applies remapping to the given class with the specified relocation path. The remapped class is then written
      * to the zip file.
      */
-    private fun FileCopyDetails.remapClass() = file.inputStream().use { inputStream ->
+    private fun FileCopyDetails.remapClass() = file.readBytes().let { bytes ->
+      var modified = false
+      val remapper = RelocatorRemapper(relocators) { modified = true }
+
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
       // to the original class names. This is not a problem at runtime (because these entries in the
       // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
       val cw = ClassWriter(0)
-      val cr = ClassReader(inputStream)
+      val cr = ClassReader(bytes)
       val cv = ClassRemapper(cw, remapper)
 
       try {
         cr.accept(cv, ClassReader.EXPAND_FRAMES)
       } catch (t: Throwable) {
         throw GradleException("Error in ASM processing class $path", t)
+      }
+
+      val newBytes = if (modified) {
+        cw.toByteArray()
+      } else {
+        // If we didn't need to change anything, keep the original bytes as-is
+        bytes
       }
 
       // Temporarily remove the multi-release prefix.
@@ -211,7 +219,7 @@ public open class ShadowCopyAction(
         }
         // Now we put it back on so the class file is written out with the right extension.
         zipOutStr.putNextEntry(entry)
-        zipOutStr.write(cw.toByteArray())
+        zipOutStr.write(newBytes)
         zipOutStr.closeEntry()
       } catch (_: ZipException) {
         logger.warn("We have a duplicate $mappedName in source project")

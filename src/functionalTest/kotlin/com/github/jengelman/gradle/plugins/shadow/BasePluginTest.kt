@@ -58,6 +58,7 @@ abstract class BasePluginTest {
 
   val projectScript: Path get() = path("build.gradle")
   val settingsScript: Path get() = path("settings.gradle")
+  val outputJar: JarPath get() = jarPath("build/libs/my-1.0.jar")
   open val outputShadowedJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
   val outputServerShadowedJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
