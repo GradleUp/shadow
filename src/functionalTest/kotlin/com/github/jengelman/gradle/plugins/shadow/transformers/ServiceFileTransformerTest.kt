@@ -8,6 +8,11 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+import org.gradle.api.file.DuplicatesStrategy.FAIL
+import org.gradle.api.file.DuplicatesStrategy.INCLUDE
+import org.gradle.api.file.DuplicatesStrategy.INHERIT
+import org.gradle.api.file.DuplicatesStrategy.WARN
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -221,8 +226,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun strategyExcludeCanBeOverriddenByFilesMatching() {
-    writeDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+  fun strategyCanBeOverriddenByFilesMatching() {
+    writeDuplicatesStrategy(EXCLUDE)
     projectScript.appendText(
       """
         $shadowJarTask {
@@ -242,13 +247,41 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun strategyIncludeCanBeOverriddenByFilesNotMatching() {
-    writeDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
+  fun strategyCanBeOverriddenByFilesNotMatching() {
+    writeDuplicatesStrategy(INCLUDE)
     projectScript.appendText(
       """
         $shadowJarTask {
           filesNotMatching('$ENTRY_SERVICES_SHADE') {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("eachFileStrategyProvider")
+  fun strategyCanBeOverriddenByEachFile(
+    default: DuplicatesStrategy,
+    override: DuplicatesStrategy,
+    matchPath: String,
+  ) {
+    writeDuplicatesStrategy(default)
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          eachFile {
+            if (path == '$matchPath') {
+              duplicatesStrategy = DuplicatesStrategy.$override
+            }
           }
         }
       """.trimIndent(),
@@ -279,21 +312,21 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   private companion object {
     @JvmStatic
     fun withThrowingProvider() = listOf(
-      Arguments.of(
-        DuplicatesStrategy.FAIL,
-        "Cannot copy zip entry .* to .* because zip entry .* has already been copied there",
-      ),
-      Arguments.of(
-        DuplicatesStrategy.INHERIT,
-        "Entry .* is a duplicate but no duplicate handling strategy has been set",
-      ),
+      Arguments.of(FAIL, "Cannot copy zip entry .* to .* because zip entry .* has already been copied there"),
+      Arguments.of(INHERIT, "Entry .* is a duplicate but no duplicate handling strategy has been set"),
     )
 
     @JvmStatic
     fun withoutThrowingProvider() = listOf(
-      Arguments.of(DuplicatesStrategy.EXCLUDE, CONTENT_ONE, "one"),
-      Arguments.of(DuplicatesStrategy.INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
-      Arguments.of(DuplicatesStrategy.WARN, CONTENT_ONE_TWO, "one\ntwo"),
+      Arguments.of(EXCLUDE, CONTENT_ONE, "one"),
+      Arguments.of(INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
+      Arguments.of(WARN, CONTENT_ONE_TWO, "one\ntwo"),
+    )
+
+    @JvmStatic
+    fun eachFileStrategyProvider() = listOf(
+      Arguments.of(EXCLUDE, INCLUDE, ENTRY_SERVICES_SHADE),
+      Arguments.of(INCLUDE, EXCLUDE, ENTRY_SERVICES_FOO),
     )
   }
 }
