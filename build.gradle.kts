@@ -105,6 +105,7 @@ val testGradleVersion: String = providers.gradleProperty("testGradleVersion").or
 dependencies {
   compileOnly(libs.develocity)
   compileOnly(libs.kotlin.kmp)
+  compileOnly(libs.kotlin.reflect)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
