@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
+import java.util.Objects
 import java.util.regex.Pattern
 import org.apache.commons.io.FilenameUtils
 import org.codehaus.plexus.util.SelectorUtils
@@ -149,19 +150,18 @@ public open class SimpleRelocator @JvmOverloads constructor(
       excludes == other.excludes
   }
 
-  override fun hashCode(): Int {
-    var result = rawString.hashCode()
-    result = 31 * result + skipStringConstants.hashCode()
-    result = 31 * result + pattern.hashCode()
-    result = 31 * result + pathPattern.hashCode()
-    result = 31 * result + shadedPattern.hashCode()
-    result = 31 * result + shadedPathPattern.hashCode()
-    result = 31 * result + sourcePackageExcludes.hashCode()
-    result = 31 * result + sourcePathExcludes.hashCode()
-    result = 31 * result + includes.hashCode()
-    result = 31 * result + excludes.hashCode()
-    return result
-  }
+  override fun hashCode(): Int = Objects.hash(
+    rawString,
+    skipStringConstants,
+    pattern,
+    pathPattern,
+    shadedPattern,
+    shadedPathPattern,
+    sourcePackageExcludes,
+    sourcePathExcludes,
+    includes,
+    excludes,
+  )
 
   private fun isIncluded(path: String): Boolean {
     return includes.isEmpty() || includes.any { SelectorUtils.matchPath(it, path, "/", true) }
