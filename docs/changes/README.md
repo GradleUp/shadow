@@ -1,7 +1,7 @@
 # Change Log
 
 
-## [Unreleased](https://github.com/GradleUp/shadow/compare/9.0.2...HEAD) - 2025-xx-xx
+## [9.1.0](https://github.com/GradleUp/shadow/compare/9.1.0) - 2025-08-29
 
 ## Added
 
@@ -13,7 +13,6 @@
 
 - Don't inject `TargetJvmVersion` attribute when automatic JVM targeting is disabled. ([#1666](https://github.com/GradleUp/shadow/pull/1666))
 - Do not write modified class files for no-op relocations. ([#1694](https://github.com/GradleUp/shadow/pull/1694))
-
 
 ## [9.0.2](https://github.com/GradleUp/shadow/releases/tag/9.0.2) - 2025-08-15
 
