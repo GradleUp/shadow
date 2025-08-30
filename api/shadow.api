@@ -143,8 +143,11 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
+	public abstract fun configuration (Ljava/lang/Object;)Ljava/util/Set;
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
+	public abstract fun exclude (Ljava/util/Set;)V
 	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)V
+	public abstract fun include (Ljava/util/Set;)V
 	public abstract fun include (Lorg/gradle/api/specs/Spec;)V
 	public abstract fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
@@ -154,10 +157,13 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter$AbstractDependencyFilter : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
 	public fun <init> (Lorg/gradle/api/Project;Ljava/util/List;Ljava/util/List;)V
 	public synthetic fun <init> (Lorg/gradle/api/Project;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun configuration (Ljava/lang/Object;)Ljava/util/Set;
 	public fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
+	public fun exclude (Ljava/util/Set;)V
 	public fun exclude (Lorg/gradle/api/specs/Spec;)V
 	protected final fun getExcludeSpecs ()Ljava/util/List;
 	protected final fun getIncludeSpecs ()Ljava/util/List;
+	public fun include (Ljava/util/Set;)V
 	public fun include (Lorg/gradle/api/specs/Spec;)V
 	protected final fun isIncluded (Lorg/gradle/api/artifacts/ResolvedDependency;)Z
 	public fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;

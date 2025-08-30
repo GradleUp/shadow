@@ -29,9 +29,19 @@ public interface DependencyFilter : Serializable {
   public fun exclude(spec: Spec<ResolvedDependency>)
 
   /**
+   * Exclude dependencies that match any of the provided [specs].
+   */
+  public fun exclude(specs: Set<Spec<ResolvedDependency>>)
+
+  /**
    * Include dependencies that match the provided [spec].
    */
   public fun include(spec: Spec<ResolvedDependency>)
+
+  /**
+   * Include dependencies that match any of the provided [specs].
+   */
+  public fun include(specs: Set<Spec<ResolvedDependency>>)
 
   /**
    * Create a [Spec] that matches the provided project [notation].
@@ -42,6 +52,11 @@ public interface DependencyFilter : Serializable {
    * Create a [Spec] that matches the provided [dependencyNotation].
    */
   public fun dependency(dependencyNotation: Any): Spec<ResolvedDependency>
+
+  /**
+   * Create a [Set] of [Spec] that matches the provided configuration [notation].
+   */
+  public fun configuration(notation: Any): Set<Spec<ResolvedDependency>>
 
   public abstract class AbstractDependencyFilter(
     @Transient private val project: Project,
@@ -77,8 +92,16 @@ public interface DependencyFilter : Serializable {
       excludeSpecs.add(spec)
     }
 
+    override fun exclude(specs: Set<Spec<ResolvedDependency>>) {
+      excludeSpecs.addAll(specs)
+    }
+
     override fun include(spec: Spec<ResolvedDependency>) {
       includeSpecs.add(spec)
+    }
+
+    override fun include(specs: Set<Spec<ResolvedDependency>>) {
+      includeSpecs.addAll(specs)
     }
 
     override fun project(notation: Any): Spec<ResolvedDependency> {
@@ -99,6 +122,15 @@ public interface DependencyFilter : Serializable {
         else -> dependencyNotation
       }
       return project.dependencies.create(realNotation).toSpec()
+    }
+
+    override fun configuration(notation: Any): Set<Spec<ResolvedDependency>> {
+      val realNotation = when (notation) {
+        is Provider<*> -> notation.get()
+        else -> notation
+      }
+      val configuration = project.configurations.getByName(realNotation.toString())
+      return configuration.allDependencies.map { it.toSpec() }.toSet()
     }
 
     protected fun ResolvedDependency.isIncluded(): Boolean {
