@@ -87,6 +87,32 @@ class FilteringTest : BasePluginTest() {
     commonAssertions()
   }
 
+  @Test
+  fun excludeDependenciesUsingConfiguration() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'my:d:1.0'
+          runtimeOnly 'my:a:1.0'
+        }
+        $shadowJarTask {
+          dependencies {
+            exclude(configuration('implementation'))
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        *entriesInA,
+        *manifestEntries,
+      )
+    }
+  }
+
   @ParameterizedTest
   @ValueSource(
     strings = [
