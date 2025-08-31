@@ -16,6 +16,7 @@ plugins {
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.pluginPublish)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.shadow) apply false
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -106,14 +107,7 @@ dependencies {
   compileOnly(libs.develocity)
   compileOnly(libs.kotlin.kmp)
   compileOnly(libs.kotlin.reflect)
-  api(libs.apache.ant) // Types from Ant are exposed in the public API.
-  implementation(libs.apache.commonsIo)
-  implementation(libs.apache.log4j)
-  implementation(libs.asm)
-  implementation(libs.jdependency)
-  implementation(libs.jdom2)
-  implementation(libs.plexus.utils)
-  implementation(libs.plexus.xml)
+  implementation(project(path = ":deps", configuration = "shadow"))
 
   testPluginClasspath(libs.foojayResolver)
   testPluginClasspath(libs.develocity)

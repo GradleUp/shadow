@@ -43,3 +43,5 @@ dependencyResolutionManagement {
 rootProject.name = "shadow"
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+
+include(":deps")
