@@ -84,6 +84,9 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
     os.closeEntry()
   }
 
+  /*
+   * https://groovy-lang.org/metaprogramming.html#module-descriptor
+   */
   public companion object {
     public const val PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
       "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
