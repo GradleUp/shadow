@@ -5,6 +5,7 @@
 
 ### Added
 
+- Support relocating Groovy extensions in Module descriptors. ([#1705](https://github.com/GradleUp/shadow/pull/1705))
 - Add extensions for `Iterable<Relocator>`. ([#1710](https://github.com/GradleUp/shadow/pull/1710))
 
 ### Changed
