@@ -140,6 +140,9 @@ class MinimizeTest : BasePluginTest() {
    * 'Client', 'Server' and 'junit' are independent.
    * Unused classes of 'client' and theirs dependencies shouldn't be removed.
    */
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/744",
+  )
   @Test
   fun excludeProjectFromMinimize() {
     writeClientAndServerModules(
