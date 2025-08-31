@@ -69,7 +69,7 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
     }
     ```
 
-> When excluding a `project`, all dependencies of the excluded `project` are automatically excluding from 
+> When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from 
 > minimization as well.
 
 
