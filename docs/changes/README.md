@@ -3,7 +3,7 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.1.0...HEAD) - 2025-xx-xx
 
-## Changed
+### Changed
 
 - Merge Gradle Module descriptors into the modern `META-INF` path. ([#1706](https://github.com/GradleUp/shadow/pull/1706))  
   The Gradle Module descriptors (`org.codehaus.groovy.runtime.ExtensionModule` files) defined under `META-INF/services/`
