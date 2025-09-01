@@ -40,7 +40,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
+    commonAssertions()
   }
 
   @ParameterizedTest
@@ -60,7 +60,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
+    commonAssertions()
   }
 
   private fun buildJarFoo(
@@ -91,8 +91,8 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     )
   }
 
-  private fun commonAssertions(entry: String) {
-    val properties = outputShadowedJar.use { it.getContent(entry) }.toProperties()
+  private fun commonAssertions() {
+    val properties = outputShadowedJar.use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) }.toProperties()
 
     assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
     assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
