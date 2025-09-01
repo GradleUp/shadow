@@ -13,8 +13,9 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import java.nio.file.Path
 import kotlin.io.path.appendText
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
@@ -42,29 +43,17 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
   }
 
-  @Test
-  fun groovyExtensionModuleTransformerWorksForLegacyGroovy() {
+  @ParameterizedTest
+  @MethodSource("resourcePathProvider")
+  fun mergeLegacyAndModernModuleDescriptorsIntoTheNewResourcePath(
+    fooEntry: String,
+    barEntry: String,
+  ) {
     projectScript.appendText(
       transform<GroovyExtensionModuleTransformer>(
         dependenciesBlock = implementationFiles(
-          buildJarFoo(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-          buildJarBar(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-        ),
-      ),
-    )
-
-    run(shadowJarPath)
-
-    commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
-  }
-
-  @Test
-  fun mergeLegacyAndModernModuleDescriptorsIntoTheNewResourcePath() {
-    projectScript.appendText(
-      transform<GroovyExtensionModuleTransformer>(
-        dependenciesBlock = implementationFiles(
-          buildJarFoo(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-          buildJarBar(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+          buildJarFoo(fooEntry),
+          buildJarBar(barEntry),
         ),
       ),
     )
@@ -118,5 +107,13 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     const val EXTENSION_CLASSES_BAR = "com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension"
     const val STATIC_EXTENSION_CLASSES_FOO = "com.acme.foo.FooStaticExtension"
     const val STATIC_EXTENSION_CLASSES_BAR = "com.acme.bar.SomeStaticExtension"
+
+    @JvmStatic
+    fun resourcePathProvider() = listOf(
+      Arguments.of(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+      Arguments.of(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+      Arguments.of(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+      Arguments.of(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+    )
   }
 }
