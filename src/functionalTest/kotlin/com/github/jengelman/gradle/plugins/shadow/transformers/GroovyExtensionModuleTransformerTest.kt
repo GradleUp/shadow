@@ -58,6 +58,22 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
   }
 
+  @Test
+  fun mergeLegacyAndModernModuleDescriptorsIntoTheNewResourcePath() {
+    projectScript.appendText(
+      transform<GroovyExtensionModuleTransformer>(
+        dependenciesBlock = implementationFiles(
+          buildJarFoo(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+          buildJarBar(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+        ),
+      ),
+    )
+
+    run(shadowJarPath)
+
+    commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
+  }
+
   private fun buildJarFoo(
     entry: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
   ): Path = buildJar("foo.jar") {
