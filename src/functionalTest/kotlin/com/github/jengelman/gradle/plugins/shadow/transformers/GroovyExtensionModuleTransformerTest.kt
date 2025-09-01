@@ -55,7 +55,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    commonAssertions(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
+    commonAssertions(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
   }
 
   private fun buildJarFoo(
