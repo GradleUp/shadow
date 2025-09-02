@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.lang.reflect.Field
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassReader
@@ -26,7 +26,7 @@ internal class RelocationClassWriter(
       entries.forEach { entryObj ->
         if (entryObj != null) {
           (symbolValueField.get(entryObj) as? String)?.let { value ->
-            val newValue = relocators.applyClassRelocation(value)
+            val newValue = relocators.relocateClass(value)
             if (value != newValue) {
               symbolValueField.set(entryObj, newValue)
               isRelocated = true
@@ -64,9 +64,5 @@ internal class RelocationClassWriter(
       .apply { isAccessible = true }
     private val symbolValueField: Field = symbolClass.getDeclaredField("value")
       .apply { isAccessible = true }
-
-    fun Iterable<Relocator>.applyClassRelocation(value: String): String = fold(value) { string, relocator ->
-      relocator.relocateClass(RelocateClassContext(string))
-    }
   }
 }
