@@ -8,10 +8,9 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_STATIC_EXTENSION_CLASSES
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_VERSION
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_EXTENSION_MODULE
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_PREFIX
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+import com.github.jengelman.gradle.plugins.shadow.util.JarPath
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import java.nio.file.Path
 import kotlin.io.path.appendText
@@ -83,9 +82,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     run(shadowJarPath)
 
-    val properties = outputShadowedJar.use {
-      it.getContent("$PATH_GROOVY_PREFIX/foo.$PATH_EXTENSION_MODULE")
-    }.toProperties()
+    val properties = outputShadowedJar.extensionModuleProperties
 
     assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
     assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
@@ -127,7 +124,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   }
 
   private fun commonAssertions() {
-    val properties = outputShadowedJar.use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) }.toProperties()
+    val properties = outputShadowedJar.extensionModuleProperties
 
     assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
     assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
@@ -142,6 +139,10 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     const val EXTENSION_CLASSES_BAR = "com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension"
     const val STATIC_EXTENSION_CLASSES_FOO = "com.acme.foo.FooStaticExtension"
     const val STATIC_EXTENSION_CLASSES_BAR = "com.acme.bar.SomeStaticExtension"
+
+    val JarPath.extensionModuleProperties get() = use {
+      it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties()
+    }
 
     @JvmStatic
     fun resourcePathProvider() = listOf(
