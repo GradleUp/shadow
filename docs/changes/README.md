@@ -14,8 +14,34 @@
 ## Added
 
 - Allow opting out of `shadowRuntimeElements` variant. ([#1662](https://github.com/GradleUp/shadow/pull/1662))
+  ```kotlin
+  shadow {
+    // Disable publishing `shadowRuntimeElements` as an optional variant of the `java` component.
+    addShadowVariantIntoJavaComponent = false
+  }
+
+  // The workaround should be replaced by the config above. Since `addShadowVariantIntoJavaComponent` and `java` component
+  // stuff must be configured in the `afterEvaluate` phase, you can't access `shadowRuntimeElements` before that.
+  val javaComponent = components["java"] as AdhocComponentWithVariants
+  javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
+    // See more details in https://github.com/GradleUp/shadow/pull/1662.
+    skip()
+  }
+  ```
 - Allow opting out of `TARGET_JVM_VERSION_ATTRIBUTE`. ([#1674](https://github.com/GradleUp/shadow/pull/1674))
+  ```kotlin
+  shadow {
+    // Disable adding `TargetJvmVersion` attribute into the Gradle Module Metadata of the shadowed jar.
+    addTargetJvmVersionAttribute = false
+  }
+  ```
 - Allow opting out of `Multi-Release` attribute. ([#1675](https://github.com/GradleUp/shadow/pull/1675))
+  ```kotlin
+  tasks.shadowJar {
+    // Disable adding `Multi-Release` attribute into the manifest of the shadowed jar.
+    addMultiReleaseAttribute = false
+  }
+  ```
 
 ## Changed
 
