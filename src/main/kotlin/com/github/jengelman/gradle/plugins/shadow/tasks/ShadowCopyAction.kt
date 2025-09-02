@@ -1,9 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.internal.CompositeRelocator
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
@@ -39,6 +41,7 @@ public open class ShadowCopyAction(
   private val failOnDuplicateEntries: Boolean,
   private val encoding: String?,
 ) : CopyAction {
+  private val compositeRelocator = CompositeRelocator(relocators)
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
@@ -166,7 +169,7 @@ public open class ShadowCopyAction(
           }
         }
         else -> {
-          val mapped = RelocatorRemapper(relocators).map(path)
+          val mapped = compositeRelocator.relocatePath(path)
           if (transform(fileDetails, mapped)) return
           fileDetails.writeToZip(mapped)
         }
@@ -215,9 +218,9 @@ public open class ShadowCopyAction(
       // Temporarily remove the multi-release prefix.
       val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
       val newPath = path.replace(multiReleasePrefix, "")
-      val mappedName = multiReleasePrefix + remapper.mapPath(newPath)
+      val relocatedName = multiReleasePrefix + compositeRelocator.relocatePath(newPath)
       try {
-        val entry = zipEntry("$mappedName.class", preserveFileTimestamps, lastModified) {
+        val entry = zipEntry(relocatedName, preserveFileTimestamps, lastModified) {
           unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
         }
         // Now we put it back on so the class file is written out with the right extension.
@@ -225,7 +228,7 @@ public open class ShadowCopyAction(
         zipOutStr.write(newBytes)
         zipOutStr.closeEntry()
       } catch (_: ZipException) {
-        logger.warn("We have a duplicate $mappedName in source project")
+        logger.warn("We have a duplicate $relocatedName in source project")
       }
     }
 
