@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.util.Properties
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -27,6 +28,7 @@ import org.gradle.api.file.FileTreeElement
 @CacheableTransformer
 public open class GroovyExtensionModuleTransformer : ResourceTransformer {
   private val module = Properties()
+  private var extensionModulePath = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.path
@@ -56,12 +58,18 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
         }
       }
     }
+
+    // The `PATH_EXTENSION_MODULE` is hardcoded in Groovy code:
+    // https://github.com/apache/groovy/blame/c14dc71183d517f6bcd3a58ab4f6145c4c9e245a/src/main/java/org/codehaus/groovy/runtime/m12n/ExtensionModuleScanner.java#L43
+    // The relocation for `PATH_EXTENSION_MODULE` should be avoided when `Relocator.skipStringConstants` is enabled and
+    // `org.codehaus.groovy.runtime` is relocated, but it's a rare case.
+    extensionModulePath = context.relocators.relocatePath(PATH_EXTENSION_MODULE)
   }
 
   override fun hasTransformedResource(): Boolean = module.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, preserveFileTimestamps))
+    os.putNextEntry(zipEntry(extensionModulePath, preserveFileTimestamps))
     module.inputStream().use {
       it.copyTo(os)
     }
@@ -81,10 +89,12 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
    * https://groovy-lang.org/metaprogramming.html#module-descriptor
    */
   public companion object {
+    private const val PATH_GROOVY_PREFIX = "META-INF/groovy"
+    private const val PATH_EXTENSION_MODULE = "org.codehaus.groovy.runtime.ExtensionModule"
     public const val PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
-      "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+      "META-INF/services/$PATH_EXTENSION_MODULE"
     public const val PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
-      "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
+      "$PATH_GROOVY_PREFIX/$PATH_EXTENSION_MODULE"
 
     public const val KEY_MODULE_NAME: String = "moduleName"
     public const val KEY_MODULE_VERSION: String = "moduleVersion"
