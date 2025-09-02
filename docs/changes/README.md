@@ -20,8 +20,7 @@
     addShadowVariantIntoJavaComponent = false
   }
 
-  // The workaround should be replaced by the config above. Since `addShadowVariantIntoJavaComponent` and `java` component
-  // stuff must be configured in the `afterEvaluate` phase, you can't access `shadowRuntimeElements` before that.
+  // configuration must be done in the `afterEvaluate` phase, you cannot access `shadowRuntimeElements` before that.
   val javaComponent = components["java"] as AdhocComponentWithVariants
   javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
     // See more details in https://github.com/GradleUp/shadow/pull/1662.
