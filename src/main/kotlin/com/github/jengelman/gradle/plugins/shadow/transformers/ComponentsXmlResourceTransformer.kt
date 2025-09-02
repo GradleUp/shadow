@@ -63,14 +63,16 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
 
     val children = newDom.getChild("components").getChildren("component")
     for (component in children) {
-      var role: String? = getValue(component, "role")
-      role = getRelocatedClass(role, context)
+      val role = getValue(component, "role").let {
+        context.relocators.relocateClass(it)
+      }
       setValue(component, "role", role)
 
       val roleHint = getValue(component, "role-hint")
 
-      var impl: String? = getValue(component, "implementation")
-      impl = getRelocatedClass(impl, context)
+      val impl = getValue(component, "implementation").let {
+        context.relocators.relocateClass(it)
+      }
       setValue(component, "implementation", impl)
 
       val key = "$role:$roleHint"
@@ -84,8 +86,9 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
       if (requirements != null && requirements.childCount > 0) {
         for (r in requirements.childCount - 1 downTo 0) {
           val requirement = requirements.getChild(r)
-          var requiredRole: String? = getValue(requirement, "role")
-          requiredRole = getRelocatedClass(requiredRole, context)
+          val requiredRole = getValue(requirement, "role").let {
+            context.relocators.relocateClass(it)
+          }
           setValue(requirement, "role", requiredRole)
         }
       }
@@ -104,10 +107,6 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
 
   public companion object {
     public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
-
-    private fun getRelocatedClass(className: String?, context: TransformerContext): String? {
-      return className?.let { context.relocators.relocateClass(it) }
-    }
 
     private fun getValue(dom: Xpp3Dom, element: String): String {
       return dom.getChild(element).value.orEmpty()
