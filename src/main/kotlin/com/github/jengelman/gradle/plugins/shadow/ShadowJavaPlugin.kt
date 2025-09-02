@@ -67,7 +67,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
       it.outgoing.artifact(tasks.shadowJar)
     }
 
-    // Must use afterEvaluate here as we need to check the value of targetJvmVersion and track its changes.
+    // Must use afterEvaluate here as we need to track the changes of addTargetJvmVersionAttribute.
     afterEvaluate {
       if (shadow.addTargetJvmVersionAttribute.get()) {
         logger.info("Setting ${TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name} attribute for ${shadowRuntimeElements.name} configuration.")
@@ -98,6 +98,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
     shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
+    // Must use afterEvaluate here as we need to track the changes of addShadowVariantIntoJavaComponent.
     afterEvaluate {
       if (shadow.addShadowVariantIntoJavaComponent.get()) {
         logger.info("Adding ${shadowRuntimeElements.name} variant to Java component.")
