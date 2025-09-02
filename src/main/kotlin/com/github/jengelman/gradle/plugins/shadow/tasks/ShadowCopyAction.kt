@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.internal.CompositeRelocator
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
@@ -41,7 +40,6 @@ public open class ShadowCopyAction(
   private val failOnDuplicateEntries: Boolean,
   private val encoding: String?,
 ) : CopyAction {
-  private val compositeRelocator = CompositeRelocator(relocators)
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
@@ -169,7 +167,7 @@ public open class ShadowCopyAction(
           }
         }
         else -> {
-          val relocated = compositeRelocator.relocatePath(path)
+          val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
           fileDetails.writeToZip(relocated)
         }
@@ -218,7 +216,7 @@ public open class ShadowCopyAction(
       // Temporarily remove the multi-release prefix.
       val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
       val newPath = path.replace(multiReleasePrefix, "")
-      val relocatedPath = multiReleasePrefix + compositeRelocator.relocatePath(newPath)
+      val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
       try {
         val entry = zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
           unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
