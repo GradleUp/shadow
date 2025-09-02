@@ -35,8 +35,7 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
   override fun transform(context: TransformerContext) {
     val props = Properties()
     props.load(context.inputStream)
-    @Suppress("JavaMapForEach")
-    props.forEach { key, value ->
+    props.forEach { (key, value) ->
       when (key as String) {
         KEY_MODULE_NAME -> handle(key, value as String) {
           module.setProperty(key, MERGED_MODULE_NAME)
