@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
@@ -166,9 +167,9 @@ public open class ShadowCopyAction(
           }
         }
         else -> {
-          val mapped = RelocatorRemapper(relocators).map(path)
-          if (transform(fileDetails, mapped)) return
-          fileDetails.writeToZip(mapped)
+          val relocated = relocators.relocatePath(path)
+          if (transform(fileDetails, relocated)) return
+          fileDetails.writeToZip(relocated)
         }
       }
     }
@@ -215,9 +216,9 @@ public open class ShadowCopyAction(
       // Temporarily remove the multi-release prefix.
       val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
       val newPath = path.replace(multiReleasePrefix, "")
-      val mappedName = multiReleasePrefix + remapper.mapPath(newPath)
+      val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
       try {
-        val entry = zipEntry("$mappedName.class", preserveFileTimestamps, lastModified) {
+        val entry = zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
           unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
         }
         // Now we put it back on so the class file is written out with the right extension.
@@ -225,16 +226,16 @@ public open class ShadowCopyAction(
         zipOutStr.write(newBytes)
         zipOutStr.closeEntry()
       } catch (_: ZipException) {
-        logger.warn("We have a duplicate $mappedName in source project")
+        logger.warn("We have a duplicate $relocatedPath in source project")
       }
     }
 
-    private fun transform(fileDetails: FileCopyDetails, mapped: String): Boolean {
+    private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
       fileDetails.file.inputStream().use { inputStream ->
         transformer.transform(
           TransformerContext(
-            path = mapped,
+            path = path,
             inputStream = inputStream,
             relocators = relocators,
           ),
