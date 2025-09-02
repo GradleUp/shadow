@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassWriter
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassVisitor
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
@@ -31,7 +31,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.commons.ClassRemapper
+import org.objectweb.asm.ClassWriter
 
 /**
  * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
@@ -209,9 +209,9 @@ public open class ShadowCopyAction(
       // to the original class names. This is not a problem at runtime (because these entries in the
       // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
       // that use the constant pool to determine the dependencies of a class.
+      val cw = ClassWriter(0)
       val cr = ClassReader(bytes)
-      val cw = RelocationClassWriter(classReader = cr, relocators = relocators)
-      val cv = ClassRemapper(cw, remapper)
+      val cv = RelocationClassVisitor(classWriter = cw, remapper = remapper, relocators = relocators)
 
       try {
         cr.accept(cv, ClassReader.EXPAND_FRAMES)
