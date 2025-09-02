@@ -74,7 +74,6 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
         }
         $shadowJarTask {
           relocate('com.acme', 'com.example.shaded.acme')
-          relocate('org.codehaus', 'foo.org.codehaus') // Relocate Groovy source packages.
           mergeGroovyExtensionModules()
         }
       """.trimIndent(),
