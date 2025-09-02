@@ -106,14 +106,7 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
     public const val COMPONENTS_XML_PATH: String = "META-INF/plexus/components.xml"
 
     private fun getRelocatedClass(className: String?, context: TransformerContext): String? {
-      if (!className.isNullOrEmpty()) {
-        for (relocator in context.relocators) {
-          if (relocator.canRelocateClass(className)) {
-            return relocator.relocateClass(className)
-          }
-        }
-      }
-      return className
+      return className?.let { context.relocators.relocateClass(it) }
     }
 
     private fun getValue(dom: Xpp3Dom, element: String): String {

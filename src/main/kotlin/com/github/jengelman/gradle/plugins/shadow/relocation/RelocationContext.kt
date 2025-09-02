@@ -16,6 +16,15 @@ public fun Relocator.relocatePath(path: String): String {
   return relocatePath(RelocatePathContext(path))
 }
 
+public fun Iterable<Relocator>.relocateClass(className: String): String {
+  forEach { relocator ->
+    if (relocator.canRelocateClass(className)) {
+      return relocator.relocateClass(className)
+    }
+  }
+  return className
+}
+
 public fun Iterable<Relocator>.relocatePath(path: String): String {
   forEach { relocator ->
     if (relocator.canRelocatePath(path)) {
