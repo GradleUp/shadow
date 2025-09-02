@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.util.Properties
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
@@ -45,8 +46,13 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
         }
         KEY_EXTENSION_CLASSES,
         KEY_STATIC_EXTENSION_CLASSES,
-        -> handle(key, value as String) { existingValue ->
-          module.setProperty(key, "$existingValue,$value")
+        -> {
+          val relocatedClasses = (value as String).split(',').joinToString(",") { className ->
+            context.relocators.relocateClass(className)
+          }
+          handle(key, relocatedClasses) { existingValue ->
+            module.setProperty(key, "$existingValue,$relocatedClasses")
+          }
         }
       }
     }
