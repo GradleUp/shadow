@@ -45,24 +45,11 @@ public open class ServiceFileTransformer(
   }
 
   override fun transform(context: TransformerContext) {
-    var resource = context.path.substringAfter("$path/")
-    context.relocators.forEach { relocator ->
-      if (relocator.canRelocateClass(resource)) {
-        resource = relocator.relocateClass(resource)
-        return@forEach
-      }
-    }
-    resource = "$path/$resource"
+    val resource = path + "/" +
+      context.relocators.relocateClass(context.path.substringAfter("$path/"))
     val out = serviceEntries.getOrPut(resource) { mutableSetOf() }
-
-    context.inputStream.bufferedReader().use { it.readLines() }.forEach {
-      var line = it
-      context.relocators.forEach { relocator ->
-        if (relocator.canRelocateClass(line)) {
-          line = relocator.relocateClass(line)
-        }
-      }
-      out.add(line)
+    context.inputStream.bufferedReader().use { it.readLines() }.forEach { line ->
+      out.add(context.relocators.relocateClass(line))
     }
   }
 
