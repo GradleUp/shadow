@@ -210,7 +210,7 @@
 
 **8.x**
 
-```kt
+```kotlin
 tasks.shadowJar {
   isEnableRelocation = true
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -221,7 +221,7 @@ tasks.shadowJar {
 
 **9.x**
 
-```kt
+```kotlin
 tasks.shadowJar {
   // `isEnableRelocation` has been renamed to `enableAutoRelocation`.
   enableAutoRelocation = true
