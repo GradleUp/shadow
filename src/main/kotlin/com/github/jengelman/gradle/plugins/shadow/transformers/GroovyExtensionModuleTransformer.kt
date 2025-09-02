@@ -63,7 +63,7 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
     // https://github.com/apache/groovy/blame/c14dc71183d517f6bcd3a58ab4f6145c4c9e245a/src/main/java/org/codehaus/groovy/runtime/m12n/ExtensionModuleScanner.java#L43
     // The relocation for `PATH_EXTENSION_MODULE` should be avoided when `Relocator.skipStringConstants` is enabled and
     // `org.codehaus.groovy.runtime` is relocated, but it's a rare case.
-    extensionModulePath = context.relocators.relocatePath(PATH_EXTENSION_MODULE)
+    extensionModulePath = context.relocators.relocatePath(extensionModulePath)
   }
 
   override fun hasTransformedResource(): Boolean = module.isNotEmpty()
@@ -89,8 +89,8 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
    * https://groovy-lang.org/metaprogramming.html#module-descriptor
    */
   public companion object {
-    private const val PATH_GROOVY_PREFIX = "META-INF/groovy"
-    private const val PATH_EXTENSION_MODULE = "org.codehaus.groovy.runtime.ExtensionModule"
+    internal const val PATH_GROOVY_PREFIX = "META-INF/groovy"
+    internal const val PATH_EXTENSION_MODULE = "org.codehaus.groovy.runtime.ExtensionModule"
     public const val PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =
       "META-INF/services/$PATH_EXTENSION_MODULE"
     public const val PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR: String =

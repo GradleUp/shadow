@@ -8,11 +8,14 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_STATIC_EXTENSION_CLASSES
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_VERSION
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_EXTENSION_MODULE
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_PREFIX
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import java.nio.file.Path
 import kotlin.io.path.appendText
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -61,6 +64,38 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     run(shadowJarPath)
 
     commonAssertions()
+  }
+
+  @Test
+  fun groovyExtensionModuleTransformerWithRelocation() {
+    projectScript.appendText(
+      """
+        dependencies {
+          ${implementationFiles(buildJarFoo(), buildJarBar())}
+        }
+        $shadowJarTask {
+          relocate('com.acme', 'com.example.shaded.acme')
+          relocate('org.codehaus', 'foo.org.codehaus') // Relocate Groovy source packages.
+          mergeGroovyExtensionModules()
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    val properties = outputShadowedJar.use {
+      it.getContent("$PATH_GROOVY_PREFIX/foo.$PATH_EXTENSION_MODULE")
+    }.toProperties()
+
+    assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
+    assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
+    assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
+      .isEqualTo(
+        "com.example.shaded.acme.foo.FooExtension,com.example.shaded.acme.foo.BarExtension," +
+          "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension",
+      )
+    assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
+      .isEqualTo("com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension")
   }
 
   private fun buildJarFoo(
