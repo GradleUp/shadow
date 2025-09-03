@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.internal.RelocationRemapper
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -201,7 +201,7 @@ public open class ShadowCopyAction(
      */
     private fun FileCopyDetails.remapClass() = file.readBytes().let { bytes ->
       var modified = false
-      val remapper = RelocationRemapper(relocators) { modified = true }
+      val remapper = RelocatorRemapper(relocators) { modified = true }
 
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
