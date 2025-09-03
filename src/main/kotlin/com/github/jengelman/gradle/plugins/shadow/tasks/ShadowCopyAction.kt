@@ -178,6 +178,10 @@ public open class ShadowCopyAction(
             fileDetails.remapKotlinModule()
           }
         }
+        path.endsWith(".kotlin_builtins") -> {
+          // Don't try to relocate kotlin builtins (kotlin/kotlin.kotlin_builtins).
+          fileDetails.writeToZip(path)
+        }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
