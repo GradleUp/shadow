@@ -252,11 +252,11 @@ public open class ShadowCopyAction(
       val newKmModule = KmModule().apply {
         optionalAnnotationClasses += kmMetadata.kmModule.optionalAnnotationClasses
         packageParts += kmMetadata.kmModule.packageParts.map { (pkg, parts) ->
-          val relocatedPkg = relocators.relocatePath(pkg)
+          val relocatedPkg = relocators.relocateClass(pkg)
           val relocatedParts = KmPackageParts(
             parts.fileFacades.mapTo(mutableListOf()) { relocators.relocatePath(it) },
             parts.multiFileClassParts.map { (name, facade) ->
-              relocators.relocateClass(name) to relocators.relocatePath(facade)
+              relocators.relocatePath(name) to relocators.relocatePath(facade)
             }.toMap().toMutableMap(),
           )
           relocatedPkg to relocatedParts
