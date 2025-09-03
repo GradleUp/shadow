@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocationClassVisitor
-import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -12,7 +12,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContex
 import java.io.File
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
-import kotlin.metadata.jvm.JvmMetadataVersion
 import kotlin.metadata.jvm.KmModule
 import kotlin.metadata.jvm.KmPackageParts
 import kotlin.metadata.jvm.KotlinModuleMetadata
@@ -202,7 +201,7 @@ public open class ShadowCopyAction(
      */
     private fun FileCopyDetails.remapClass() = file.readBytes().let { bytes ->
       var modified = false
-      val remapper = RelocatorRemapper(relocators) { modified = true }
+      val remapper = RelocationRemapper(relocators) { modified = true }
 
       // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
       // Copying the original constant pool should be avoided because it would keep references
@@ -249,26 +248,26 @@ public open class ShadowCopyAction(
      */
     @OptIn(UnstableMetadataApi::class)
     private fun FileCopyDetails.remapKotlinModule() = file.readBytes().let { bytes ->
-      val metadata = KotlinModuleMetadata.read(bytes)
-      val result = KmModule()
-      metadata.kmModule.packageParts.forEach { (pkg, parts) ->
-        result.packageParts[relocators.relocatePath(pkg)] =
-          KmPackageParts(
-            parts.fileFacades.mapTo(mutableListOf()) {
-              relocators.relocatePath(it)
-            },
-            parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
+      val kmMetadata = KotlinModuleMetadata.read(bytes)
+      val newKmModule = KmModule().apply {
+        optionalAnnotationClasses += kmMetadata.kmModule.optionalAnnotationClasses
+        packageParts += kmMetadata.kmModule.packageParts.map { (pkg, parts) ->
+          val relocatedPkg = relocators.relocatePath(pkg)
+          val relocatedParts = KmPackageParts(
+            parts.fileFacades.mapTo(mutableListOf()) { relocators.relocatePath(it) },
+            parts.multiFileClassParts.map { (name, facade) ->
               relocators.relocateClass(name) to relocators.relocatePath(facade)
-            },
+            }.toMap().toMutableMap(),
           )
+          relocatedPkg to relocatedParts
+        }
       }
-
-      val newMetadata = KotlinModuleMetadata(result, JvmMetadataVersion.LATEST_STABLE_SUPPORTED)
+      val newKmMetadata = KotlinModuleMetadata(newKmModule, kmMetadata.version)
       val entry = zipEntry(relocators.relocatePath(path), preserveFileTimestamps, lastModified) {
         unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
       }
       zipOutStr.putNextEntry(entry)
-      zipOutStr.write(newMetadata.write())
+      zipOutStr.write(newKmMetadata.write())
       zipOutStr.closeEntry()
     }
 

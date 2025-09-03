@@ -12,7 +12,7 @@ import org.objectweb.asm.commons.Remapper
  *
  * @author John Engelman
  */
-internal class RelocatorRemapper(
+internal class RelocationRemapper(
   private val relocators: Set<Relocator>,
   private val onModified: () -> Unit = {},
 ) : Remapper() {
