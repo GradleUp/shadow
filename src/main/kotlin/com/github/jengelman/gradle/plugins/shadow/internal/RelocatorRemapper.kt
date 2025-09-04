@@ -64,11 +64,21 @@ internal class RelocatorRemapper(
 
   private companion object {
     /**
-     * - `Ljava/lang/String`: normal class.
-     * - `[Ljava/lang/String;`: array of classes.
-     * - `[[Ljava/lang/String`: multidimensional array of classes.
-     * - `(Ljava/lang/String`: method argument.
-     * - `()Ljava/lang/String;`: method return type.
+     * Regex to match Java type descriptors for classes, arrays, and method signatures.
+     *
+     * Examples matched:
+     *   - `Ljava/lang/String`         : normal class
+     *   - `[Ljava/lang/String;`       : array of classes
+     *   - `[[Ljava/lang/String`       : multidimensional array of classes
+     *   - `(Ljava/lang/String`        : method argument
+     *   - `()Ljava/lang/String;`      : method return type
+     *
+     * Pattern breakdown:
+     *   - ([\\[()]*)? : Group 1 (optional): matches any number of '[' (array), or '(' (method signature start).
+     *                  '[' denotes array dimensions, '(' denotes start of method arguments.
+     *   - L           : Literal 'L', marks the start of a class type in a descriptor.
+     *   - ([^;]+)     : Group 2: matches the fully qualified class name (e.g., java/lang/String), up to but not including a semicolon.
+     *   - ;?          : Optional semicolon. In descriptors, class types are usually terminated by ';', but in some contexts (e.g., before splitting) it may be missing.
      */
     val classPattern: Pattern = Pattern.compile("([\\[()]*)?L([^;]+);?")
   }
