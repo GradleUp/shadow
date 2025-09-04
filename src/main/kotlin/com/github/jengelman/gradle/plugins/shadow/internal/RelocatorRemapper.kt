@@ -65,6 +65,6 @@ internal class RelocatorRemapper(
   }
 
   private companion object {
-    val classPattern: Pattern = Pattern.compile("([\\[]*)?L([^;]+);?")
+    val classPattern: Pattern = Pattern.compile("([\\[()]*)?L([^;]+);?")
   }
 }
