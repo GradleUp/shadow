@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
@@ -265,6 +266,49 @@ class KotlinPluginsTest : BasePluginTest() {
     assertThat(result.output).contains(
       "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
       "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
+    )
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1622",
+  )
+  @Test
+  fun relocateKotlinReflectFull() {
+    projectScript.writeText(
+      """
+        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm", withGroup = true, withVersion = true)}
+        dependencies {
+          implementation 'org.jetbrains.kotlin:kotlin-reflect'
+        }
+        $shadowJarTask {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.MainKt'
+          }
+          enableAutoRelocation = true
+          mergeServiceFiles() // Merge and relocate service files from kotlin-reflect.
+        }
+      """.trimIndent(),
+    )
+    writeClass(jvmLang = JvmLang.Kotlin) {
+      """
+        package my
+        import kotlin.reflect.full.memberProperties
+
+        fun main() {
+            println(MemberClass()::class.memberProperties)
+        }
+        private class MemberClass {
+            val prop1 = "property 1"
+            val prop2 by lazy { "property 2" }
+        }
+      """.trimIndent()
+    }
+
+    run(shadowJarPath)
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
+
+    assertThat(result).contains(
+      "[val my.MemberClass.prop1: kotlin.String, val my.MemberClass.prop2: kotlin.String]",
     )
   }
 
