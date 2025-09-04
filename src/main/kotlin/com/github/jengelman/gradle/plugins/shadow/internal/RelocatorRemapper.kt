@@ -29,11 +29,7 @@ internal class RelocatorRemapper(
 
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
     // Maybe a list of types.
-    val parts = name.split(';').toMutableList()
-    for (i in parts.indices) {
-      parts[i] = mapNameImpl(parts[i], mapLiterals)
-    }
-    val newName = parts.joinToString(";")
+    val newName = name.split(';').map { mapNameImpl(it, mapLiterals) }.joinToString(";")
 
     if (newName != name) {
       onModified()
