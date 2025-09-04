@@ -533,6 +533,45 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1403",
+  )
+  @Test
+  fun relocateMultiClassSignatureStringConstants() {
+    writeClass {
+      """
+        package my;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("Lorg/package/ClassA;Lorg/package/ClassB;");
+            System.out.println("(Lorg/package/ClassC;Lorg/package/ClassD;)");
+            System.out.println("()Lorg/package/ClassE;Lorg/package/ClassF;");
+          }
+        }
+      """.trimIndent()
+    }
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+          relocate('org.package', 'shadow.org.package')
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
+
+    // Just check that the jar can be executed without NoClassDefFoundError.
+    assertThat(result).contains(
+      "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB",
+      "Lshadow/org/package/ClassC;Lshadow/org/package/ClassD",
+      "Lshadow/org/package/ClassE;Lshadow/org/package/ClassF",
+    )
+  }
+
   @Test
   fun classBytesUnchangedIfPossible() {
     val mainClassEntry = writeClass()
