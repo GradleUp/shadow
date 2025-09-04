@@ -16,7 +16,6 @@ internal class RelocatorRemapper(
   private val relocators: Set<Relocator>,
   private val onModified: () -> Unit = {},
 ) : Remapper() {
-  private val classPattern: Pattern = Pattern.compile("(\\[*)?L(.+)")
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
@@ -29,7 +28,11 @@ internal class RelocatorRemapper(
   override fun map(internalName: String): String = mapName(internalName)
 
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
-    val newName = mapNameImpl(name, mapLiterals)
+    // Maybe a list of types.
+    val newName = name.split(';').joinToString(";") {
+      mapNameImpl(it, mapLiterals)
+    }
+
     if (newName != name) {
       onModified()
     }
@@ -59,5 +62,9 @@ internal class RelocatorRemapper(
     }
 
     return name
+  }
+
+  private companion object {
+    val classPattern: Pattern = Pattern.compile("([\\[()]*)?L([^;]+);?")
   }
 }
