@@ -445,7 +445,15 @@ public abstract class ShadowJar : Jar() {
             .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
             .map { it.name.substringBeforeLast('/').replace('/', '.') }
             .toSet()
-            .map { SimpleRelocator(it, "$prefix.$it") }
+            .map {
+              SimpleRelocator(
+                pattern = it,
+                shadedPattern = "$prefix.$it",
+                excludes = listOf(
+                  "kotlin-stdlib", // Hardcoded `kotlin-stdlib` in Kotlin @Metadata.d2 cannot be relocated.
+                ),
+              )
+            }
         }
       }
     }
