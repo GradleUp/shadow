@@ -16,7 +16,6 @@ internal class RelocatorRemapper(
   private val relocators: Set<Relocator>,
   private val onModified: () -> Unit = {},
 ) : Remapper() {
-  private val classPattern: Pattern = Pattern.compile("([\\[()]*)?L([^;]+);?")
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
@@ -65,5 +64,16 @@ internal class RelocatorRemapper(
     }
 
     return name
+  }
+
+  private companion object {
+    /**
+     * - `Ljava/lang/String`: normal class.
+     * - `[Ljava/lang/String;`: array of classes.
+     * - `[[Ljava/lang/String`: multidimensional array of classes.
+     * - `(Ljava/lang/String`: method argument.
+     * - `()Ljava/lang/String;`: method return type.
+     */
+    val classPattern: Pattern = Pattern.compile("([\\[()]*)?L([^;]+);?")
   }
 }
