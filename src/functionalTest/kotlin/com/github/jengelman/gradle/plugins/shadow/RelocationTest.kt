@@ -3,11 +3,15 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
@@ -16,6 +20,8 @@ import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
+import kotlin.metadata.jvm.KotlinModuleMetadata
+import kotlin.metadata.jvm.UnstableMetadataApi
 import kotlin.time.Duration.Companion.seconds
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -552,6 +558,64 @@ class RelocationTest : BasePluginTest() {
     val originalBytes = outputJar.use { it.getBytes(mainClassEntry) }
     val relocatedBytes = outputShadowedJar.use { it.getBytes(mainClassEntry) }
     assertThat(relocatedBytes).isEqualTo(originalBytes)
+  }
+
+  @UnstableMetadataApi
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/843",
+  )
+  @Test
+  fun relocateKotlinModuleFiles() {
+    val moduleFilePath = "META-INF/kotlin-stdlib-jdk8.kotlin_module"
+    val stdlibJar = buildJar("stdlib.jar") {
+      insert(moduleFilePath, requireResourceAsText(moduleFilePath))
+    }
+    projectScript.appendText(
+      """
+        dependencies {
+          ${implementationFiles(stdlibJar)}
+        }
+        $shadowJarTask {
+          relocate 'kotlin', 'my.kotlin'
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        moduleFilePath,
+        *manifestEntries,
+      )
+    }
+
+    val originalModule = KotlinModuleMetadata.read(requireResourceAsStream(moduleFilePath).readBytes())
+    val relocatedModule = outputShadowedJar.use {
+      KotlinModuleMetadata.read(it.getBytes(moduleFilePath))
+    }
+
+    assertThat(relocatedModule.version).isEqualTo(originalModule.version)
+    // They are both empty.
+    assertThat(relocatedModule.kmModule.optionalAnnotationClasses)
+      .isEqualTo(originalModule.kmModule.optionalAnnotationClasses)
+
+    val originalPkgParts = originalModule.kmModule.packageParts.entries
+    val relocatedPkgParts = relocatedModule.kmModule.packageParts.entries
+    // They are not empty and different.
+    assertThat(originalPkgParts).isNotEqualTo(relocatedPkgParts)
+
+    relocatedPkgParts.forEachIndexed { index, (pkg, parts) ->
+      val (originalPkg, originalParts) = originalPkgParts.elementAt(index)
+      assertThat(pkg).isNotEqualTo(originalPkg)
+      assertThat(pkg).isEqualTo(originalPkg.replace("kotlin.", "my.kotlin."))
+
+      assertThat(parts.fileFacades).isNotEqualTo(originalParts.fileFacades)
+      assertThat(parts.fileFacades).isEqualTo(originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") })
+
+      // They are both empty.
+      assertThat(parts.multiFileClassParts).isEqualTo(originalParts.multiFileClassParts)
+    }
   }
 
   private fun writeClassWithStringRef() {
