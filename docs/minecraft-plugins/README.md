@@ -27,7 +27,39 @@ For Minecraft plugin developers using Folia, Paper, or Spigot:
       relocate("com.example.lib", "your.plugin.lib.example")
     }
     ```
+    # Folia 1.21.8+ (Requires Java 21)
 
+```
+```groovy
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '8.3.3'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://jitpack.io' }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+dependencies {
+    compileOnly 'dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT'
+    // other dependencies...
+}
+
+tasks.shadowJar {
+    archiveClassifier.set('') // produce plugin.jar without "-all" or "-shadow"
+    relocate 'com.example.lib', 'your.plugin.lib.example'
+}
+```
+
+---
 === "Paper/Spigot (Java 17+)"
 
     ```kotlin
@@ -46,6 +78,31 @@ For Minecraft plugin developers using Folia, Paper, or Spigot:
       // other dependencies...
     }
     ```
+```
+```groovy
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '8.3.3'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://jitpack.io' }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT'
+    // other dependencies...
+}
+```
+
 
 ## Troubleshooting
 
