@@ -1,14 +1,12 @@
 # Minecraft Plugin Development Migration Guide
 
-This guide helps you migrate from older Shadow plugin versions to the modern `com.gradleup.shadow` plugin with Java 21 support.
+This guide helps you migrate from older Shadow plugin versions to the modern `com.gradleup.shadow` plugin.
 
 ## Overview
 
 With the release of Shadow 9.x, developers need to migrate from:
 - **Old Plugin ID**: `com.github.johnrengelman.shadow`
 - **New Plugin ID**: `com.gradleup.shadow`
-
-## Migration Steps
 
 ### 1. Update Plugin Declaration
 
@@ -51,7 +49,7 @@ java {
 **Cause**: Version mismatch between Gradle and Shadow  
 **Solution**: Use compatible versions from the matrix above
 
-### 4. Minecraft Plugin Development
+## Developing Minecraft Plugin
 
 For Minecraft plugin developers using Folia, Paper, or Spigot:
 
@@ -81,7 +79,7 @@ For Minecraft plugin developers using Folia, Paper, or Spigot:
     }
     ```
 
-=== "Paper/Spigot (Java 17+)"
+=== "Paper/Spigot"
 
     ```kotlin
     plugins {
@@ -100,34 +98,9 @@ For Minecraft plugin developers using Folia, Paper, or Spigot:
     }
     ```
 
-### 5. Breaking Changes in 9.x
+### 5. Migrating Examples
 
-If migrating to Shadow 9.x, be aware of these breaking changes:
-
-- **`isEnableRelocation`** → **`enableAutoRelocation`**
-- **Default `duplicatesStrategy`**: Changed from `EXCLUDE` to `INCLUDE` (reverted to `EXCLUDE` in 9.0.1)
-- **Transformer interface changes**: Updated to accept context objects
-- **Resource handling**: `from()` behavior aligned with Gradle's `AbstractCopyTask.from`
-
-=== "Shadow 8.x"
-
-    ```kotlin
-    tasks.shadowJar {
-        isEnableRelocation = true
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        mergeServiceFiles()
-    }
-    ```
-
-=== "Shadow 9.x"
-
-    ```kotlin
-    tasks.shadowJar {
-        enableAutoRelocation = true
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Explicitly set
-        mergeServiceFiles()
-    }
-    ```
+If migrating check theses examples https://gradleup.com/shadow/changes/#migration-example
 
 ## Troubleshooting
 
@@ -139,8 +112,6 @@ If you encounter Gradle cache corruption after migrating:
 # Clear Gradle cache
 ./gradlew clean --refresh-dependencies
 
-# Or manually clear cache
-rm -rf ~/.gradle/caches/
 ```
 
 ### Dependency Conflicts
