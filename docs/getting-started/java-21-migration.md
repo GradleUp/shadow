@@ -40,15 +40,7 @@ java {
 }
 ```
 
-### 3. Version Compatibility Matrix
-
-| Shadow Version | Plugin ID | Min Java | Min Gradle | Max Java |
-|----------------|-----------|----------|------------|----------|
-| 8.1.1 | `com.github.johnrengelman.shadow` | 8 | 7.0 | 17 |
-| 8.3.3 | `com.gradleup.shadow` | 11 | 8.3 | 21 |
-| 9.1.0+ | `com.gradleup.shadow` | 11 | 8.3 | 25 |
-
-### 4. Common Issues and Solutions
+### 3. Common Issues and Solutions
 
 #### Issue: "UnsupportedClassVersionError"
 **Cause**: Using old Shadow plugin with Java 21  
@@ -62,7 +54,7 @@ java {
 **Cause**: Version mismatch between Gradle and Shadow  
 **Solution**: Use compatible versions from the matrix above
 
-### 5. Minecraft Plugin Development
+### 4. Minecraft Plugin Development
 
 For Minecraft plugin developers using Folia, Paper, or Spigot:
 
@@ -111,7 +103,7 @@ For Minecraft plugin developers using Folia, Paper, or Spigot:
     }
     ```
 
-### 6. Breaking Changes in 9.x
+### 5. Breaking Changes in 9.x
 
 If migrating to Shadow 9.x, be aware of these breaking changes:
 
