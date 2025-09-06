@@ -174,8 +174,8 @@ Real-world example from a Folia 1.21.8 plugin:
 
 ```kotlin
 plugins {
-    kotlin("jvm") version "1.8.0"
-    id("com.gradleup.shadow") version "8.3.3"
+    kotlin("jvm")
+    id("com.gradleup.shadow")
     id("java")
 }
 
