@@ -59,6 +59,7 @@ markdown_extensions:
 nav:
   - 'Introduction': README.md
   - 'Getting Started': getting-started/README.md
+  - 'Java 21 Migration Guide': getting-started/java-21-migration.md
   - 'Configuration':
       - 'Overview': configuration/README.md
       - 'Filtering': configuration/filtering/README.md
