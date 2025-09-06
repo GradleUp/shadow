@@ -100,7 +100,7 @@ For Minecraft plugin developers using Folia, Paper, or Spigot:
 
 ### 5. Migrating Examples
 
-If migrating check theses examples https://gradleup.com/shadow/changes/#migration-example
+Check theses examples here https://gradleup.com/shadow/changes/#migration-example
 
 ## Troubleshooting
 
