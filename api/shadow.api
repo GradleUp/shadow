@@ -245,7 +245,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicen
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -264,7 +264,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNotic
 	public fun getPreamble3 ()Lorg/gradle/api/provider/Property;
 	public fun getProjectName ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -277,7 +277,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/AppendingTr
 	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun getSeparator ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -293,7 +293,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsX
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -307,7 +307,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/DontInclude
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -324,7 +324,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExten
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -339,7 +339,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeReso
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -347,7 +347,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2Plugi
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -358,7 +358,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 	public fun getAttributes ()Lorg/gradle/api/provider/SetProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -370,7 +370,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -382,7 +382,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PreserveFir
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getResources ()Lorg/gradle/api/provider/SetProperty;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -397,7 +397,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesF
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getPaths ()Lorg/gradle/api/provider/SetProperty;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun setKeyTransformer (Lkotlin/jvm/functions/Function1;)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
@@ -424,7 +424,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/trans
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public abstract fun hasTransformedResource ()Z
-	public abstract fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public abstract fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public abstract fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -432,7 +432,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Resou
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun create (Ljava/lang/Class;Lorg/gradle/api/model/ObjectFactory;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
@@ -453,7 +453,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun include (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun include ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun setPath (Ljava/lang/String;)V
@@ -498,7 +498,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/XmlAppendin
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getResource ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun modifyOutputStream (Lshadow/org/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 

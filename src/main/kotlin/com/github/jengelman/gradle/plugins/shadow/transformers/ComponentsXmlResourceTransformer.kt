@@ -5,14 +5,14 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import org.apache.tools.zip.ZipOutputStream
-import org.codehaus.plexus.util.xml.XmlStreamReader
-import org.codehaus.plexus.util.xml.XmlStreamWriter
-import org.codehaus.plexus.util.xml.Xpp3Dom
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder
-import org.codehaus.plexus.util.xml.Xpp3DomWriter
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
+import shadow.org.apache.tools.zip.ZipOutputStream
+import shadow.org.codehaus.plexus.util.xml.XmlStreamReader
+import shadow.org.codehaus.plexus.util.xml.XmlStreamWriter
+import shadow.org.codehaus.plexus.util.xml.Xpp3Dom
+import shadow.org.codehaus.plexus.util.xml.Xpp3DomBuilder
+import shadow.org.codehaus.plexus.util.xml.Xpp3DomWriter
 
 /**
  * A resource processor that aggregates plexus `components.xml` files.

@@ -10,7 +10,6 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -18,6 +17,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * Resources transformer that merges Properties files.

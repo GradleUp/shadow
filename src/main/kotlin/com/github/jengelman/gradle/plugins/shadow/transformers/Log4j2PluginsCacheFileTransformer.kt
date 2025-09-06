@@ -10,11 +10,11 @@ import java.util.Enumeration
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.outputStream
-import org.apache.commons.io.output.CloseShieldOutputStream
-import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
-import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import shadow.org.apache.commons.io.output.CloseShieldOutputStream
+import shadow.org.apache.logging.log4j.core.config.plugins.processor.PluginCache
+import shadow.org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java).

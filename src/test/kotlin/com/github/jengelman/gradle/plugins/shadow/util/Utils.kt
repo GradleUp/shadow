@@ -3,9 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow.util
 import java.io.OutputStream
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.model.ObjectFactory
 import org.gradle.testfixtures.ProjectBuilder
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 val testObjectFactory: ObjectFactory = ProjectBuilder.builder().build().objects
 

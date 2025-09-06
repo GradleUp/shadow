@@ -9,8 +9,8 @@ import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
-import org.vafer.jdependency.Clazzpath
-import org.vafer.jdependency.ClazzpathUnit
+import shadow.org.vafer.jdependency.Clazzpath
+import shadow.org.vafer.jdependency.ClazzpathUnit
 
 /** Tracks unused classes in the project classpath. */
 internal class UnusedTracker(

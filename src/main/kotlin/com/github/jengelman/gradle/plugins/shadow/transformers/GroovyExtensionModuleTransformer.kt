@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.util.Properties
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * Aggregate Apache Groovy extension modules descriptors.

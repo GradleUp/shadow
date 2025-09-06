@@ -9,8 +9,8 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 import java.util.zip.ZipInputStream
-import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * Modified from [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerParameterTests.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformerParameterTests.java).

@@ -5,20 +5,20 @@ import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.IOException
 import java.io.StringReader
 import javax.inject.Inject
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
-import org.jdom2.Document
-import org.jdom2.JDOMException
-import org.jdom2.input.SAXBuilder
-import org.jdom2.input.sax.XMLReaders
-import org.jdom2.output.Format
-import org.jdom2.output.XMLOutputter
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
+import shadow.org.apache.tools.zip.ZipOutputStream
+import shadow.org.jdom2.Document
+import shadow.org.jdom2.JDOMException
+import shadow.org.jdom2.input.SAXBuilder
+import shadow.org.jdom2.input.sax.XMLReaders
+import shadow.org.jdom2.output.Format
+import shadow.org.jdom2.output.XMLOutputter
 
 /**
  * Appends multiple occurrences of some XML file.

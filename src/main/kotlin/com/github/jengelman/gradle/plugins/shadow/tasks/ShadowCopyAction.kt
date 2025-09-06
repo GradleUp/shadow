@@ -9,10 +9,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContex
 import java.io.File
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
-import org.apache.tools.zip.UnixStat
-import org.apache.tools.zip.Zip64RequiredException
-import org.apache.tools.zip.ZipEntry
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
@@ -22,9 +18,13 @@ import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.commons.ClassRemapper
+import shadow.org.apache.tools.zip.UnixStat
+import shadow.org.apache.tools.zip.Zip64RequiredException
+import shadow.org.apache.tools.zip.ZipEntry
+import shadow.org.apache.tools.zip.ZipOutputStream
+import shadow.org.objectweb.asm.ClassReader
+import shadow.org.objectweb.asm.ClassWriter
+import shadow.org.objectweb.asm.commons.ClassRemapper
 
 /**
  * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).

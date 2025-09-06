@@ -8,12 +8,12 @@ import java.util.Date
 import java.util.Locale
 import java.util.TreeSet
 import javax.inject.Inject
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * Merges `META-INF/NOTICE.TXT` files.

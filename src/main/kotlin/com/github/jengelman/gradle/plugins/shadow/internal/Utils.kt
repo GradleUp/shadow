@@ -10,7 +10,7 @@ import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.Attributes.Name as JarAttributeName
 import kotlin.io.path.toPath
-import org.apache.tools.zip.ZipEntry
+import shadow.org.apache.tools.zip.ZipEntry
 
 /**
  * Known as `Main-Class` in the manifest file.

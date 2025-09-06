@@ -26,8 +26,6 @@ import java.io.IOException
 import java.util.jar.JarFile
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
-import org.apache.tools.zip.Zip64Mode
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -60,6 +58,8 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import shadow.org.apache.tools.zip.Zip64Mode
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 @CacheableTask
 public abstract class ShadowJar : Jar() {

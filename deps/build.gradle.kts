@@ -15,3 +15,7 @@ dependencies {
   api(libs.plexus.utils)
   api(libs.plexus.xml)
 }
+
+tasks.shadowJar {
+  enableAutoRelocation = true
+}

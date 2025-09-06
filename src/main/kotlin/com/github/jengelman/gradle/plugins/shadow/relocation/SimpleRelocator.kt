@@ -2,9 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.Objects
 import java.util.regex.Pattern
-import org.apache.commons.io.FilenameUtils
-import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
+import shadow.org.apache.commons.io.FilenameUtils
+import shadow.org.codehaus.plexus.util.SelectorUtils
 
 /**
  * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/SimpleRelocator.java).

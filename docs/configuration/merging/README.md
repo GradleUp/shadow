@@ -198,7 +198,7 @@ For simpler use cases, you can create a basic transformer:
     ```kotlin
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
     import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import org.apache.tools.zip.ZipOutputStream
+    import shadow.org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer : ResourceTransformer {
@@ -218,7 +218,7 @@ For simpler use cases, you can create a basic transformer:
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
     import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import org.apache.tools.zip.ZipOutputStream
+    import shadow.org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer implements ResourceTransformer {
@@ -242,7 +242,7 @@ can also be provided.
     ```kotlin
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
     import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import org.apache.tools.zip.ZipOutputStream
+    import shadow.org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer(@get:Input var enabled: Boolean = false) : ResourceTransformer {
@@ -270,7 +270,7 @@ can also be provided.
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
     import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
-    import org.apache.tools.zip.ZipOutputStream
+    import shadow.org.apache.tools.zip.ZipOutputStream
     import org.gradle.api.file.FileTreeElement
 
     class MyTransformer implements ResourceTransformer {

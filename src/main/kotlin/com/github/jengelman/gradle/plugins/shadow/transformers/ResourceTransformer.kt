@@ -2,11 +2,11 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import java.io.IOException
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Named
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * Modified from [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java).

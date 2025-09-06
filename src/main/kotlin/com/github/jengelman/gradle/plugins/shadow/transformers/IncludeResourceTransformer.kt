@@ -4,7 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.inject.Inject
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -12,6 +11,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * A resource processor that allows the addition of an arbitrary file content into the shaded JAR.

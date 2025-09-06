@@ -4,12 +4,12 @@ import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * A resource processor that appends content for a resource, separated by a newline.

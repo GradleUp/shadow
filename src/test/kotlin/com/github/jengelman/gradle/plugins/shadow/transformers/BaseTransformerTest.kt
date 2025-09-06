@@ -10,10 +10,10 @@ import java.util.Locale
 import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 abstract class BaseTransformerTest<T : ResourceTransformer> {
   protected lateinit var transformer: T

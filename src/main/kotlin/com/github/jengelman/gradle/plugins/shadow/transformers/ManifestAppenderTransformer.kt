@@ -6,12 +6,12 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
 import javax.inject.Inject
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import shadow.org.apache.tools.zip.ZipOutputStream
 
 /**
  * A resource processor that can append arbitrary attributes to the first MANIFEST.MF
