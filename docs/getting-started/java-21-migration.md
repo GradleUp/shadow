@@ -1,10 +1,10 @@
-# Java 21 Migration Guide
+# Minecraft Plugin Development Migration Guide
 
 This guide helps you migrate from older Shadow plugin versions to the modern `com.gradleup.shadow` plugin with Java 21 support.
 
 ## Overview
 
-With the release of Shadow 9.x and the requirement for Java 21 in many modern projects (like Folia 1.21.8), developers need to migrate from:
+With the release of Shadow 9.x, developers need to migrate from:
 - **Old Plugin ID**: `com.github.johnrengelman.shadow`
 - **New Plugin ID**: `com.gradleup.shadow`
 
@@ -24,14 +24,12 @@ With the release of Shadow 9.x and the requirement for Java 21 in many modern pr
 
     ```kotlin
     plugins {
-        id("com.gradleup.shadow") version "8.3.3" // For Java 21 support
+        id("com.gradleup.shadow") version "8.3.3"
         // or version "9.1.0" for latest features
     }
     ```
 
 ### 2. Update Java Version
-
-For Java 21 compatibility, ensure your build configuration targets Java 21:
 
 ```kotlin
 java {
@@ -43,7 +41,6 @@ java {
 ### 3. Common Issues and Solutions
 
 #### Issue: "UnsupportedClassVersionError"
-**Cause**: Using old Shadow plugin with Java 21  
 **Solution**: Migrate to Shadow 8.3.3+ or 9.x
 
 #### Issue: "Plugin not found"
@@ -58,7 +55,7 @@ java {
 
 For Minecraft plugin developers using Folia, Paper, or Spigot:
 
-=== "Folia 1.21.8+ (Requires Java 21)"
+=== "Folia 1.21.8+"
 
     ```kotlin
     plugins {
