@@ -59,7 +59,6 @@ markdown_extensions:
 nav:
   - 'Introduction': README.md
   - 'Getting Started': getting-started/README.md
-  - 'Java 21 Migration Guide': getting-started/java-21-migration.md
   - 'Configuration':
       - 'Overview': configuration/README.md
       - 'Filtering': configuration/filtering/README.md
@@ -73,6 +72,7 @@ nav:
   - 'Kotlin Plugins': kotlin-plugins/README.md
   - 'Groovy and Scala Plugins': groovy-and-scala-plugins/README.md
   - 'Android Plugins': android-plugins/README.md
+  - 'Minecraft Plugins': minecraft-plugins/README.md
   - 'Publishing': publishing/README.md
   - 'Multi-Project': multi-project/README.md
   - 'Changes': changes/README.md
