@@ -1,9 +1,5 @@
 # Getting Started
 
-!!! info "Migrating from older versions?"
-    If you're migrating from the old `com.github.johnrengelman.shadow` plugin or need Java 21 support, 
-    check out our [Java 21 Migration Guide](java-21-migration.md) for step-by-step instructions.
-
 === "Kotlin"
 
     ```kotlin
