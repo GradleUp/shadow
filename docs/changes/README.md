@@ -52,7 +52,7 @@
 
 - Don't inject `TargetJvmVersion` attribute when automatic JVM targeting is disabled. ([#1666](https://github.com/GradleUp/shadow/pull/1666))
 - Do not write modified class files for no-op relocations. ([#1694](https://github.com/GradleUp/shadow/pull/1694))
-- **BREAKING CHANGE:** As some `afterEvaluate` usages are introduced, this may cause configuration issues in rare cases.
+- **BREAKING CHANGE:** The introduction of some `afterEvaluate` usages may cause configuration issues in rare cases.
 
 ## [9.0.2](https://github.com/GradleUp/shadow/releases/tag/9.0.2) - 2025-08-15
 
