@@ -98,18 +98,15 @@ public abstract class ShadowJavaPlugin @Inject constructor(
     shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
-    // Must use afterEvaluate here as we need to track the changes of addShadowVariantIntoJavaComponent.
-    afterEvaluate {
+    components.named("java", AdhocComponentWithVariants::class.java) {
       if (shadow.addShadowVariantIntoJavaComponent.get()) {
         logger.info("Adding ${shadowRuntimeElements.name} variant to Java component.")
       } else {
         logger.info("Skipping adding ${shadowRuntimeElements.name} variant to Java component.")
-        return@afterEvaluate
+        return@named
       }
-      components.named("java", AdhocComponentWithVariants::class.java) {
-        it.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
-          variant.mapToOptional()
-        }
+      it.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
+        variant.mapToOptional()
       }
     }
   }
