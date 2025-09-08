@@ -173,6 +173,19 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
 }
 
+public final class com/github/jengelman/gradle/plugins/shadow/tasks/SerializableManifest : java/io/Serializable, org/gradle/api/java/archives/Manifest {
+	public fun <init> (Lorg/gradle/api/java/archives/Manifest;)V
+	public fun attributes (Ljava/util/Map;)Lorg/gradle/api/java/archives/Manifest;
+	public fun attributes (Ljava/util/Map;Ljava/lang/String;)Lorg/gradle/api/java/archives/Manifest;
+	public fun from (Ljava/lang/Object;Lgroovy/lang/Closure;)Lorg/gradle/api/java/archives/Manifest;
+	public fun from (Ljava/lang/Object;Lorg/gradle/api/Action;)Lorg/gradle/api/java/archives/Manifest;
+	public fun from ([Ljava/lang/Object;)Lorg/gradle/api/java/archives/Manifest;
+	public fun getAttributes ()Lorg/gradle/api/java/archives/Attributes;
+	public fun getEffectiveManifest ()Lorg/gradle/api/java/archives/Manifest;
+	public fun getSections ()Ljava/util/Map;
+	public fun writeTo (Ljava/lang/Object;)Lorg/gradle/api/java/archives/Manifest;
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
 	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ZZLjava/lang/String;)V

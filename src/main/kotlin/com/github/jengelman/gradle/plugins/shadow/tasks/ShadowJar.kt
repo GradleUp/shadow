@@ -154,7 +154,7 @@ public abstract class ShadowJar : Jar() {
    */
   @get:Input
   @get:Optional
-  public open val parentManifest: Property<Manifest> = objectFactory.property()
+  public open val parentManifest: Property<SerializableManifest> = objectFactory.property()
 
   /**
    * Enables auto relocation of packages in the dependencies.
@@ -515,7 +515,7 @@ public abstract class ShadowJar : Jar() {
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
-        task.parentManifest.convention(jarTask.map { it.manifest })
+        task.parentManifest.convention(jarTask.map { SerializableManifest(it.manifest) })
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
 
