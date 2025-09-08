@@ -42,6 +42,7 @@ import org.gradle.api.file.DuplicatesStrategy.INHERIT
 import org.gradle.api.file.DuplicatesStrategy.WARN
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
+import org.gradle.api.java.archives.Manifest
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -148,12 +149,12 @@ public abstract class ShadowJar : Jar() {
   }
 
   /**
-   * The [Jar] task whose manifest and other attributes should be inherited by this [ShadowJar].
-   * Typically set to the main jar task of the project.
+   * The [Manifest] should be inherited by this [ShadowJar].
+   * Typically set to the main jar task manifest of the project.
    */
   @get:Input
   @get:Optional
-  public open val parentJarTask: Property<Jar> = objectFactory.property()
+  public open val parentManifest: Property<Manifest> = objectFactory.property()
 
   /**
    * Enables auto relocation of packages in the dependencies.
@@ -459,10 +460,10 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectManifestAttrs() {
-    parentJarTask.orNull?.let { jarTask ->
-      manifest.inheritFrom(jarTask.manifest)
+    parentManifest.orNull?.let { parent ->
+      manifest.inheritFrom(parent)
 
-      val classPathAttr = jarTask.manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
+      val classPathAttr = parent.attributes[classPathAttributeKey]?.toString().orEmpty()
       val shadowFiles = project.files(project.configurations.shadow)
       if (!shadowFiles.isEmpty) {
         val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
@@ -514,7 +515,7 @@ public abstract class ShadowJar : Jar() {
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
-        task.parentJarTask.convention(jarTask)
+        task.parentManifest.convention(jarTask.map { it.manifest })
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
 

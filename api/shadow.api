@@ -207,7 +207,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
-	public fun getParentJarTask ()Lorg/gradle/api/provider/Property;
+	public fun getParentManifest ()Lorg/gradle/api/provider/Property;
 	public fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
 	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
