@@ -503,8 +503,13 @@ public abstract class ShadowJar : Jar() {
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
-        @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
-        task.manifest.inheritFrom(jarTask.get().manifest)
+
+        task.manifest = DefaultInheritManifest(
+          task.services.get(FileResolver::class.java),
+          @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
+          jarTask.get().manifest,
+        )
+
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
 

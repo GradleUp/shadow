@@ -10,7 +10,7 @@ import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
 internal class DefaultInheritManifest @JvmOverloads constructor(
   private val fileResolver: FileResolver,
-  private val internalManifest: DefaultManifest = DefaultManifest(fileResolver),
+  private val internalManifest: Manifest = DefaultManifest(fileResolver),
 ) : InheritManifest,
   Manifest by internalManifest {
   private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
