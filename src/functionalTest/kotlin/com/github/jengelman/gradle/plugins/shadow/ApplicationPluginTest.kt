@@ -177,8 +177,7 @@ class ApplicationPluginTest : BasePluginTest() {
     val result = runWithFailure(runShadowPath)
 
     assertThat(result.output).contains(
-      "Error: Could not find or load main class",
-      "Caused by: java.lang.ClassNotFoundException:",
+      "no main manifest attribute, in",
     )
   }
 
