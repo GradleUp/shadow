@@ -135,7 +135,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         val realClass = mainClassName.orNull
         // Inject the attribute if it is not already present.
         if (!task.manifest.attributes.contains(mainClassAttributeKey) && !realClass.isNullOrEmpty()) {
-          task.manifest.attributes[mainClassAttributeKey] = mainClassName.orNull
+          task.manifest.attributes[mainClassAttributeKey] = realClass
         }
       }
     }
