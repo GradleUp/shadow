@@ -16,6 +16,7 @@
   and `META-INF/groovy` will be merged into `META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule`.
 - Move injecting `Class-Path` manifest attr logic from `doFirst` into `copy`. ([#1720](https://github.com/GradleUp/shadow/pull/1720))
 - Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
+- Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
 
 ### Fixed
 

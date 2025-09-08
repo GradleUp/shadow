@@ -132,12 +132,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     tasks.shadowJar.configure { task ->
       task.inputs.property("mainClassName", mainClassName)
       task.doFirst("Set $mainClassAttributeKey attribute in the manifest") {
+        val realClass = mainClassName.orNull
         // Inject the attribute if it is not already present.
-        if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
-          val realClass = mainClassName.orNull
-          if (realClass.isNullOrEmpty()) {
-            error("The main class must be specified and not left empty in `application.mainClass` or manifest attributes.")
-          }
+        if (!task.manifest.attributes.contains(mainClassAttributeKey) && !realClass.isNullOrEmpty()) {
           task.manifest.attributes[mainClassAttributeKey] = realClass
         }
       }
