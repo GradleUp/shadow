@@ -18,6 +18,7 @@
 - Move injecting `Class-Path` manifest attr logic from `doFirst` into `copy`. ([#1720](https://github.com/GradleUp/shadow/pull/1720))
 - Move injecting `Main-Class` manifest attr logic from `doFirst` into `copy`. ([#1724](https://github.com/GradleUp/shadow/pull/1724))
 - Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
+- Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
 
 ### Fixed
 
