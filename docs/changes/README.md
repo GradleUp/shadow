@@ -8,6 +8,7 @@
 - Support relocating Groovy extensions in Module descriptors. ([#1705](https://github.com/GradleUp/shadow/pull/1705))
 - Add extensions for `Iterable<Relocator>`. ([#1710](https://github.com/GradleUp/shadow/pull/1710))
 - Support relocating list of types in `RelocatorRemapper`. ([#1714](https://github.com/GradleUp/shadow/pull/1714))
+- Add `mainClass` property into `ShadowJar`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
 
 ### Changed
 
@@ -15,6 +16,7 @@
   The Gradle Module descriptors (`org.codehaus.groovy.runtime.ExtensionModule` files) defined under `META-INF/services/`
   and `META-INF/groovy` will be merged into `META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule`.
 - Move injecting `Class-Path` manifest attr logic from `doFirst` into `copy`. ([#1720](https://github.com/GradleUp/shadow/pull/1720))
+- Move injecting `Main-Class` manifest attr logic from `doFirst` into `copy`. ([#1724](https://github.com/GradleUp/shadow/pull/1724))
 - Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
 
 ### Fixed
