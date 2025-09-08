@@ -40,7 +40,6 @@ import org.gradle.api.file.DuplicatesStrategy.FAIL
 import org.gradle.api.file.DuplicatesStrategy.INCLUDE
 import org.gradle.api.file.DuplicatesStrategy.INHERIT
 import org.gradle.api.file.DuplicatesStrategy.WARN
-import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty

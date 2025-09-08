@@ -8,7 +8,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="6"
+            line="8"
             column="1"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="7"
+            line="9"
             column="1"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="10"
+            line="12"
             column="1"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="11"
+            line="13"
             column="1"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="18"
+            line="20"
             column="44"/>
     </issue>
 
@@ -63,7 +63,7 @@
         errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="18"
+            line="20"
             column="44"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="37"
+            line="39"
             column="14"/>
     </issue>
 
@@ -180,22 +180,11 @@
     <issue
         id="InternalGradleApiUsage"
         message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.api.internal.file.FileResolver"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="43"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
         errorLine1="import org.gradle.api.internal.file.copy.CopyAction"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="44"
+            line="43"
             column="1"/>
     </issue>
 
