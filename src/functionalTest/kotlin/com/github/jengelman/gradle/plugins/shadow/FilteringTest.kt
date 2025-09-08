@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -161,6 +162,32 @@ class FilteringTest : BasePluginTest() {
         }
       """.trimIndent(),
     )
+
+    run(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        *junitEntries,
+        *manifestEntries,
+      )
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/671",
+  )
+  @Test
+  fun filterProjectThatVersionContainsPlus() {
+    writeClientAndServerModules(
+      serverShadowBlock = """
+        dependencies {
+          exclude(project(':client'))
+        }
+      """.trimIndent(),
+    )
+    path("client/build.gradle").appendText("version = '1.0.0+1'")
 
     run(serverShadowJarPath)
 

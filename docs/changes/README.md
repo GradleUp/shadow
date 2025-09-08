@@ -15,6 +15,10 @@
   The Gradle Module descriptors (`org.codehaus.groovy.runtime.ExtensionModule` files) defined under `META-INF/services/`
   and `META-INF/groovy` will be merged into `META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule`.
 
+### Fixed
+
+- Fix excluding dependencies whose versions contain `+`. ([#1597](https://github.com/GradleUp/shadow/pull/1597))
+
 ## [9.1.0](https://github.com/GradleUp/shadow/compare/9.1.0) - 2025-08-29
 
 ### Added
