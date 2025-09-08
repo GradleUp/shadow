@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgpVersion
-import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import org.gradle.api.Plugin
@@ -41,15 +40,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
 
       @OptIn(ExperimentalKotlinGradlePluginApi::class)
       target.mainRun {
-        // Fix cannot serialize object of type 'org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmRun'.
-        val mainClassName = provider { mainClass }
-        task.inputs.property("mainClassName", mainClassName)
-        task.doFirst("Set $mainClassAttributeKey attribute in the manifest") {
-          val realClass = mainClassName.get().orNull
-          if (!task.manifest.attributes.contains(mainClassAttributeKey) && !realClass.isNullOrEmpty()) {
-            task.manifest.attributes[mainClassAttributeKey] = realClass
-          }
-        }
+        task.mainClass.convention(mainClass)
       }
     }
   }

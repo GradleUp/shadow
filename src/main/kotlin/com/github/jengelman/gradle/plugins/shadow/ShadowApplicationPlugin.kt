@@ -6,7 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
-import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import org.gradle.api.GradleException
@@ -127,20 +126,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureShadowJarMainClass() {
-    // Default to empty string to avoid the error of the value not being configured yet.
-    val mainClassName = applicationExtension.mainClass.convention("")
     tasks.shadowJar.configure { task ->
-      task.inputs.property("mainClassName", mainClassName)
-      task.doFirst("Set $mainClassAttributeKey attribute in the manifest") {
-        // Inject the attribute if it is not already present.
-        if (!task.manifest.attributes.contains(mainClassAttributeKey)) {
-          val realClass = mainClassName.orNull
-          if (realClass.isNullOrEmpty()) {
-            error("The main class must be specified and not left empty in `application.mainClass` or manifest attributes.")
-          }
-          task.manifest.attributes[mainClassAttributeKey] = realClass
-        }
-      }
+      task.mainClass.convention(applicationExtension.mainClass)
     }
   }
 

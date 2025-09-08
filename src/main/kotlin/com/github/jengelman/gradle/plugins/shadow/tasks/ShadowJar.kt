@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -193,6 +194,18 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(option = "add-multi-release-attribute", description = "Adds the multi-release attribute to the manifest if any dependencies contain it.")
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
+
+  /**
+   * Main class attribute to add to the manifest of the shadow JAR.
+   *
+   * This property will be fell back if there is no explicit `Main-Class` attribute set for the [ShadowJar] task or the
+   * main [Jar] task.
+   *
+   * Defaults to `null`.
+   */
+  @get:Optional
+  @get:Input
+  public open val mainClass: Property<String> = objectFactory.property()
 
   @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
   @Internal
@@ -452,6 +465,12 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectManifestAttributes() {
+    mainClass.orNull?.let { value ->
+      if (!manifest.attributes.contains(mainClassAttributeKey) && value.isNotEmpty()) {
+        manifest.attributes[mainClassAttributeKey] = value
+      }
+    }
+
     val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
     val shadowFiles = shadowDependencies.get()
     if (!shadowFiles.isEmpty) {
