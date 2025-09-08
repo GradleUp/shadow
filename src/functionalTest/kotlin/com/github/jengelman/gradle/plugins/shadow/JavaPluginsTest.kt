@@ -724,7 +724,7 @@ class JavaPluginsTest : BasePluginTest() {
           }
         }
         $shadowJarTask {
-          manifest.inheritFrom(testJar.get().manifest)
+          manifest.from(testJar.get().manifest)
         }
       """.trimIndent(),
     )
