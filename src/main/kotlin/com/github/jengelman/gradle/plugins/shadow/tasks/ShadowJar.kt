@@ -198,7 +198,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Main class attribute to add to the manifest of the shadow JAR.
    *
-   * This property will be fell back if there is no explicit `Main-Class` attribute set for the [ShadowJar] task or the
+   * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar] task or the
    * main [Jar] task.
    *
    * Defaults to `null`.
