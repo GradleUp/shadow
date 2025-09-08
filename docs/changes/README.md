@@ -14,6 +14,7 @@
 - Merge Gradle Module descriptors into the modern `META-INF` path. ([#1706](https://github.com/GradleUp/shadow/pull/1706))  
   The Gradle Module descriptors (`org.codehaus.groovy.runtime.ExtensionModule` files) defined under `META-INF/services/`
   and `META-INF/groovy` will be merged into `META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule`.
+- Move injecting `Class-Path` manifest attr login from `doFirst` into `copy`. ([#1720](https://github.com/GradleUp/shadow/pull/1720))
 
 ### Fixed
 
