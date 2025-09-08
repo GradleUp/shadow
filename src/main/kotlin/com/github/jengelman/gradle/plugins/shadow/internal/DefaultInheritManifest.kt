@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.InheritManifest
