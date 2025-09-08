@@ -5,10 +5,14 @@ import org.gradle.api.java.archives.Manifest
 import org.gradle.api.java.archives.ManifestMergeSpec
 
 @Deprecated(
-  message = "This is deprecated and will be removed in a future release. `inheritFrom` should be replaced by `from`.",
+  message = "This is deprecated and will be removed in a future release.",
   replaceWith = ReplaceWith("Manifest", "org.gradle.api.java.archives.Manifest"),
 )
 public interface InheritManifest : Manifest {
+  @Deprecated(
+    message = "This is deprecated and will be removed in a future release.",
+    replaceWith = ReplaceWith("from"),
+  )
   public fun inheritFrom(vararg inheritPaths: Any) {
     inheritFrom(inheritPaths = inheritPaths, action = {})
   }
