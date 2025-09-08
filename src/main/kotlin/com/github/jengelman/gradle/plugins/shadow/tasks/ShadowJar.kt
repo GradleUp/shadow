@@ -72,7 +72,7 @@ public abstract class ShadowJar : Jar() {
 
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
     duplicatesStrategy = EXCLUDE
-    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
+    manifest = DefaultInheritManifest(project)
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       transformers.get().any { !it::class.hasAnnotation<CacheableTransformer>() } ||
@@ -505,7 +505,7 @@ public abstract class ShadowJar : Jar() {
         )
 
         task.manifest = DefaultInheritManifest(
-          task.services.get(FileResolver::class.java),
+          project,
           @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
           jarTask.get().manifest,
         )

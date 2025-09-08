@@ -8,7 +8,18 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="5"
+            line="6"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.project.DefaultProject"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="7"
             column="1"/>
     </issue>
 
@@ -19,7 +30,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="8"
+            line="10"
             column="1"/>
     </issue>
 
@@ -30,8 +41,30 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="9"
+            line="11"
             column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
+        errorLine1="  private val fileResolver: FileResolver = (project as DefaultProject).services.get(FileResolver::class.java),"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="18"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
+        errorLine1="  private val fileResolver: FileResolver = (project as DefaultProject).services.get(FileResolver::class.java),"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="18"
+            column="44"/>
     </issue>
 
     <issue
@@ -41,7 +74,7 @@
         errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="31"
+            line="37"
             column="14"/>
     </issue>
 
@@ -164,72 +197,6 @@
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
             line="44"
             column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
-        errorLine1="    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="75"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
-        errorLine1="    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="75"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
-        errorLine1="          task.services.get(FileResolver::class.java),"
-        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="508"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
-        errorLine1="          task.services.get(FileResolver::class.java),"
-        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="508"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method getServices from org.gradle.api.internal.AbstractTask)"
-        errorLine1="          task.services.get(FileResolver::class.java),"
-        errorLine2="          ~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="508"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method getServices from org.gradle.api.internal.AbstractTask)"
-        errorLine1="          task.services.get(FileResolver::class.java),"
-        errorLine2="          ~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="508"
-            column="11"/>
     </issue>
 
 </issues>
