@@ -195,6 +195,7 @@ public abstract class ShadowJar : Jar() {
   @get:Option(option = "add-multi-release-attribute", description = "Adds the multi-release attribute to the manifest if any dependencies contain it.")
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
+  @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
