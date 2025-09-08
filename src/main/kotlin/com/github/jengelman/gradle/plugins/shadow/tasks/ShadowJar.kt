@@ -64,6 +64,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  private val shadowDependencies = project.provider { project.files(project.configurations.shadow) }
 
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
@@ -71,7 +72,7 @@ public abstract class ShadowJar : Jar() {
 
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
     duplicatesStrategy = EXCLUDE
-    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
+    manifest = DefaultInheritManifest(project)
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       transformers.get().any { !it::class.hasAnnotation<CacheableTransformer>() } ||
@@ -369,7 +370,7 @@ public abstract class ShadowJar : Jar() {
         }
       }
     }
-    injectMultiReleaseAttrIfPresent()
+    injectManifestAttributes()
     super.copy()
   }
 
@@ -450,7 +451,14 @@ public abstract class ShadowJar : Jar() {
       }
     }
 
-  private fun injectMultiReleaseAttrIfPresent() {
+  private fun injectManifestAttributes() {
+    val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
+    val shadowFiles = shadowDependencies.get()
+    if (!shadowFiles.isEmpty) {
+      val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
+      manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
+    }
+
     if (addMultiReleaseAttribute.get()) {
       logger.info("Adding $multiReleaseAttributeKey attribute to the manifest if any dependencies contain it.")
     } else {
@@ -496,16 +504,11 @@ public abstract class ShadowJar : Jar() {
           "module-info.class",
         )
 
-        @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
-        task.manifest.inheritFrom(jarTask.get().manifest)
-        val classPathAttr = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
-        val shadowFiles = files(configurations.shadow)
-        task.doFirst("Set $classPathAttributeKey attribute in the manifest") {
-          if (!shadowFiles.isEmpty) {
-            val attrs = listOf(classPathAttr.get()) + shadowFiles.map { it.name }
-            task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
-          }
-        }
+        task.manifest = DefaultInheritManifest(
+          project,
+          @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
+          jarTask.get().manifest,
+        )
 
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
