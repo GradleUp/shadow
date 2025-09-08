@@ -64,6 +64,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  private val shadowDependencies = project.provider { project.files(project.configurations.shadow) }
 
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
@@ -452,7 +453,7 @@ public abstract class ShadowJar : Jar() {
 
   private fun injectManifestAttributes() {
     val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
-    val shadowFiles = project.files(project.configurations.shadow)
+    val shadowFiles = shadowDependencies.get()
     if (!shadowFiles.isEmpty) {
       val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
       manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
