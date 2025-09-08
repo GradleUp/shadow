@@ -122,7 +122,7 @@ Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the foll
 Class-Path: /libs/foo.jar
 ```
 
-If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`][Jar] task, the `from`
+If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`][Jar] task, the `inheritFrom`
 methods on the `shadowJar.manifest` object can be used to configure the upstream.
 
 === "Kotlin"
@@ -135,7 +135,7 @@ methods on the `shadowJar.manifest` object can be used to configure the upstream
     }
 
     tasks.shadowJar {
-      manifest.from(testJar.get().manifest)
+      manifest.inheritFrom(testJar.get().manifest)
     }
     ```
 
@@ -149,7 +149,7 @@ methods on the `shadowJar.manifest` object can be used to configure the upstream
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      manifest.from(testJar.get().manifest)
+      manifest.inheritFrom(testJar.get().manifest)
     }
     ```
 
