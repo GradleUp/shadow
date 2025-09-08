@@ -109,9 +109,19 @@ public interface DependencyFilter : Serializable {
 
     private fun Dependency.toSpec(): Spec<ResolvedDependency> {
       return Spec<ResolvedDependency> { resolvedDependency ->
-        (group == null || resolvedDependency.moduleGroup.matches(group!!.toRegex())) &&
-          resolvedDependency.moduleName.matches(name.toRegex()) &&
-          (version == null || resolvedDependency.moduleVersion.matches(version!!.toRegex()))
+        val groupMatch = group?.let {
+          it == resolvedDependency.moduleGroup || resolvedDependency.moduleGroup.matches(it.toRegex())
+        } ?: true
+        val nameMatch = name.let {
+          it == resolvedDependency.moduleName || resolvedDependency.moduleName.matches(it.toRegex())
+        }
+        val versionMatch = version?.let {
+          // Version like `1.0.0+1` can't be converted to regex directly because `+` is a special character in regex.
+          // So we check for exact match first, then fallback to regex match.
+          it == resolvedDependency.moduleVersion || resolvedDependency.moduleVersion.matches(it.toRegex())
+        } ?: true
+
+        groupMatch && nameMatch && versionMatch
       }
     }
   }
