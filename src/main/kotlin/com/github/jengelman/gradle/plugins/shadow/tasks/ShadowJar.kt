@@ -148,6 +148,14 @@ public abstract class ShadowJar : Jar() {
   }
 
   /**
+   * The [Jar] task whose manifest and other attributes should be inherited by this [ShadowJar].
+   * Typically set to the main jar task of the project.
+   */
+  @get:Input
+  @get:Optional
+  public open val parentJarTask: Property<Jar> = objectFactory.property()
+
+  /**
    * Enables auto relocation of packages in the dependencies.
    *
    * Defaults to `false`.
@@ -369,7 +377,7 @@ public abstract class ShadowJar : Jar() {
         }
       }
     }
-    injectMultiReleaseAttrIfPresent()
+    injectManifestAttrs()
     super.copy()
   }
 
@@ -450,7 +458,18 @@ public abstract class ShadowJar : Jar() {
       }
     }
 
-  private fun injectMultiReleaseAttrIfPresent() {
+  private fun injectManifestAttrs() {
+    parentJarTask.orNull?.let { jarTask ->
+      manifest.inheritFrom(jarTask.manifest)
+
+      val classPathAttr = jarTask.manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
+      val shadowFiles = project.files(project.configurations.shadow)
+      if (!shadowFiles.isEmpty) {
+        val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
+        manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
+      }
+    }
+
     if (addMultiReleaseAttribute.get()) {
       logger.info("Adding $multiReleaseAttributeKey attribute to the manifest if any dependencies contain it.")
     } else {
@@ -495,18 +514,7 @@ public abstract class ShadowJar : Jar() {
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
-
-        @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
-        task.manifest.inheritFrom(jarTask.get().manifest)
-        val classPathAttr = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
-        val shadowFiles = files(configurations.shadow)
-        task.doFirst("Set $classPathAttributeKey attribute in the manifest") {
-          if (!shadowFiles.isEmpty) {
-            val attrs = listOf(classPathAttr.get()) + shadowFiles.map { it.name }
-            task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
-          }
-        }
-
+        task.parentJarTask.convention(jarTask)
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
 
