@@ -466,13 +466,15 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectManifestAttributes() {
-    if (manifest.attributes.contains(mainClassAttributeKey)) {
-      logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.")
-    } else {
-      val mainClassValue = mainClass.orNull
-      if (mainClassValue.isNullOrEmpty()) {
+    val mainClassValue = mainClass.orNull
+    when {
+      manifest.attributes.contains(mainClassAttributeKey) -> {
+        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.")
+      }
+      mainClassValue.isNullOrEmpty() -> {
         logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty.")
-      } else {
+      }
+      else -> {
         manifest.attributes[mainClassAttributeKey] = mainClassValue
         logger.info("Adding $mainClassAttributeKey attribute to the manifest with value '$mainClassValue'.")
       }
