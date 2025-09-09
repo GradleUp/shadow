@@ -19,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -31,7 +32,9 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
+import kotlin.io.path.copyToRecursively
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
@@ -1012,6 +1015,30 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       getMainAttr(mainClassAttributeKey).isEqualTo(expected)
+    }
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/882",
+  )
+  @Test
+  @ExperimentalPathApi
+  fun compatGradleArtifactTransform() {
+    requireResourceAsPath("fixtures/gradle-artifact-transform").copyToRecursively(
+      target = projectRoot,
+      followLinks = false,
+      overwrite = true,
+    )
+
+    run(":lib:jar")
+    run(":app:$SHADOW_JAR_TASK_NAME")
+
+    assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
+      containsAtLeast(
+        "com/company/Main.class",
+        "com/company/Utils.class",
+        manifestEntry,
+      )
     }
   }
 
