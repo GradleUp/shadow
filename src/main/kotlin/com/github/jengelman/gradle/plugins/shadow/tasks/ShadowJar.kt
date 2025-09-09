@@ -63,7 +63,8 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 @CacheableTask
 public abstract class ShadowJar : Jar() {
-  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  @get:Internal
+  internal val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
   private val shadowDependencies = project.provider { project.files(project.configurations.shadow) }
 
   init {
@@ -540,6 +541,17 @@ public abstract class ShadowJar : Jar() {
 
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
+
+        val dependencyFilterExcluded = task.dependencyFilter.map {
+          if (it.addExcludedIntoShadowConfiguration.get()) it.excludedDependencies else files()
+        }
+        val minimizeExcluded = provider {
+          task.dependencyFilterForMinimize.let {
+            if (it.addExcludedIntoShadowConfiguration.get()) it.excludedDependencies else files()
+          }
+        }
+        dependencies.add("shadow", dependencyFilterExcluded)
+        dependencies.add("shadow", minimizeExcluded)
 
         action(task)
       }

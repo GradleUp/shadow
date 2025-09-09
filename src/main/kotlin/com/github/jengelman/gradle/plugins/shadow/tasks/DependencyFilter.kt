@@ -9,10 +9,12 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 
 // DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
@@ -26,6 +28,9 @@ public interface DependencyFilter : Serializable {
    */
   @get:Input
   public val addExcludedIntoShadowConfiguration: Property<Boolean>
+
+  @get:Classpath
+  public val excludedDependencies: ConfigurableFileCollection
 
   /**
    * Resolve a [configuration] against the [include]/[exclude] rules in the filter.
@@ -62,6 +67,7 @@ public interface DependencyFilter : Serializable {
     @Transient protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
     @Transient protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
     @Transient override val addExcludedIntoShadowConfiguration: Property<Boolean> = project.objects.property(false),
+    @Transient override val excludedDependencies: ConfigurableFileCollection = project.objects.fileCollection(),
   ) : DependencyFilter {
 
     protected abstract fun resolve(
@@ -78,12 +84,8 @@ public interface DependencyFilter : Serializable {
         includedDependencies = includes,
         excludedDependencies = excludes,
       )
-      return project.files(configuration.files) -
-        project.files(excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }).also {
-          if (addExcludedIntoShadowConfiguration.get()) {
-            project.configurations.shadow.get() + it
-          }
-        }
+      excludedDependencies.from(excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) })
+      return project.files(configuration.files) - excludedDependencies
     }
 
     override fun resolve(configurations: Collection<Configuration>): FileCollection {

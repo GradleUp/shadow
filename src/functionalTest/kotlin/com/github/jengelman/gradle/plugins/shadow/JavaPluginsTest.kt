@@ -515,7 +515,7 @@ class JavaPluginsTest : BasePluginTest() {
       containsOnly(
         *manifestEntries,
       )
-      getMainAttr(classPathAttributeKey).isEqualTo("a-1.0.jar b-1.0.jar")
+      getMainAttr(classPathAttributeKey).isEqualTo("b-1.0.jar a-1.0.jar")
     }
   }
 
