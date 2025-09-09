@@ -490,6 +490,36 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Issue(
+    "https://github.com/GradleUp/shadow/issues/265",
+  )
+  @Test
+  fun addExcludedDependencyIntoShadowConfiguration() {
+    projectScript.appendText(
+      """
+        dependencies {
+          shadow 'my:a:1.0'
+          implementation 'my:b:1.0'
+        }
+        $shadowJarTask {
+          dependencies {
+            addExcludedIntoShadowConfiguration = true
+            exclude(dependency('my:b:1.0'))
+          }
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        *manifestEntries,
+      )
+      getMainAttr(classPathAttributeKey).isEqualTo("a-1.0.jar b-1.0.jar")
+    }
+  }
+
+  @Issue(
     "https://github.com/GradleUp/shadow/issues/203",
   )
   @ParameterizedTest
