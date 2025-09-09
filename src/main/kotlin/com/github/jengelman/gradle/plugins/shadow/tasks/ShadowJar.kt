@@ -171,6 +171,19 @@ public abstract class ShadowJar : Jar() {
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
+   * Main class attribute to add to manifest.
+   *
+   * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar]
+   * task or the main [Jar] task.
+   *
+   * Defaults to `null`.
+   */
+  @get:Optional
+  @get:Input
+  @get:Option(option = "main-class", description = "Main class attribute to add to manifest.")
+  public open val mainClass: Property<String> = objectFactory.property()
+
+  /**
    * Fails build if the ZIP entries in the shadowed JAR are duplicate.
    *
    * This is related to setting [getDuplicatesStrategy] to [FAIL] but there are some differences:
@@ -194,18 +207,6 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(option = "add-multi-release-attribute", description = "Adds the multi-release attribute to the manifest if any dependencies contain it.")
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
-
-  /**
-   * Main class attribute to add to the manifest of the shadow JAR.
-   *
-   * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar] task or the
-   * main [Jar] task.
-   *
-   * Defaults to `null`.
-   */
-  @get:Optional
-  @get:Input
-  public open val mainClass: Property<String> = objectFactory.property()
 
   @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
   @Internal
@@ -465,9 +466,15 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectManifestAttributes() {
-    mainClass.orNull?.let { value ->
-      if (!manifest.attributes.contains(mainClassAttributeKey) && value.isNotEmpty()) {
-        manifest.attributes[mainClassAttributeKey] = value
+    if (manifest.attributes.contains(mainClassAttributeKey)) {
+      logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.")
+    } else {
+      val mainClassValue = mainClass.orNull
+      if (mainClassValue.isNullOrEmpty()) {
+        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty.")
+      } else {
+        manifest.attributes[mainClassAttributeKey] = mainClassValue
+        logger.info("Adding $mainClassAttributeKey attribute to the manifest with value '$mainClassValue'.")
       }
     }
 

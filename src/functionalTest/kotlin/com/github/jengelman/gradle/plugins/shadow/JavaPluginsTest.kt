@@ -104,6 +104,7 @@ class JavaPluginsTest : BasePluginTest() {
       assertThat(enableAutoRelocation.get()).isFalse()
       assertThat(failOnDuplicateEntries.get()).isFalse()
       assertThat(minimizeJar.get()).isFalse()
+      assertThat(mainClass.orNull).isNull()
 
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
       assertThat(configurations.get()).all {
@@ -126,6 +127,7 @@ class JavaPluginsTest : BasePluginTest() {
       "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
       "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
       "--no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries",
+      "--main-class     Main class attribute to add to manifest.",
       "--minimize-jar     Minimizes the jar by removing unused classes.",
       "--no-minimize-jar     Disables option --minimize-jar.",
       "--relocation-prefix     Prefix used for auto relocation of packages in the dependencies.",

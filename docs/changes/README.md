@@ -9,6 +9,12 @@
 - Add extensions for `Iterable<Relocator>`. ([#1710](https://github.com/GradleUp/shadow/pull/1710))
 - Support relocating list of types in `RelocatorRemapper`. ([#1714](https://github.com/GradleUp/shadow/pull/1714))
 - Add `mainClass` property into `ShadowJar`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
+  ```kotlin
+  tasks.shadowJar {
+    // This property will be used as a fallback if there is no explicit `Main-Class` attribute set.
+    mainClass = "my.Main"
+  }
+  ```
 
 ### Changed
 
