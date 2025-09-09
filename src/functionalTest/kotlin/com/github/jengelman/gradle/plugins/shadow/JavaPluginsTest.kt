@@ -23,11 +23,14 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.testGradleVersion
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
+import kotlin.io.path.copyToRecursively
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
@@ -946,6 +949,21 @@ class JavaPluginsTest : BasePluginTest() {
     }
 
     assertThat(outputShadowedJar).useAll { getMainAttr(mainClassAttributeKey).isEqualTo(expected) }
+  }
+
+  @Issue("https://github.com/GradleUp/shadow/issues/882")
+  @Test
+  @ExperimentalPathApi
+  fun compatGradleArtifactTransform() {
+    requireResourceAsPath("fixtures/gradle-artifact-transform")
+      .copyToRecursively(target = projectRoot, followLinks = false, overwrite = true)
+
+    runWithSuccess(":lib:jar")
+    runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
+
+    assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
+      containsAtLeast("com/company/Main.class", "com/company/Utils.class", manifestEntry)
+    }
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {
