@@ -154,6 +154,7 @@ Here are the options that can be passed to the `shadowJar`:
 --no-enable-auto-relocation         Disables option --enable-auto-relocation.
 --fail-on-duplicate-entries         Fails build if the ZIP entries in the shadowed JAR are duplicate.
 --no-fail-on-duplicate-entries      Disables option --fail-on-duplicate-entries.
+--main-class                        Main class attribute to add to manifest.
 --minimize-jar                      Minimizes the jar by removing unused classes.
 --no-minimize-jar                   Disables option --minimize-jar.
 --relocation-prefix                 Prefix used for auto relocation of packages in the dependencies.

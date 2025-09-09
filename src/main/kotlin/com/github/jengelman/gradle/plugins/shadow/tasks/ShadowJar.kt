@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -168,6 +169,19 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(option = "relocation-prefix", description = "Prefix used for auto relocation of packages in the dependencies.")
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
+
+  /**
+   * Main class attribute to add to manifest.
+   *
+   * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar]
+   * task or the main [Jar] task.
+   *
+   * Defaults to `null`.
+   */
+  @get:Optional
+  @get:Input
+  @get:Option(option = "main-class", description = "Main class attribute to add to manifest.")
+  public open val mainClass: Property<String> = objectFactory.property()
 
   /**
    * Fails build if the ZIP entries in the shadowed JAR are duplicate.
@@ -452,6 +466,20 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectManifestAttributes() {
+    val mainClassValue = mainClass.orNull
+    when {
+      manifest.attributes.contains(mainClassAttributeKey) -> {
+        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.")
+      }
+      mainClassValue.isNullOrEmpty() -> {
+        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty.")
+      }
+      else -> {
+        manifest.attributes[mainClassAttributeKey] = mainClassValue
+        logger.info("Adding $mainClassAttributeKey attribute to the manifest with value '$mainClassValue'.")
+      }
+    }
+
     val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
     val shadowFiles = shadowDependencies.get()
     if (!shadowFiles.isEmpty) {
