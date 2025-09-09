@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.CONFIGURATION_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import java.io.Serializable
 import org.gradle.api.Project
@@ -81,7 +81,7 @@ public interface DependencyFilter : Serializable {
       return project.files(configuration.files) -
         project.files(excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }).also {
           if (addExcludedIntoShadowConfiguration.get()) {
-            project.dependencies.add(CONFIGURATION_NAME, it)
+            project.configurations.shadow.get() + it
           }
         }
     }
