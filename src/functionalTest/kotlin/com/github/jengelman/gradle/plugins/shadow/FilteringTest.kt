@@ -12,8 +12,8 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class FilteringTest : BasePluginTest() {
   @BeforeEach
-  override fun setup() {
-    super.setup()
+  override fun beforeEach() {
+    super.beforeEach()
     projectScript.appendText(
       """
         dependencies {

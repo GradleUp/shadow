@@ -8,8 +8,8 @@ import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseTransformerTest : BasePluginTest() {
   @BeforeEach
-  override fun setup() {
-    super.setup()
+  override fun beforeEach() {
+    super.beforeEach()
     projectScript.appendText(
       """
         $shadowJarTask {

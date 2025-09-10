@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test
 
 class GroovyPluginTest : BasePluginTest() {
   @BeforeEach
-  override fun setup() {
-    super.setup()
+  override fun beforeEach() {
+    super.beforeEach()
     val projectBuildScript = getDefaultProjectBuildScript(
       plugin = "groovy",
       withGroup = true,
