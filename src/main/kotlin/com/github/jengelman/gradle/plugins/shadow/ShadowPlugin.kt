@@ -6,19 +6,17 @@ import com.github.jengelman.gradle.plugins.shadow.internal.findOptionalProperty
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.ApplicationPlugin
-import org.gradle.api.plugins.JavaPlugin
 
 public abstract class ShadowPlugin : Plugin<Project> {
 
   override fun apply(project: Project): Unit = with(project.plugins) {
     apply(ShadowBasePlugin::class.java)
-    @Suppress("WithTypeWithoutConfigureEach")
-    withType(JavaPlugin::class.java) {
+    // org.gradle.api.plugins.JavaPlugin
+    withId("org.gradle.java") {
       apply(ShadowJavaPlugin::class.java)
     }
-    @Suppress("WithTypeWithoutConfigureEach")
-    withType(ApplicationPlugin::class.java) {
+    // org.gradle.api.plugins.ApplicationPlugin
+    withId("org.gradle.application") {
       apply(ShadowApplicationPlugin::class.java)
     }
     withId(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
