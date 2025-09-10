@@ -197,6 +197,10 @@ class SimpleRelocatorTest {
     relocator = SimpleRelocator("org.foo", "private.stuff")
     assertThat(relocator.relocatePath("org/foo/bar/Class.class"))
       .isEqualTo("private/stuff/bar/Class.class")
+
+    relocator = SimpleRelocator("org.foo", "org.foo.\\${'$'}internal\\$")
+    assertThat(relocator.relocatePath("org/foo/bar/Class.class"))
+      .isEqualTo("org/foo/${'$'}internal$/bar/Class.class")
   }
 
   @Test
@@ -208,6 +212,10 @@ class SimpleRelocatorTest {
     relocator = SimpleRelocator("org.foo", "private.stuff")
     assertThat(relocator.relocateClass("org.foo.bar.Class"))
       .isEqualTo("private.stuff.bar.Class")
+
+    relocator = SimpleRelocator("org.foo", "org.foo.\\${'$'}internal\\$")
+    assertThat(relocator.relocateClass("org.foo.bar.Class"))
+      .isEqualTo("org.foo.${'$'}internal$.bar.Class")
   }
 
   @Test
