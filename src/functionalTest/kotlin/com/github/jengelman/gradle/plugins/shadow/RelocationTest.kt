@@ -593,9 +593,12 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/211",
+  )
   @Test
   fun dollarPatterns() {
-    val relocatedMain = "com.my.internal.${'$'}guava$.${'$'}Main"
+    val relocatedMain = "com.my.internal.${'$'}guava$.Main"
     writeClass(
       packageName = "com.google.common",
     ) {
@@ -614,7 +617,7 @@ class RelocationTest : BasePluginTest() {
           manifest {
             attributes '$mainClassAttributeKey': '$relocatedMain'
           }
-          relocate('com.google.common', 'com.my.internal.${'$'}guava$')
+          relocate('com.google.common', 'com.my.internal.\\${'$'}guava\\$')
         }
       """.trimIndent(),
     )
@@ -628,7 +631,7 @@ class RelocationTest : BasePluginTest() {
         "com/my/",
         "com/my/internal/",
         "com/my/internal/\$guava$/",
-        "com/my/internal/\$guava$/\$Main.class",
+        "com/my/internal/\$guava$/Main.class",
         *manifestEntries,
       )
     }
