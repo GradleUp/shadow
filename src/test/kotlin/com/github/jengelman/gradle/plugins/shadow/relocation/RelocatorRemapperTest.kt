@@ -36,6 +36,22 @@ class RelocatorRemapperTest {
       Arguments.of("(Lorg/package/ClassA;Lorg/package/ClassB;)", "(Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;)"),
       // Method return types.
       Arguments.of("()Lorg/package/ClassA;Lorg/package/ClassB;", "()Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;"),
+      // void method(byte arg1, org.package.ClassA arg2)
+      Arguments.of("(BLorg/package/ClassA;)V", "(BLshadow/org/package/ClassA;)V"),
+      // void method(char arg1, org.package.ClassA arg2)
+      Arguments.of("(CLorg/package/ClassA;)V", "(CLshadow/org/package/ClassA;)V"),
+      // void method(double arg1, org.package.ClassA arg2)
+      Arguments.of("(DLorg/package/ClassA;)V", "(DLshadow/org/package/ClassA;)V"),
+      // void method(float arg1, org.package.ClassA arg2)
+      Arguments.of("(FLorg/package/ClassA;)V", "(FLshadow/org/package/ClassA;)V"),
+      // void method(int arg1, org.package.ClassA arg2)
+      Arguments.of("(ILorg/package/ClassA;)V", "(ILshadow/org/package/ClassA;)V"),
+      // void method(long arg1, org.package.ClassA arg2)
+      Arguments.of("(JLorg/package/ClassA;)V", "(JLshadow/org/package/ClassA;)V"),
+      // void method(short arg1, org.package.ClassA arg2)
+      Arguments.of("(SLorg/package/ClassA;)V", "(SLshadow/org/package/ClassA;)V"),
+      // void method(boolean arg1, org.package.ClassA arg2)
+      Arguments.of("(ZLorg/package/ClassA;)V", "(ZLshadow/org/package/ClassA;)V"),
     )
   }
 }
