@@ -114,25 +114,16 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
   override fun relocatePath(context: RelocatePathContext): String {
     val path = context.path
-    val unescaped = if (rawString) {
-      path.replace(pathPattern.toRegex(), escapeSubstitution(shadedPathPattern))
+    return if (rawString) {
+      path.replace(pathPattern.toRegex(), shadedPathPattern)
     } else {
-      path.replaceFirst(pathPattern.toRegex(), escapeSubstitution(shadedPathPattern))
+      path.replaceFirst(pathPattern.toRegex(), shadedPathPattern)
     }
-    return unescapeRelocationResult(unescaped, shadedPathPattern, '/')
   }
 
   override fun relocateClass(context: RelocateClassContext): String {
     val clazz = context.className
-    return if (rawString) {
-      clazz
-    } else {
-      unescapeRelocationResult(
-        clazz.replaceFirst(pattern.toRegex(), escapeSubstitution(shadedPattern)),
-        shadedPattern,
-        '.',
-      )
-    }
+    return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
   }
 
   /**
@@ -181,9 +172,6 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   private companion object {
-    private const val TOKEN_DOLLAR = "$"
-    private const val ESCAPE_TOKEN_DOLLAR = "__DOLLAR__"
-
     /**
      * Match dot, slash or space at end of string
      */
@@ -205,28 +193,6 @@ public open class SimpleRelocator @JvmOverloads constructor(
         "|" +
         "([{}(=;,]|\\*/) $",
     )
-
-    fun escapeSubstitution(pattern: String): String {
-      return pattern.replace(TOKEN_DOLLAR, ESCAPE_TOKEN_DOLLAR)
-    }
-
-    fun unescapeRelocationResult(
-      escapedResult: String,
-      patternSubstitution: String,
-      pathSeparator: Char,
-    ): String {
-      var result = escapedResult.replace(ESCAPE_TOKEN_DOLLAR, TOKEN_DOLLAR)
-      val endsWithDollar = patternSubstitution.endsWith(TOKEN_DOLLAR)
-      if (endsWithDollar) {
-        val indexOfSeparator = result.lastIndexOf(pathSeparator)
-        if (indexOfSeparator > 0) {
-          val builder = StringBuilder(result)
-          builder.insert(indexOfSeparator + 1, TOKEN_DOLLAR)
-          result = builder.toString()
-        }
-      }
-      return result
-    }
 
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
