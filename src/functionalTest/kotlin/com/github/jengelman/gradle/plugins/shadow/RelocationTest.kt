@@ -593,6 +593,50 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
+  @Test
+  fun dollarPatterns() {
+    val relocatedMain = "com.my.internal.${'$'}guava$.${'$'}Main"
+    writeClass(
+      packageName = "com.google.common",
+    ) {
+      """
+        package com.google.common;
+        public class Main {
+          public static void main(String[] args) {
+            System.out.println("The class is " + Main.class.getName());
+          }
+        }
+      """.trimIndent()
+    }
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          manifest {
+            attributes '$mainClassAttributeKey': '$relocatedMain'
+          }
+          relocate('com.google.common', 'com.my.internal.${'$'}guava$')
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "com/",
+        "com/my/",
+        "com/my/internal/",
+        "com/my/internal/\$guava$/",
+        "com/my/internal/\$guava$/\$Main.class",
+        *manifestEntries,
+      )
+    }
+    assertThat(result).contains(
+      "The class is $relocatedMain",
+    )
+  }
+
   private fun writeClassWithStringRef() {
     writeClass {
       """
