@@ -27,13 +27,13 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   private lateinit var tempJar: Path
 
   @BeforeEach
-  override fun setup() {
-    super.setup()
+  override fun beforeEach() {
+    super.beforeEach()
     tempJar = createTempFile("shade.", ".jar")
   }
 
   @AfterEach
-  fun cleanup() {
+  fun afterEach() {
     tempJar.deleteExisting()
   }
 

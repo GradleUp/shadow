@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test
 
 class ScalaPluginTest : BasePluginTest() {
   @BeforeEach
-  override fun setup() {
-    super.setup()
+  override fun beforeEach() {
+    super.beforeEach()
     val projectBuildScript = getDefaultProjectBuildScript(
       plugin = "scala",
       withGroup = true,

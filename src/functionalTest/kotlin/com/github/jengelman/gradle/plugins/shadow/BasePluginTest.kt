@@ -63,7 +63,7 @@ abstract class BasePluginTest {
   val outputServerShadowedJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   @BeforeAll
-  open fun doFirst() {
+  fun beforeAll() {
     localRepo = AppendableMavenRepository(
       createTempDirectory().resolve("local-maven-repo").createDirectories(),
       runner(projectDir = null),
@@ -124,18 +124,18 @@ abstract class BasePluginTest {
   }
 
   @BeforeEach
-  open fun setup() {
+  open fun beforeEach() {
     projectScript.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
     settingsScript.writeText(getDefaultSettingsBuildScript())
   }
 
   @AfterEach
-  fun cleanup() {
+  fun afterEach() {
     println(projectScript.readText())
   }
 
   @AfterAll
-  fun doLast() {
+  fun afterAll() {
     @OptIn(ExperimentalPathApi::class)
     localRepo.root.deleteRecursively()
   }

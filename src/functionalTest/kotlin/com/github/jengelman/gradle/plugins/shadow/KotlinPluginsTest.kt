@@ -19,8 +19,8 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class KotlinPluginsTest : BasePluginTest() {
   @BeforeEach
-  override fun setup() {
-    super.setup()
+  override fun beforeEach() {
+    super.beforeEach()
     val projectBuildScript = getDefaultProjectBuildScript(
       plugin = "org.jetbrains.kotlin.multiplatform",
       withGroup = true,
