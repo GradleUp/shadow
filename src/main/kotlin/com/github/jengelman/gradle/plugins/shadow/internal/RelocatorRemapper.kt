@@ -65,6 +65,9 @@ internal class RelocatorRemapper(
   }
 
   private companion object {
-    val classPattern: Pattern = Pattern.compile("([\\[()]*)?L([^;]+);?")
+    /**
+     * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
+     */
+    val classPattern: Pattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+);?")
   }
 }
