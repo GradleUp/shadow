@@ -20,6 +20,13 @@ class RelocatorRemapperTest {
   }
 
   private companion object {
+    val primitiveTypes = setOf('B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z')
+
+    val primitiveTypeArguments = primitiveTypes.map {
+      // Methods like `void method(boolean arg1, org.package.ClassA arg2)`
+      Arguments.of("(${it}Lorg/package/ClassA;)V", "(${it}Lshadow/org/package/ClassA;)V")
+    }
+
     @JvmStatic
     fun classSignatureStringConstants() = listOf(
       // Normal class.
@@ -36,6 +43,6 @@ class RelocatorRemapperTest {
       Arguments.of("(Lorg/package/ClassA;Lorg/package/ClassB;)", "(Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;)"),
       // Method return types.
       Arguments.of("()Lorg/package/ClassA;Lorg/package/ClassB;", "()Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;"),
-    )
+    ) + primitiveTypeArguments
   }
 }
