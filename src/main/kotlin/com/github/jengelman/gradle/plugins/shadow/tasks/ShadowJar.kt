@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -40,7 +41,6 @@ import org.gradle.api.file.DuplicatesStrategy.FAIL
 import org.gradle.api.file.DuplicatesStrategy.INCLUDE
 import org.gradle.api.file.DuplicatesStrategy.INHERIT
 import org.gradle.api.file.DuplicatesStrategy.WARN
-import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
@@ -64,6 +64,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  private val shadowDependencies = project.provider { project.files(project.configurations.shadow) }
 
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
@@ -71,7 +72,7 @@ public abstract class ShadowJar : Jar() {
 
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
     duplicatesStrategy = EXCLUDE
-    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))
+    manifest = DefaultInheritManifest(project)
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       transformers.get().any { !it::class.hasAnnotation<CacheableTransformer>() } ||
@@ -170,6 +171,19 @@ public abstract class ShadowJar : Jar() {
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
+   * Main class attribute to add to manifest.
+   *
+   * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar]
+   * task or the main [Jar] task.
+   *
+   * Defaults to `null`.
+   */
+  @get:Optional
+  @get:Input
+  @get:Option(option = "main-class", description = "Main class attribute to add to manifest.")
+  public open val mainClass: Property<String> = objectFactory.property()
+
+  /**
    * Fails build if the ZIP entries in the shadowed JAR are duplicate.
    *
    * This is related to setting [getDuplicatesStrategy] to [FAIL] but there are some differences:
@@ -194,6 +208,7 @@ public abstract class ShadowJar : Jar() {
   @get:Option(option = "add-multi-release-attribute", description = "Adds the multi-release attribute to the manifest if any dependencies contain it.")
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
+  @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
@@ -369,7 +384,7 @@ public abstract class ShadowJar : Jar() {
         }
       }
     }
-    injectMultiReleaseAttrIfPresent()
+    injectManifestAttributes()
     super.copy()
   }
 
@@ -450,7 +465,28 @@ public abstract class ShadowJar : Jar() {
       }
     }
 
-  private fun injectMultiReleaseAttrIfPresent() {
+  private fun injectManifestAttributes() {
+    val mainClassValue = mainClass.orNull
+    when {
+      manifest.attributes.contains(mainClassAttributeKey) -> {
+        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.")
+      }
+      mainClassValue.isNullOrEmpty() -> {
+        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty.")
+      }
+      else -> {
+        manifest.attributes[mainClassAttributeKey] = mainClassValue
+        logger.info("Adding $mainClassAttributeKey attribute to the manifest with value '$mainClassValue'.")
+      }
+    }
+
+    val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
+    val shadowFiles = shadowDependencies.get()
+    if (!shadowFiles.isEmpty) {
+      val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
+      manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
+    }
+
     if (addMultiReleaseAttribute.get()) {
       logger.info("Adding $multiReleaseAttributeKey attribute to the manifest if any dependencies contain it.")
     } else {
@@ -496,16 +532,11 @@ public abstract class ShadowJar : Jar() {
           "module-info.class",
         )
 
-        @Suppress("EagerGradleConfiguration") // mergeSpec.from hasn't supported lazy configuration yet.
-        task.manifest.inheritFrom(jarTask.get().manifest)
-        val classPathAttr = jarTask.map { it.manifest.attributes[classPathAttributeKey]?.toString().orEmpty() }
-        val shadowFiles = files(configurations.shadow)
-        task.doFirst("Set $classPathAttributeKey attribute in the manifest") {
-          if (!shadowFiles.isEmpty) {
-            val attrs = listOf(classPathAttr.get()) + shadowFiles.map { it.name }
-            task.manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
-          }
-        }
+        task.manifest = DefaultInheritManifest(
+          project,
+          @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
+          jarTask.get().manifest,
+        )
 
         @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
         tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)

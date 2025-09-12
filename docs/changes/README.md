@@ -7,12 +7,29 @@
 
 - Support relocating Groovy extensions in Module descriptors. ([#1705](https://github.com/GradleUp/shadow/pull/1705))
 - Add extensions for `Iterable<Relocator>`. ([#1710](https://github.com/GradleUp/shadow/pull/1710))
+- Support relocating list of types in `RelocatorRemapper`. ([#1714](https://github.com/GradleUp/shadow/pull/1714))
+- Add `mainClass` property into `ShadowJar`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
+  ```kotlin
+  tasks.shadowJar {
+    // This property will be used as a fallback if there is no explicit `Main-Class` attribute set.
+    mainClass = "my.Main"
+  }
+  ```
 
 ### Changed
 
 - Merge Gradle Module descriptors into the modern `META-INF` path. ([#1706](https://github.com/GradleUp/shadow/pull/1706))  
   The Gradle Module descriptors (`org.codehaus.groovy.runtime.ExtensionModule` files) defined under `META-INF/services/`
   and `META-INF/groovy` will be merged into `META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule`.
+- Move injecting `Class-Path` manifest attr logic from `doFirst` into `copy`. ([#1720](https://github.com/GradleUp/shadow/pull/1720))
+- Move injecting `Main-Class` manifest attr logic from `doFirst` into `copy`. ([#1724](https://github.com/GradleUp/shadow/pull/1724))
+- Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
+- Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
+- Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
+
+### Fixed
+
+- Fix excluding dependencies whose versions contain `+`. ([#1597](https://github.com/GradleUp/shadow/pull/1597))
 
 ## [9.1.0](https://github.com/GradleUp/shadow/compare/9.1.0) - 2025-08-29
 
@@ -51,6 +68,7 @@
 
 - Don't inject `TargetJvmVersion` attribute when automatic JVM targeting is disabled. ([#1666](https://github.com/GradleUp/shadow/pull/1666))
 - Do not write modified class files for no-op relocations. ([#1694](https://github.com/GradleUp/shadow/pull/1694))
+- **BREAKING CHANGE:** The introduction of some `afterEvaluate` usages may cause configuration issues in rare cases.
 
 ## [9.0.2](https://github.com/GradleUp/shadow/releases/tag/9.0.2) - 2025-08-15
 

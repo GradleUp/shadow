@@ -171,13 +171,31 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   @Test
+  fun overrideMainClassFromApplicationPlugin() {
+    prepare()
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          mainClass = 'my.Main2' // Different from application.mainClass.
+        }
+      """.trimIndent(),
+    )
+
+    run(runShadowPath) // Run without errors.
+
+    assertThat(jarPath("build/libs/myapp-1.0-all.jar")).useAll {
+      getMainAttr(mainClassAttributeKey).isEqualTo("my.Main2")
+    }
+  }
+
+  @Test
   fun errorWhenMainClassNotSet() {
     prepare(mainClassBlock = "")
 
     val result = runWithFailure(runShadowPath)
 
     assertThat(result.output).contains(
-      "The main class must be specified and not left empty in `application.mainClass` or manifest attributes.",
+      "no main manifest attribute, in",
     )
   }
 

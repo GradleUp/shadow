@@ -48,7 +48,9 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
@@ -104,6 +106,7 @@ class JavaPluginsTest : BasePluginTest() {
       assertThat(enableAutoRelocation.get()).isFalse()
       assertThat(failOnDuplicateEntries.get()).isFalse()
       assertThat(minimizeJar.get()).isFalse()
+      assertThat(mainClass.orNull).isNull()
 
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
       assertThat(configurations.get()).all {
@@ -126,6 +129,7 @@ class JavaPluginsTest : BasePluginTest() {
       "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
       "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
       "--no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries",
+      "--main-class     Main class attribute to add to manifest.",
       "--minimize-jar     Minimizes the jar by removing unused classes.",
       "--no-minimize-jar     Disables option --minimize-jar.",
       "--relocation-prefix     Prefix used for auto relocation of packages in the dependencies.",
@@ -710,7 +714,7 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun inheritFromOtherManifest() {
+  fun inheritManifestAttrsFromJars() {
     projectScript.appendText(
       """
         $jarTask {
@@ -724,7 +728,7 @@ class JavaPluginsTest : BasePluginTest() {
           }
         }
         $shadowJarTask {
-          manifest.inheritFrom(testJar.get().manifest)
+          manifest.from(testJar.get().manifest)
         }
       """.trimIndent(),
     )
@@ -735,6 +739,32 @@ class JavaPluginsTest : BasePluginTest() {
       transform { it.mainAttrSize }.isGreaterThan(2)
       getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
       getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
+    }
+  }
+
+  @Test
+  fun inheritManifestMainClassFromJar() {
+    projectScript.appendText(
+      """
+        $jarTask {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+        }
+        $shadowJarTask {
+          mainClass = 'my.Main2' // This should not override the inherited one.
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(shadowJarPath, infoArgument)
+
+    assertThat(result.output).contains(
+      "Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.",
+    )
+    assertThat(outputShadowedJar).useAll {
+      transform { it.mainAttrSize }.isGreaterThan(1)
+      getMainAttr("Main-Class").isEqualTo("my.Main")
     }
   }
 
@@ -950,7 +980,50 @@ class JavaPluginsTest : BasePluginTest() {
     )
   }
 
+  @ParameterizedTest
+  @MethodSource("fallbackMainClassProvider")
+  fun fallbackMainClassByProperty(input: String, expected: String?, message: String) {
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          mainClass = '$input'
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(shadowJarPath, infoArgument)
+
+    assertThat(result.output).contains(
+      message,
+    )
+    assertThat(outputShadowedJar).useAll {
+      getMainAttr(mainClassAttributeKey).isEqualTo(expected)
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("fallbackMainClassProvider")
+  fun fallbackMainClassByCliOption(input: String, expected: String?) {
+    if (input.isEmpty()) {
+      run(shadowJarPath)
+    } else {
+      run(shadowJarPath, "--main-class", input)
+    }
+
+    assertThat(outputShadowedJar).useAll {
+      getMainAttr(mainClassAttributeKey).isEqualTo(expected)
+    }
+  }
+
   private fun dependencies(configuration: String, vararg flags: String): String {
     return run("dependencies", "--configuration", configuration, *flags).output
+  }
+
+  private companion object {
+    @JvmStatic
+    fun fallbackMainClassProvider() = listOf(
+      Arguments.of("my.Main", "my.Main", "Adding $mainClassAttributeKey attribute to the manifest with value"),
+      Arguments.of("", null, "Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty."),
+    )
   }
 }

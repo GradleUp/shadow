@@ -49,7 +49,7 @@ It must be available on the target system.
 Executable JARs contain a JAR MANIFEST that specifies the application Main Class.
 This allows the application to be started with a single command:
 
-```shell
+```sh
 java -jar application-shadow.jar
 ```
 

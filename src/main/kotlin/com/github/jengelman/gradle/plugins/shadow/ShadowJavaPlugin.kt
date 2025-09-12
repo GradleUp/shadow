@@ -24,7 +24,6 @@ import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 
 public abstract class ShadowJavaPlugin @Inject constructor(
   private val softwareComponentFactory: SoftwareComponentFactory,
@@ -115,7 +114,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   }
 
   protected open fun Project.configureJavaGradlePlugin() {
-    plugins.withType(JavaGradlePluginPlugin::class.java).configureEach {
+    // org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
+    plugins.withId("org.gradle.java-gradle-plugin") {
       val gradleApi = dependencies.gradleApi()
       // Remove the gradleApi so it isn't merged into the jar file.
       // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.

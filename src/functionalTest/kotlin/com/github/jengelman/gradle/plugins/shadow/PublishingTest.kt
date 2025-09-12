@@ -54,8 +54,8 @@ class PublishingTest : BasePluginTest() {
   lateinit var remoteRepoPath: Path
 
   @BeforeEach
-  override fun setup() {
-    super.setup()
+  override fun beforeEach() {
+    super.beforeEach()
     settingsScript.appendText("rootProject.name = 'maven'$lineSeparator")
   }
 

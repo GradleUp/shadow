@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.12.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.12.0)" variant="all" version="8.12.0">
+<issues format="6" by="lint 8.13.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.0)" variant="all" version="8.13.0">
 
     <issue
         id="InternalGradleApiUsage"
@@ -8,7 +8,18 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="5"
+            line="8"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs"
+        errorLine1="import org.gradle.api.internal.project.DefaultProject"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="9"
             column="1"/>
     </issue>
 
@@ -19,7 +30,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="8"
+            line="12"
             column="1"/>
     </issue>
 
@@ -30,8 +41,30 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="9"
+            line="13"
             column="1"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
+        errorLine1="  private val fileResolver: FileResolver = (project as DefaultProject).services.get(FileResolver::class.java),"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="20"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="InternalGradleApiUsage"
+        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
+        errorLine1="  private val fileResolver: FileResolver = (project as DefaultProject).services.get(FileResolver::class.java),"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
+            line="20"
+            column="44"/>
     </issue>
 
     <issue
@@ -41,7 +74,7 @@
         errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/internal/DefaultInheritManifest.kt"
-            line="31"
+            line="39"
             column="14"/>
     </issue>
 
@@ -52,7 +85,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="73"
+            line="72"
             column="9"/>
     </issue>
 
@@ -63,7 +96,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="74"
+            line="73"
             column="9"/>
     </issue>
 
@@ -74,7 +107,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="75"
+            line="74"
             column="9"/>
     </issue>
 
@@ -85,7 +118,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="76"
+            line="75"
             column="9"/>
     </issue>
 
@@ -96,7 +129,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
-            line="18"
+            line="19"
             column="1"/>
     </issue>
 
@@ -107,7 +140,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
-            line="19"
+            line="20"
             column="1"/>
     </issue>
 
@@ -118,7 +151,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
-            line="20"
+            line="21"
             column="1"/>
     </issue>
 
@@ -129,7 +162,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
-            line="21"
+            line="22"
             column="1"/>
     </issue>
 
@@ -140,19 +173,8 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction.kt"
-            line="53"
+            line="54"
             column="9"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs"
-        errorLine1="import org.gradle.api.internal.file.FileResolver"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="43"
-            column="1"/>
     </issue>
 
     <issue
@@ -164,28 +186,6 @@
             file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
             line="44"
             column="1"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
-        errorLine1="    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="74"
-            column="39"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method get from org.gradle.internal.service.ServiceRegistry)"
-        errorLine1="    manifest = DefaultInheritManifest(services.get(FileResolver::class.java))"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar.kt"
-            line="74"
-            column="39"/>
     </issue>
 
 </issues>
