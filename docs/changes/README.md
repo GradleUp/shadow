@@ -15,6 +15,9 @@
     mainClass = "my.Main"
   }
   ```
+- Support relocating Kotlin module files. ([#1539](https://github.com/GradleUp/shadow/pull/1539))  
+  The current implementation relocates all properties in `KotlinModuleMetadata` but `KmModule.optionalAnnotationClasses`
+  due to very limited usages of it. See more discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
 
 ### Changed
 
