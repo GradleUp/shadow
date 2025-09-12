@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -635,9 +636,9 @@ class RelocationTest : BasePluginTest() {
     }
 
     assertThat(relocatedModule.version).isEqualTo(originalModule.version)
-    // They are both empty.
-    assertThat(relocatedModule.kmModule.optionalAnnotationClasses)
-      .isEqualTo(originalModule.kmModule.optionalAnnotationClasses)
+    // No implementation for writing this property yet.
+    // https://github.com/JetBrains/kotlin/blob/81502985ae0a2f5b21e121ffc180c3f4dd467e17/libraries/kotlinx-metadata/jvm/src/kotlin/metadata/jvm/KotlinModuleMetadata.kt#L71
+    assertThat(relocatedModule.kmModule.optionalAnnotationClasses).isEmpty()
 
     val originalPkgParts = originalModule.kmModule.packageParts.entries
     val relocatedPkgParts = relocatedModule.kmModule.packageParts.entries

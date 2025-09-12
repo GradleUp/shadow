@@ -250,6 +250,7 @@ public open class ShadowCopyAction(
     private fun FileCopyDetails.remapKotlinModule() = file.readBytes().let { bytes ->
       val kmMetadata = KotlinModuleMetadata.read(bytes)
       val newKmModule = KmModule().apply {
+        // We don't need to relocate the nested properties in `optionalAnnotationClasses`, there is a very special use case for Kotlin Multiplatform.
         optionalAnnotationClasses += kmMetadata.kmModule.optionalAnnotationClasses
         packageParts += kmMetadata.kmModule.packageParts.map { (pkg, parts) ->
           val relocatedPkg = relocators.relocateClass(pkg)
