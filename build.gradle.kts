@@ -112,7 +112,7 @@ dependencies {
   implementation(libs.asm)
   implementation(libs.jdependency)
   implementation(libs.jdom2)
-  implementation(kotlin("metadata-jvm")) // libs.kotlin.metadata can't be added on my local device, but it works on CI.
+  implementation(libs.kotlin.metadata)
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
