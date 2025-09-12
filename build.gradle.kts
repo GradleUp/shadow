@@ -113,6 +113,8 @@ dependencies {
   implementation(libs.jdependency)
   implementation(libs.jdom2)
   implementation(libs.kotlin.metadata)
+  implementation(libs.moshi)
+  implementation(libs.moshi.kotlin)
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 

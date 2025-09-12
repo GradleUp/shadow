@@ -10,6 +10,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.moshi
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -20,8 +21,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.exists
@@ -663,7 +662,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   private companion object {
-    val gmmAdapter: JsonAdapter<GradleModuleMetadata> = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    val gmmAdapter: JsonAdapter<GradleModuleMetadata> = moshi
       .adapter(GradleModuleMetadata::class.java)
     val pomReader = MavenXpp3Reader()
 
