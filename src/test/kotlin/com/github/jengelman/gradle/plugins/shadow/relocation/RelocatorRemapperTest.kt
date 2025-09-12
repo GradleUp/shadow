@@ -39,6 +39,8 @@ class RelocatorRemapperTest {
       Arguments.of("Lorg/package/ClassA;Lorg/package/ClassB;", "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;"),
       // Multiple classes.
       Arguments.of("Ljava/lang/Object;Lorg/package/ClassB;", "Ljava/lang/Object;Lshadow/org/package/ClassB;"),
+      // Single method argument.
+      Arguments.of("(Lorg/package/ClassA;)", "(Lshadow/org/package/ClassA;)"),
       // Method arguments.
       Arguments.of("(Lorg/package/ClassA;Lorg/package/ClassB;)", "(Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;)"),
       // Method return types.
