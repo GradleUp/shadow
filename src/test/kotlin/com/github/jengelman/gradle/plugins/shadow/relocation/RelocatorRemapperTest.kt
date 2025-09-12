@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource
 
 class RelocatorRemapperTest {
   @ParameterizedTest
-  @MethodSource("classSignatureStringConstants")
+  @MethodSource("signaturePatternsProvider")
   fun relocateSignaturePatterns(input: String, expected: String) {
     val relocator = RelocatorRemapper(
       relocators = setOf(
@@ -22,29 +22,29 @@ class RelocatorRemapperTest {
   private companion object {
     val primitiveTypes = setOf('B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z')
 
-    val primitiveTypeArguments = primitiveTypes.map {
+    val primitiveTypePatterns = primitiveTypes.map {
       // Methods like `void method(boolean arg1, org.package.ClassA arg2)`
       Arguments.of("(${it}Lorg/package/ClassA;)V", "(${it}Lshadow/org/package/ClassA;)V")
     }
 
     @JvmStatic
-    fun classSignatureStringConstants() = listOf(
-      // Normal class.
+    fun signaturePatternsProvider() = listOf(
+      // Normal class: `org.package.ClassA`
       Arguments.of("Lorg/package/ClassA;", "Lshadow/org/package/ClassA;"),
-      // Array class.
+      // Array class: `org.package.ClassA[]`
       Arguments.of("[Lorg/package/ClassA;", "[Lshadow/org/package/ClassA;"),
-      // Multidimensional array of class.
+      // Multidimensional array of class: `org.package.ClassA[][]`
       Arguments.of("[[Lorg/package/ClassA;", "[[Lshadow/org/package/ClassA;"),
-      // Multiple classes.
+      // Multiple classes: `org.package.ClassA org.package.ClassB`
       Arguments.of("Lorg/package/ClassA;Lorg/package/ClassB;", "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;"),
-      // Multiple classes.
+      // Multiple classes: `java.lang.Object org.package.ClassB`
       Arguments.of("Ljava/lang/Object;Lorg/package/ClassB;", "Ljava/lang/Object;Lshadow/org/package/ClassB;"),
-      // Single method argument.
+      // Single method argument: `void method(org.package.ClassA arg);`
       Arguments.of("(Lorg/package/ClassA;)", "(Lshadow/org/package/ClassA;)"),
-      // Method arguments.
+      // Method arguments: `void method(org.package.ClassA arg1, org.package.ClassB arg2);`
       Arguments.of("(Lorg/package/ClassA;Lorg/package/ClassB;)", "(Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;)"),
-      // Method return types.
+      // Example from issue 1403.
       Arguments.of("()Lorg/package/ClassA;Lorg/package/ClassB;", "()Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;"),
-    ) + primitiveTypeArguments
+    ) + primitiveTypePatterns
   }
 }
