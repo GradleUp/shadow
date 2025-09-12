@@ -10,8 +10,8 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
@@ -19,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.getBytes
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
+import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
 import kotlin.metadata.jvm.KotlinModuleMetadata
 import kotlin.metadata.jvm.UnstableMetadataApi
@@ -605,10 +606,9 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateKotlinModuleFiles() {
-    val originalModuleFilePath = "META-INF/kotlin-stdlib-jdk8.kotlin_module"
-    val relocatedModuleFilePath = "META-INF/kotlin-stdlib-jdk8.shadow.kotlin_module"
+    val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
     val stdlibJar = buildJar("stdlib.jar") {
-      insert(originalModuleFilePath, requireResourceAsText(originalModuleFilePath))
+      insert(originalModuleFilePath, requireResourceAsPath(originalModuleFilePath).readBytes())
     }
     projectScript.appendText(
       """
@@ -623,6 +623,7 @@ class RelocationTest : BasePluginTest() {
 
     run(shadowJarPath)
 
+    val relocatedModuleFilePath = "META-INF/kotlin-stdlib.shadow.kotlin_module"
     assertThat(outputShadowedJar).useAll {
       containsOnly(
         relocatedModuleFilePath,
@@ -635,7 +636,9 @@ class RelocationTest : BasePluginTest() {
       KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath))
     }
 
-    assertThat(relocatedModule.version).isEqualTo(originalModule.version)
+    assertThat(relocatedModule.version.toString()).isEqualTo("2.2.0")
+    assertThat(originalModule.version.toString()).isEqualTo("2.2.0")
+
     // No implementation for writing this property yet.
     // https://github.com/JetBrains/kotlin/blob/81502985ae0a2f5b21e121ffc180c3f4dd467e17/libraries/kotlinx-metadata/jvm/src/kotlin/metadata/jvm/KotlinModuleMetadata.kt#L71
     assertThat(relocatedModule.kmModule.optionalAnnotationClasses).isEmpty()
@@ -648,13 +651,27 @@ class RelocationTest : BasePluginTest() {
     relocatedPkgParts.forEachIndexed { index, (pkg, parts) ->
       val (originalPkg, originalParts) = originalPkgParts.elementAt(index)
       assertThat(pkg).isNotEqualTo(originalPkg)
-      assertThat(pkg).isEqualTo(originalPkg.replace("kotlin.", "my.kotlin."))
+      assertThat(pkg).isEqualTo(originalPkg.replace("kotlin", "my.kotlin"))
 
-      assertThat(parts.fileFacades).isNotEqualTo(originalParts.fileFacades)
-      assertThat(parts.fileFacades).isEqualTo(originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") })
+      if (originalParts.fileFacades.isEmpty()) {
+        assertThat(parts.fileFacades).isEmpty()
+      } else {
+        assertThat(parts.fileFacades).isNotEmpty()
+        assertThat(parts.fileFacades).isNotEqualTo(originalParts.fileFacades)
+        assertThat(parts.fileFacades).isEqualTo(originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") })
+      }
 
-      // They are both empty.
-      assertThat(parts.multiFileClassParts).isEqualTo(originalParts.multiFileClassParts)
+      if (originalParts.multiFileClassParts.isEmpty()) {
+        assertThat(parts.multiFileClassParts).isEmpty()
+      } else {
+        assertThat(parts.multiFileClassParts).isNotEmpty()
+        assertThat(parts.multiFileClassParts).isNotEqualTo(originalParts.multiFileClassParts)
+        assertThat(parts.multiFileClassParts).isEqualTo(
+          originalParts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
+            name.replace("kotlin/", "my/kotlin/") to facade.replace("kotlin/", "my/kotlin/")
+          },
+        )
+      }
     }
   }
 
