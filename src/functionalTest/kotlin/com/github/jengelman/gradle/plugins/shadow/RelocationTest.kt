@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
@@ -605,9 +604,10 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateKotlinModuleFiles() {
-    val moduleFilePath = "META-INF/kotlin-stdlib-jdk8.kotlin_module"
+    val originalModuleFilePath = "META-INF/kotlin-stdlib-jdk8.kotlin_module"
+    val relocatedModuleFilePath = "META-INF/kotlin-stdlib-jdk8.shadow.kotlin_module"
     val stdlibJar = buildJar("stdlib.jar") {
-      insert(moduleFilePath, requireResourceAsText(moduleFilePath))
+      insert(originalModuleFilePath, requireResourceAsText(originalModuleFilePath))
     }
     projectScript.appendText(
       """
@@ -624,14 +624,14 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        moduleFilePath,
+        relocatedModuleFilePath,
         *manifestEntries,
       )
     }
 
-    val originalModule = KotlinModuleMetadata.read(requireResourceAsStream(moduleFilePath).readBytes())
+    val originalModule = KotlinModuleMetadata.read(requireResourceAsStream(originalModuleFilePath).readBytes())
     val relocatedModule = outputShadowedJar.use {
-      KotlinModuleMetadata.read(it.getBytes(moduleFilePath))
+      KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath))
     }
 
     assertThat(relocatedModule.version).isEqualTo(originalModule.version)

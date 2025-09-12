@@ -263,7 +263,17 @@ public open class ShadowCopyAction(
         }
       }
       val newKmMetadata = KotlinModuleMetadata(newKmModule, kmMetadata.version)
-      val entry = zipEntry(relocators.relocatePath(path), preserveFileTimestamps, lastModified) {
+
+      val newBytes = newKmMetadata.write()
+      val relocatedPath = relocators.relocatePath(path)
+      val entryName = when {
+        relocatedPath != path -> relocatedPath
+        // Nothing changed, so keep the original path.
+        newBytes.contentEquals(bytes) -> path
+        // Content changed but path didn't, so rename to avoid name clash. The filename does not matter to the compiler.
+        else -> path.replace(".kotlin_module", ".shadow.kotlin_module")
+      }
+      val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
         unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
       }
       zipOutStr.putNextEntry(entry)
