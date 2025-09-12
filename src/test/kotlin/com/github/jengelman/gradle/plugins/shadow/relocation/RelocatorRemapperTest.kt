@@ -29,8 +29,20 @@ class RelocatorRemapperTest {
 
     @JvmStatic
     fun classSignatureStringConstants() = listOf(
-      Arguments.of("(Lorg/package/ClassA;)", "(Lshadow/org/package/ClassA;)"),
-      Arguments.of("(Lkotlin/reflect/KClass;)", "(Lshadow/kotlin/reflect/KClass;)"),
-    )
+      // Normal class.
+      Arguments.of("Lorg/package/ClassA;", "Lshadow/org/package/ClassA;"),
+      // Array class.
+      Arguments.of("[Lorg/package/ClassA;", "[Lshadow/org/package/ClassA;"),
+      // Multidimensional array of class.
+      Arguments.of("[[Lorg/package/ClassA;", "[[Lshadow/org/package/ClassA;"),
+      // Multiple classes.
+      Arguments.of("Lorg/package/ClassA;Lorg/package/ClassB;", "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;"),
+      // Multiple classes.
+      Arguments.of("Ljava/lang/Object;Lorg/package/ClassB;", "Ljava/lang/Object;Lshadow/org/package/ClassB;"),
+      // Method arguments.
+      Arguments.of("(Lorg/package/ClassA;Lorg/package/ClassB;)", "(Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;)"),
+      // Method return types.
+      Arguments.of("()Lorg/package/ClassA;Lorg/package/ClassB;", "()Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;"),
+    ) + primitiveTypeArguments
   }
 }
