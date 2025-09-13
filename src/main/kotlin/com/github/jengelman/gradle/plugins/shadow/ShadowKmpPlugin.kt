@@ -1,10 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_RUN_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgpVersion
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.ApplicationPlugin
+import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -24,6 +28,14 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
 
       configureShadowJar(target)
     }
+
+    // TODO: https://youtrack.jetbrains.com/issue/KT-77499
+    afterEvaluate {
+      if (!isAtLeastKgpVersion(2, 1, 20)) return@afterEvaluate
+      @Suppress("EagerGradleConfiguration") // TODO: findByName should be allowed in afterEvaluate, need to file a new issue to Lint side.
+      val runJvmTask = tasks.findByName("runJvm") as? JavaExec ?: return@afterEvaluate
+      addRunTask(runJvmTask)
+    }
   }
 
   private fun Project.configureShadowJar(target: KotlinJvmTarget) {
@@ -41,6 +53,23 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       @OptIn(ExperimentalKotlinGradlePluginApi::class)
       target.mainRun {
         task.mainClass.convention(mainClass)
+      }
+    }
+  }
+
+  private fun Project.addRunTask(runJvmTask: JavaExec) {
+    tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
+      task.description = "Runs this project as a JVM application using the shadow jar"
+      task.group = ApplicationPlugin.APPLICATION_GROUP
+
+      task.classpath = files(tasks.shadowJar)
+
+      with(runJvmTask) {
+        task.mainModule.convention(mainModule)
+        task.mainClass.convention(mainClass)
+        task.jvmArguments.convention(jvmArguments)
+        task.modularity.inferModulePath.convention(modularity.inferModulePath)
+        task.javaLauncher.convention(javaLauncher)
       }
     }
   }
