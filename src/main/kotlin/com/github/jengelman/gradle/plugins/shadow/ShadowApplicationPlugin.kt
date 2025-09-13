@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import java.io.IOException
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -35,12 +36,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.addRunTask() {
-    tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
-      task.description = "Runs this project as a JVM application using the shadow jar"
-      task.group = ApplicationPlugin.APPLICATION_GROUP
-
-      task.classpath = files(tasks.shadowJar)
-
+    registerRunShadowCommon { task ->
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
@@ -146,5 +142,16 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     @get:JvmSynthetic
     public inline val TaskContainer.installShadowDist: TaskProvider<Sync>
       get() = named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
+
+    internal fun Project.registerRunShadowCommon(
+      action: Action<JavaExec>,
+    ): TaskProvider<JavaExec> {
+      return tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
+        task.description = "Runs this project as a JVM application using the shadow jar"
+        task.group = ApplicationPlugin.APPLICATION_GROUP
+        task.classpath = files(tasks.shadowJar)
+        action.execute(task)
+      }
+    }
   }
 }

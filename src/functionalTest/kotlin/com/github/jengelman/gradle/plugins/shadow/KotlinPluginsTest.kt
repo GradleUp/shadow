@@ -292,7 +292,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(runShadowPath)
+    val result = run(runShadowPath, "--args='foo'")
 
     assertThat(result.output).contains(
       "Hello, World! (foo) from Main",
