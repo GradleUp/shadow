@@ -5,8 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgpVersion
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
@@ -14,7 +12,6 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmBinariesDsl
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 public abstract class ShadowKmpPlugin : Plugin<Project> {
@@ -62,15 +59,13 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
 
       task.classpath = files(tasks.shadowJar)
 
-      val binariesDsl = target::class.memberProperties
-        .single { it.name == "binariesDsl" }
-        .apply { isAccessible = true }
-        .getter.call(target) as KotlinJvmBinariesDsl
-
-      binariesDsl.executable { dsl ->
-        task.mainModule.set(dsl.mainModule)
-        task.mainClass.set(dsl.mainClass)
-        task.jvmArguments.convention(dsl.applicationDefaultJvmArgs)
+      @OptIn(ExperimentalKotlinGradlePluginApi::class)
+      target.binaries {
+        executable { dsl ->
+          task.mainModule.set(dsl.mainModule)
+          task.mainClass.set(dsl.mainClass)
+          task.jvmArguments.convention(dsl.applicationDefaultJvmArgs)
+        }
       }
     }
   }
