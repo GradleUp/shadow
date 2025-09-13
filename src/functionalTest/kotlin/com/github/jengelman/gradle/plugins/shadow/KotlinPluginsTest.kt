@@ -268,6 +268,38 @@ class KotlinPluginsTest : BasePluginTest() {
     )
   }
 
+  @Test
+  fun compatKmpApplicationDsl() {
+    writeClass(sourceSet = "jvmMain", withImports = true, jvmLang = JvmLang.Kotlin)
+    projectScript.appendText(
+      """
+        kotlin {
+          jvm {
+            binaries {
+              executable {
+                it.mainClass.set('my.Main')
+              }
+            }
+          }
+          sourceSets {
+            jvmMain {
+              dependencies {
+                implementation 'junit:junit:3.8.2'
+              }
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(runShadowPath)
+
+    assertThat(result.output).contains(
+      "Hello, World! (foo) from Main",
+      "Refs: junit.framework.Test",
+    )
+  }
+
   private fun compileOnlyStdlib(exclude: Boolean): String {
     return if (exclude) {
       // Disable the stdlib dependency added via `implementation`.
