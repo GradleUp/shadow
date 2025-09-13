@@ -27,7 +27,14 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       }
 
       configureShadowJar(target)
-      addRunTask(target)
+    }
+
+    // TODO: https://youtrack.jetbrains.com/issue/KT-77499
+    afterEvaluate {
+      if (!isAtLeastKgpVersion(2, 1, 20)) return@afterEvaluate
+      @Suppress("EagerGradleConfiguration") // TODO: findByName should be allowed in afterEvaluate, need to file a new issue to Lint side.
+      val runJvmTask = tasks.findByName("runJvm") as? JavaExec ?: return@afterEvaluate
+      addRunTask(runJvmTask)
     }
   }
 
@@ -50,22 +57,19 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
     }
   }
 
-  private fun Project.addRunTask(target: KotlinJvmTarget) {
-    if (!isAtLeastKgpVersion(2, 1, 20)) return
-
+  private fun Project.addRunTask(runJvmTask: JavaExec) {
     tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
       task.classpath = files(tasks.shadowJar)
 
-      @OptIn(ExperimentalKotlinGradlePluginApi::class)
-      target.binaries {
-        executable { dsl ->
-          task.mainModule.set(dsl.mainModule)
-          task.mainClass.set(dsl.mainClass)
-          task.jvmArguments.convention(dsl.applicationDefaultJvmArgs)
-        }
+      with(runJvmTask) {
+        task.mainModule.convention(mainModule)
+        task.mainClass.convention(mainClass)
+        task.jvmArguments.convention(jvmArguments)
+        task.modularity.inferModulePath.convention(modularity.inferModulePath)
+        task.javaLauncher.convention(javaLauncher)
       }
     }
   }
