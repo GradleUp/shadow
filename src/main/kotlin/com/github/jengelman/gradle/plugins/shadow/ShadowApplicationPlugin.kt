@@ -97,6 +97,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun Project.configureDistribution() {
     distributions.register(DISTRIBUTION_NAME) {
+      it.distributionBaseName.convention(provider(applicationExtension::getApplicationName))
       it.contents { shadowDist ->
         shadowDist.from(file("src/dist"))
         shadowDist.into("lib") { lib ->
