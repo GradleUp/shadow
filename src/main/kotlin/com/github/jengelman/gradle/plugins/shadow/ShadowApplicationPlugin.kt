@@ -72,13 +72,15 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   protected open fun Project.configureInstallTask() {
     tasks.installShadowDist.configure { task ->
       val applicationName = providers.provider { applicationExtension.applicationName }
+      val executableDir = providers.provider { applicationExtension.executableDir }
 
       task.doFirst("Check installation directory") {
         if (
           !task.destinationDir.listFiles().isNullOrEmpty() &&
           (
             !task.destinationDir.resolve("lib").isDirectory ||
-              !task.destinationDir.resolve("bin").isDirectory
+              !task.destinationDir.resolve("bin").isDirectory ||
+              !task.destinationDir.resolve(executableDir.get()).isDirectory
             )
         ) {
           throw GradleException(
