@@ -258,6 +258,28 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun honorApplicationExtensionProperties() {
+    val applicationNames = "new" to "new"
+    val executableDirs = "sbin" to "sbin"
+
+    prepare(
+      applicationBlock = """
+        applicationName = '${applicationNames.first}'
+        executableDir = '${executableDirs.first}'
+      """.trimIndent(),
+    )
+
+    run(installShadowDistPath)
+
+    val installPath = path("build/install/")
+    assertThat(installPath.walkEntries()).containsOnly(
+      "${applicationNames.second}/${executableDirs.second}/${applicationNames.second}",
+      "${applicationNames.second}/${executableDirs.second}/${applicationNames.second}.bat",
+      "${applicationNames.second}/lib/myapp-1.0-all.jar",
+    )
+  }
+
   private fun prepare(
     mainClassWithImports: Boolean = false,
     projectBlock: String = "",
