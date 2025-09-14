@@ -1,12 +1,16 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.registerRunShadowCommon
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.registerStartShadowScriptsCommon
 import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgpVersion
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import java.util.Locale
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.application.CreateStartScripts
 import org.gradle.api.tasks.bundling.Jar
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -15,6 +19,8 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 public abstract class ShadowKmpPlugin : Plugin<Project> {
 
   override fun apply(project: Project): Unit = with(project) {
+    var jvmTarget: KotlinJvmTarget? = null
+
     extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target ->
       if (target !is KotlinJvmTarget) return@configureEach
       @Suppress("EagerGradleConfiguration")
@@ -25,14 +31,24 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       }
 
       configureShadowJar(target)
+      jvmTarget = target
     }
 
     // TODO: https://youtrack.jetbrains.com/issue/KT-77499
     afterEvaluate {
       if (!isAtLeastKgpVersion(2, 1, 20)) return@afterEvaluate
+      jvmTarget ?: return@afterEvaluate
+      val targetNameCap = jvmTarget.targetName.replaceFirstChar { it.titlecase(Locale.US) }
+
       @Suppress("EagerGradleConfiguration") // TODO: https://issuetracker.google.com/issues/444825893
-      val runJvmTask = tasks.findByName("runJvm") as? JavaExec ?: return@afterEvaluate
-      addRunTask(runJvmTask)
+      (tasks.findByName("run$targetNameCap") as? JavaExec)?.let {
+        addRunTask(it)
+      } ?: return@afterEvaluate
+      // This task must exist if the runJvmTask exists.
+      @Suppress("EagerGradleConfiguration") // TODO: https://issuetracker.google.com/issues/444825893
+      (tasks.getByName("startScriptsFor$targetNameCap") as CreateStartScripts).let {
+        addCreateScriptsTask(it)
+      }
     }
   }
 
@@ -56,6 +72,9 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
   }
 
   private fun Project.addRunTask(runJvmTask: JavaExec) {
+    tasks.shadowJar.configure { task ->
+      task.mainClass.convention(runJvmTask.mainClass)
+    }
     registerRunShadowCommon { task ->
       with(runJvmTask) {
         task.mainModule.convention(mainModule)
@@ -63,6 +82,20 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         task.jvmArguments.convention(jvmArguments)
         task.modularity.inferModulePath.convention(modularity.inferModulePath)
         task.javaLauncher.convention(javaLauncher)
+      }
+    }
+  }
+
+  private fun Project.addCreateScriptsTask(startScriptsTask: CreateStartScripts) {
+    registerStartShadowScriptsCommon { task ->
+      @Suppress("InternalGradleApiUsage", "DuplicatedCode") // Usages of conventionMapping.
+      with(startScriptsTask) {
+        task.mainModule.convention(mainModule)
+        task.mainClass.convention(mainClass)
+        task.conventionMapping.map("applicationName", ::getApplicationName)
+        task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
+        task.conventionMapping.map("executableDir", ::getExecutableDir)
+        task.conventionMapping.map("defaultJvmOpts", ::getDefaultJvmOpts)
       }
     }
   }

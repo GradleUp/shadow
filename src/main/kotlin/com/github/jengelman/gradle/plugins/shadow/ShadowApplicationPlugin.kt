@@ -48,13 +48,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.addCreateScriptsTask() {
-    tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
-      task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
-      task.group = ApplicationPlugin.APPLICATION_GROUP
-
-      task.classpath = files(tasks.shadowJar)
-
-      @Suppress("InternalGradleApiUsage") // Usages of conventionMapping.
+    registerStartShadowScriptsCommon { task ->
+      @Suppress("InternalGradleApiUsage", "DuplicatedCode") // Usages of conventionMapping.
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
@@ -148,6 +143,17 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     ): TaskProvider<JavaExec> {
       return tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
         task.description = "Runs this project as a JVM application using the shadow jar"
+        task.group = ApplicationPlugin.APPLICATION_GROUP
+        task.classpath = files(tasks.shadowJar)
+        action.execute(task)
+      }
+    }
+
+    internal fun Project.registerStartShadowScriptsCommon(
+      action: Action<CreateStartScripts>,
+    ): TaskProvider<CreateStartScripts> {
+      return tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
+        task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
         task.group = ApplicationPlugin.APPLICATION_GROUP
         task.classpath = files(tasks.shadowJar)
         action.execute(task)
