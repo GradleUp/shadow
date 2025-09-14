@@ -44,7 +44,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
-        task.jvmArguments.convention(provider { applicationDefaultJvmArgs })
+        task.jvmArguments.convention(provider(::getApplicationDefaultJvmArgs))
       }
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
       task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
@@ -73,8 +73,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun Project.configureInstallTask() {
     tasks.installShadowDist.configure { task ->
-      val applicationName = providers.provider { applicationExtension.applicationName }
-      val executableDir = providers.provider { applicationExtension.executableDir }
+      val applicationName = provider(applicationExtension::getApplicationName)
+      val executableDir = provider(applicationExtension::getExecutableDir)
 
       task.doFirst("Check installation directory") {
         val destinationDir = task.destinationDir

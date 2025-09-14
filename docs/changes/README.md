@@ -15,7 +15,8 @@
     mainClass = "my.Main"
   }
   ```
-- Honor `executableDir` in `application` extension. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
+- Honor `executableDir` in `application` extension. ([#1740](https://github.com/GradleUp/shadow/pull/1738))
+- Honor `applicationName` in `application` extension. ([#1740](https://github.com/GradleUp/shadow/pull/1740))
 
 ### Changed
 
