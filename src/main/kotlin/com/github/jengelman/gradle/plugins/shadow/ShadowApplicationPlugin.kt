@@ -6,7 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -17,7 +16,6 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
-import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
@@ -57,12 +55,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
       task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
-
-      val dir = "com/github/jengelman/gradle/plugins/shadow/internal"
-      (task.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        resources.text.fromString(requireResourceAsText("$dir/unixStartScript.txt"))
-      (task.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        resources.text.fromString(requireResourceAsText("$dir/windowsStartScript.txt"))
 
       task.classpath = files(tasks.shadowJar)
 
