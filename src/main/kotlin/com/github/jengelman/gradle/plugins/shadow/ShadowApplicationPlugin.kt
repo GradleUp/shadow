@@ -106,7 +106,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           lib.from(configurations.shadow)
         }
         // Defaults to bin dir.
-        shadowDist.into(applicationExtension.executableDir) { bin ->
+        shadowDist.into(provider(applicationExtension::getExecutableDir)) { bin ->
           bin.from(tasks.startShadowScripts)
           bin.filePermissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
