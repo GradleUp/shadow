@@ -20,7 +20,7 @@ import org.gradle.api.tasks.application.CreateStartScripts
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
  *
- * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
+ * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/fdecc3c95828bb9a1c1bb6114483fe5b16f9159d/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
  *
  * @see [ApplicationPlugin]
  */
@@ -45,7 +45,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         task.mainClass.convention(mainClass)
         task.jvmArguments.convention(provider { applicationDefaultJvmArgs })
       }
-
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
       task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
     }
@@ -66,7 +65,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         task.conventionMapping.map("executableDir", ::getExecutableDir)
         task.conventionMapping.map("defaultJvmOpts", ::getApplicationDefaultJvmArgs)
       }
-
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
@@ -99,11 +97,12 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         shadowDist.from(file("src/dist"))
         shadowDist.into("lib") { lib ->
           lib.from(tasks.shadowJar)
+          // Reflects the `Class-Path` value in the manifest.
           lib.from(configurations.shadow)
         }
         shadowDist.into("bin") { bin ->
           bin.from(tasks.startShadowScripts)
-          bin.filePermissions { it.unix(UNIX_SCRIPT_PERMISSIONS) }
+          bin.filePermissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
         shadowDist.with(applicationExtension.applicationDistribution)
       }
