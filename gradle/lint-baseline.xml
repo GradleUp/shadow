@@ -80,50 +80,6 @@
 
     <issue
         id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method map from org.gradle.api.internal.ConventionMapping)"
-        errorLine1="        task.conventionMapping.map(&quot;applicationName&quot;, ::getApplicationName)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="72"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method map from org.gradle.api.internal.ConventionMapping)"
-        errorLine1="        task.conventionMapping.map(&quot;outputDir&quot;) { layout.buildDirectory.dir(&quot;scriptsShadow&quot;).get().asFile }"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="73"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method map from org.gradle.api.internal.ConventionMapping)"
-        errorLine1="        task.conventionMapping.map(&quot;executableDir&quot;, ::getExecutableDir)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="74"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
-        message="Avoid using internal Gradle APIs (method map from org.gradle.api.internal.ConventionMapping)"
-        errorLine1="        task.conventionMapping.map(&quot;defaultJvmOpts&quot;, ::getApplicationDefaultJvmArgs)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin.kt"
-            line="75"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="InternalGradleApiUsage"
         message="Avoid using internal Gradle APIs"
         errorLine1="import org.gradle.api.internal.file.CopyActionProcessingStreamAction"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
