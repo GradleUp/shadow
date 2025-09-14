@@ -270,13 +270,19 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(installShadowDistPath)
+    run(installShadowDistPath, shadowDistZipPath)
 
-    val installPath = path("build/install/")
-    assertThat(installPath.walkEntries()).containsOnly(
+    assertThat(path("build/install/").walkEntries()).containsOnly(
       "${applicationNames.second}/${executableDirs.second}/${applicationNames.second}",
       "${applicationNames.second}/${executableDirs.second}/${applicationNames.second}.bat",
       "${applicationNames.second}/lib/myapp-1.0-all.jar",
+    )
+    val zipPath = path("build/distributions/${applicationNames.second}-1.0.zip")
+    val zipEntries = ZipFile(zipPath.toFile()).entries().toList().filter { !it.isDirectory }.map { it.name }
+    assertThat(zipEntries).containsOnly(
+      "${applicationNames.second}-1.0/${executableDirs.second}/${applicationNames.second}",
+      "${applicationNames.second}-1.0/${executableDirs.second}/${applicationNames.second}.bat",
+      "${applicationNames.second}-1.0/lib/myapp-1.0-all.jar",
     )
   }
 
