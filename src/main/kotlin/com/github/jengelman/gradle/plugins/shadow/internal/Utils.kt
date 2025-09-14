@@ -60,10 +60,6 @@ internal fun Properties.inputStream(
   return os.toByteArray().inputStream()
 }
 
-internal fun requireResourceAsText(name: String): String {
-  return requireResourceAsStream(name).bufferedReader().use { it.readText() }
-}
-
 internal fun requireResourceAsStream(name: String): InputStream {
   return Utils::class.java.classLoader.getResourceAsStream(name)
     ?: throw NoSuchFileException("Resource $name not found.")

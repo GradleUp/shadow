@@ -15,6 +15,7 @@
     mainClass = "my.Main"
   }
   ```
+- Honor `executableDir` in `application` extension. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
 
 ### Changed
 
@@ -26,6 +27,7 @@
 - Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
 - Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
 - Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
+- Stop using start script templates bundled in Shadow. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
 
 ### Fixed
 

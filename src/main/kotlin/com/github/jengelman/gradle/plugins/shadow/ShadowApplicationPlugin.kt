@@ -6,8 +6,8 @@ import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import java.io.IOException
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -17,12 +17,11 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
-import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator
 
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
  *
- * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/45a20d82b623786d19b50185e595adf3d7b196b2/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
+ * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/fdecc3c95828bb9a1c1bb6114483fe5b16f9159d/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
  *
  * @see [ApplicationPlugin]
  */
@@ -47,7 +46,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         task.mainClass.convention(mainClass)
         task.jvmArguments.convention(provider { applicationDefaultJvmArgs })
       }
-
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
       task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
     }
@@ -57,12 +55,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
       task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
-
-      val dir = "com/github/jengelman/gradle/plugins/shadow/internal"
-      (task.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        resources.text.fromString(requireResourceAsText("$dir/unixStartScript.txt"))
-      (task.windowsStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        resources.text.fromString(requireResourceAsText("$dir/windowsStartScript.txt"))
 
       task.classpath = files(tasks.shadowJar)
 
@@ -74,7 +66,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         task.conventionMapping.map("executableDir", ::getExecutableDir)
         task.conventionMapping.map("defaultJvmOpts", ::getApplicationDefaultJvmArgs)
       }
-
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
   }
@@ -82,27 +73,22 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   protected open fun Project.configureInstallTask() {
     tasks.installShadowDist.configure { task ->
       val applicationName = providers.provider { applicationExtension.applicationName }
+      val executableDir = providers.provider { applicationExtension.executableDir }
 
       task.doFirst("Check installation directory") {
+        val destinationDir = task.destinationDir
+        val children = destinationDir.list() ?: throw IOException("Could not list directory $destinationDir")
+        if (children.isEmpty()) return@doFirst
         if (
-          !task.destinationDir.listFiles().isNullOrEmpty() &&
-          (
-            !task.destinationDir.resolve("lib").isDirectory ||
-              !task.destinationDir.resolve("bin").isDirectory
-            )
+          !destinationDir.resolve("lib").isDirectory ||
+          !destinationDir.resolve("bin").isDirectory ||
+          !destinationDir.resolve(executableDir.get()).isDirectory
         ) {
           throw GradleException(
-            "The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
+            "The specified installation directory '$destinationDir' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
               "If you really want to install to this directory, delete it and run the install task again.\n" +
               "Alternatively, choose a different installation directory.",
           )
-        }
-      }
-      task.doLast("Set permissions for the start scripts") {
-        task.eachFile {
-          if (it.path == "bin/${applicationName.get()}") {
-            it.permissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
-          }
         }
       }
     }
@@ -114,11 +100,13 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         shadowDist.from(file("src/dist"))
         shadowDist.into("lib") { lib ->
           lib.from(tasks.shadowJar)
+          // Reflects the value of the `Class-Path` attribute in the JAR manifest.
           lib.from(configurations.shadow)
         }
-        shadowDist.into("bin") { bin ->
+        // Defaults to bin dir.
+        shadowDist.into(applicationExtension.executableDir) { bin ->
           bin.from(tasks.startShadowScripts)
-          bin.filePermissions { it.unix(UNIX_SCRIPT_PERMISSIONS) }
+          bin.filePermissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
         shadowDist.with(applicationExtension.applicationDistribution)
       }

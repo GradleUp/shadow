@@ -6,7 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsText
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
@@ -15,6 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.getStream
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
@@ -61,7 +62,7 @@ class TransformersTest : BaseTransformerTest() {
   )
   @Test
   fun mergeLog4j2PluginCacheFiles() {
-    val content = requireResourceAsText(PLUGIN_CACHE_FILE)
+    val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
     val one = buildJarOne {
       insert(PLUGIN_CACHE_FILE, content)
     }
