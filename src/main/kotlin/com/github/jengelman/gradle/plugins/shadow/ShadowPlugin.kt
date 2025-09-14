@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.findOptionalProperty
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.internal.cc.base.logger
 
 public abstract class ShadowPlugin : Plugin<Project> {
 
@@ -36,6 +37,12 @@ public abstract class ShadowPlugin : Plugin<Project> {
     // If the user applies shadow before those plugins. However, this is fine, because this was also
     // the behavior with the old plugin when applying in that order.
     apply(LegacyShadowPlugin::class.java)
+
+    project.afterEvaluate {
+      project.tasks.findByName("assemble")?.let {
+        logger.info("Calling findByName should be allowed in afterEvaluate.")
+      }
+    }
   }
 
   private fun Project.configureBuildScan() {
