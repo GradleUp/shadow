@@ -100,7 +100,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         shadowDist.from(file("src/dist"))
         shadowDist.into("lib") { lib ->
           lib.from(tasks.shadowJar)
-          // Reflects the `Class-Path` value in the manifest.
+          // Reflects the value of the `Class-Path` attribute in the JAR manifest.
           lib.from(configurations.shadow)
         }
         // Defaults to bin dir.
