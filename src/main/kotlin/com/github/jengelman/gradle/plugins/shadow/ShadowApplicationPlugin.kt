@@ -98,13 +98,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           )
         }
       }
-      task.doLast("Set permissions for the start scripts") {
-        task.eachFile {
-          if (it.path == "bin/${applicationName.get()}") {
-            it.permissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
-          }
-        }
-      }
     }
   }
 
