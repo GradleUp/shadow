@@ -12,7 +12,9 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.distribution.Distribution
 import org.gradle.api.plugins.ApplicationPlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskContainer
@@ -87,7 +89,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureDistribution() {
-    distributions.register(DISTRIBUTION_NAME) { dist ->
+    registerShadowDistributionCommon { dist ->
       dist.distributionBaseName.convention(
         provider {
           // distributionBaseName defaults to `$project.name-$distribution.name`, applicationName defaults to project.name
@@ -96,12 +98,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         },
       )
       dist.contents { distSpec ->
-        distSpec.from(file("src/dist"))
-        distSpec.into("lib") { lib ->
-          lib.from(tasks.shadowJar)
-          // Reflects the value of the `Class-Path` attribute in the JAR manifest.
-          lib.from(configurations.shadow)
-        }
         // Defaults to bin dir.
         distSpec.into(provider(applicationExtension::getExecutableDir)) { bin ->
           bin.from(tasks.startShadowScripts)
@@ -122,7 +118,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     /**
      * Reflects the number of 755.
      */
-    private const val UNIX_SCRIPT_PERMISSIONS = "rwxr-xr-x"
+    internal const val UNIX_SCRIPT_PERMISSIONS = "rwxr-xr-x"
 
     public const val DISTRIBUTION_NAME: String = SHADOW
 
@@ -157,6 +153,22 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         task.group = ApplicationPlugin.APPLICATION_GROUP
         task.classpath = files(tasks.shadowJar)
         action.execute(task)
+      }
+    }
+
+    internal fun Project.registerShadowDistributionCommon(
+      action: Action<Distribution>,
+    ): Provider<Distribution> {
+      return distributions.register(DISTRIBUTION_NAME) { dist ->
+        dist.contents { distSpec ->
+          distSpec.from(file("src/dist"))
+          distSpec.into("lib") { lib ->
+            lib.from(tasks.shadowJar)
+            // Reflects the value of the `Class-Path` attribute in the JAR manifest.
+            lib.from(configurations.shadow)
+          }
+        }
+        action.execute(dist)
       }
     }
   }

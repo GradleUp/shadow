@@ -1,7 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.UNIX_SCRIPT_PERMISSIONS
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.registerRunShadowCommon
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.registerShadowDistributionCommon
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.registerStartShadowScriptsCommon
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.startShadowScripts
 import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgpVersion
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
@@ -49,6 +52,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       (tasks.getByName("startScriptsFor$targetNameCap") as CreateStartScripts).let {
         addCreateScriptsTask(it)
       }
+      configureDistribution()
     }
   }
 
@@ -96,6 +100,20 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
         task.conventionMapping.map("executableDir", ::getExecutableDir)
         task.conventionMapping.map("defaultJvmOpts", ::getDefaultJvmOpts)
+      }
+    }
+  }
+
+  private fun Project.configureDistribution() {
+    registerShadowDistributionCommon { dist ->
+      dist.contents { distSpec ->
+        // Should use KotlinJvmBinaryDsl.applicationDistribution instead.
+        distSpec.into("bin") { bin ->
+          bin.from(tasks.startShadowScripts)
+          bin.filePermissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
+        }
+        // TODO: we can't access KotlinJvmBinaryDsl instance for now.
+//      distSpec.with(KotlinJvmBinaryDsl.applicationDistribution)
       }
     }
   }
