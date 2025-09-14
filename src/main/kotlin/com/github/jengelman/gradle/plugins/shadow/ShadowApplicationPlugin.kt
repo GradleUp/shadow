@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.distributions
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import java.io.IOException
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -75,16 +76,16 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       val executableDir = providers.provider { applicationExtension.executableDir }
 
       task.doFirst("Check installation directory") {
+        val destinationDir = task.destinationDir
+        val children = destinationDir.list() ?: throw IOException("Could not list directory $destinationDir")
+        if (children.isEmpty()) return@doFirst
         if (
-          !task.destinationDir.listFiles().isNullOrEmpty() &&
-          (
-            !task.destinationDir.resolve("lib").isDirectory ||
-              !task.destinationDir.resolve("bin").isDirectory ||
-              !task.destinationDir.resolve(executableDir.get()).isDirectory
-            )
+          !destinationDir.resolve("lib").isDirectory ||
+          !destinationDir.resolve("bin").isDirectory ||
+          !destinationDir.resolve(executableDir.get()).isDirectory
         ) {
           throw GradleException(
-            "The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
+            "The specified installation directory '$destinationDir' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
               "If you really want to install to this directory, delete it and run the install task again.\n" +
               "Alternatively, choose a different installation directory.",
           )
