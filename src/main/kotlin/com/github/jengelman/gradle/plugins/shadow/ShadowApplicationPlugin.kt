@@ -100,7 +100,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           // Reflects the `Class-Path` value in the manifest.
           lib.from(configurations.shadow)
         }
-        shadowDist.into("bin") { bin ->
+        // Defaults to bin dir.
+        shadowDist.into(applicationExtension.executableDir) { bin ->
           bin.from(tasks.startShadowScripts)
           bin.filePermissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
