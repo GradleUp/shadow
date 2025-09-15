@@ -97,8 +97,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
   @MethodSource("relocationProvider")
   fun relocations(pattern: String, shadedPattern: String, expected: String) {
     val aggregator = PluginCache().apply {
-      val resources = Collections.enumeration(listOf(pluginCacheUrl))
-      loadCacheFiles(resources)
+      loadCacheFiles(Collections.enumeration(listOf(pluginCacheUrl)))
     }
     transformer.transform(context(SimpleRelocator(pattern, shadedPattern)))
     transformer.relocatePlugins(aggregator)
