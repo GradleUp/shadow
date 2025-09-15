@@ -35,11 +35,13 @@ public open class ManifestResourceTransformer @Inject constructor(
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
+  /**
+   * Defaults to `null`.
+   */
   @get:Optional
   @get:Input
   public open val mainClass: Property<String> = objectFactory.property()
 
-  @get:Optional
   @get:Input
   public open val manifestEntries: MapProperty<String, JarAttribute> = objectFactory.mapProperty()
 

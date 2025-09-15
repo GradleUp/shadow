@@ -22,6 +22,9 @@ import org.gradle.api.tasks.Optional
 public open class DontIncludeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : ResourceTransformer by ResourceTransformer.Companion {
+  /**
+   * Defaults to `null`.
+   */
   @get:Optional
   @get:Input
   public open val resource: Property<String> = objectFactory.property()

@@ -36,6 +36,9 @@ public open class XmlAppendingTransformer @Inject constructor(
   @get:Input
   public open val ignoreDtd: Property<Boolean> = objectFactory.property(true)
 
+  /**
+   * Defaults to `null`.
+   */
   @get:Optional
   @get:Input
   public open val resource: Property<String> = objectFactory.property()

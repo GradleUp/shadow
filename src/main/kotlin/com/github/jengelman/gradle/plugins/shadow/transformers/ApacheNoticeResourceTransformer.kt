@@ -67,6 +67,9 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   @get:Input
   public open val inceptionYear: Property<String> = objectFactory.property("2006")
 
+  /**
+   * Defaults to `null`.
+   */
   @get:Optional
   @get:Input
   public open val copyright: Property<String> = objectFactory.property()

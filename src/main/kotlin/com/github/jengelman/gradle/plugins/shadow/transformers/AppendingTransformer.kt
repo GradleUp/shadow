@@ -26,6 +26,9 @@ public open class AppendingTransformer @Inject constructor(
   private var _data: ByteArrayOutputStream? = null // It's nullable to allow lazy initialization to support CC.
   private inline val data get() = _data ?: ByteArrayOutputStream().also { _data = it }
 
+  /**
+   * Defaults to `null`.
+   */
   @get:Optional
   @get:Input
   public open val resource: Property<String> = objectFactory.property()
