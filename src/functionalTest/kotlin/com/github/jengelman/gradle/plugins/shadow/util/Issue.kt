@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.testkit
+package com.github.jengelman.gradle.plugins.shadow.util
 
 import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.extension.BeforeEachCallback
