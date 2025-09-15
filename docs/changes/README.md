@@ -30,7 +30,7 @@
 - Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
 - Stop using start script templates bundled in Shadow. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
 - Bump min Java requirement to 17. ([#1744](https://github.com/GradleUp/shadow/pull/1744))
-- Require all optional properties non-null. ([#1745](https://github.com/GradleUp/shadow/pull/1745))
+- Require most optional properties non-null. ([#1745](https://github.com/GradleUp/shadow/pull/1745))
 
 ### Fixed
 
