@@ -56,8 +56,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
     // Pull the data back out and make sure it was transformed
     val cache = PluginCache()
     val url = URI("jar:" + tempJar.toUri().toURL() + "!/" + PLUGIN_CACHE_FILE).toURL()
-    val resources = Collections.enumeration(listOf(url))
-    cache.loadCacheFiles(resources)
+    cache.loadCacheFiles(Collections.enumeration(listOf(url)))
 
     assertThat(cache.getCategory("lookup")["date"]?.className)
       .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
