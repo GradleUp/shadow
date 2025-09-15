@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.testkit
+package com.github.jengelman.gradle.plugins.shadow.util
 
 enum class JvmLang(
   val suffix: String,

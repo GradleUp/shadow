@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.testkit
+package com.github.jengelman.gradle.plugins.shadow.util
 
 import java.nio.file.Path
 import java.util.jar.JarEntry
