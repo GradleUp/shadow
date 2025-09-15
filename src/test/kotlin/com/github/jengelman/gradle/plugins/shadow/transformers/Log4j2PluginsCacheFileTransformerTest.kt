@@ -8,6 +8,7 @@ import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import assertk.assertions.startsWith
 import assertk.fail
+import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -55,8 +56,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
     // Pull the data back out and make sure it was transformed
     val cache = PluginCache()
     val url = URI("jar:" + tempJar.toUri().toURL() + "!/" + PLUGIN_CACHE_FILE).toURL()
-    val resources = Collections.enumeration(listOf(url))
-    cache.loadCacheFiles(resources)
+    cache.loadCacheFiles(Collections.enumeration(listOf(url)))
 
     assertThat(cache.getCategory("lookup")["date"]?.className)
       .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
@@ -96,8 +96,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
   @MethodSource("relocationProvider")
   fun relocations(pattern: String, shadedPattern: String, expected: String) {
     val aggregator = PluginCache().apply {
-      val resources = Collections.enumeration(listOf(pluginCacheUrl))
-      loadCacheFiles(resources)
+      loadCacheFiles(Collections.enumeration(listOf(pluginCacheUrl)))
     }
     transformer.transform(context(SimpleRelocator(pattern, shadedPattern)))
     transformer.relocatePlugins(aggregator)
@@ -110,7 +109,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
   }
 
   private companion object {
-    val pluginCacheUrl: URL = requireNotNull(this::class.java.classLoader.getResource(PLUGIN_CACHE_FILE))
+    val pluginCacheUrl: URL = requireResourceAsPath(PLUGIN_CACHE_FILE).toUri().toURL()
 
     fun context(vararg relocators: Relocator): TransformerContext {
       return TransformerContext(PLUGIN_CACHE_FILE, requireResourceAsStream(PLUGIN_CACHE_FILE), relocators.toSet())

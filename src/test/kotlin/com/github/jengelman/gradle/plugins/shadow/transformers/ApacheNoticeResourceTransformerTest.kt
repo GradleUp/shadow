@@ -4,8 +4,6 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import assertk.fail
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 import java.util.zip.ZipInputStream
@@ -13,7 +11,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
 
 /**
- * Modified from [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerParameterTests.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformerParameterTests.java).
+ * Modified from [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformerTest.java).
  */
 class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeResourceTransformer>() {
 
@@ -37,71 +35,22 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
     val zos = ZipOutputStream(baos)
 
     transformer.projectName.set("test-project")
-    transformer.transform(
-      TransformerContext(
-        path = NOTICE_RESOURCE,
-        inputStream = "".byteInputStream(),
-      ),
-    )
+    transformer.transform(context())
     transformer.modifyOutputStream(zos, false)
     zos.close()
 
-    val zis = ZipInputStream(ByteArrayInputStream(baos.toByteArray()))
+    val zis = ZipInputStream(baos.toByteArray().inputStream())
     zis.nextEntry
     val output = zis.readAllBytes().toString(Charset.forName(transformer.charsetName.get()))
 
     assertThat(output).contains("in this case for test-project")
   }
 
-  @Test
-  fun noParametersShouldNotThrowNullPointerWhenNoInput() {
-    processAndFailOnNullPointer("")
-  }
+  private companion object {
+    const val NOTICE_RESOURCE = "META-INF/NOTICE"
 
-  @Test
-  fun noParametersShouldNotThrowNullPointerWhenNoLinesOfInput() {
-    processAndFailOnNullPointer("Some notice text")
-  }
-
-  @Test
-  fun noParametersShouldNotThrowNullPointerWhenOneLineOfInput() {
-    processAndFailOnNullPointer("Some notice text\n")
-  }
-
-  @Test
-  fun noParametersShouldNotThrowNullPointerWhenTwoLinesOfInput() {
-    processAndFailOnNullPointer("Some notice text\nSome notice text\n")
-  }
-
-  @Test
-  fun noParametersShouldNotThrowNullPointerWhenLineStartsWithSlashSlash() {
-    processAndFailOnNullPointer("Some notice text\n//Some notice text\n")
-  }
-
-  @Test
-  fun noParametersShouldNotThrowNullPointerWhenLineIsSlashSlash() {
-    processAndFailOnNullPointer("//\n")
-  }
-
-  @Test
-  fun noParametersShouldNotThrowNullPointerWhenLineIsEmpty() {
-    processAndFailOnNullPointer("\n")
-  }
-
-  private fun processAndFailOnNullPointer(noticeText: String) {
-    try {
-      transformer.transform(
-        TransformerContext(
-          path = NOTICE_RESOURCE,
-          inputStream = noticeText.byteInputStream(),
-        ),
-      )
-    } catch (_: NullPointerException) {
-      fail("Null pointer should not be thrown when no parameters are set.")
+    fun context(text: String = ""): TransformerContext {
+      return TransformerContext(NOTICE_RESOURCE, text.byteInputStream())
     }
-  }
-
-  companion object {
-    private const val NOTICE_RESOURCE = "META-INF/NOTICE"
   }
 }

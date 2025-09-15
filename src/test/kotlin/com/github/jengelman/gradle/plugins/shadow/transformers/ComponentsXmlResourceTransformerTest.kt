@@ -13,23 +13,19 @@ class ComponentsXmlResourceTransformerTest : BaseTransformerTest<ComponentsXmlRe
   @Test
   fun configurationMerging() {
     XMLUnit.setNormalizeWhitespace(true)
+    transformer.transform(context("components-1.xml"))
+    transformer.transform(context("components-2.xml"))
 
-    transformer.transform(
-      TransformerContext(
-        path = "components-1.xml",
-        inputStream = requireResourceAsStream("components-1.xml"),
-      ),
-    )
-    transformer.transform(
-      TransformerContext(
-        path = "components-1.xml",
-        inputStream = requireResourceAsStream("components-2.xml"),
-      ),
-    )
     val diff = XMLUnit.compareXML(
       requireResourceAsStream("components-expected.xml").bufferedReader().readText(),
       transformer.transformedResource.decodeToString(),
     )
     assertThat(diff.identical()).isTrue()
+  }
+
+  private companion object {
+    fun context(path: String): TransformerContext {
+      return TransformerContext(path, requireResourceAsStream(path))
+    }
   }
 }
