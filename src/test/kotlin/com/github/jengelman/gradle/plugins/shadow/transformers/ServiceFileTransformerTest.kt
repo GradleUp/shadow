@@ -6,10 +6,10 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.zipOutputStream
-import java.io.InputStream
 import java.nio.file.Path
-import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
@@ -86,7 +86,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResourceShaded) }
+    val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
     assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
   }
 
@@ -105,7 +105,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResourceShaded) }
+    val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
     assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
   }
 
@@ -122,7 +122,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResource) }
+    val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
     assertThat(transformedContent).isEqualTo("org.eclipse1234.osgi.launch.EquinoxFactory")
   }
 
@@ -144,22 +144,13 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = ZipFile(tempJar.toFile()).use { it.getContent(contentResource) }
+    val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
     assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.blah.Service")
   }
 
   private companion object {
     fun context(path: String, input: String, vararg relocators: Relocator): TransformerContext {
       return TransformerContext(path, input.byteInputStream(), relocators = relocators.toSet())
-    }
-
-    fun ZipFile.getContent(entryName: String): String {
-      return getStream(entryName).bufferedReader().use { it.readText() }
-    }
-
-    fun ZipFile.getStream(entryName: String): InputStream {
-      val entry = requireNotNull(getEntry(entryName)) { "Entry $entryName not found in all entries: ${entries().toList()}" }
-      return getInputStream(entry)
     }
 
     @JvmStatic
