@@ -67,7 +67,7 @@ public open class ManifestResourceTransformer @Inject constructor(
     }
 
     val attributes = manifest!!.mainAttributes
-    mainClass.get().takeIf(CharSequence::isNotEmpty).let {
+    mainClass.get().takeIf(CharSequence::isNotEmpty)?.let {
       attributes[mainClassAttributeKey] = it
     }
     manifestEntries.get().forEach { (key, value) ->
