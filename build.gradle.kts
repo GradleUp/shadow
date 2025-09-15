@@ -39,7 +39,7 @@ kotlin {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_2_0
     languageVersion = apiVersion
-    jvmTarget = JvmTarget.JVM_11
+    jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
     freeCompilerArgs.add("-Xjdk-release=${libs.versions.jdkRelease.get()}")
   }
