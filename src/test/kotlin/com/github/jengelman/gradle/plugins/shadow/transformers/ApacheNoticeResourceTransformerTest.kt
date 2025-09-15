@@ -37,12 +37,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
     val zos = ZipOutputStream(baos)
 
     transformer.projectName.set("test-project")
-    transformer.transform(
-      TransformerContext(
-        path = NOTICE_RESOURCE,
-        inputStream = "".byteInputStream(),
-      ),
-    )
+    transformer.transform(context())
     transformer.modifyOutputStream(zos, false)
     zos.close()
 
@@ -90,18 +85,17 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
 
   private fun processAndFailOnNullPointer(noticeText: String) {
     try {
-      transformer.transform(
-        TransformerContext(
-          path = NOTICE_RESOURCE,
-          inputStream = noticeText.byteInputStream(),
-        ),
-      )
+      transformer.transform(context(noticeText))
     } catch (_: NullPointerException) {
       fail("Null pointer should not be thrown when no parameters are set.")
     }
   }
 
   companion object {
-    private const val NOTICE_RESOURCE = "META-INF/NOTICE"
+    const val NOTICE_RESOURCE = "META-INF/NOTICE"
+
+    fun context(text: String = ""): TransformerContext {
+      return TransformerContext(NOTICE_RESOURCE, text.byteInputStream())
+    }
   }
 }
