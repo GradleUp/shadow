@@ -29,7 +29,7 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
     transformer = clazz.create(testObjectFactory)
   }
 
-  protected companion object {
+  companion object {
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
 
     fun ResourceTransformer.canTransformResource(path: String, isFile: Boolean = true): Boolean {

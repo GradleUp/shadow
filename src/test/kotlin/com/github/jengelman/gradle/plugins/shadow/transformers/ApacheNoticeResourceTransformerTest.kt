@@ -91,7 +91,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
     }
   }
 
-  companion object {
+  private companion object {
     const val NOTICE_RESOURCE = "META-INF/NOTICE"
 
     fun context(text: String = ""): TransformerContext {
