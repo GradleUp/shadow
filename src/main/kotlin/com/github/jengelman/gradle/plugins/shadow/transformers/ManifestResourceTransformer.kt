@@ -16,7 +16,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 
 /**
  * A resource processor that allows the arbitrary addition of attributes to
@@ -35,11 +34,9 @@ public open class ManifestResourceTransformer @Inject constructor(
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
-  @get:Optional
   @get:Input
-  public open val mainClass: Property<String> = objectFactory.property()
+  public open val mainClass: Property<String> = objectFactory.property("")
 
-  @get:Optional
   @get:Input
   public open val manifestEntries: MapProperty<String, JarAttribute> = objectFactory.mapProperty()
 
@@ -70,7 +67,7 @@ public open class ManifestResourceTransformer @Inject constructor(
     }
 
     val attributes = manifest!!.mainAttributes
-    mainClass.orNull?.let {
+    mainClass.get().takeIf(CharSequence::isNotEmpty)?.let {
       attributes[mainClassAttributeKey] = it
     }
     manifestEntries.get().forEach { (key, value) ->
