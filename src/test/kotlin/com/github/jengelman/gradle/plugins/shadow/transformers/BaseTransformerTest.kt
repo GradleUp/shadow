@@ -42,7 +42,7 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
     }
 
     fun JarPath.readContentLines(resourceName: String = MANIFEST_NAME): List<String> {
-      return use { it.getStream(resourceName).reader().readLines() }
+      return use { it.getStream(resourceName).bufferedReader().readLines() }
     }
 
     fun doTransformAndGetTransformedPath(
