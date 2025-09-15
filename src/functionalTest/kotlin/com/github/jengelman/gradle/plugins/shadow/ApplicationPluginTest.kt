@@ -80,7 +80,7 @@ class ApplicationPluginTest : BasePluginTest() {
     run(installShadowDistPath)
 
     val installPath = path("build/install/")
-    assertThat(installPath.walkEntries()).containsOnly(
+    assertThat(installPath.invariantSeparatorsEntries()).containsOnly(
       "myapp-shadow/bin/myapp",
       "myapp-shadow/bin/myapp.bat",
       "myapp-shadow/lib/myapp-1.0-all.jar",
@@ -271,7 +271,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     run(installShadowDistPath, shadowDistZipPath)
 
-    assertThat(path("build/install/").walkEntries()).containsOnly(
+    assertThat(path("build/install/").invariantSeparatorsEntries()).containsOnly(
       "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}",
       "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}.bat",
       "${applicationNames.second}-shadow/lib/myapp-1.0-all.jar",
@@ -337,11 +337,9 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private companion object {
     @OptIn(ExperimentalPathApi::class)
-    fun Path.walkEntries(): Sequence<String> {
-      return walk()
-        .filter { it.isRegularFile() }
-        .map { it.relativeTo(this) }
-        .map { it.invariantSeparatorsPathString }
-    }
+    fun Path.invariantSeparatorsEntries(includeDirs: Boolean = false): Sequence<String> = walk()
+      .filter { includeDirs || it.isRegularFile() }
+      .map { it.relativeTo(this) }
+      .map { it.invariantSeparatorsPathString }
   }
 }
