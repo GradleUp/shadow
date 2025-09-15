@@ -6,12 +6,12 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.util.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getStream
+import com.github.jengelman.gradle.plugins.shadow.util.requireResourceAsPath
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString

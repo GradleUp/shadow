@@ -3,13 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.nio.charset.Charset
-import java.nio.file.NoSuchFileException
-import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.Attributes.Name as JarAttributeName
-import kotlin.io.path.toPath
 import org.apache.tools.zip.ZipEntry
 
 /**
@@ -59,16 +55,3 @@ internal fun Properties.inputStream(
   }
   return os.toByteArray().inputStream()
 }
-
-internal fun requireResourceAsStream(name: String): InputStream {
-  return Utils::class.java.classLoader.getResourceAsStream(name)
-    ?: throw NoSuchFileException("Resource $name not found.")
-}
-
-internal fun requireResourceAsPath(name: String): Path {
-  val resource = Utils::class.java.classLoader.getResource(name)
-    ?: throw NoSuchFileException("Resource $name not found.")
-  return resource.toURI().toPath()
-}
-
-private object Utils
