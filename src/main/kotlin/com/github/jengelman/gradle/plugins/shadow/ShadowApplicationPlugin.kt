@@ -44,7 +44,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
-        task.jvmArguments.convention(provider { applicationDefaultJvmArgs })
+        task.jvmArguments.convention(provider(::getApplicationDefaultJvmArgs))
       }
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
       task.javaLauncher.convention(javaToolchainService.launcherFor(javaPluginExtension.toolchain))
@@ -73,8 +73,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun Project.configureInstallTask() {
     tasks.installShadowDist.configure { task ->
-      val applicationName = providers.provider { applicationExtension.applicationName }
-      val executableDir = providers.provider { applicationExtension.executableDir }
+      val applicationName = provider(applicationExtension::getApplicationName)
+      val executableDir = provider(applicationExtension::getExecutableDir)
 
       task.doFirst("Check installation directory") {
         val destinationDir = task.destinationDir
@@ -97,6 +97,13 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun Project.configureDistribution() {
     distributions.register(DISTRIBUTION_NAME) {
+      it.distributionBaseName.convention(
+        provider {
+          // distributionBaseName defaults to `$project.name-$distribution.name`, applicationName defaults to project.name
+          // so we append the suffix to match the default distributionBaseName. Modified from `ApplicationPlugin.configureDistribution()`.
+          "${applicationExtension.applicationName}-$DISTRIBUTION_NAME"
+        },
+      )
       it.contents { shadowDist ->
         shadowDist.from(file("src/dist"))
         shadowDist.into("lib") { lib ->
@@ -105,7 +112,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           lib.from(configurations.shadow)
         }
         // Defaults to bin dir.
-        shadowDist.into(applicationExtension.executableDir) { bin ->
+        shadowDist.into(provider(applicationExtension::getExecutableDir)) { bin ->
           bin.from(tasks.startShadowScripts)
           bin.filePermissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
         }

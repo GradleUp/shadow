@@ -258,6 +258,36 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun honorApplicationExtensionProperties() {
+    val applicationNames = "new" to "new"
+    val executableDirs = "sbin" to "sbin"
+
+    prepare(
+      applicationBlock = """
+        applicationName = '${applicationNames.first}'
+        executableDir = '${executableDirs.first}'
+      """.trimIndent(),
+    )
+
+    run(installShadowDistPath, shadowDistZipPath)
+
+    assertThat(path("build/install/").walkEntries()).containsOnly(
+      "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}",
+      "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}.bat",
+      "${applicationNames.second}-shadow/lib/myapp-1.0-all.jar",
+    )
+    val zipPath = path("build/distributions/${applicationNames.second}-shadow-1.0.zip")
+    ZipFile(zipPath.toFile()).use { zip ->
+      val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
+      assertThat(entries).containsOnly(
+        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}",
+        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}.bat",
+        "${applicationNames.second}-shadow-1.0/lib/myapp-1.0-all.jar",
+      )
+    }
+  }
+
   private fun prepare(
     mainClassWithImports: Boolean = false,
     projectBlock: String = "",

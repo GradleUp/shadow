@@ -15,7 +15,8 @@
     mainClass = "my.Main"
   }
   ```
-- Honor `executableDir` in `application` extension. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
+- Honor `executableDir` and `applicationName` in `application` extension. ([#1740](https://github.com/GradleUp/shadow/pull/1738))  
+  This is useful when you want to customize the output directory of the start scripts and the application distribution.
 
 ### Changed
 
