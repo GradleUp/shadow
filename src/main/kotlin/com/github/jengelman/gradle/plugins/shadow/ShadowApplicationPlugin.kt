@@ -97,7 +97,13 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun Project.configureDistribution() {
     distributions.register(DISTRIBUTION_NAME) {
-      it.distributionBaseName.convention(provider(applicationExtension::getApplicationName))
+      it.distributionBaseName.convention(
+        provider {
+          // distributionBaseName defaults to `$project.name-$distribution.name`, applicationName defaults to project.name
+          // so we append the suffix to match the default distributionBaseName. Modified from `ApplicationPlugin.configureDistribution()`.
+          "${applicationExtension.applicationName}-$DISTRIBUTION_NAME"
+        },
+      )
       it.contents { shadowDist ->
         shadowDist.from(file("src/dist"))
         shadowDist.into("lib") { lib ->
