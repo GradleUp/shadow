@@ -278,12 +278,14 @@ class ApplicationPluginTest : BasePluginTest() {
       "${applicationNames.second}-shadow/lib/myapp-1.0-all.jar",
     )
     val zipPath = path("build/distributions/${applicationNames.second}-shadow-1.0.zip")
-    val zipEntries = ZipFile(zipPath.toFile()).entries().toList().filter { !it.isDirectory }.map { it.name }
-    assertThat(zipEntries).containsOnly(
-      "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}",
-      "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}.bat",
-      "${applicationNames.second}-shadow-1.0/lib/myapp-1.0-all.jar",
-    )
+    ZipFile(zipPath.toFile()).use { zip ->
+      val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
+      assertThat(entries).containsOnly(
+        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}",
+        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}.bat",
+        "${applicationNames.second}-shadow-1.0/lib/myapp-1.0-all.jar",
+      )
+    }
   }
 
   private fun prepare(
