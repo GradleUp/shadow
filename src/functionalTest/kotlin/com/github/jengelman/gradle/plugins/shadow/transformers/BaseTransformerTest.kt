@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
-import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarBuilder
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.BeforeEach

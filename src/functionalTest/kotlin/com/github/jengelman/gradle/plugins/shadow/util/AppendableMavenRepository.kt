@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.util
+package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.commonArguments
 import java.nio.file.Path

@@ -1,9 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.testkit.noOpDelegate
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.testObjectFactory
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
-import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
-import com.github.jengelman.gradle.plugins.shadow.util.requireResourceAsStream
-import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
 import java.util.Locale

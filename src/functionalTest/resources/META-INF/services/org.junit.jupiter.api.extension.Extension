@@ -1,1 +1,1 @@
-com.github.jengelman.gradle.plugins.shadow.util.IssueExtension
+com.github.jengelman.gradle.plugins.shadow.testkit.IssueExtension
