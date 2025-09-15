@@ -8,11 +8,11 @@ import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import assertk.assertions.startsWith
 import assertk.fail
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
-import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.zipOutputStream
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.net.URL

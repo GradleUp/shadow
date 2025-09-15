@@ -1,13 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.noOpDelegate
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.testObjectFactory
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
-import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
-import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.lang.reflect.ParameterizedType
-import java.nio.file.Path
 import java.util.Locale
-import java.util.zip.ZipFile
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
@@ -41,22 +41,19 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
       return canTransformResource(element)
     }
 
-    fun readFrom(jarPath: Path, resourceName: String = MANIFEST_NAME): List<String> {
-      return ZipFile(jarPath.toFile()).use { zip ->
-        val entry = zip.getEntry(resourceName) ?: return emptyList()
-        zip.getInputStream(entry).bufferedReader().readLines()
-      }
+    fun JarPath.readContentLines(resourceName: String = MANIFEST_NAME): List<String> {
+      return use { it.getStream(resourceName).bufferedReader().readLines() }
     }
 
     fun doTransformAndGetTransformedPath(
       transformer: ResourceTransformer,
       preserveFileTimestamps: Boolean,
-    ): Path {
+    ): JarPath {
       val testableZipPath = createTempFile("testable-zip-file-", ".jar")
-      ZipOutputStream(testableZipPath.outputStream().buffered()).use { zipOutputStream ->
+      ZipOutputStream(testableZipPath.outputStream()).use { zipOutputStream ->
         transformer.modifyOutputStream(zipOutputStream, preserveFileTimestamps)
       }
-      return testableZipPath
+      return JarPath(testableZipPath)
     }
 
     /**

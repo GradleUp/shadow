@@ -66,6 +66,9 @@ val testPluginClasspath by configurations.registering {
   description = "Plugins used in integration tests could be resolved in classpath."
 }
 
+val testKit by sourceSets.creating
+val testKitImplementation by configurations.getting
+
 configurations.configureEach {
   when (name) {
     API_ELEMENTS_CONFIGURATION_NAME,
@@ -114,6 +117,8 @@ dependencies {
   implementation(libs.jdom2)
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
+
+  testKitImplementation(libs.assertk)
 
   testPluginClasspath(libs.foojayResolver)
   testPluginClasspath(libs.develocity)
@@ -172,6 +177,7 @@ testing.suites {
   withType<JvmTestSuite>().configureEach {
     useJUnitJupiter(libs.junit.bom.map { requireNotNull(it.version) })
     dependencies {
+      implementation(testKit.output)
       implementation(libs.assertk)
     }
     targets.configureEach {

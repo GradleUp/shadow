@@ -6,7 +6,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
@@ -44,9 +44,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       transform(manifestTransformerContext)
     }
 
-    val testableZipPath = doTransformAndGetTransformedPath(transformer, true)
-
-    val targetLines = readFrom(testableZipPath)
+    val targetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
     assertThat(targetLines).isNotEmpty()
     assertThat(targetLines.size).isGreaterThan(4)
 
@@ -66,8 +64,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
   fun noTransformation() {
     val sourceLines = requireResourceAsStream(MANIFEST_NAME).bufferedReader().readLines()
     transformer.transform(manifestTransformerContext)
-    val testableZipPath = doTransformAndGetTransformedPath(transformer, true)
-    val targetLines = readFrom(testableZipPath)
+    val targetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
 
     assertThat(targetLines).isEqualTo(sourceLines)
   }

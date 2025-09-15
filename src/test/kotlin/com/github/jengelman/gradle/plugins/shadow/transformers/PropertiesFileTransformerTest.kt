@@ -32,8 +32,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun transformation() {
     transformer.transform(manifestTransformerContext)
 
-    val testableZipPath = doTransformAndGetTransformedPath(transformer, false)
-    val targetLines = readFrom(testableZipPath)
+    val targetLines = doTransformAndGetTransformedPath(transformer, false).readContentLines()
 
     assertThat(targetLines).isNotEmpty()
     assertThat(targetLines).contains("Manifest-Version=1.0")
@@ -43,13 +42,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun transformationPropertiesAreReproducible() {
     transformer.transform(manifestTransformerContext)
 
-    val firstRunTransformedPath = doTransformAndGetTransformedPath(transformer, true)
-    val firstRunTargetLines = readFrom(firstRunTransformedPath)
-
+    val firstRunTargetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
     Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
-
-    val secondRunTransformedPath = doTransformAndGetTransformedPath(transformer, true)
-    val secondRunTargetLines = readFrom(secondRunTransformedPath)
+    val secondRunTargetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
 
     assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
   }
