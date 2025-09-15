@@ -16,11 +16,11 @@ import com.github.jengelman.gradle.plugins.shadow.util.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.OS
 
-@ExperimentalPathApi
 class ApplicationPluginTest : BasePluginTest() {
   private lateinit var mainClass: String
 
@@ -337,11 +336,10 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private companion object {
-    fun Path.walkEntries(): Sequence<String> {
-      return walk()
-        .filter { it.isRegularFile() }
-        .map { it.relativeTo(this) }
-        .map { it.toString().replace(FileSystems.getDefault().separator, "/") }
-    }
+    @OptIn(ExperimentalPathApi::class)
+    fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> = walk()
+      .filter { includeDirs || it.isRegularFile() }
+      .map { it.relativeTo(this) }
+      .map { it.invariantSeparatorsPathString }
   }
 }
