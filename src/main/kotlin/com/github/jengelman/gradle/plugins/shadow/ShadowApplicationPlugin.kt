@@ -96,27 +96,27 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureDistribution() {
-    distributions.register(DISTRIBUTION_NAME) {
-      it.distributionBaseName.convention(
+    distributions.register(DISTRIBUTION_NAME) { dist ->
+      dist.distributionBaseName.convention(
         provider {
           // distributionBaseName defaults to `$project.name-$distribution.name`, applicationName defaults to project.name
           // so we append the suffix to match the default distributionBaseName. Modified from `ApplicationPlugin.configureDistribution()`.
           "${applicationExtension.applicationName}-$DISTRIBUTION_NAME"
         },
       )
-      it.contents { shadowDist ->
-        shadowDist.from(file("src/dist"))
-        shadowDist.into("lib") { lib ->
+      dist.contents { distSpec ->
+        distSpec.from(file("src/dist"))
+        distSpec.into("lib") { lib ->
           lib.from(tasks.shadowJar)
           // Reflects the value of the `Class-Path` attribute in the JAR manifest.
           lib.from(configurations.shadow)
         }
         // Defaults to bin dir.
-        shadowDist.into(provider(applicationExtension::getExecutableDir)) { bin ->
+        distSpec.into(provider(applicationExtension::getExecutableDir)) { bin ->
           bin.from(tasks.startShadowScripts)
           bin.filePermissions { permissions -> permissions.unix(UNIX_SCRIPT_PERMISSIONS) }
         }
-        shadowDist.with(applicationExtension.applicationDistribution)
+        distSpec.with(applicationExtension.applicationDistribution)
       }
     }
   }
