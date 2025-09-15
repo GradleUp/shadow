@@ -7,7 +7,6 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 
 /**
  * A resource processor that prevents the inclusion of an arbitrary resource into the shaded JAR.
@@ -22,14 +21,10 @@ import org.gradle.api.tasks.Optional
 public open class DontIncludeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : ResourceTransformer by ResourceTransformer.Companion {
-  /**
-   * Defaults to `null`.
-   */
-  @get:Optional
   @get:Input
-  public open val resource: Property<String> = objectFactory.property()
+  public open val resource: Property<String> = objectFactory.property("")
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return !resource.orNull.isNullOrEmpty() && element.path.endsWith(resource.get())
+    return resource.get().isNotEmpty() && element.path.endsWith(resource.get())
   }
 }

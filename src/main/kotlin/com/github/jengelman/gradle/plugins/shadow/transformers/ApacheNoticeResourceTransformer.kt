@@ -13,7 +13,6 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 
 /**
  * Merges `META-INF/NOTICE.TXT` files.
@@ -67,12 +66,8 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   @get:Input
   public open val inceptionYear: Property<String> = objectFactory.property("2006")
 
-  /**
-   * Defaults to `null`.
-   */
-  @get:Optional
   @get:Input
-  public open val copyright: Property<String> = objectFactory.property()
+  public open val copyright: Property<String> = objectFactory.property("")
 
   /**
    * The file encoding of the `NOTICE` file.
@@ -163,7 +158,7 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   override fun hasTransformedResource(): Boolean = true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    val copyright = copyright.orNull ?: fallbackCopyright
+    val copyright = copyright.get().ifEmpty { fallbackCopyright }
     val sb = StringBuilder()
     var count = 0
     for (line in entries) {

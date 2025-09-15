@@ -50,7 +50,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -174,13 +173,10 @@ public abstract class ShadowJar : Jar() {
    *
    * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar]
    * task or the main [Jar] task.
-   *
-   * Defaults to `null`.
    */
-  @get:Optional
   @get:Input
   @get:Option(option = "main-class", description = "Main class attribute to add to manifest.")
-  public open val mainClass: Property<String> = objectFactory.property()
+  public open val mainClass: Property<String> = objectFactory.property("")
 
   /**
    * Fails build if the ZIP entries in the shadowed JAR are duplicate.
@@ -465,12 +461,12 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun injectManifestAttributes() {
-    val mainClassValue = mainClass.orNull
+    val mainClassValue = mainClass.get()
     when {
       manifest.attributes.contains(mainClassAttributeKey) -> {
         logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.")
       }
-      mainClassValue.isNullOrEmpty() -> {
+      mainClassValue.isEmpty() -> {
         logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty.")
       }
       else -> {

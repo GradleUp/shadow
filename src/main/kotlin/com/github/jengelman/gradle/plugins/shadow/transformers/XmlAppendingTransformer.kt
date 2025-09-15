@@ -10,7 +10,6 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 import org.jdom2.Document
 import org.jdom2.JDOMException
 import org.jdom2.input.SAXBuilder
@@ -36,15 +35,11 @@ public open class XmlAppendingTransformer @Inject constructor(
   @get:Input
   public open val ignoreDtd: Property<Boolean> = objectFactory.property(true)
 
-  /**
-   * Defaults to `null`.
-   */
-  @get:Optional
   @get:Input
-  public open val resource: Property<String> = objectFactory.property()
+  public open val resource: Property<String> = objectFactory.property("")
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.orNull?.equals(element.path, ignoreCase = true) == true
+    return resource.get().equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {

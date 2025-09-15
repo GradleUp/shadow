@@ -9,7 +9,6 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
 
 /**
  * A resource processor that appends content for a resource, separated by a newline.
@@ -26,18 +25,14 @@ public open class AppendingTransformer @Inject constructor(
   private var _data: ByteArrayOutputStream? = null // It's nullable to allow lazy initialization to support CC.
   private inline val data get() = _data ?: ByteArrayOutputStream().also { _data = it }
 
-  /**
-   * Defaults to `null`.
-   */
-  @get:Optional
   @get:Input
-  public open val resource: Property<String> = objectFactory.property()
+  public open val resource: Property<String> = objectFactory.property("")
 
   @get:Input
   public open val separator: Property<String> = objectFactory.property(DEFAULT_SEPARATOR)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.orNull.equals(element.path, ignoreCase = true)
+    return resource.get().equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
