@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- Stop using start script templates bundled in Shadow. ([#1750](https://github.com/GradleUp/shadow/pull/1750))
+
 **Fixed**
 
 - Fix resolving BOM dependencies when `minimize` is enabled. ([#1638](https://github.com/GradleUp/shadow/pull/1638))
