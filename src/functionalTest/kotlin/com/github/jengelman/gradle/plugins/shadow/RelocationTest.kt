@@ -10,11 +10,11 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.internal.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
