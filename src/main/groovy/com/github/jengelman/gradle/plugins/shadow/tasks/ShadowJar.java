@@ -1,11 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks;
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowStats;
-import com.github.jengelman.gradle.plugins.shadow.internal.*;
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter;
+import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
+import com.github.jengelman.gradle.plugins.shadow.internal.GradleVersionUtil;
+import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter;
+import com.github.jengelman.gradle.plugins.shadow.internal.RelocationUtil;
+import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker;
+import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor;
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator;
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator;
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator;
-import com.github.jengelman.gradle.plugins.shadow.transformers.*;
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer;
+import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer;
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer;
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer;
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer;
+
 import org.gradle.api.Action;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DuplicatesStrategy;
@@ -13,7 +24,18 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.DocumentationRegistry;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.file.copy.CopyAction;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.Nested;
+import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
+import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.util.PatternSet;
 import org.jetbrains.annotations.NotNull;
@@ -107,16 +129,16 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) : null;
         return new ShadowCopyAction(getArchiveFile().get().getAsFile(), getInternalCompressor(), documentationRegistry,
-                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
-                isPreserveFileTimestamps(), minimizeJar, unusedTracker);
+            this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
+            isPreserveFileTimestamps(), minimizeJar, unusedTracker);
     }
 
     @Classpath
     FileCollection getToMinimize() {
         if (toMinimize == null) {
             toMinimize = minimizeJar
-                    ? dependencyFilterForMinimize.resolve(configurations).minus(getApiJars())
-                    : getProject().getObjects().fileCollection();
+                ? dependencyFilterForMinimize.resolve(configurations).minus(getApiJars())
+                : getProject().getObjects().fileCollection();
         }
         return toMinimize;
     }
@@ -126,8 +148,8 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
     FileCollection getApiJars() {
         if (apiJars == null) {
             apiJars = minimizeJar
-                    ? UnusedTracker.getApiJarsFromProject(getProject())
-                    : getProject().getObjects().fileCollection();
+                ? UnusedTracker.getApiJarsFromProject(getProject())
+                : getProject().getObjects().fileCollection();
         }
         return apiJars;
     }
@@ -209,7 +231,7 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
      * Add a Transformer instance for modifying JAR resources and configure.
      *
      * @param clazz the transformer class to add. Must have no-arg constructor
-     * @param c the configuration for the transformer
+     * @param c     the configuration for the transformer
      * @return this
      */
     @Override
@@ -321,7 +343,7 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
     /**
      * Add a class relocator that maps each class in the pattern to the provided destination.
      *
-     * @param pattern the source pattern to relocate
+     * @param pattern     the source pattern to relocate
      * @param destination the destination package
      * @return this
      */
@@ -333,9 +355,9 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
     /**
      * Add a class relocator that maps each class in the pattern to the provided destination.
      *
-     * @param pattern the source pattern to relocate
+     * @param pattern     the source pattern to relocate
      * @param destination the destination package
-     * @param configure the configuration of the relocator
+     * @param configure   the configuration of the relocator
      * @return this
      */
     @Override
@@ -380,7 +402,7 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
      * Add a relocator of the provided class and configure.
      *
      * @param relocatorClass the relocator class to add. Must have a no-arg constructor
-     * @param configure the configuration for the relocator
+     * @param configure      the configuration for the relocator
      * @return this
      */
     @Override
@@ -412,7 +434,8 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
         this.relocators = relocators;
     }
 
-    @Classpath @Optional
+    @Classpath
+    @Optional
     public List<FileCollection> getConfigurations() {
         return this.configurations;
     }

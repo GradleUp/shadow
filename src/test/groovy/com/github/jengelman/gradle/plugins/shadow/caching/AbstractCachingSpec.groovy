@@ -12,7 +12,8 @@ import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 abstract class AbstractCachingSpec extends PluginSpecification {
-    @TempDir Path alternateDir
+    @TempDir
+    Path alternateDir
 
     @Override
     def setup() {
@@ -33,13 +34,13 @@ abstract class AbstractCachingSpec extends PluginSpecification {
     }
 
     BuildResult runWithCacheEnabled(String... arguments) {
-        List<String> cacheArguments = [ '--build-cache' ]
+        List<String> cacheArguments = ['--build-cache']
         cacheArguments.addAll(arguments)
         return run(cacheArguments)
     }
 
     BuildResult runInAlternateDirWithCacheEnabled(String... arguments) {
-        List<String> cacheArguments = [ '--build-cache' ]
+        List<String> cacheArguments = ['--build-cache']
         cacheArguments.addAll(arguments)
         // TODO: Use PluginSpecification.run here to reuse flags, but cache tests failed for now, need to investigate.
         return runner.withProjectDir(alternateDir.toFile()).withArguments(cacheArguments).build()

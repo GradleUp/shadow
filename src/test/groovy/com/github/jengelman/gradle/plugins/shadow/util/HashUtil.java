@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util;
 
 import org.gradle.internal.UncheckedException;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;

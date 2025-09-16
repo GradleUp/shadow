@@ -98,8 +98,8 @@ class ShadowApplicationPlugin implements Plugin<Project> {
                 if (task.destinationDir.directory) {
                     if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
                         throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
-                                "If you really want to install to this directory, delete it and run the install task again.\n" +
-                                "Alternatively, choose a different installation directory."
+                            "If you really want to install to this directory, delete it and run the install task again.\n" +
+                            "Alternatively, choose a different installation directory."
                         )
                     }
                 }

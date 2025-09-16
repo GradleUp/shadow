@@ -105,8 +105,8 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
     Spec<? super ResolvedDependency> dependency(Dependency dependency) {
         this.dependency({ ResolvedDependency it ->
             (!dependency.group || it.moduleGroup.matches(dependency.group)) &&
-                    (!dependency.name || it.moduleName.matches(dependency.name)) &&
-                    (!dependency.version || it.moduleVersion.matches(dependency.version))
+                (!dependency.name || it.moduleName.matches(dependency.name)) &&
+                (!dependency.version || it.moduleVersion.matches(dependency.version))
         })
     }
 
@@ -117,7 +117,7 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
      */
     @Override
     Spec<? super ResolvedDependency> dependency(Closure spec) {
-        return Specs.<ResolvedDependency>convertClosureToSpec(spec)
+        return Specs.<ResolvedDependency> convertClosureToSpec(spec)
     }
 
     protected boolean isIncluded(ResolvedDependency dependency) {

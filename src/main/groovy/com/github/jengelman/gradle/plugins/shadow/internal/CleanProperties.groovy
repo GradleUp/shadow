@@ -25,8 +25,8 @@ class CleanProperties extends Properties {
 
         private boolean couldBeCommentWithTimestamp(final String str) {
             return str != null &&
-                    str.startsWith("#") &&
-                    str.length() == lengthOfExpectedTimestamp
+                str.startsWith("#") &&
+                str.length() == lengthOfExpectedTimestamp
         }
     }
 

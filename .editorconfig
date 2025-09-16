@@ -7,8 +7,10 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{groovy,java}]
+[*.{java,groovy}]
 indent_size = 4
+ij_java_class_count_to_use_import_on_demand = 999
+ij_groovy_class_count_to_use_import_on_demand = 999
 
 [*.{kt,kts}]
 ij_kotlin_imports_layout = *

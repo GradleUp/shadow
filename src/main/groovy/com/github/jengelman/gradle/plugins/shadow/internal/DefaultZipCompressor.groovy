@@ -22,7 +22,7 @@ class DefaultZipCompressor implements ZipCompressor {
     private final int entryCompressionMethod
     private final Zip64Mode zip64Mode
 
-     DefaultZipCompressor(boolean allowZip64Mode, int entryCompressionMethod) {
+    DefaultZipCompressor(boolean allowZip64Mode, int entryCompressionMethod) {
         this.entryCompressionMethod = entryCompressionMethod
         zip64Mode = allowZip64Mode ? Zip64Mode.AsNeeded : Zip64Mode.Never
     }

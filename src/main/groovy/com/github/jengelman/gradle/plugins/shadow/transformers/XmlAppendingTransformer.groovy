@@ -76,7 +76,7 @@ class XmlAppendingTransformer implements Transformer {
             if (ignoreDtd) {
                 builder.setEntityResolver(new EntityResolver() {
                     InputSource resolveEntity(String publicId, String systemId)
-                    throws SAXException, IOException {
+                        throws SAXException, IOException {
                         return new InputSource(new StringReader(""))
                     }
                 })

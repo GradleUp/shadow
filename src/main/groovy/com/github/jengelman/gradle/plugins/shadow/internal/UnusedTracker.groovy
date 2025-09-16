@@ -53,7 +53,7 @@ class UnusedTracker {
         def dependencyName = dep.name
 
         return (fileName == "${dependencyName}.jar") ||
-                (fileName.startsWith("${dependencyName}-") && fileName.endsWith('.jar'))
+            (fileName.startsWith("${dependencyName}-") && fileName.endsWith('.jar'))
     }
 
     private static void addJar(Configuration config, Dependency dep, List<File> result) {

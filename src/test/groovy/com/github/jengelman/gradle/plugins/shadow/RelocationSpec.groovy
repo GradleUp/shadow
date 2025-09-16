@@ -31,41 +31,41 @@ class RelocationSpec extends PluginSpecification {
 
         then:
         contains(output, [
-                'META-INF/MANIFEST.MF',
-                'a/ResultPrinter.class',
-                'a/TestRunner.class',
-                'b/Assert.class',
-                'b/AssertionFailedError.class',
-                'b/ComparisonCompactor.class',
-                'b/ComparisonFailure.class',
-                'b/Protectable.class',
-                'b/Test.class',
-                'b/TestCase.class',
-                'b/TestFailure.class',
-                'b/TestListener.class',
-                'b/TestResult$1.class',
-                'b/TestResult.class',
-                'b/TestSuite$1.class',
-                'b/TestSuite.class'
+            'META-INF/MANIFEST.MF',
+            'a/ResultPrinter.class',
+            'a/TestRunner.class',
+            'b/Assert.class',
+            'b/AssertionFailedError.class',
+            'b/ComparisonCompactor.class',
+            'b/ComparisonFailure.class',
+            'b/Protectable.class',
+            'b/Test.class',
+            'b/TestCase.class',
+            'b/TestFailure.class',
+            'b/TestListener.class',
+            'b/TestResult$1.class',
+            'b/TestResult.class',
+            'b/TestSuite$1.class',
+            'b/TestSuite.class'
         ])
 
         and:
         doesNotContain(output, [
-                'junit/textui/ResultPrinter.class',
-                'junit/textui/TestRunner.class',
-                'junit/framework/Assert.class',
-                'junit/framework/AssertionFailedError.class',
-                'junit/framework/ComparisonCompactor.class',
-                'junit/framework/ComparisonFailure.class',
-                'junit/framework/Protectable.class',
-                'junit/framework/Test.class',
-                'junit/framework/TestCase.class',
-                'junit/framework/TestFailure.class',
-                'junit/framework/TestListener.class',
-                'junit/framework/TestResult$1.class',
-                'junit/framework/TestResult.class',
-                'junit/framework/TestSuite$1.class',
-                'junit/framework/TestSuite.class'
+            'junit/textui/ResultPrinter.class',
+            'junit/textui/TestRunner.class',
+            'junit/framework/Assert.class',
+            'junit/framework/AssertionFailedError.class',
+            'junit/framework/ComparisonCompactor.class',
+            'junit/framework/ComparisonFailure.class',
+            'junit/framework/Protectable.class',
+            'junit/framework/Test.class',
+            'junit/framework/TestCase.class',
+            'junit/framework/TestFailure.class',
+            'junit/framework/TestListener.class',
+            'junit/framework/TestResult$1.class',
+            'junit/framework/TestResult.class',
+            'junit/framework/TestSuite$1.class',
+            'junit/framework/TestSuite.class'
         ])
 
         and: 'Test that manifest file exists with contents'
@@ -99,35 +99,35 @@ class RelocationSpec extends PluginSpecification {
 
         then:
         contains(output, [
-                'a/ResultPrinter.class',
-                'b/Test.class',
-                'b/TestCase.class',
-                'b/TestFailure.class',
-                'b/TestListener.class',
-                'b/TestResult$1.class',
-                'b/TestResult.class',
-                'b/TestSuite$1.class',
-                'b/TestSuite.class'
+            'a/ResultPrinter.class',
+            'b/Test.class',
+            'b/TestCase.class',
+            'b/TestFailure.class',
+            'b/TestListener.class',
+            'b/TestResult$1.class',
+            'b/TestResult.class',
+            'b/TestSuite$1.class',
+            'b/TestSuite.class'
         ])
 
         and:
         doesNotContain(output, [
-                'a/TestRunner.class',
-                'b/Assert.class',
-                'b/AssertionFailedError.class',
-                'b/ComparisonCompactor.class',
-                'b/ComparisonFailure.class',
-                'b/Protectable.class'
+            'a/TestRunner.class',
+            'b/Assert.class',
+            'b/AssertionFailedError.class',
+            'b/ComparisonCompactor.class',
+            'b/ComparisonFailure.class',
+            'b/Protectable.class'
         ])
 
         and:
         contains(output, [
-                'junit/textui/TestRunner.class',
-                'junit/framework/Assert.class',
-                'junit/framework/AssertionFailedError.class',
-                'junit/framework/ComparisonCompactor.class',
-                'junit/framework/ComparisonFailure.class',
-                'junit/framework/Protectable.class'
+            'junit/textui/TestRunner.class',
+            'junit/framework/Assert.class',
+            'junit/framework/AssertionFailedError.class',
+            'junit/framework/ComparisonCompactor.class',
+            'junit/framework/ComparisonFailure.class',
+            'junit/framework/Protectable.class'
         ])
     }
 
@@ -162,21 +162,21 @@ class RelocationSpec extends PluginSpecification {
 
         then:
         contains(output, [
-                'shadow/ShadowTest.class',
-                'shadow/junit/Test.class',
-                'shadow/junit'
+            'shadow/ShadowTest.class',
+            'shadow/junit/Test.class',
+            'shadow/junit'
         ])
 
         and:
         doesNotContain(output, [
-                'junit/framework',
-                'junit/framework/Test.class'
+            'junit/framework',
+            'junit/framework/Test.class'
         ])
 
         and: 'check that the class can be loaded. If the file was not relocated properly, we should get a NoDefClassFound'
         // Isolated class loader with only the JVM system jars and the output jar from the test project
         URLClassLoader classLoader = new URLClassLoader([output.toURI().toURL()] as URL[],
-                ClassLoader.systemClassLoader.parent)
+            ClassLoader.systemClassLoader.parent)
         classLoader.loadClass('shadow.ShadowTest')
     }
 
@@ -238,12 +238,12 @@ class RelocationSpec extends PluginSpecification {
 
         and:
         contains(appOutput, [
-                'TEST',
-                'APP-TEST',
-                'test.properties',
-                'app/core/Core.class',
-                'app/App.class',
-                'app/junit/framework/Test.class'
+            'TEST',
+            'APP-TEST',
+            'test.properties',
+            'app/core/Core.class',
+            'app/App.class',
+            'app/junit/framework/Test.class'
         ])
     }
 
@@ -251,8 +251,8 @@ class RelocationSpec extends PluginSpecification {
     def "relocate resource files"() {
         given:
         repo.module('shadow', 'dep', '1.0')
-                .insertFile('foo/dep.properties', 'c')
-                .publish()
+            .insertFile('foo/dep.properties', 'c')
+            .publish()
         file('src/main/java/foo/Foo.java') << '''
         package foo;
 
@@ -275,16 +275,16 @@ class RelocationSpec extends PluginSpecification {
 
         then:
         contains(output, [
-                'bar/Foo.class',
-                'bar/foo.properties',
-                'bar/dep.properties'
+            'bar/Foo.class',
+            'bar/foo.properties',
+            'bar/dep.properties'
         ])
 
         and:
         doesNotContain(output, [
-                'foo/Foo.class',
-                'foo/foo.properties',
-                'foo/dep.properties'
+            'foo/Foo.class',
+            'foo/foo.properties',
+            'foo/dep.properties'
         ])
     }
 

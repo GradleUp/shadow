@@ -35,7 +35,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
 
     @Test
     void testTransformation() {
-        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
+        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
 
         def testableZipFile = doTransformAndGetTransformedFile(transformer, false)
         def targetLines = readFrom(testableZipFile, MANIFEST_NAME)
@@ -47,7 +47,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
 
     @Test
     void testTransformationPropertiesAreReproducible() {
-        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
+        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
 
         def firstRunTransformedFile = doTransformAndGetTransformedFile(transformer, true)
         def firstRunTargetLines = readFrom(firstRunTransformedFile, MANIFEST_NAME)
@@ -60,7 +60,7 @@ final class PropertiesFileTransformerTest extends TransformerTestSupport<Propert
         assertEquals(firstRunTargetLines, secondRunTargetLines)
     }
 
-    static File doTransformAndGetTransformedFile(final PropertiesFileTransformer transformer, final boolean  preserveFileTimestamps) {
+    static File doTransformAndGetTransformedFile(final PropertiesFileTransformer transformer, final boolean preserveFileTimestamps) {
         def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
         def fileOutputStream = new FileOutputStream(testableZipFile)
         def bufferedOutputStream = new BufferedOutputStream(fileOutputStream)
