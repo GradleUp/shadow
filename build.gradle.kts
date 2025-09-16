@@ -39,7 +39,7 @@ kotlin {
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_2_0
     languageVersion = apiVersion
-    jvmTarget = JvmTarget.JVM_11
+    jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
     freeCompilerArgs.add("-Xjdk-release=${libs.versions.jdkRelease.get()}")
   }
@@ -65,6 +65,9 @@ val testPluginClasspath by configurations.registering {
   isCanBeResolved = true
   description = "Plugins used in integration tests could be resolved in classpath."
 }
+
+val testKit by sourceSets.creating
+val testKitImplementation by configurations.getting
 
 configurations.configureEach {
   when (name) {
@@ -115,6 +118,8 @@ dependencies {
   implementation(libs.kotlin.metadata)
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
+
+  testKitImplementation(libs.assertk)
 
   testPluginClasspath(libs.foojayResolver)
   testPluginClasspath(libs.develocity)
@@ -173,6 +178,7 @@ testing.suites {
   withType<JvmTestSuite>().configureEach {
     useJUnitJupiter(libs.junit.bom.map { requireNotNull(it.version) })
     dependencies {
+      implementation(testKit.output)
       implementation(libs.assertk)
     }
     targets.configureEach {

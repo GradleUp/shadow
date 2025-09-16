@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.util
+package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import java.io.OutputStream
 import java.lang.reflect.InvocationHandler

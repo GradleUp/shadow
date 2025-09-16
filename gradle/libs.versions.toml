@@ -1,5 +1,5 @@
 [versions]
-jdkRelease = "11"
+jdkRelease = "17"
 kotlin = "2.2.20"
 moshi = "1.15.2"
 pluginPublish = "2.0.0"
@@ -17,7 +17,7 @@ kotlin-metadata = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.2"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.1.0"
-xmlunit = "org.xmlunit:xmlunit-legacy:2.10.3"
+xmlunit = "org.xmlunit:xmlunit-legacy:2.10.4"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
@@ -30,7 +30,7 @@ androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha05"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.1"
 
-junit-bom = "org.junit:junit-bom:5.13.4"
+junit-bom = "org.junit:junit-bom:6.0.0-RC3"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]

@@ -133,7 +133,6 @@ public abstract class ShadowJar : Jar() {
    * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
    */
   @get:Classpath
-  @get:Optional
   public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
 
   @get:Input

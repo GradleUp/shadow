@@ -9,18 +9,18 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.DISTRIBUTION_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.JarPath
-import com.github.jengelman.gradle.plugins.shadow.util.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.util.getContent
-import com.github.jengelman.gradle.plugins.shadow.util.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.OS
 
-@ExperimentalPathApi
 class ApplicationPluginTest : BasePluginTest() {
   private lateinit var mainClass: String
 
@@ -258,6 +257,36 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun honorApplicationExtensionProperties() {
+    val applicationNames = "new" to "new"
+    val executableDirs = "sbin" to "sbin"
+
+    prepare(
+      applicationBlock = """
+        applicationName = '${applicationNames.first}'
+        executableDir = '${executableDirs.first}'
+      """.trimIndent(),
+    )
+
+    run(installShadowDistPath, shadowDistZipPath)
+
+    assertThat(path("build/install/").walkEntries()).containsOnly(
+      "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}",
+      "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}.bat",
+      "${applicationNames.second}-shadow/lib/myapp-1.0-all.jar",
+    )
+    val zipPath = path("build/distributions/${applicationNames.second}-shadow-1.0.zip")
+    ZipFile(zipPath.toFile()).use { zip ->
+      val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
+      assertThat(entries).containsOnly(
+        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}",
+        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}.bat",
+        "${applicationNames.second}-shadow-1.0/lib/myapp-1.0-all.jar",
+      )
+    }
+  }
+
   private fun prepare(
     mainClassWithImports: Boolean = false,
     projectBlock: String = "",
@@ -307,11 +336,10 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private companion object {
-    fun Path.walkEntries(): Sequence<String> {
-      return walk()
-        .filter { it.isRegularFile() }
-        .map { it.relativeTo(this) }
-        .map { it.toString().replace(FileSystems.getDefault().separator, "/") }
-    }
+    @OptIn(ExperimentalPathApi::class)
+    fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> = walk()
+      .filter { includeDirs || it.isRegularFile() }
+      .map { it.relativeTo(this) }
+      .map { it.invariantSeparatorsPathString }
   }
 }

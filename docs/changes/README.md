@@ -15,6 +15,8 @@
     mainClass = "my.Main"
   }
   ```
+- Honor `executableDir` and `applicationName` in `application` extension. ([#1740](https://github.com/GradleUp/shadow/pull/1738))  
+  This is useful when you want to customize the output directory of the start scripts and the application distribution.
 - Support relocating Kotlin module files. ([#1539](https://github.com/GradleUp/shadow/pull/1539))  
   The current implementation relocates all properties in `KotlinModuleMetadata` but `KmModule.optionalAnnotationClasses`
   due to very limited usages of it. See more discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
@@ -29,6 +31,9 @@
 - Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
 - Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
 - Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
+- Stop using start script templates bundled in Shadow. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
+- Bump min Java requirement to 17. ([#1744](https://github.com/GradleUp/shadow/pull/1744))
+- Require most optional properties non-null. ([#1745](https://github.com/GradleUp/shadow/pull/1745))
 
 ### Fixed
 

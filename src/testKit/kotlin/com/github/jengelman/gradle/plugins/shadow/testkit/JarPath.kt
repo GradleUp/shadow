@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.util
+package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.Assert
 import assertk.assertions.containsAtLeast
