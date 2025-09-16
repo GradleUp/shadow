@@ -19,7 +19,7 @@ class ShadowStats {
 
     String getRelocationString() {
         def maxLength = relocations.keySet().collect { it.length() }.max()
-        relocations.collect { k, v -> "${k} ${separator(k, maxLength)} ${v}"}.sort().join("\n")
+        relocations.collect { k, v -> "${k} ${separator(k, maxLength)} ${v}" }.sort().join("\n")
     }
 
     static String separator(String key, int max) {
@@ -60,7 +60,7 @@ class ShadowStats {
     double getAverageTimeSecsPerJar() {
         averageTimePerJar / 1000
     }
-    
+
     String toString() {
         StringBuilder sb = new StringBuilder()
         sb.append "*******************\n"
@@ -74,8 +74,8 @@ class ShadowStats {
 
     Map<String, String> getBuildScanData() {
         [
-                dependencies: jarCount,
-                relocations : relocationString,
+            dependencies: jarCount,
+            relocations : relocationString,
         ] as Map<String, String>
     }
 }

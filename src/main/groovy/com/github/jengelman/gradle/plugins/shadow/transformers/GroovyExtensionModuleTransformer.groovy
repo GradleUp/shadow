@@ -43,9 +43,9 @@ import org.gradle.api.file.FileTreeElement
 class GroovyExtensionModuleTransformer implements Transformer {
 
     private static final GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH =
-            "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+        "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
     private static final GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH =
-            "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
+        "META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule"
 
     private static final MODULE_NAME_KEY = 'moduleName'
     private static final MODULE_VERSION_KEY = 'moduleVersion'

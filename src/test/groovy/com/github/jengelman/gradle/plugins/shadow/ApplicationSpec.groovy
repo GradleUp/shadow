@@ -13,9 +13,9 @@ class ApplicationSpec extends PluginSpecification {
     def 'integration with application plugin'() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
 
         file('src/main/java/myapp/Main.java') << """
             package myapp;
@@ -32,11 +32,11 @@ class ApplicationSpec extends PluginSpecification {
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                implementation 'shadow:a:1.0'
             }
-            
+
             runShadow {
                args 'foo'
             }
@@ -76,9 +76,9 @@ class ApplicationSpec extends PluginSpecification {
     def 'integration with application plugin and java toolchains'() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
 
         file('src/main/java/myapp/Main.java') << """
             package myapp;
@@ -91,35 +91,35 @@ class ApplicationSpec extends PluginSpecification {
 
         buildFile << """
             apply plugin: 'application'
-            
+
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                implementation 'shadow:a:1.0'
             }
-            
+
             java {
                 toolchain {
                     languageVersion = JavaLanguageVersion.of(17)
                 }
             }
-            
+
             runShadow {
                args 'foo'
                doFirst {
                    logger.lifecycle("Running application with JDK \${it.javaLauncher.get().metadata.languageVersion.asInt()}")
                }
-            }          
+            }
         """.stripIndent()
 
-        settingsFile.write """ 
+        settingsFile.write """
             plugins {
               // https://docs.gradle.org/8.0.1/userguide/toolchains.html#sub:download_repositories
               id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
             }
-            
+
             rootProject.name = 'myapp'
         """.stripIndent()
 
@@ -157,9 +157,9 @@ class ApplicationSpec extends PluginSpecification {
     def 'shadow application distributions should use shadow jar'() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
 
         file('src/main/java/myapp/Main.java') << """
             package myapp;
@@ -176,11 +176,11 @@ class ApplicationSpec extends PluginSpecification {
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                shadow 'shadow:a:1.0'
             }
-            
+
             runShadow {
                args 'foo'
             }
@@ -209,9 +209,9 @@ class ApplicationSpec extends PluginSpecification {
     def 'installShadow does not execute dependent shadow task'() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
 
         file('src/main/java/myapp/Main.java') << """
             package myapp;
@@ -228,11 +228,11 @@ class ApplicationSpec extends PluginSpecification {
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                implementation 'shadow:a:1.0'
             }
-            
+
             runShadow {
                args 'foo'
             }

@@ -158,7 +158,7 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         output == toMap(transformer.propertiesEntries[path])
 
         where:
-        path                    | charset      | input                 || output
-        'utf8.properties'       | 'utf-8'      | ['foo': '传傳磨宿说説'] || ['foo': '传傳磨宿说説']
+        path              | charset | input                   || output
+        'utf8.properties' | 'utf-8' | ['foo': '传傳磨宿说説'] || ['foo': '传傳磨宿说説']
     }
 }

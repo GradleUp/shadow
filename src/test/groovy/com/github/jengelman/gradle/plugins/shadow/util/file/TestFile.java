@@ -16,7 +16,11 @@
 
 package com.github.jengelman.gradle.plugins.shadow.util.file;
 
-import groovy.lang.Closure;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -25,17 +29,29 @@ import org.apache.tools.ant.taskdefs.Zip;
 import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.codehaus.groovy.runtime.ResourceGroovyMethods;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import groovy.lang.Closure;
 
 public class TestFile extends File {
     private boolean useNativeTools;
@@ -203,7 +219,7 @@ public class TestFile extends File {
                 FileUtils.copyDirectory(this, target);
             } catch (IOException e) {
                 throw new RuntimeException(String.format("Could not copy test directory '%s' to '%s'", this,
-                        target), e);
+                    target), e);
             }
         } else {
             try {
@@ -394,7 +410,7 @@ public class TestFile extends File {
             return this;
         }
         throw new AssertionError("Problems creating dir: " + this
-                + ". Diagnostics: exists=" + this.exists() + ", isFile=" + this.isFile() + ", isDirectory=" + this.isDirectory());
+            + ". Diagnostics: exists=" + this.exists() + ", isFile=" + this.isFile() + ", isDirectory=" + this.isDirectory());
     }
 
     public TestFile createDir(Object path) {
@@ -408,6 +424,7 @@ public class TestFile extends File {
 
     /**
      * Attempts to delete this directory, ignoring failures to do so.
+     *
      * @return this
      */
     public TestFile maybeDeleteDir() {
@@ -444,7 +461,7 @@ public class TestFile extends File {
         return zipFile;
     }
 
-    public TestFile zipTo(TestFile zipFile){
+    public TestFile zipTo(TestFile zipFile) {
         new TestFileHelper(this).zipTo(zipFile, useNativeTools);
         return this;
     }

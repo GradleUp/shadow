@@ -72,7 +72,7 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestApp
             append('Name', 'com/example/')
             append('Sealed', false)
 
-            transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
+            transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
         }
 
         def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
@@ -104,7 +104,7 @@ class ManifestAppenderTransformerTest extends TransformerTestSupport<ManifestApp
     void testNoTransformation() {
         def sourceLines = getResourceStream(MANIFEST_NAME).readLines()
 
-        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator>emptyList(), new ShadowStats()))
+        transformer.transform(new TransformerContext(MANIFEST_NAME, getResourceStream(MANIFEST_NAME), Collections.<Relocator> emptyList(), new ShadowStats()))
 
         def testableZipFile = File.createTempFile("testable-zip-file-", ".jar")
         def fileOutputStream = new FileOutputStream(testableZipFile)

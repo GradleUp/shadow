@@ -2,17 +2,17 @@ package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.execut
 
 public class CompileException extends RuntimeException {
 
-  private static final long serialVersionUID = 0;
+    private static final long serialVersionUID = 0;
 
-  private final int lineNo;
+    private final int lineNo;
 
-  public CompileException(Throwable cause, int lineNo) {
-    super(cause);
-    this.lineNo = lineNo;
-  }
+    public CompileException(Throwable cause, int lineNo) {
+        super(cause);
+        this.lineNo = lineNo;
+    }
 
-  public int getLineNo() {
-    return lineNo;
-  }
+    public int getLineNo() {
+        return lineNo;
+    }
 
 }

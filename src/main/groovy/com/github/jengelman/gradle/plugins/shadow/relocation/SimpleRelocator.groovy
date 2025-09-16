@@ -46,7 +46,7 @@ class SimpleRelocator implements Relocator {
     private final Set<String> includes
 
     private final Set<String> excludes
-    
+
     private final boolean rawString
 
     SimpleRelocator() {
@@ -58,7 +58,7 @@ class SimpleRelocator implements Relocator {
     }
 
     SimpleRelocator(String patt, String shadedPattern, List<String> includes, List<String> excludes,
-                           boolean rawString) {
+                    boolean rawString) {
         this.rawString = rawString
 
         if (rawString) {
@@ -170,7 +170,7 @@ class SimpleRelocator implements Relocator {
 
         // Allow for annoying option of an extra / on the front of a path. See MSHADE-119 comes from getClass().getResource("/a/b/c.properties").
         boolean pathStartsWithPattern =
-                path.charAt(0) == '/' ? path.startsWith(pathPattern, 1) : path.startsWith(pathPattern)
+            path.charAt(0) == '/' ? path.startsWith(pathPattern, 1) : path.startsWith(pathPattern)
         if (pathStartsWithPattern) {
             return isIncluded(path) && !isExcluded(path)
         }
@@ -180,8 +180,8 @@ class SimpleRelocator implements Relocator {
     @Override
     boolean canRelocateClass(String className) {
         return !rawString &&
-                className.indexOf('/') < 0 &&
-                canRelocatePath(className.replace('.', '/'))
+            className.indexOf('/') < 0 &&
+            canRelocatePath(className.replace('.', '/'))
     }
 
     @Override

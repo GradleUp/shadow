@@ -23,7 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.*
+import static org.junit.jupiter.api.Assertions.assertEquals
 
 /**
  * Test for {@link SimpleRelocator}.
@@ -42,7 +42,7 @@ class SimpleRelocatorTest {
 
     @BeforeEach
     void setUp() {
-      stats = new ShadowStats()
+        stats = new ShadowStats()
     }
 
     @Test
@@ -64,7 +64,7 @@ class SimpleRelocatorTest {
         assertEquals(false, relocator.canRelocatePath("/org/Foo/Class.class"))
 
         relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
-                [ "org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff" ] as String[]))
+            ["org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"] as String[]))
         assertEquals(true, relocator.canRelocatePath("org/foo/Class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/Class.class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/excluded"))
@@ -99,8 +99,8 @@ class SimpleRelocatorTest {
         assertEquals(true, relocator.canRelocatePath("/org/f"))  // equal to path pattern with /
     }
 
-   @Test
-   void testCanRelocatePathWithRegex() {
+    @Test
+    void testCanRelocatePathWithRegex() {
         SimpleRelocator relocator
 
         // Include with Regex
@@ -126,12 +126,12 @@ class SimpleRelocatorTest {
 
         // Include with Regex and normal pattern
         relocator = new SimpleRelocator("org.foo", null,
-                Arrays.asList("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"), null)
+            Arrays.asList("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"), null)
         assertEquals(true, relocator.canRelocatePath("org/foo/Factory1.class"))
         assertEquals(true, relocator.canRelocatePath("org/foo/public/Bar.class"))
         assertEquals(false, relocator.canRelocatePath("org/foo/Factory.class"))
         assertEquals(false, relocator.canRelocatePath("org/foo/R.class"))
-   }
+    }
 
     @Test
     void testCanRelocateClass() {
@@ -144,7 +144,7 @@ class SimpleRelocatorTest {
         assertEquals(false, relocator.canRelocateClass("org.Foo.Class"))
 
         relocator = new SimpleRelocator("org.foo", null, null, Arrays.asList(
-                [ "org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff" ] as String[]))
+            ["org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"] as String[]))
         assertEquals(true, relocator.canRelocateClass("org.foo.Class"))
         assertEquals(true, relocator.canRelocateClass("org.foo.excluded"))
         assertEquals(false, relocator.canRelocateClass("org.foo.Excluded"))

@@ -57,7 +57,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
         try {
             BufferedInputStream bis = new BufferedInputStream(context.is) {
                 void close()
-                throws IOException {
+                    throws IOException {
                     // leave ZIP open
                 }
             }
@@ -136,7 +136,7 @@ class ComponentsXmlResourceTransformer implements Transformer {
     }
 
     private byte[] getTransformedResource()
-            throws IOException {
+        throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024 * 4)
 
         try (Writer writer = new XmlStreamWriter(baos)) {

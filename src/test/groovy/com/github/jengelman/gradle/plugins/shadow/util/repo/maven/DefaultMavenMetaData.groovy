@@ -5,7 +5,7 @@ import groovy.xml.XmlParser
 /**
  * http://maven.apache.org/ref/3.0.1/maven-repository-metadata/repository-metadata.html
  */
-class DefaultMavenMetaData implements MavenMetaData{
+class DefaultMavenMetaData implements MavenMetaData {
 
     String text
 

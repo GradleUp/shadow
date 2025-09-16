@@ -63,10 +63,10 @@ class ShadowPluginSpec extends PluginSpecification {
     def 'Compatible with Gradle #version'() {
         given:
         File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
-                'one # NOTE: No newline terminates this line/file').write()
+            'one # NOTE: No newline terminates this line/file').write()
 
         repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
-                'two # NOTE: No newline terminates this line/file').publish()
+            'two # NOTE: No newline terminates this line/file').publish()
 
         buildFile << """
             dependencies {
@@ -204,9 +204,9 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'client/Client.class',
-                'server/Server.class',
-                'junit/framework/Test.class'
+            'client/Client.class',
+            'server/Server.class',
+            'junit/framework/Test.class'
         ])
     }
 
@@ -261,8 +261,8 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'client/Client.class',
-                'server/Server.class'
+            'client/Client.class',
+            'server/Server.class'
         ])
         doesNotContain(serverOutput, ['junit/framework/Test.class'])
     }
@@ -316,8 +316,8 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'server/Server.class',
-                'junit/framework/Test.class'
+            'server/Server.class',
+            'junit/framework/Test.class'
         ])
         doesNotContain(serverOutput, ['client/Client.class'])
     }
@@ -368,8 +368,8 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         contains(serverOutput, [
-                'client/Client.class',
-                'server/Server.class'
+            'client/Client.class',
+            'server/Server.class'
         ])
     }
 
@@ -423,9 +423,9 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         contains(serverOutput, [
-                'client/Client.class',
-                'server/Server.class',
-                'junit/framework/TestCase.class'
+            'client/Client.class',
+            'server/Server.class',
+            'junit/framework/TestCase.class'
         ])
     }
 
@@ -476,9 +476,9 @@ class ShadowPluginSpec extends PluginSpecification {
 
         then:
         contains(serverOutput, [
-                'client/Client.class',
-                'server/Server.class',
-                'junit/framework/TestCase.class'
+            'client/Client.class',
+            'server/Server.class',
+            'junit/framework/TestCase.class'
         ])
     }
 
@@ -555,10 +555,10 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'impl/SimpleEntity.class',
-                'api/Entity.class',
-                'api/UnusedEntity.class',
-                'lib/LibEntity.class',
+            'impl/SimpleEntity.class',
+            'api/Entity.class',
+            'api/UnusedEntity.class',
+            'lib/LibEntity.class',
         ])
         doesNotContain(serverOutput, ['junit/framework/Test.class', 'lib/UnusedLibEntity.class'])
     }
@@ -631,11 +631,11 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'impl/SimpleEntity.class',
-                'api/Entity.class',
-                'api/UnusedEntity.class',
-                'lib/LibEntity.class',
-                'lib/UnusedLibEntity.class'
+            'impl/SimpleEntity.class',
+            'api/Entity.class',
+            'api/UnusedEntity.class',
+            'lib/LibEntity.class',
+            'lib/UnusedLibEntity.class'
         ])
     }
 
@@ -685,14 +685,14 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         and:
         doesNotContain(serverOutput, [
-                'client/Client.class',
-                'junit/framework/Test.class',
-                'client/junit/framework/Test.class'
+            'client/Client.class',
+            'junit/framework/Test.class',
+            'client/junit/framework/Test.class'
         ])
     }
 
@@ -743,27 +743,27 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'client/Client.class',
-                'client/junit/framework/Test.class',
-                'server/Server.class',
+            'client/Client.class',
+            'client/junit/framework/Test.class',
+            'server/Server.class',
         ])
 
         and:
         doesNotContain(serverOutput, [
-                'junit/framework/Test.class'
+            'junit/framework/Test.class'
         ])
     }
 
     def "exclude INDEX.LIST, *.SF, *.DSA, and *.RSA by default"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('META-INF/INDEX.LIST', 'JarIndex-Version: 1.0')
-                .insertFile('META-INF/a.SF', 'Signature File')
-                .insertFile('META-INF/a.DSA', 'DSA Signature Block')
-                .insertFile('META-INF/a.RSA', 'RSA Signature Block')
-                .insertFile('META-INF/a.properties', 'key=value')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('META-INF/INDEX.LIST', 'JarIndex-Version: 1.0')
+            .insertFile('META-INF/a.SF', 'Signature File')
+            .insertFile('META-INF/a.DSA', 'DSA Signature Block')
+            .insertFile('META-INF/a.RSA', 'RSA Signature Block')
+            .insertFile('META-INF/a.properties', 'key=value')
+            .publish()
 
         file('src/main/java/shadow/Passed.java') << '''
             package shadow;
@@ -787,12 +787,12 @@ class ShadowPluginSpec extends PluginSpecification {
     def "include runtime configuration by default"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .publish()
 
         repo.module('shadow', 'b', '1.0')
-                .insertFile('b.properties', 'b')
-                .publish()
+            .insertFile('b.properties', 'b')
+            .publish()
 
         buildFile << """
             dependencies {
@@ -814,21 +814,21 @@ class ShadowPluginSpec extends PluginSpecification {
     def "include java-library configurations by default"() {
         given:
         repo.module('shadow', 'api', '1.0')
-                .insertFile('api.properties', 'api')
-                .publish()
+            .insertFile('api.properties', 'api')
+            .publish()
 
         repo.module('shadow', 'implementation-dep', '1.0')
-                .insertFile('implementation-dep.properties', 'implementation-dep')
-                .publish()
+            .insertFile('implementation-dep.properties', 'implementation-dep')
+            .publish()
 
         repo.module('shadow', 'implementation', '1.0')
-                .insertFile('implementation.properties', 'implementation')
-                .dependsOn('implementation-dep')
-                .publish()
+            .insertFile('implementation.properties', 'implementation')
+            .dependsOn('implementation-dep')
+            .publish()
 
         repo.module('shadow', 'runtimeOnly', '1.0')
-                .insertFile('runtimeOnly.properties', 'runtimeOnly')
-                .publish()
+            .insertFile('runtimeOnly.properties', 'runtimeOnly')
+            .publish()
 
         buildFile.text = getDefaultBuildScript('java-library')
         buildFile << """
@@ -850,12 +850,12 @@ class ShadowPluginSpec extends PluginSpecification {
     def "doesn't include compileOnly configuration by default"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .publish()
 
         repo.module('shadow', 'b', '1.0')
-                .insertFile('b.properties', 'b')
-                .publish()
+            .insertFile('b.properties', 'b')
+            .publish()
 
         buildFile << """
             dependencies {
@@ -877,12 +877,12 @@ class ShadowPluginSpec extends PluginSpecification {
     def "default copying strategy"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('META-INF/MANIFEST.MF', 'MANIFEST A')
-                .publish()
+            .insertFile('META-INF/MANIFEST.MF', 'MANIFEST A')
+            .publish()
 
         repo.module('shadow', 'b', '1.0')
-                .insertFile('META-INF/MANIFEST.MF', 'MANIFEST B')
-                .publish()
+            .insertFile('META-INF/MANIFEST.MF', 'MANIFEST B')
+            .publish()
 
         buildFile << """
             dependencies {
@@ -1041,7 +1041,7 @@ class ShadowPluginSpec extends PluginSpecification {
         then:
         serverOutput.exists()
         contains(serverOutput, [
-                'api/UnusedEntity.class',
+            'api/UnusedEntity.class',
         ])
     }
 
@@ -1050,9 +1050,9 @@ class ShadowPluginSpec extends PluginSpecification {
     def "check large zip files with zip64 enabled"() {
         given:
         repo.module('shadow', 'a', '1.0')
-                .insertFile('a.properties', 'a')
-                .insertFile('a2.properties', 'a2')
-                .publish()
+            .insertFile('a.properties', 'a')
+            .insertFile('a2.properties', 'a2')
+            .publish()
 
         file('src/main/java/myapp/Main.java') << """
             package myapp;

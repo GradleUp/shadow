@@ -2,9 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.docs.internal.snippets.fixtur
 
 class GroovyScriptFixture extends SnippetFixture {
 
-  @Override
-  String post() {
-    "\n;0;"
-  }
+    @Override
+    String post() {
+        "\n;0;"
+    }
 
 }

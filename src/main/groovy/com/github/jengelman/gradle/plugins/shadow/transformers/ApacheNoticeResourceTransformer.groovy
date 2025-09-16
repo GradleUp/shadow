@@ -49,8 +49,8 @@ class ApacheNoticeResourceTransformer implements Transformer {
 
     @Input
     String preamble1 = "// ------------------------------------------------------------------\n" +
-            "// NOTICE file corresponding to the section 4d of The Apache License,\n" +
-            "// Version 2.0, in this case for "
+        "// NOTICE file corresponding to the section 4d of The Apache License,\n" +
+        "// Version 2.0, in this case for "
 
     @Input
     String preamble2 = "\n// ------------------------------------------------------------------\n"
@@ -130,7 +130,7 @@ class ApacheNoticeResourceTransformer implements Transformer {
                     if (trimedLine.startsWith("- ")) {
                         //resource-bundle 1.3 mode
                         if (lineCount == 1
-                                && sb.toString().indexOf("This product includes/uses software(s) developed by") != -1) {
+                            && sb.toString().indexOf("This product includes/uses software(s) developed by") != -1) {
                             currentOrg = organizationEntries.get(sb.toString().trim())
                             if (currentOrg == null) {
                                 currentOrg = new TreeSet<String>()

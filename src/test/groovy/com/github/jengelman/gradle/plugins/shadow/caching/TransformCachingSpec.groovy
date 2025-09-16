@@ -23,26 +23,26 @@ class TransformCachingSpec extends AbstractCachingSpec {
             import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
             import org.apache.tools.zip.ZipOutputStream
             import org.gradle.api.file.FileTreeElement
-            
+
             class CustomTransformer implements Transformer {
                 @Override
                 boolean canTransformResource(FileTreeElement element) {
                     return false
                 }
-        
+
                 @Override
                 void transform(TransformerContext context) {
-        
+
                 }
-        
+
                 @Override
                 boolean hasTransformedResource() {
                     return false
                 }
-        
+
                 @Override
                 void modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps) {
-        
+
                 }
             }
 
@@ -58,7 +58,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -67,7 +67,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
     }
 
@@ -89,7 +89,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -106,7 +106,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -115,7 +115,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -132,7 +132,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -141,7 +141,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
     }
 
@@ -164,7 +164,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -181,8 +181,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/bar.properties'
+            'server/Server.class',
+            'foo/bar.properties'
         ])
 
         when:
@@ -191,8 +191,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/bar.properties'
+            'server/Server.class',
+            'foo/bar.properties'
         ])
 
         when:
@@ -211,8 +211,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/baz.properties'
+            'server/Server.class',
+            'foo/baz.properties'
         ])
 
         when:
@@ -221,8 +221,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/baz.properties'
+            'server/Server.class',
+            'foo/baz.properties'
         ])
     }
 
@@ -245,7 +245,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -262,8 +262,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/bar.xml'
+            'server/Server.class',
+            'foo/bar.xml'
         ])
 
         when:
@@ -272,8 +272,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/bar.xml'
+            'server/Server.class',
+            'foo/bar.xml'
         ])
 
         when:
@@ -292,8 +292,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/baz.xml'
+            'server/Server.class',
+            'foo/baz.xml'
         ])
 
         when:
@@ -302,8 +302,8 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class',
-                'foo/baz.xml'
+            'server/Server.class',
+            'foo/baz.xml'
         ])
     }
 
@@ -325,7 +325,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -340,7 +340,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
 
         when:
@@ -349,7 +349,7 @@ class TransformCachingSpec extends AbstractCachingSpec {
         then:
         output.exists()
         contains(output, [
-                'server/Server.class'
+            'server/Server.class'
         ])
     }
 }

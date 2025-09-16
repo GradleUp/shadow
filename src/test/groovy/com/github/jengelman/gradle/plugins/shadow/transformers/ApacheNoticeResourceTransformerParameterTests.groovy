@@ -24,7 +24,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.*
+import static org.junit.jupiter.api.Assertions.fail
 
 /**
  * Tests {@link ApacheLicenseResourceTransformer} parameters.

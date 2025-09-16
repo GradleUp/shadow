@@ -97,8 +97,8 @@ class ShadowJavaPlugin implements Plugin<Project> {
             }
             shadow.from(sourceSets.main.output)
             shadow.configurations = [
-                    project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME) ?:
-                            project.configurations.runtime,
+                project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME) ?:
+                    project.configurations.runtime,
             ]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
         }

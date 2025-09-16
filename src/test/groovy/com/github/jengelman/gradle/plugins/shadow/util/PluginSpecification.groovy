@@ -14,7 +14,8 @@ import java.util.jar.JarFile
 
 abstract class PluginSpecification extends Specification {
 
-    @TempDir Path dir
+    @TempDir
+    Path dir
 
     public static final String TEST_GRADLE_VERSION = System.getProperty("TEST_GRADLE_VERSION")
 
@@ -55,10 +56,10 @@ abstract class PluginSpecification extends Specification {
 
     GradleRunner getRunner() {
         GradleRunner.create()
-                .withGradleVersion(TEST_GRADLE_VERSION)
-                .withProjectDir(dir.toFile())
-                .forwardOutput()
-                .withPluginClasspath()
+            .withGradleVersion(TEST_GRADLE_VERSION)
+            .withProjectDir(dir.toFile())
+            .forwardOutput()
+            .withPluginClasspath()
     }
 
     GradleRunner runner(Collection<String> tasks) {
@@ -93,7 +94,7 @@ abstract class PluginSpecification extends Specification {
 
     static boolean containsDeprecationWarning(String output) {
         output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
-                output.contains("has been deprecated. This is scheduled to be removed in Gradle")
+            output.contains("has been deprecated. This is scheduled to be removed in Gradle")
     }
 
     File getBuildFile() {

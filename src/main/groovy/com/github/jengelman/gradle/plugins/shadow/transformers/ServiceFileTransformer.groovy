@@ -23,12 +23,12 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContex
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.codehaus.plexus.util.IOUtil
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
-import org.codehaus.plexus.util.IOUtil
 
 /**
  * Modified from org.apache.maven.plugins.shade.resource.ServiceResourceTransformer.java
@@ -49,12 +49,12 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
     private static final String SERVICES_PATTERN = "META-INF/services/**"
 
     private static final String GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN =
-            "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
+        "META-INF/services/org.codehaus.groovy.runtime.ExtensionModule"
 
     private Map<String, ServiceStream> serviceEntries = [:].withDefault { new ServiceStream() }
 
     private final PatternSet patternSet =
-            new PatternSet().include(SERVICES_PATTERN).exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN)
+        new PatternSet().include(SERVICES_PATTERN).exclude(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATTERN)
 
     void setPath(String path) {
         patternSet.setIncludes(["${path}/**"])
@@ -70,7 +70,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
     void transform(TransformerContext context) {
         def lines = context.is.readLines()
         def targetPath = context.path
-        context.relocators.each {rel ->
+        context.relocators.each { rel ->
             if (rel.canRelocateClass(new File(targetPath).name)) {
                 targetPath = rel.relocateClass(RelocateClassContext.builder().className(targetPath).stats(context.stats).build())
             }
@@ -81,7 +81,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
                 }
             }
         }
-        lines.each {line -> serviceEntries[targetPath].append(new ByteArrayInputStream(line.getBytes()))}
+        lines.each { line -> serviceEntries[targetPath].append(new ByteArrayInputStream(line.getBytes())) }
     }
 
     @Override
@@ -102,12 +102,12 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
 
     static class ServiceStream extends ByteArrayOutputStream {
 
-        ServiceStream(){
-            super( 1024 )
+        ServiceStream() {
+            super(1024)
         }
 
-        void append(InputStream is ) throws IOException {
-            if ( super.count > 0 && super.buf[super.count - 1] != '\n' && super.buf[super.count - 1] != '\r' ) {
+        void append(InputStream is) throws IOException {
+            if (super.count > 0 && super.buf[super.count - 1] != '\n' && super.buf[super.count - 1] != '\r') {
                 byte[] newline = '\n'.bytes
                 write(newline, 0, newline.length)
             }
@@ -115,7 +115,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
         }
 
         InputStream toInputStream() {
-            return new ByteArrayInputStream( super.buf, 0, super.count )
+            return new ByteArrayInputStream(super.buf, 0, super.count)
         }
     }
 
