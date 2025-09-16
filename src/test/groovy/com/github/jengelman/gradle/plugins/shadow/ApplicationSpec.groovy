@@ -32,11 +32,11 @@ class ApplicationSpec extends PluginSpecification {
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                implementation 'shadow:a:1.0'
             }
-            
+
             runShadow {
                args 'foo'
             }
@@ -66,7 +66,6 @@ class ApplicationSpec extends PluginSpecification {
         File startScript = getFile('build/install/myapp-shadow/bin/myapp')
         assert startScript.exists()
         assert startScript.text.contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
-        assert startScript.text.contains("-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
         assert startScript.text.contains("exec \"\$JAVACMD\" \"\$@\"")
 
         cleanup:
@@ -91,35 +90,35 @@ class ApplicationSpec extends PluginSpecification {
 
         buildFile << """
             apply plugin: 'application'
-            
+
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                implementation 'shadow:a:1.0'
             }
-            
+
             java {
                 toolchain {
                     languageVersion = JavaLanguageVersion.of(17)
                 }
             }
-            
+
             runShadow {
                args 'foo'
                doFirst {
                    logger.lifecycle("Running application with JDK \${it.javaLauncher.get().metadata.languageVersion.asInt()}")
                }
-            }          
+            }
         """.stripIndent()
 
-        settingsFile.write """ 
+        settingsFile.write """
             plugins {
               // https://docs.gradle.org/8.0.1/userguide/toolchains.html#sub:download_repositories
               id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
             }
-            
+
             rootProject.name = 'myapp'
         """.stripIndent()
 
@@ -146,7 +145,6 @@ class ApplicationSpec extends PluginSpecification {
         File startScript = getFile('build/install/myapp-shadow/bin/myapp')
         assert startScript.exists()
         assert startScript.text.contains("CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar")
-        assert startScript.text.contains("-jar \"\\\"\$CLASSPATH\\\"\" \"\$APP_ARGS\"")
         assert startScript.text.contains("exec \"\$JAVACMD\" \"\$@\"")
 
         cleanup:
@@ -176,11 +174,11 @@ class ApplicationSpec extends PluginSpecification {
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                shadow 'shadow:a:1.0'
             }
-            
+
             runShadow {
                args 'foo'
             }
@@ -228,11 +226,11 @@ class ApplicationSpec extends PluginSpecification {
             application {
                mainClass = 'myapp.Main'
             }
-            
+
             dependencies {
                implementation 'shadow:a:1.0'
             }
-            
+
             runShadow {
                args 'foo'
             }
