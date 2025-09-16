@@ -246,23 +246,6 @@ tasks.check {
   )
 }
 
-tasks.register<Copy>("downloadStartScripts") {
-  description = "Download start scripts from Gradle sources, this should be run intervally to track updates."
-
-  val urlPrefix = "https://raw.githubusercontent.com/gradle/gradle/refs/heads/master/platforms/jvm/" +
-    "plugins-application/src/main/resources/org/gradle/api/internal/plugins"
-  from(resources.text.fromUri("$urlPrefix/unixStartScript.txt")) {
-    rename { "unixStartScript.txt" }
-  }
-  from(resources.text.fromUri("$urlPrefix/windowsStartScript.txt")) {
-    rename { "windowsStartScript.txt" }
-  }
-  val destDir = file("src/main/resources/com/github/jengelman/gradle/plugins/shadow/internal").also {
-    if (!it.exists() || !it.isDirectory) error("Download destination dir $it does not exist or is not a directory.")
-  }
-  into(destDir)
-}
-
 tasks.clean {
   delete += listOf(
     projectDir.resolve(".gradle"),
