@@ -284,7 +284,7 @@ class KotlinPluginsTest : BasePluginTest() {
           manifest {
             attributes '$mainClassAttributeKey': 'my.MainKt'
           }
-          enableAutoRelocation = true
+          relocate('kotlin.', 'shadow.kotlin.')
           mergeServiceFiles() // Merge and relocate service files from kotlin-reflect.
         }
       """.trimIndent(),
