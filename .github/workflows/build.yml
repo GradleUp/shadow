@@ -14,13 +14,13 @@ jobs:
       matrix:
         os: [ ubuntu-24.04-arm ]
         # Always test on the latest version and some LTS.
-        java: [ 17, 24 ]
+        java: [ 17, 25 ]
         # Test on the minimum Gradle version and the latest.
         gradle: [ 8.11, current ]
         exclude:
-          # Gradle 8.11 doesn't support Java 24.
+          # Gradle 8.11 doesn't support Java 25.
           - gradle: 8.11
-            java: 24
+            java: 25
         include:
           # We just test one JDK version on Windows.
           - os: windows-11-arm
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: 21
+          java-version: 25
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew lint
 
@@ -77,7 +77,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: 21
+          java-version: 25
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
