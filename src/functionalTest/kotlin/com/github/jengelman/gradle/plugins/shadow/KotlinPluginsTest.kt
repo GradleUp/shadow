@@ -1,8 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
@@ -287,6 +289,7 @@ class KotlinPluginsTest : BasePluginTest() {
           relocate('kotlin.', 'shadow.kotlin.') {
             exclude('kotlin/kotlin.kotlin_builtins')
           }
+          relocate('org.', 'shadow.org.')
           mergeServiceFiles() // Merge and relocate service files from kotlin-reflect.
         }
       """.trimIndent(),
@@ -312,6 +315,15 @@ class KotlinPluginsTest : BasePluginTest() {
     assertThat(result).contains(
       "[val my.MemberClass.prop1: kotlin.String, val my.MemberClass.prop2: kotlin.String]",
     )
+    assertThat(outputShadowedJar).useAll {
+      // All dependency classes are relocated.
+      transform { actual ->
+        actual.entries().toList()
+          .map { it.name.removePrefix("META-INF/versions/9/") }
+          .filter { it.endsWith(".class") && !it.startsWith("my/") }
+          .all { it.startsWith("shadow/") }
+      }.isTrue()
+    }
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {
