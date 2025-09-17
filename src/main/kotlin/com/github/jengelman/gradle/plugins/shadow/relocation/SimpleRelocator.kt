@@ -163,6 +163,21 @@ public open class SimpleRelocator @JvmOverloads constructor(
     excludes,
   )
 
+  override fun toString(): String = buildString {
+    append("SimpleRelocator(")
+    append("rawString=$rawString").append(", ")
+    append("skipStringConstants=$skipStringConstants").append(", ")
+    append("pattern='$pattern'").append(", ")
+    append("pathPattern='$pathPattern'").append(", ")
+    append("shadedPattern='$shadedPattern'").append(", ")
+    append("shadedPathPattern='$shadedPathPattern'").append(", ")
+    append("sourcePackageExcludes=$sourcePackageExcludes").append(", ")
+    append("sourcePathExcludes=$sourcePathExcludes").append(", ")
+    append("includes=$includes").append(", ")
+    append("excludes=$excludes")
+    append(")")
+  }
+
   private fun isIncluded(path: String): Boolean {
     return includes.isEmpty() || includes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
