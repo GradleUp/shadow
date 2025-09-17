@@ -284,7 +284,9 @@ class KotlinPluginsTest : BasePluginTest() {
           manifest {
             attributes '$mainClassAttributeKey': 'my.MainKt'
           }
-          relocate('kotlin.', 'shadow.kotlin.')
+          relocate('kotlin.', 'shadow.kotlin.') {
+            exclude('kotlin/kotlin.kotlin_builtins')
+          }
           mergeServiceFiles() // Merge and relocate service files from kotlin-reflect.
         }
       """.trimIndent(),
