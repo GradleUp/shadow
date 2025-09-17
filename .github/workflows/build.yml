@@ -14,17 +14,18 @@ jobs:
       matrix:
         os: [ ubuntu-24.04-arm ]
         # Always test on the latest version and some LTS.
-        java: [ 17, 24 ]
+        java: [ 17, 25 ]
         # Test on the minimum Gradle version and the latest.
         gradle: [ 9.0.0, current ]
+        exclude:
+          # Gradle 9.0.0 doesn't support Java 25.
+          - gradle: 9.0.0
+            java: 25
         include:
           # We just test one JDK version on Windows.
           - os: windows-11-arm
-            gradle: 9.0.0
-            java: 21
-          - os: windows-11-arm
             gradle: current
-            java: 21
+            java: 25
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -43,7 +44,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: 21
+          java-version: 25
       - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew lint
 
@@ -73,7 +74,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: 21
+          java-version: 25
       - uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: true
