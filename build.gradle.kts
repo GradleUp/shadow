@@ -50,6 +50,7 @@ lint {
   ignoreTestFixturesSources = true
   ignoreTestSources = true
   warningsAsErrors = true
+  disable += "NewerVersionAvailable"
 }
 
 spotless {
