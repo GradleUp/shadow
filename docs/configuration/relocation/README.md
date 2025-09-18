@@ -210,6 +210,13 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
 > Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these
 > dependencies if you do not intend to shadow them into your library.
 
+
+## Relocating Kotlin Standard Library
+
+It is not recommended to relocate Kotlin Standard Library if you are using [Kotlin Metadata][kotlin-metadata] or
+[Kotlin Reflection][kotlin-reflection] in the project, because they are tightly coupled with Kotlin compiler and
+runtime. See more details and discussion in [#1622][#1622].
+
 ## Relocating Project Resources Only
 
 If you want to relocate the resources of the project only and exclude all dependencies (related to a normal JAR but with
@@ -237,3 +244,9 @@ relocating), you can try out the trick like:
 
 This is useful in some cases like [#759](https://github.com/GradleUp/shadow/issues/759) mentioned. See
 [Configuring Shadowed Dependencies](../dependencies/README.md) for more information about `configurations`.
+
+
+
+[#1622]: https://github.com/GradleUp/shadow/issues/1622
+[kotlin-metadata]: https://kotlinlang.org/docs/metadata-jvm.html
+[kotlin-reflection]: https://kotlinlang.org/docs/reflection.html
