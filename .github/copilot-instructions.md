@@ -22,4 +22,4 @@ This project is a Gradle plugin to create fat/uber JARs, apply file transforms, 
 
 ## Document guidelines
 
-- Check and refine the newly added document and comment wording.
+- Check and refine the newly added documents and comment wording.
