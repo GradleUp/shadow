@@ -19,7 +19,7 @@
   This is useful when you want to customize the output directory of the start scripts and the application distribution.
 - Support relocating Kotlin module files. ([#1539](https://github.com/GradleUp/shadow/pull/1539))  
   The current implementation relocates all properties in `KotlinModuleMetadata` but `KmModule.optionalAnnotationClasses`
-  due to very limited usages of it. See more discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
+  due to very limited usage of it. See more discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
 
 ### Changed
 
