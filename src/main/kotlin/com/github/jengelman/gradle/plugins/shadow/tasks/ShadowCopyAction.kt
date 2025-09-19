@@ -278,7 +278,7 @@ public open class ShadowCopyAction(
         unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
       }
       zipOutStr.putNextEntry(entry)
-      zipOutStr.write(newKmMetadata.write())
+      zipOutStr.write(newBytes)
       zipOutStr.closeEntry()
     }
 
