@@ -283,7 +283,7 @@ tasks.shadowJar {
   // `isEnableRelocation` has been renamed to `enableAutoRelocation`.
   enableAutoRelocation = true
 
-  // If you want to make `mergeServiceFiles` or most resource transformers work, should set the `duplicatesStrategy` as `INCLUDE`.
+  // If you want to make `mergeServiceFiles` or most resource transformers work, you should set the `duplicatesStrategy` to `INCLUDE`.
   // Because `EXCLUDE` will exclude extra service files to be merged.
   duplicatesStrategy = DuplicatesStrategy.INCLUDE
   mergeServiceFiles()
