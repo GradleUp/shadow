@@ -103,6 +103,7 @@ Alternatively, you can follow these steps:
 Optional steps:
 
 - Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
+  This can also ensure the regressions are caught in the future.
 - Use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
 
 Here are some examples:

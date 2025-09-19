@@ -142,6 +142,7 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 	public fun setSkipStringConstants (Z)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
