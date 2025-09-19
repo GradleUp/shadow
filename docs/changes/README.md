@@ -127,7 +127,7 @@
 
 !!! note
 
-    Release notes for 9.0.0 beta and rc versions are available on GitHub Releases: https://github.com/GradleUp/shadow/releases
+    Release notes for 9.0.0 beta and rc versions are available on [GitHub Releases](https://github.com/GradleUp/shadow/releases).
 
 ### Added
 
