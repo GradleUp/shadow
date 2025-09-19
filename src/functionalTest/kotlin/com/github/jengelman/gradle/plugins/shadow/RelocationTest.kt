@@ -600,7 +600,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
-  @UnstableMetadataApi
+  @OptIn(UnstableMetadataApi::class)
   @Issue(
     "https://github.com/GradleUp/shadow/issues/843",
   )
