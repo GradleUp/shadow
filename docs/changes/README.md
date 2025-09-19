@@ -302,7 +302,7 @@ If you used Shadow for merging service files, the following steps are recommende
 1. Make sure to leave `duplicatesStrategy` as `INCLUDE` or `WARN`.
 2. Apply `mergeServiceFiles` or `ServiceFileTransformer` stuff as you did in your previous setup.
 3. Diff the JARs from upgrading or not.
-4. Remove the extra entries that are added by `INCLUDE` by  `eachFile`, `filesMatching`, or `PreserveFirstFoundResourceTransformer`.
+4. Remove the extra entries that are added by `INCLUDE` by `eachFile`, `filesMatching`, or `PreserveFirstFoundResourceTransformer`.
 5. Diff the JARs again, and check that only the entries you want to preserve remain.
 6. Optionally, if you want a stricter check for the shadowed JAR entries, enable `failOnDuplicateEntries`.
    This can also ensure the regressions are caught in the future.
