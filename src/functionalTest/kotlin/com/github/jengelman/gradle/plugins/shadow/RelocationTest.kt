@@ -616,7 +616,7 @@ class RelocationTest : BasePluginTest() {
           ${implementationFiles(stdlibJar)}
         }
         $shadowJarTask {
-          relocate 'kotlin', 'my.kotlin'
+          relocate('kotlin', 'my.kotlin')
         }
       """.trimIndent(),
     )
@@ -647,28 +647,32 @@ class RelocationTest : BasePluginTest() {
     val relocatedPkgParts = relocatedModule.kmModule.packageParts.entries
     // They are not empty and different.
     assertThat(originalPkgParts).isNotEqualTo(relocatedPkgParts)
+    assertThat(originalPkgParts.size).isEqualTo(relocatedPkgParts.size)
 
-    relocatedPkgParts.forEachIndexed { index, (pkg, parts) ->
+    relocatedPkgParts.forEachIndexed { index, (relocatedPkg, relocatedParts) ->
       val (originalPkg, originalParts) = originalPkgParts.elementAt(index)
-      assertThat(pkg).isNotEqualTo(originalPkg)
-      assertThat(pkg).isEqualTo(originalPkg.replace("kotlin", "my.kotlin"))
+      assertThat(relocatedPkg).isNotEqualTo(originalPkg)
+      assertThat(relocatedPkg).isEqualTo(originalPkg.replace("kotlin", "my.kotlin"))
 
       if (originalParts.fileFacades.isEmpty()) {
-        assertThat(parts.fileFacades).isEmpty()
+        assertThat(relocatedParts.fileFacades).isEmpty()
       } else {
-        assertThat(parts.fileFacades).isNotEmpty()
-        assertThat(parts.fileFacades).isNotEqualTo(originalParts.fileFacades)
-        assertThat(parts.fileFacades).isEqualTo(originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") })
+        assertThat(relocatedParts.fileFacades).isNotEmpty()
+        assertThat(relocatedParts.fileFacades).isNotEqualTo(originalParts.fileFacades)
+        assertThat(relocatedParts.fileFacades).isEqualTo(
+          originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") },
+        )
       }
 
       if (originalParts.multiFileClassParts.isEmpty()) {
-        assertThat(parts.multiFileClassParts).isEmpty()
+        assertThat(relocatedParts.multiFileClassParts).isEmpty()
       } else {
-        assertThat(parts.multiFileClassParts).isNotEmpty()
-        assertThat(parts.multiFileClassParts).isNotEqualTo(originalParts.multiFileClassParts)
-        assertThat(parts.multiFileClassParts).isEqualTo(
+        assertThat(relocatedParts.multiFileClassParts).isNotEmpty()
+        assertThat(relocatedParts.multiFileClassParts).isNotEqualTo(originalParts.multiFileClassParts)
+        assertThat(relocatedParts.multiFileClassParts).isEqualTo(
           originalParts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
-            name.replace("kotlin/", "my/kotlin/") to facade.replace("kotlin/", "my/kotlin/")
+            name.replace("kotlin/", "my/kotlin/") to
+              facade.replace("kotlin/", "my/kotlin/")
           },
         )
       }
