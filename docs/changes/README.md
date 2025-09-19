@@ -283,15 +283,10 @@ tasks.shadowJar {
   // `isEnableRelocation` has been renamed to `enableAutoRelocation`.
   enableAutoRelocation = true
 
-  // If you want to make `mergeServiceFiles` work, should set the `duplicatesStrategy` as `INCLUDE`.
-  // `EXCLUDE` will exclude extra service files to be merged.
+  // If you want to make `mergeServiceFiles` or most resource transformers work, should set the `duplicatesStrategy` as `INCLUDE`.
+  // Because `EXCLUDE` will exclude extra service files to be merged.
   duplicatesStrategy = DuplicatesStrategy.INCLUDE
   mergeServiceFiles()
-  // If you leave `duplicatesStrategy` as `INCLUDE`, you can use the new `PreserveFirstFoundResourceTransformer`
-  // to ensure that only the first found resource is included in the final JAR. Or duplicate entries will be bundled.
-  transform<PreserveFirstFoundResourceTransformer>() {
-    resources.add("META-INF/some-resource.txt")
-  }
   // Optionally, you can enable the new `failOnDuplicateEntries` property to fail the build if there are duplicate entries.
   failOnDuplicateEntries = true
 
@@ -307,9 +302,12 @@ If you used Shadow for merging service files, the following steps are recommende
 1. Make sure to leave `duplicatesStrategy` as `INCLUDE` or `WARN`.
 2. Apply `mergeServiceFiles` or `ServiceFileTransformer` stuff as you did in your previous setup.
 3. Diff the JARs from upgrading or not.
-4. Remove the extra entries that are added by `INCLUDE` by `filesMatching` or `PreserveFirstFoundResourceTransformer`.
+4. Remove the extra entries that are added by `INCLUDE` by  `eachFile`, `filesMatching`, or `PreserveFirstFoundResourceTransformer`.
 5. Diff the JARs again, and check that only the entries you want to preserve remain.
 6. Optionally, if you want a stricter check for the shadowed JAR entries, enable `failOnDuplicateEntries`.
+   This can also ensure the regressions are caught in the future.
+
+See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
 ## [8.3.9](https://github.com/GradleUp/shadow/releases/tag/8.3.9) - 2025-08-05
 
