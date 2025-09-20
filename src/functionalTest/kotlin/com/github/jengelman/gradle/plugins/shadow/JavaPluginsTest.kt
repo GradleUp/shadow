@@ -23,7 +23,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -48,6 +47,7 @@ import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -122,15 +122,37 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
-    with(ProjectBuilder.builder().build()) {
-      plugins.apply(ShadowPlugin::class.java)
-      val testJar = tasks.register("testJar", Jar::class.java)
-      val testShadowJar = registerShadowJarCommon(testJar)
-      assertThat(project.tasks.findByName(ASSEMBLE_TASK_NAME)).isNull()
-      tasks.register(ASSEMBLE_TASK_NAME)
-      assertThat(project.tasks.findByName(ASSEMBLE_TASK_NAME)).isNotNull()
-        .transform { it.dependsOn }.contains(testShadowJar.get())
-    }
+    projectScript.writeText(
+      """
+        plugins {
+          id('com.gradleup.shadow')
+        }
+
+        def testJar = tasks.register('testJar', Jar)
+        ${ShadowJar::class.qualifiedName}.registerShadowJarCommon(project, testJar) {
+          it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
+        }
+
+        afterEvaluate {
+          tasks.register('$ASSEMBLE_TASK_NAME') {
+          def taskDependencies = provider { dependsOn.collect { it.name }.join(', ') }
+            doFirst {
+              logger.lifecycle('task dependencies: ' + taskDependencies.get())
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(ASSEMBLE_TASK_NAME)
+
+    assertThat(result.task(":$ASSEMBLE_TASK_NAME")).isNotNull()
+      .transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result.task(shadowJarPath)).isNotNull()
+      .transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result.output).contains(
+      "task dependencies: $SHADOW_JAR_TASK_NAME",
+    )
   }
 
   @Test
