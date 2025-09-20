@@ -4,12 +4,17 @@ import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
+import kotlin.metadata.jvm.KmModule
+import kotlin.metadata.jvm.KmPackageParts
+import kotlin.metadata.jvm.KotlinModuleMetadata
+import kotlin.metadata.jvm.UnstableMetadataApi
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
@@ -166,6 +171,13 @@ public open class ShadowCopyAction(
             fileDetails.remapClass()
           }
         }
+        path.endsWith(".kotlin_module") -> {
+          if (relocators.isEmpty()) {
+            fileDetails.writeToZip(path)
+          } else {
+            fileDetails.remapKotlinModule()
+          }
+        }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
@@ -228,6 +240,46 @@ public open class ShadowCopyAction(
       } catch (_: ZipException) {
         logger.warn("We have a duplicate $relocatedPath in source project")
       }
+    }
+
+    /**
+     * Applies remapping to the given kotlin module with the specified relocation path.
+     * The remapped module is then written to the zip file.
+     */
+    @OptIn(UnstableMetadataApi::class)
+    private fun FileCopyDetails.remapKotlinModule() = file.readBytes().let { bytes ->
+      val kmMetadata = KotlinModuleMetadata.read(bytes)
+      val newKmModule = KmModule().apply {
+        // We don't need to relocate the nested properties in `optionalAnnotationClasses`, there is a very special use case for Kotlin Multiplatform.
+        optionalAnnotationClasses += kmMetadata.kmModule.optionalAnnotationClasses
+        packageParts += kmMetadata.kmModule.packageParts.map { (pkg, parts) ->
+          val relocatedPkg = relocators.relocateClass(pkg)
+          val relocatedParts = KmPackageParts(
+            parts.fileFacades.mapTo(mutableListOf()) { relocators.relocatePath(it) },
+            parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
+              relocators.relocatePath(name) to relocators.relocatePath(facade)
+            },
+          )
+          relocatedPkg to relocatedParts
+        }
+      }
+      val newKmMetadata = KotlinModuleMetadata(newKmModule, kmMetadata.version)
+
+      val newBytes = newKmMetadata.write()
+      val relocatedPath = relocators.relocatePath(path)
+      val entryName = when {
+        relocatedPath != path -> relocatedPath
+        // Nothing changed, so keep the original path.
+        newBytes.contentEquals(bytes) -> path
+        // Content changed but path didn't, so rename to avoid name clash. The filename does not matter to the compiler.
+        else -> path.replace(".kotlin_module", ".shadow.kotlin_module")
+      }
+      val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
+        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+      }
+      zipOutStr.putNextEntry(entry)
+      zipOutStr.write(newBytes)
+      zipOutStr.closeEntry()
     }
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
