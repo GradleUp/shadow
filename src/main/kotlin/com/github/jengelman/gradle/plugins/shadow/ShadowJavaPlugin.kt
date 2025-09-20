@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import javax.inject.Inject
@@ -61,7 +62,10 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
-        attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
+
+        // Using AttributeContainer#attributeProvider means the value isn't queried until it is needed.
+        // Unless the attributes are consumed too early, this is an effective substitute for Project#afterEvaluate.
+        attrs.attributeProvider(Bundling.BUNDLING_ATTRIBUTE, tasks.shadowJar.flatMap(ShadowJar::getFinalBundlingAttribute))
       }
       it.outgoing.artifact(tasks.shadowJar)
     }

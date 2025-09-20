@@ -32,6 +32,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Bundling
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.CopySpec
@@ -43,6 +44,8 @@ import org.gradle.api.file.DuplicatesStrategy.INHERIT
 import org.gradle.api.file.DuplicatesStrategy.WARN
 import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -170,6 +173,29 @@ public abstract class ShadowJar : Jar() {
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
+   * The [org.gradle.api.attributes.Bundling] attribute to use for the Gradle Module Metadata.
+   *
+   * If unset, Shadow will use [org.gradle.api.attributes.Bundling.SHADOWED] if this shadow JAR is relocating packages
+   * or [org.gradle.api.attributes.Bundling.EMBEDDED] if it is not.
+   *
+   * Defaults to `shadow`.
+   */
+  @get:Internal
+  public open val bundlingAttribute: Property<String> = objectFactory.property(Bundling.SHADOWED)
+
+  @Internal
+  internal fun getFinalBundlingAttribute(): Provider<Bundling> {
+    return bundlingAttribute.orElse(
+      providers.zip<Set<Relocator>, Boolean, Boolean>(
+        relocators,
+        enableAutoRelocation,
+      ) { set, autoRelocating ->
+        !set.isEmpty() || autoRelocating
+      }.orElse(false).map { isRelocating -> if (isRelocating) Bundling.SHADOWED else Bundling.EMBEDDED },
+    ).map { objectFactory.named(Bundling::class.java, it) }
+  }
+
+  /**
    * Main class attribute to add to manifest.
    *
    * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar]
@@ -243,6 +269,9 @@ public abstract class ShadowJar : Jar() {
    * @see [CopySpec.duplicatesStrategy]
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
+
+  @get:Inject
+  protected abstract val providers: ProviderFactory
 
   @get:Inject
   protected abstract val archiveOperations: ArchiveOperations
