@@ -1,6 +1,8 @@
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin : org/gradle/api/Plugin {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion;
 	public static final field DISTRIBUTION_NAME Ljava/lang/String;
+	public static final field SHADOW_DIST_TAR_TASK_NAME Ljava/lang/String;
+	public static final field SHADOW_DIST_ZIP_TASK_NAME Ljava/lang/String;
 	public static final field SHADOW_INSTALL_TASK_NAME Ljava/lang/String;
 	public static final field SHADOW_RUN_TASK_NAME Ljava/lang/String;
 	public static final field SHADOW_SCRIPTS_TASK_NAME Ljava/lang/String;
@@ -17,6 +19,8 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicati
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion {
 	public final synthetic fun getInstallShadowDist (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 	public final synthetic fun getRunShadow (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final synthetic fun getShadowDistTar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final synthetic fun getShadowDistZip (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 	public final synthetic fun getStartShadowScripts (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 }
 

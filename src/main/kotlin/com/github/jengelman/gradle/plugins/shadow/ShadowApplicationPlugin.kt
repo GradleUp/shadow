@@ -17,6 +17,7 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
+import org.gradle.api.tasks.bundling.Zip
 
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
@@ -138,6 +139,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
     public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"
     public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
+    public const val SHADOW_DIST_TAR_TASK_NAME: String = "shadowDistTar"
+    public const val SHADOW_DIST_ZIP_TASK_NAME: String = "shadowDistZip"
 
     @get:JvmSynthetic
     public inline val TaskContainer.runShadow: TaskProvider<JavaExec>
@@ -150,5 +153,13 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     @get:JvmSynthetic
     public inline val TaskContainer.installShadowDist: TaskProvider<Sync>
       get() = named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
+
+    @get:JvmSynthetic
+    public inline val TaskContainer.shadowDistTar: TaskProvider<Zip>
+      get() = named(SHADOW_DIST_TAR_TASK_NAME, Zip::class.java)
+
+    @get:JvmSynthetic
+    public inline val TaskContainer.shadowDistZip: TaskProvider<Zip>
+      get() = named(SHADOW_DIST_ZIP_TASK_NAME, Zip::class.java)
   }
 }
