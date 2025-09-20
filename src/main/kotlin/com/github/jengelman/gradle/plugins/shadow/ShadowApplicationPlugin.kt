@@ -140,6 +140,10 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
 
     @get:JvmSynthetic
+    public inline val TaskContainer.runShadow: TaskProvider<JavaExec>
+      get() = named(SHADOW_RUN_TASK_NAME, JavaExec::class.java)
+
+    @get:JvmSynthetic
     public inline val TaskContainer.startShadowScripts: TaskProvider<CreateStartScripts>
       get() = named(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java)
 

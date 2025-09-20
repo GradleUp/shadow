@@ -15,6 +15,8 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.single
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.runShadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.startShadowScripts
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
@@ -26,6 +28,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -49,14 +52,12 @@ import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrSubTarget.Companion.RUN_TASK_NAME
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -85,7 +86,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
 
     project.plugins.apply(JavaPlugin::class.java)
-    val shadowJarTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
+    val shadowJarTask = project.tasks.shadowJar.get()
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
     val assembleTask = project.tasks.getByName(ASSEMBLE_TASK_NAME)
     assertThat(assembleTask.dependsOn.filterIsInstance<Named>().map { it.name }).all {
@@ -96,7 +97,8 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(project.plugins.findPlugin(ShadowApplicationPlugin::class.java)).isNull()
     project.plugins.apply(ApplicationPlugin::class.java)
     assertThat(project.plugins.findPlugin(ShadowApplicationPlugin::class.java)).isNotNull()
-    val runShadowTask = project.tasks.getByName(RUN_TASK_NAME) as JavaExec
+    val runShadowTask = project.tasks.runShadow.get()
+    val startShadowScripts = project.tasks.startShadowScripts.get()
     val applicationExtension = project.applicationExtension
     val javaPluginExtension = project.javaPluginExtension
     val javaToolchainService = project.javaToolchainService
@@ -148,6 +150,21 @@ class JavaPluginsTest : BasePluginTest() {
         .isEqualTo(javaPluginExtension.modularity.inferModulePath.orNull)
       assertThat(javaLauncher.get().metadata.jvmVersion)
         .isEqualTo(javaToolchainService.launcherFor(javaPluginExtension.toolchain).get().metadata.jvmVersion)
+    }
+
+    with(startShadowScripts) {
+      assertThat(description).isEqualTo("Creates OS specific scripts to run the project as a JVM application using the shadow jar")
+      assertThat(group).isEqualTo(ApplicationPlugin.APPLICATION_GROUP)
+      assertThat(classpath).isNotNull().transform { it.files }.contains(shadowJarTask.archiveFile.get().asFile)
+      assertThat(mainModule.orNull).isEqualTo(applicationExtension.mainModule.orNull)
+      assertThat(mainClass.orNull).isEqualTo(applicationExtension.mainClass.orNull)
+      assertThat(applicationName).isEqualTo(applicationExtension.applicationName)
+      assertThat(outputDir).isNotNull()
+        .isEqualTo(project.layout.buildDirectory.dir("scriptsShadow").get().asFile)
+      assertThat(executableDir).isEqualTo(applicationExtension.executableDir)
+      assertThat(defaultJvmOpts).isEqualTo(applicationExtension.applicationDefaultJvmArgs)
+      assertThat(modularity.inferModulePath.orNull)
+        .isEqualTo(javaPluginExtension.modularity.inferModulePath.orNull)
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowJarTask.archiveFile.get().asFile)
