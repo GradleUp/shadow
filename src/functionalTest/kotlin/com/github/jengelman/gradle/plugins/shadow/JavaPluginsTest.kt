@@ -37,6 +37,8 @@ import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.jvm.javaMethod
 import org.gradle.api.Named
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.internal.tasks.JvmConstants
@@ -126,6 +128,10 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
+    val kFunction = ShadowJar.Companion::class.declaredFunctions
+      .single { it.name == "registerShadowJarCommon" }
+    val jvmName = requireNotNull(kFunction.javaMethod).name
+
     projectScript.writeText(
       """
         plugins {
@@ -133,7 +139,7 @@ class JavaPluginsTest : BasePluginTest() {
         }
 
         def testJar = tasks.register('testJar', Jar)
-        ${ShadowJar::class.qualifiedName}.registerShadowJarCommon(project, testJar) {
+        ${ShadowJar::class.qualifiedName}.Companion.$jvmName(project, testJar) {
           it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
         }
 

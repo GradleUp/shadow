@@ -515,8 +515,7 @@ public abstract class ShadowJar : Jar() {
     public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>
       get() = named(SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
 
-    @JvmStatic
-    public fun Project.registerShadowJarCommon(
+    internal fun Project.registerShadowJarCommon(
       jarTask: TaskProvider<Jar>,
       action: Action<ShadowJar> = Action {},
     ): TaskProvider<ShadowJar> {
