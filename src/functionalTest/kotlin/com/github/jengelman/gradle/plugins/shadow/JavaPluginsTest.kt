@@ -37,6 +37,7 @@ import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.gradle.api.Named
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.internal.tasks.JvmConstants
 import org.gradle.api.plugins.JavaPlugin
@@ -77,7 +78,10 @@ class JavaPluginsTest : BasePluginTest() {
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
     val assembleTask = project.tasks.getByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)
-    assertThat(assembleTask.dependsOn).contains(shadowTask)
+    assertThat(assembleTask.dependsOn.filterIsInstance<Named>().map { it.name }).all {
+      isNotEmpty()
+      contains(shadowTask.name)
+    }
 
     // Check inherited properties.
     with(shadowTask as Jar) {
