@@ -542,7 +542,7 @@ public abstract class ShadowJar : Jar() {
 
       // Can't use `named` directly as the task is optional or may not exist when the plugin is applied.
       // Using Spec<String> applies the action to the task if it is added later.
-      tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach { it.dependsOn(task) }
+      tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach { it.dependsOn(task.get()) }
 
       return task
     }
