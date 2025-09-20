@@ -58,7 +58,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
       task.classpath = files(tasks.shadowJar)
 
-      @Suppress("InternalGradleApiUsage") // Usages of conventionMapping.
+      @Suppress("InternalGradleApiUsage") // TODO: replace usages of conventionMapping.
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
