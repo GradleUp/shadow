@@ -58,14 +58,13 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
       task.classpath = files(tasks.shadowJar)
 
-      @Suppress("InternalGradleApiUsage") // Usages of conventionMapping.
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
-        task.conventionMapping.map("applicationName", ::getApplicationName)
-        task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
-        task.conventionMapping.map("executableDir", ::getExecutableDir)
-        task.conventionMapping.map("defaultJvmOpts", ::getApplicationDefaultJvmArgs)
+        task.applicationName = applicationName
+        task.outputDir = layout.buildDirectory.dir("scriptsShadow").get().asFile
+        task.executableDir = executableDir
+        task.defaultJvmOpts = applicationDefaultJvmArgs
       }
       task.modularity.inferModulePath.convention(javaPluginExtension.modularity.inferModulePath)
     }
