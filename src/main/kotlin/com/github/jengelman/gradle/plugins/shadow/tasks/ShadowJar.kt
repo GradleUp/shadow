@@ -519,7 +519,7 @@ public abstract class ShadowJar : Jar() {
       jarTask: TaskProvider<Jar>,
       action: (ShadowJar) -> Unit,
     ): TaskProvider<ShadowJar> {
-      return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
+      val task = tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
         task.archiveClassifier.set("all")
         task.exclude(
           "META-INF/INDEX.LIST",
@@ -537,11 +537,14 @@ public abstract class ShadowJar : Jar() {
           jarTask.get().manifest,
         )
 
-        @Suppress("EagerGradleConfiguration") // Can't use `named` as the task is optional.
-        tasks.findByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)?.dependsOn(task)
-
         action(task)
       }
+
+      // Can't use `named` directly as the task is optional or may not exist when the plugin is applied.
+      // Using Spec<String> applies the action to the task if it is added later.
+      tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach { it.dependsOn(task) }
+
+      return task
     }
   }
 }
