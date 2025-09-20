@@ -138,7 +138,7 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.writeText(
       """
         plugins {
-          id('com.gradleup.shadow')
+          id '$shadowPluginId'
         }
 
         def testJar = tasks.register('testJar', Jar)
