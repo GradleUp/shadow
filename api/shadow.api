@@ -19,6 +19,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowApplicati
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowApplicationPlugin$Companion {
 	public final synthetic fun getInstallShadowDist (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 	public final synthetic fun getRunShadow (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
+	public final synthetic fun getShadow (Lorg/gradle/api/distribution/DistributionContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 	public final synthetic fun getShadowDistTar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 	public final synthetic fun getShadowDistZip (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 	public final synthetic fun getStartShadowScripts (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;

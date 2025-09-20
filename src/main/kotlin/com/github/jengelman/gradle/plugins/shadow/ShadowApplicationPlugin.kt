@@ -9,8 +9,11 @@ import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import java.io.IOException
 import org.gradle.api.GradleException
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.distribution.Distribution
+import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
@@ -141,6 +144,10 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
     public const val SHADOW_DIST_TAR_TASK_NAME: String = "shadowDistTar"
     public const val SHADOW_DIST_ZIP_TASK_NAME: String = "shadowDistZip"
+
+    @get:JvmSynthetic
+    public inline val DistributionContainer.shadow: NamedDomainObjectProvider<Distribution>
+      get() = named(DISTRIBUTION_NAME)
 
     @get:JvmSynthetic
     public inline val TaskContainer.runShadow: TaskProvider<JavaExec>
