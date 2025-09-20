@@ -9,6 +9,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
@@ -31,13 +32,12 @@ class ShadowPropertiesTest {
   fun beforeEach() {
     project = ProjectBuilder.builder().withName(PROJECT_NAME).build().also {
       it.version = VERSION
+      it.plugins.apply(ShadowPlugin::class.java)
     }
   }
 
   @Test
-  fun applyJavaPlugin() = with(project) {
-    plugins.apply(ShadowPlugin::class.java)
-
+  fun misc() = with(project) {
     assertThat(plugins.hasPlugin(ShadowPlugin::class.java)).isTrue()
     assertThat(plugins.hasPlugin(LegacyShadowPlugin::class.java)).isTrue()
     assertThat(tasks.findByName(SHADOW_JAR_TASK_NAME)).isNull()
@@ -46,10 +46,13 @@ class ShadowPropertiesTest {
       assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
       assertThat(addTargetJvmVersionAttribute.get()).isTrue()
     }
+  }
 
+  @Test
+  fun applyJavaPlugin() = with(project) {
     plugins.apply(JavaPlugin::class.java)
     val shadowJarTask = tasks.shadowJar.get()
-    val shadowConfig = configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
+    val shadowConfig = configurations.shadow.get()
     val assembleTask = tasks.getByName(ASSEMBLE_TASK_NAME)
 
     assertThat(shadowConfig.artifacts.files).contains(shadowJarTask.archiveFile.get().asFile)
