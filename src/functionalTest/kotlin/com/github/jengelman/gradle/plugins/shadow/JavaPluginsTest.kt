@@ -23,6 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -45,6 +46,7 @@ import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -76,7 +78,7 @@ class JavaPluginsTest : BasePluginTest() {
     project.plugins.apply(JavaPlugin::class.java)
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
-    val assembleTask = project.tasks.getByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)
+    val assembleTask = project.tasks.getByName(ASSEMBLE_TASK_NAME)
     assertThat(assembleTask.dependsOn).contains(shadowTask)
 
     // Check inherited properties.
@@ -116,6 +118,19 @@ class JavaPluginsTest : BasePluginTest() {
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
+  }
+
+  @Test
+  fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
+    with(ProjectBuilder.builder().build()) {
+      plugins.apply(ShadowPlugin::class.java)
+      val testJar = tasks.register("testJar", Jar::class.java)
+      val testShadowJar = registerShadowJarCommon(testJar)
+      assertThat(project.tasks.findByName(ASSEMBLE_TASK_NAME)).isNull()
+      tasks.register(ASSEMBLE_TASK_NAME)
+      assertThat(project.tasks.findByName(ASSEMBLE_TASK_NAME)).isNotNull()
+        .transform { it.dependsOn }.contains(testShadowJar.get())
+    }
   }
 
   @Test
