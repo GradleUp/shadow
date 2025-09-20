@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -17,10 +18,13 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shad
 import org.gradle.api.Named
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.internal.tasks.JvmConstants.API_CONFIGURATION_NAME
+import org.gradle.api.internal.tasks.JvmConstants.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
+import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -96,6 +100,16 @@ class ShadowPropertiesTest {
         containsOnly(runtimeConfiguration)
       }
     }
+  }
+
+  @Test
+  fun applyJavaGradlePlugin() = with(project) {
+    plugins.apply(JavaGradlePluginPlugin::class.java)
+    val api = configurations.named(API_CONFIGURATION_NAME).get()
+    val compileOnly = configurations.named(COMPILE_ONLY_CONFIGURATION_NAME).get()
+    val gradleApi = dependencies.gradleApi()
+    assertThat(api.dependencies).containsNone(gradleApi)
+    assertThat(compileOnly.dependencies).contains(gradleApi)
   }
 
   private companion object {
