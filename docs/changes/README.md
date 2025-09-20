@@ -17,6 +17,7 @@
   ```
 - Honor `executableDir` and `applicationName` in `application` extension. ([#1740](https://github.com/GradleUp/shadow/pull/1738))  
   This is useful when you want to customize the output directory of the start scripts and the application distribution.
+- Provide more task accessors in `ShadowApplicationPlugin.Companion`. ([#1771](https://github.com/GradleUp/shadow/pull/1771))
 
 ### Changed
 
