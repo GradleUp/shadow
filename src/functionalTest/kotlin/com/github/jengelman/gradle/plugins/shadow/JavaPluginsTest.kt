@@ -34,9 +34,9 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
-import org.gradle.api.internal.tasks.JvmConstants
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -419,7 +419,7 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/65",
   )
   @ParameterizedTest
-  @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME])
+  @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, IMPLEMENTATION_CONFIGURATION_NAME])
   fun addShadowConfigurationToClassPathInManifest(configuration: String) {
     projectScript.appendText(
       """
