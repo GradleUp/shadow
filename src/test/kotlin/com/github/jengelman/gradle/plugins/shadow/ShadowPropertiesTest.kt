@@ -11,8 +11,8 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import org.gradle.api.Named
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
@@ -48,18 +48,18 @@ class ShadowPropertiesTest {
     }
 
     plugins.apply(JavaPlugin::class.java)
-    val shadowTask = tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
+    val shadowJarTask = tasks.shadowJar.get()
     val shadowConfig = configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
     val assembleTask = tasks.getByName(ASSEMBLE_TASK_NAME)
 
-    assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
+    assertThat(shadowConfig.artifacts.files).contains(shadowJarTask.archiveFile.get().asFile)
     assertThat(assembleTask.dependsOn.filterIsInstance<Named>().map { it.name }).all {
       isNotEmpty()
-      contains(shadowTask.name)
+      contains(shadowJarTask.name)
     }
 
     // Check inherited properties.
-    with(shadowTask as Jar) {
+    with(shadowJarTask as Jar) {
       assertThat(group).isEqualTo(LifecycleBasePlugin.BUILD_GROUP)
       assertThat(description).isEqualTo("Create a combined JAR of project and runtime dependencies")
 
@@ -80,7 +80,7 @@ class ShadowPropertiesTest {
     }
 
     // Check self properties.
-    with(shadowTask) {
+    with(shadowJarTask) {
       assertThat(addMultiReleaseAttribute.get()).isTrue()
       assertThat(enableAutoRelocation.get()).isFalse()
       assertThat(failOnDuplicateEntries.get()).isFalse()
