@@ -37,6 +37,8 @@ import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.jvm.javaMethod
 import org.gradle.api.Named
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.internal.tasks.JvmConstants
@@ -46,7 +48,9 @@ import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -77,7 +81,7 @@ class JavaPluginsTest : BasePluginTest() {
     project.plugins.apply(JavaPlugin::class.java)
     val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
     val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
-    val assembleTask = project.tasks.getByName(LifecycleBasePlugin.ASSEMBLE_TASK_NAME)
+    val assembleTask = project.tasks.getByName(ASSEMBLE_TASK_NAME)
     assertThat(assembleTask.dependsOn.filterIsInstance<Named>().map { it.name }).all {
       isNotEmpty()
       contains(shadowTask.name)
@@ -120,6 +124,50 @@ class JavaPluginsTest : BasePluginTest() {
     }
 
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
+  }
+
+  @Issue(
+    "https://github.com/GradleUp/shadow/pull/1766",
+  )
+  @Test
+  fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
+    val kFunction = ShadowJar.Companion::class.declaredFunctions
+      .single { it.name == "registerShadowJarCommon" }
+    val jvmName = requireNotNull(kFunction.javaMethod).name
+
+    projectScript.writeText(
+      """
+        plugins {
+          id('com.gradleup.shadow')
+        }
+
+        def testJar = tasks.register('testJar', Jar)
+        // Must use `@Companion` to access the companion object instance instead of the class.
+        def companion = ${ShadowJar::class.qualifiedName}.@Companion
+        companion.$jvmName(project, testJar) {
+          it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
+        }
+
+        afterEvaluate {
+          tasks.register('$ASSEMBLE_TASK_NAME') {
+          def taskDependencies = provider { dependsOn.collect { it.name }.join(', ') }
+            doFirst {
+              logger.lifecycle('task dependencies: ' + taskDependencies.get())
+            }
+          }
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(ASSEMBLE_TASK_NAME)
+
+    assertThat(result.task(":$ASSEMBLE_TASK_NAME")).isNotNull()
+      .transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result.task(shadowJarPath)).isNotNull()
+      .transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result.output).contains(
+      "task dependencies: $SHADOW_JAR_TASK_NAME",
+    )
   }
 
   @Test
