@@ -127,10 +127,7 @@ class JavaPluginsTest : BasePluginTest() {
       val testJar = tasks.register("testJar", Jar::class.java)
       val testShadowJar = registerShadowJarCommon(testJar)
       assertThat(project.tasks.findByName(ASSEMBLE_TASK_NAME)).isNull()
-      // Defer assemble task registration.
-      afterEvaluate {
-        tasks.register(ASSEMBLE_TASK_NAME)
-      }
+      tasks.register(ASSEMBLE_TASK_NAME)
       assertThat(project.tasks.findByName(ASSEMBLE_TASK_NAME)).isNotNull()
         .transform { it.dependsOn }.contains(testShadowJar.get())
     }
