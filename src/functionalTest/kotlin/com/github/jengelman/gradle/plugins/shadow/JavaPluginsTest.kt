@@ -126,6 +126,9 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/pull/1766",
+  )
   @Test
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
     val kFunction = ShadowJar.Companion::class.declaredFunctions
@@ -139,7 +142,9 @@ class JavaPluginsTest : BasePluginTest() {
         }
 
         def testJar = tasks.register('testJar', Jar)
-        ${ShadowJar::class.qualifiedName}.Companion.$jvmName(project, testJar) {
+        // Must use `@Companion` to access the companion object instance instead of the class.
+        def companion = ${ShadowJar::class.qualifiedName}.@Companion
+        companion.$jvmName(project, testJar) {
           it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
         }
 
