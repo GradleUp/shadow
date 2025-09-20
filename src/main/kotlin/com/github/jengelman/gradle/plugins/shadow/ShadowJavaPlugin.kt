@@ -5,6 +5,8 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import javax.inject.Inject
@@ -23,6 +25,7 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin @Inject constructor(
@@ -61,7 +64,26 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
-        attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
+
+        // Using AttributeContainer#attributeProvider means the value isn't queried until it is needed.
+        // Unless the attributes are consumed too early, this is an effective substitute for Project#afterEvaluate.
+        attrs.attributeProvider(
+          Bundling.BUNDLING_ATTRIBUTE,
+          providers.zip(tasks.shadowJar, shadow.useEmbeddedBundlingAttribute) { task, useEmbeddedBundlingAttribute->
+            //println("Executed: ${this.state.executed}") // If this prints "false", there's a problem
+            if (!useEmbeddedBundlingAttribute) return@zip objects.named(Bundling::class.java, Bundling.SHADOWED)
+
+            val isRelocating = providers.zip<Set<Relocator>, Boolean, Boolean>(
+              task.relocators, task.enableAutoRelocation
+            ) { set, autoRelocating->
+              !set.isEmpty() || autoRelocating
+            }.orElse(false)
+            objects.named(
+              Bundling::class.java,
+              if (isRelocating.get()) Bundling.SHADOWED else Bundling.EMBEDDED,
+            )
+          }
+        )
       }
       it.outgoing.artifact(tasks.shadowJar)
     }

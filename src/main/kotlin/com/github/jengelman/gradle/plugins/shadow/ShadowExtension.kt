@@ -19,4 +19,14 @@ public interface ShadowExtension {
    * Defaults to `true`.
    */
   public val addTargetJvmVersionAttribute: Property<Boolean>
+
+  /**
+   * If `true`, uses the [org.gradle.api.attributes.Bundling.EMBEDDED] attribute instead of the
+   * [org.gradle.api.attributes.Bundling.SHADOWED] attribute for the Gradle Module Metadata if the
+   * shadowed JAR does not relocate packages. This affects how consumers resolve the published artifact based on the
+   * requested [org.gradle.api.attributes.Bundling] attribute.
+   *
+   * Defaults to `false`.
+   */
+  public val useEmbeddedBundlingAttribute: Property<Boolean>
 }
