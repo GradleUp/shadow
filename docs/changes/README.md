@@ -32,7 +32,6 @@
 - Bump min Java requirement to 17. ([#1744](https://github.com/GradleUp/shadow/pull/1744))
 - Require most optional properties non-null. ([#1745](https://github.com/GradleUp/shadow/pull/1745))
 - Make assemble depend on shadowJar even if it is added later. ([#1766](https://github.com/GradleUp/shadow/pull/1766))
-- Remove `conventionMapping` usages. ([#1770](https://github.com/GradleUp/shadow/pull/1770))
 
 ### Fixed
 
