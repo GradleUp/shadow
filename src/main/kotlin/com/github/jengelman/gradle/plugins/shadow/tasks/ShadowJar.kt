@@ -517,7 +517,7 @@ public abstract class ShadowJar : Jar() {
 
     internal fun Project.registerShadowJarCommon(
       jarTask: TaskProvider<Jar>,
-      action: Action<ShadowJar> = Action {},
+      action: Action<ShadowJar>,
     ): TaskProvider<ShadowJar> {
       return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
         task.archiveClassifier.set("all")
