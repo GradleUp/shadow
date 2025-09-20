@@ -31,6 +31,7 @@
 - Stop using start script templates bundled in Shadow. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
 - Bump min Java requirement to 17. ([#1744](https://github.com/GradleUp/shadow/pull/1744))
 - Require most optional properties non-null. ([#1745](https://github.com/GradleUp/shadow/pull/1745))
+- Make assemble depend on shadowJar even if it is added later. ([#1766](https://github.com/GradleUp/shadow/pull/1766))
 
 ### Fixed
 
