@@ -8,16 +8,26 @@ import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.installShadowDist
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.runShadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.shadowDistZip
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.startShadowScripts
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import org.gradle.api.Named
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
@@ -60,7 +70,7 @@ class ShadowPropertiesTest {
     val assembleTask = tasks.getByName(ASSEMBLE_TASK_NAME)
 
     assertThat(shadowConfig.artifacts.files).contains(shadowJarTask.archiveFile.get().asFile)
-    assertThat(assembleTask.dependsOn.filterIsInstance<Named>().map { it.name }).all {
+    assertThat(assembleTask.dependsOnTaskNames).all {
       isNotEmpty()
       contains(shadowJarTask.name)
     }
@@ -103,6 +113,66 @@ class ShadowPropertiesTest {
   }
 
   @Test
+  fun applyApplicationPlugin() = with(project) {
+    plugins.apply(ApplicationPlugin::class.java)
+    val shadowJarTask = tasks.shadowJar.get()
+    val runShadowTask = tasks.runShadow.get()
+    val startShadowScripts = tasks.startShadowScripts.get()
+    val installShadowDist = tasks.installShadowDist.get()
+    val shadowDistZip = tasks.shadowDistZip.get()
+
+    with(runShadowTask) {
+      assertThat(description).isEqualTo("Runs this project as a JVM application using the shadow jar")
+      assertThat(group).isEqualTo(ApplicationPlugin.APPLICATION_GROUP)
+      assertThat(classpath.files).contains(shadowJarTask.archiveFile.get().asFile)
+      assertThat(mainModule.orNull).isEqualTo(applicationExtension.mainModule.orNull)
+      assertThat(mainClass.orNull).isEqualTo(applicationExtension.mainClass.orNull)
+      assertThat(jvmArguments.get()).isEqualTo(applicationExtension.applicationDefaultJvmArgs)
+      assertThat(modularity.inferModulePath.orNull)
+        .isEqualTo(javaPluginExtension.modularity.inferModulePath.orNull)
+      assertThat(javaLauncher.get().metadata.jvmVersion)
+        .isEqualTo(javaToolchainService.launcherFor(javaPluginExtension.toolchain).get().metadata.jvmVersion)
+    }
+
+    with(startShadowScripts) {
+      assertThat(description).isEqualTo("Creates OS specific scripts to run the project as a JVM application using the shadow jar")
+      assertThat(group).isEqualTo(ApplicationPlugin.APPLICATION_GROUP)
+      assertThat(classpath).isNotNull().transform { it.files }.contains(shadowJarTask.archiveFile.get().asFile)
+      assertThat(mainModule.orNull).isEqualTo(applicationExtension.mainModule.orNull)
+      assertThat(mainClass.orNull).isEqualTo(applicationExtension.mainClass.orNull)
+      assertThat(applicationName).isEqualTo(applicationExtension.applicationName)
+      assertThat(outputDir).isNotNull()
+        .isEqualTo(layout.buildDirectory.dir("scriptsShadow").get().asFile)
+      assertThat(executableDir).isEqualTo(applicationExtension.executableDir)
+      assertThat(defaultJvmOpts).isEqualTo(applicationExtension.applicationDefaultJvmArgs)
+      assertThat(modularity.inferModulePath.orNull)
+        .isEqualTo(javaPluginExtension.modularity.inferModulePath.orNull)
+    }
+
+    with(installShadowDist) {
+      assertThat(description).isEqualTo("Installs the project as a distribution as-is.")
+      assertThat(group).isEqualTo("distribution")
+      assertThat(destinationDir).isNotNull()
+        .isEqualTo(projectDir.resolve("build/install/my-shadow-shadow"))
+    }
+
+    with(shadowDistZip) {
+      assertThat(description).isEqualTo("Bundles the project as a distribution.")
+      assertThat(group).isEqualTo("distribution")
+      assertThat(archiveAppendix.orNull).isNull()
+      assertThat(archiveBaseName.get()).isEqualTo("my-shadow-shadow")
+      assertThat(archiveClassifier.orNull).isNull()
+      assertThat(archiveExtension.get()).isEqualTo("zip")
+      assertThat(archiveFileName.get()).isEqualTo("my-shadow-shadow-1.0.0.zip")
+      assertThat(archiveVersion.get()).isEqualTo(version)
+      assertThat(archiveFile.get().asFile)
+        .isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
+      assertThat(destinationDirectory.get().asFile)
+        .isEqualTo(layout.buildDirectory.dir("distributions").get().asFile)
+    }
+  }
+
+  @Test
   fun applyJavaGradlePlugin() = with(project) {
     plugins.apply(JavaGradlePluginPlugin::class.java)
     val api = configurations.named(API_CONFIGURATION_NAME).get()
@@ -115,5 +185,7 @@ class ShadowPropertiesTest {
   private companion object {
     const val PROJECT_NAME = "my-shadow"
     const val VERSION = "1.0.0"
+
+    val Task.dependsOnTaskNames: List<String> get() = dependsOn.filterIsInstance<Named>().map { it.name }
   }
 }
