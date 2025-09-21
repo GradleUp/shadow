@@ -1,19 +1,25 @@
-*.un~
+.fleet
+.gradle
+.kotlin
+build
+
+### Android Studio ###
+local.properties
+
+### IntelliJ IDEA ###
+.idea
+*.iws
 *.iml
 *.ipr
-*.iws
-.idea
-build
-.gradle
-*.orig
 out
-.gradletasknamecache
-.gradle-test-kit
-classes/
-node_modules/
-yarn-error.log
-src/docs/.vuepress/dist/
+
+### VS Code ###
+.vscode
+bin
+
+### Mac OS ###
 .DS_Store
-jd-gui.cfg
-bin/
-.vscode/
+
+### MkDocs ###
+docs/api
+site
