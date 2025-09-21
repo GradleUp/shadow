@@ -13,6 +13,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.installShadowDist
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.runShadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.shadowDistTar
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.shadowDistZip
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.startShadowScripts
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
@@ -31,6 +32,7 @@ import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
@@ -122,6 +124,7 @@ class ShadowPropertiesTest {
     val startShadowScripts = tasks.startShadowScripts.get()
     val installShadowDist = tasks.installShadowDist.get()
     val shadowDistZip = tasks.shadowDistZip.get()
+    val shadowDistTar = tasks.shadowDistTar.get()
 
     with(runShadowTask) {
       assertThat(description).isEqualTo("Runs this project as a JVM application using the shadow jar")
@@ -160,22 +163,37 @@ class ShadowPropertiesTest {
         .isEqualTo(projectDir.resolve("build/install/my-project-shadow"))
     }
 
+    listOf(
+      shadowDistZip,
+      shadowDistTar,
+    ).forEach {
+      with(it as AbstractArchiveTask) {
+        assertThat(description).isEqualTo("Bundles the project as a distribution.")
+        assertThat(group).isEqualTo("distribution")
+        assertThat(archiveAppendix.orNull).isNull()
+        assertThat(archiveBaseName.get()).isEqualTo("my-project-shadow")
+        assertThat(archiveClassifier.orNull).isNull()
+        assertThat(archiveVersion.get()).isEqualTo(version)
+        assertThat(destinationDirectory.get().asFile).all {
+          isEqualTo(layout.buildDirectory.dir("distributions").get().asFile)
+          isEqualTo(projectDir.resolve("build/distributions"))
+        }
+      }
+    }
     with(shadowDistZip) {
-      assertThat(description).isEqualTo("Bundles the project as a distribution.")
-      assertThat(group).isEqualTo("distribution")
-      assertThat(archiveAppendix.orNull).isNull()
-      assertThat(archiveBaseName.get()).isEqualTo("my-project-shadow")
-      assertThat(archiveClassifier.orNull).isNull()
       assertThat(archiveExtension.get()).isEqualTo("zip")
       assertThat(archiveFileName.get()).isEqualTo("my-project-shadow-1.0.0.zip")
-      assertThat(archiveVersion.get()).isEqualTo(version)
       assertThat(archiveFile.get().asFile).all {
         isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
         isEqualTo(projectDir.resolve("build/distributions/my-project-shadow-1.0.0.zip"))
       }
-      assertThat(destinationDirectory.get().asFile).all {
-        isEqualTo(layout.buildDirectory.dir("distributions").get().asFile)
-        isEqualTo(projectDir.resolve("build/distributions"))
+    }
+    with(shadowDistTar) {
+      assertThat(archiveExtension.get()).isEqualTo("tar")
+      assertThat(archiveFileName.get()).isEqualTo("my-project-shadow-1.0.0.tar")
+      assertThat(archiveFile.get().asFile).all {
+        isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
+        isEqualTo(projectDir.resolve("build/distributions/my-project-shadow-1.0.0.tar"))
       }
     }
   }

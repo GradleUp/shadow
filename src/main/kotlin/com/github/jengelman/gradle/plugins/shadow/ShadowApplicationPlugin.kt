@@ -20,6 +20,7 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
+import org.gradle.api.tasks.bundling.Tar
 import org.gradle.api.tasks.bundling.Zip
 
 /**
@@ -162,8 +163,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       get() = named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
 
     @get:JvmSynthetic
-    public inline val TaskContainer.shadowDistTar: TaskProvider<Zip>
-      get() = named(SHADOW_DIST_TAR_TASK_NAME, Zip::class.java)
+    public inline val TaskContainer.shadowDistTar: TaskProvider<Tar>
+      get() = named(SHADOW_DIST_TAR_TASK_NAME, Tar::class.java)
 
     @get:JvmSynthetic
     public inline val TaskContainer.shadowDistZip: TaskProvider<Zip>
