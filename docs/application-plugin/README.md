@@ -113,6 +113,19 @@ You can also add more files into the distribution like:
         into("extra")
       }
     }
+
+    tasks.installShadowDist {
+      // Configure the install task if needed.
+    }
+    tasks.startShadowScripts {
+      // Configure the start scripts task if needed.
+    }
+    tasks.shadowDistZip {
+      // Configure the zip distribution task if needed.
+    }
+    tasks.shadowDistTar {
+      // Configure the tar distribution task if needed.
+    }
     ```
 
 === "Groovy"
@@ -137,6 +150,19 @@ You can also add more files into the distribution like:
       contents.from('extra/echo.sh') {
         into 'extra'
       }
+    }
+
+    tasks.named('installShadowDist', Sync) {
+      // Configure the install task if needed.
+    }
+    tasks.named('startShadowScripts', CreateStartScripts) {
+      // Configure the start scripts task if needed.
+    }
+    tasks.named('shadowDistZip', Zip) {
+      // Configure the zip distribution task if needed.
+    }
+    tasks.named('shadowDistTar', Tar) {
+      // Configure the tar distribution task if needed.
     }
     ```
 
