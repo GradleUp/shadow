@@ -600,11 +600,11 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
-  @OptIn(UnstableMetadataApi::class)
   @Issue(
     "https://github.com/GradleUp/shadow/issues/843",
   )
   @Test
+  @OptIn(UnstableMetadataApi::class)
   fun relocateKotlinModuleFiles() {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
     val stdlibJar = buildJar("stdlib.jar") {
