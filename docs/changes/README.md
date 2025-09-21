@@ -18,6 +18,9 @@
 - Honor `executableDir` and `applicationName` in `application` extension. ([#1740](https://github.com/GradleUp/shadow/pull/1738))  
   This is useful when you want to customize the output directory of the start scripts and the application distribution.
 - Provide more task accessors in `ShadowApplicationPlugin.Companion`. ([#1771](https://github.com/GradleUp/shadow/pull/1771))
+- Support relocating Kotlin module files. ([#1539](https://github.com/GradleUp/shadow/pull/1539))  
+  The current implementation relocates all properties in `KotlinModuleMetadata` but `KmModule.optionalAnnotationClasses`
+  due to very limited usage of it. See more discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
 
 ### Changed
 
