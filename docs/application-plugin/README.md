@@ -107,7 +107,7 @@ You can also add more files into the distribution like:
     }
 
     // `shadow` is the name of the distribution created by Shadow plugin
-    distributions.named("shadow") {
+    distributions.shadow {
       // Optionally, you can add more files into extra directory in the distribution like this:
       contents.from("extra/echo.sh") {
         into("extra")
