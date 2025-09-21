@@ -90,8 +90,10 @@ class ShadowPropertiesTest {
         isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
         isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all.jar"))
       }
-      assertThat(destinationDirectory.get().asFile)
-        .isEqualTo(layout.buildDirectory.dir("libs").get().asFile)
+      assertThat(destinationDirectory.get().asFile).all {
+        isEqualTo(layout.buildDirectory.dir("libs").get().asFile)
+        isEqualTo(projectDir.resolve("build/libs"))
+      }
 
       assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.EXCLUDE)
     }
@@ -137,12 +139,14 @@ class ShadowPropertiesTest {
     with(startShadowScripts) {
       assertThat(description).isEqualTo("Creates OS specific scripts to run the project as a JVM application using the shadow jar")
       assertThat(group).isEqualTo(ApplicationPlugin.APPLICATION_GROUP)
-      assertThat(classpath).isNotNull().transform { it.files }.contains(shadowJarTask.archiveFile.get().asFile)
+      assertThat(classpath?.files).isNotNull().contains(shadowJarTask.archiveFile.get().asFile)
       assertThat(mainModule.orNull).isEqualTo(applicationExtension.mainModule.orNull)
       assertThat(mainClass.orNull).isEqualTo(applicationExtension.mainClass.orNull)
       assertThat(applicationName).isEqualTo(applicationExtension.applicationName)
-      assertThat(outputDir).isNotNull()
-        .isEqualTo(layout.buildDirectory.dir("scriptsShadow").get().asFile)
+      assertThat(outputDir).isNotNull().all {
+        isEqualTo(layout.buildDirectory.dir("scriptsShadow").get().asFile)
+        isEqualTo(projectDir.resolve("build/scriptsShadow"))
+      }
       assertThat(executableDir).isEqualTo(applicationExtension.executableDir)
       assertThat(defaultJvmOpts).isEqualTo(applicationExtension.applicationDefaultJvmArgs)
       assertThat(modularity.inferModulePath.orNull)
@@ -165,10 +169,14 @@ class ShadowPropertiesTest {
       assertThat(archiveExtension.get()).isEqualTo("zip")
       assertThat(archiveFileName.get()).isEqualTo("my-project-shadow-1.0.0.zip")
       assertThat(archiveVersion.get()).isEqualTo(version)
-      assertThat(archiveFile.get().asFile)
-        .isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
-      assertThat(destinationDirectory.get().asFile)
-        .isEqualTo(layout.buildDirectory.dir("distributions").get().asFile)
+      assertThat(archiveFile.get().asFile).all {
+        isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
+        isEqualTo(projectDir.resolve("build/distributions/my-project-shadow-1.0.0.zip"))
+      }
+      assertThat(destinationDirectory.get().asFile).all {
+        isEqualTo(layout.buildDirectory.dir("distributions").get().asFile)
+        isEqualTo(projectDir.resolve("build/distributions"))
+      }
     }
   }
 
@@ -186,6 +194,6 @@ class ShadowPropertiesTest {
     const val PROJECT_NAME = "my-project"
     const val VERSION = "1.0.0"
 
-    val Task.dependsOnTaskNames: List<String> get() = dependsOn.filterIsInstance<Named>().map { it.name }
+    val Task.dependsOnTaskNames: List<String> get() = dependsOn.filterIsInstance<Named>().map(Named::getName)
   }
 }
