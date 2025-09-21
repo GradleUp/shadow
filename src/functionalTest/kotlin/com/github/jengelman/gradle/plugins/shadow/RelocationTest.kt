@@ -639,7 +639,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedModule.version.toString()).isEqualTo("2.2.0")
     assertThat(originalModule.version.toString()).isEqualTo("2.2.0")
 
-    // No implementation for writing this property yet.
+    // No implementation for writing the optionalAnnotationClasses property yet.
     // https://github.com/JetBrains/kotlin/blob/81502985ae0a2f5b21e121ffc180c3f4dd467e17/libraries/kotlinx-metadata/jvm/src/kotlin/metadata/jvm/KotlinModuleMetadata.kt#L71
     assertThat(relocatedModule.kmModule.optionalAnnotationClasses).isEmpty()
 
