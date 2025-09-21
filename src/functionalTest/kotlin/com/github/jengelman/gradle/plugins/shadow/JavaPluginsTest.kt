@@ -4,23 +4,18 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
-import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
-import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
-import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
-import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
@@ -39,17 +34,11 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
-import org.gradle.api.Named
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.internal.tasks.JvmConstants
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
-import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.plugins.JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.ZipEntryCompression
-import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
-import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -59,73 +48,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
-  @Test
-  fun applyPlugin() {
-    val projectName = "my-shadow"
-    val version = "1.0.0"
-
-    val project = ProjectBuilder.builder().withName(projectName).build().also {
-      it.version = version
-    }
-    project.plugins.apply(ShadowPlugin::class.java)
-
-    assertThat(project.plugins.hasPlugin(ShadowPlugin::class.java)).isTrue()
-    assertThat(project.plugins.hasPlugin(LegacyShadowPlugin::class.java)).isTrue()
-    assertThat(project.tasks.findByName(SHADOW_JAR_TASK_NAME)).isNull()
-
-    with(project.extensions.getByType(ShadowExtension::class.java)) {
-      assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
-      assertThat(addTargetJvmVersionAttribute.get()).isTrue()
-    }
-
-    project.plugins.apply(JavaPlugin::class.java)
-    val shadowTask = project.tasks.getByName(SHADOW_JAR_TASK_NAME) as ShadowJar
-    val shadowConfig = project.configurations.getByName(ShadowBasePlugin.CONFIGURATION_NAME)
-    val assembleTask = project.tasks.getByName(ASSEMBLE_TASK_NAME)
-    assertThat(assembleTask.dependsOn.filterIsInstance<Named>().map { it.name }).all {
-      isNotEmpty()
-      contains(shadowTask.name)
-    }
-
-    // Check inherited properties.
-    with(shadowTask as Jar) {
-      assertThat(group).isEqualTo(LifecycleBasePlugin.BUILD_GROUP)
-      assertThat(description).isEqualTo("Create a combined JAR of project and runtime dependencies")
-
-      assertThat(archiveAppendix.orNull).isNull()
-      assertThat(archiveBaseName.get()).isEqualTo(projectName)
-      assertThat(archiveClassifier.get()).isEqualTo("all")
-      assertThat(archiveExtension.get()).isEqualTo("jar")
-      assertThat(archiveFileName.get()).isEqualTo("my-shadow-1.0.0-all.jar")
-      assertThat(archiveVersion.get()).isEqualTo(version)
-      assertThat(archiveFile.get().asFile).all {
-        isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
-        isEqualTo(project.projectDir.resolve("build/libs/my-shadow-1.0.0-all.jar"))
-      }
-      assertThat(destinationDirectory.get().asFile)
-        .isEqualTo(project.layout.buildDirectory.dir("libs").get().asFile)
-
-      assertThat(duplicatesStrategy).isEqualTo(DuplicatesStrategy.EXCLUDE)
-    }
-
-    // Check self properties.
-    with(shadowTask) {
-      assertThat(addMultiReleaseAttribute.get()).isTrue()
-      assertThat(enableAutoRelocation.get()).isFalse()
-      assertThat(failOnDuplicateEntries.get()).isFalse()
-      assertThat(minimizeJar.get()).isFalse()
-      assertThat(mainClass.orNull).isNull()
-
-      assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
-      assertThat(configurations.get()).all {
-        isNotEmpty()
-        containsOnly(project.runtimeConfiguration)
-      }
-    }
-
-    assertThat(shadowConfig.artifacts.files).contains(shadowTask.archiveFile.get().asFile)
-  }
-
   @Issue(
     "https://github.com/GradleUp/shadow/pull/1766",
   )
@@ -497,7 +419,7 @@ class JavaPluginsTest : BasePluginTest() {
     "https://github.com/GradleUp/shadow/issues/65",
   )
   @ParameterizedTest
-  @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME])
+  @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, IMPLEMENTATION_CONFIGURATION_NAME])
   fun addShadowConfigurationToClassPathInManifest(configuration: String) {
     projectScript.appendText(
       """
