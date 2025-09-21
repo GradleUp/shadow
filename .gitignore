@@ -3,6 +3,9 @@
 .kotlin
 build
 
+### Android Studio ###
+local.properties
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
