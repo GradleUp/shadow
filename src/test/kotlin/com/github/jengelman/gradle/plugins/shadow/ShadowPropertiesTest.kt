@@ -84,11 +84,11 @@ class ShadowPropertiesTest {
       assertThat(archiveBaseName.get()).isEqualTo(PROJECT_NAME)
       assertThat(archiveClassifier.get()).isEqualTo("all")
       assertThat(archiveExtension.get()).isEqualTo("jar")
-      assertThat(archiveFileName.get()).isEqualTo("my-shadow-1.0.0-all.jar")
+      assertThat(archiveFileName.get()).isEqualTo("my-project-1.0.0-all.jar")
       assertThat(archiveVersion.get()).isEqualTo(version)
       assertThat(archiveFile.get().asFile).all {
         isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
-        isEqualTo(projectDir.resolve("build/libs/my-shadow-1.0.0-all.jar"))
+        isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all.jar"))
       }
       assertThat(destinationDirectory.get().asFile)
         .isEqualTo(layout.buildDirectory.dir("libs").get().asFile)
@@ -153,17 +153,17 @@ class ShadowPropertiesTest {
       assertThat(description).isEqualTo("Installs the project as a distribution as-is.")
       assertThat(group).isEqualTo("distribution")
       assertThat(destinationDir).isNotNull()
-        .isEqualTo(projectDir.resolve("build/install/my-shadow-shadow"))
+        .isEqualTo(projectDir.resolve("build/install/my-project-shadow"))
     }
 
     with(shadowDistZip) {
       assertThat(description).isEqualTo("Bundles the project as a distribution.")
       assertThat(group).isEqualTo("distribution")
       assertThat(archiveAppendix.orNull).isNull()
-      assertThat(archiveBaseName.get()).isEqualTo("my-shadow-shadow")
+      assertThat(archiveBaseName.get()).isEqualTo("my-project-shadow")
       assertThat(archiveClassifier.orNull).isNull()
       assertThat(archiveExtension.get()).isEqualTo("zip")
-      assertThat(archiveFileName.get()).isEqualTo("my-shadow-shadow-1.0.0.zip")
+      assertThat(archiveFileName.get()).isEqualTo("my-project-shadow-1.0.0.zip")
       assertThat(archiveVersion.get()).isEqualTo(version)
       assertThat(archiveFile.get().asFile)
         .isEqualTo(destinationDirectory.file(archiveFileName).get().asFile)
@@ -183,7 +183,7 @@ class ShadowPropertiesTest {
   }
 
   private companion object {
-    const val PROJECT_NAME = "my-shadow"
+    const val PROJECT_NAME = "my-project"
     const val VERSION = "1.0.0"
 
     val Task.dependsOnTaskNames: List<String> get() = dependsOn.filterIsInstance<Named>().map { it.name }
