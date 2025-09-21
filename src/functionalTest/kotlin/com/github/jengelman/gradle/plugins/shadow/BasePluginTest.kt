@@ -149,8 +149,8 @@ abstract class BasePluginTest {
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
-        id('$plugin')
-        id('com.gradleup.shadow')
+        id '$plugin'
+        id '$shadowPluginId'
       }
       $groupInfo
       $versionInfo
@@ -424,6 +424,7 @@ abstract class BasePluginTest {
       Path(gradleUserHome, "testkit")
     }
 
+    const val shadowPluginId = "com.gradleup.shadow"
     const val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
     const val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
     const val runShadowPath = ":$SHADOW_RUN_TASK_NAME"

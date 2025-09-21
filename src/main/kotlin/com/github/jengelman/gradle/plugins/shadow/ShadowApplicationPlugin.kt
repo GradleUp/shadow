@@ -9,14 +9,19 @@ import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import java.io.IOException
 import org.gradle.api.GradleException
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.distribution.Distribution
+import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.application.CreateStartScripts
+import org.gradle.api.tasks.bundling.Tar
+import org.gradle.api.tasks.bundling.Zip
 
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
@@ -58,7 +63,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
       task.classpath = files(tasks.shadowJar)
 
-      @Suppress("InternalGradleApiUsage") // Usages of conventionMapping.
+      @Suppress("InternalGradleApiUsage") // TODO: replace usages of conventionMapping.
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
@@ -138,6 +143,16 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     public const val SHADOW_RUN_TASK_NAME: String = "runShadow"
     public const val SHADOW_SCRIPTS_TASK_NAME: String = "startShadowScripts"
     public const val SHADOW_INSTALL_TASK_NAME: String = "installShadowDist"
+    public const val SHADOW_DIST_TAR_TASK_NAME: String = "shadowDistTar"
+    public const val SHADOW_DIST_ZIP_TASK_NAME: String = "shadowDistZip"
+
+    @get:JvmSynthetic
+    public inline val DistributionContainer.shadow: NamedDomainObjectProvider<Distribution>
+      get() = named(DISTRIBUTION_NAME)
+
+    @get:JvmSynthetic
+    public inline val TaskContainer.runShadow: TaskProvider<JavaExec>
+      get() = named(SHADOW_RUN_TASK_NAME, JavaExec::class.java)
 
     @get:JvmSynthetic
     public inline val TaskContainer.startShadowScripts: TaskProvider<CreateStartScripts>
@@ -146,5 +161,13 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     @get:JvmSynthetic
     public inline val TaskContainer.installShadowDist: TaskProvider<Sync>
       get() = named(SHADOW_INSTALL_TASK_NAME, Sync::class.java)
+
+    @get:JvmSynthetic
+    public inline val TaskContainer.shadowDistTar: TaskProvider<Tar>
+      get() = named(SHADOW_DIST_TAR_TASK_NAME, Tar::class.java)
+
+    @get:JvmSynthetic
+    public inline val TaskContainer.shadowDistZip: TaskProvider<Zip>
+      get() = named(SHADOW_DIST_ZIP_TASK_NAME, Zip::class.java)
   }
 }
