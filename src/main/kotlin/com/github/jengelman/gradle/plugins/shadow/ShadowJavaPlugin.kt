@@ -65,7 +65,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
 
         // Using AttributeContainer#attributeProvider means the value isn't queried until it is needed.
         // Unless the attributes are consumed too early, this is an effective substitute for Project#afterEvaluate.
-        attrs.attributeProvider(Bundling.BUNDLING_ATTRIBUTE, tasks.shadowJar.flatMap(ShadowJar::getFinalBundlingAttribute))
+        attrs.attributeProvider(Bundling.BUNDLING_ATTRIBUTE, tasks.shadowJar.map { task -> objects.named(Bundling::class.java, task.bundlingAttribute.get()) })
       }
       it.outgoing.artifact(tasks.shadowJar)
     }
