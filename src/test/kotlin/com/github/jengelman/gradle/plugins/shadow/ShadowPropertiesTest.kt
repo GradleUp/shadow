@@ -2,12 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
@@ -71,11 +69,8 @@ class ShadowPropertiesTest {
     val shadowConfig = configurations.shadow.get()
     val assembleTask = tasks.getByName(ASSEMBLE_TASK_NAME)
 
-    assertThat(shadowConfig.artifacts.files).contains(shadowJarTask.archiveFile.get().asFile)
-    assertThat(assembleTask.dependsOnTaskNames).all {
-      isNotEmpty()
-      contains(shadowJarTask.name)
-    }
+    assertThat(shadowConfig.artifacts.files).containsOnly(shadowJarTask.archiveFile.get().asFile)
+    assertThat(assembleTask.dependsOnTaskNames).containsOnly(shadowJarTask.name)
 
     // Check inherited properties.
     with(shadowJarTask as Jar) {
@@ -109,10 +104,7 @@ class ShadowPropertiesTest {
       assertThat(mainClass.orNull).isNull()
 
       assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
-      assertThat(configurations.get()).all {
-        isNotEmpty()
-        containsOnly(runtimeConfiguration)
-      }
+      assertThat(configurations.get()).containsOnly(runtimeConfiguration)
     }
   }
 
@@ -129,7 +121,7 @@ class ShadowPropertiesTest {
     with(runShadowTask) {
       assertThat(description).isEqualTo("Runs this project as a JVM application using the shadow jar")
       assertThat(group).isEqualTo(ApplicationPlugin.APPLICATION_GROUP)
-      assertThat(classpath.files).contains(shadowJarTask.archiveFile.get().asFile)
+      assertThat(classpath.files).containsOnly(shadowJarTask.archiveFile.get().asFile)
       assertThat(mainModule.orNull).isEqualTo(applicationExtension.mainModule.orNull)
       assertThat(mainClass.orNull).isEqualTo(applicationExtension.mainClass.orNull)
       assertThat(jvmArguments.get()).isEqualTo(applicationExtension.applicationDefaultJvmArgs)
@@ -142,7 +134,7 @@ class ShadowPropertiesTest {
     with(startShadowScripts) {
       assertThat(description).isEqualTo("Creates OS specific scripts to run the project as a JVM application using the shadow jar")
       assertThat(group).isEqualTo(ApplicationPlugin.APPLICATION_GROUP)
-      assertThat(classpath?.files).isNotNull().contains(shadowJarTask.archiveFile.get().asFile)
+      assertThat(classpath?.files).isNotNull().containsOnly(shadowJarTask.archiveFile.get().asFile)
       assertThat(mainModule.orNull).isEqualTo(applicationExtension.mainModule.orNull)
       assertThat(mainClass.orNull).isEqualTo(applicationExtension.mainClass.orNull)
       assertThat(applicationName).isEqualTo(applicationExtension.applicationName)
@@ -205,7 +197,7 @@ class ShadowPropertiesTest {
     val compileOnly = configurations.named(COMPILE_ONLY_CONFIGURATION_NAME).get()
     val gradleApi = dependencies.gradleApi()
     assertThat(api.dependencies).containsNone(gradleApi)
-    assertThat(compileOnly.dependencies).contains(gradleApi)
+    assertThat(compileOnly.dependencies).containsOnly(gradleApi)
   }
 
   private companion object {
