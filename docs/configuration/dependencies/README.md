@@ -104,7 +104,7 @@ meet the following error when building the shadowed JAR:
 ```
 * What went wrong:
 Execution failed for task ':shadowJar'.
-> Cannot expand ZIP '/home/ludo/.gradle/caches/modules-2/files-2.1/org.graalvm.js/js-community/24.2.2/f30ba393d9a64382fda48616af973773c906d2ec/js-community-24.2.2.pom'.
+> Cannot expand ZIP '/home/user/.gradle/caches/modules-2/files-2.1/org.graalvm.js/js-community/24.2.2/f30ba393d9a64382fda48616af973773c906d2ec/js-community-24.2.2.pom'.
 ```
 
 To embed such dependencies into your shadowed JAR, you can use the [`Jar.from`][Jar.from] method with a custom
