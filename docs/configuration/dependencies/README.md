@@ -31,7 +31,7 @@ This means any dependency declared in the `runtimeOnly` configuration would be *
 > not have the intended effect, as `configurations.compile` will try to delegate to the
 > [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`
 
-## Embedding Local Jar Files Into Your Shadowed Jar
+## Embedding Local Jar Files into Your Shadowed Jar
 
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
@@ -94,7 +94,7 @@ Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Proje
 
 See also [Adding Extra Files](../README.md#adding-extra-files)
 
-## Embedding Non-JAR Dependencies Into Your Shadowed Jar
+## Embedding Non-JAR Dependencies into Your Shadowed Jar
 
 Not all remote dependencies are JAR files, e.g. some of them are [POM](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
 [SO](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/), and so on.
