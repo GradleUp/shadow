@@ -96,8 +96,8 @@ See also [Adding Extra Files](../README.md#adding-extra-files)
 
 ## Embedding Non-JAR Dependencies into Your Shadowed Jar
 
-Not all remote dependencies are JAR files, e.g. some of them are [POM](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
-[SO](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/), and so on.
+Not all remote dependencies are JAR files, e.g. some of them are [POM files](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
+[SO files](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/), and so on.
 If you add such dependencies to your `runtimeClasspath` configuration (`api`, `implementation`, `runtimeOnly`), you will
 meet the following error when building the shadowed JAR:
 
