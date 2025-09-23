@@ -124,6 +124,8 @@ configuration.
     dependencies {
       nonJar("org.graalvm.js:js-community:24.2.2")
       nonJar("io.github.ganadist.sqlite4java:libsqlite4java-osx-aarch64:1.0.392")
+      // If you add a real JAR file into the new `nonJar` configuration, it will be merged without unzipping.
+      nonJar(files("foo.jar"))
     }
 
     tasks.shadowJar {
@@ -145,6 +147,8 @@ configuration.
     dependencies {
       add('nonJar', 'org.graalvm.js:js-community:24.2.2')
       add('nonJar', 'io.github.ganadist.sqlite4java:libsqlite4java-osx-aarch64:1.0.392')
+      // If you add a real JAR file into the new `nonJar` configuration, it will be merged without unzipping.
+      add('nonJar', files('foo.jar'))
     }
 
     tasks.shadowJar {

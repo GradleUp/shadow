@@ -788,6 +788,32 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun addDependenciesViaCustomConfigurationWithoutUnzipping() {
+    projectScript.appendText(
+      """
+        def nonJar = configurations.create('nonJar')
+        dependencies {
+          add('nonJar', 'my:a:1.0')
+          add('nonJar', 'my:b:1.0')
+        }
+        $shadowJarTask {
+          from(nonJar)
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "a-1.0.jar",
+        "b-1.0.jar",
+        *manifestEntries,
+      )
+    }
+  }
+
   @Issue(
     "https://github.com/GradleUp/shadow/issues/520",
   )
