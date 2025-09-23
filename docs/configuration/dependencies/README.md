@@ -31,7 +31,7 @@ This means any dependency declared in the `runtimeOnly` configuration would be *
 > not have the intended effect, as `configurations.compile` will try to delegate to the
 > [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`
 
-## Embedding Jar Files Inside Your Shadow Jar
+## Embedding Local Jar Files Into Your Shadowed Jar
 
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
