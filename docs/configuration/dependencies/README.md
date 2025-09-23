@@ -96,15 +96,25 @@ See also [Adding Extra Files](../README.md#adding-extra-files)
 
 ## Embedding Non-JAR Dependencies into Your Shadowed JAR
 
-Not all remote dependencies are JAR files, e.g. some of them are [POM files](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
-[SO files](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/), and so on.
-If you add such dependencies to your `runtimeClasspath` configuration (`api`, `implementation`, `runtimeOnly`), you will
-encounter the following error when building the shadowed JAR:
+Dependencies added into `runtimeClasspath` configuration (`api`, `implementation`, `runtimeOnly`) will be unzipped and
+merged into the shadowed JAR. Not all dependencies are JAR files, e.g. some of them are
+[POM files](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
+[SO files](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/),
+and so on. If such dependencies are added into `runtimeClasspath`, you will encounter the following error when building
+the shadowed JAR:
 
 ```
 * What went wrong:
 Execution failed for task ':shadowJar'.
-> Cannot expand ZIP '/home/user/.gradle/caches/modules-2/files-2.1/org.graalvm.js/js-community/24.2.2/f30ba393d9a64382fda48616af973773c906d2ec/js-community-24.2.2.pom'.
+> Cannot expand ZIP '/home/user/.gradle/caches/modules-2/files-2.1/some/of/non/jar/file.pom'.
+...
+Caused by: java.util.zip.ZipException: Archive is not a ZIP archive
+  at org.apache.commons.compress.archivers.zip.ZipFile.positionAtEndOfCentralDirectoryRecord(ZipFile.java:562)
+  at org.apache.commons.compress.archivers.zip.ZipFile.openZipChannel(ZipFile.java:504)
+  at org.apache.commons.compress.archivers.zip.ZipFile.access$000(ZipFile.java:88)
+  at org.apache.commons.compress.archivers.zip.ZipFile$Builder.get(ZipFile.java:159)
+  at org.gradle.api.internal.file.archive.ZipFileTree.lambda$visit$0(ZipFileTree.java:97)
+  ... 146 more
 ```
 
 To embed such dependencies into your shadowed JAR, you can use the [`Jar.from`][Jar.from] method with a custom
