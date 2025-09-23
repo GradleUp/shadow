@@ -94,6 +94,64 @@ Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Proje
 
 See also [Adding Extra Files](../README.md#adding-extra-files)
 
+## Embedding Non-JAR Dependencies Into Your Shadowed Jar
+
+Not all remote dependencies are JAR files, e.g. some of them are [POM](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
+[SO](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/), and so on.
+If you add such dependencies to your `runtimeClasspath` configuration (`api`, `implementation`, `runtimeOnly`), will
+meet the following error when building the shadowed JAR:
+
+```
+* What went wrong:
+Execution failed for task ':shadowJar'.
+> Cannot expand ZIP '/home/ludo/.gradle/caches/modules-2/files-2.1/org.graalvm.js/js-community/24.2.2/f30ba393d9a64382fda48616af973773c906d2ec/js-community-24.2.2.pom'.
+```
+
+To embed such dependencies into your shadowed JAR, you can use the [`Jar.from`][Jar.from] method with a custom
+configuration.
+
+=== "Kotlin"
+
+    ```kotlin
+    val nonJar by configurations.creating
+
+    // This is necessary to make the dependencies in `nonJar` available at compile time.
+    // If you don't need that, you can skip this step.
+    configurations.named("compileClasspath") {
+      extendsFrom(nonJar)
+    }
+
+    dependencies {
+      nonJar("org.graalvm.js:js-community:24.2.2")
+      nonJar("io.github.ganadist.sqlite4java:libsqlite4java-osx-aarch64:1.0.392")
+    }
+
+    tasks.shadowJar {
+      from(nonJar)
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    def nonJar = configurations.create('nonJar')
+
+    // This is necessary to make the dependencies in `nonJar` available at compile time.
+    // If you don't need that, you can skip this step.
+    configurations.compileClasspath {
+      extendsFrom nonJar
+    }
+
+    dependencies {
+      add('nonJar', 'org.graalvm.js:js-community:24.2.2')
+      add('nonJar', 'io.github.ganadist.sqlite4java:libsqlite4java-osx-aarch64:1.0.392')
+    }
+
+    tasks.shadowJar {
+      from(nonJar)
+    }
+    ```
+
 ## Filtering Dependencies
 
 Individual dependencies can be filtered from the final JAR by using the `dependencies` block of a
