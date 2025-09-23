@@ -31,7 +31,7 @@ This means any dependency declared in the `runtimeOnly` configuration would be *
 > not have the intended effect, as `configurations.compile` will try to delegate to the
 > [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`
 
-## Embedding Jar Files Inside Your Shadow Jar
+## Embedding Local Jar Files into Your Shadowed JAR
 
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
@@ -93,6 +93,78 @@ Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Proje
     ```
 
 See also [Adding Extra Files](../README.md#adding-extra-files)
+
+## Embedding Non-JAR Dependencies into Your Shadowed JAR
+
+Dependencies added into `runtimeClasspath` configuration (`api`, `implementation`, `runtimeOnly`) will be unzipped and
+merged into the shadowed JAR. Not all dependencies are JAR files, e.g. some of them are
+[POM files](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
+[SO files](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/),
+and so on. If such dependencies are added into `runtimeClasspath`, you will encounter the following error when building
+the shadowed JAR:
+
+```
+* What went wrong:
+Execution failed for task ':shadowJar'.
+> Cannot expand ZIP '/home/user/.gradle/caches/modules-2/files-2.1/some/of/non/jar/file.pom'.
+...
+Caused by: java.util.zip.ZipException: Archive is not a ZIP archive
+  at org.apache.commons.compress.archivers.zip.ZipFile.positionAtEndOfCentralDirectoryRecord(ZipFile.java:562)
+  at org.apache.commons.compress.archivers.zip.ZipFile.openZipChannel(ZipFile.java:504)
+  at org.apache.commons.compress.archivers.zip.ZipFile.access$000(ZipFile.java:88)
+  at org.apache.commons.compress.archivers.zip.ZipFile$Builder.get(ZipFile.java:159)
+  at org.gradle.api.internal.file.archive.ZipFileTree.lambda$visit$0(ZipFileTree.java:97)
+  ... 146 more
+```
+
+To embed such dependencies into your shadowed JAR, you can use the [`Jar.from`][Jar.from] method with a custom
+configuration.
+
+=== "Kotlin"
+
+    ```kotlin
+    val nonJar by configurations.creating
+
+    // This is necessary to make the dependencies in `nonJar` available at compile time.
+    // If you don't need that, you can skip this step.
+    configurations.named("compileClasspath") {
+      extendsFrom(nonJar)
+    }
+
+    dependencies {
+      nonJar("org.graalvm.js:js-community:24.2.2")
+      nonJar("io.github.ganadist.sqlite4java:libsqlite4java-osx-aarch64:1.0.392")
+      // If you add a real JAR file into the new `nonJar` configuration, it will be included as-is. Different from `implementation`.
+      nonJar(files("foo.jar"))
+    }
+
+    tasks.shadowJar {
+      from(nonJar)
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    def nonJar = configurations.create('nonJar')
+
+    // This is necessary to make the dependencies in `nonJar` available at compile time.
+    // If you don't need that, you can skip this step.
+    configurations.compileClasspath {
+      extendsFrom nonJar
+    }
+
+    dependencies {
+      add('nonJar', 'org.graalvm.js:js-community:24.2.2')
+      add('nonJar', 'io.github.ganadist.sqlite4java:libsqlite4java-osx-aarch64:1.0.392')
+      // If you add a real JAR file into the new `nonJar` configuration, it will be included as-is. Different from `implementation`.
+      add('nonJar', files('foo.jar'))
+    }
+
+    tasks.shadowJar {
+      from(nonJar)
+    }
+    ```
 
 ## Filtering Dependencies
 
