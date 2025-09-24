@@ -26,7 +26,7 @@
   You can override it for now by:
   ```kotlin
   shadow {
-    bundlingAttribute = org.gradle.api.attributes.Bundling.EMBEDDED
+    bundlingAttribute = Bundling.EMBEDDED
   }
   ```
 

@@ -136,7 +136,7 @@ setting the `bundlingAttribute` property in the `shadow` extension:
     ```kotlin
     shadow {
       // Per description of the attribute, you should set it to either `Bundling.SHADOWED` or `Bundling.EMBEDDED`.
-      bundlingAttribute = org.gradle.api.attributes.Bundling.EMBEDDED
+      bundlingAttribute = Bundling.EMBEDDED
     }
     ```
 
@@ -145,7 +145,7 @@ setting the `bundlingAttribute` property in the `shadow` extension:
     ```groovy
     shadow {
       // Per description of the attribute, you should set it to either `Bundling.SHADOWED` or `Bundling.EMBEDDED`.
-      bundlingAttribute = org.gradle.api.attributes.Bundling.EMBEDDED
+      bundlingAttribute = Bundling.EMBEDDED
     }
     ```
 

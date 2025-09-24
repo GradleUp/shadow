@@ -26,7 +26,7 @@ public interface ShadowExtension {
    *
    * Per description of the attribute, you should set it to either [Bundling.SHADOWED] or [Bundling.EMBEDDED].
    *
-   * Defaults to `shadow`.
+   * Defaults to [Bundling.SHADOWED].
    */
   public val bundlingAttribute: Property<String>
 }

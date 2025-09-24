@@ -63,9 +63,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         )
         attrs.attributeProvider(
           Bundling.BUNDLING_ATTRIBUTE,
-          shadow.bundlingAttribute.map { attr ->
-            objects.named(Bundling::class.java, attr)
-          },
+          shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
         )
       }
       it.outgoing.artifact(tasks.shadowJar)
