@@ -127,6 +127,28 @@ you can disable this by setting the `addTargetJvmVersionAttribute` property in t
     }
     ```
 
+The BUNDLING attribute (`org.gradle.dependency.bundling`) of the shadowed variant is set to `shadowed` by default,
+it is useful for consumers to distinguish between normal and shadowed dependencies. You can override this attribute by
+setting the `bundlingAttribute` property in the `shadow` extension:
+
+=== "Kotlin"
+
+    ```kotlin
+    shadow {
+      // Per description of the attribute, you should set it to either `Bundling.SHADOWED` or `Bundling.EMBEDDED`.
+      bundlingAttribute = org.gradle.api.attributes.Bundling.EMBEDDED
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    shadow {
+      // Per description of the attribute, you should set it to either `Bundling.SHADOWED` or `Bundling.EMBEDDED`.
+      bundlingAttribute = org.gradle.api.attributes.Bundling.EMBEDDED
+    }
+    ```
+
 ## Shadow Configuration and Publishing
 
 The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify
