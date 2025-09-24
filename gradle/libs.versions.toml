@@ -39,4 +39,4 @@ android-lint = "com.android.lint:8.13.0"
 jetbrains-dokka = "org.jetbrains.dokka:2.1.0-Beta"
 mavenPublish = "com.vanniktech.maven.publish:0.34.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
-spotless = "com.diffplug.spotless:7.2.1"
+spotless = "com.diffplug.spotless:8.0.0"
