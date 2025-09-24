@@ -5,7 +5,6 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import javax.inject.Inject
@@ -64,8 +63,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         )
         attrs.attributeProvider(
           Bundling.BUNDLING_ATTRIBUTE,
-          tasks.shadowJar.map { task ->
-            objects.named(Bundling::class.java, task.bundlingAttribute.get())
+          shadow.bundlingAttribute.map { attr ->
+            objects.named(Bundling::class.java, attr)
           },
         )
       }

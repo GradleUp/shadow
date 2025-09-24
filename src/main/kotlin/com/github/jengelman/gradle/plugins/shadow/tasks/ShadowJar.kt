@@ -171,16 +171,6 @@ public abstract class ShadowJar : Jar() {
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
-   * The [Bundling] attribute to use for the Gradle Module Metadata.
-   *
-   * Per description of the attribute, you should set it to either [Bundling.SHADOWED] or [Bundling.EMBEDDED].
-   *
-   * Defaults to `shadow`.
-   */
-  @get:Internal
-  public open val bundlingAttribute: Property<String> = objectFactory.property(Bundling.SHADOWED)
-
-  /**
    * Main class attribute to add to manifest.
    *
    * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar]

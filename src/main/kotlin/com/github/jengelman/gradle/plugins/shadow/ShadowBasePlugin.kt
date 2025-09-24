@@ -8,6 +8,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.attributes.Bundling
 import org.gradle.api.component.SoftwareComponentContainer
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.plugins.ExtensionContainer
@@ -22,6 +23,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     with(extensions.create(EXTENSION_NAME, ShadowExtension::class.java)) {
       addShadowVariantIntoJavaComponent.convention(true)
       addTargetJvmVersionAttribute.convention(true)
+      bundlingAttribute.convention(Bundling.SHADOWED)
     }
     @Suppress("EagerGradleConfiguration") // this should be created eagerly.
     configurations.create(CONFIGURATION_NAME)

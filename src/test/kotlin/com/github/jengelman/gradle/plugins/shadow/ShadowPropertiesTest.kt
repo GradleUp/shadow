@@ -25,6 +25,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shad
 import org.gradle.api.Named
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.attributes.Bundling
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
@@ -59,6 +60,7 @@ class ShadowPropertiesTest {
     with(extensions.getByType(ShadowExtension::class.java)) {
       assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
       assertThat(addTargetJvmVersionAttribute.get()).isTrue()
+      assertThat(bundlingAttribute.get()).isEqualTo(Bundling.SHADOWED)
     }
   }
 
