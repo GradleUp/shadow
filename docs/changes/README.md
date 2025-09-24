@@ -22,7 +22,7 @@
   The current implementation relocates all properties in `KotlinModuleMetadata` but `KmModule.optionalAnnotationClasses`
   due to very limited usage of it. See more discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
 - Allow overriding `BUNDLING_ATTRIBUTE` in GMM. ([#1773](https://github.com/GradleUp/shadow/pull/1773))  
-  The `org.gradle.dependency.bundling` in shadowed JAR's Gradle Module Metadata is set to `embedded` by default.
+  The `org.gradle.dependency.bundling` in shadowed JAR's Gradle Module Metadata is set to `shadowed` by default.
   You can override it for now by:
   ```kotlin
   shadow {
