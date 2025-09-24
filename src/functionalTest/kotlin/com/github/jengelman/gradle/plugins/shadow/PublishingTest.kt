@@ -192,6 +192,33 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun overrideBundlingAttrInGradleMetadata() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock = """
+          shadow {
+            bundlingAttribute = Bundling.EMBEDDED
+          }
+        """.trimIndent(),
+        shadowBlock = """
+          archiveClassifier = ''
+          archiveBaseName = 'maven-all'
+        """.trimIndent(),
+      ),
+    )
+
+    publish()
+
+    assertShadowVariantCommon(
+      gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
+      variantAttrs = commonVariantAttrs + arrayOf(
+        Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EMBEDDED,
+        Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+      ),
+    )
+  }
+
+  @Test
   fun publishShadowJarInsteadOfJar() {
     projectScript.appendText(
       publishConfiguration(

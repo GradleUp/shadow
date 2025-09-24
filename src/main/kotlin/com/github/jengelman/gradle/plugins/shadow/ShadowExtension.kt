@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.provider.Property
 
@@ -19,4 +20,13 @@ public interface ShadowExtension {
    * Defaults to `true`.
    */
   public val addTargetJvmVersionAttribute: Property<Boolean>
+
+  /**
+   * The [Bundling] attribute to use for the Gradle Module Metadata.
+   *
+   * Per description of the attribute, you should set it to either [Bundling.SHADOWED] or [Bundling.EMBEDDED].
+   *
+   * Defaults to [Bundling.SHADOWED].
+   */
+  public val bundlingAttribute: Property<String>
 }

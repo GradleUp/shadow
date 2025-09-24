@@ -61,7 +61,10 @@ public abstract class ShadowJavaPlugin @Inject constructor(
           LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
           objects.named(LibraryElements::class.java, LibraryElements.JAR),
         )
-        attrs.attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling::class.java, Bundling.SHADOWED))
+        attrs.attributeProvider(
+          Bundling.BUNDLING_ATTRIBUTE,
+          shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
+        )
       }
       it.outgoing.artifact(tasks.shadowJar)
     }
