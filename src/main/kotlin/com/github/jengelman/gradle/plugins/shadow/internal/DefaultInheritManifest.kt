@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "InternalGradleApiUsage") // TODO: remove this in Shadow 10.
 
 package com.github.jengelman.gradle.plugins.shadow.internal
 
