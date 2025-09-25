@@ -41,7 +41,6 @@ import org.gradle.api.file.DuplicatesStrategy.FAIL
 import org.gradle.api.file.DuplicatesStrategy.INCLUDE
 import org.gradle.api.file.DuplicatesStrategy.INHERIT
 import org.gradle.api.file.DuplicatesStrategy.WARN
-import org.gradle.api.internal.file.copy.CopyAction
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -387,7 +386,8 @@ public abstract class ShadowJar : Jar() {
     super.copy()
   }
 
-  override fun createCopyAction(): CopyAction {
+  @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
+  override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
     val zosProvider = { destination: File ->
       try {
         val entryCompressionMethod = when (entryCompression) {

@@ -1,3 +1,5 @@
+@file:Suppress("InternalGradleApiUsage") // We have to use internal Gradle APIs to implement a CopyAction.
+
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
