@@ -716,6 +716,32 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Issue(
+    "https://github.com/GradleUp/shadow/issues/1781",
+  )
+  @Test
+  fun inheritManifestFromJarAgain() {
+    projectScript.appendText(
+      """
+        $jarTask {
+          manifest {
+            attributes 'Foo-Attr': 'Foo-Value'
+          }
+        }
+        $shadowJarTask {
+          manifest.from($jarTask.get().manifest)
+        }
+      """.trimIndent(),
+    )
+
+    run(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      transform { it.mainAttrSize }.isGreaterThan(2)
+      getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
+    }
+  }
+
   @Test
   fun inheritManifestMainClassFromJar() {
     projectScript.appendText(
