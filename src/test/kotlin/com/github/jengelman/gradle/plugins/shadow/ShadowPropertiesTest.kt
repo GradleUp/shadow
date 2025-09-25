@@ -82,8 +82,7 @@ class ShadowPropertiesTest {
     tasks.shadowJar.configure {
       it.manifest.attributes["shadowJar"] = "fromShadowJar"
       it.manifest.from(jar1.get().manifest)
-      @Suppress("DEPRECATION") // TODO: remove this once InheritManifest is removed.
-      it.manifest.inheritFrom(jar2.get().manifest)
+      it.manifest.from(jar2.get().manifest)
     }
     // Call effectiveManifest as a way to force merging to happen like writing the jar would.
     assertThat(tasks.shadowJar.get().manifest.effectiveManifest.attributes).containsOnly(

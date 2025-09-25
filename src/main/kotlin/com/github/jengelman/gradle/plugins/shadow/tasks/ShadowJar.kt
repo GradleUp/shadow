@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
-import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
@@ -47,7 +46,6 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
@@ -71,7 +69,6 @@ public abstract class ShadowJar : Jar() {
 
     // https://github.com/gradle/gradle/blob/df5bc230c57db70aa3f6909403e5f89d7efde531/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/copy/DuplicateHandlingCopyActionDecorator.java#L55-L64
     duplicatesStrategy = EXCLUDE
-    manifest = DefaultInheritManifest(project)
 
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       transformers.get().any { !it::class.hasAnnotation<CacheableTransformer>() } ||
@@ -205,10 +202,6 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(option = "add-multi-release-attribute", description = "Adds the multi-release attribute to the manifest if any dependencies contain it.")
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
-
-  @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
-  @Internal
-  override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
   @Input // Trigger task executions after includes changed.
   override fun getIncludes(): MutableSet<String> = super.getIncludes()
@@ -530,13 +523,8 @@ public abstract class ShadowJar : Jar() {
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
-
-        task.manifest = DefaultInheritManifest(
-          project,
-          @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
-          jarTask.get().manifest,
-        )
-
+        @Suppress("EagerGradleConfiguration") // getManifest should be migrated to lazy property first.
+        task.manifest = jarTask.get().manifest
         action.execute(task)
       }.also { task ->
         // Can't use `named` directly as the task is optional or may not exist when the plugin is applied.

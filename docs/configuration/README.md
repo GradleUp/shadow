@@ -120,8 +120,7 @@ Inspecting the `META-INF/MANIFEST.MF` entry in the JAR files will reveal the fol
 Main-Class: my.Main
 ```
 
-If it is desired to merge a manifest from another [`Jar`][Jar] task, the `manifest.from` methods can be used to
-configure the upstream.
+If you want to inherit the manifest from another [`Jar`][Jar] task instead of the standard `jar` task, try
 
 === "Kotlin"
 
@@ -133,7 +132,7 @@ configure the upstream.
     }
 
     tasks.shadowJar {
-      manifest.from(testJar.get().manifest)
+      manifest = testJar.get().manifest
     }
     ```
 
@@ -145,6 +144,29 @@ configure the upstream.
         attributes 'Description': 'This is an application JAR'
       }
     }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      manifest = testJar.get().manifest
+    }
+    ```
+
+If it is desired to merge a manifest from another [`Jar`][Jar] task, the `manifest.from` methods can be used to
+configure the upstream.
+
+=== "Kotlin"
+
+    ```kotlin
+    val testJar by tasks.registering(Jar::class)
+
+    tasks.shadowJar {
+      manifest.from(testJar.get().manifest)
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    def testJar = tasks.register('testJar', Jar)
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest.from testJar.get().manifest
