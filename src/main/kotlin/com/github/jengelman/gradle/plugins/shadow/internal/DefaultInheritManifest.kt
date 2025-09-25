@@ -14,11 +14,10 @@ import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
 internal class DefaultInheritManifest(
   project: Project,
-  manifest: Manifest? = null,
   // `AbstractTask.getServices` is protected, we need to get it via `DefaultProject`.
   // https://github.com/gradle/gradle/blob/master/subprojects/core/src/main/java/org/gradle/api/internal/AbstractTask.java#L194
   private val fileResolver: FileResolver = (project as DefaultProject).services.get(FileResolver::class.java),
-  private val internalManifest: Manifest = manifest ?: DefaultManifest(fileResolver),
+  private val internalManifest: Manifest = DefaultManifest(fileResolver),
 ) : InheritManifest,
   Manifest by internalManifest {
   private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
