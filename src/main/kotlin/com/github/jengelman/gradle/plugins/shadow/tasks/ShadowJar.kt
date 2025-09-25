@@ -530,8 +530,8 @@ public abstract class ShadowJar : Jar() {
           "META-INF/versions/**/module-info.class",
           "module-info.class",
         )
-        @Suppress("EagerGradleConfiguration") // manifest is not a lazy property.
-        task.manifest.from(jarTask.get().manifest)
+        @Suppress("EagerGradleConfiguration", "DEPRECATION") // manifest is not a lazy property.
+        task.manifest.inheritFrom(jarTask.get().manifest)
         action.execute(task)
       }.also { task ->
         // Can't use `named` directly as the task is optional or may not exist when the plugin is applied.
