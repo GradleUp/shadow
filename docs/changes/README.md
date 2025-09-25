@@ -42,12 +42,17 @@
 - Move injecting `Main-Class` manifest attr logic from `doFirst` into `copy`. ([#1724](https://github.com/GradleUp/shadow/pull/1724))
 - Deprecate `InheritManifest` and `inheritFrom`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
   ```kotlin
+  // Before (deprecated):
   tasks.shadowJar {
-    // `inheritFrom` is deprecated, use `from` instead.
     manifest.inheritFrom(tasks.jar.get().manifest)
-    // BTW, you don't need to inherit the manifest from `jar` task as it's done by default for the `shadowJar` task.
-    // But If you want to inherit manifest for your custom `ShadowJar` task, you still need to do it explicitly.
   }
+
+  // After (recommended):
+  tasks.shadowJar {
+    manifest.from(tasks.jar.get().manifest)
+  }
+  // Note: You don't need to inherit the manifest from `jar` task as it's done by default for the `shadowJar` task.
+  // But if you want to inherit the manifest for your custom `ShadowJar` task, you still need to do it explicitly.
   ```
 - Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
 - Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
