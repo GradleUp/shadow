@@ -702,7 +702,10 @@ class JavaPluginsTest : BasePluginTest() {
           }
         }
         $shadowJarTask {
-          manifest.from(testJar.get().manifest)
+          manifest {
+            attributes 'Baz-Attr': 'Baz-Value'
+            from(testJar.get().manifest)
+          }
         }
       """.trimIndent(),
     )
@@ -713,6 +716,7 @@ class JavaPluginsTest : BasePluginTest() {
       transform { it.mainAttrSize }.isGreaterThan(2)
       getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
       getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
+      getMainAttr("Baz-Attr").isEqualTo("Baz-Value")
     }
   }
 
