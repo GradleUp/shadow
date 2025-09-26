@@ -6,7 +6,7 @@
 
 ## [9.2.2](https://github.com/GradleUp/shadow/compare/9.2.2) - 2025-09-26
 
-## Fixed
+### Fixed
 
 - Fix the regression of registering `ShadowJar` tasks without `ShadowPlugin` applied. ([#1787](https://github.com/GradleUp/shadow/pull/1787))
 
