@@ -40,7 +40,7 @@ the output.
 
       manifest {
         // Optionally, set the main class for the JAR.
-        attributes 'Main-Class': 'test.Main'
+        attributes('Main-Class': 'test.Main')
         // You can also set other attributes here.
       }
     }

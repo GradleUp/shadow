@@ -487,7 +487,7 @@ class RelocationTest : BasePluginTest() {
       """
         $shadowJarTask {
           manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
+            attributes('$mainClassAttributeKey': 'my.Main')
           }
           relocate('foo', 'shadow.foo')
         }
@@ -515,7 +515,7 @@ class RelocationTest : BasePluginTest() {
       """
         $shadowJarTask {
           manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
+            attributes('$mainClassAttributeKey': 'my.Main')
           }
           relocate('foo', 'shadow.foo') {
             skipStringConstants = $skipStringConstants
@@ -561,7 +561,7 @@ class RelocationTest : BasePluginTest() {
       """
         $shadowJarTask {
           manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
+            attributes('$mainClassAttributeKey': 'my.Main')
           }
           relocate('org.package', 'shadow.org.package')
         }

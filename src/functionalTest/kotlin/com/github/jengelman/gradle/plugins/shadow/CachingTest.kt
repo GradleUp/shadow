@@ -148,12 +148,12 @@ class CachingTest : BasePluginTest() {
       """
         $jarTask {
           manifest {
-            attributes 'Foo': 'Foo1'
+            attributes('Foo': 'Foo1')
           }
         }
         $shadowJarTask {
           manifest {
-            attributes 'Bar': 'Bar1'
+            attributes('Bar': 'Bar1')
           }
         }
       """.trimIndent(),

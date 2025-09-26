@@ -177,7 +177,7 @@ class KotlinPluginsTest : BasePluginTest() {
   fun setMainClassAttributeFromMainRun(useShadowAttr: Boolean) {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
-    val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
+    val mainAttr = if (useShadowAttr) "attributes('$mainClassAttributeKey': '$main2ClassName')" else ""
     projectScript.appendText(
       """
         kotlin {
@@ -205,7 +205,7 @@ class KotlinPluginsTest : BasePluginTest() {
   fun setManifestAttrsFromJvmTargetJar(useShadowAttr: Boolean) {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
-    val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
+    val mainAttr = if (useShadowAttr) "attributes('$mainClassAttributeKey': '$main2ClassName')" else ""
     projectScript.appendText(
       """
         kotlin {
@@ -213,7 +213,7 @@ class KotlinPluginsTest : BasePluginTest() {
         }
         tasks.named('jvmJar', Jar) {
           manifest {
-            attributes '$mainClassAttributeKey': '$mainClassName'
+            attributes('$mainClassAttributeKey': '$mainClassName')
           }
         }
         $shadowJarTask {
