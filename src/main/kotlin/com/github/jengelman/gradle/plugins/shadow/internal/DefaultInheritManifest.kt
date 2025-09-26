@@ -10,7 +10,6 @@ import org.gradle.api.internal.project.DefaultProject
 import org.gradle.api.java.archives.Manifest
 import org.gradle.api.java.archives.ManifestMergeSpec
 import org.gradle.api.java.archives.internal.DefaultManifest
-import org.gradle.api.java.archives.internal.DefaultManifestMergeSpec
 
 internal class DefaultInheritManifest(
   project: Project,
@@ -21,28 +20,13 @@ internal class DefaultInheritManifest(
   private val internalManifest: Manifest = manifest ?: DefaultManifest(fileResolver),
 ) : InheritManifest,
   Manifest by internalManifest {
-  private val inheritMergeSpecs = mutableListOf<DefaultManifestMergeSpec>()
 
   override fun inheritFrom(
     vararg inheritPaths: Any,
     action: Action<ManifestMergeSpec>,
   ) {
-    val mergeSpec = DefaultManifestMergeSpec()
-    mergeSpec.from(*inheritPaths)
-    inheritMergeSpecs.add(mergeSpec)
-    action.execute(mergeSpec)
-  }
-
-  override fun getEffectiveManifest(): DefaultManifest {
-    var base = DefaultManifest(fileResolver)
-    inheritMergeSpecs.forEach {
-      base = it.merge(base, fileResolver)
+    inheritPaths.forEach {
+      from(it, action)
     }
-    base.from(internalManifest)
-    return base.effectiveManifest
-  }
-
-  override fun writeTo(path: Any): Manifest = apply {
-    effectiveManifest.writeTo(path)
   }
 }
