@@ -109,7 +109,7 @@ is configured to __inherit__ from the manifest of the standard `jar` task.
     ```groovy
     tasks.named('jar', Jar) {
       manifest {
-        attributes '"Main-Class': 'my.Main'
+        attributes 'Main-Class': 'my.Main'
       }
     }
     ```
