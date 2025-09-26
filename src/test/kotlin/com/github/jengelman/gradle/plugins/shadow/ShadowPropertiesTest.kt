@@ -18,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
@@ -31,6 +32,8 @@ import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
+import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -62,6 +65,49 @@ class ShadowPropertiesTest {
       assertThat(addTargetJvmVersionAttribute.get()).isTrue()
       assertThat(bundlingAttribute.get()).isEqualTo(Bundling.SHADOWED)
     }
+  }
+
+  @Test
+  fun inheritManifestAttrsFromJars() = with(project) {
+    plugins.apply(JavaPlugin::class.java)
+    tasks.jar.configure {
+      it.manifest.attributes["jar"] = "fromJar"
+    }
+    val jar1 = tasks.register("jar1", Jar::class.java) {
+      it.manifest.attributes["jar1"] = "fromJar1"
+    }
+    val jar2 = tasks.register("jar2", Jar::class.java) {
+      it.manifest.attributes["jar2"] = "fromJar2"
+    }
+    tasks.shadowJar.configure {
+      it.manifest.attributes["shadowJar"] = "fromShadowJar"
+      it.manifest.from(jar1.get().manifest)
+      @Suppress("DEPRECATION") // TODO: remove this once InheritManifest is removed.
+      it.manifest.inheritFrom(jar2.get().manifest)
+    }
+    // Call effectiveManifest as a way to force merging to happen like writing the jar would.
+    assertThat(tasks.shadowJar.get().manifest.effectiveManifest.attributes).containsOnly(
+      "Manifest-Version" to "1.0",
+      "jar" to "fromJar",
+      "jar1" to "fromJar1",
+      "jar2" to "fromJar2",
+      "shadowJar" to "fromShadowJar",
+    )
+  }
+
+  @Test
+  fun inheritManifestMainClassFromJar() = with(project) {
+    plugins.apply(JavaPlugin::class.java)
+    tasks.jar.configure {
+      it.manifest.attributes[mainClassAttributeKey] = "Main"
+    }
+    tasks.shadowJar.configure {
+      it.mainClass.set("Main2") // This should not override the inherited one from jar.
+    }
+    assertThat(tasks.shadowJar.get().manifest.attributes).containsOnly(
+      "Manifest-Version" to "1.0",
+      mainClassAttributeKey to "Main",
+    )
   }
 
   @Test
@@ -207,5 +253,7 @@ class ShadowPropertiesTest {
     const val VERSION = "1.0.0"
 
     val Task.dependsOnTaskNames: List<String> get() = dependsOn.filterIsInstance<Named>().map(Named::getName)
+
+    val TaskContainer.jar: TaskProvider<Jar> get() = named("jar", Jar::class.java)
   }
 }

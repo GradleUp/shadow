@@ -6,7 +6,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
-import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
@@ -512,7 +511,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
-      transform { it.mainAttrSize }.isGreaterThan(0)
+      transform { it.mainAttrSize }.isEqualTo(1)
       // Doesn't contain Gradle classes.
       getMainAttr(classPathAttributeKey).isNull()
 
@@ -685,61 +684,6 @@ class JavaPluginsTest : BasePluginTest() {
       "Shadowing AAR file is not supported.",
       "Please exclude dependency artifact:",
     )
-  }
-
-  @Test
-  fun inheritManifestAttrsFromJars() {
-    projectScript.appendText(
-      """
-        $jarTask {
-          manifest {
-            attributes 'Foo-Attr': 'Foo-Value'
-          }
-        }
-        def testJar = tasks.register('testJar', Jar) {
-          manifest {
-            attributes 'Bar-Attr': 'Bar-Value'
-          }
-        }
-        $shadowJarTask {
-          manifest.from(testJar.get().manifest)
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      transform { it.mainAttrSize }.isGreaterThan(2)
-      getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
-      getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
-    }
-  }
-
-  @Test
-  fun inheritManifestMainClassFromJar() {
-    projectScript.appendText(
-      """
-        $jarTask {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-          }
-        }
-        $shadowJarTask {
-          mainClass = 'my.Main2' // This should not override the inherited one.
-        }
-      """.trimIndent(),
-    )
-
-    val result = run(shadowJarPath, infoArgument)
-
-    assertThat(result.output).contains(
-      "Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.",
-    )
-    assertThat(outputShadowedJar).useAll {
-      transform { it.mainAttrSize }.isGreaterThan(1)
-      getMainAttr("Main-Class").isEqualTo("my.Main")
-    }
   }
 
   @Test
