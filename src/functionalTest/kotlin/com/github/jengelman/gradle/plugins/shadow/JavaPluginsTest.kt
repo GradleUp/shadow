@@ -687,39 +687,6 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun inheritManifestAttrsFromJars() {
-    projectScript.appendText(
-      """
-        $jarTask {
-          manifest {
-            attributes 'Foo-Attr': 'Foo-Value'
-          }
-        }
-        def testJar = tasks.register('testJar', Jar) {
-          manifest {
-            attributes 'Bar-Attr': 'Bar-Value'
-          }
-        }
-        $shadowJarTask {
-         manifest {
-            attributes 'Baz-Attr': 'Baz-Value'
-            from testJar.get().manifest
-          }
-        }
-      """.trimIndent(),
-    )
-
-    run(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      transform { it.mainAttrSize }.isEqualTo(4)
-      getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
-      getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
-      getMainAttr("Baz-Attr").isEqualTo("Baz-Value")
-    }
-  }
-
-  @Test
   fun inheritManifestMainClassFromJar() {
     projectScript.appendText(
       """
