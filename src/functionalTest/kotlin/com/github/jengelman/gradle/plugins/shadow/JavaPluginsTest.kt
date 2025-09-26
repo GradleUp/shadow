@@ -605,6 +605,62 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Issue(
+    "https://github.com/GradleUp/shadow/issues/1784",
+  )
+  @Test
+  fun registerShadowJarTaskWithoutShadowPluginApplied() {
+    val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
+    val testShadowJarTask = "testShadowJar"
+    projectScript.writeText(
+      """
+        ${getDefaultProjectBuildScript(withGroup = true, withVersion = true, applyShadowPlugin = false)}
+        dependencies {
+          testImplementation 'junit:junit:3.8.2'
+        }
+        def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
+          description = 'Create a combined JAR of project and test dependencies'
+          archiveClassifier = 'test'
+          from sourceSets.named('test').map { it.output }
+          configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+        }
+        afterEvaluate {
+          def hasShadowPlugin = plugins.hasPlugin('${ShadowPlugin::class.qualifiedName}')
+          def hasShadowBasePlugin = plugins.hasPlugin('${ShadowBasePlugin::class.qualifiedName}')
+          logger.lifecycle("Has ShadowPlugin: " + hasShadowPlugin)
+          logger.lifecycle("Has ShadowBasePlugin: " + hasShadowBasePlugin)
+        }
+      """.trimIndent(),
+    )
+
+    val result = run(testShadowJarTask)
+
+    assertThat(result.output).contains(
+      "Has ShadowPlugin: false",
+      "Has ShadowBasePlugin: false",
+    )
+
+    assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        *junitEntries,
+        *manifestEntries,
+      )
+      getMainAttr(mainClassAttributeKey).isNotNull()
+    }
+
+    val pathString = path("build/libs/my-1.0-test.jar").toString()
+    val runningOutput = runProcess("java", "-jar", pathString, "foo")
+    assertThat(runningOutput).contains(
+      "Hello, World! (foo) from Main",
+      "Refs: junit.framework.Test",
+    )
+  }
+
+  @Issue(
     "https://github.com/GradleUp/shadow/issues/443",
   )
   @Test

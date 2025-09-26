@@ -144,13 +144,14 @@ abstract class BasePluginTest {
     plugin: String = "java",
     withGroup: Boolean = false,
     withVersion: Boolean = false,
+    applyShadowPlugin: Boolean = true,
   ): String {
     val groupInfo = if (withGroup) "group = 'my'" else ""
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
       plugins {
         id '$plugin'
-        id '$shadowPluginId'
+        id '$shadowPluginId' apply $applyShadowPlugin
       }
       $groupInfo
       $versionInfo
