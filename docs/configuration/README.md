@@ -91,17 +91,15 @@ When deploying a shadowed JAR as an execution JAR, it is important to note that 
 
 ## Configuring the JAR Manifest
 
-Beyond the automatic configuration of the `Class-Path` entry, the [`ShadowJar`][ShadowJar] manifest is configured in a
-number of ways. First, the manifest for the [`ShadowJar`][ShadowJar] task is configured to __inherit__ from the
-manifest of the standard [`Jar`][Jar] task. This means that any configuration performed on the [`Jar`][Jar] task
-will propagate to the [`ShadowJar`][ShadowJar] tasks.
+The [`ShadowJar`][ShadowJar] manifest is configured in a number of ways. First, the manifest for the `shadowJar` task
+is configured to __inherit__ from the manifest of the standard `jar` task.
 
 === "Kotlin"
 
     ```kotlin
     tasks.jar {
       manifest {
-        attributes["Class-Path"] = "/libs/foo.jar"
+        attributes["Main-Class"] = "my.Main"
       }
     }
     ```
@@ -111,19 +109,18 @@ will propagate to the [`ShadowJar`][ShadowJar] tasks.
     ```groovy
     tasks.named('jar', Jar) {
       manifest {
-        attributes 'Class-Path': '/libs/foo.jar'
+        attributes '"Main-Class': 'my.Main'
       }
     }
     ```
 
-Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the following attribute:
+Inspecting the `META-INF/MANIFEST.MF` entry in the JAR files will reveal the following attribute:
 
 ```property
-Class-Path: /libs/foo.jar
+Main-Class: my.Main
 ```
 
-If it is desired to inherit a manifest from a JAR task other than the standard [`Jar`][Jar] task, the `from`
-methods on the `shadowJar.manifest` object can be used to configure the upstream.
+If you want to inherit the manifest from another [`Jar`][Jar] task instead of the standard `jar` task, try
 
 === "Kotlin"
 
@@ -135,7 +132,7 @@ methods on the `shadowJar.manifest` object can be used to configure the upstream
     }
 
     tasks.shadowJar {
-      manifest.from(testJar.get().manifest)
+      manifest = testJar.get().manifest
     }
     ```
 
@@ -147,6 +144,29 @@ methods on the `shadowJar.manifest` object can be used to configure the upstream
         attributes 'Description': 'This is an application JAR'
       }
     }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      manifest = testJar.get().manifest
+    }
+    ```
+
+If it is desired to merge a manifest from another [`Jar`][Jar] task, the `manifest.from` methods can be used to
+configure the upstream.
+
+=== "Kotlin"
+
+    ```kotlin
+    val testJar by tasks.registering(Jar::class)
+
+    tasks.shadowJar {
+      manifest.from(testJar.get().manifest)
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    def testJar = tasks.register('testJar', Jar)
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest.from testJar.get().manifest
