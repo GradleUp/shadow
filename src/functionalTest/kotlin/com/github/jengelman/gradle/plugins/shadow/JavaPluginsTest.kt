@@ -6,7 +6,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
-import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
@@ -512,7 +511,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
         .single().isEqualTo("my/plugin/MyPlugin.class")
-      transform { it.mainAttrSize }.isGreaterThan(0)
+      transform { it.mainAttrSize }.isEqualTo(1)
       // Doesn't contain Gradle classes.
       getMainAttr(classPathAttributeKey).isNull()
 
@@ -702,7 +701,10 @@ class JavaPluginsTest : BasePluginTest() {
           }
         }
         $shadowJarTask {
-          manifest.from(testJar.get().manifest)
+         manifest {
+            attributes 'Baz-Attr': 'Baz-Value'
+            from(testJar.get().manifest)
+          }
         }
       """.trimIndent(),
     )
@@ -710,9 +712,10 @@ class JavaPluginsTest : BasePluginTest() {
     run(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      transform { it.mainAttrSize }.isGreaterThan(2)
+      transform { it.mainAttrSize }.isEqualTo(4)
       getMainAttr("Foo-Attr").isEqualTo("Foo-Value")
       getMainAttr("Bar-Attr").isEqualTo("Bar-Value")
+      getMainAttr("Baz-Attr").isEqualTo("Baz-Value")
     }
   }
 
@@ -737,7 +740,7 @@ class JavaPluginsTest : BasePluginTest() {
       "Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.",
     )
     assertThat(outputShadowedJar).useAll {
-      transform { it.mainAttrSize }.isGreaterThan(1)
+      transform { it.mainAttrSize }.isEqualTo(2)
       getMainAttr("Main-Class").isEqualTo("my.Main")
     }
   }
