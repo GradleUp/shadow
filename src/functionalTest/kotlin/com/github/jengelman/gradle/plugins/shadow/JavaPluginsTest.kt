@@ -627,10 +627,10 @@ class JavaPluginsTest : BasePluginTest() {
           }
         }
         afterEvaluate {
-          def hasShadowPlugin = project.plugins.findPlugin('${ShadowPlugin::class.qualifiedName}')
-          def hasShadowBasePlugin = project.plugins.findPlugin('${ShadowBasePlugin::class.qualifiedName}')
-          logger.lifecycle("Has Shadow plugin: " + (hasShadowPlugin != null))
-          logger.lifecycle("Has Shadow Base plugin: " + (hasShadowBasePlugin != null))
+          def hasShadowPlugin = plugins.hasPlugin('${ShadowPlugin::class.qualifiedName}')
+          def hasShadowBasePlugin = plugins.hasPlugin('${ShadowBasePlugin::class.qualifiedName}')
+          logger.lifecycle("Has ShadowPlugin: " + hasShadowPlugin)
+          logger.lifecycle("Has ShadowBasePlugin: " + hasShadowBasePlugin)
         }
       """.trimIndent(),
     )
@@ -638,8 +638,8 @@ class JavaPluginsTest : BasePluginTest() {
     val result = run(testShadowJarTask)
 
     assertThat(result.output).contains(
-      "Has Shadow plugin: false",
-      "Has Shadow Base plugin: false",
+      "Has ShadowPlugin: false",
+      "Has ShadowBasePlugin: false",
     )
 
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {

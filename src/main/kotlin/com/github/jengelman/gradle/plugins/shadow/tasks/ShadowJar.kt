@@ -64,7 +64,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
   private val shadowDependencies = project.provider {
-    // Find shadow configuration here instead of get, as the ShadowJar task could be registered without Shadow plugin applied.
+    // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered without Shadow plugin applied.
     project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
   }
 
