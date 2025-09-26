@@ -703,7 +703,7 @@ class JavaPluginsTest : BasePluginTest() {
         $shadowJarTask {
          manifest {
             attributes 'Baz-Attr': 'Baz-Value'
-            from(testJar.get().manifest)
+            from testJar.get().manifest
           }
         }
       """.trimIndent(),

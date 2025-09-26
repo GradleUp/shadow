@@ -149,7 +149,7 @@ methods on the `shadowJar.manifest` object can be used to configure the upstream
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      manifest.from(testJar.get().manifest)
+      manifest.from testJar.get().manifest
     }
     ```
 
