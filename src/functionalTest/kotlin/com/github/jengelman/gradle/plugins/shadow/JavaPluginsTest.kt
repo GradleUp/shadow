@@ -240,7 +240,7 @@ class JavaPluginsTest : BasePluginTest() {
       """
         $jarTask {
           manifest {
-            attributes('$multiReleaseAttributeKey': 'true')
+            attributes '$multiReleaseAttributeKey': 'true'
           }
         }
       """.trimIndent() + lineSeparator,
@@ -274,7 +274,7 @@ class JavaPluginsTest : BasePluginTest() {
       """
         $jarTask {
           manifest {
-            attributes('$multiReleaseAttributeKey': 'true')
+            attributes '$multiReleaseAttributeKey': 'true'
           }
         }
       """.trimIndent() + lineSeparator,
@@ -427,7 +427,7 @@ class JavaPluginsTest : BasePluginTest() {
         }
         $jarTask {
           manifest {
-            attributes('$classPathAttributeKey': '/libs/foo.jar')
+            attributes '$classPathAttributeKey': '/libs/foo.jar'
           }
         }
       """.trimIndent(),
@@ -578,7 +578,7 @@ class JavaPluginsTest : BasePluginTest() {
           from sourceSets.named('test').map { it.output }
           configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
           manifest {
-            attributes('$mainClassAttributeKey': 'my.Main')
+            attributes '$mainClassAttributeKey': 'my.Main'
           }
         }
       """.trimIndent(),
@@ -692,17 +692,17 @@ class JavaPluginsTest : BasePluginTest() {
       """
         $jarTask {
           manifest {
-            attributes('Foo-Attr': 'Foo-Value')
+            attributes 'Foo-Attr': 'Foo-Value'
           }
         }
         def testJar = tasks.register('testJar', Jar) {
           manifest {
-            attributes('Bar-Attr': 'Bar-Value')
+            attributes 'Bar-Attr': 'Bar-Value'
           }
         }
         $shadowJarTask {
          manifest {
-            attributes('Baz-Attr': 'Baz-Value')
+            attributes 'Baz-Attr': 'Baz-Value'
             from(testJar.get().manifest)
           }
         }
@@ -725,7 +725,7 @@ class JavaPluginsTest : BasePluginTest() {
       """
         $jarTask {
           manifest {
-            attributes('$mainClassAttributeKey': 'my.Main')
+            attributes '$mainClassAttributeKey': 'my.Main'
           }
         }
         $shadowJarTask {

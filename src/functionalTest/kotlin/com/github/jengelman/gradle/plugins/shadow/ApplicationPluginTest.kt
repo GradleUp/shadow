@@ -134,7 +134,7 @@ class ApplicationPluginTest : BasePluginTest() {
       projectBlock = """
         shadowJar {
           manifest {
-            attributes('$mainClassAttributeKey': 'my.Main2')
+            attributes '$mainClassAttributeKey': 'my.Main2'
           }
         }
       """.trimIndent(),

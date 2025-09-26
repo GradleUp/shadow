@@ -111,7 +111,7 @@ will propagate to the [`ShadowJar`][ShadowJar] tasks.
     ```groovy
     tasks.named('jar', Jar) {
       manifest {
-        attributes('Class-Path': '/libs/foo.jar')
+        attributes 'Class-Path': '/libs/foo.jar'
       }
     }
     ```
@@ -144,7 +144,7 @@ methods on the `shadowJar.manifest` object can be used to configure the upstream
     ```groovy
     def testJar = tasks.register('testJar', Jar) {
       manifest {
-        attributes('Description': 'This is an application JAR')
+        attributes 'Description': 'This is an application JAR'
       }
     }
 

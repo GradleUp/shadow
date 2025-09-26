@@ -41,7 +41,7 @@ For Groovy:
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
-        attributes('Main-Class': 'com.example.Main')
+        attributes 'Main-Class': 'com.example.Main'
       }
     }
     ```
@@ -85,7 +85,7 @@ For Scala:
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
-        attributes('Main-Class': 'com.example.Main')
+        attributes 'Main-Class': 'com.example.Main'
       }
     }
     ```

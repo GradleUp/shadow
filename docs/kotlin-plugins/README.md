@@ -140,7 +140,7 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       manifest {
         // Optionally, set the main class for the shadowed JAR.
-        attributes('Main-Class': 'com.example.MainKt')
+        attributes 'Main-Class': 'com.example.MainKt'
       }
     }
     ```

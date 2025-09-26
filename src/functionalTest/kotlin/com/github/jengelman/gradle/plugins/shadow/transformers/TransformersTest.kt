@@ -31,8 +31,8 @@ class TransformersTest : BaseTransformerTest() {
       """
         $jarTask {
           manifest {
-            attributes('$mainClassAttributeKey': 'my.Main')
-            attributes('$TEST_ENTRY_ATTR_KEY': 'PASSED')
+            attributes '$mainClassAttributeKey': 'my.Main'
+            attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
           }
         }
       """.trimIndent(),
@@ -293,14 +293,14 @@ class TransformersTest : BaseTransformerTest() {
     val MANIFEST_ATTRS = """
         $jarTask {
           manifest {
-            attributes('$mainClassAttributeKey': 'my.Main')
-            attributes('$TEST_ENTRY_ATTR_KEY': 'FAILED')
+            attributes '$mainClassAttributeKey': 'my.Main'
+            attributes '$TEST_ENTRY_ATTR_KEY': 'FAILED'
           }
         }
         $shadowJarTask {
           manifest {
-            attributes('$NEW_ENTRY_ATTR_KEY': 'NEW')
-            attributes('$TEST_ENTRY_ATTR_KEY': 'PASSED')
+            attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
+            attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
           }
         }
     """.trimIndent()
