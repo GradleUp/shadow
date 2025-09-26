@@ -63,7 +63,10 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-  private val shadowDependencies = project.provider { project.files(project.configurations.shadow) }
+  private val shadowDependencies = project.provider {
+    // Find shadow configuration here instead of get, as the ShadowJar task could be registered without Shadow plugin applied.
+    project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
+  }
 
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
