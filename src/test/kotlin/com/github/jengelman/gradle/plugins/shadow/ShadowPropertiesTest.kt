@@ -18,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
+import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
@@ -91,6 +92,21 @@ class ShadowPropertiesTest {
       "jar1" to "fromJar1",
       "jar2" to "fromJar2",
       "shadowJar" to "fromShadowJar",
+    )
+  }
+
+  @Test
+  fun inheritManifestMainClassFromJar() = with(project) {
+    plugins.apply(JavaPlugin::class.java)
+    tasks.jar.configure {
+      it.manifest.attributes[mainClassAttributeKey] = "Main"
+    }
+    tasks.shadowJar.configure {
+      it.mainClass.set("Main2") // This should not override the inherited one from jar.
+    }
+    assertThat(tasks.shadowJar.get().manifest.attributes).containsOnly(
+      "Manifest-Version" to "1.0",
+      mainClassAttributeKey to "Main",
     )
   }
 

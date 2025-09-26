@@ -687,32 +687,6 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun inheritManifestMainClassFromJar() {
-    projectScript.appendText(
-      """
-        $jarTask {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-          }
-        }
-        $shadowJarTask {
-          mainClass = 'my.Main2' // This should not override the inherited one.
-        }
-      """.trimIndent(),
-    )
-
-    val result = run(shadowJarPath, infoArgument)
-
-    assertThat(result.output).contains(
-      "Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.",
-    )
-    assertThat(outputShadowedJar).useAll {
-      transform { it.mainAttrSize }.isEqualTo(2)
-      getMainAttr("Main-Class").isEqualTo("my.Main")
-    }
-  }
-
-  @Test
   fun addExtraFilesViaFrom() {
     val mainClassEntry = writeClass()
     path("Foo").writeText("Foo")
