@@ -130,12 +130,12 @@ class CachingTest : BasePluginTest() {
       DuplicatesStrategy.WARN,
     ).forEach { strategy ->
       projectScript.writeText(
-        getDefaultProjectBuildScript(withGroup = true, withVersion = true) +
-          """
+        """
+            ${getDefaultProjectBuildScript()}
             $shadowJarTask {
               duplicatesStrategy = DuplicatesStrategy.$strategy
             }
-          """.trimIndent(),
+        """.trimIndent(),
       )
 
       assertCompositeExecutions()
@@ -191,14 +191,9 @@ class CachingTest : BasePluginTest() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
 
-    val projectBuildScript = getDefaultProjectBuildScript(
-      plugin = "org.jetbrains.kotlin.multiplatform",
-      withGroup = true,
-      withVersion = true,
-    )
     projectScript.writeText(
       """
-        $projectBuildScript
+        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")}
         kotlin {
           jvm().mainRun {
             it.mainClass.set('$mainClassName')

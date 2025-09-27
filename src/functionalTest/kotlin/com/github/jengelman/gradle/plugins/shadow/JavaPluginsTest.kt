@@ -374,7 +374,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript("java-library", withGroup = true, withVersion = true)}
+        ${getDefaultProjectBuildScript("java-library")}
         dependencies {
           api 'my:api:1.0'
           implementation 'my:implementation:1.0'
@@ -613,7 +613,7 @@ class JavaPluginsTest : BasePluginTest() {
     val testShadowJarTask = "testShadowJar"
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript(withGroup = true, withVersion = true, applyShadowPlugin = false)}
+        ${getDefaultProjectBuildScript(applyShadowPlugin = false)}
         dependencies {
           testImplementation 'junit:junit:3.8.2'
         }

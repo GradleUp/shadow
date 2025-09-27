@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -13,6 +14,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class MinimizeTest : BasePluginTest() {
+  private val outputImplShadowedJar: JarPath get() = jarPath("impl/build/libs/impl-1.0-all.jar")
+
   /**
    * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
    * The minimize step shall remove 'junit', but not 'api'.
@@ -24,7 +27,7 @@ class MinimizeTest : BasePluginTest() {
 
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
-    assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
+    assertThat(outputImplShadowedJar).useAll {
       containsAtLeast(
         "api/",
         "lib/",
@@ -58,7 +61,7 @@ class MinimizeTest : BasePluginTest() {
 
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
-    assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
+    assertThat(outputImplShadowedJar).useAll {
       containsOnly(
         "api/",
         "impl/",
@@ -296,7 +299,7 @@ class MinimizeTest : BasePluginTest() {
 
     run(":impl:$SHADOW_JAR_TASK_NAME")
 
-    assertThat(jarPath("impl/build/libs/impl-all.jar")).useAll {
+    assertThat(outputImplShadowedJar).useAll {
       containsAtLeast(
         "api/",
         "lib/",
