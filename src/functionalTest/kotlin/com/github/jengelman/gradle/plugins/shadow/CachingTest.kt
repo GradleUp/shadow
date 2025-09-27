@@ -130,7 +130,7 @@ class CachingTest : BasePluginTest() {
       DuplicatesStrategy.WARN,
     ).forEach { strategy ->
       projectScript.writeText(
-        getDefaultProjectBuildScript(withGroup = true, withVersion = true) +
+        getDefaultProjectBuildScript() +
           """
             $shadowJarTask {
               duplicatesStrategy = DuplicatesStrategy.$strategy
@@ -191,11 +191,7 @@ class CachingTest : BasePluginTest() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
 
-    val projectBuildScript = getDefaultProjectBuildScript(
-      plugin = "org.jetbrains.kotlin.multiplatform",
-      withGroup = true,
-      withVersion = true,
-    )
+    val projectBuildScript = getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")
     projectScript.writeText(
       """
         $projectBuildScript

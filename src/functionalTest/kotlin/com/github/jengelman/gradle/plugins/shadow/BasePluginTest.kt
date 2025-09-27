@@ -125,7 +125,7 @@ abstract class BasePluginTest {
 
   @BeforeEach
   open fun beforeEach() {
-    projectScript.writeText(getDefaultProjectBuildScript(withGroup = true, withVersion = true))
+    projectScript.writeText(getDefaultProjectBuildScript())
     settingsScript.writeText(getDefaultSettingsBuildScript())
   }
 
@@ -142,8 +142,8 @@ abstract class BasePluginTest {
 
   fun getDefaultProjectBuildScript(
     plugin: String = "java",
-    withGroup: Boolean = false,
-    withVersion: Boolean = false,
+    withGroup: Boolean = true,
+    withVersion: Boolean = true,
     applyShadowPlugin: Boolean = true,
   ): String {
     val groupInfo = if (withGroup) "group = 'my'" else ""
@@ -303,7 +303,7 @@ abstract class BasePluginTest {
     )
     path("client/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java", withVersion = true)}
+        ${getDefaultProjectBuildScript("java")}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
@@ -319,7 +319,7 @@ abstract class BasePluginTest {
     )
     path("server/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java", withVersion = true)}
+        ${getDefaultProjectBuildScript("java")}
         dependencies {
           implementation project(':client')
         }
@@ -353,7 +353,7 @@ abstract class BasePluginTest {
   fun writeGradlePluginModule() {
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript("java-gradle-plugin", withGroup = true, withVersion = true)}
+        ${getDefaultProjectBuildScript("java-gradle-plugin")}
         gradlePlugin {
           plugins {
             create('myPlugin') {

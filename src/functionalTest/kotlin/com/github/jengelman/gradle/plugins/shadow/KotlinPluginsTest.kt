@@ -21,11 +21,7 @@ class KotlinPluginsTest : BasePluginTest() {
   @BeforeEach
   override fun beforeEach() {
     super.beforeEach()
-    val projectBuildScript = getDefaultProjectBuildScript(
-      plugin = "org.jetbrains.kotlin.multiplatform",
-      withGroup = true,
-      withVersion = true,
-    )
+    val projectBuildScript = getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")
     projectScript.writeText(projectBuildScript)
   }
 
@@ -36,7 +32,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm", withGroup = true, withVersion = true)}
+        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
         dependencies {
           implementation 'junit:junit:3.8.2'
           $stdlib

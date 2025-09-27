@@ -372,7 +372,7 @@ class MinimizeTest : BasePluginTest() {
     )
     path("impl/build.gradle").writeText(
       """
-        ${getDefaultProjectBuildScript("java-library")}
+        ${getDefaultProjectBuildScript("java-library", withGroup = false, withVersion = false)}
         dependencies {
           api project(':api')
         }
