@@ -12,8 +12,7 @@ class ScalaPluginTest : BasePluginTest() {
   @BeforeEach
   override fun beforeEach() {
     super.beforeEach()
-    val projectBuildScript = getDefaultProjectBuildScript(plugin = "scala")
-    projectScript.writeText(projectBuildScript)
+    projectScript.writeText(getDefaultProjectBuildScript(plugin = "scala"))
   }
 
   @Test

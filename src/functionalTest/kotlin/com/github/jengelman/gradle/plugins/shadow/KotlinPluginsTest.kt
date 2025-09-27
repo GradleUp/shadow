@@ -21,8 +21,7 @@ class KotlinPluginsTest : BasePluginTest() {
   @BeforeEach
   override fun beforeEach() {
     super.beforeEach()
-    val projectBuildScript = getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")
-    projectScript.writeText(projectBuildScript)
+    projectScript.writeText(getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform"))
   }
 
   @ParameterizedTest

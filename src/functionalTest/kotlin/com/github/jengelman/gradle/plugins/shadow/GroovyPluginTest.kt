@@ -12,8 +12,7 @@ class GroovyPluginTest : BasePluginTest() {
   @BeforeEach
   override fun beforeEach() {
     super.beforeEach()
-    val projectBuildScript = getDefaultProjectBuildScript(plugin = "groovy")
-    projectScript.writeText(projectBuildScript)
+    projectScript.writeText(getDefaultProjectBuildScript(plugin = "groovy"))
   }
 
   @Test
