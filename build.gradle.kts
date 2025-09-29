@@ -157,14 +157,10 @@ testing.suites {
         // Required to test configuration cache in tests when using withDebug().
         // See https://github.com/gradle/gradle/issues/22765#issuecomment-1339427241.
         jvmArgs(
-          "--add-opens",
-          "java.base/java.util=ALL-UNNAMED",
-          "--add-opens",
-          "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
-          "--add-opens",
-          "java.base/java.lang.invoke=ALL-UNNAMED",
-          "--add-opens",
-          "java.base/java.net=ALL-UNNAMED",
+          "--add-opens=java.base/java.util=ALL-UNNAMED",
+          "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+          "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+          "--add-opens=java.base/java.net=ALL-UNNAMED",
         )
       }
     }
