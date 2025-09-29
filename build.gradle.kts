@@ -108,7 +108,7 @@ val testGradleVersion: String = providers.gradleProperty("testGradleVersion").or
 
 dependencies {
   compileOnly(libs.develocity)
-  compileOnly(libs.kotlin.kmp)
+  compileOnly(libs.kotlin.gradlePlugin)
   compileOnly(libs.kotlin.reflect)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.commonsIo)
@@ -124,7 +124,7 @@ dependencies {
 
   testPluginClasspath(libs.foojayResolver)
   testPluginClasspath(libs.develocity)
-  testPluginClasspath(libs.kotlin.kmp)
+  testPluginClasspath(libs.kotlin.gradlePlugin)
   testPluginClasspath(libs.pluginPublish)
 
   lintChecks(libs.androidx.gradlePluginLints)
