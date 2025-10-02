@@ -15,7 +15,7 @@ jobs:
       pages: write
     steps:
       - uses: actions/checkout@v5
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: true
       - name: Prepare API documentation
