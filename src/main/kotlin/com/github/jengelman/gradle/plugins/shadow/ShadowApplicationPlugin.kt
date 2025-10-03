@@ -59,7 +59,6 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   protected open fun Project.addCreateScriptsTask() {
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
       task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
-      task.group = ApplicationPlugin.APPLICATION_GROUP
 
       task.classpath = files(tasks.shadowJar)
 
