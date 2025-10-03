@@ -303,6 +303,26 @@ the `archiveClassifier` of the shadowed JAR like the following:
     }
     ```
 
+Because the default `archiveClassifier` of [`Jar`][Jar] is `""` (empty), setting the `archiveClassifier` of
+[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases.
+If you don't need the standard JAR, you can disable the `jar` task like:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.jar {
+      enabled = false
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('jar', Jar) {
+      enabled = false
+    }
+    ```
+
 ## Publishing the Shadowed Gradle Plugins
 
 The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
