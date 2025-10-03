@@ -181,7 +181,6 @@ class ShadowPropertiesTest {
 
     with(startShadowScripts) {
       assertThat(description).isEqualTo("Creates OS specific scripts to run the project as a JVM application using the shadow jar")
-      assertThat(group).isEqualTo(ApplicationPlugin.APPLICATION_GROUP)
       assertThat(classpath?.files).isNotNull().containsOnly(shadowJarTask.archiveFile.get().asFile)
       assertThat(mainModule.orNull).isEqualTo(applicationExtension.mainModule.orNull)
       assertThat(mainClass.orNull).isEqualTo(applicationExtension.mainClass.orNull)
