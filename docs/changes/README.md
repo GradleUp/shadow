@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.2.2...HEAD) - 2025-xx-xx
 
+### Changed
+
+- Change the group of `startShadowScripts` from `application` to `other`. ([#1797](https://github.com/GradleUp/shadow/pull/1797))
 
 ## [9.2.2](https://github.com/GradleUp/shadow/compare/9.2.2) - 2025-09-26
 
