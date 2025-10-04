@@ -29,7 +29,6 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
-import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
@@ -67,13 +66,6 @@ class PublishingTest : BasePluginTest() {
           archiveBaseName = 'maven-all'
         """.trimIndent(),
       ) + lineSeparator,
-    )
-    settingsScript.writeText(
-      """
-        plugins {
-          id 'org.gradle.toolchains.foojay-resolver-convention'
-        }
-      """.trimIndent() + lineSeparator + settingsScript.readText(),
     )
 
     val assertions = { variantAttrs: Array<Pair<String, String>> ->
