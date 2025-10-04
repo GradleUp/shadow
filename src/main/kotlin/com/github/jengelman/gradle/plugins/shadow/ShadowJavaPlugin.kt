@@ -86,8 +86,10 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         logger.info("Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.")
       } else {
         logger.info("Setting target JVM version to $targetJvmVersion for ${shadowRuntimeElements.name} configuration.")
-        shadowRuntimeElements.get().attributes { attrs ->
-          attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+        shadowRuntimeElements.configure {
+          it.attributes { attrs ->
+            attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+          }
         }
       }
     }
