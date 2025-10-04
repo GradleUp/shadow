@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHADOW
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.internal.addVariantsFromConfigurationCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
@@ -94,10 +95,10 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   }
 
   protected open fun Project.configureComponents() {
-    val shadowRuntimeElements = configurations.shadowRuntimeElements.get()
+    val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
+    shadowComponent.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
     // Must use afterEvaluate here as we need to track the changes of addShadowVariantIntoJavaComponent.
@@ -109,7 +110,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         return@afterEvaluate
       }
       components.named("java", AdhocComponentWithVariants::class.java) {
-        it.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
+        it.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
           variant.mapToOptional()
         }
       }
