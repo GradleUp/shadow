@@ -2,8 +2,13 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
+import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ConsumableConfiguration
+import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -16,6 +21,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
+import org.gradle.util.GradleVersion
 
 /**
  * Return `runtimeClasspath` or `runtime` configuration.
@@ -50,6 +56,22 @@ internal fun Project.addBuildScanCustomValues() {
       buildScan.value("shadow.${task.path}.executed", "true")
       buildScan.value("shadow.${task.path}.didWork", task.didWork.toString())
     }
+  }
+}
+
+/**
+ * TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above.
+ */
+@Suppress("UnstableApiUsage")
+internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
+  outgoingConfiguration: NamedDomainObjectProvider<Configuration>,
+  action: Action<in ConfigurationVariantDetails>,
+) {
+  if (GradleVersion.current() >= GradleVersion.version("9.2")) {
+    @Suppress("UNCHECKED_CAST")
+    addVariantsFromConfiguration(outgoingConfiguration as Provider<ConsumableConfiguration>, action)
+  } else {
+    addVariantsFromConfiguration(outgoingConfiguration.get(), action)
   }
 }
 
