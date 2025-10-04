@@ -50,8 +50,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
     configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
       compileClasspath.extendsFrom(shadowConfiguration)
     }
-    @Suppress("EagerGradleConfiguration") // this should be created eagerly.
-    val shadowRuntimeElements = configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
+    val shadowRuntimeElements = configurations.register(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
       it.extendsFrom(shadowConfiguration)
       it.isCanBeConsumed = true
       it.isCanBeResolved = false
@@ -87,7 +86,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         logger.info("Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.")
       } else {
         logger.info("Setting target JVM version to $targetJvmVersion for ${shadowRuntimeElements.name} configuration.")
-        shadowRuntimeElements.attributes { attrs ->
+        shadowRuntimeElements.get().attributes { attrs ->
           attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
         }
       }
