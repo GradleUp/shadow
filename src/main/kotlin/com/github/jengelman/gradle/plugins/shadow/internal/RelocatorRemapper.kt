@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.util.regex.Pattern
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.commons.Remapper
 
 /**
@@ -15,7 +16,7 @@ import org.objectweb.asm.commons.Remapper
 internal class RelocatorRemapper(
   private val relocators: Set<Relocator>,
   private val onModified: () -> Unit = {},
-) : Remapper() {
+) : Remapper(Opcodes.ASM9) {
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
