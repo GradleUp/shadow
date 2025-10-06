@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHADOW
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.internal.addVariantsFromConfigurationCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
@@ -49,8 +50,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
     configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
       compileClasspath.extendsFrom(shadowConfiguration)
     }
-    @Suppress("EagerGradleConfiguration") // this should be created eagerly.
-    val shadowRuntimeElements = configurations.create(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
+    val shadowRuntimeElements = configurations.register(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
       it.extendsFrom(shadowConfiguration)
       it.isCanBeConsumed = true
       it.isCanBeResolved = false
@@ -86,18 +86,20 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         logger.info("Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.")
       } else {
         logger.info("Setting target JVM version to $targetJvmVersion for ${shadowRuntimeElements.name} configuration.")
-        shadowRuntimeElements.attributes { attrs ->
-          attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+        shadowRuntimeElements.configure {
+          it.attributes { attrs ->
+            attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+          }
         }
       }
     }
   }
 
   protected open fun Project.configureComponents() {
-    val shadowRuntimeElements = configurations.shadowRuntimeElements.get()
+    val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
+    shadowComponent.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
     // Must use afterEvaluate here as we need to track the changes of addShadowVariantIntoJavaComponent.
@@ -109,7 +111,7 @@ public abstract class ShadowJavaPlugin @Inject constructor(
         return@afterEvaluate
       }
       components.named("java", AdhocComponentWithVariants::class.java) {
-        it.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
+        it.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
           variant.mapToOptional()
         }
       }
