@@ -37,7 +37,7 @@ kotlin {
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    apiVersion = KotlinVersion.KOTLIN_2_0 // TODO: upgrade to 2.2 when the min Gradle requirement is 9.0+
+    apiVersion = KotlinVersion.KOTLIN_2_2
     languageVersion = apiVersion
     jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
@@ -101,7 +101,7 @@ publishing.publications.withType<MavenPublication>().configureEach {
 configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
   attributes.attribute(
     GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-    objects.named<GradlePluginApiVersion>("8.11"),
+    objects.named<GradlePluginApiVersion>("9.0.0"),
   )
 }
 

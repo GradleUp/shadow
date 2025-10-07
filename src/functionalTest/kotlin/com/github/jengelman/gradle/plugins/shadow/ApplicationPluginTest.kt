@@ -53,9 +53,9 @@ class ApplicationPluginTest : BasePluginTest() {
           id 'org.gradle.toolchains.foojay-resolver-convention'
         }
       """.trimIndent(),
-      runShadowBlock = """
+      runShadowBlock = $$"""
         doFirst {
-          logger.lifecycle("Running application with JDK ${'$'}{it.javaLauncher.get().metadata.languageVersion.asInt()}")
+          logger.lifecycle("Running application with JDK ${it.javaLauncher.get().metadata.languageVersion.asInt()}")
         }
       """.trimIndent(),
     )
@@ -95,8 +95,8 @@ class ApplicationPluginTest : BasePluginTest() {
     val winScript = path("myapp-shadow/bin/myapp.bat", installPath)
 
     assertThat(unixScript.readText()).contains(
-      "CLASSPATH=\$APP_HOME/lib/myapp-1.0-all.jar",
-      "exec \"\$JAVACMD\" \"$@\"",
+      $$"CLASSPATH=$APP_HOME/lib/myapp-1.0-all.jar",
+      $$"exec \"$JAVACMD\" \"$@\"",
       "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
     )
     assertThat(winScript.readText()).contains(
