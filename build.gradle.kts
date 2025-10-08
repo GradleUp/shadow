@@ -76,18 +76,16 @@ configurations.configureEach {
     RUNTIME_ELEMENTS_CONFIGURATION_NAME,
     JAVADOC_ELEMENTS_CONFIGURATION_NAME,
     SOURCES_ELEMENTS_CONFIGURATION_NAME,
-    -> {
-      outgoing {
-        // Main/current capability.
-        capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
+    -> outgoing {
+      // Main/current capability.
+      capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
 
-        // Historical capabilities.
-        capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
-        capability("com.github.johnrengelman:shadow:$version")
-        capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
-        capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
-        capability("com.github.jengelman.gradle.plugins:shadow:$version")
-      }
+      // Historical capabilities.
+      capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
+      capability("com.github.johnrengelman:shadow:$version")
+      capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
+      capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
+      capability("com.github.jengelman.gradle.plugins:shadow:$version")
     }
   }
 }
