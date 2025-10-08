@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.EXTENSION_NAME
-import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,14 +11,10 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.component.SoftwareComponentContainer
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.plugins.ExtensionContainer
-import org.gradle.util.GradleVersion
 
 public abstract class ShadowBasePlugin : Plugin<Project> {
 
   override fun apply(project: Project): Unit = with(project) {
-    if (GradleVersion.current() < GradleVersion.version("8.11")) {
-      throw GradleException("This version of Shadow supports Gradle 8.11+ only. Please upgrade.")
-    }
     with(extensions.create(EXTENSION_NAME, ShadowExtension::class.java)) {
       addShadowVariantIntoJavaComponent.convention(true)
       addTargetJvmVersionAttribute.convention(true)

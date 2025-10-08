@@ -98,6 +98,13 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
 }
 
+configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
+  attributes.attribute(
+    GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+    objects.named<GradlePluginApiVersion>("8.11"),
+  )
+}
+
 val testGradleVersion: String = providers.gradleProperty("testGradleVersion").orNull.let {
   val value = if (it == null || it == "current") GradleVersion.current().version else it
   logger.lifecycle("Using Gradle $value in tests")
