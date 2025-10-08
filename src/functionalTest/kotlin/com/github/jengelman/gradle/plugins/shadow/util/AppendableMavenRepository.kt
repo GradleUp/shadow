@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.commonArguments
+import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
+import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectory
@@ -14,11 +15,9 @@ import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.gradle.api.logging.Logging
-import org.gradle.testkit.runner.GradleRunner
 
 class AppendableMavenRepository(
   val root: Path,
-  private val gradleRunner: GradleRunner,
 ) {
   private val modules = mutableListOf<Module>()
   private val jarsDir: Path
@@ -71,9 +70,11 @@ class AppendableMavenRepository(
       }
     }
 
-    gradleRunner.withProjectDir(root.toFile())
-      .withArguments(commonArguments + "publish")
-      .build()
+    gradleRunner(
+      projectDir = root,
+      arguments = commonGradleArgs + "publish",
+    ).build()
+
     logger.info(
       """
         Publish modules to Maven repository at ${root.toUri()}:

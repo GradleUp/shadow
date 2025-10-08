@@ -125,6 +125,7 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
+  testKitImplementation(gradleTestKit())
   testKitImplementation(libs.assertk)
 
   testPluginClasspath(libs.foojayResolver)

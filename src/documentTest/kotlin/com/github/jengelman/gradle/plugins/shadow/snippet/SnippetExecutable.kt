@@ -1,12 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.snippet
 
+import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
+import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
+import com.github.jengelman.gradle.plugins.shadow.testkit.toWarningsAsErrors
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
-import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.function.Executable
 
 sealed class SnippetExecutable : Executable {
@@ -86,24 +88,12 @@ sealed class SnippetExecutable : Executable {
       JarOutputStream(it.outputStream()).use {}
     }
 
-    val warningMode = if (mainScript.contains("org.jetbrains.kotlin.multiplatform")) {
-      "none" // TODO: https://youtrack.jetbrains.com/issue/KT-78620
-    } else {
-      "fail"
-    }
-
     try {
-      GradleRunner.create()
-        .withGradleVersion(testGradleVersion)
-        .withProjectDir(projectRoot.toFile())
-        .withPluginClasspath()
-        .forwardOutput()
-        .withArguments(
-          "--warning-mode=$warningMode",
-          "--stacktrace",
-          "build",
-        )
-        .build()
+      gradleRunner(
+        projectDir = projectRoot,
+        warningsAsErrors = mainScript.toWarningsAsErrors(),
+        arguments = listOf("build", "--stacktrace"),
+      ).build().assertNoDeprecationWarnings()
     } catch (t: Throwable) {
       throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)
     }
@@ -131,8 +121,6 @@ sealed class SnippetExecutable : Executable {
   }
 
   companion object {
-    private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
-      ?: error("TEST_GRADLE_VERSION system property is not set.")
 
     private val lineSeparator = System.lineSeparator()
 
