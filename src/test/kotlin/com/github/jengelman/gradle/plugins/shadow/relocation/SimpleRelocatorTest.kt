@@ -81,13 +81,13 @@ class SimpleRelocatorTest {
       includes = listOf("%regex[org/foo/R(\\$.*)?$]"),
     )
     assertThat(relocator.canRelocatePath("org/foo/R.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/foo/R\$string.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/foo/R\$layout.class")).isTrue()
+    assertThat(relocator.canRelocatePath($$"org/foo/R$string.class")).isTrue()
+    assertThat(relocator.canRelocatePath($$"org/foo/R$layout.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Recording/R.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/foo/Recording.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/foo/bar/R\$string.class")).isFalse()
+    assertThat(relocator.canRelocatePath($$"org/foo/bar/R$string.class")).isFalse()
     assertThat(relocator.canRelocatePath("org/R.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/R\$string.class")).isFalse()
+    assertThat(relocator.canRelocatePath($$"org/R$string.class")).isFalse()
 
     // Exclude with Regex
     relocator = SimpleRelocator(

@@ -7,6 +7,7 @@
 
 - Change the group of `startShadowScripts` from `application` to `other`. ([#1797](https://github.com/GradleUp/shadow/pull/1797))
 - Update ASM and jdependency to support Java 26. ([#1799](https://github.com/GradleUp/shadow/pull/1799))
+- Bump min Gradle requirement to 9.0.0. ([#1801](https://github.com/GradleUp/shadow/pull/1801))
 
 ## [9.2.2](https://github.com/GradleUp/shadow/compare/9.2.2) - 2025-09-26
 
