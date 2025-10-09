@@ -389,7 +389,7 @@ abstract class BasePluginTest {
       true // Default warning mode if projectScript is not initialized yet.
     }
     return gradleRunner(
-      arguments = arguments + commonGradleArgs,
+      arguments = commonGradleArgs + arguments,
       projectDir = projectDir,
       warningsAsErrors = warningsAsErrors,
       block = block,
