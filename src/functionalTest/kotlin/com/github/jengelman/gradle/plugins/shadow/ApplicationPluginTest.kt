@@ -60,7 +60,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(runShadowPath)
+    val result = runWithSuccess(runShadowPath)
 
     assertThat(result.output).contains(
       "Running application with JDK 17",
@@ -77,7 +77,7 @@ class ApplicationPluginTest : BasePluginTest() {
       applicationBlock = "applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']",
     )
 
-    run(installShadowDistPath)
+    runWithSuccess(installShadowDistPath)
 
     val installPath = path("build/install/")
     assertThat(installPath.walkEntries()).containsOnly(
@@ -119,7 +119,7 @@ class ApplicationPluginTest : BasePluginTest() {
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 
-    run(installShadowDistPath)
+    runWithSuccess(installShadowDistPath)
 
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
@@ -140,7 +140,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    var result = run(runShadowPath)
+    var result = runWithSuccess(runShadowPath)
 
     val assertions = { output: String, arg: String ->
       assertThat(output).all {
@@ -164,7 +164,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    result = run(":run")
+    result = runWithSuccess(":run")
 
     assertions(result.output, "bar")
   }
@@ -180,7 +180,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(runShadowPath) // Run without errors.
+    runWithSuccess(runShadowPath) // Run without errors.
 
     assertThat(jarPath("build/libs/myapp-1.0-all.jar")).useAll {
       getMainAttr(mainClassAttributeKey).isEqualTo("my.Main2")
@@ -217,7 +217,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowDistZipPath)
+    runWithSuccess(shadowDistZipPath)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
@@ -241,7 +241,7 @@ class ApplicationPluginTest : BasePluginTest() {
     path("src/dist/echo.sh").writeText("echo 'Hello, World!'")
     prepare()
 
-    run(shadowDistZipPath)
+    runWithSuccess(shadowDistZipPath)
 
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
@@ -269,7 +269,7 @@ class ApplicationPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(installShadowDistPath, shadowDistZipPath)
+    runWithSuccess(installShadowDistPath, shadowDistZipPath)
 
     assertThat(path("build/install/").walkEntries()).containsOnly(
       "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}",

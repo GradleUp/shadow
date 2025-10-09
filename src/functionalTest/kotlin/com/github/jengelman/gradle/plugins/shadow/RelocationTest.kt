@@ -60,7 +60,7 @@ class RelocationTest : BasePluginTest() {
       }
     }.toTypedArray()
 
-    val result = run(shadowJarPath, infoArgument)
+    val result = runWithSuccess(shadowJarPath, infoArgument)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -92,9 +92,9 @@ class RelocationTest : BasePluginTest() {
       .toTypedArray()
 
     if (enable) {
-      run(shadowJarPath, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
+      runWithSuccess(shadowJarPath, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
     } else {
-      run(shadowJarPath, "--no-enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
+      runWithSuccess(shadowJarPath, "--no-enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
     }
 
     val commonEntries = arrayOf(
@@ -145,7 +145,7 @@ class RelocationTest : BasePluginTest() {
       .map { it.replace("junit/framework/", "b/") }.toTypedArray()
     val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -187,7 +187,7 @@ class RelocationTest : BasePluginTest() {
       .map { it.replace("junit/framework/", "b/") }.toTypedArray()
     val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -234,7 +234,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -280,7 +280,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -312,7 +312,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     if (enableAutoRelocation) {
       val (relocatedEntries, otherEntries) = outputShadowedJar.use {
@@ -399,7 +399,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -434,7 +434,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       if (exclude) {
@@ -467,7 +467,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -494,7 +494,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     assertThat(result).contains(
@@ -524,7 +524,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     if (skipStringConstants) {
@@ -568,7 +568,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     // Just check that the jar can be executed without NoClassDefFoundError.
@@ -593,7 +593,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":jar", shadowJarPath)
+    runWithSuccess(":jar", shadowJarPath)
 
     val originalBytes = outputJar.use { it.getBytes(mainClassEntry) }
     val relocatedBytes = outputShadowedJar.use { it.getBytes(mainClassEntry) }
@@ -621,7 +621,7 @@ class RelocationTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val relocatedModuleFilePath = "META-INF/kotlin-stdlib.shadow.kotlin_module"
     assertThat(outputShadowedJar).useAll {

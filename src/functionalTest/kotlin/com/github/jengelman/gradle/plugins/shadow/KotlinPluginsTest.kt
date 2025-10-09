@@ -40,7 +40,7 @@ class KotlinPluginsTest : BasePluginTest() {
     )
     val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Kotlin)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       val entries = arrayOf(
@@ -85,7 +85,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       val entries = arrayOf(
@@ -133,7 +133,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       val entries = arrayOf(
@@ -188,7 +188,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
@@ -219,7 +219,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)

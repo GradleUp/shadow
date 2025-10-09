@@ -514,7 +514,7 @@ class CachingTest : BasePluginTest() {
   }
 
   private fun cleanOutputs() {
-    run("clean")
+    runWithSuccess("clean")
     @OptIn(ExperimentalPathApi::class)
     val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
     // Make sure build folders are deleted by clean task.
@@ -552,7 +552,7 @@ class CachingTest : BasePluginTest() {
   }
 
   private fun assertRunWithResult(expectedOutcome: TaskOutcome) {
-    val result = run(taskPath)
+    val result = runWithSuccess(taskPath)
     assertThat(result).taskOutcomeEquals(taskPath, expectedOutcome)
   }
 }

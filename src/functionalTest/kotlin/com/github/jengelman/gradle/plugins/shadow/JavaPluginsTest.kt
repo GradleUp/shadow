@@ -80,7 +80,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(ASSEMBLE_TASK_NAME)
+    val result = runWithSuccess(ASSEMBLE_TASK_NAME)
 
     assertThat(result.task(":$ASSEMBLE_TASK_NAME")).isNotNull()
       .transform { it.outcome }.isEqualTo(SUCCESS)
@@ -93,7 +93,7 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun shadowJarCliOptions() {
-    val result = run("help", "--task", shadowJarPath)
+    val result = runWithSuccess("help", "--task", shadowJarPath)
 
     assertThat(result.output).contains(
       "--add-multi-release-attribute     Adds the multi-release attribute to the manifest if any dependencies contain it.",
@@ -113,7 +113,7 @@ class JavaPluginsTest : BasePluginTest() {
   fun includeProjectDependencies() {
     writeClientAndServerModules()
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
@@ -131,7 +131,7 @@ class JavaPluginsTest : BasePluginTest() {
   fun dependOnProjectShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
 
-    run(":server:jar")
+    runWithSuccess(":server:jar")
 
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
       containsOnly(
@@ -158,7 +158,7 @@ class JavaPluginsTest : BasePluginTest() {
     val relocatedEntries = junitEntries
       .map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
@@ -212,7 +212,7 @@ class JavaPluginsTest : BasePluginTest() {
     )
     path("client/src/custom/resources/Foo.bar").writeText("Foo=Bar")
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
@@ -253,7 +253,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(serverShadowJarPath, infoArgument)
+    val result = runWithSuccess(serverShadowJarPath, infoArgument)
 
     assertThat(result.output).contains(
       if (addAttribute) {
@@ -281,7 +281,7 @@ class JavaPluginsTest : BasePluginTest() {
     )
 
     val arg = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
-    val result = run(serverShadowJarPath, infoArgument, arg)
+    val result = runWithSuccess(serverShadowJarPath, infoArgument, arg)
 
     assertThat(result.output).contains(
       if (enable) {
@@ -319,7 +319,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -341,7 +341,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -383,7 +383,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -406,7 +406,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       transform { it.mainAttrSize }.isEqualTo(1)
@@ -433,7 +433,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val actual = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     val expected = when (configuration) {
@@ -456,7 +456,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val value = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
     assertThat(value).isEqualTo("junit-3.8.2.jar")
@@ -480,7 +480,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -506,7 +506,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       transform { actual -> actual.entries().toList().map { it.name }.filter { it.endsWith(".class") } }
@@ -584,7 +584,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(testShadowJarTask)
+    runWithSuccess(testShadowJarTask)
 
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
       containsOnly(
@@ -635,7 +635,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(testShadowJarTask)
+    val result = runWithSuccess(testShadowJarTask)
 
     assertThat(result.output).contains(
       "Has ShadowPlugin: false",
@@ -681,7 +681,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run("jar", dependencyShadowJar)
+    runWithSuccess("jar", dependencyShadowJar)
 
     assertThat(jarPath("build/libs/my-1.0.jar")).useAll {
       containsOnly(
@@ -762,7 +762,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -803,7 +803,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -839,7 +839,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -889,7 +889,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
@@ -908,7 +908,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(
+    val result = runWithSuccess(
       serverShadowJarPath,
       ipArgument,
       infoArgument,
@@ -944,7 +944,7 @@ class JavaPluginsTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarPath)
     } else {
-      run(shadowJarPath, infoArgument)
+      runWithSuccess(shadowJarPath, infoArgument)
     }
 
     assertThat(result.output).contains(
@@ -971,7 +971,7 @@ class JavaPluginsTest : BasePluginTest() {
     val result = if (enable) {
       runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
     } else {
-      run(shadowJarPath, infoArgument, "--no-fail-on-duplicate-entries")
+      runWithSuccess(shadowJarPath, infoArgument, "--no-fail-on-duplicate-entries")
     }
 
     assertThat(result.output).contains(
@@ -991,7 +991,7 @@ class JavaPluginsTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result = run(shadowJarPath, infoArgument)
+    val result = runWithSuccess(shadowJarPath, infoArgument)
 
     assertThat(result.output).contains(
       message,
@@ -1005,9 +1005,9 @@ class JavaPluginsTest : BasePluginTest() {
   @MethodSource("fallbackMainClassProvider")
   fun fallbackMainClassByCliOption(input: String, expected: String?) {
     if (input.isEmpty()) {
-      run(shadowJarPath)
+      runWithSuccess(shadowJarPath)
     } else {
-      run(shadowJarPath, "--main-class", input)
+      runWithSuccess(shadowJarPath, "--main-class", input)
     }
 
     assertThat(outputShadowedJar).useAll {
@@ -1016,7 +1016,7 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {
-    return run("dependencies", "--configuration", configuration, *flags).output
+    return runWithSuccess("dependencies", "--configuration", configuration, *flags).output
   }
 
   private companion object {
