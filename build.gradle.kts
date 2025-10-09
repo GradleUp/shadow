@@ -37,7 +37,8 @@ kotlin {
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    apiVersion = KotlinVersion.KOTLIN_2_0 // TODO: upgrade to 2.2 when the min Gradle requirement is 9.0+
+    @Suppress("DEPRECATION") // TODO: upgrade to 2.2 when the min Gradle requirement is 9.0+
+    apiVersion = KotlinVersion.KOTLIN_2_0
     languageVersion = apiVersion
     jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
