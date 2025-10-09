@@ -12,7 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
-import com.github.jengelman.gradle.plugins.shadow.testkit.zipOutputStream
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.net.URL

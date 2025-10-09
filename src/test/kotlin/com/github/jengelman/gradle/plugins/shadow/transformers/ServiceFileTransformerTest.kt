@@ -8,7 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.testkit.zipOutputStream
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.file.Path
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting

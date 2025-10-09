@@ -37,7 +37,7 @@ kotlin {
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    apiVersion = KotlinVersion.KOTLIN_2_0
+    apiVersion = KotlinVersion.KOTLIN_2_0 // TODO: upgrade to 2.2 when the min Gradle requirement is 9.0+
     languageVersion = apiVersion
     jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
@@ -76,18 +76,16 @@ configurations.configureEach {
     RUNTIME_ELEMENTS_CONFIGURATION_NAME,
     JAVADOC_ELEMENTS_CONFIGURATION_NAME,
     SOURCES_ELEMENTS_CONFIGURATION_NAME,
-    -> {
-      outgoing {
-        // Main/current capability.
-        capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
+    -> outgoing {
+      // Main/current capability.
+      capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
 
-        // Historical capabilities.
-        capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
-        capability("com.github.johnrengelman:shadow:$version")
-        capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
-        capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
-        capability("com.github.jengelman.gradle.plugins:shadow:$version")
-      }
+      // Historical capabilities.
+      capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
+      capability("com.github.johnrengelman:shadow:$version")
+      capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
+      capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
+      capability("com.github.jengelman.gradle.plugins:shadow:$version")
     }
   }
 }
@@ -98,6 +96,13 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(RUNTIME_ELEMENTS_CONFIGURATION_NAME)
   suppressPomMetadataWarningsFor(JAVADOC_ELEMENTS_CONFIGURATION_NAME)
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
+}
+
+configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
+  attributes.attribute(
+    GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+    objects.named<GradlePluginApiVersion>("8.11"),
+  )
 }
 
 val testGradleVersion: String = providers.gradleProperty("testGradleVersion").orNull.let {
