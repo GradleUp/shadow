@@ -2,8 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.Assert
 import assertk.all
-import assertk.assertThat
-import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
@@ -11,7 +9,11 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
+import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
+import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.toWarningsAsErrors
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
@@ -21,8 +23,6 @@ import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.JarEntry
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
@@ -65,8 +65,7 @@ abstract class BasePluginTest {
   @BeforeAll
   fun beforeAll() {
     localRepo = AppendableMavenRepository(
-      createTempDirectory().resolve("local-maven-repo").createDirectories(),
-      runner(projectDir = null),
+      root = createTempDirectory().resolve("local-maven-repo").createDirectories(),
     ).apply {
       jarModule("junit", "junit", "3.8.2") {
         useJar(junitJar)
@@ -205,17 +204,17 @@ abstract class BasePluginTest {
 
   fun run(
     vararg arguments: String,
-    runnerBlock: (GradleRunner) -> Unit = {},
+    block: GradleRunner.() -> Unit = {},
   ): BuildResult {
-    return runner(arguments = arguments.toList(), block = runnerBlock)
+    return runner(arguments = arguments.toList(), block = block)
       .build().assertNoDeprecationWarnings()
   }
 
   fun runWithFailure(
     vararg arguments: String,
-    runnerBlock: (GradleRunner) -> Unit = {},
+    block: GradleRunner.() -> Unit = {},
   ): BuildResult {
-    return runner(arguments = arguments.toList(), block = runnerBlock)
+    return runner(arguments = arguments.toList(), block = block)
       .buildAndFail().assertNoDeprecationWarnings()
   }
 
@@ -379,51 +378,26 @@ abstract class BasePluginTest {
     )
   }
 
-  fun runner(
-    arguments: Iterable<String> = emptyList(),
-    projectDir: Path? = projectRoot,
-    block: (GradleRunner) -> Unit = {},
-  ): GradleRunner = GradleRunner.create()
-    .withGradleVersion(testGradleVersion)
-    .forwardOutput()
-    .withPluginClasspath()
-    .withTestKitDir(testKitDir.toFile())
-    .withArguments(
-      buildList {
-        val warningsAsErrors = try {
-          // TODO: https://youtrack.jetbrains.com/issue/KT-78620
-          !projectScript.readText().contains("org.jetbrains.kotlin.multiplatform")
-        } catch (_: UninitializedPropertyAccessException) {
-          true // Default warning mode if projectScript is not initialized yet.
-        }
-        if (warningsAsErrors) {
-          add("--warning-mode=fail")
-        }
-        addAll(commonArguments)
-        addAll(arguments)
-      },
-    )
-    .apply {
-      if (projectDir != null) {
-        withProjectDir(projectDir.toFile())
-      }
-      block(this)
+  private fun runner(
+    arguments: Iterable<String>,
+    block: GradleRunner.() -> Unit,
+  ): GradleRunner {
+    val warningsAsErrors = try {
+      projectScript.readText().toWarningsAsErrors()
+    } catch (_: UninitializedPropertyAccessException) {
+      true // Default warning mode if projectScript is not initialized yet.
     }
+    return gradleRunner(
+      projectDir = projectRoot,
+      arguments = commonGradleArgs + arguments,
+      warningsAsErrors = warningsAsErrors,
+      block = block,
+    )
+  }
 
   @Suppress("ConstPropertyName")
   companion object {
-    private val testGradleVersion = System.getProperty("TEST_GRADLE_VERSION")
-      ?: error("TEST_GRADLE_VERSION system property is not set.")
-
     val lineSeparator: String = System.lineSeparator()
-
-    val testKitDir: Path = run {
-      var gradleUserHome = System.getenv("GRADLE_USER_HOME")
-      if (gradleUserHome == null) {
-        gradleUserHome = Path(System.getProperty("user.home"), ".gradle").absolutePathString()
-      }
-      Path(gradleUserHome, "testkit")
-    }
 
     const val shadowPluginId = "com.gradleup.shadow"
     const val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
@@ -484,14 +458,6 @@ abstract class BasePluginTest {
           }
         }
       """.trimIndent()
-    }
-
-    fun BuildResult.assertNoDeprecationWarnings() = apply {
-      assertThat(output).doesNotContain(
-        "has been deprecated and is scheduled to be removed in Gradle",
-        "has been deprecated. This is scheduled to be removed in Gradle",
-        "will fail with an error in Gradle",
-      )
     }
 
     fun <T : Closeable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {
