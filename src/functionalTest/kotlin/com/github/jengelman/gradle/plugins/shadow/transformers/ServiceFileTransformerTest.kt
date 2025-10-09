@@ -44,7 +44,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
     projectScript.appendText(config)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
@@ -80,7 +80,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
     projectScript.appendText(config)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(ENTRY_FOO_SHADE) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
@@ -138,7 +138,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getContent("META-INF/services/java.sql.Driver").isEqualTo(
@@ -189,7 +189,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     )
     path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(servicesBarEntry) }
     assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
@@ -217,7 +217,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(firstValue)
@@ -238,7 +238,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
@@ -259,7 +259,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
@@ -287,7 +287,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)

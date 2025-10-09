@@ -27,7 +27,7 @@ class ScalaPluginTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(

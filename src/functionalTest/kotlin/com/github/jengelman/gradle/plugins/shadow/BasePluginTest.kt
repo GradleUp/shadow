@@ -202,7 +202,7 @@ abstract class BasePluginTest {
     return JarBuilder(path("temp/$relative")).apply(builder).write()
   }
 
-  fun run(
+  fun runWithSuccess(
     vararg arguments: String,
     block: GradleRunner.() -> Unit = {},
   ): BuildResult {

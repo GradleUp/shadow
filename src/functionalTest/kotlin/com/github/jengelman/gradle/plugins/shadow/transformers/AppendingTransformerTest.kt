@@ -36,7 +36,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
     }
     projectScript.appendText(config)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
@@ -83,7 +83,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
 
     projectScript.appendText(config)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val content1 = outputShadowedJar.use { it.getContent("resources/$APPLICATION_YML_FILE") }
     assertThat(content1).isEqualTo(

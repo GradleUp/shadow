@@ -612,7 +612,7 @@ class PublishingTest : BasePluginTest() {
     return JarPath(remoteRepoPath.resolve(relative))
   }
 
-  private fun publish(vararg arguments: String): BuildResult = run("publish", *arguments)
+  private fun publish(vararg arguments: String): BuildResult = runWithSuccess("publish", *arguments)
 
   private fun publishConfiguration(
     projectBlock: String = "",

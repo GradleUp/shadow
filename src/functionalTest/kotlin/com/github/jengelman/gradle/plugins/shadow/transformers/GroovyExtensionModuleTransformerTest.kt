@@ -40,7 +40,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     }
     projectScript.appendText(config)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     commonAssertions()
   }
@@ -60,7 +60,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     commonAssertions()
   }
@@ -79,7 +79,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val properties = outputShadowedJar.extensionModuleProperties
 

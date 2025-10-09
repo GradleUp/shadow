@@ -26,7 +26,7 @@ class FilteringTest : BasePluginTest() {
 
   @Test
   fun includeAllDependencies() {
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -46,7 +46,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -83,7 +83,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     commonAssertions()
   }
@@ -113,7 +113,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     commonAssertions()
   }
@@ -139,7 +139,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -163,7 +163,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
@@ -189,7 +189,7 @@ class FilteringTest : BasePluginTest() {
     )
     path("client/build.gradle").appendText("version = '1.0.0+1'")
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
@@ -211,7 +211,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
@@ -236,7 +236,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -263,7 +263,7 @@ class FilteringTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(

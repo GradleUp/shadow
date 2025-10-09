@@ -25,7 +25,7 @@ class MinimizeTest : BasePluginTest() {
   fun useMinimizeWithDependenciesWithApiScope() {
     writeApiLibAndImplModules()
 
-    run(":impl:$SHADOW_JAR_TASK_NAME")
+    runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(outputImplShadowedJar).useAll {
       containsAtLeast(
@@ -59,7 +59,7 @@ class MinimizeTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":impl:$SHADOW_JAR_TASK_NAME")
+    runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(outputImplShadowedJar).useAll {
       containsOnly(
@@ -98,7 +98,7 @@ class MinimizeTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
@@ -126,7 +126,7 @@ class MinimizeTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
@@ -156,7 +156,7 @@ class MinimizeTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly(
@@ -193,7 +193,7 @@ class MinimizeTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
@@ -209,7 +209,7 @@ class MinimizeTest : BasePluginTest() {
         public class Client {}
       """.trimIndent(),
     )
-    run(serverShadowJarPath)
+    runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast(
@@ -239,7 +239,7 @@ class MinimizeTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -256,9 +256,9 @@ class MinimizeTest : BasePluginTest() {
     writeClientAndServerModules()
 
     if (enable) {
-      run(serverShadowJarPath, "--minimize-jar")
+      runWithSuccess(serverShadowJarPath, "--minimize-jar")
     } else {
-      run(serverShadowJarPath, "--no-minimize-jar")
+      runWithSuccess(serverShadowJarPath, "--no-minimize-jar")
     }
 
     assertThat(outputServerShadowedJar).useAll {
@@ -297,7 +297,7 @@ class MinimizeTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    run(":impl:$SHADOW_JAR_TASK_NAME")
+    runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(outputImplShadowedJar).useAll {
       containsAtLeast(

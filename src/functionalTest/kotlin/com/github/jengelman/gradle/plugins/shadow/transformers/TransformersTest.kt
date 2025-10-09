@@ -38,7 +38,7 @@ class TransformersTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     commonAssertions {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
@@ -52,7 +52,7 @@ class TransformersTest : BaseTransformerTest() {
 
     projectScript.appendText(MANIFEST_ATTRS)
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     commonAssertions()
   }
@@ -75,7 +75,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     val actualFileBytes = outputShadowedJar.use { jar ->
       jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
@@ -99,7 +99,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -123,7 +123,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -153,7 +153,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -182,7 +182,7 @@ class TransformersTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -229,7 +229,7 @@ class TransformersTest : BaseTransformerTest() {
       ),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
@@ -267,7 +267,7 @@ class TransformersTest : BaseTransformerTest() {
       """.trimIndent(),
     )
 
-    run(shadowJarPath)
+    runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsAtLeast(*entriesInAB)
