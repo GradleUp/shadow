@@ -863,12 +863,12 @@ class JavaPluginsTest : BasePluginTest() {
   fun includeFilesInTaskOutputDirectory() {
     // Create a build that has a task with jars in the output directory
     projectScript.appendText(
-      """
+      $$"""
       def createJars = tasks.register('createJars') {
-        def artifactAJar = file('${artifactAJar.invariantSeparatorsPathString}')
-        def artifactBJar = file('${artifactBJar.invariantSeparatorsPathString}')
+        def artifactAJar = file('$${artifactAJar.invariantSeparatorsPathString}')
+        def artifactBJar = file('$${artifactBJar.invariantSeparatorsPathString}')
         inputs.files(artifactAJar, artifactBJar)
-        def outputDir = file('${'$'}{buildDir}/jars')
+        def outputDir = file('${buildDir}/jars')
         outputs.dir(outputDir)
         doLast {
           artifactAJar.withInputStream { input ->
@@ -883,7 +883,7 @@ class JavaPluginsTest : BasePluginTest() {
           }
         }
       }
-      $shadowJarTask {
+      $$shadowJarTask {
         includedDependencies.from(files(createJars).asFileTree)
       }
       """.trimIndent(),
