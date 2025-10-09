@@ -204,17 +204,17 @@ abstract class BasePluginTest {
 
   fun run(
     vararg arguments: String,
-    runnerBlock: (GradleRunner) -> Unit = {},
+    block: GradleRunner.() -> Unit = {},
   ): BuildResult {
-    return runner(arguments = arguments.toList(), block = runnerBlock)
+    return runner(arguments = arguments.toList(), block = block)
       .build().assertNoDeprecationWarnings()
   }
 
   fun runWithFailure(
     vararg arguments: String,
-    runnerBlock: (GradleRunner) -> Unit = {},
+    block: GradleRunner.() -> Unit = {},
   ): BuildResult {
-    return runner(arguments = arguments.toList(), block = runnerBlock)
+    return runner(arguments = arguments.toList(), block = block)
       .buildAndFail().assertNoDeprecationWarnings()
   }
 
@@ -379,9 +379,8 @@ abstract class BasePluginTest {
   }
 
   private fun runner(
-    arguments: Iterable<String> = emptyList(),
-    projectDir: Path? = projectRoot,
-    block: (GradleRunner) -> Unit = {},
+    arguments: Iterable<String>,
+    block: GradleRunner.() -> Unit,
   ): GradleRunner {
     val warningsAsErrors = try {
       projectScript.readText().toWarningsAsErrors()
@@ -389,8 +388,8 @@ abstract class BasePluginTest {
       true // Default warning mode if projectScript is not initialized yet.
     }
     return gradleRunner(
+      projectDir = projectRoot,
       arguments = commonGradleArgs + arguments,
-      projectDir = projectDir,
       warningsAsErrors = warningsAsErrors,
       block = block,
     )

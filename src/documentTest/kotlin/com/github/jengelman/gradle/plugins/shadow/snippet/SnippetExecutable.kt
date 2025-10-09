@@ -91,8 +91,8 @@ sealed class SnippetExecutable : Executable {
     try {
       gradleRunner(
         projectDir = projectRoot,
-        warningsAsErrors = mainScript.toWarningsAsErrors(),
         arguments = listOf("build", "--stacktrace"),
+        warningsAsErrors = mainScript.toWarningsAsErrors(),
       ).build().assertNoDeprecationWarnings()
     } catch (t: Throwable) {
       throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)

@@ -9,16 +9,13 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 
 private val testKitDir by lazy {
-  var gradleUserHome = System.getenv("GRADLE_USER_HOME")
-  if (gradleUserHome == null) {
-    gradleUserHome = Path(System.getProperty("user.home"), ".gradle").absolutePathString()
-  }
+  val gradleUserHome = System.getenv("GRADLE_USER_HOME")
+    ?: Path(System.getProperty("user.home"), ".gradle").absolutePathString()
   Path(gradleUserHome, "testkit")
 }
 
 private val testGradleVersion by lazy {
-  System.getProperty("TEST_GRADLE_VERSION")
-    ?: error("TEST_GRADLE_VERSION system property is not set.")
+  System.getProperty("TEST_GRADLE_VERSION") ?: error("TEST_GRADLE_VERSION system property is not set.")
 }
 
 val commonGradleArgs = setOf(
@@ -31,10 +28,10 @@ val commonGradleArgs = setOf(
 )
 
 fun gradleRunner(
-  arguments: Iterable<String> = emptyList(),
+  projectDir: Path,
+  arguments: Iterable<String>,
   warningsAsErrors: Boolean = true,
-  projectDir: Path? = null,
-  block: (GradleRunner) -> Unit = {},
+  block: GradleRunner.() -> Unit = {},
 ): GradleRunner = GradleRunner.create()
   .withGradleVersion(testGradleVersion)
   .forwardOutput()
@@ -48,12 +45,8 @@ fun gradleRunner(
       }
     },
   )
-  .apply {
-    if (projectDir != null) {
-      withProjectDir(projectDir.toFile())
-    }
-    block(this)
-  }
+  .withProjectDir(projectDir.toFile())
+  .apply(block)
 
 fun BuildResult.assertNoDeprecationWarnings() = apply {
   assertThat(output).doesNotContain(
