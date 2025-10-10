@@ -45,7 +45,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        BuildResult result = run('runShadow')
+        BuildResult result = runWithSuccess('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -123,7 +123,7 @@ class ApplicationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow')
+        BuildResult result = runWithSuccess('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('Running application with JDK 17')
@@ -187,7 +187,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        run('shadowDistZip')
+        runWithSuccess('shadowDistZip')
 
         then: 'Check that the distribution zip was created'
         File zip = getFile('build/distributions/myapp-shadow-1.0.zip')
@@ -239,7 +239,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        run(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
+        runWithSuccess(ShadowApplicationPlugin.SHADOW_INSTALL_TASK_NAME)
 
         then: 'Check that the proper jar file was installed'
         File installedJar = getFile('build/install/myapp-shadow/lib/myapp-1.0-all.jar')

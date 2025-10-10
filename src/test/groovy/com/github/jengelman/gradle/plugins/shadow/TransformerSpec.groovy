@@ -41,7 +41,7 @@ class TransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -81,7 +81,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -121,7 +121,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -176,7 +176,7 @@ com.mysql.jdbc.Driver'''.stripIndent())
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -224,7 +224,7 @@ org.mortbay.log.Factory'''.stripIndent()
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -261,7 +261,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
             'three # NOTE: No newline terminates this line/file'
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -297,7 +297,7 @@ two # NOTE: No newline terminates this line/file'''.stripIndent()
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -330,7 +330,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -366,7 +366,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -410,7 +410,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -462,7 +462,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -509,7 +509,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        run('jar', 'shadowJar')
+        runWithSuccess('jar', 'shadowJar')
 
         then:
         File jar = getFile('build/libs/shadow-1.0.jar')
@@ -569,7 +569,7 @@ two # NOTE: No newline terminates this line/file
         """.stripIndent()
 
         when:
-        run('jar', 'shadowJar')
+        runWithSuccess('jar', 'shadowJar')
 
         then:
         File jar = getFile('build/libs/shadow-1.0.jar')
@@ -628,7 +628,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -672,7 +672,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         output.exists()
@@ -715,7 +715,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
             """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -745,7 +745,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         """.stripIndent()
 
         when:
-        run('shadowJar', '--warning-mode=all')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()

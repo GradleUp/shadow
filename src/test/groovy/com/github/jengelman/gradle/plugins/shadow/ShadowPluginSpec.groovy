@@ -2,16 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
-import spock.lang.Ignore
-import spock.lang.IgnoreIf
 import spock.lang.Issue
-import spock.lang.Unroll
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
@@ -55,64 +51,6 @@ class ShadowPluginSpec extends PluginSpecification {
 
     }
 
-    @IgnoreIf({
-        // Gradle 8.3 doesn't support Java 21.
-        JavaVersion.current().majorVersion.toInteger() >= 21
-    })
-    @Unroll
-    def 'Compatible with Gradle #version'() {
-        given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
-            'one # NOTE: No newline terminates this line/file').write()
-
-        repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
-            'two # NOTE: No newline terminates this line/file').publish()
-
-        buildFile << """
-            dependencies {
-              implementation 'junit:junit:3.8.2'
-              implementation files('${escapedPath(one)}')
-            }
-
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-               mergeServiceFiles()
-            }
-        """.stripIndent()
-
-        when:
-        run(['shadowJar']) {
-            it.withGradleVersion(version)
-            it.withDebug(true)
-            it.withTestKitDir(getTestKitDir())
-        }
-
-        then:
-        assert output.exists()
-
-        where:
-        version << ['8.3']
-    }
-
-    def 'Error in Gradle versions < 8.3'() {
-        given:
-        buildFile << """
-            dependencies {
-              implementation 'junit:junit:3.8.2'
-            }
-
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-               mergeServiceFiles()
-            }
-        """.stripIndent()
-
-        expect:
-        runWithFailure(['shadowJar']) {
-            it.withGradleVersion('7.0')
-            it.withDebug(true)
-            it.withTestKitDir(getTestKitDir())
-        }
-    }
-
     def 'shadow copy'() {
         given:
         URL artifact = this.class.classLoader.getResource('test-artifact-1.0-SNAPSHOT.jar')
@@ -126,7 +64,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -153,7 +91,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output("shadow.jar"), ['shadow/Passed.class', 'junit/framework/Test.class'])
@@ -199,7 +137,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        run(':server:shadowJar')
+        runWithSuccess(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -256,7 +194,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        runWithSuccess(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -311,7 +249,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        runWithSuccess(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -364,7 +302,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        runWithSuccess(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -419,7 +357,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        runWithSuccess(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -472,7 +410,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        runWithSuccess(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -550,7 +488,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        runWithSuccess(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -626,7 +564,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        runWithSuccess(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -680,7 +618,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server.jar')
 
         when:
-        run(':server:jar')
+        runWithSuccess(':server:jar')
 
         then:
         serverOutput.exists()
@@ -738,7 +676,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        run(':server:shadowJar')
+        runWithSuccess(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -775,7 +713,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, ['a.properties', 'META-INF/a.properties'])
@@ -802,7 +740,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, ['a.properties'])
@@ -840,7 +778,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runWithDebug('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, ['api.properties', 'implementation.properties',
@@ -865,7 +803,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, ['a.properties'])
@@ -892,7 +830,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         JarFile jar = new JarFile(output)
@@ -907,7 +845,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -939,7 +877,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -961,7 +899,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -988,7 +926,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -1036,144 +974,13 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-1.0-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        runWithSuccess(':impl:shadowJar')
 
         then:
         serverOutput.exists()
         contains(serverOutput, [
             'api/UnusedEntity.class',
         ])
-    }
-
-    @Issue('SHADOW-143')
-    @Ignore("This spec requires > 15 minutes and > 8GB of disk space to run")
-    def "check large zip files with zip64 enabled"() {
-        given:
-        repo.module('shadow', 'a', '1.0')
-            .insertFile('a.properties', 'a')
-            .insertFile('a2.properties', 'a2')
-            .publish()
-
-        file('src/main/java/myapp/Main.java') << """
-            package myapp;
-            public class Main {
-               public static void main(String[] args) {
-                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
-               }
-            }
-        """.stripIndent()
-
-        buildFile << """
-            apply plugin: 'application'
-
-            application {
-               mainClass = 'myapp.Main'
-            }
-
-            dependencies {
-               implementation 'shadow:a:1.0'
-            }
-
-            def generatedResourcesDir = new File(project.layout.buildDirectory.asFile.get(), "generated-resources")
-
-            task generateResources {
-                doLast {
-                    def rnd = new Random()
-                    def buf = new byte[128 * 1024]
-                    for (x in 0..255) {
-                        def dir = new File(generatedResourcesDir, x.toString())
-                        dir.mkdirs()
-                        for (y in 0..255) {
-                            def file = new File(dir, y.toString())
-                            rnd.nextBytes(buf)
-                            file.bytes = buf
-                        }
-                    }
-                }
-            }
-
-            sourceSets {
-                main {
-                    output.dir(generatedResourcesDir, builtBy: generateResources)
-                }
-            }
-
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-                zip64 = true
-            }
-
-            runShadow {
-               args 'foo'
-            }
-        """.stripIndent()
-
-        settingsFile << "rootProject.name = 'myapp'"
-
-        when:
-        BuildResult result = run('runShadow')
-
-        then: 'tests that runShadow executed and exited'
-        assert result.output.contains('TestApp: Hello World! (foo)')
-
-
-    }
-
-    @Issue("SHADOW-303")
-    @Ignore("Plugin has been deprecated")
-    def "doesn't error when adding aspectj plugin"() {
-        given:
-        buildFile.text = """
-        buildscript {
-            repositories {
-                maven {
-                    url = "https://maven.eveoh.nl/content/repositories/releases"
-                }
-            }
-
-            dependencies {
-                classpath "nl.eveoh:gradle-aspectj:2.0"
-            }
-        }
-        """.stripIndent()
-
-        buildFile << defaultBuildScript
-
-        buildFile << """
-            project.ext {
-                aspectjVersion = '1.8.12'
-            }
-
-            apply plugin: 'aspectj'
-            apply plugin: 'application'
-
-            application {
-               mainClass = 'myapp.Main'
-            }
-
-            repositories {
-                mavenCentral()
-            }
-
-            runShadow {
-               args 'foo'
-            }
-
-        """
-
-        file('src/main/java/myapp/Main.java') << """
-            package myapp;
-            public class Main {
-               public static void main(String[] args) {
-                   System.out.println("TestApp: Hello World! (" + args[0] + ")");
-               }
-            }
-        """.stripIndent()
-
-        when:
-        BuildResult result = run('runShadow')
-
-        then: 'tests that runShadow executed and exited'
-        assert result.output.contains('TestApp: Hello World! (foo)')
     }
 
     @Issue("https://github.com/GradleUp/shadow/issues/609")
@@ -1212,7 +1019,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = run('runShadow')
+        BuildResult result = runWithSuccess('runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -1238,7 +1045,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()

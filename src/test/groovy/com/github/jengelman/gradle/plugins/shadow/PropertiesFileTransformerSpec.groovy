@@ -34,7 +34,7 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
@@ -87,7 +87,7 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         output.exists()
@@ -121,7 +121,7 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         output.exists()
@@ -158,7 +158,7 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         output.exists()
@@ -202,7 +202,7 @@ class PropertiesFileTransformerSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         output.exists()

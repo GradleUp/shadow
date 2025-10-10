@@ -36,14 +36,14 @@ abstract class AbstractCachingSpec extends PluginSpecification {
     BuildResult runWithCacheEnabled(String... arguments) {
         List<String> cacheArguments = ['--build-cache']
         cacheArguments.addAll(arguments)
-        return run(cacheArguments)
+        return runWithSuccess(cacheArguments)
     }
 
     BuildResult runInAlternateDirWithCacheEnabled(String... arguments) {
         List<String> cacheArguments = ['--build-cache']
         cacheArguments.addAll(arguments)
         // TODO: Use PluginSpecification.run here to reuse flags, but cache tests failed for now, need to investigate.
-        return runner.withProjectDir(alternateDir.toFile()).withArguments(cacheArguments).build()
+        return runner().withProjectDir(alternateDir.toFile()).withArguments(cacheArguments).build()
     }
 
     void assertShadowJarHasResult(TaskOutcome expectedOutcome) {
