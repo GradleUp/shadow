@@ -23,9 +23,6 @@ jobs:
           # Gradle 8.3 doesn't support Java 25.
           - gradle: 8.3
             java: 25
-          # Gradle 9 doesn't support Java 11.
-          - gradle: current
-            java: 11
         include:
           - os: windows-latest
             gradle: 8.3
