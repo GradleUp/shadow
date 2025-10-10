@@ -32,12 +32,12 @@ jobs:
             java: 21
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}" --stacktrace
 
   # Status check that is required in branch protection rules.
@@ -61,12 +61,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'GradleUp/shadow' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: true
       - run: ./gradlew publishToMavenCentral
