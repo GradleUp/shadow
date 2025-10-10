@@ -14,15 +14,22 @@ jobs:
     name: OS=${{ matrix.os }}, Java=${{ matrix.java }}, Gradle=${{ matrix.gradle }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-24.04-arm ]
         # Always test on the latest version and some LTS.
-        java: [ 17, 21, 25 ]
+        java: [ 17, 25 ]
         # Test on the minimum Gradle version and the latest.
         gradle: [ 8.3, current ]
         exclude:
           # Gradle 8.3 doesn't support Java 25.
           - gradle: 8.3
             java: 25
+        include:
+          - os: windows-latest
+            gradle: 8.3
+            java: 17
+          - os: windows-latest
+            gradle: current
+            java: 21
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
