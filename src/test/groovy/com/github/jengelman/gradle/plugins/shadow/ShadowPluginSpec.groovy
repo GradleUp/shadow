@@ -256,7 +256,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -311,7 +311,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
         serverOutput.exists()
@@ -364,7 +364,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -419,7 +419,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -472,7 +472,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = file('server/build/libs/server-all.jar')
 
         when:
-        runWithDebug(':server:shadowJar')
+        run(':server:shadowJar')
 
         then:
         contains(serverOutput, [
@@ -550,7 +550,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        run(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -626,7 +626,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        run(':impl:shadowJar')
 
         then:
         serverOutput.exists()
@@ -840,7 +840,7 @@ class ShadowPluginSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        runWithDebug('shadowJar')
+        run('shadowJar')
 
         then:
         contains(output, ['api.properties', 'implementation.properties',
@@ -1036,7 +1036,7 @@ class ShadowPluginSpec extends PluginSpecification {
         File serverOutput = getFile('impl/build/libs/impl-1.0-all.jar')
 
         when:
-        runWithDebug(':impl:shadowJar')
+        run(':impl:shadowJar')
 
         then:
         serverOutput.exists()

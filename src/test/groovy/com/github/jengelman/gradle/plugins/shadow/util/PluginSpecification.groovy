@@ -76,10 +76,6 @@ abstract class PluginSpecification extends Specification {
         return result
     }
 
-    BuildResult runWithDebug(String... tasks) {
-        return run(tasks.toList(), { it.withDebug(true) })
-    }
-
     BuildResult runWithFailure(List<String> tasks, Function<GradleRunner, GradleRunner> runnerFunction = { it }) {
         def result = runnerFunction.apply(runner(tasks)).buildAndFail()
         assertNoDeprecationWarnings(result)
