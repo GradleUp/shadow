@@ -8,6 +8,7 @@ import spock.lang.Specification
 import spock.lang.TempDir
 
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.function.Function
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -17,7 +18,15 @@ abstract class PluginSpecification extends Specification {
     @TempDir
     Path dir
 
-    public static final String TEST_GRADLE_VERSION = System.getProperty("TEST_GRADLE_VERSION")
+    private static final String TEST_GRADLE_VERSION = System.getProperty("TEST_GRADLE_VERSION")
+
+    private static final Path TEST_KIT_DIR
+
+    static {
+        def gradleUserHome = System.getenv("GRADLE_USER_HOME")
+            ?: Paths.get(System.getProperty("user.home"), ".gradle").toAbsolutePath().toString()
+        TEST_KIT_DIR = Paths.get(gradleUserHome, "testkit")
+    }
 
     AppendableMavenFileRepository repo
 
@@ -54,26 +63,29 @@ abstract class PluginSpecification extends Specification {
         """.stripIndent()
     }
 
-    GradleRunner getRunner() {
+    GradleRunner runner(Collection<String> tasks = Collections.emptyList()) {
+        def extraArgs = ["--warning-mode=fail", "--configuration-cache", "--stacktrace"]
         GradleRunner.create()
             .withGradleVersion(TEST_GRADLE_VERSION)
             .withProjectDir(dir.toFile())
+            .withTestKitDir(TEST_KIT_DIR.toFile())
             .forwardOutput()
             .withPluginClasspath()
-    }
-
-    GradleRunner runner(Collection<String> tasks) {
-        runner.withArguments(["-Dorg.gradle.warning.mode=all", "--configuration-cache", "--stacktrace"] + tasks.toList())
+            .withArguments(extraArgs + tasks)
     }
 
     BuildResult runWithSuccess(String... tasks) {
-        runWithSuccess(tasks.toList())
+        return runWithSuccess(tasks.toList())
     }
 
     BuildResult runWithSuccess(List<String> tasks, Function<GradleRunner, GradleRunner> runnerFunction = { it }) {
         def result = runnerFunction.apply(runner(tasks)).build()
         assertNoDeprecationWarnings(result)
         return result
+    }
+
+    BuildResult runWithFailure(String... tasks) {
+        return runWithFailure(tasks.toList())
     }
 
     BuildResult runWithFailure(List<String> tasks, Function<GradleRunner, GradleRunner> runnerFunction = { it }) {
@@ -90,7 +102,8 @@ abstract class PluginSpecification extends Specification {
 
     static boolean containsDeprecationWarning(String output) {
         output.contains("has been deprecated and is scheduled to be removed in Gradle") ||
-            output.contains("has been deprecated. This is scheduled to be removed in Gradle")
+            output.contains("has been deprecated. This is scheduled to be removed in Gradle") ||
+            output.contains("will fail with an error in Gradle")
     }
 
     File getBuildFile() {

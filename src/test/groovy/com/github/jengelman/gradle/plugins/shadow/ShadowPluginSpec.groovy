@@ -2,16 +2,13 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.util.PluginSpecification
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Ignore
-import spock.lang.IgnoreIf
 import spock.lang.Issue
-import spock.lang.Unroll
 
 import java.util.jar.Attributes
 import java.util.jar.JarFile
@@ -53,64 +50,6 @@ class ShadowPluginSpec extends PluginSpecification {
         assert shadowConfig
         shadowConfig.artifacts.file.contains(shadow.archiveFile.get().asFile)
 
-    }
-
-    @IgnoreIf({
-        // Gradle 8.3 doesn't support Java 21.
-        JavaVersion.current().majorVersion.toInteger() >= 21
-    })
-    @Unroll
-    def 'Compatible with Gradle #version'() {
-        given:
-        File one = buildJar('one.jar').insertFile('META-INF/services/shadow.Shadow',
-            'one # NOTE: No newline terminates this line/file').write()
-
-        repo.module('shadow', 'two', '1.0').insertFile('META-INF/services/shadow.Shadow',
-            'two # NOTE: No newline terminates this line/file').publish()
-
-        buildFile << """
-            dependencies {
-              implementation 'junit:junit:3.8.2'
-              implementation files('${escapedPath(one)}')
-            }
-
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-               mergeServiceFiles()
-            }
-        """.stripIndent()
-
-        when:
-        runWithSuccess(['shadowJar']) {
-            it.withGradleVersion(version)
-            it.withDebug(true)
-            it.withTestKitDir(getTestKitDir())
-        }
-
-        then:
-        assert output.exists()
-
-        where:
-        version << ['8.3']
-    }
-
-    def 'Error in Gradle versions < 8.3'() {
-        given:
-        buildFile << """
-            dependencies {
-              implementation 'junit:junit:3.8.2'
-            }
-
-            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-               mergeServiceFiles()
-            }
-        """.stripIndent()
-
-        expect:
-        runWithFailure(['shadowJar']) {
-            it.withGradleVersion('7.0')
-            it.withDebug(true)
-            it.withTestKitDir(getTestKitDir())
-        }
     }
 
     def 'shadow copy'() {

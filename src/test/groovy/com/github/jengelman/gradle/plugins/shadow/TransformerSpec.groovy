@@ -745,7 +745,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         """.stripIndent()
 
         when:
-        runWithSuccess('shadowJar', '--warning-mode=all')
+        runWithSuccess('shadowJar')
 
         then:
         assert output.exists()
