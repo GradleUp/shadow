@@ -57,7 +57,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('publish')
+        runWithSuccess('publish')
 
         then:
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
@@ -125,7 +125,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('publish')
+        runWithSuccess('publish')
 
         then:
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0-my-classifier.my-ext').canonicalFile
@@ -206,7 +206,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripMargin()
 
         when:
-        run('publish')
+        runWithSuccess('publish')
 
         then:
         File publishedFile = publishingRepo.rootDir.file('shadow/maven-all/1.0/maven-all-1.0.jar').canonicalFile
@@ -270,7 +270,7 @@ class PublishingSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('publish')
+        runWithSuccess('publish')
 
         then:
         File mainJar = publishingRepo.rootDir.file('com/acme/maven/1.0/maven-1.0.jar').canonicalFile

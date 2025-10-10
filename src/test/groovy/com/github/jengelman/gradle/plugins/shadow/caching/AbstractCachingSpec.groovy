@@ -36,7 +36,7 @@ abstract class AbstractCachingSpec extends PluginSpecification {
     BuildResult runWithCacheEnabled(String... arguments) {
         List<String> cacheArguments = ['--build-cache']
         cacheArguments.addAll(arguments)
-        return run(cacheArguments)
+        return runWithSuccess(cacheArguments)
     }
 
     BuildResult runInAlternateDirWithCacheEnabled(String... arguments) {

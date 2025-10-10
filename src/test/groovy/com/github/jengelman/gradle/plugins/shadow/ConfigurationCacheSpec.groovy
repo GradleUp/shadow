@@ -52,8 +52,8 @@ class ConfigurationCacheSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        run('shadowJar')
-        def result = run('shadowJar')
+        runWithSuccess('shadowJar')
+        def result = runWithSuccess('shadowJar')
 
         then:
         result.output.contains("Reusing configuration cache.")
@@ -68,9 +68,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
         output.delete()
-        def result = run('shadowJar')
+        def result = runWithSuccess('shadowJar')
 
         then:
         contains(output, ['a.properties', 'b.properties'])
@@ -120,9 +120,9 @@ class ConfigurationCacheSpec extends PluginSpecification {
         def output = getFile('server/build/libs/server-all.jar')
 
         when:
-        run('shadowJar', '-s')
+        runWithSuccess('shadowJar', '-s')
         output.delete()
-        def result = run('shadowJar', '-s')
+        def result = runWithSuccess('shadowJar', '-s')
 
         then:
         output.exists()
@@ -163,8 +163,8 @@ class ConfigurationCacheSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar', '-s')
-        def result = run('shadowJar', '-s')
+        runWithSuccess('shadowJar', '-s')
+        def result = runWithSuccess('shadowJar', '-s')
 
         then:
         result.output.contains(":lib:shadowJar UP-TO-DATE")

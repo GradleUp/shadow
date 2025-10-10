@@ -66,11 +66,11 @@ abstract class PluginSpecification extends Specification {
         runner.withArguments(["-Dorg.gradle.warning.mode=all", "--configuration-cache", "--stacktrace"] + tasks.toList())
     }
 
-    BuildResult run(String... tasks) {
-        run(tasks.toList())
+    BuildResult runWithSuccess(String... tasks) {
+        runWithSuccess(tasks.toList())
     }
 
-    BuildResult run(List<String> tasks, Function<GradleRunner, GradleRunner> runnerFunction = { it }) {
+    BuildResult runWithSuccess(List<String> tasks, Function<GradleRunner, GradleRunner> runnerFunction = { it }) {
         def result = runnerFunction.apply(runner(tasks)).build()
         assertNoDeprecationWarnings(result)
         return result

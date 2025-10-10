@@ -27,7 +27,7 @@ class RelocationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, [
@@ -95,7 +95,7 @@ class RelocationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, [
@@ -158,7 +158,7 @@ class RelocationSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, [
@@ -230,7 +230,7 @@ class RelocationSpec extends PluginSpecification {
         '''.stripIndent()
 
         when:
-        run(':app:shadowJar')
+        runWithSuccess(':app:shadowJar')
 
         then:
         File appOutput = getFile('app/build/libs/app-all.jar')
@@ -271,7 +271,7 @@ class RelocationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         contains(output, [
@@ -316,7 +316,7 @@ class RelocationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        run('shadowJar')
+        runWithSuccess('shadowJar')
 
         then:
         noExceptionThrown()
