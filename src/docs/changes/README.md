@@ -6,6 +6,7 @@
 **Changed**
 
 - Stop using start script templates bundled in Shadow. ([#1750](https://github.com/GradleUp/shadow/pull/1750))
+- Update ASM and jdependency to support Java 26. ([#1799](https://github.com/GradleUp/shadow/pull/1799))
 
 **Fixed**
 
