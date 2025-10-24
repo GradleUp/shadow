@@ -99,7 +99,10 @@ publishing.publications.withType<MavenPublication>().configureEach {
 }
 
 configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
-  attributes.attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("9.0.0"))
+  attributes.attribute(
+    GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+    objects.named(libs.versions.minGradle.get()),
+  )
 }
 
 val testGradleVersion: String = providers.gradleProperty("testGradleVersion").orNull.let {
