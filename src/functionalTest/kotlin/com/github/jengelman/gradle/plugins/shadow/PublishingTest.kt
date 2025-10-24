@@ -19,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
+import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -62,7 +63,7 @@ class PublishingTest : BasePluginTest() {
   @DisabledOnOs(
     OS.WINDOWS,
     architectures = ["aarch64"],
-    disabledReason = "Cannot use toolchain on Windows ARM64", // TODO: https://github.com/gradle/gradle/issues/29807
+    disabledReason = "Cannot use toolchain on Windows ARM64", // TODO: remove when min Gradle is bumped to 9.2+
   )
   @Test
   fun publishShadowJarWithCorrectTargetJvm() {
@@ -91,6 +92,13 @@ class PublishingTest : BasePluginTest() {
     val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
     val targetJvmAttr8 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "8"
 
+    settingsScript.prependText(
+      """
+        plugins {
+          id 'org.gradle.toolchains.foojay-resolver-convention'
+        }
+      """.trimIndent() + lineSeparator,
+    )
     projectScript.appendText(
       """
         java {
