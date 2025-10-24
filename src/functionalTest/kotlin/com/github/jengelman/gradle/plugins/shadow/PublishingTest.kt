@@ -19,6 +19,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
+import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -29,7 +30,6 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
-import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
@@ -85,12 +85,12 @@ class PublishingTest : BasePluginTest() {
     val targetJvmAttr11 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "11"
     val targetJvmAttr8 = TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name to "8"
 
-    settingsScript.writeText(
+    settingsScript.prependText(
       """
         plugins {
           id 'org.gradle.toolchains.foojay-resolver-convention'
         }
-      """.trimIndent() + lineSeparator + settingsScript.readText(),
+      """.trimIndent() + lineSeparator,
     )
     projectScript.appendText(
       """
