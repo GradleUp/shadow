@@ -3,44 +3,40 @@
   extends: [
     'config:recommended',
   ],
-  "labels": [
-    "dependencies",
+  labels: [
+    'dependencies',
   ],
-  "packageRules": [
+  packageRules: [
     {
-      // https://github.com/tcurdt/jdependency/issues/325
-      "groupName": "ASM and jdependency",
-      "matchPackageNames": [
-        "org.vafer:jdependency",
-        "org.ow2.asm:asm-commons"
+      groupName: 'ASM and jdependency',
+      matchPackageNames: [
+        'org.vafer:jdependency',
+        'org.ow2.asm:asm-commons',
       ],
     },
     {
-      "groupName": "Develocity",
-      "matchPackageNames": [
-        "com.gradle:develocity-gradle-plugin",
-        "com.gradle.develocity:com.gradle.develocity.gradle.plugin",
+      groupName: 'Develocity',
+      matchPackageNames: [
+        'com.gradle:develocity-gradle-plugin',
+        'com.gradle.develocity:com.gradle.develocity.gradle.plugin',
       ],
     },
   ],
   ignorePresets: [
-    // Ensure we get the latest version and are not pinned to old versions.
     'workarounds:javaLTSVersions',
   ],
   customManagers: [
-    // Update .java-version file with the latest JDK version.
     {
       customType: 'regex',
-      fileMatch: [
-        '\\.java-version$',
+      managerFilePatterns: [
+        '/\\.java-version$/',
       ],
       matchStrings: [
         '(?<currentValue>.*)\\n',
       ],
       datasourceTemplate: 'java-version',
       depNameTemplate: 'java',
-      // Only write the major version.
       extractVersionTemplate: '^(?<version>\\d+)',
     },
-  ]
+  ],
 }
