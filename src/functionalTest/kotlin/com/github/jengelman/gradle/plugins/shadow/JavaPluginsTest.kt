@@ -24,12 +24,12 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
@@ -899,13 +899,12 @@ class JavaPluginsTest : BasePluginTest() {
   @Test
   fun integrateWithDevelocityBuildScan() {
     writeClientAndServerModules()
-    settingsScript.writeText(
+    settingsScript.prependText(
       """
         plugins {
           id 'com.gradle.develocity'
         }
-        ${settingsScript.readText()}
-      """.trimIndent(),
+      """.trimIndent() + lineSeparator,
     )
 
     val result = runWithSuccess(
