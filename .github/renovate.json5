@@ -8,6 +8,7 @@
   ],
   packageRules: [
     {
+      // https://github.com/tcurdt/jdependency/issues/325
       groupName: 'ASM and jdependency',
       matchPackageNames: [
         'org.vafer:jdependency',
