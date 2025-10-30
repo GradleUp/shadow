@@ -226,7 +226,6 @@ abstract class BasePluginTest {
     jvmLang: JvmLang = JvmLang.Java,
     content: () -> String = {
       when (jvmLang) {
-        JvmLang.Groovy,
         JvmLang.Java,
         -> {
           val imports = if (withImports) "import junit.framework.Test;" else ""
@@ -256,22 +255,6 @@ abstract class BasePluginTest {
               val content ="Hello, World! (%s) from $className".format(*args)
               println(content)
               println($classRef)
-            }
-          """.trimIndent()
-        }
-        JvmLang.Scala -> {
-          val imports = if (withImports) "import junit.framework.Test" else ""
-          val classRef = if (withImports) "\"Refs: \" + classOf[Test].getName" else "\"Refs: null\""
-          """
-            package $packageName
-            $imports
-            object $className {
-              def main(args: Array[String]): Unit = {
-                if (args.isEmpty) throw new IllegalArgumentException("No arguments provided.")
-                val content = s"Hello, World! (%s) from $className".format(args: _*)
-                println(content)
-                println($classRef)
-              }
             }
           """.trimIndent()
         }
