@@ -22,9 +22,6 @@ dependent libraries into the output jar without incurring the I/O overhead of ex
 
 | Shadow Version | Min Gradle Version | Min Java Version | Plugin ID                                            |
 |----------------|--------------------|------------------|------------------------------------------------------|
-| 5.2.0 - 6.1.0  | 5.x - 6.x          | 7                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
-| 6.1.0+         | 6.x                | 8                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
-| 7.0.0+         | 7.x                | 8                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
 | 8.0.0+         | 8.0                | 8                | [`com.github.johnrengelman.shadow`][johnrengelman's] |
 | 8.3.0+         | 8.3                | 8                | [`com.gradleup.shadow`][gradleup's]                  |
 | 9.0.0+         | 8.11               | 11               | [`com.gradleup.shadow`][gradleup's]                  |
