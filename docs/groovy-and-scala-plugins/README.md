@@ -69,3 +69,5 @@ For Scala:
       }
     }
     ```
+
+You can customize the other configurations of the `shadowJar` task as needed, just like with Java projects.
