@@ -15,6 +15,11 @@ version = providers.gradleProperty("VERSION_NAME").get()
 group = providers.gradleProperty("GROUP").get()
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 gradlePlugin {
   website = providers.gradleProperty("POM_URL")
   vcsUrl = providers.gradleProperty("POM_URL")
@@ -86,14 +91,6 @@ dependencies {
   testImplementation(platform("org.junit:junit-bom:5.13.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.platform:junit-platform-suite-engine")
-}
-
-tasks.withType<GroovyCompile>().configureEach {
-  options.release = 8
-}
-
-tasks.withType<JavaCompile>().configureEach {
-  options.release = 8
 }
 
 tasks.withType<Test>().configureEach {
