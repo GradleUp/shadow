@@ -323,6 +323,24 @@ If you don't need the standard JAR, you can disable the `jar` task like:
     }
     ```
 
+Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.jar {
+      archiveClassifier = "ignored"
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('jar', Jar) {
+      archiveClassifier = 'ignored'
+    }
+    ```
+
 ## Publishing the Shadowed Gradle Plugins
 
 The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
