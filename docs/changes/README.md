@@ -9,6 +9,10 @@
 - Update ASM and jdependency to support Java 26. ([#1799](https://github.com/GradleUp/shadow/pull/1799))
 - Bump min Gradle requirement to 9.0.0. ([#1801](https://github.com/GradleUp/shadow/pull/1801))
 
+### Fixed
+
+- Fix Develocity integration when Isolated Projects enabled. ([#1836](https://github.com/GradleUp/shadow/pull/1836))
+
 ## [9.2.2](https://github.com/GradleUp/shadow/compare/9.2.2) - 2025-09-26
 
 ### Fixed

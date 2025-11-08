@@ -45,8 +45,9 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
 
-@Suppress("GradleProjectIsolation") // TODO: we can't call 'providers.gradleProperty' instead due to https://github.com/gradle/gradle/issues/23572.
-internal fun Project.findOptionalProperty(propertyName: String): String? = findProperty(propertyName)?.toString()
+@Suppress("GradleProjectIsolation") // TODO: https://github.com/gradle/gradle/issues/23572
+internal fun Project.findOptionalProperty(propertyName: String): String? = providers.gradleProperty(propertyName).orNull
+  ?: findProperty(propertyName)?.toString()
 
 internal fun Project.addBuildScanCustomValues() {
   val develocity = extensions.findByType(DevelocityConfiguration::class.java) ?: return
