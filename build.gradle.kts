@@ -51,6 +51,8 @@ lint {
   ignoreTestSources = true
   warningsAsErrors = true
   disable += "NewerVersionAvailable"
+  disable += "GradleDependency"
+  disable += "AndroidGradlePluginVersion"
 }
 
 spotless {
