@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgpVersion
+import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgp
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import org.gradle.api.Plugin
@@ -36,7 +36,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         },
       )
 
-      if (!isAtLeastKgpVersion(1, 9, 0)) return@registerShadowJarCommon
+      if (!isAtLeastKgp("1.9.0")) return@registerShadowJarCommon
 
       @OptIn(ExperimentalKotlinGradlePluginApi::class)
       target.mainRun {
