@@ -5,16 +5,16 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
 internal const val KOTLIN_MULTIPLATFORM_PLUGIN_ID = "org.jetbrains.kotlin.multiplatform"
 
-internal fun Project.isAtLeastKgpVersion(
-  major: Int,
-  minor: Int,
-  patch: Int,
+internal fun Project.isAtLeastKgp(
+  version: String,
   id: String = KOTLIN_MULTIPLATFORM_PLUGIN_ID,
 ): Boolean {
-  val plugin = plugins.getPlugin(id) as KotlinBasePlugin
-  val elements = plugin.pluginVersion.takeWhile { it != '-' }.split(".")
-  val kgpMajor = elements[0].toInt()
-  val kgpMinor = elements[1].toInt()
-  val kgpPatch = elements[2].toInt()
-  return kgpMajor > major || (kgpMajor == major && (kgpMinor > minor || (kgpMinor == minor && kgpPatch >= patch)))
+  val (major, minor, patch) = version.normalizeVersion()
+  val (actualMajor, actualMinor, actualPatch) = (plugins.getPlugin(id) as KotlinBasePlugin).pluginVersion.normalizeVersion()
+  return KotlinVersion(actualMajor, actualMinor, actualPatch) >= KotlinVersion(major, minor, patch)
+}
+
+private fun String.normalizeVersion(): Triple<Int, Int, Int> {
+  val (major, minor, patch) = takeWhile { it != '-' }.split(".").map { it.toInt() }
+  return Triple(major, minor, patch)
 }
