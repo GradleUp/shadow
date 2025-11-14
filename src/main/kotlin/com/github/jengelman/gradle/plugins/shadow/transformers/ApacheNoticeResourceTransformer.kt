@@ -12,6 +12,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 
 /**
@@ -33,6 +34,30 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
    * Fallback [copyright] as the [Property] value can't be changed in execution phase.
    */
   private var fallbackCopyright: String? = null
+
+  /**
+   * Paths to consider as a notice files, evaluated using `it.equals(path, ignoreCase = true)`.
+   *
+   * Defaults to `META-INF/NOTICE`.
+   */
+  @get:Input
+  public open val paths: SetProperty<String> = objectFactory.setProperty(String::class.java).value(setOf("META-INF/NOTICE"))
+
+  /**
+   * Paths to consider as a notice files, evaluated using `it.regionMatches(0, path, 0, it.length, ignoreCase = true)`.
+   *
+   * Defaults to `META-INF/NOTICE.txt` and `META-INF/NOTICE.md`.
+   */
+  @get:Input
+  public open val regionMatchPaths: SetProperty<String> = objectFactory.setProperty(String::class.java).value(setOf("META-INF/NOTICE.txt", "META-INF/NOTICE.md"))
+
+  /**
+   * Path of the resulting output file.
+   *
+   * Defaults to `META-INF/NOTICE`.
+   */
+  @get:Input
+  public open val outputPath: Property<String> = objectFactory.property("META-INF/NOTICE")
 
   @get:Input
   public open val projectName: Property<String> = objectFactory.property("")
@@ -77,9 +102,11 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.path
-    return NOTICE_PATH.equals(path, ignoreCase = true) ||
-      NOTICE_TXT_PATH.equals(path, ignoreCase = true) ||
-      NOTICE_MD_PATH.equals(path, ignoreCase = true)
+    return paths.get().any {
+      it.equals(path, ignoreCase = true)
+    } || regionMatchPaths.get().any {
+      it.regionMatches(0, path, 0, it.length, ignoreCase = true)
+    }
   }
 
   override fun transform(context: TransformerContext) {
@@ -184,16 +211,10 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
       }
     }
 
-    os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
+    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
     os.write(sb.toString().trim().toByteArray(charset))
     os.closeEntry()
 
     entries.clear()
-  }
-
-  private companion object {
-    private const val NOTICE_PATH = "META-INF/NOTICE"
-    private const val NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
-    private const val NOTICE_MD_PATH = "META-INF/NOTICE.md"
   }
 }

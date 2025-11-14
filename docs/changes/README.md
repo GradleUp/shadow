@@ -9,6 +9,7 @@
 - Update ASM and jdependency to support Java 26. ([#1799](https://github.com/GradleUp/shadow/pull/1799))
 - Bump min Gradle requirement to 9.0.0. ([#1801](https://github.com/GradleUp/shadow/pull/1801))
 - Fix `ApacheLicenseResourceTransformer` to not remove `META-INF/LICENSE*` files ([#1842](https://github.com/GradleUp/shadow/pull/1842))
+- Configurable match-patterns for `ApacheLicenseResourceTransformer` + `ApacheNoticeResourceTransformer` files ([#1842](https://github.com/GradleUp/shadow/pull/1845))
 
 ## [9.2.2](https://github.com/GradleUp/shadow/compare/9.2.2) - 2025-09-26
 
