@@ -6,6 +6,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStrea
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
+import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
 import kotlin.io.path.createTempFile
@@ -14,6 +15,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.io.TempDir
 
 abstract class BaseTransformerTest<T : ResourceTransformer> {
   protected lateinit var transformer: T
@@ -37,6 +39,16 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
         private val _relativePath = RelativePath.parse(isFile, path)
         override fun getPath(): String = _relativePath.pathString
         override fun getRelativePath(): RelativePath = _relativePath
+      }
+      return canTransformResource(element)
+    }
+
+    fun ResourceTransformer.canTransformResource(path: String, file: File): Boolean {
+      val element = object : FileTreeElement by noOpDelegate() {
+        private val _relativePath = RelativePath.parse(true, path)
+        override fun getPath(): String = _relativePath.pathString
+        override fun getRelativePath(): RelativePath = _relativePath
+        override fun getFile(): File = file
       }
       return canTransformResource(element)
     }
