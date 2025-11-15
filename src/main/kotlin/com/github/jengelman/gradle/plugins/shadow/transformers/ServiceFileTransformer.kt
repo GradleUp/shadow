@@ -24,12 +24,12 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ServiceFileTransformer(
-  private val patternSet: PatternSet = PatternSet()
-    .include(SERVICES_PATTERN)
-    .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-) : ResourceTransformer,
-  PatternFilterable by patternSet {
+public open class ServiceFileTransformer :
+  PatternFilterableResourceTransformer(
+    patternSet = PatternSet()
+      .include(SERVICES_PATTERN)
+      .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+  ) {
   @get:Internal
   internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 
@@ -62,12 +62,6 @@ public open class ServiceFileTransformer(
       os.closeEntry()
     }
   }
-
-  @Input // Trigger task executions after includes changed.
-  override fun getIncludes(): MutableSet<String> = patternSet.includes
-
-  @Input // Trigger task executions after excludes changed.
-  override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
   private companion object {
     private const val SERVICES_PATH = "META-INF/services"
