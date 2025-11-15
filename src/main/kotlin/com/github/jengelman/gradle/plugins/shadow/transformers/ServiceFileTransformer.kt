@@ -4,10 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 
 /**
@@ -38,10 +35,6 @@ public open class ServiceFileTransformer(
       field = value
       patternSet.setIncludes(listOf("$value/**"))
     }
-
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return patternSet.asSpec.isSatisfiedBy(element)
-  }
 
   override fun transform(context: TransformerContext) {
     val resource = path + "/" +
