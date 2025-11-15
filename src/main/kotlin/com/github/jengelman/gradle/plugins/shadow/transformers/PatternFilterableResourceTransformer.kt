@@ -6,6 +6,11 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 
+/**
+ * A base class for resource transformers that support pattern filtering.
+ *
+ * @param patternSet The [PatternSet] used for filtering resources.
+ */
 public abstract class PatternFilterableResourceTransformer(
   @Internal public val patternSet: PatternSet,
 ) : ResourceTransformer by ResourceTransformer.Companion,
