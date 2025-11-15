@@ -29,7 +29,7 @@ pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.r
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha05"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.1"
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.8.0"
 
 junit-bom = "org.junit:junit-bom:6.0.1"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
