@@ -6,6 +6,7 @@
 ### Added
 
 - Add `PatternFilterableResourceTransformer` to simplify pattern based `ResourceTransformer`s. ([#1849](https://github.com/GradleUp/shadow/pull/1849))
+- Expose `patternSet` of `ServiceFileTransformer` as `public`. ([#1849](https://github.com/GradleUp/shadow/pull/1849))
 
 ### Changed
 

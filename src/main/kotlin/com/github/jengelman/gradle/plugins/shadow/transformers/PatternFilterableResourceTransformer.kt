@@ -6,7 +6,7 @@ import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 
 public abstract class PatternFilterableResourceTransformer(
-  @Internal internal val patternSet: PatternSet = PatternSet(),
+  @Internal public val patternSet: PatternSet,
 ) : ResourceTransformer,
   PatternFilterable by patternSet {
 
