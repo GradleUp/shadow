@@ -21,6 +21,7 @@
     enableKotlinModuleRemapping = false
   }
   ```
+- Add `DeduplicatingResourceTransformer` to deduplicate on path _and_ content. ([#1859](https://github.com/GradleUp/shadow/pull/1859))
 
 ### Changed
 

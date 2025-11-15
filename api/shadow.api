@@ -329,6 +329,15 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsX
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion {
 }
 
+public class com/github/jengelman/gradle/plugins/shadow/transformers/DeduplicatingResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/transformers/DontIncludeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
