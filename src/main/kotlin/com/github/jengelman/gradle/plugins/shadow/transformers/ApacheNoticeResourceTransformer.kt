@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.WithPatternFilterable
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.nio.charset.Charset
@@ -24,7 +25,15 @@ import org.gradle.api.tasks.Input
 @CacheableTransformer
 public open class ApacheNoticeResourceTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
-) : ResourceTransformer {
+) : WithPatternFilterable(
+  defaultIncludes =
+  setOf(
+    "META-INF/NOTICE",
+    "META-INF/NOTICE.txt",
+    "META-INF/NOTICE.md",
+  ),
+),
+  ResourceTransformer {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
   private inline val charset get() = Charset.forName(charsetName.get())
@@ -75,11 +84,13 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.UTF_8.name())
 
+  /** Path to write the notice file to. Defaults to `META-INF/NOTICE`. */
+  @get:Input
+  public val outputPath: Property<String> =
+    objectFactory.property(String::class.java).value("META-INF/NOTICE")
+
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return NOTICE_PATH.equals(path, ignoreCase = true) ||
-      NOTICE_TXT_PATH.equals(path, ignoreCase = true) ||
-      NOTICE_MD_PATH.equals(path, ignoreCase = true)
+    return patternSpec.isSatisfiedBy(element)
   }
 
   override fun transform(context: TransformerContext) {
@@ -184,16 +195,10 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
       }
     }
 
-    os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
+    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
     os.write(sb.toString().trim().toByteArray(charset))
     os.closeEntry()
 
     entries.clear()
-  }
-
-  private companion object {
-    private const val NOTICE_PATH = "META-INF/NOTICE"
-    private const val NOTICE_TXT_PATH = "META-INF/NOTICE.txt"
-    private const val NOTICE_MD_PATH = "META-INF/NOTICE.md"
   }
 }
