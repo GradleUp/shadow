@@ -2,11 +2,14 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.Assert
 import assertk.assertions.containsAtLeast
+import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import java.io.InputStream
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.jar.JarFile
+import java.util.jar.JarInputStream
 import java.util.zip.ZipFile
 
 /**
@@ -44,6 +47,26 @@ fun ZipFile.getStream(entryName: String): InputStream {
 
 fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
 
+/**
+ * Scans the jar file for all entries that match the specified [entryName],
+ * [getContent] or [getStream] return only one of the matching entries;
+ * which one these functions return is undefined.
+ */
+fun Assert<JarPath>.getContents(entryName: String) = transform {
+  Files.newInputStream(it.path).use {
+    val jarInput = JarInputStream(it)
+    val contents = mutableListOf<String>()
+    while (true) {
+      val entry = jarInput.nextEntry ?: break
+      if (entry.name == entryName) {
+        contents.add(jarInput.readAllBytes().toString(Charsets.UTF_8))
+      }
+      jarInput.closeEntry()
+    }
+    contents
+  }
+}
+
 fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
 
 /**
@@ -63,6 +86,12 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
  * Used alone, without [containsAtLeast] or [containsNone].
  */
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
+
+/**
+ * Ensures the JAR contains only the specified entries.
+ * Used alone, without [containsAtLeast] or [containsNone].
+ */
+fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) = toEntries().containsExactlyInAnyOrder(*entries)
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }
