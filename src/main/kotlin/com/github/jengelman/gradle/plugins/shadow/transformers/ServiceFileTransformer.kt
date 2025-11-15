@@ -24,12 +24,11 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ServiceFileTransformer :
-  PatternFilterableResourceTransformer(
-    patternSet = PatternSet()
-      .include(SERVICES_PATTERN)
-      .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-  ) {
+public open class ServiceFileTransformer(
+  patternSet: PatternSet = PatternSet()
+    .include(SERVICES_PATTERN)
+    .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+) : PatternFilterableResourceTransformer(patternSet = patternSet) {
   @get:Internal
   internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 
