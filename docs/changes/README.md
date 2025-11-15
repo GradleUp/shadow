@@ -7,6 +7,7 @@
 
 - Add `PatternFilterableResourceTransformer` to simplify pattern based `ResourceTransformer`s. ([#1849](https://github.com/GradleUp/shadow/pull/1849))
 - Expose `patternSet` of `ServiceFileTransformer` as `public`. ([#1849](https://github.com/GradleUp/shadow/pull/1849))
+- Expose `patternSet` of `ApacheLicenseResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1850))
 
 ### Changed
 
