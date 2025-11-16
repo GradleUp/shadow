@@ -10,7 +10,7 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ApacheLicenseResourceTransformer(
+public open class ApacheLicenseResourceTransformer @JvmOverloads constructor(
   patternSet: PatternSet = PatternSet()
     .apply { isCaseSensitive = false }
     .include(

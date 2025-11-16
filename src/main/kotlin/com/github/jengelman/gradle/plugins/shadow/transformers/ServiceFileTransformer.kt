@@ -21,7 +21,7 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ServiceFileTransformer(
+public open class ServiceFileTransformer @JvmOverloads constructor(
   patternSet: PatternSet = PatternSet()
     .include(SERVICES_PATTERN)
     .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
