@@ -3,6 +3,11 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.2.2...HEAD) - 2025-xx-xx
 
+### Added
+
+- Add `PatternFilterableResourceTransformer` to simplify pattern based `ResourceTransformer`s. ([#1849](https://github.com/GradleUp/shadow/pull/1849))
+- Expose `patternSet` of `ServiceFileTransformer` as `public`. ([#1849](https://github.com/GradleUp/shadow/pull/1849))
+
 ### Changed
 
 - Change the group of `startShadowScripts` from `application` to `other`. ([#1797](https://github.com/GradleUp/shadow/pull/1797))
