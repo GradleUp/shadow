@@ -14,8 +14,14 @@ public open class ApacheLicenseResourceTransformer @JvmOverloads constructor(
   patternSet: PatternSet = PatternSet()
     .apply { isCaseSensitive = false }
     .include(
-      "META-INF/LICENSE",
-      "META-INF/LICENSE.txt",
-      "META-INF/LICENSE.md",
+      LICENSE_PATH,
+      LICENSE_TXT_PATH,
+      LICENSE_MD_PATH,
     ),
-) : PatternFilterableResourceTransformer(patternSet = patternSet)
+) : PatternFilterableResourceTransformer(patternSet = patternSet) {
+  private companion object {
+    private const val LICENSE_PATH = "META-INF/LICENSE"
+    private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"
+    private const val LICENSE_MD_PATH = "META-INF/LICENSE.md"
+  }
+}
