@@ -42,6 +42,7 @@ public open class PreserveFirstFoundResourceTransformer(
   public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
+    // Init once before patternSpec is accessed.
     includeResources
     return patternSpec.isSatisfiedBy(element) && !found.add(element.path)
   }
