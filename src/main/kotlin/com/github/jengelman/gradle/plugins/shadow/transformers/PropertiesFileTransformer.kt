@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
@@ -111,7 +111,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   internal val conflicts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 
   @get:Internal
-  internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
+  internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
 
   @get:Input
   public open val paths: SetProperty<String> = objectFactory.setProperty()
@@ -125,6 +125,22 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val mergeSeparator: Property<String> = objectFactory.property(",")
 
+  /**
+   * Properties files are written without escaping unicode characters using the character set
+   * configured by [charsetName].
+   *
+   * Set this property to `true` to escape all unicode characters in the properties file, producing
+   * ASCII compatible files.
+   */
+  @get:Input
+  public open val escapeUnicode: Property<Boolean> = objectFactory.property(false)
+
+  /**
+   * The character set to use when reading and writing property files.
+   * Defaults to `ISO-8859-1`.
+   *
+   * See also [escapeUnicode].
+   */
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
@@ -148,49 +164,35 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    val props = propertiesEntries[context.path]
-    val incoming = loadAndTransformKeys(context.inputStream)
-    if (props == null) {
-      propertiesEntries[context.path] = incoming
-    } else {
-      for ((key, value) in incoming) {
-        if (props.containsKey(key)) {
-          when (MergeStrategy.from(mergeStrategyFor(context.path))) {
-            MergeStrategy.Latest -> {
-              props[key] = value
-            }
-            MergeStrategy.Append -> {
-              props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
-            }
-            MergeStrategy.First -> Unit
-            MergeStrategy.Fail -> {
-              val conflictsForPath: MutableMap<String, Int> = conflicts.computeIfAbsent(context.path) { mutableMapOf() }
-              conflictsForPath.compute(key as String) { _, count -> (count ?: 1) + 1 }
-            }
+    val props = propertiesEntries.computeIfAbsent(context.path) { ReproducibleProperties() }.props
+    val mergeStrategy = MergeStrategy.from(mergeStrategyFor(context.path))
+    val mergeSeparator = if (mergeStrategy == MergeStrategy.Append) mergeSeparatorFor(context.path) else ""
+    loadAndTransformKeys(context.inputStream) { key, value ->
+      if (props.containsKey(key)) {
+        when (mergeStrategy) {
+          MergeStrategy.Latest -> {
+            props[key] = value
           }
-        } else {
-          props[key] = value
+          MergeStrategy.Append -> {
+            props[key] = props[key] + mergeSeparator + value
+          }
+          MergeStrategy.First -> Unit
+          MergeStrategy.Fail -> {
+            val conflictsForPath: MutableMap<String, Int> = conflicts.computeIfAbsent(context.path) { mutableMapOf() }
+            conflictsForPath.compute(key as String) { _, count -> (count ?: 1) + 1 }
+          }
         }
+      } else {
+        props[key] = value
       }
     }
   }
 
-  private fun loadAndTransformKeys(inputStream: InputStream): CleanProperties {
-    val props = CleanProperties()
+  private fun loadAndTransformKeys(inputStream: InputStream, keyValue: (key: String, value: String) -> Unit) {
+    val props = Properties()
     // InputStream closed by caller, so we don't do it here.
     props.load(inputStream.bufferedReader(charset))
-    return transformKeys(props)
-  }
-
-  private fun transformKeys(properties: Properties): CleanProperties {
-    if (keyTransformer == IDENTITY) {
-      return properties as CleanProperties
-    }
-    val result = CleanProperties()
-    properties.forEach { (key, value) ->
-      result[keyTransformer(key as String)] = value
-    }
-    return result
+    props.forEach { keyValue(keyTransformer(it.key as String), it.value as String) }
   }
 
   private fun mergeStrategyFor(path: String): String {
@@ -235,13 +237,9 @@ public open class PropertiesFileTransformer @Inject constructor(
     }
 
     // Cannot close the writer as the OutputStream needs to remain open.
-    val zipWriter = os.writer(charset)
     propertiesEntries.forEach { (path, props) ->
       os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      props.inputStream(charset).bufferedReader(charset).use {
-        it.copyTo(zipWriter)
-      }
-      zipWriter.flush()
+      props.writeProperties(charset, os, escapeUnicode.get())
       os.closeEntry()
     }
   }

@@ -74,7 +74,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transformer.transform(context(path, input2))
     }
 
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    assertThat(transformer.propertiesEntries[path]?.props.orEmpty()).isEqualTo(expectedOutput)
     assertThat(transformer.conflicts).isEqualTo(expectedConflicts)
   }
 
@@ -95,7 +95,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transformer.transform(context(path, input2))
     }
 
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    assertThat(transformer.propertiesEntries[path]?.props.orEmpty()).isEqualTo(expectedOutput)
   }
 
   @ParameterizedTest
@@ -115,7 +115,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transformer.transform(context(path, input2))
     }
 
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    assertThat(transformer.propertiesEntries[path]?.props.orEmpty()).isEqualTo(expectedOutput)
   }
 
   @ParameterizedTest
@@ -135,7 +135,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transformer.transform(context(path, input2))
     }
 
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    assertThat(transformer.propertiesEntries[path]?.props.orEmpty()).isEqualTo(expectedOutput)
   }
 
   @ParameterizedTest
@@ -152,7 +152,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transformer.transform(context(path, input, Charset.forName(charset)))
     }
 
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    assertThat(transformer.propertiesEntries[path]?.props.orEmpty()).isEqualTo(expectedOutput)
   }
 
   private companion object {

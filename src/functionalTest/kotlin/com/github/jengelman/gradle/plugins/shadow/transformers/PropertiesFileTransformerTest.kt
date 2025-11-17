@@ -171,8 +171,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content.trimIndent()).isEqualTo(
       """
-        #
-
         foo=one,two
       """.trimIndent(),
     )
