@@ -19,7 +19,7 @@ on:
 
 jobs:
   check-links:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest # TODO: https://github.com/UmbrellaDocs/linkspector/issues/149
     if: github.event.repository.fork == false
     steps:
       - uses: actions/checkout@v5
@@ -34,7 +34,6 @@ jobs:
           pip install mkdocs-material
           mkdocs build --strict
       - uses: umbrelladocs/action-linkspector@v1
-        if: false # TODO: https://github.com/UmbrellaDocs/linkspector/issues/149
         with:
           reporter: github-pr-check
           fail_on_error: true
