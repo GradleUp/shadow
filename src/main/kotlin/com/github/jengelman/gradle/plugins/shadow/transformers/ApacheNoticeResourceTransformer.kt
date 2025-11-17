@@ -76,6 +76,14 @@ public open class ApacheNoticeResourceTransformer(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.UTF_8.name())
 
+  /**
+   * The output path of the `NOTICE` file.
+   *
+   * Defaults to `META-INF/NOTICE`.
+   */
+  @get:Input
+  public open val outputPath: Property<String> = objectFactory.property(NOTICE_PATH)
+
   @Inject
   public constructor(objectFactory: ObjectFactory) : this(
     objectFactory,
@@ -190,7 +198,7 @@ public open class ApacheNoticeResourceTransformer(
       }
     }
 
-    os.putNextEntry(zipEntry(NOTICE_PATH, preserveFileTimestamps))
+    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
     os.write(sb.toString().trim().toByteArray(charset))
     os.closeEntry()
 
