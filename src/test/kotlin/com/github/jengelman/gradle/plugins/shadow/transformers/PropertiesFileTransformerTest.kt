@@ -64,6 +64,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input1: Map<String, String>,
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
+    expectedConflicts: Map<String, Map<String, Int>>,
   ) {
     transformer.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
     transformer.mergeSeparator.set(mergeSeparator)
@@ -74,6 +75,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     }
 
     assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    assertThat(transformer.conflicts).isEqualTo(expectedConflicts)
   }
 
   @ParameterizedTest
@@ -263,6 +265,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "foo"),
+        mapOf<String, Map<String, Int>>(),
       ),
       Arguments.of(
         "f.properties",
@@ -271,6 +274,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "bar"),
+        mapOf<String, Map<String, Int>>(),
       ),
       Arguments.of(
         "f.properties",
@@ -279,6 +283,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "foo,bar"),
+        mapOf<String, Map<String, Int>>(),
       ),
       Arguments.of(
         "f.properties",
@@ -287,6 +292,16 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "foo;bar"),
+        mapOf<String, Map<String, Int>>(),
+      ),
+      Arguments.of(
+        "f.properties",
+        "fail",
+        ";",
+        mapOf("foo" to "foo"),
+        mapOf("foo" to "bar"),
+        mapOf("foo" to "foo"),
+        mapOf("f.properties" to mapOf("foo" to 2)),
       ),
     )
 

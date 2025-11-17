@@ -434,6 +434,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesF
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy : java/lang/Enum {
 	public static final field Append Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy$Companion;
+	public static final field Fail Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 	public static final field First Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 	public static final field Latest Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
 	public static final fun from (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer$MergeStrategy;
