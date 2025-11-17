@@ -266,7 +266,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNotic
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getOrganizationName ()Lorg/gradle/api/provider/Property;
 	public fun getOrganizationURL ()Lorg/gradle/api/provider/Property;
-	public final fun getOutputPath ()Lorg/gradle/api/provider/Property;
+	public fun getOutputPath ()Lorg/gradle/api/provider/Property;
 	public fun getPreamble1 ()Lorg/gradle/api/provider/Property;
 	public fun getPreamble2 ()Lorg/gradle/api/provider/Property;
 	public fun getPreamble3 ()Lorg/gradle/api/provider/Property;
