@@ -82,7 +82,7 @@ public open class ApacheNoticeResourceTransformer(
    * Defaults to `META-INF/NOTICE`.
    */
   @get:Input
-  public val outputPath: Property<String> = objectFactory.property(NOTICE_PATH)
+  public open val outputPath: Property<String> = objectFactory.property(NOTICE_PATH)
 
   @Inject
   public constructor(objectFactory: ObjectFactory) : this(
