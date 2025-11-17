@@ -251,6 +251,45 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
+  @Test
+  fun overrideOutputPathOfNoticeFile() {
+    val noticeEntry = "META-INF/NOTICE"
+    val customNoticeEntry = "META-INF/CUSTOM_NOTICE"
+    val one = buildJarOne {
+      insert(noticeEntry, "Notice from A")
+    }
+    val two = buildJarTwo {
+      insert(noticeEntry, "Notice from B")
+    }
+    projectScript.appendText(
+      transform<ApacheNoticeResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = "addHeader = false; outputPath = '$customNoticeEntry'",
+      ),
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        customNoticeEntry,
+        *manifestEntries,
+      )
+      getContent(customNoticeEntry).isEqualTo(
+        """
+          Copyright 2006-2025 The Apache Software Foundation
+
+          This product includes software developed at
+          The Apache Software Foundation (https://www.apache.org/).
+
+          Notice from A
+
+          Notice from B
+        """.trimIndent(),
+      )
+    }
+  }
+
   @ParameterizedTest
   @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
