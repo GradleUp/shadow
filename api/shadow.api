@@ -250,19 +250,15 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar$Co
 	public final synthetic fun getShadowJar (Lorg/gradle/api/tasks/TaskContainer;)Lorg/gradle/api/tasks/TaskProvider;
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> ()V
-	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
-	public fun getName ()Ljava/lang/String;
-	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
+	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
 	public fun getAddHeader ()Lorg/gradle/api/provider/Property;
 	public fun getCharsetName ()Lorg/gradle/api/provider/Property;
 	public fun getCopyright ()Lorg/gradle/api/provider/Property;

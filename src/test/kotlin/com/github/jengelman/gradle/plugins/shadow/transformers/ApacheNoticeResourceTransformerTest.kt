@@ -30,6 +30,16 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   }
 
   @Test
+  fun canTransformByPattern() {
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.txt")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.log")).isFalse()
+    transformer.exclude("META-INF/NOTICE.txt")
+    transformer.include("META-INF/NOTICE.*")
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.txt")).isFalse()
+    assertThat(transformer.canTransformResource("META-INF/NOTICE.log")).isTrue()
+  }
+
+  @Test
   fun preamble1ShouldHaveATrailingSpace() {
     val baos = ByteArrayOutputStream()
     val zos = ZipOutputStream(baos)

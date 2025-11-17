@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Prevents duplicate copies of the license.
@@ -10,14 +10,15 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ApacheLicenseResourceTransformer : ResourceTransformer by ResourceTransformer.Companion {
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return LICENSE_PATH.equals(path, ignoreCase = true) ||
-      LICENSE_TXT_PATH.regionMatches(0, path, 0, LICENSE_TXT_PATH.length, ignoreCase = true) ||
-      LICENSE_MD_PATH.regionMatches(0, path, 0, LICENSE_MD_PATH.length, ignoreCase = true)
-  }
-
+public open class ApacheLicenseResourceTransformer @JvmOverloads constructor(
+  patternSet: PatternSet = PatternSet()
+    .apply { isCaseSensitive = false }
+    .include(
+      LICENSE_PATH,
+      LICENSE_TXT_PATH,
+      LICENSE_MD_PATH,
+    ),
+) : PatternFilterableResourceTransformer(patternSet = patternSet) {
   private companion object {
     private const val LICENSE_PATH = "META-INF/LICENSE"
     private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"

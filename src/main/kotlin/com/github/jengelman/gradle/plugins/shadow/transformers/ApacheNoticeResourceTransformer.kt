@@ -9,10 +9,10 @@ import java.util.Locale
 import java.util.TreeSet
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Merges `META-INF/NOTICE.TXT` files.
@@ -22,9 +22,10 @@ import org.gradle.api.tasks.Input
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ApacheNoticeResourceTransformer @Inject constructor(
+public open class ApacheNoticeResourceTransformer(
   final override val objectFactory: ObjectFactory,
-) : ResourceTransformer {
+  patternSet: PatternSet,
+) : PatternFilterableResourceTransformer(patternSet) {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
   private inline val charset get() = Charset.forName(charsetName.get())
@@ -75,12 +76,17 @@ public open class ApacheNoticeResourceTransformer @Inject constructor(
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.UTF_8.name())
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return NOTICE_PATH.equals(path, ignoreCase = true) ||
-      NOTICE_TXT_PATH.equals(path, ignoreCase = true) ||
-      NOTICE_MD_PATH.equals(path, ignoreCase = true)
-  }
+  @Inject
+  public constructor(objectFactory: ObjectFactory) : this(
+    objectFactory,
+    patternSet = PatternSet()
+      .apply { isCaseSensitive = false }
+      .include(
+        NOTICE_PATH,
+        NOTICE_TXT_PATH,
+        NOTICE_MD_PATH,
+      ),
+  )
 
   override fun transform(context: TransformerContext) {
     val projectName = projectName.get()
