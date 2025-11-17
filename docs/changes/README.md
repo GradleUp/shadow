@@ -9,7 +9,7 @@
 - Expose `patternSet` of `ServiceFileTransformer` as `public`. ([#1849](https://github.com/GradleUp/shadow/pull/1849))
 - Expose `patternSet` of `ApacheLicenseResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1850))
 - Expose `patternSet` of `ApacheNoticeResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1850))
-- Expose `patternSet` of `PreserveFirstFoundResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1855))
+- Expose `patternSet` of `PreserveFirstFoundResourceTransformer` as `public`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
 - Support overriding output path of `ApacheNoticeResourceTransformer`. ([#1851](https://github.com/GradleUp/shadow/pull/1851))
 
 ### Changed
