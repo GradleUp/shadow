@@ -127,27 +127,36 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/reloc
 	public abstract fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator : com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
+public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocator : com/github/jengelman/gradle/plugins/shadow/relocation/Relocator, org/gradle/api/tasks/util/PatternFilterable {
 	public fun <init> ()V
 	public fun <init> (Ljava/lang/String;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Z)V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZZ)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZLorg/gradle/api/tasks/util/PatternSet;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZLorg/gradle/api/tasks/util/PatternSet;Z)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZLorg/gradle/api/tasks/util/PatternSet;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public fun canRelocateClass (Ljava/lang/String;)Z
 	public fun canRelocatePath (Ljava/lang/String;)Z
 	public fun equals (Ljava/lang/Object;)Z
-	public fun exclude (Ljava/lang/String;)V
-	public final fun getExcludes ()Ljava/util/Set;
-	public final fun getIncludes ()Ljava/util/Set;
+	public fun exclude (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun getExcludes ()Ljava/util/Set;
+	public fun getIncludes ()Ljava/util/Set;
 	public fun getSkipStringConstants ()Z
 	public fun hashCode ()I
-	public fun include (Ljava/lang/String;)V
+	public fun include (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun relocateClass (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocateClassContext;)Ljava/lang/String;
 	public fun relocatePath (Lcom/github/jengelman/gradle/plugins/shadow/relocation/RelocatePathContext;)Ljava/lang/String;
+	public fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun setSkipStringConstants (Z)V
 	public fun toString ()Ljava/lang/String;
 }

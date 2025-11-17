@@ -5,6 +5,8 @@ import java.util.regex.Pattern
 import org.apache.commons.io.FilenameUtils
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/SimpleRelocator.java).
@@ -20,8 +22,10 @@ public open class SimpleRelocator @JvmOverloads constructor(
   includes: List<String>? = null,
   excludes: List<String>? = null,
   private val rawString: Boolean = false,
+  private val patternSet: PatternSet = PatternSet(),
   @get:Input override var skipStringConstants: Boolean = false,
-) : Relocator {
+) : Relocator,
+  PatternFilterable by patternSet {
   private val pattern: String
   private val pathPattern: String
   private val shadedPattern: String
@@ -29,11 +33,11 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val sourcePackageExcludes = mutableSetOf<String>()
   private val sourcePathExcludes = mutableSetOf<String>()
 
-  @get:Input
-  public val includes: MutableSet<String> = mutableSetOf()
+  @Input // Trigger task executions after includes changed.
+  override fun getIncludes(): MutableSet<String> = patternSet.includes
 
-  @get:Input
-  public val excludes: MutableSet<String> = mutableSetOf()
+  @Input // Trigger task executions after excludes changed.
+  override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
   init {
     if (rawString) {
@@ -87,12 +91,16 @@ public open class SimpleRelocator @JvmOverloads constructor(
     }
   }
 
-  public open fun include(pattern: String) {
-    includes.addAll(normalizePatterns(listOf(pattern)))
+  override fun include(vararg includes: String): PatternFilterable = apply {
+    includes.forEach { include ->
+      getIncludes().addAll(normalizePatterns(listOf(include)))
+    }
   }
 
-  public open fun exclude(pattern: String) {
-    excludes.addAll(normalizePatterns(listOf(pattern)))
+  override fun exclude(vararg excludes: String): PatternFilterable = apply {
+    excludes.forEach { exclude ->
+      getExcludes().addAll(normalizePatterns(listOf(exclude)))
+    }
   }
 
   override fun canRelocatePath(path: String): Boolean {
