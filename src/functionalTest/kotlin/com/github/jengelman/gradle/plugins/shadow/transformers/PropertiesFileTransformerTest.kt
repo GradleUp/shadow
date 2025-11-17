@@ -3,10 +3,14 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isSameAs
+import assertk.assertions.isSameInstanceAs
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
+import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -33,15 +37,29 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    runWithSuccess(shadowJarPath)
+    if (strategy == MergeStrategy.Fail) {
+      val run = runWithFailure(shadowJarPath)
+      val taskOutcome = run.task(":shadowJar")!!
+      assertThat(taskOutcome.outcome).isSameInstanceAs(TaskOutcome.FAILED)
+      assertThat(run.output).contains(
+        """
+        Execution failed for task ':shadowJar'.
+        > The following properties files have conflicting property values and cannot be merged:
+           * META-INF/test.properties: Property key2 in is duplicated in another resource and merge strategy is set to fail
+        """.trimIndent(),
+      )
+    } else {
+      runWithSuccess(shadowJarPath)
 
-    val expected = when (strategy) {
-      MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
-      MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
-      MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
+      val expected = when (strategy) {
+        MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
+        MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
+        MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
+        else -> fail("Unexpected strategy: $strategy")
+      }
+      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
+      assertThat(content).contains(*expected)
     }
-    val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-    assertThat(content).contains(*expected)
   }
 
   @Test

@@ -107,7 +107,8 @@ public open class PropertiesFileTransformer @Inject constructor(
 ) : ResourceTransformer {
   private inline val charset get() = Charset.forName(charsetName.get())
 
-  private val conflicts: MutableList<String> = mutableListOf()
+  @get:Internal
+  internal val conflicts: MutableList<String> = mutableListOf()
 
   @get:Internal
   internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
@@ -223,7 +224,7 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     if (conflicts.isNotEmpty()) {
-      throw GradleException("The following properties files have conflicting property values and cannot be merged: ${conflicts.joinToString(separator = "\n * ", prefix = "\n * ")}")
+      throw GradleException("The following properties files have conflicting property values and cannot be merged:${conflicts.joinToString(separator = "\n * ", prefix = "\n * ")}")
     }
 
     // Cannot close the writer as the OutputStream needs to remain open.
