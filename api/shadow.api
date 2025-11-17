@@ -394,6 +394,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/transformers/Pa
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public final fun getPatternSet ()Lorg/gradle/api/tasks/util/PatternSet;
+	protected final fun getPatternSpec ()Lorg/gradle/api/specs/Spec;
 	public fun hasTransformedResource ()Z
 	public fun include (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
