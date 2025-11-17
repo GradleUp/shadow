@@ -33,7 +33,6 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   fun canTransformByPattern() {
     transformer.exclude("META-INF/NOTICE.txt")
     transformer.include("META-INF/NOTICE.*")
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.log")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/NOTICE.txt")).isFalse()
     assertThat(transformer.canTransformResource("META-INF/NOTICE.log")).isTrue()
   }
