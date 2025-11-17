@@ -17,6 +17,7 @@ public abstract class PatternFilterableResourceTransformer(
 ) : ResourceTransformer by ResourceTransformer.Companion,
   PatternFilterable by patternSet {
 
+  @get:Internal
   internal open val patternSpec: Spec<FileTreeElement> by lazy(LazyThreadSafetyMode.NONE) {
     patternSet.asSpec
   }
