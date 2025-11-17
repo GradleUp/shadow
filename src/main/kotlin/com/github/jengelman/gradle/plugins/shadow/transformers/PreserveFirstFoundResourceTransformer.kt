@@ -34,7 +34,6 @@ public open class PreserveFirstFoundResourceTransformer(
   protected val found: MutableSet<String> = mutableSetOf()
 
   @get:Deprecated("Use `include(..)` instead")
-  @get:Input
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
   @Inject
