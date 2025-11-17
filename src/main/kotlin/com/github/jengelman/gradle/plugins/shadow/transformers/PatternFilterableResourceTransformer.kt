@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternFilterable
@@ -16,8 +17,12 @@ public abstract class PatternFilterableResourceTransformer(
 ) : ResourceTransformer by ResourceTransformer.Companion,
   PatternFilterable by patternSet {
 
+  internal open val patternSpec: Spec<FileTreeElement> by lazy(LazyThreadSafetyMode.NONE) {
+    patternSet.asSpec
+  }
+
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return patternSet.asSpec.isSatisfiedBy(element)
+    return patternSpec.isSatisfiedBy(element)
   }
 
   @Input // Trigger task executions after includes changed.
