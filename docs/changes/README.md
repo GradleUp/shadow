@@ -10,15 +10,14 @@
 - Expose `patternSet` of `ApacheLicenseResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1850))
 - Expose `patternSet` of `ApacheNoticeResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1850))
 - Support overriding output path of `ApacheNoticeResourceTransformer`. ([#1851](https://github.com/GradleUp/shadow/pull/1851))
-- `PreserveFirstFoundResourceTransformer` now implements `PatternFilterable`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
-  Migrate usages of `PreserveFirstFoundResourceTransformer.resources` to use the `include()` configuration functions.
 
 ### Changed
 
 - Change the group of `startShadowScripts` from `application` to `other`. ([#1797](https://github.com/GradleUp/shadow/pull/1797))
 - Update ASM and jdependency to support Java 26. ([#1799](https://github.com/GradleUp/shadow/pull/1799))
 - Bump min Gradle requirement to 9.0.0. ([#1801](https://github.com/GradleUp/shadow/pull/1801))
-- Add new merge strategy 'fail' to `PropertiesFileTransformer`. ([#1856](https://github.com/GradleUp/shadow/pull/1856))
+- `PreserveFirstFoundResourceTransformer` now implements `PatternFilterable`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
+  Migrate usages of `PreserveFirstFoundResourceTransformer.resources` to use the `include()` configuration functions.
 
 ### Fixed
 

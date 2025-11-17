@@ -26,6 +26,11 @@ public open class PreserveFirstFoundResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
+  private val includeResources by lazy(LazyThreadSafetyMode.NONE) {
+    @Suppress("DEPRECATION")
+    include(resources.get())
+  }
+
   @get:Internal
   protected val found: MutableSet<String> = mutableSetOf()
 
@@ -36,12 +41,8 @@ public open class PreserveFirstFoundResourceTransformer(
   @Inject
   public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
-  private val includeResources by lazy(LazyThreadSafetyMode.NONE) {
-    @Suppress("DEPRECATION")
-    include(resources.get())
-  }
-
   override fun canTransformResource(element: FileTreeElement): Boolean {
+    includeResources
     return patternSpec.isSatisfiedBy(element) && !found.add(element.path)
   }
 }
