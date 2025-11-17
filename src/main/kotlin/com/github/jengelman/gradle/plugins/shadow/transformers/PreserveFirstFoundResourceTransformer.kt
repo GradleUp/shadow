@@ -29,20 +29,16 @@ public open class PreserveFirstFoundResourceTransformer(
   @get:Internal
   protected val found: MutableSet<String> = mutableSetOf()
 
-  @get:Deprecated("Migrate to include(..) instead of using PreserveFirstFoundResourceTransformer.resources.")
+  @get:Deprecated("Use `include(..)` instead")
   @get:Input
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
   @Inject
-  public constructor(objectFactory: ObjectFactory) : this(
-    objectFactory,
-    patternSet = PatternSet(),
-  )
+  public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
-  override fun setupForSpec() {
+  private val includeResources by lazy(LazyThreadSafetyMode.NONE) {
     @Suppress("DEPRECATION")
-    val res = resources.get()
-    patternSet.include(res)
+    include(resources.get())
   }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
