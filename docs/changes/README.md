@@ -10,6 +10,8 @@
 - Expose `patternSet` of `ApacheLicenseResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1850))
 - Expose `patternSet` of `ApacheNoticeResourceTransformer` as `public`. ([#1850](https://github.com/GradleUp/shadow/pull/1850))
 - Support overriding output path of `ApacheNoticeResourceTransformer`. ([#1851](https://github.com/GradleUp/shadow/pull/1851))
+- `PreserveFirstFoundResourceTransformer` now implements `PatternFilterable`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
+  Migrate usages of `PreserveFirstFoundResourceTransformer.resources` to use the `include()` configuration functions.
 
 ### Changed
 
