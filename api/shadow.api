@@ -394,6 +394,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/transformers/Pa
 	public fun getName ()Ljava/lang/String;
 	public fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public final fun getPatternSet ()Lorg/gradle/api/tasks/util/PatternSet;
+	protected final fun getPatternSpec ()Lorg/gradle/api/specs/Spec;
 	public fun hasTransformedResource ()Z
 	public fun include (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
@@ -405,16 +406,13 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/transformers/Pa
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/PreserveFirstFoundResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/PreserveFirstFoundResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	protected final fun getFound ()Ljava/util/Set;
-	public fun getName ()Ljava/lang/String;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getResources ()Lorg/gradle/api/provider/SetProperty;
-	public fun hasTransformedResource ()Z
-	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
-	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
