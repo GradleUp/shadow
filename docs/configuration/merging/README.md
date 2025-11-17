@@ -546,6 +546,41 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
     }
     ```
 
+## Configuring Resource Transformer Filtering by Pattern
+
+There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provided by Shadow. Some of them extend
+[`PatternFilterableResourceTransformer`][PatternFilterableResourceTransformer], which extends
+[`PatternFilterable`][PatternFilterable] to provide `include`/`exclude` pattern filtering capabilities. e.g.
+
+- [`ApacheLicenseResourceTransformer`][ApacheLicenseResourceTransformer]
+- [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer]
+- [`ServiceFileTransformer`][ServiceFileTransformer]
+- ...
+
+You can use `include`/`exclude` and more methods to configure the patterns for those
+[`ResourceTransformer`][ResourceTransformer]s that support it. For example:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer>() {
+        include("META-INF/LICENSE.*")
+        exclude("META-INF/LICENSE.log")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer) {
+        include 'META-INF/LICENSE.*'
+        exclude 'META-INF/LICENSE.log'
+      }
+    }
+
 
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
@@ -558,8 +593,12 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [Log4j2PluginsCacheFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-log4j2-plugins-cache-file-transformer/index.html
 [ResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
+[ApacheLicenseResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-apache-license-resource-transformer/index.html
+[ApacheNoticeResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transform/-apache-notice-resource-transformer/index.html
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
 [PreserveFirstFoundResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-preserve-first-found-resource-transformer/index.html
+[PatternFilterable]: https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.tasks.util/-pattern-filterable/index.html
+[PatternFilterableResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-pattern-filterable-resource-transformer/index.html
 [ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
 [ShadowJar.failOnDuplicateEntries]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html
 [ShadowJar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
