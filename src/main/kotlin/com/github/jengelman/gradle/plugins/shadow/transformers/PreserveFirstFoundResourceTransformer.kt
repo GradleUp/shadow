@@ -9,29 +9,43 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * A resource processor that preserves the first resource matched and excludes all others.
  *
  * This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
  * want to ensure that only the first found resource is included in the final JAR. If there are multiple resources with
- * the same path in a project and its dependencies, the first one found should be the projects'.
+ * the same path in a project and its dependencies, the first one found should be the projects.
  *
  * @see [DuplicatesStrategy]
  * @see [ShadowJar.getDuplicatesStrategy]
  */
 @CacheableTransformer
-public open class PreserveFirstFoundResourceTransformer @Inject constructor(
+public open class PreserveFirstFoundResourceTransformer(
   final override val objectFactory: ObjectFactory,
-) : ResourceTransformer by ResourceTransformer.Companion {
+  patternSet: PatternSet,
+) : PatternFilterableResourceTransformer(patternSet) {
   @get:Internal
   protected val found: MutableSet<String> = mutableSetOf()
 
+  @get:Deprecated("Migrate to include(..) instead of using PreserveFirstFoundResourceTransformer.resources.")
   @get:Input
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
+  @Inject
+  public constructor(objectFactory: ObjectFactory) : this(
+    objectFactory,
+    patternSet = PatternSet(),
+  )
+
+  override fun setupForSpec() {
+    @Suppress("DEPRECATION")
+    val res = resources.get()
+    patternSet.include(res)
+  }
+
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return resources.get().contains(path) && !found.add(path)
+    return patternSpec.isSatisfiedBy(element) && !found.add(element.path)
   }
 }

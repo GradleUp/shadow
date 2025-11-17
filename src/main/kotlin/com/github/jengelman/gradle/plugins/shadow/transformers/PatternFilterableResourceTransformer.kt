@@ -17,8 +17,15 @@ public abstract class PatternFilterableResourceTransformer(
 ) : ResourceTransformer by ResourceTransformer.Companion,
   PatternFilterable by patternSet {
 
-  private val patternSpec by lazy(LazyThreadSafetyMode.NONE) {
+  /**
+   * Called to customize the `PatternSet`.
+   */
+  internal open fun setupForSpec() {}
+
+  @get:Internal
+  internal val patternSpec by lazy(LazyThreadSafetyMode.NONE) {
     // Cache the spec to prevent some unnecessary allocations during runtime.
+    setupForSpec()
     patternSet.asSpec
   }
 
