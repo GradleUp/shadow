@@ -11,6 +11,7 @@ import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -62,6 +63,9 @@ import org.gradle.api.tasks.Internal
  * - key2 = value2;balue2
  * - key3 = value3
  *
+ * With `mergeStrategy = MergeStrategy.Fail` the transformation will fail if there
+ * are conflicting values.
+ *
  * There are three additional properties that can be set: [paths], [mappings],
  * and [keyTransformer].
  * The first contains a list of strings or regexes that will be used to determine if
@@ -102,6 +106,8 @@ public open class PropertiesFileTransformer @Inject constructor(
   final override val objectFactory: ObjectFactory,
 ) : ResourceTransformer {
   private inline val charset get() = Charset.forName(charsetName.get())
+
+  private val conflicts: MutableList<String> = mutableListOf()
 
   @get:Internal
   internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
@@ -156,6 +162,7 @@ public open class PropertiesFileTransformer @Inject constructor(
               props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
             }
             MergeStrategy.First -> Unit
+            MergeStrategy.Fail -> conflicts.add("${context.path}: Property $key in is duplicated in another resource and merge strategy is set to fail")
           }
         } else {
           props[key] = value
@@ -215,6 +222,10 @@ public open class PropertiesFileTransformer @Inject constructor(
   override fun hasTransformedResource(): Boolean = propertiesEntries.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
+    if (conflicts.isNotEmpty()) {
+      throw GradleException("The following properties files have conflicting property values and cannot be merged: ${conflicts.joinToString(separator = "\n * ", prefix = "\n * ")}")
+    }
+
     // Cannot close the writer as the OutputStream needs to remain open.
     val zipWriter = os.writer(charset)
     propertiesEntries.forEach { (path, props) ->
@@ -231,6 +242,7 @@ public open class PropertiesFileTransformer @Inject constructor(
     First,
     Latest,
     Append,
+    Fail,
     ;
 
     public companion object {
