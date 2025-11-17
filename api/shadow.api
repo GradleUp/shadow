@@ -439,6 +439,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesF
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getCharsetName ()Lorg/gradle/api/provider/Property;
+	public fun getEscapeUnicode ()Lorg/gradle/api/provider/Property;
 	public fun getKeyTransformer ()Lkotlin/jvm/functions/Function1;
 	public fun getMappings ()Lorg/gradle/api/provider/MapProperty;
 	public fun getMergeSeparator ()Lorg/gradle/api/provider/Property;
