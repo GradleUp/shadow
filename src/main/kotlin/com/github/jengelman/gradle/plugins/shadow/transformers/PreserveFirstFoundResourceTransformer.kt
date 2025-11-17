@@ -16,7 +16,7 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
  * want to ensure that only the first found resource is included in the final JAR. If there are multiple resources with
- * the same path in a project and its dependencies, the first one found should be the projects.
+ * the same path in a project and its dependencies, the first one found should be the project's.
  *
  * @see [DuplicatesStrategy]
  * @see [ShadowJar.getDuplicatesStrategy]
