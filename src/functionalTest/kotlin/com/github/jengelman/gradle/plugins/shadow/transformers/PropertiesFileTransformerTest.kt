@@ -47,7 +47,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
         > The following properties files have conflicting property values and cannot be merged:
            * META-INF/test.properties
              * Property key2 is duplicated 2 times with different values
-        """.trimIndent(),
+        """.trimIndent().replace("\n", System.lineSeparator()),
       )
     } else {
       runWithSuccess(shadowJarPath)
