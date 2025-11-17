@@ -24,7 +24,7 @@ class PreserveFirstFoundResourceTransformerTest : BaseTransformerTest() {
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
         exclude("multiple-contents")
-      """.trimIndent(),
+        """.trimIndent(),
       ),
     )
 
