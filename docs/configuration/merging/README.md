@@ -580,7 +580,7 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
         exclude 'META-INF/LICENSE.log'
       }
     }
-
+    ```
 
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
