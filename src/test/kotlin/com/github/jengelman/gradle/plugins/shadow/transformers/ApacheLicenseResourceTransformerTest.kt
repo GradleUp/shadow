@@ -28,7 +28,6 @@ class ApacheLicenseResourceTransformerTest : BaseTransformerTest<ApacheLicenseRe
   fun canTransformByPattern() {
     transformer.exclude("META-INF/LICENSE.txt")
     transformer.include("META-INF/LICENSE.*")
-    assertThat(transformer.canTransformResource("META-INF/LICENSE.log")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/LICENSE.txt")).isFalse()
     assertThat(transformer.canTransformResource("META-INF/LICENSE.log")).isTrue()
   }
