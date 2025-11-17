@@ -29,6 +29,7 @@ public open class ServiceFileTransformer @JvmOverloads constructor(
   @get:Internal
   internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 
+  @Deprecated("Use `setIncludes` instead.", ReplaceWith("setIncludes()"))
   @get:Internal // No need to mark this as an input as `getIncludes` is already marked as `@Input`.
   public open var path: String = SERVICES_PATH
     set(value) {
