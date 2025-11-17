@@ -7,6 +7,7 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternSet
 
@@ -34,6 +35,7 @@ public open class PreserveFirstFoundResourceTransformer(
   protected val found: MutableSet<String> = mutableSetOf()
 
   @get:Deprecated("Use `include(..)` instead")
+  @get:Input
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
   @Inject
