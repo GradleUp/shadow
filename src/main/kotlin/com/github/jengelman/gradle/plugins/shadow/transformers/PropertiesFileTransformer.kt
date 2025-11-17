@@ -108,7 +108,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   private inline val charset get() = Charset.forName(charsetName.get())
 
   @get:Internal
-  internal val conflicts: MutableList<String> = mutableListOf()
+  internal val conflicts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 
   @get:Internal
   internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
@@ -163,7 +163,10 @@ public open class PropertiesFileTransformer @Inject constructor(
               props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
             }
             MergeStrategy.First -> Unit
-            MergeStrategy.Fail -> conflicts.add("${context.path}: Property $key in is duplicated in another resource and merge strategy is set to fail")
+            MergeStrategy.Fail -> {
+              val conflictsForPath: MutableMap<String, Int> = conflicts.computeIfAbsent(context.path) { mutableMapOf() }
+              conflictsForPath.compute(key as String) { _, count -> (count ?: 1) + 1 }
+            }
           }
         } else {
           props[key] = value
@@ -224,7 +227,11 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     if (conflicts.isNotEmpty()) {
-      throw GradleException("The following properties files have conflicting property values and cannot be merged:${conflicts.joinToString(separator = "\n * ", prefix = "\n * ")}")
+      throw GradleException(
+        "The following properties files have conflicting property values and cannot be merged:${conflicts
+          .map { (path, conflicts) -> "$path${conflicts.map { "Property ${it.key} is duplicated ${it.value} times with different values" }.joinToString(separator = "\n   * ", prefix = "\n   * ")}" }
+          .joinToString(separator = "\n * ", prefix = "\n * ")}",
+      )
     }
 
     // Cannot close the writer as the OutputStream needs to remain open.

@@ -45,7 +45,8 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
         """
         Execution failed for task ':shadowJar'.
         > The following properties files have conflicting property values and cannot be merged:
-           * META-INF/test.properties: Property key2 in is duplicated in another resource and merge strategy is set to fail
+           * META-INF/test.properties
+             * Property key2 is duplicated 2 times with different values
         """.trimIndent(),
       )
     } else {

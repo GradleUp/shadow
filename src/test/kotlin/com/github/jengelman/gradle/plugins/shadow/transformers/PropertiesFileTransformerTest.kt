@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
@@ -65,7 +64,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input1: Map<String, String>,
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
-    expectedConflicts: List<String>,
+    expectedConflicts: Map<String, Map<String, Int>>,
   ) {
     transformer.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
     transformer.mergeSeparator.set(mergeSeparator)
@@ -76,7 +75,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     }
 
     assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
-    assertThat(transformer.conflicts).containsExactly(*expectedConflicts.toTypedArray())
+    assertThat(transformer.conflicts).isEqualTo(expectedConflicts)
   }
 
   @ParameterizedTest
@@ -266,7 +265,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "foo"),
-        listOf<String>(),
+        mapOf<String, Map<String, Int>>(),
       ),
       Arguments.of(
         "f.properties",
@@ -275,7 +274,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "bar"),
-        listOf<String>(),
+        mapOf<String, Map<String, Int>>(),
       ),
       Arguments.of(
         "f.properties",
@@ -284,7 +283,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "foo,bar"),
-        listOf<String>(),
+        mapOf<String, Map<String, Int>>(),
       ),
       Arguments.of(
         "f.properties",
@@ -293,7 +292,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "foo;bar"),
-        listOf<String>(),
+        mapOf<String, Map<String, Int>>(),
       ),
       Arguments.of(
         "f.properties",
@@ -302,9 +301,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         mapOf("foo" to "foo"),
         mapOf("foo" to "bar"),
         mapOf("foo" to "foo"),
-        listOf<String>(
-          "f.properties: Property foo in is duplicated in another resource and merge strategy is set to fail",
-        ),
+        mapOf("f.properties" to mapOf("foo" to 2)),
       ),
     )
 
