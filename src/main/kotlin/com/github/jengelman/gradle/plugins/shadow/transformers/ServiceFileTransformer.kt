@@ -33,7 +33,8 @@ public open class ServiceFileTransformer @JvmOverloads constructor(
   public open var path: String = SERVICES_PATH
     set(value) {
       field = value
-      patternSet.setIncludes(listOf("$value/**"))
+      // Reset the includes to match the new path.
+      setIncludes(listOf("$value/**"))
     }
 
   override fun transform(context: TransformerContext) {
