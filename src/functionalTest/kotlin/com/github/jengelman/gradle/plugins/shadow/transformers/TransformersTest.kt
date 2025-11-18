@@ -14,6 +14,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.invariantEolString
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
@@ -387,7 +388,7 @@ class TransformersTest : BaseTransformerTest() {
         "META-INF/",
         "META-INF/MANIFEST.MF",
       )
-      getContent("MY_LICENSE").transform { it.replace(lineSeparator, "\n") }.isEqualTo(
+      getContent("MY_LICENSE").transform { it.invariantEolString }.isEqualTo(
         """
             artifact license text
             ####
