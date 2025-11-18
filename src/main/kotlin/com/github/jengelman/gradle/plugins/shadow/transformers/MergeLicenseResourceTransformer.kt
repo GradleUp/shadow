@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.OutputStream
@@ -31,7 +32,6 @@ import org.gradle.api.tasks.util.PatternSet
  * specify a different set of files to include, the paths mentioned above are then not considered
  * unless explicitly included.
  */
-@Suppress("unused")
 @CacheableTransformer
 public open class MergeLicenseResourceTransformer(
   objectFactory: ObjectFactory,
@@ -61,7 +61,7 @@ public open class MergeLicenseResourceTransformer(
   /** Path to write the aggregated license file to. Defaults to `META-INF/LICENSE`. */
   @get:Input
   public val outputPath: Property<String> =
-    objectFactory.property(String::class.java).value("META-INF/LICENSE")
+    objectFactory.property("META-INF/LICENSE")
 
   /**
    * The generated license file is potentially a collection of multiple license texts. To avoid
@@ -71,7 +71,7 @@ public open class MergeLicenseResourceTransformer(
    */
   @get:Input
   public val artifactLicenseSpdxId: Property<String> =
-    objectFactory.property(String::class.java).value("Apache-2.0")
+    objectFactory.property("Apache-2.0")
 
   /** Path to the project's license text, this property *must* be configured. */
   @get:InputFile
@@ -84,8 +84,7 @@ public open class MergeLicenseResourceTransformer(
   @get:Input
   public val firstSeparator: Property<String> =
     objectFactory
-      .property(String::class.java)
-      .value(
+      .property(
         """
 
         ${"-".repeat(120)}
@@ -100,13 +99,10 @@ public open class MergeLicenseResourceTransformer(
   /** Separator between included dependency license texts. */
   @get:Input
   public val separator: Property<String> =
-    objectFactory.property(String::class.java).value("\n${"-".repeat(120)}\n")
+    objectFactory.property("\n${"-".repeat(120)}\n")
 
   @Inject
-  public constructor(objectFactory: ObjectFactory) : this(
-    objectFactory,
-    patternSet = PatternSet(),
-  )
+  public constructor(objectFactory: ObjectFactory) : this(objectFactory, patternSet = PatternSet())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     // Init once before patternSpec is accessed.
@@ -116,13 +112,6 @@ public open class MergeLicenseResourceTransformer(
 
   override fun transform(context: TransformerContext) {
     transformInternal(context.inputStream.readAllBytes())
-  }
-
-  internal fun transformInternal(bytes: ByteArray) {
-    val content = bytes.toString(UTF_8).trim('\n', '\r')
-    if (!content.isEmpty()) {
-      elements.add(content)
-    }
   }
 
   override fun hasTransformedResource(): Boolean = true
@@ -135,6 +124,13 @@ public open class MergeLicenseResourceTransformer(
     writeLicenseFile(os)
 
     os.closeEntry()
+  }
+
+  internal fun transformInternal(bytes: ByteArray) {
+    val content = bytes.toString(UTF_8).trim('\n', '\r')
+    if (!content.isEmpty()) {
+      elements.add(content)
+    }
   }
 
   internal fun writeLicenseFile(os: OutputStream) {
