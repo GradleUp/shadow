@@ -18,6 +18,7 @@ import org.gradle.api.tasks.util.PatternSet
  * [com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer].
  *
  * First, add the task to your build script:
+ *
  * ```kotlin
  * val findResources by tasks.registering(FindResourceInClasspath::class) {
  *   // add configurations to search for resources in dependency jars
@@ -32,12 +33,11 @@ import org.gradle.api.tasks.util.PatternSet
  * Then let `shadowJar` depend on the task, or just run the above task manually.
  *
  * ```kotlin
- * tasks.named("shadowJar") {
+ * tasks.shadowJar {
  *   dependsOn(findResources)
  * }
  * ```
  */
-@Suppress("unused")
 @CacheableTask
 public abstract class FindResourceInClasspath(private val patternSet: PatternSet) :
   DefaultTask(),

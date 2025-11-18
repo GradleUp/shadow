@@ -12,6 +12,7 @@
 - Expose `patternSet` of `PreserveFirstFoundResourceTransformer` as `public`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
 - Support overriding output path of `ApacheNoticeResourceTransformer`. ([#1851](https://github.com/GradleUp/shadow/pull/1851))
 - Add new merge strategy `Fail` to `PropertiesFileTransformer`. ([#1856](https://github.com/GradleUp/shadow/pull/1856))
+- Add convenience `FindResourceInClasspath` task to help debugging issues with merged licenses and duplicated resources. ([#1860](https://github.com/GradleUp/shadow/pull/1860))
 
 ### Changed
 
