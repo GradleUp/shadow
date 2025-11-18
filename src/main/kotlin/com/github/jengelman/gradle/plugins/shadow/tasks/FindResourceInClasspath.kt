@@ -4,13 +4,13 @@ import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Helper task to temporarily add to your build script to find resources in the classpath that were
@@ -38,6 +38,7 @@ import org.gradle.api.tasks.util.PatternSet
  * }
  * ```
  */
+@DisableCachingByDefault(because = "Not worth caching")
 public abstract class FindResourceInClasspath(private val patternSet: PatternSet) :
   DefaultTask(),
   PatternFilterable by patternSet {
