@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.invariantEolString
 import kotlin.io.path.appendText
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Assertions.fail
@@ -39,7 +40,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       val result = runWithFailure(shadowJarPath)
 
       assertThat(result).taskOutcomeEquals(shadowJarPath, FAILED)
-      assertThat(result.output.replace(lineSeparator, "\n")).contains(
+      assertThat(result.output.invariantEolString).contains(
         """
           Caused by: java.lang.IllegalStateException: The following properties files have conflicting property values and cannot be merged:
            * META-INF/test.properties
