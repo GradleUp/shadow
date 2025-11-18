@@ -183,6 +183,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/FindResou
 	public fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun exclude (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
 	public fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public final fun findResources ()V
 	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
 	public abstract fun getClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getExcludes ()Ljava/util/Set;
