@@ -7,6 +7,8 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
+import org.gradle.testkit.runner.TaskOutcome.FAILED
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -33,15 +35,29 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       ),
     )
 
-    runWithSuccess(shadowJarPath)
+    if (strategy == MergeStrategy.Fail) {
+      val result = runWithFailure(shadowJarPath)
 
-    val expected = when (strategy) {
-      MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
-      MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
-      MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
+      assertThat(result).taskOutcomeEquals(shadowJarPath, FAILED)
+      assertThat(result.output.replace(lineSeparator, "\n")).contains(
+        """
+          Caused by: java.lang.IllegalStateException: The following properties files have conflicting property values and cannot be merged:
+           * META-INF/test.properties
+             * Property key2 is duplicated 2 times with different values
+        """.trimIndent(),
+      )
+    } else {
+      runWithSuccess(shadowJarPath)
+
+      val expected = when (strategy) {
+        MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
+        MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
+        MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
+        else -> fail("Unexpected strategy: $strategy")
+      }
+      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
+      assertThat(content).contains(*expected)
     }
-    val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-    assertThat(content).contains(*expected)
   }
 
   @Test
