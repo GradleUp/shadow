@@ -38,7 +38,6 @@ import org.gradle.api.tasks.util.PatternSet
  * }
  * ```
  */
-@CacheableTask
 public abstract class FindResourceInClasspath(private val patternSet: PatternSet) :
   DefaultTask(),
   PatternFilterable by patternSet {
