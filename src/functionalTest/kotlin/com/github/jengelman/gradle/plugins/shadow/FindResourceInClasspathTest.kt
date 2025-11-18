@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.util.invariantFilePathString
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 
@@ -33,7 +33,7 @@ class FindResourceInClasspathTest : BasePluginTest() {
     assertThat(result1.output).contains(
       "> Task :find1",
       "scanning ",
-      "/my/a/1.0/a-1.0.jar",
+      "/my/a/1.0/a-1.0.jar".invariantFilePathString,
       "/a.properties",
       "/a2.properties",
     )
@@ -42,7 +42,7 @@ class FindResourceInClasspathTest : BasePluginTest() {
     assertThat(result2.output).contains(
       "> Task :find2",
       "scanning ",
-      "/my/a/1.0/a-1.0.jar",
+      "/my/a/1.0/a-1.0.jar".invariantFilePathString,
       "/a.properties",
     )
     assertThat(result2.output).doesNotContain(
@@ -53,7 +53,7 @@ class FindResourceInClasspathTest : BasePluginTest() {
     assertThat(result3.output).contains(
       "> Task :find3",
       "scanning ",
-      "/my/a/1.0/a-1.0.jar",
+      "/my/a/1.0/a-1.0.jar".invariantFilePathString,
       "/a2.properties",
     )
     assertThat(result3.output).doesNotContain(
