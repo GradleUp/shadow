@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
+import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.inject.Inject
 import org.gradle.api.file.DuplicatesStrategy
@@ -26,7 +27,7 @@ public open class PreserveFirstFoundResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
-  private val includeResources by lazy(LazyThreadSafetyMode.NONE) {
+  private val includeResources by unsafeLazy {
     @Suppress("DEPRECATION")
     include(resources.get())
   }
