@@ -176,6 +176,26 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/Dependenc
 	public fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
+public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/FindResourceInClasspath : org/gradle/api/DefaultTask, org/gradle/api/tasks/util/PatternFilterable {
+	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun exclude (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public final fun findResources ()V
+	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
+	public abstract fun getClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public fun getExcludes ()Ljava/util/Set;
+	public fun getIncludes ()Ljava/util/Set;
+	public fun include (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+}
+
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest : org/gradle/api/java/archives/Manifest {
 	public fun inheritFrom ([Ljava/lang/Object;)V
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
