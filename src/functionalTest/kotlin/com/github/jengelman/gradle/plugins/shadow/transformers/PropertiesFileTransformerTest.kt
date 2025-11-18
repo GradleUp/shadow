@@ -80,9 +80,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     )
 
     if (strategy == MergeStrategy.Fail) {
-      val run = runWithFailure(shadowJarPath)
-      assertThat(run).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
-      assertThat(run.output.lines()).contains(
+      val result = runWithFailure(shadowJarPath)
+      assertThat(result).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
+      assertThat(result.output).contains(
 
         // TODO EXPERIMENT
         """
