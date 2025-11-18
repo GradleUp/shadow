@@ -39,9 +39,12 @@ import org.gradle.api.tasks.util.PatternSet
  */
 @Suppress("unused")
 @CacheableTask
-public abstract class FindResourceInClasspath(private val patternSet: PatternSet = PatternSet()) :
+public abstract class FindResourceInClasspath(private val patternSet: PatternSet) :
   DefaultTask(),
   PatternFilterable by patternSet {
+
+  @Inject public constructor() : this(PatternSet())
+
   @get:InputFiles
   @get:Classpath
   public abstract val classpath: ConfigurableFileCollection
