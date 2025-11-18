@@ -2,10 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsSubList
 import assertk.assertions.isEqualTo
-import assertk.assertions.isSameInstanceAs
-import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.taskOutcomeEquals
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -39,16 +36,14 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     )
 
     if (strategy == MergeStrategy.Fail) {
-      val run = runWithFailure(shadowJarPath)
-      assertThat(run).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
-      assertThat(run.output.lines()).containsSubList(
-        listOf(
-          // Keep this list approach for Unix/Windows test compatibility.
-          "Execution failed for task ':shadowJar'.",
-          "> The following properties files have conflicting property values and cannot be merged:",
-          "   * META-INF/test.properties",
-          "     * Property key2 is duplicated 2 times with different values",
-        ),
+      val result = runWithFailure(shadowJarPath)
+
+      assertThat(result).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
+      assertThat(result.output).contains(
+        "Execution failed for task ':shadowJar'.",
+        "> The following properties files have conflicting property values and cannot be merged:",
+        "   * META-INF/test.properties",
+        "     * Property key2 is duplicated 2 times with different values",
       )
     } else {
       runWithSuccess(shadowJarPath)
