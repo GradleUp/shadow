@@ -34,8 +34,8 @@ class FindResourceInClasspathTest : BasePluginTest() {
       "> Task :find1",
       "scanning ",
       "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
-      "/a.properties",
-      "/a2.properties",
+      "/a.properties".invariantSeparatorsPathString,
+      "/a2.properties".invariantSeparatorsPathString,
     )
 
     val result2 = runWithSuccess(":find2")
@@ -43,10 +43,10 @@ class FindResourceInClasspathTest : BasePluginTest() {
       "> Task :find2",
       "scanning ",
       "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
-      "/a.properties",
+      "/a.properties".invariantSeparatorsPathString,
     )
     assertThat(result2.output).doesNotContain(
-      "/a2.properties",
+      "/a2.properties".invariantSeparatorsPathString,
     )
 
     val result3 = runWithSuccess(":find3")
@@ -54,10 +54,10 @@ class FindResourceInClasspathTest : BasePluginTest() {
       "> Task :find3",
       "scanning ",
       "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
-      "/a2.properties",
+      "/a2.properties".invariantSeparatorsPathString,
     )
     assertThat(result3.output).doesNotContain(
-      "/a.properties",
+      "/a.properties".invariantSeparatorsPathString,
     )
   }
 }
