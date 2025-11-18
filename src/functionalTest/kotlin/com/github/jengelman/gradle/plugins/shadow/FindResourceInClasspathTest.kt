@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
 import com.github.jengelman.gradle.plugins.shadow.util.variantSeparatorsPathString
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
@@ -11,19 +12,20 @@ import org.junit.jupiter.api.Test
 class FindResourceInClasspathTest : BasePluginTest() {
   @Test
   fun findResourceInClasspath() {
+    val taskClassName = FindResourceInClasspath::class.java.name
     projectScript.appendText(
       """
         dependencies {
           implementation 'my:a:1.0'
         }
-        tasks.register('find1', com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath) {
+        tasks.register('find1', $taskClassName) {
           classpath = configurations.runtimeClasspath
         }
-        tasks.register('find2', com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath) {
+        tasks.register('find2', $taskClassName) {
           classpath = configurations.runtimeClasspath
           include("a.properties")
         }
-        tasks.register('find3', com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath) {
+        tasks.register('find3', $taskClassName) {
           classpath = configurations.runtimeClasspath
           exclude("a.properties")
         }
