@@ -123,20 +123,8 @@ public open class PropertiesFileTransformer @Inject constructor(
   public open val mergeSeparator: Property<String> = objectFactory.property(",")
 
   /**
-   * Properties files are written without escaping Unicode characters using the character set
-   * configured by [charsetName].
-   *
-   * Set this property to `true` to escape all Unicode characters in the properties file, producing
-   * ASCII compatible files.
-   */
-  @get:Input
-  public open val escapeUnicode: Property<Boolean> = objectFactory.property(false)
-
-  /**
    * The character set to use when reading and writing property files.
    * Defaults to `ISO-8859-1`.
-   *
-   * See also [escapeUnicode].
    */
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
@@ -161,7 +149,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    val props = propertiesEntries.computeIfAbsent(context.path) { ReproducibleProperties() }.props
+    val props = propertiesEntries.computeIfAbsent(context.path) { ReproducibleProperties() }
     val mergeStrategy = MergeStrategy.from(mergeStrategyFor(context.path))
     val mergeSeparator = if (mergeStrategy == MergeStrategy.Append) mergeSeparatorFor(context.path) else ""
     loadAndTransformKeys(context.inputStream) { key, value ->
@@ -171,7 +159,7 @@ public open class PropertiesFileTransformer @Inject constructor(
             props[key] = value
           }
           MergeStrategy.Append -> {
-            props[key] = props[key] + mergeSeparator + value
+            props[key] = props[key] as String + mergeSeparator + value
           }
           MergeStrategy.First -> Unit
           MergeStrategy.Fail -> {
@@ -237,7 +225,7 @@ public open class PropertiesFileTransformer @Inject constructor(
     // Cannot close the writer as the OutputStream needs to remain open.
     propertiesEntries.forEach { (path, props) ->
       os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      props.writeProperties(charset, os, escapeUnicode.get())
+      props.writeWithoutComments(charset, os)
       os.closeEntry()
     }
   }

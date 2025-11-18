@@ -51,13 +51,31 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       runWithSuccess(shadowJarPath)
 
       val expected = when (strategy) {
-        MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
-        MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
-        MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
+        MergeStrategy.First ->
+          """
+          key1=one
+          key2=one
+          key3=two
+
+          """
+        MergeStrategy.Latest ->
+          """
+          key1=one
+          key2=two
+          key3=two
+
+          """
+        MergeStrategy.Append ->
+          """
+          key1=one
+          key2=one;two
+          key3=two
+
+          """
         else -> fail("Unexpected strategy: $strategy")
-      }
-      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-      assertThat(content).contains(*expected)
+      }.trimIndent()
+      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }.invariantEolString
+      assertThat(content).isEqualTo(expected)
     }
   }
 
