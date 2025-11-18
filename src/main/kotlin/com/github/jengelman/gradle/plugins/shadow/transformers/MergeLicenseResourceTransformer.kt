@@ -140,7 +140,7 @@ public open class MergeLicenseResourceTransformer(
   internal fun writeLicenseFile(os: OutputStream) {
     if (artifactLicenseSpdxId.isPresent) {
       val spdxId = artifactLicenseSpdxId.get()
-      if (spdxId.isBlank()) {
+      if (spdxId.isNotBlank()) {
         os.write("SPDX-License-Identifier: $spdxId\n".toByteArray(UTF_8))
       }
     }

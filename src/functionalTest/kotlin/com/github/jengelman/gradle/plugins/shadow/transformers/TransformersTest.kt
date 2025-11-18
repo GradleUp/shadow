@@ -390,6 +390,7 @@ class TransformersTest : BaseTransformerTest() {
       )
       getContent("MY_LICENSE").transform { it.invariantEolString }.isEqualTo(
         """
+            SPDX-License-Identifier: Apache-2.0
             artifact license text
             ####
             license one

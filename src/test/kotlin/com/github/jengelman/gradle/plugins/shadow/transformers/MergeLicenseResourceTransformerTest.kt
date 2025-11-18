@@ -79,6 +79,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       val written = baos.toByteArray().toString(Charsets.UTF_8).lines()
       assertThat(written).isEqualTo(
         listOf(
+          "SPDX-License-Identifier: Apache-2.0",
           "artifact license file content",
         ) + firstSeparator.get().lines() +
           "license one" +
@@ -106,6 +107,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       val written = baos.toByteArray().toString(Charsets.UTF_8).lines()
       assertThat(written).isEqualTo(
         listOf(
+          "SPDX-License-Identifier: Apache-2.0",
           "artifact license file content",
         ) + firstSeparator.get().lines() +
           "license one",
@@ -116,6 +118,29 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
   @Test
   fun noAdditionalLicenses(@TempDir tempDir: Path) {
     with(transformer) {
+      val artifactLicenseFile = tempDir.resolve("artifact-license").toFile()
+      artifactLicenseFile.writeText("artifact license file content")
+      artifactLicense.set(artifactLicenseFile)
+
+      assertThat(elements).isEmpty()
+
+      val baos = ByteArrayOutputStream()
+      writeLicenseFile(baos)
+      val written = baos.toByteArray().toString(Charsets.UTF_8).lines()
+      assertThat(written).isEqualTo(
+        listOf(
+          "SPDX-License-Identifier: Apache-2.0",
+          "artifact license file content",
+        ),
+      )
+    }
+  }
+
+  @Test
+  fun noSpdxId(@TempDir tempDir: Path) {
+    with(transformer) {
+      transformer.artifactLicenseSpdxId.unset()
+
       val artifactLicenseFile = tempDir.resolve("artifact-license").toFile()
       artifactLicenseFile.writeText("artifact license file content")
       artifactLicense.set(artifactLicenseFile)
