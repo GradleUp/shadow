@@ -5,6 +5,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsSubList
 import assertk.assertions.isEqualTo
 import assertk.assertions.isSameInstanceAs
+import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.taskOutcomeEquals
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
@@ -39,8 +40,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
     if (strategy == MergeStrategy.Fail) {
       val run = runWithFailure(shadowJarPath)
-      val taskOutcome = run.task(":shadowJar")!!
-      assertThat(taskOutcome.outcome).isSameInstanceAs(TaskOutcome.FAILED)
+      assertThat(run).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
       assertThat(run.output.lines()).containsSubList(
         listOf(
           // Keep this list approach for Unix/Windows test compatibility.
