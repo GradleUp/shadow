@@ -139,7 +139,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
   @Test
   fun noSpdxId(@TempDir tempDir: Path) {
     with(transformer) {
-      transformer.artifactLicenseSpdxId.unset()
+      artifactLicenseSpdxId.unsetConvention()
 
       val artifactLicenseFile = tempDir.resolve("artifact-license").toFile()
       artifactLicenseFile.writeText("artifact license file content")
