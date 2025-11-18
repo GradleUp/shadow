@@ -11,7 +11,6 @@ import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -63,8 +62,7 @@ import org.gradle.api.tasks.Internal
  * - key2 = value2;balue2
  * - key3 = value3
  *
- * With `mergeStrategy = MergeStrategy.Fail` the transformation will fail if there
- * are conflicting values.
+ * With `mergeStrategy = MergeStrategy.Fail` the transformation will fail if there are conflicting values.
  *
  * There are three additional properties that can be set: [paths], [mappings],
  * and [keyTransformer].
@@ -164,7 +162,7 @@ public open class PropertiesFileTransformer @Inject constructor(
             }
             MergeStrategy.First -> Unit
             MergeStrategy.Fail -> {
-              val conflictsForPath: MutableMap<String, Int> = conflicts.computeIfAbsent(context.path) { mutableMapOf() }
+              val conflictsForPath = conflicts.computeIfAbsent(context.path) { mutableMapOf() }
               conflictsForPath.compute(key as String) { _, count -> (count ?: 1) + 1 }
             }
           }
@@ -227,11 +225,12 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     if (conflicts.isNotEmpty()) {
-      throw GradleException(
-        "The following properties files have conflicting property values and cannot be merged:${conflicts
-          .map { (path, conflicts) -> "$path${conflicts.map { "Property ${it.key} is duplicated ${it.value} times with different values" }.joinToString(separator = "\n   * ", prefix = "\n   * ")}" }
-          .joinToString(separator = "\n * ", prefix = "\n * ")}",
-      )
+      val message = "The following properties files have conflicting property values and cannot be merged:" +
+        conflicts.map { (path, props) ->
+          path + props.map { "Property ${it.key} is duplicated ${it.value} times with different values" }
+            .joinToString(separator = "\n   * ", prefix = "\n   * ")
+        }.joinToString(separator = "\n * ", prefix = "\n * ")
+      error(message)
     }
 
     // Cannot close the writer as the OutputStream needs to remain open.

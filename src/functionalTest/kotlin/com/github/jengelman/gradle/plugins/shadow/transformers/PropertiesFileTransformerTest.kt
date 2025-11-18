@@ -7,7 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -38,7 +38,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     if (strategy == MergeStrategy.Fail) {
       val result = runWithFailure(shadowJarPath)
 
-      assertThat(result).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
+      assertThat(result).taskOutcomeEquals(shadowJarPath, FAILED)
       assertThat(result.output).contains(
         "Execution failed for task ':shadowJar'.",
         "> The following properties files have conflicting property values and cannot be merged:",
@@ -81,9 +81,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
     if (strategy == MergeStrategy.Fail) {
       val result = runWithFailure(shadowJarPath)
-      assertThat(result).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
-      assertThat(result.output).contains(
 
+      assertThat(result).taskOutcomeEquals(shadowJarPath, FAILED)
+      assertThat(result.output).contains(
         // TODO EXPERIMENT
         """
           Execution failed for task ':shadowJar'.
