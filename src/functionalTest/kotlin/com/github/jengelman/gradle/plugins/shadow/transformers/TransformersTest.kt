@@ -6,6 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.lines
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -386,17 +387,15 @@ class TransformersTest : BaseTransformerTest() {
         "META-INF/",
         "META-INF/MANIFEST.MF",
       )
-      getContent("MY_LICENSE").given {
-        assertThat(it.lines()).isEqualTo(
-          listOf(
-            "artifact license text",
-            "####",
-            "license one",
-            "----",
-            "license two",
-          ),
-        )
-      }
+      getContent("MY_LICENSE").transform { it.replace(lineSeparator, "\n") }.isEqualTo(
+        """
+            artifact license text
+            ####
+            license one
+            ----
+            license two
+        """.trimIndent(),
+      )
     }
   }
 }
