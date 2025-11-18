@@ -59,7 +59,7 @@ public abstract class FindResourceInClasspath(private val patternSet: PatternSet
   protected abstract val archiveOperations: ArchiveOperations
 
   @TaskAction
-  internal fun findResources() {
+  public fun findResources() {
     classpath.forEach { file ->
       logger.lifecycle("scanning {}", file)
 
