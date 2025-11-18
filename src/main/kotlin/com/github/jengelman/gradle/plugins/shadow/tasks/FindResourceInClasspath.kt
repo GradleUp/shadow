@@ -1,6 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -50,12 +52,15 @@ public abstract class FindResourceInClasspath(private val patternSet: PatternSet
   @Input
   override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
+  @get:Inject
+  protected abstract val archiveOperations: ArchiveOperations
+
   @TaskAction
   internal fun findResources() {
     classpath.forEach { file ->
       logger.lifecycle("scanning {}", file)
 
-      project.zipTree(file).matching(patternSet).forEach { entry ->
+      archiveOperations.zipTree(file).matching(patternSet).forEach { entry ->
         logger.lifecycle("  -> {}", entry)
       }
     }
