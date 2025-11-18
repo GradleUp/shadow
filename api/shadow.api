@@ -408,9 +408,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/MergeLicens
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun getArtifactLicense ()Lorg/gradle/api/file/RegularFileProperty;
 	public final fun getArtifactLicenseSpdxId ()Lorg/gradle/api/provider/Property;
-	public fun getExcludes ()Ljava/util/Set;
 	public final fun getFirstSeparator ()Lorg/gradle/api/provider/Property;
-	public fun getIncludes ()Ljava/util/Set;
 	public final fun getOutputPath ()Lorg/gradle/api/provider/Property;
 	public final fun getSeparator ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z

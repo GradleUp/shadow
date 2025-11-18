@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets.UTF_8
@@ -36,7 +37,7 @@ public open class MergeLicenseResourceTransformer(
   objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
-  private val initializePatternSet by lazy {
+  private val initializePatternSet by unsafeLazy {
     if (patternSet.isEmpty) {
       includeDefaults()
     }
@@ -56,12 +57,6 @@ public open class MergeLicenseResourceTransformer(
     )
     return this
   }
-
-  @Input
-  override fun getIncludes(): MutableSet<String> = patternSet.includes
-
-  @Input
-  override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
   /** Path to write the aggregated license file to. Defaults to `META-INF/LICENSE`. */
   @get:Input

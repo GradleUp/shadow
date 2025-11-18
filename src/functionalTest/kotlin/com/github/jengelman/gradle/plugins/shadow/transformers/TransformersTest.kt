@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
@@ -351,5 +352,97 @@ class TransformersTest : BaseTransformerTest() {
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
     )
+  }
+
+  @Test
+  fun mergeLicenseResourceTransformer() {
+    val one = buildJarOne {
+      insert("META-INF/LICENSE", "license one")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/LICENSE", "license two")
+    }
+
+    val artifactLicense = projectRoot.resolve("my-license")
+    artifactLicense.writeText("artifact license text")
+
+    projectScript.appendText(
+      transform<MergeLicenseResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          outputPath = 'MY_LICENSE'
+          artifactLicense = file('my-license')
+          firstSeparator = '####'
+          separator = '----'
+        """.trimIndent(),
+      ),
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "MY_LICENSE",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+      getContent("MY_LICENSE").given {
+        assertThat(it.lines()).isEqualTo(
+          listOf(
+            "artifact license text",
+            "####",
+            "license one",
+            "----",
+            "license two",
+          ),
+        )
+      }
+    }
+  }
+
+  @Test
+  fun mergeLicenseResourceTransformerEXPERIMENT() {
+    val one = buildJarOne {
+      insert("META-INF/LICENSE", "license one")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/LICENSE", "license two")
+    }
+
+    val artifactLicense = projectRoot.resolve("my-license")
+    artifactLicense.writeText("artifact license text")
+
+    projectScript.appendText(
+      transform<MergeLicenseResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          outputPath = 'MY_LICENSE'
+          artifactLicense = file('my-license')
+          firstSeparator = '####'
+          separator = '----'
+        """.trimIndent(),
+      ),
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "MY_LICENSE",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+      getContent("MY_LICENSE").given {
+        assertThat(it).contains(
+          """
+            artifact license text
+            ####
+            license one
+            ----
+            license two
+          """.trimIndent().replace("\n", System.lineSeparator()),
+        )
+      }
+    }
   }
 }
