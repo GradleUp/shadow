@@ -54,7 +54,7 @@ fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(en
  * which one these functions return is undefined.
  */
 fun Assert<JarPath>.getContents(entryName: String) = transform { actual ->
-  JarInputStream(actual.inputStream()).use { jarInput ->
+  JarInputStream(actual.path.inputStream()).use { jarInput ->
     val contents = mutableListOf<String>()
     while (true) {
       val entry = jarInput.nextEntry ?: break
