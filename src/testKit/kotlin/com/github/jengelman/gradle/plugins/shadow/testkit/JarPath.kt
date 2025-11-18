@@ -11,6 +11,7 @@ import java.nio.file.Path
 import java.util.jar.JarFile
 import java.util.jar.JarInputStream
 import java.util.zip.ZipFile
+import kotlin.io.path.inputStream
 
 /**
  * A wrapper for [JarFile] that also implements [Path].
@@ -52,9 +53,8 @@ fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(en
  * [getContent] or [getStream] return only one of the matching entries;
  * which one these functions return is undefined.
  */
-fun Assert<JarPath>.getContents(entryName: String) = transform {
-  Files.newInputStream(it.path).use {
-    val jarInput = JarInputStream(it)
+fun Assert<JarPath>.getContents(entryName: String) = transform { actual ->
+  JarInputStream(actual.inputStream()).use { jarInput ->
     val contents = mutableListOf<String>()
     while (true) {
       val entry = jarInput.nextEntry ?: break

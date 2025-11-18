@@ -8,8 +8,8 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -35,12 +35,12 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
     val file2 = tempDir.resolve("file2")
     val file3 = tempDir.resolve("file3")
 
-    val content1 = "content1".toByteArray()
-    val content2 = "content2".toByteArray()
+    val content1 = "content1"
+    val content2 = "content2"
 
-    Files.write(file1, content1)
-    Files.write(file2, content1)
-    Files.write(file3, content2)
+    file1.writeText(content1)
+    file2.writeText(content1)
+    file3.writeText(content2)
 
     this.file1 = file1.toFile()
     this.file2 = file2.toFile()
