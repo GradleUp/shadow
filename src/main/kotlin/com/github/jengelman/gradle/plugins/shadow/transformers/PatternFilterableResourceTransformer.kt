@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Input
@@ -18,7 +19,7 @@ public abstract class PatternFilterableResourceTransformer(
   PatternFilterable by patternSet {
 
   @get:Internal
-  protected val patternSpec: Spec<FileTreeElement> by lazy(LazyThreadSafetyMode.NONE) {
+  protected val patternSpec: Spec<FileTreeElement> by unsafeLazy {
     // Cache the spec to prevent some unnecessary allocations during runtime.
     patternSet.asSpec
   }

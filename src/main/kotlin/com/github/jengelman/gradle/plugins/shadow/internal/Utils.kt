@@ -29,6 +29,9 @@ internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString(
  */
 internal inline fun <reified T : Any> Any?.cast(): T = this as T
 
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun <T : Any> unsafeLazy(noinline initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
+
 internal inline fun zipEntry(
   name: String,
   preserveLastModified: Boolean = true,
