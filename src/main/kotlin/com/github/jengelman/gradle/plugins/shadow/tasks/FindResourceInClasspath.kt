@@ -49,10 +49,10 @@ public abstract class FindResourceInClasspath(private val patternSet: PatternSet
   @get:Classpath
   public abstract val classpath: ConfigurableFileCollection
 
-  @Input
+  @Input // Trigger task executions after includes changed.
   override fun getIncludes(): MutableSet<String> = patternSet.includes
 
-  @Input
+  @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
   @get:Inject
