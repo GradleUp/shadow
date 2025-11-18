@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
@@ -29,8 +30,7 @@ class FindResourceInClasspathTest : BasePluginTest() {
       """.trimIndent(),
     )
 
-    val result1 = runWithSuccess(":find1")
-    assertThat(result1.output).contains(
+    assertThat(runWithSuccess(":find1").output).contains(
       "> Task :find1",
       "scanning ",
       "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
@@ -38,26 +38,28 @@ class FindResourceInClasspathTest : BasePluginTest() {
       "/a2.properties".invariantSeparatorsPathString,
     )
 
-    val result2 = runWithSuccess(":find2")
-    assertThat(result2.output).contains(
-      "> Task :find2",
-      "scanning ",
-      "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
-      "/a.properties".invariantSeparatorsPathString,
-    )
-    assertThat(result2.output).doesNotContain(
-      "/a2.properties".invariantSeparatorsPathString,
-    )
+    assertThat(runWithSuccess(":find2").output).all {
+      contains(
+        "> Task :find2",
+        "scanning ",
+        "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
+        "/a.properties".invariantSeparatorsPathString,
+      )
+      doesNotContain(
+        "/a2.properties".invariantSeparatorsPathString,
+      )
+    }
 
-    val result3 = runWithSuccess(":find3")
-    assertThat(result3.output).contains(
-      "> Task :find3",
-      "scanning ",
-      "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
-      "/a2.properties".invariantSeparatorsPathString,
-    )
-    assertThat(result3.output).doesNotContain(
-      "/a.properties".invariantSeparatorsPathString,
-    )
+    assertThat(runWithSuccess(":find3").output).all {
+      contains(
+        "> Task :find3",
+        "scanning ",
+        "/my/a/1.0/a-1.0.jar".invariantSeparatorsPathString,
+        "/a2.properties".invariantSeparatorsPathString,
+      )
+      doesNotContain(
+        "/a.properties".invariantSeparatorsPathString,
+      )
+    }
   }
 }
