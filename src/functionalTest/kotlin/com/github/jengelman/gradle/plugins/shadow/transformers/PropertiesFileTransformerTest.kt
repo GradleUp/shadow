@@ -64,6 +64,53 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     }
   }
 
+  @ParameterizedTest
+  @EnumSource(MergeStrategy::class)
+  fun mergePropertiesWithDifferentStrategiesEXPERIMENT(strategy: MergeStrategy) {
+    val one = buildJarOne {
+      insert("META-INF/test.properties", "key1=one\nkey2=one")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/test.properties", "key2=two\nkey3=two")
+    }
+    projectScript.appendText(
+      transform<PropertiesFileTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          mergeStrategy = $mergeStrategyClassName.$strategy
+          mergeSeparator = ";"
+          paths = ["META-INF/test.properties"]
+        """.trimIndent(),
+      ),
+    )
+
+    if (strategy == MergeStrategy.Fail) {
+      val run = runWithFailure(shadowJarPath)
+      assertThat(run).taskOutcomeEquals(shadowJarPath, TaskOutcome.FAILED)
+      assertThat(run.output.lines()).contains(
+
+        // TODO EXPERIMENT
+        """
+          Execution failed for task ':shadowJar'.
+          > The following properties files have conflicting property values and cannot be merged:
+             * META-INF/test.properties
+               * Property key2 is duplicated 2 times with different values
+        """.trimIndent().replace("\n", System.lineSeparator()),
+      )
+    } else {
+      runWithSuccess(shadowJarPath)
+
+      val expected = when (strategy) {
+        MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
+        MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
+        MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
+        else -> fail("Unexpected strategy: $strategy")
+      }
+      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
+      assertThat(content).contains(*expected)
+    }
+  }
+
   @Test
   fun mergePropertiesWithKeyTransformer() {
     val one = buildJarOne {
