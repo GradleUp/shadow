@@ -160,16 +160,27 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
   }
 
   @Issue(
-    "https://github.com/GradleUp/shadow/issues/622",
     "https://github.com/GradleUp/shadow/issues/856",
   )
   @Test
-  fun mergedPropertiesDoNotContainDateComment() {
+  fun mergedPropertiesWithoutComments() {
     val one = buildJarOne {
-      insert("META-INF/test.properties", "foo=one")
+      insert(
+        "META-INF/test.properties",
+        """
+          # A comment from jar one.
+          foo=one
+        """.trimIndent(),
+      )
     }
     val two = buildJarTwo {
-      insert("META-INF/test.properties", "foo=two")
+      insert(
+        "META-INF/test.properties",
+        """
+          # A comment from jar two.
+          foo=two
+        """.trimIndent(),
+      )
     }
     projectScript.appendText(
       transform<PropertiesFileTransformer>(
@@ -184,10 +195,11 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-    assertThat(content.trimIndent()).isEqualTo(
+    assertThat(content.invariantEolString).isEqualTo(
       """
-        foo=one,two
-      """.trimIndent(),
+        |foo=one,two
+        |
+      """.trimMargin(),
     )
   }
 
