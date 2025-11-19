@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.util.jar.Attributes as JarAttribute
@@ -351,5 +352,49 @@ class TransformersTest : BaseTransformerTest() {
       "" to ManifestAppenderTransformer::class,
       "" to ManifestResourceTransformer::class,
     )
+  }
+
+  @Test
+  fun mergeLicenseResourceTransformer() {
+    val one = buildJarOne {
+      insert("META-INF/LICENSE", "license one")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/LICENSE", "license two")
+    }
+    val artifactLicense = path("my-license")
+    artifactLicense.writeText("artifact license text")
+
+    projectScript.appendText(
+      transform<MergeLicenseResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          outputPath = 'MY_LICENSE'
+          artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
+          firstSeparator = '####'
+          separator = '----'
+        """.trimIndent(),
+      ),
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "MY_LICENSE",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+      getContent("MY_LICENSE").transform { it.invariantEolString }.isEqualTo(
+        """
+          SPDX-License-Identifier: Apache-2.0
+          artifact license text
+          ####
+          license one
+          ----
+          license two
+        """.trimIndent(),
+      )
+    }
   }
 }

@@ -402,6 +402,20 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public class com/github/jengelman/gradle/plugins/shadow/transformers/MergeLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun getArtifactLicense ()Lorg/gradle/api/file/RegularFileProperty;
+	public fun getArtifactLicenseSpdxId ()Lorg/gradle/api/provider/Property;
+	public fun getFirstSeparator ()Lorg/gradle/api/provider/Property;
+	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public fun getOutputPath ()Lorg/gradle/api/provider/Property;
+	public fun getSeparator ()Lorg/gradle/api/provider/Property;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
 public abstract class com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer, org/gradle/api/tasks/util/PatternFilterable {
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z

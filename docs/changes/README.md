@@ -13,6 +13,7 @@
 - Support overriding output path of `ApacheNoticeResourceTransformer`. ([#1851](https://github.com/GradleUp/shadow/pull/1851))
 - Add new merge strategy `Fail` to `PropertiesFileTransformer`. ([#1856](https://github.com/GradleUp/shadow/pull/1856))
 - Add `FindResourceInClasspath` task to help with debugging issues with merged duplicate resources. ([#1860](https://github.com/GradleUp/shadow/pull/1860))
+- Add `MergeLicenseResourceTransformer`. ([#1858](https://github.com/GradleUp/shadow/pull/1858))
 
 ### Changed
 
