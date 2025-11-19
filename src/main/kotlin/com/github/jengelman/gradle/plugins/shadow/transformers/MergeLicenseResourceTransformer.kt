@@ -41,7 +41,7 @@ public open class MergeLicenseResourceTransformer(
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
   private val initializePatternSet by unsafeLazy {
-    patternSet.include(
+    include(
       "META-INF/LICENSE",
       "META-INF/LICENSE.txt",
       "META-INF/LICENSE.md",
