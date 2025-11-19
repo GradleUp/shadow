@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -108,7 +108,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   internal val conflicts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 
   @get:Internal
-  internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
+  internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
 
   @get:Input
   public open val paths: SetProperty<String> = objectFactory.setProperty()
@@ -149,7 +149,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    val props = propertiesEntries.computeIfAbsent(context.path) { CleanProperties() }
+    val props = propertiesEntries.computeIfAbsent(context.path) { ReproducibleProperties() }
     loadAndTransformKeys(context.inputStream) { key, value ->
       if (props.containsKey(key)) {
         when (MergeStrategy.from(mergeStrategyFor(context.path))) {

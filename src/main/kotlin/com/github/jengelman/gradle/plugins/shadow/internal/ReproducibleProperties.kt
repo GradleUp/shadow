@@ -9,7 +9,7 @@ import java.util.Properties
 /**
  * Provides functionality for reproducible serialization.
  */
-internal class CleanProperties : Properties() {
+internal class ReproducibleProperties : Properties() {
   override fun store(writer: Writer, comments: String) {
     throw UnsupportedOperationException("use writeWithoutComments()")
   }

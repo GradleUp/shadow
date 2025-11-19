@@ -9,11 +9,11 @@ import java.nio.charset.StandardCharsets
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-class CleanPropertiesTest {
+class ReproduciblePropertiesTest {
   @ParameterizedTest
   @MethodSource("generalCharsetsProvider")
   fun emptyProperties(charset: Charset) {
-    val output = CleanProperties().writeToString(charset)
+    val output = ReproducibleProperties().writeToString(charset)
 
     assertThat(output).isEqualTo("")
   }
@@ -21,7 +21,7 @@ class CleanPropertiesTest {
   @ParameterizedTest
   @MethodSource("generalCharsetsProvider")
   fun asciiProps(charset: Charset) {
-    val output = CleanProperties().also { props ->
+    val output = ReproducibleProperties().also { props ->
       props["key"] = "value"
       props["key2"] = "value2"
       props["a"] = "b"
@@ -50,7 +50,7 @@ class CleanPropertiesTest {
   @ParameterizedTest
   @MethodSource("utfCharsetsProvider")
   fun utfProps(charset: Charset) {
-    val output = CleanProperties().also { props ->
+    val output = ReproducibleProperties().also { props ->
       props["äöüß"] = "aouss"
       props["áèô"] = "aeo"
       props["€²³"] = "x"
@@ -81,7 +81,7 @@ class CleanPropertiesTest {
       StandardCharsets.UTF_16,
     )
 
-    fun CleanProperties.writeToString(charset: Charset): String {
+    fun ReproducibleProperties.writeToString(charset: Charset): String {
       return ByteArrayOutputStream().also { writeWithoutComments(charset, it) }
         .toString(charset.name()).invariantEolString
     }
