@@ -145,7 +145,7 @@ public open class MergeLicenseResourceTransformer(
     }
     os.write(artifactLicense.get().asFile.readBytes())
 
-    if (!elements.isEmpty()) {
+    if (elements.isNotEmpty()) {
       os.write("\n".toByteArray(UTF_8))
       os.write(firstSeparator.get().toByteArray(UTF_8))
       os.write("\n".toByteArray(UTF_8))
