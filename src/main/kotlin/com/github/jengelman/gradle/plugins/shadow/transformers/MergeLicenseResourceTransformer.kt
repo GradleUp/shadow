@@ -19,7 +19,7 @@ import org.gradle.api.tasks.util.PatternSet
 /**
  * Generates a license file using the configured license text source.
  *
- * A mandatory `SPDX-License-Identifier` is placed in front of the license text to avoid ambiguous
+ * An optional `SPDX-License-Identifier` can be placed in front of the license text to avoid ambiguous
  * license detection by license-detection-tools.
  *
  * License texts found in the files names:
