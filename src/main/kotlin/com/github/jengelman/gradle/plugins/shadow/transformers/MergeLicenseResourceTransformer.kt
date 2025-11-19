@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.LinkedHashSet
 import javax.inject.Inject
@@ -109,7 +108,7 @@ public open class MergeLicenseResourceTransformer(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.putNextEntry(zipEntry(outputPath.get()))
-    os.write(buildLicenseFile())
+    os.write(buildLicense().toByteArray())
     os.closeEntry()
   }
 
@@ -120,29 +119,26 @@ public open class MergeLicenseResourceTransformer(
     }
   }
 
-  internal fun buildLicenseFile(): ByteArray {
-    val buffer = ByteArrayOutputStream()
+  internal fun buildLicense() = buildString {
     val spdxId = artifactLicenseSpdxId.orNull.orEmpty()
     if (spdxId.isNotBlank()) {
-      buffer.write("SPDX-License-Identifier: $spdxId\n".toByteArray())
+      append("SPDX-License-Identifier: $spdxId\n")
     }
 
-    artifactLicense.get().asFile.inputStream().use { it.copyTo(buffer) }
+    append(artifactLicense.get().asFile.readText())
 
     if (elements.isNotEmpty()) {
-      buffer.write(("\n" + firstSeparator.get() + "\n").toByteArray())
+      append("\n" + firstSeparator.get() + "\n")
 
       var first = true
-      val separatorBytes = ("\n" + separator.get() + "\n").toByteArray()
+      val separatorLine = ("\n" + separator.get() + "\n")
       for (element in elements) {
         if (!first) {
-          buffer.write(separatorBytes)
+          append(separatorLine)
         }
-        buffer.write(element.toByteArray())
+        append(element)
         first = false
       }
     }
-
-    return buffer.toByteArray()
   }
 }

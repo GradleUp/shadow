@@ -58,7 +58,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).containsExactlyInAnyOrder("license one", "   license two", "license three")
 
-      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
+      val written = buildLicense().lines()
       assertThat(written).isEqualTo(
         listOf(
           "SPDX-License-Identifier: Apache-2.0",
@@ -84,7 +84,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).containsExactlyInAnyOrder("license one")
 
-      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
+      val written = buildLicense().lines()
       assertThat(written).isEqualTo(
         listOf(
           "SPDX-License-Identifier: Apache-2.0",
@@ -104,7 +104,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
+      val written = buildLicense().lines()
       assertThat(written).isEqualTo(
         listOf(
           "SPDX-License-Identifier: Apache-2.0",
@@ -125,7 +125,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
+      val written = buildLicense().lines()
       assertThat(written).isEqualTo(
         listOf(
           "artifact license file content",
