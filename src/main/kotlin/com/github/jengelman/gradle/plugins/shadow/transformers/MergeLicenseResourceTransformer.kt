@@ -107,7 +107,7 @@ public open class MergeLicenseResourceTransformer(
   override fun hasTransformedResource(): Boolean = true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(outputPath.get()))
+    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
     os.write(buildLicense().toByteArray())
     os.closeEntry()
   }
