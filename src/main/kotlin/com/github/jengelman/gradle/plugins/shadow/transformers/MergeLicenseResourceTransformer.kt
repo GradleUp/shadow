@@ -63,8 +63,7 @@ public open class MergeLicenseResourceTransformer(
 
   /** Path to write the aggregated license file to. Defaults to `META-INF/LICENSE`. */
   @get:Input
-  public val outputPath: Property<String> =
-    objectFactory.property("META-INF/LICENSE")
+  public val outputPath: Property<String> = objectFactory.property("META-INF/LICENSE")
 
   /**
    * The generated license file is potentially a collection of multiple license texts. To avoid
