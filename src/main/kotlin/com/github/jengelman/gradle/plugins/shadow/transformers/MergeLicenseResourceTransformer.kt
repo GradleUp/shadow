@@ -39,9 +39,8 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * To exclude these defaults, add [exclude]s to the transformer configuration.
  *
- * Use the [PatternFilterable][org.gradle.api.tasks.util.PatternFilterable] functions to
- * specify a different set of files to include, the paths mentioned above are then not considered
- * unless explicitly included.
+ * Use the [org.gradle.api.tasks.util.PatternFilterable] functions to specify a different set of files to include,
+ * the paths mentioned above are then not considered unless explicitly included.
  */
 @CacheableTransformer
 public open class MergeLicenseResourceTransformer(
