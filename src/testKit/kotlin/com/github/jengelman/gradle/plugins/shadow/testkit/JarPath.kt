@@ -87,7 +87,7 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
 
 /**
- * Ensures the JAR contains only the specified entries.
+ * Ensures the JAR contains exactly the specified entries, including duplicates, in any order.
  * Used alone, without [containsAtLeast] or [containsNone].
  */
 fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) = toEntries().containsExactlyInAnyOrder(*entries)
