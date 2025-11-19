@@ -114,7 +114,7 @@ public open class MergeLicenseResourceTransformer(
 
   internal fun transformInternal(bytes: ByteArray) {
     val content = bytes.toString(UTF_8).trim('\n', '\r')
-    if (!content.isEmpty()) {
+    if (content.isNotEmpty()) {
       elements.add(content)
     }
   }
