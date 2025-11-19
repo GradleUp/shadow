@@ -69,21 +69,20 @@ public open class MergeLicenseResourceTransformer(
    * Separator between the project's license text and license texts from the included dependencies.
    */
   @get:Input
-  public val firstSeparator: Property<String> =
-    objectFactory
-      .property(
-        """
+  public val firstSeparator: Property<String> = objectFactory.property(
+    """
+      |
+      |${"-".repeat(120)}
+      |
+      |This artifact includes dependencies with the following licenses:
+      |----------------------------------------------------------------
+      |
+    """.trimMargin(),
+  )
 
-        ${"-".repeat(120)}
-
-        This artifact includes dependencies with the following licenses:
-        ----------------------------------------------------------------
-
-        """
-          .trimIndent(),
-      )
-
-  /** Separator between included dependency license texts. */
+  /**
+   * Separator between included dependency license texts.
+   */
   @get:Input
   public val separator: Property<String> = objectFactory.property("\n${"-".repeat(120)}\n")
 
@@ -123,8 +122,7 @@ public open class MergeLicenseResourceTransformer(
 
   internal fun buildLicenseFile(): ByteArray {
     val buffer = ByteArrayOutputStream()
-
-    val spdxId = artifactLicenseSpdxId.orElse("").get().trim()
+    val spdxId = artifactLicenseSpdxId.orNull.orEmpty()
     if (spdxId.isNotBlank()) {
       buffer.write("SPDX-License-Identifier: $spdxId\n".toByteArray())
     }

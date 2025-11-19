@@ -362,8 +362,7 @@ class TransformersTest : BaseTransformerTest() {
     val two = buildJarTwo {
       insert("META-INF/LICENSE", "license two")
     }
-
-    val artifactLicense = projectRoot.resolve("my-license")
+    val artifactLicense = path("my-license")
     artifactLicense.writeText("artifact license text")
 
     projectScript.appendText(
@@ -371,7 +370,7 @@ class TransformersTest : BaseTransformerTest() {
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
           outputPath = 'MY_LICENSE'
-          artifactLicense = file('my-license')
+          artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
           firstSeparator = '####'
           separator = '----'
         """.trimIndent(),
@@ -388,12 +387,12 @@ class TransformersTest : BaseTransformerTest() {
       )
       getContent("MY_LICENSE").transform { it.invariantEolString }.isEqualTo(
         """
-            SPDX-License-Identifier: Apache-2.0
-            artifact license text
-            ####
-            license one
-            ----
-            license two
+          SPDX-License-Identifier: Apache-2.0
+          artifact license text
+          ####
+          license one
+          ----
+          license two
         """.trimIndent(),
       )
     }
