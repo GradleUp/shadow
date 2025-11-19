@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
-import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -123,6 +122,10 @@ public open class PropertiesFileTransformer @Inject constructor(
   @get:Input
   public open val mergeSeparator: Property<String> = objectFactory.property(",")
 
+  /**
+   * The character set to use when reading and writing property files.
+   * Defaults to `ISO-8859-1`.
+   */
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
@@ -146,49 +149,31 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    val props = propertiesEntries[context.path]
-    val incoming = loadAndTransformKeys(context.inputStream)
-    if (props == null) {
-      propertiesEntries[context.path] = incoming
-    } else {
-      for ((key, value) in incoming) {
-        if (props.containsKey(key)) {
-          when (MergeStrategy.from(mergeStrategyFor(context.path))) {
-            MergeStrategy.Latest -> {
-              props[key] = value
-            }
-            MergeStrategy.Append -> {
-              props[key] = props.getProperty(key as String) + mergeSeparatorFor(context.path) + value
-            }
-            MergeStrategy.First -> Unit
-            MergeStrategy.Fail -> {
-              val conflictsForPath = conflicts.computeIfAbsent(context.path) { mutableMapOf() }
-              conflictsForPath.compute(key as String) { _, count -> (count ?: 1) + 1 }
-            }
+    val props = propertiesEntries.computeIfAbsent(context.path) { CleanProperties() }
+    loadAndTransformKeys(context.inputStream) { key, value ->
+      if (props.containsKey(key)) {
+        when (MergeStrategy.from(mergeStrategyFor(context.path))) {
+          MergeStrategy.Latest -> {
+            props[key] = value
           }
-        } else {
-          props[key] = value
+          MergeStrategy.Append -> {
+            props[key] = props[key] as String + mergeSeparatorFor(context.path) + value
+          }
+          MergeStrategy.First -> Unit
+          MergeStrategy.Fail -> {
+            val conflictsForPath = conflicts.computeIfAbsent(context.path) { mutableMapOf() }
+            conflictsForPath.compute(key) { _, count -> (count ?: 1) + 1 }
+          }
         }
+      } else {
+        props[key] = value
       }
     }
   }
 
-  private fun loadAndTransformKeys(inputStream: InputStream): CleanProperties {
-    val props = CleanProperties()
-    // InputStream closed by caller, so we don't do it here.
-    props.load(inputStream.bufferedReader(charset))
-    return transformKeys(props)
-  }
-
-  private fun transformKeys(properties: Properties): CleanProperties {
-    if (keyTransformer == IDENTITY) {
-      return properties as CleanProperties
-    }
-    val result = CleanProperties()
-    properties.forEach { (key, value) ->
-      result[keyTransformer(key as String)] = value
-    }
-    return result
+  private fun loadAndTransformKeys(inputStream: InputStream, action: (key: String, value: String) -> Unit) {
+    val props = Properties().apply { load(inputStream.bufferedReader(charset)) }
+    props.forEach { action(keyTransformer(it.key as String), it.value as String) }
   }
 
   private fun mergeStrategyFor(path: String): String {
@@ -233,14 +218,9 @@ public open class PropertiesFileTransformer @Inject constructor(
       error(message)
     }
 
-    // Cannot close the writer as the OutputStream needs to remain open.
-    val zipWriter = os.writer(charset)
     propertiesEntries.forEach { (path, props) ->
       os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      props.inputStream(charset).bufferedReader(charset).use {
-        it.copyTo(zipWriter)
-      }
-      zipWriter.flush()
+      props.writeWithoutComments(charset, os)
       os.closeEntry()
     }
   }

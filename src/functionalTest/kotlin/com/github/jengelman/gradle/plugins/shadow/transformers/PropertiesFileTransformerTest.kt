@@ -4,9 +4,9 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.invariantEolString
 import kotlin.io.path.appendText
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Assertions.fail
@@ -51,13 +51,31 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       runWithSuccess(shadowJarPath)
 
       val expected = when (strategy) {
-        MergeStrategy.First -> arrayOf("key1=one", "key2=one", "key3=two")
-        MergeStrategy.Latest -> arrayOf("key1=one", "key2=two", "key3=two")
-        MergeStrategy.Append -> arrayOf("key1=one", "key2=one;two", "key3=two")
+        MergeStrategy.First ->
+          """
+          |key1=one
+          |key2=one
+          |key3=two
+          |
+          """.trimMargin()
+        MergeStrategy.Latest ->
+          """
+          |key1=one
+          |key2=two
+          |key3=two
+          |
+          """.trimMargin()
+        MergeStrategy.Append ->
+          """
+          |key1=one
+          |key2=one;two
+          |key3=two
+          |
+          """.trimMargin()
         else -> fail("Unexpected strategy: $strategy")
       }
       val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-      assertThat(content).contains(*expected)
+      assertThat(content.invariantEolString).isEqualTo(expected)
     }
   }
 
@@ -168,8 +186,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content.trimIndent()).isEqualTo(
       """
-        #
-
         foo=one,two
       """.trimIndent(),
     )

@@ -5,7 +5,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
 import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
-import com.github.jengelman.gradle.plugins.shadow.util.variantSeparatorsPathString
+import com.github.jengelman.gradle.plugins.shadow.testkit.variantSeparatorsPathString
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 

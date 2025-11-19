@@ -20,6 +20,7 @@
 - Update ASM and jdependency to support Java 26. ([#1799](https://github.com/GradleUp/shadow/pull/1799))
 - Bump min Gradle requirement to 9.0.0. ([#1801](https://github.com/GradleUp/shadow/pull/1801))
 - Deprecate `PreserveFirstFoundResourceTransformer.resources`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
+- Make the output of `PropertiesFileTransformer` reproducible. ([#1861](https://github.com/GradleUp/shadow/pull/1861))
 
 ### Fixed
 
