@@ -58,17 +58,26 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).containsExactlyInAnyOrder("license one", "   license two", "license three")
 
-      val written = buildLicense().lines()
-      assertThat(written).isEqualTo(
-        listOf(
-          "SPDX-License-Identifier: Apache-2.0",
-          "artifact license file content",
-        ) + firstSeparator.get().lines() +
-          "license one" +
-          separator.get().lines() +
-          "   license two" +
-          separator.get().lines() +
-          "license three",
+      assertThat(buildLicense()).isEqualTo(
+        """
+          SPDX-License-Identifier: Apache-2.0
+          artifact license file content
+
+          ------------------------------------------------------------------------------------------------------------------------
+
+          This artifact includes dependencies with the following licenses:
+          ----------------------------------------------------------------
+
+          license one
+
+          ------------------------------------------------------------------------------------------------------------------------
+
+             license two
+
+          ------------------------------------------------------------------------------------------------------------------------
+
+          license three
+        """.trimIndent(),
       )
     }
   }
@@ -84,13 +93,18 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).containsExactlyInAnyOrder("license one")
 
-      val written = buildLicense().lines()
-      assertThat(written).isEqualTo(
-        listOf(
-          "SPDX-License-Identifier: Apache-2.0",
-          "artifact license file content",
-        ) + firstSeparator.get().lines() +
-          "license one",
+      assertThat(buildLicense()).isEqualTo(
+        """
+          SPDX-License-Identifier: Apache-2.0
+          artifact license file content
+
+          ------------------------------------------------------------------------------------------------------------------------
+
+          This artifact includes dependencies with the following licenses:
+          ----------------------------------------------------------------
+
+          license one
+        """.trimIndent(),
       )
     }
   }
@@ -104,12 +118,11 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      val written = buildLicense().lines()
-      assertThat(written).isEqualTo(
-        listOf(
-          "SPDX-License-Identifier: Apache-2.0",
-          "artifact license file content",
-        ),
+      assertThat(buildLicense()).isEqualTo(
+        """
+          SPDX-License-Identifier: Apache-2.0
+          artifact license file content
+        """.trimIndent(),
       )
     }
   }
@@ -125,11 +138,8 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      val written = buildLicense().lines()
-      assertThat(written).isEqualTo(
-        listOf(
-          "artifact license file content",
-        ),
+      assertThat(buildLicense()).isEqualTo(
+        "artifact license file content",
       )
     }
   }
