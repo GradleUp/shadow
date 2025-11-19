@@ -99,8 +99,7 @@ public open class MergeLicenseResourceTransformer(
 
   /** Separator between included dependency license texts. */
   @get:Input
-  public val separator: Property<String> =
-    objectFactory.property("\n${"-".repeat(120)}\n")
+  public val separator: Property<String> = objectFactory.property("\n${"-".repeat(120)}\n")
 
   @Inject
   public constructor(objectFactory: ObjectFactory) : this(objectFactory, patternSet = PatternSet())
