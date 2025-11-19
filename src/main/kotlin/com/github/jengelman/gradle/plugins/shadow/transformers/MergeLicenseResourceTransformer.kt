@@ -130,15 +130,8 @@ public open class MergeLicenseResourceTransformer(
     if (elements.isNotEmpty()) {
       append("\n" + firstSeparator.get() + "\n")
 
-      var first = true
-      val separatorLine = ("\n" + separator.get() + "\n")
-      for (element in elements) {
-        if (!first) {
-          append(separatorLine)
-        }
-        append(element)
-        first = false
-      }
+      val separatorLine = "\n" + separator.get() + "\n"
+      append(elements.joinToString(separator = separatorLine))
     }
   }
 }
