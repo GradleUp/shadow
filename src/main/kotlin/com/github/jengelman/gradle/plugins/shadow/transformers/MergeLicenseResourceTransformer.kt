@@ -48,7 +48,7 @@ public open class MergeLicenseResourceTransformer(
 
   /** Path to write the aggregated license file to. Defaults to `META-INF/LICENSE`. */
   @get:Input
-  public val outputPath: Property<String> = objectFactory.property("META-INF/LICENSE")
+  public open val outputPath: Property<String> = objectFactory.property("META-INF/LICENSE")
 
   /**
    * The generated license file is potentially a collection of multiple license texts. To avoid
@@ -57,18 +57,18 @@ public open class MergeLicenseResourceTransformer(
    * this property is present and not empty. Defaults to `Apache-2.0`.
    */
   @get:Input
-  public val artifactLicenseSpdxId: Property<String> = objectFactory.property("Apache-2.0")
+  public open val artifactLicenseSpdxId: Property<String> = objectFactory.property("Apache-2.0")
 
   /** Path to the project's license text, this property *must* be configured. */
   @get:InputFile
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public val artifactLicense: RegularFileProperty = objectFactory.fileProperty()
+  public open val artifactLicense: RegularFileProperty = objectFactory.fileProperty()
 
   /**
    * Separator between the project's license text and license texts from the included dependencies.
    */
   @get:Input
-  public val firstSeparator: Property<String> = objectFactory.property(
+  public open val firstSeparator: Property<String> = objectFactory.property(
     """
       |
       |${"-".repeat(120)}
@@ -83,7 +83,7 @@ public open class MergeLicenseResourceTransformer(
    * Separator between included dependency license texts.
    */
   @get:Input
-  public val separator: Property<String> = objectFactory.property("\n${"-".repeat(120)}\n")
+  public open val separator: Property<String> = objectFactory.property("\n${"-".repeat(120)}\n")
 
   @Inject
   public constructor(objectFactory: ObjectFactory) : this(
