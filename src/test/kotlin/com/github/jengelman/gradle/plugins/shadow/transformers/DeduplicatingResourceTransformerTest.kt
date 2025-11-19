@@ -25,9 +25,9 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
   lateinit var file2: File
   lateinit var file3: File
 
-  var hash1: Long = 0L
-  var hash2: Long = 0L
-  var hash3: Long = 0L
+  var hash1: String = ""
+  var hash2: String = ""
+  var hash3: String = ""
 
   @BeforeEach
   fun setupFiles() {
