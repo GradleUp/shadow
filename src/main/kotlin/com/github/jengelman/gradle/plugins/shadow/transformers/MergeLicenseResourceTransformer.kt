@@ -26,9 +26,17 @@ import org.gradle.api.tasks.util.PatternSet
  * A mandatory `SPDX-License-Identifier` is placed in front of the license text to avoid ambiguous
  * license detection by license-detection-tools.
  *
- * License texts found in the files names `META-INF/LICENSE`, `META-INF/LICENSE.txt`,
- * `META-INF/LICENSE.md`, `LICENSE`, `LICENSE.txt`, `LICENSE.md` are included from the shadow jar
- * sources.
+ * License texts found in the files names:
+ *
+ * - `META-INF/LICENSE`
+ * - `META-INF/LICENSE.txt`
+ * - `META-INF/LICENSE.md`
+ * - `LICENSE`
+ * - `LICENSE.txt`
+ * - `LICENSE.md`
+ *
+ * are included for the shadowed jar sources.
+ *
  * To exclude these defaults, add [exclude]s to the transformer configuration.
  *
  * Use the [PatternFilterable][org.gradle.api.tasks.util.PatternFilterable] functions to
