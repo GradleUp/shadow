@@ -1,14 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.LinkedHashSet
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -46,17 +44,6 @@ public open class MergeLicenseResourceTransformer(
   objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
-  private val initializePatternSet by unsafeLazy {
-    include(
-      "META-INF/LICENSE",
-      "META-INF/LICENSE.txt",
-      "META-INF/LICENSE.md",
-      "LICENSE",
-      "LICENSE.txt",
-      "LICENSE.md",
-    )
-  }
-
   @get:Internal
   internal val elements: MutableSet<String> = LinkedHashSet()
 
@@ -101,13 +88,19 @@ public open class MergeLicenseResourceTransformer(
   public val separator: Property<String> = objectFactory.property("\n${"-".repeat(120)}\n")
 
   @Inject
-  public constructor(objectFactory: ObjectFactory) : this(objectFactory, patternSet = PatternSet())
-
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    // Init once before patternSpec is accessed.
-    initializePatternSet
-    return super.canTransformResource(element)
-  }
+  public constructor(objectFactory: ObjectFactory) : this(
+    objectFactory,
+    patternSet = PatternSet().apply {
+      include(
+        "META-INF/LICENSE",
+        "META-INF/LICENSE.txt",
+        "META-INF/LICENSE.md",
+        "LICENSE",
+        "LICENSE.txt",
+        "LICENSE.md",
+      )
+    },
+  )
 
   override fun transform(context: TransformerContext) {
     transformInternal(context.inputStream.readAllBytes())

@@ -405,7 +405,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 public class com/github/jengelman/gradle/plugins/shadow/transformers/MergeLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
-	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public final fun getArtifactLicense ()Lorg/gradle/api/file/RegularFileProperty;
 	public final fun getArtifactLicenseSpdxId ()Lorg/gradle/api/provider/Property;
 	public final fun getFirstSeparator ()Lorg/gradle/api/provider/Property;
