@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -108,7 +108,7 @@ public open class PropertiesFileTransformer @Inject constructor(
   internal val conflicts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 
   @get:Internal
-  internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
+  internal val propertiesEntries = mutableMapOf<String, CleanProperties>()
 
   @get:Input
   public open val paths: SetProperty<String> = objectFactory.setProperty()
@@ -149,17 +149,15 @@ public open class PropertiesFileTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    val props = propertiesEntries.computeIfAbsent(context.path) { ReproducibleProperties() }
-    val mergeStrategy = MergeStrategy.from(mergeStrategyFor(context.path))
-    val mergeSeparator = if (mergeStrategy == MergeStrategy.Append) mergeSeparatorFor(context.path) else ""
+    val props = propertiesEntries.computeIfAbsent(context.path) { CleanProperties() }
     loadAndTransformKeys(context.inputStream) { key, value ->
       if (props.containsKey(key)) {
-        when (mergeStrategy) {
+        when (MergeStrategy.from(mergeStrategyFor(context.path))) {
           MergeStrategy.Latest -> {
             props[key] = value
           }
           MergeStrategy.Append -> {
-            props[key] = props[key] as String + mergeSeparator + value
+            props[key] = props[key] as String + mergeSeparatorFor(context.path) + value
           }
           MergeStrategy.First -> Unit
           MergeStrategy.Fail -> {
@@ -173,11 +171,9 @@ public open class PropertiesFileTransformer @Inject constructor(
     }
   }
 
-  private fun loadAndTransformKeys(inputStream: InputStream, keyValue: (key: String, value: String) -> Unit) {
-    val props = Properties()
-    // InputStream closed by caller, so we don't do it here.
-    props.load(inputStream.bufferedReader(charset))
-    props.forEach { keyValue(keyTransformer(it.key as String), it.value as String) }
+  private fun loadAndTransformKeys(inputStream: InputStream, action: (key: String, value: String) -> Unit) {
+    val props = Properties().apply { load(inputStream.bufferedReader(charset)) }
+    props.forEach { action(keyTransformer(it.key as String), it.value as String) }
   }
 
   private fun mergeStrategyFor(path: String): String {
@@ -222,7 +218,6 @@ public open class PropertiesFileTransformer @Inject constructor(
       error(message)
     }
 
-    // Cannot close the writer as the OutputStream needs to remain open.
     propertiesEntries.forEach { (path, props) ->
       os.putNextEntry(zipEntry(path, preserveFileTimestamps))
       props.writeWithoutComments(charset, os)

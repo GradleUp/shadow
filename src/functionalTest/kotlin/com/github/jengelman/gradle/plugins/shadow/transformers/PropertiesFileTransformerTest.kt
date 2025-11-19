@@ -4,9 +4,9 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import com.github.jengelman.gradle.plugins.shadow.util.invariantEolString
 import kotlin.io.path.appendText
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Assertions.fail
@@ -53,29 +53,29 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       val expected = when (strategy) {
         MergeStrategy.First ->
           """
-          key1=one
-          key2=one
-          key3=two
-
-          """
+          |key1=one
+          |key2=one
+          |key3=two
+          |
+          """.trimMargin()
         MergeStrategy.Latest ->
           """
-          key1=one
-          key2=two
-          key3=two
-
-          """
+          |key1=one
+          |key2=two
+          |key3=two
+          |
+          """.trimMargin()
         MergeStrategy.Append ->
           """
-          key1=one
-          key2=one;two
-          key3=two
-
-          """
+          |key1=one
+          |key2=one;two
+          |key3=two
+          |
+          """.trimMargin()
         else -> fail("Unexpected strategy: $strategy")
-      }.trimIndent()
-      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }.invariantEolString
-      assertThat(content).isEqualTo(expected)
+      }
+      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
+      assertThat(content.invariantEolString).isEqualTo(expected)
     }
   }
 
