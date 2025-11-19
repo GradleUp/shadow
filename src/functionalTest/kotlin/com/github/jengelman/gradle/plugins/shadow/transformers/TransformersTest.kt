@@ -19,7 +19,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.util.jar.Attributes as JarAttribute
-import kotlin.booleanArrayOf
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
