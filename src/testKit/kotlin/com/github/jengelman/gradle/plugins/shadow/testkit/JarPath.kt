@@ -6,7 +6,6 @@ import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import java.io.InputStream
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.jar.JarFile
 import java.util.jar.JarInputStream
