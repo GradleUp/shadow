@@ -73,8 +73,7 @@ public open class MergeLicenseResourceTransformer(
    * this property is present and not empty. Defaults to `Apache-2.0`.
    */
   @get:Input
-  public val artifactLicenseSpdxId: Property<String> =
-    objectFactory.property("Apache-2.0")
+  public val artifactLicenseSpdxId: Property<String> = objectFactory.property("Apache-2.0")
 
   /** Path to the project's license text, this property *must* be configured. */
   @get:InputFile
