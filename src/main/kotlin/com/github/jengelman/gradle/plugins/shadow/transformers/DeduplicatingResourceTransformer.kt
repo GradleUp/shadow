@@ -1,15 +1,16 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.File
-import java.nio.ByteBuffer
 import java.security.MessageDigest
 import javax.inject.Inject
+import org.apache.commons.io.input.MessageDigestInputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternSet
+import org.gradle.internal.impldep.org.apache.commons.codec.binary.Hex
 
 /**
  * Transformer to include files with identical content only once in the shadow JAR.
@@ -61,11 +62,11 @@ public open class DeduplicatingResourceTransformer(
   public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
   internal data class PathInfos(val failOnDuplicateContent: Boolean) {
-    val filesPerHash: MutableMap<Long, MutableList<File>> = mutableMapOf()
+    val filesPerHash: MutableMap<String, MutableList<File>> = mutableMapOf()
 
     fun uniqueContentCount() = filesPerHash.size
 
-    fun addFile(hash: Long, file: File): Boolean {
+    fun addFile(hash: String, file: File): Boolean {
       var filesForHash: MutableList<File>? = filesPerHash[hash]
       val new = filesForHash == null
       if (new) {
@@ -113,23 +114,23 @@ public open class DeduplicatingResourceTransformer(
   @Transient
   private var digest: MessageDigest? = null
 
-  internal fun hashForFile(file: File): Long {
+  internal fun hashForFile(file: File): String {
     if (digest == null) {
       digest = MessageDigest.getInstance("SHA-256")
     }
     val d = digest!!
     try {
+      // We could replace this block with `o.a.c.codec.digest.DigestUtils.digest(MessageDigest, File)`,
+      // but adding a whole new dependency seemed a bit overkill.
+      // Using org.apache.commons.io.input.MessageDigestInputStream doesn't give simpler code either.
       file.inputStream().use {
         val buffer = ByteArray(8192)
-        while (true) {
-          val rd = it.read(buffer)
-          if (rd == -1) {
-            break
-          }
-          d.update(buffer, 0, rd)
+        var readBytes: Int
+        while (it.read(buffer).also { r -> readBytes = r } != -1) {
+          d.update(buffer, 0, readBytes)
         }
       }
-      return ByteBuffer.wrap(d.digest()).getLong(0)
+      return Hex.encodeHexString(d.digest(), true)
     } catch (e: Exception) {
       throw RuntimeException("Failed to read data or calculate hash for $file", e)
     }
