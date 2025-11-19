@@ -18,7 +18,7 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * Some scenarios for duplicate resources in a shadow jar:
  * * Duplicate `.class` files
- *   Having duplicate `.class` files with different is a situation indicating that the resulting jar is
+ *   Having duplicate `.class` files with different content is a situation indicating that the resulting jar is
  *   built with _incompatible_ classes, likely leading to issues during runtime.
  *   This situation can happen when one dependency is (also) included in an uber jar.
  * * Duplicate `META-INF/<group-id>/<artifact-id>/pom.properties`/`xml` files.
