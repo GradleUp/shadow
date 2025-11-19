@@ -2,15 +2,14 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.File
 import java.security.MessageDigest
+import java.util.HexFormat
 import javax.inject.Inject
-import org.apache.commons.io.input.MessageDigestInputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternSet
-import org.gradle.internal.impldep.org.apache.commons.codec.binary.Hex
 
 /**
  * Transformer to include files with identical content only once in the shadow JAR.
@@ -130,7 +129,7 @@ public open class DeduplicatingResourceTransformer(
           d.update(buffer, 0, readBytes)
         }
       }
-      return Hex.encodeHexString(d.digest(), true)
+      return HexFormat.of().formatHex(d.digest())
     } catch (e: Exception) {
       throw RuntimeException("Failed to read data or calculate hash for $file", e)
     }
