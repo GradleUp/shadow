@@ -22,7 +22,7 @@ import org.gradle.api.tasks.util.PatternSet
  * An optional `SPDX-License-Identifier` can be placed in front of the license text to avoid ambiguous
  * license detection by license-detection-tools.
  *
- * License texts found in the files names:
+ * License texts found in the file names:
  *
  * - `META-INF/LICENSE`
  * - `META-INF/LICENSE.txt`
