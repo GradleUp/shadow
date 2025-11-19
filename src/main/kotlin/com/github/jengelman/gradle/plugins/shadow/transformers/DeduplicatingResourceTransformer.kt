@@ -119,6 +119,7 @@ public open class DeduplicatingResourceTransformer(
     }
     val d = digest!!
     try {
+      d.reset()
       // We could replace this block with `o.a.c.codec.digest.DigestUtils.digest(MessageDigest, File)`,
       // but adding a whole new dependency seemed a bit overkill.
       // Using org.apache.commons.io.input.MessageDigestInputStream doesn't give simpler code either.
