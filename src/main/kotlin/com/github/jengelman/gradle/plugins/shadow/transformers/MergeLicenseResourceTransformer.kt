@@ -40,7 +40,7 @@ import org.gradle.api.tasks.util.PatternSet
  */
 @CacheableTransformer
 public open class MergeLicenseResourceTransformer(
-  objectFactory: ObjectFactory,
+  final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
   @get:Internal
