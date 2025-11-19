@@ -100,7 +100,7 @@ public open class DeduplicatingResourceTransformer(
           duplicatePaths
             .map { (path, infos) ->
               "  * $path${infos.filesPerHash.map { (hash, files) ->
-                files.joinToString { file -> "    * ${file.path} (Hash: $hash)" }
+                files.joinToString { file -> "    * ${file.path} (SHA256: $hash)" }
               }.joinToString("\n", "\n", "")}"
             }
             .joinToString("\n", "\n", "")

@@ -87,8 +87,8 @@ class TransformersTest : BaseTransformerTest() {
         "Execution failed for task ':shadowJar'.",
         "> Found 1 path duplicate(s) with different content in the shadow JAR:",
         "    * differing-content-2",
-        "differing-content-2 (Hash: -1337566116240053116)",
-        "differing-content-2 (Hash: -6159701213549668473)",
+        "differing-content-2 (SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73)",
+        "differing-content-2 (SHA256: aa845861bbd4578700e10487d85b25ead8723ee98fbf143df7b7e0bf1cb3385d)",
       )
     }
   }
