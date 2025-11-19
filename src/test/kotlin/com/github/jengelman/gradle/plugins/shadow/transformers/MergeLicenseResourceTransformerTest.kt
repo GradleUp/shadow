@@ -30,6 +30,8 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
   fun customIncludes() {
     with(transformer) {
       include("META-INF/FOO")
+      exclude("META-INF/LICENSE*")
+      exclude("LICENSE*")
       assertThat(canTransformResource("META-INF/FOO")).isTrue()
       assertThat(canTransformResource("META-INF/LICENSE")).isFalse()
       assertThat(canTransformResource("META-INF/LICENSE.txt")).isFalse()
@@ -45,7 +47,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
   fun customIncludesWithDefaults() {
     with(transformer) {
       include("META-INF/FOO")
-      includeDefaults()
       assertThat(canTransformResource("META-INF/FOO")).isTrue()
       assertThat(canTransformResource("META-INF/LICENSE")).isTrue()
       assertThat(canTransformResource("META-INF/LICENSE.txt")).isTrue()

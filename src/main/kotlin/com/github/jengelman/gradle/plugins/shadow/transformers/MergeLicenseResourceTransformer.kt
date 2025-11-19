@@ -28,7 +28,10 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * License texts found in the files names `META-INF/LICENSE`, `META-INF/LICENSE.txt`,
  * `META-INF/LICENSE.md`, `LICENSE`, `LICENSE.txt`, `LICENSE.md` are included from the shadow jar
- * sources. Use the [PatternFilterable][org.gradle.api.tasks.util.PatternFilterable] functions to
+ * sources.
+ * To exclude these defaults, add [exclude]s to the transformer configuration.
+ *
+ * Use the [PatternFilterable][org.gradle.api.tasks.util.PatternFilterable] functions to
  * specify a different set of files to include, the paths mentioned above are then not considered
  * unless explicitly included.
  */
@@ -38,15 +41,6 @@ public open class MergeLicenseResourceTransformer(
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
   private val initializePatternSet by unsafeLazy {
-    if (patternSet.isEmpty) {
-      includeDefaults()
-    }
-  }
-
-  @get:Internal
-  internal val elements: MutableSet<String> = LinkedHashSet()
-
-  public fun includeDefaults(): MergeLicenseResourceTransformer {
     patternSet.include(
       "META-INF/LICENSE",
       "META-INF/LICENSE.txt",
@@ -55,8 +49,10 @@ public open class MergeLicenseResourceTransformer(
       "LICENSE.txt",
       "LICENSE.md",
     )
-    return this
   }
+
+  @get:Internal
+  internal val elements: MutableSet<String> = LinkedHashSet()
 
   /** Path to write the aggregated license file to. Defaults to `META-INF/LICENSE`. */
   @get:Input

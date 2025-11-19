@@ -412,7 +412,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/MergeLicens
 	public final fun getOutputPath ()Lorg/gradle/api/provider/Property;
 	public final fun getSeparator ()Lorg/gradle/api/provider/Property;
 	public fun hasTransformedResource ()Z
-	public final fun includeDefaults ()Lcom/github/jengelman/gradle/plugins/shadow/transformers/MergeLicenseResourceTransformer;
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
