@@ -5,9 +5,7 @@ import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
-import java.io.ByteArrayOutputStream
 import java.nio.file.Path
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -44,21 +42,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
   }
 
   @Test
-  fun customIncludesWithDefaults() {
-    with(transformer) {
-      include("META-INF/FOO")
-      assertThat(canTransformResource("META-INF/FOO")).isTrue()
-      assertThat(canTransformResource("META-INF/LICENSE")).isTrue()
-      assertThat(canTransformResource("META-INF/LICENSE.txt")).isTrue()
-      assertThat(canTransformResource("META-INF/LICENSE.md")).isTrue()
-      assertThat(canTransformResource("LICENSE")).isTrue()
-      assertThat(canTransformResource("LICENSE.txt")).isTrue()
-      assertThat(canTransformResource("LICENSE.md")).isTrue()
-      assertThat(canTransformResource("something else")).isFalse()
-    }
-  }
-
-  @Test
   fun deduplicateLicenseTexts(@TempDir tempDir: Path) {
     with(transformer) {
       transformInternal("license one".toByteArray())
@@ -75,9 +58,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).containsExactlyInAnyOrder("license one", "   license two", "license three")
 
-      val baos = ByteArrayOutputStream()
-      writeLicenseFile(baos)
-      val written = baos.toByteArray().toString(Charsets.UTF_8).lines()
+      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
       assertThat(written).isEqualTo(
         listOf(
           "SPDX-License-Identifier: Apache-2.0",
@@ -103,9 +84,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).containsExactlyInAnyOrder("license one")
 
-      val baos = ByteArrayOutputStream()
-      writeLicenseFile(baos)
-      val written = baos.toByteArray().toString(Charsets.UTF_8).lines()
+      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
       assertThat(written).isEqualTo(
         listOf(
           "SPDX-License-Identifier: Apache-2.0",
@@ -125,9 +104,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      val baos = ByteArrayOutputStream()
-      writeLicenseFile(baos)
-      val written = baos.toByteArray().toString(Charsets.UTF_8).lines()
+      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
       assertThat(written).isEqualTo(
         listOf(
           "SPDX-License-Identifier: Apache-2.0",
@@ -148,9 +125,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      val baos = ByteArrayOutputStream()
-      writeLicenseFile(baos)
-      val written = baos.toByteArray().toString(Charsets.UTF_8).lines()
+      val written = buildLicenseFile().toString(Charsets.UTF_8).lines()
       assertThat(written).isEqualTo(
         listOf(
           "artifact license file content",

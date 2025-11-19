@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import java.io.OutputStream
+import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.LinkedHashSet
 import javax.inject.Inject
@@ -110,9 +110,7 @@ public open class MergeLicenseResourceTransformer(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.putNextEntry(zipEntry(outputPath.get()))
-
-    writeLicenseFile(os)
-
+    os.write(buildLicenseFile())
     os.closeEntry()
   }
 
@@ -123,30 +121,30 @@ public open class MergeLicenseResourceTransformer(
     }
   }
 
-  internal fun writeLicenseFile(os: OutputStream) {
-    if (artifactLicenseSpdxId.isPresent) {
-      val spdxId = artifactLicenseSpdxId.get()
-      if (spdxId.isNotBlank()) {
-        os.write("SPDX-License-Identifier: $spdxId\n".toByteArray())
-      }
+  internal fun buildLicenseFile(): ByteArray {
+    val buffer = ByteArrayOutputStream()
+
+    val spdxId = artifactLicenseSpdxId.orElse("").get().trim()
+    if (spdxId.isNotBlank()) {
+      buffer.write("SPDX-License-Identifier: $spdxId\n".toByteArray())
     }
-    os.write(artifactLicense.get().asFile.readBytes())
+
+    artifactLicense.get().asFile.inputStream().use { it.copyTo(buffer) }
 
     if (elements.isNotEmpty()) {
-      os.write("\n".toByteArray())
-      os.write(firstSeparator.get().toByteArray())
-      os.write("\n".toByteArray())
+      buffer.write(("\n" + firstSeparator.get() + "\n").toByteArray())
 
       var first = true
-      val separator = (this.separator.get() + "\n").toByteArray()
+      val separatorBytes = ("\n" + separator.get() + "\n").toByteArray()
       for (element in elements) {
         if (!first) {
-          os.write("\n".toByteArray())
-          os.write(separator)
+          buffer.write(separatorBytes)
         }
-        os.write(element.toByteArray())
+        buffer.write(element.toByteArray())
         first = false
       }
     }
+
+    return buffer.toByteArray()
   }
 }
