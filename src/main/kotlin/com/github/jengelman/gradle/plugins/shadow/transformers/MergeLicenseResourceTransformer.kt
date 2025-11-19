@@ -2,12 +2,11 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
+import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.LinkedHashSet
 import javax.inject.Inject
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RegularFileProperty
@@ -117,9 +116,7 @@ public open class MergeLicenseResourceTransformer(
   override fun hasTransformedResource(): Boolean = true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(
-      ZipEntry(outputPath.get()).apply { time = ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES },
-    )
+    os.putNextEntry(zipEntry(outputPath.get()))
 
     writeLicenseFile(os)
 
