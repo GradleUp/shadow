@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import java.nio.charset.Charset
 import java.util.Properties
+import java.util.jar.JarFile.MANIFEST_NAME
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

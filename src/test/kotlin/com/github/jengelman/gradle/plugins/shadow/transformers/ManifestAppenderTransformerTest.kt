@@ -8,6 +8,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import java.util.jar.JarFile.MANIFEST_NAME
 import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {

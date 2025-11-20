@@ -1,14 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
-import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
+import java.util.jar.JarFile.MANIFEST_NAME
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
@@ -31,8 +30,6 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
   }
 
   companion object {
-    const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
-
     fun ResourceTransformer.canTransformResource(path: String): Boolean {
       val element = object : FileTreeElement by noOpDelegate() {
         private val _relativePath = RelativePath.parse(true, path)
