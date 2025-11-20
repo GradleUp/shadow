@@ -62,8 +62,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
   fun noTransformation() {
     val sourceLines = requireResourceAsStream(MANIFEST_NAME).reader().readLines()
     transformer.transform(manifestTransformerContext)
-    val targetLines = transformer.transformToJar()
-      .getStream(MANIFEST_NAME).reader().readLines()
+    val targetLines = transformer.transformToJar().getStream(MANIFEST_NAME).reader().readLines()
 
     assertThat(targetLines).isEqualTo(sourceLines)
   }
