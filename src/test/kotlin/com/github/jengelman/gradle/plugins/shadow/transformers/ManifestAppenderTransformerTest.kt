@@ -7,8 +7,9 @@ import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import java.util.jar.JarFile.MANIFEST_NAME
+import kotlin.io.path.readLines
 import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
@@ -65,7 +66,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
 
   @Test
   fun noTransformation() {
-    val sourceLines = requireResourceAsStream(MANIFEST_NAME).bufferedReader().readLines()
+    val sourceLines = requireResourceAsPath(MANIFEST_NAME).readLines()
     transformer.transform(manifestTransformerContext)
     val targetLines = doTransformAndGetTransformedPath(transformer, true)
       .getContent(MANIFEST_NAME).lines()
