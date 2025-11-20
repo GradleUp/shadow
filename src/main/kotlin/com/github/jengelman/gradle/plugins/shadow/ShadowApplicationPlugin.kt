@@ -26,18 +26,20 @@ import org.gradle.api.tasks.bundling.Zip
 /**
  * A [Plugin] which packages and runs a project as a Java Application using the shadowed jar.
  *
- * Modified from [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/fdecc3c95828bb9a1c1bb6114483fe5b16f9159d/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
+ * Modified from
+ * [org.gradle.api.plugins.ApplicationPlugin.java](https://github.com/gradle/gradle/blob/fdecc3c95828bb9a1c1bb6114483fe5b16f9159d/platforms/jvm/plugins-application/src/main/java/org/gradle/api/plugins/ApplicationPlugin.java).
  *
  * @see [ApplicationPlugin]
  */
 public abstract class ShadowApplicationPlugin : Plugin<Project> {
-  override fun apply(project: Project): Unit = with(project) {
-    addRunTask()
-    addCreateScriptsTask()
-    configureDistribution()
-    configureShadowJarMainClass()
-    configureInstallTask()
-  }
+  override fun apply(project: Project): Unit =
+    with(project) {
+      addRunTask()
+      addCreateScriptsTask()
+      configureDistribution()
+      configureShadowJarMainClass()
+      configureInstallTask()
+    }
 
   protected open fun Project.addRunTask() {
     tasks.register(SHADOW_RUN_TASK_NAME, JavaExec::class.java) { task ->
@@ -58,7 +60,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
   protected open fun Project.addCreateScriptsTask() {
     tasks.register(SHADOW_SCRIPTS_TASK_NAME, CreateStartScripts::class.java) { task ->
-      task.description = "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
+      task.description =
+        "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
 
       task.classpath = files(tasks.shadowJar)
 
@@ -67,7 +70,9 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
         task.mainModule.convention(mainModule)
         task.mainClass.convention(mainClass)
         task.conventionMapping.map("applicationName", ::getApplicationName)
-        task.conventionMapping.map("outputDir") { layout.buildDirectory.dir("scriptsShadow").get().asFile }
+        task.conventionMapping.map("outputDir") {
+          layout.buildDirectory.dir("scriptsShadow").get().asFile
+        }
         task.conventionMapping.map("executableDir", ::getExecutableDir)
         task.conventionMapping.map("defaultJvmOpts", ::getApplicationDefaultJvmArgs)
       }
@@ -82,17 +87,18 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
 
       task.doFirst("Check installation directory") {
         val destinationDir = task.destinationDir
-        val children = destinationDir.list() ?: throw IOException("Could not list directory $destinationDir")
+        val children =
+          destinationDir.list() ?: throw IOException("Could not list directory $destinationDir")
         if (children.isEmpty()) return@doFirst
         if (
           !destinationDir.resolve("lib").isDirectory ||
-          !destinationDir.resolve("bin").isDirectory ||
-          !destinationDir.resolve(executableDir.get()).isDirectory
+            !destinationDir.resolve("bin").isDirectory ||
+            !destinationDir.resolve(executableDir.get()).isDirectory
         ) {
           throw GradleException(
             "The specified installation directory '$destinationDir' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
               "If you really want to install to this directory, delete it and run the install task again.\n" +
-              "Alternatively, choose a different installation directory.",
+              "Alternatively, choose a different installation directory."
           )
         }
       }
@@ -103,10 +109,12 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
     distributions.register(DISTRIBUTION_NAME) { dist ->
       dist.distributionBaseName.convention(
         provider {
-          // distributionBaseName defaults to `$project.name-$distribution.name`, applicationName defaults to project.name
-          // so we append the suffix to match the default distributionBaseName. Modified from `ApplicationPlugin.configureDistribution()`.
+          // distributionBaseName defaults to `$project.name-$distribution.name`, applicationName
+          // defaults to project.name
+          // so we append the suffix to match the default distributionBaseName. Modified from
+          // `ApplicationPlugin.configureDistribution()`.
           "${applicationExtension.applicationName}-$DISTRIBUTION_NAME"
-        },
+        }
       )
       dist.contents { distSpec ->
         distSpec.from(file("src/dist"))
@@ -126,15 +134,11 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
   }
 
   protected open fun Project.configureShadowJarMainClass() {
-    tasks.shadowJar.configure { task ->
-      task.mainClass.convention(applicationExtension.mainClass)
-    }
+    tasks.shadowJar.configure { task -> task.mainClass.convention(applicationExtension.mainClass) }
   }
 
   public companion object {
-    /**
-     * Reflects the number of 755.
-     */
+    /** Reflects the number of 755. */
     private const val UNIX_SCRIPT_PERMISSIONS = "rwxr-xr-x"
 
     public const val DISTRIBUTION_NAME: String = SHADOW

@@ -11,29 +11,29 @@ class AppendingTransformerTest : BaseTransformerTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun appendTestProperties(shortSyntax: Boolean) {
-    val one = buildJarOne {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE)
-    }
-    val two = buildJarTwo {
-      insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO)
-    }
-    val config = if (shortSyntax) {
-      """
+    val one = buildJarOne { insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE) }
+    val two = buildJarTwo { insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO) }
+    val config =
+      if (shortSyntax) {
+        """
         dependencies {
           ${implementationFiles(one, two)}
         }
         $shadowJarTask {
           append('$ENTRY_TEST_PROPERTIES')
         }
-      """.trimIndent()
-    } else {
-      transform<AppendingTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+      """
+          .trimIndent()
+      } else {
+        transform<AppendingTransformer>(
+          dependenciesBlock = implementationFiles(one, two),
+          transformerBlock =
+            """
           resource = '$ENTRY_TEST_PROPERTIES'
-        """.trimIndent(),
-      )
-    }
+        """
+              .trimIndent(),
+        )
+      }
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
@@ -53,8 +53,9 @@ class AppendingTransformerTest : BaseTransformerTest() {
       insert("resources/$APPLICATION_YML_FILE", CONTENT_TWO)
       insert("resources/config/$APPLICATION_YML_FILE", CONTENT_THREE)
     }
-    val config = if (shortSyntax) {
-      """
+    val config =
+      if (shortSyntax) {
+        """
         dependencies {
           ${implementationFiles(one, two)}
         }
@@ -62,45 +63,56 @@ class AppendingTransformerTest : BaseTransformerTest() {
           append('resources/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
           append('resources/config/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
         }
-      """.trimIndent()
-    } else {
-      val block1 = transform<AppendingTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+      """
+          .trimIndent()
+      } else {
+        val block1 =
+          transform<AppendingTransformer>(
+            dependenciesBlock = implementationFiles(one, two),
+            transformerBlock =
+              """
           resource = 'resources/$APPLICATION_YML_FILE'
           separator = '$APPLICATION_YML_SEPARATOR'
-        """.trimIndent(),
-      )
-      val block2 = transform<AppendingTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        """
+                .trimIndent(),
+          )
+        val block2 =
+          transform<AppendingTransformer>(
+            dependenciesBlock = implementationFiles(one, two),
+            transformerBlock =
+              """
           resource = 'resources/config/$APPLICATION_YML_FILE'
           separator = '$APPLICATION_YML_SEPARATOR'
-        """.trimIndent(),
-      )
-      block1 + lineSeparator + block2
-    }
+        """
+                .trimIndent(),
+          )
+        block1 + lineSeparator + block2
+      }
 
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
 
     val content1 = outputShadowedJar.use { it.getContent("resources/$APPLICATION_YML_FILE") }
-    assertThat(content1).isEqualTo(
-      """
+    assertThat(content1)
+      .isEqualTo(
+        """
       $CONTENT_ONE
       ---
       $CONTENT_TWO
-      """.trimIndent(),
-    )
-    val content2 = outputShadowedJar.use { it.getContent("resources/config/$APPLICATION_YML_FILE") }
-    assertThat(content2).isEqualTo(
       """
+          .trimIndent()
+      )
+    val content2 = outputShadowedJar.use { it.getContent("resources/config/$APPLICATION_YML_FILE") }
+    assertThat(content2)
+      .isEqualTo(
+        """
       $CONTENT_TWO
       ---
       $CONTENT_THREE
-      """.trimIndent(),
-    )
+      """
+          .trimIndent()
+      )
   }
 
   private companion object {

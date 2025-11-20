@@ -18,24 +18,24 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 
 /**
- * A resource processor that allows the arbitrary addition of attributes to
- * the first MANIFEST.MF that is found in the set of JARs being processed, or
- * to a newly created manifest for the shaded JAR.
+ * A resource processor that allows the arbitrary addition of attributes to the first MANIFEST.MF
+ * that is found in the set of JARs being processed, or to a newly created manifest for the shaded
+ * JAR.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.ManifestResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ManifestResourceTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.ManifestResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ManifestResourceTransformer.java).
  *
  * @author Jason van Zyl
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ManifestResourceTransformer @Inject constructor(
-  final override val objectFactory: ObjectFactory,
-) : ResourceTransformer {
+public open class ManifestResourceTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
-  @get:Input
-  public open val mainClass: Property<String> = objectFactory.property("")
+  @get:Input public open val mainClass: Property<String> = objectFactory.property("")
 
   @get:Input
   public open val manifestEntries: MapProperty<String, JarAttribute> = objectFactory.mapProperty()
@@ -45,8 +45,10 @@ public open class ManifestResourceTransformer @Inject constructor(
   }
 
   override fun transform(context: TransformerContext) {
-    // We just want to take the first manifest we come across as that's our project's manifest. This is the behavior
-    // now which is situational at best. Right now there is no context passed in with the processing so we cannot
+    // We just want to take the first manifest we come across as that's our project's manifest. This
+    // is the behavior
+    // now which is situational at best. Right now there is no context passed in with the processing
+    // so we cannot
     // tell what artifact is being processed.
     if (!manifestDiscovered) {
       try {
@@ -67,12 +69,8 @@ public open class ManifestResourceTransformer @Inject constructor(
     }
 
     val attributes = manifest!!.mainAttributes
-    mainClass.get().takeIf(CharSequence::isNotEmpty)?.let {
-      attributes[mainClassAttributeKey] = it
-    }
-    manifestEntries.get().forEach { (key, value) ->
-      attributes[JarAttribute.Name(key)] = value
-    }
+    mainClass.get().takeIf(CharSequence::isNotEmpty)?.let { attributes[mainClassAttributeKey] = it }
+    manifestEntries.get().forEach { (key, value) -> attributes[JarAttribute.Name(key)] = value }
 
     os.putNextEntry(zipEntry(JarFile.MANIFEST_NAME, preserveFileTimestamps))
     manifest!!.write(os)

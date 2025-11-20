@@ -4,16 +4,16 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolvedDependency
 
-internal class DefaultDependencyFilter(
-  project: Project,
-) : DependencyFilter.AbstractDependencyFilter(project) {
+internal class DefaultDependencyFilter(project: Project) :
+  DependencyFilter.AbstractDependencyFilter(project) {
   override fun resolve(
     dependencies: Set<ResolvedDependency>,
     includedDependencies: MutableSet<ResolvedDependency>,
     excludedDependencies: MutableSet<ResolvedDependency>,
   ) {
     dependencies.forEach { dep ->
-      val added = if (dep.isIncluded()) includedDependencies.add(dep) else excludedDependencies.add(dep)
+      val added =
+        if (dep.isIncluded()) includedDependencies.add(dep) else excludedDependencies.add(dep)
       if (added) {
         resolve(dep.children, includedDependencies, excludedDependencies)
       }

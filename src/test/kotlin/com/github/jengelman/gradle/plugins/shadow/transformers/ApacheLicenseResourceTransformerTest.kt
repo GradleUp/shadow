@@ -6,9 +6,11 @@ import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
 
 /**
- * Modified from [org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheLicenseResourceTransformerTest.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheLicenseResourceTransformerTest.java).
  */
-class ApacheLicenseResourceTransformerTest : BaseTransformerTest<ApacheLicenseResourceTransformer>() {
+class ApacheLicenseResourceTransformerTest :
+  BaseTransformerTest<ApacheLicenseResourceTransformer>() {
 
   init {
     setupTurkishLocale()

@@ -10,16 +10,20 @@ class GroovyBuildExecutable(
 
   override val buildScriptName: String = "build.gradle"
 
-  override val pluginsBlock: String = """
+  override val pluginsBlock: String =
+    """
     plugins {
       id 'java'
       id 'com.gradleup.shadow'
     }
-  """.trimIndent()
+    """
+      .trimIndent()
 
-  override val assembleDependsOn: String = """
+  override val assembleDependsOn: String =
+    """
     tasks.named('assemble') {
       dependsOn tasks.withType(Jar) // ShadowJar is a subtype of Jar.
     }
-  """.trimIndent()
+    """
+      .trimIndent()
 }

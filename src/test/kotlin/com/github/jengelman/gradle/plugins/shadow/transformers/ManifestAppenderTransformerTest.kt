@@ -46,23 +46,21 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       transform(manifestTransformerContext)
     }
 
-    val targetLines = transformer.transformToJar().use { it.getContent(MANIFEST_NAME).trim().lines() }
+    val targetLines =
+      transformer.transformToJar().use { it.getContent(MANIFEST_NAME).trim().lines() }
     assertThat(targetLines.size).isGreaterThanOrEqualTo(4)
-    assertThat(targetLines.takeLast(4)).isEqualTo(
-      listOf(
-        "Name: org/foo/bar/",
-        "Sealed: true",
-        "Name: com/example/",
-        "Sealed: false",
-      ),
-    )
+    assertThat(targetLines.takeLast(4))
+      .isEqualTo(
+        listOf("Name: org/foo/bar/", "Sealed: true", "Name: com/example/", "Sealed: false")
+      )
   }
 
   @Test
   fun noTransformation() {
     val sourceLines = requireResourceAsStream(MANIFEST_NAME).reader().readLines()
     transformer.transform(manifestTransformerContext)
-    val targetLines = transformer.transformToJar().use { it.getStream(MANIFEST_NAME).reader().readLines() }
+    val targetLines =
+      transformer.transformToJar().use { it.getStream(MANIFEST_NAME).reader().readLines() }
 
     assertThat(targetLines).isEqualTo(sourceLines)
   }

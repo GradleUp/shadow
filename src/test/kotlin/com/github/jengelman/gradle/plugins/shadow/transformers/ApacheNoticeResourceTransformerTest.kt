@@ -11,7 +11,8 @@ import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
 
 /**
- * Modified from [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformerTest.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformerTest.java).
  */
 class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeResourceTransformer>() {
 

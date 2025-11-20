@@ -24,20 +24,22 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun groovyExtensionModuleTransformer(shortSyntax: Boolean) {
-    val config = if (shortSyntax) {
-      """
+    val config =
+      if (shortSyntax) {
+        """
         dependencies {
           ${implementationFiles(buildJarFoo(), buildJarBar())}
         }
         $shadowJarTask {
           mergeGroovyExtensionModules()
         }
-      """.trimIndent()
-    } else {
-      transform<GroovyExtensionModuleTransformer>(
-        dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar()),
-      )
-    }
+      """
+          .trimIndent()
+      } else {
+        transform<GroovyExtensionModuleTransformer>(
+          dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar())
+        )
+      }
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
@@ -53,11 +55,8 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   ) {
     projectScript.appendText(
       transform<GroovyExtensionModuleTransformer>(
-        dependenciesBlock = implementationFiles(
-          buildJarFoo(fooEntry),
-          buildJarBar(barEntry),
-        ),
-      ),
+        dependenciesBlock = implementationFiles(buildJarFoo(fooEntry), buildJarBar(barEntry))
+      )
     )
 
     runWithSuccess(shadowJarPath)
@@ -76,7 +75,8 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
           relocate('com.acme', 'com.example.shaded.acme')
           mergeGroovyExtensionModules()
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -88,39 +88,41 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
       .isEqualTo(
         "com.example.shaded.acme.foo.FooExtension,com.example.shaded.acme.foo.BarExtension," +
-          "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension",
+          "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension"
       )
     assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
-      .isEqualTo("com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension")
+      .isEqualTo(
+        "com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension"
+      )
   }
 
-  private fun buildJarFoo(
-    entry: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-  ): Path = buildJar("foo.jar") {
-    insert(
-      entry,
-      """
+  private fun buildJarFoo(entry: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR): Path =
+    buildJar("foo.jar") {
+      insert(
+        entry,
+        """
         $KEY_MODULE_NAME=foo
         $KEY_MODULE_VERSION=1.0.5
         $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_FOO
         $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_FOO
-      """.trimIndent(),
-    )
-  }
-
-  private fun buildJarBar(
-    entry: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-  ): Path = buildJar("bar.jar") {
-    insert(
-      entry,
       """
+          .trimIndent(),
+      )
+    }
+
+  private fun buildJarBar(entry: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR): Path =
+    buildJar("bar.jar") {
+      insert(
+        entry,
+        """
         $KEY_MODULE_NAME=bar
         $KEY_MODULE_VERSION=2.3.5
         $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_BAR
         $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_BAR
-      """.trimIndent(),
-    )
-  }
+      """
+          .trimIndent(),
+      )
+    }
 
   private fun commonAssertions() {
     val properties = outputShadowedJar.extensionModuleProperties
@@ -139,16 +141,28 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     const val STATIC_EXTENSION_CLASSES_FOO = "com.acme.foo.FooStaticExtension"
     const val STATIC_EXTENSION_CLASSES_BAR = "com.acme.bar.SomeStaticExtension"
 
-    val JarPath.extensionModuleProperties get() = use {
-      it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties()
-    }
+    val JarPath.extensionModuleProperties
+      get() = use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties() }
 
     @JvmStatic
-    fun resourcePathProvider() = listOf(
-      Arguments.of(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-      Arguments.of(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-      Arguments.of(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-      Arguments.of(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
-    )
+    fun resourcePathProvider() =
+      listOf(
+        Arguments.of(
+          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+        ),
+        Arguments.of(
+          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+        ),
+        Arguments.of(
+          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+        ),
+        Arguments.of(
+          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+        ),
+      )
   }
 }

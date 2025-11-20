@@ -16,7 +16,8 @@ abstract class BaseTransformerTest : BasePluginTest() {
           // Most transformers in tests require this to handle duplicate resources.
           duplicatesStrategy = DuplicatesStrategy.INCLUDE
         }
-      """.trimIndent() + lineSeparator,
+      """
+        .trimIndent() + lineSeparator
     )
   }
 
@@ -24,7 +25,7 @@ abstract class BaseTransformerTest : BasePluginTest() {
     builder: JarBuilder.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_ONE)
       insert(ENTRY_SERVICES_FOO, "one")
-    },
+    }
   ): Path {
     return buildJar("one.jar", builder)
   }
@@ -33,7 +34,7 @@ abstract class BaseTransformerTest : BasePluginTest() {
     builder: JarBuilder.() -> Unit = {
       insert(ENTRY_SERVICES_SHADE, CONTENT_TWO)
       insert(ENTRY_SERVICES_FOO, "two")
-    },
+    }
   ): Path {
     return buildJar("two.jar", builder)
   }

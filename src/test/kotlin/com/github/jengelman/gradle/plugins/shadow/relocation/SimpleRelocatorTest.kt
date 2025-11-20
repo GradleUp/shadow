@@ -7,7 +7,8 @@ import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
 
 /**
- * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocatorTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/relocation/SimpleRelocatorTest.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.relocation.SimpleRelocatorTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/relocation/SimpleRelocatorTest.java).
  */
 class SimpleRelocatorTest {
 
@@ -27,10 +28,17 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("/org/Foo/Class")).isFalse()
     assertThat(relocator.canRelocatePath("/org/Foo/Class.class")).isFalse()
 
-    relocator = SimpleRelocator(
-      "org.foo",
-      excludes = listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
-    )
+    relocator =
+      SimpleRelocator(
+        "org.foo",
+        excludes =
+          listOf(
+            "org.foo.Excluded",
+            "org.foo.public.*",
+            "org.foo.recurse.**",
+            "org.foo.Public*Stuff",
+          ),
+      )
     assertThat(relocator.canRelocatePath("org/foo/Class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/excluded")).isTrue()
@@ -67,7 +75,8 @@ class SimpleRelocatorTest {
     relocator = SimpleRelocator("foo.")
     assertThat(relocator.canRelocatePath("foo/foo.bar")).isTrue()
     relocator.exclude("foo/foo.bar")
-    assertThat(relocator.canRelocatePath("foo/foo.bar")).isFalse() // Don't handle file path pattern.
+    assertThat(relocator.canRelocatePath("foo/foo.bar"))
+      .isFalse() // Don't handle file path pattern.
     assertThat(relocator.canRelocatePath("foo/foobar")).isTrue()
     relocator.exclude("foo/foobar")
     assertThat(relocator.canRelocatePath("foo/foobar")).isFalse() // File without extension.
@@ -76,10 +85,7 @@ class SimpleRelocatorTest {
   @Test
   fun canRelocatePathWithRegex() {
     // Include with Regex
-    var relocator = SimpleRelocator(
-      "org.foo",
-      includes = listOf("%regex[org/foo/R(\\$.*)?$]"),
-    )
+    var relocator = SimpleRelocator("org.foo", includes = listOf("%regex[org/foo/R(\\$.*)?$]"))
     assertThat(relocator.canRelocatePath("org/foo/R.class")).isTrue()
     assertThat(relocator.canRelocatePath($$"org/foo/R$string.class")).isTrue()
     assertThat(relocator.canRelocatePath($$"org/foo/R$layout.class")).isTrue()
@@ -90,10 +96,7 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath($$"org/R$string.class")).isFalse()
 
     // Exclude with Regex
-    relocator = SimpleRelocator(
-      "org.foo",
-      excludes = listOf("%regex[org/foo/.*Factory[0-9].*]"),
-    )
+    relocator = SimpleRelocator("org.foo", excludes = listOf("%regex[org/foo/.*Factory[0-9].*]"))
     assertThat(relocator.canRelocatePath("org/foo/Factory.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/FooFactoryMain.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/BarFactory.class")).isTrue()
@@ -102,10 +105,11 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocatePath("org/foo/BarFactory2.class")).isFalse()
 
     // Include with Regex and normal pattern
-    relocator = SimpleRelocator(
-      "org.foo",
-      includes = listOf("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"),
-    )
+    relocator =
+      SimpleRelocator(
+        "org.foo",
+        includes = listOf("%regex[org/foo/.*Factory[0-9].*]", "org.foo.public.*"),
+      )
     assertThat(relocator.canRelocatePath("org/foo/Factory1.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/public/Bar.class")).isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Factory.class")).isFalse()
@@ -120,10 +124,17 @@ class SimpleRelocatorTest {
     assertThat(relocator.canRelocateClass("com.foo.bar.Class")).isFalse()
     assertThat(relocator.canRelocateClass("org.Foo.Class")).isFalse()
 
-    relocator = SimpleRelocator(
-      "org.foo",
-      excludes = listOf("org.foo.Excluded", "org.foo.public.*", "org.foo.recurse.**", "org.foo.Public*Stuff"),
-    )
+    relocator =
+      SimpleRelocator(
+        "org.foo",
+        excludes =
+          listOf(
+            "org.foo.Excluded",
+            "org.foo.public.*",
+            "org.foo.recurse.**",
+            "org.foo.Public*Stuff",
+          ),
+      )
     assertThat(relocator.canRelocateClass("org.foo.Class")).isTrue()
     assertThat(relocator.canRelocateClass("org.foo.excluded")).isTrue()
     assertThat(relocator.canRelocateClass("org.foo.Excluded")).isFalse()
@@ -159,11 +170,12 @@ class SimpleRelocatorTest {
 
   @Test
   fun canRelocateAbsClassPathWithExcludes() {
-    val relocator = SimpleRelocator(
-      "org/apache/velocity",
-      "org/apache/momentum",
-      excludes = listOf("org/apache/velocity/excluded/*"),
-    )
+    val relocator =
+      SimpleRelocator(
+        "org/apache/velocity",
+        "org/apache/momentum",
+        excludes = listOf("org/apache/velocity/excluded/*"),
+      )
     assertThat(relocator.canRelocatePath("/org/apache/velocity/mass.properties")).isTrue()
     assertThat(relocator.canRelocatePath("org/apache/velocity/mass.properties")).isTrue()
     assertThat(relocator.canRelocatePath("/org/apache/velocity/excluded/mass.properties")).isFalse()
@@ -172,11 +184,12 @@ class SimpleRelocatorTest {
 
   @Test
   fun canRelocateAbsClassPathWithIncludes() {
-    val relocator = SimpleRelocator(
-      "org/apache/velocity",
-      "org/apache/momentum",
-      includes = listOf("org/apache/velocity/included/*"),
-    )
+    val relocator =
+      SimpleRelocator(
+        "org/apache/velocity",
+        "org/apache/momentum",
+        includes = listOf("org/apache/velocity/included/*"),
+      )
     assertThat(relocator.canRelocatePath("/org/apache/velocity/mass.properties")).isFalse()
     assertThat(relocator.canRelocatePath("org/apache/velocity/mass.properties")).isFalse()
     assertThat(relocator.canRelocatePath("/org/apache/velocity/included/mass.properties")).isTrue()
@@ -200,12 +213,10 @@ class SimpleRelocatorTest {
   @Test
   fun relocateClass() {
     var relocator = SimpleRelocator("org.foo")
-    assertThat(relocator.relocateClass("org.foo.bar.Class"))
-      .isEqualTo("hidden.org.foo.bar.Class")
+    assertThat(relocator.relocateClass("org.foo.bar.Class")).isEqualTo("hidden.org.foo.bar.Class")
 
     relocator = SimpleRelocator("org.foo", "private.stuff")
-    assertThat(relocator.relocateClass("org.foo.bar.Class"))
-      .isEqualTo("private.stuff.bar.Class")
+    assertThat(relocator.relocateClass("org.foo.bar.Class")).isEqualTo("private.stuff.bar.Class")
   }
 
   @Test
@@ -214,114 +225,167 @@ class SimpleRelocatorTest {
     assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class;"))
       .isEqualTo("(I)Lhidden/org/foo/bar/Class;")
 
-    relocator = SimpleRelocator("^META-INF/org.foo.xml$", "META-INF/hidden.org.foo.xml", rawString = true)
+    relocator =
+      SimpleRelocator("^META-INF/org.foo.xml$", "META-INF/hidden.org.foo.xml", rawString = true)
     assertThat(relocator.relocatePath("META-INF/org.foo.xml"))
       .isEqualTo("META-INF/hidden.org.foo.xml")
   }
 
   @Test
   fun relocateMavenFiles() {
-    val relocator = SimpleRelocator(
-      "META-INF/maven",
-      "META-INF/shade/maven",
-      excludes = listOf("META-INF/maven/com.foo.bar/artifactId/pom.*"),
-    )
-    assertThat(relocator.canRelocatePath("META-INF/maven/com.foo.bar/artifactId/pom.properties")).isFalse()
+    val relocator =
+      SimpleRelocator(
+        "META-INF/maven",
+        "META-INF/shade/maven",
+        excludes = listOf("META-INF/maven/com.foo.bar/artifactId/pom.*"),
+      )
+    assertThat(relocator.canRelocatePath("META-INF/maven/com.foo.bar/artifactId/pom.properties"))
+      .isFalse()
     assertThat(relocator.canRelocatePath("META-INF/maven/com.foo.bar/artifactId/pom.xml")).isFalse()
-    assertThat(relocator.canRelocatePath("META-INF/maven/com/foo/bar/artifactId/pom.properties")).isTrue()
+    assertThat(relocator.canRelocatePath("META-INF/maven/com/foo/bar/artifactId/pom.properties"))
+      .isTrue()
     assertThat(relocator.canRelocatePath("META-INF/maven/com/foo/bar/artifactId/pom.xml")).isTrue()
-    assertThat(relocator.canRelocatePath("META-INF/maven/com-foo-bar/artifactId/pom.properties")).isTrue()
+    assertThat(relocator.canRelocatePath("META-INF/maven/com-foo-bar/artifactId/pom.properties"))
+      .isTrue()
     assertThat(relocator.canRelocatePath("META-INF/maven/com-foo-bar/artifactId/pom.xml")).isTrue()
   }
 
   @Test
   fun canRelocateExcludedSourceFile() {
-    val relocator = SimpleRelocator(
-      "org.foo",
-      excludes = listOf("org/apache/iceberg/spark/parquet/**", "org/apache/spark/sql/execution/datasources/parquet/**"),
-    )
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isFalse()
+    val relocator =
+      SimpleRelocator(
+        "org.foo",
+        excludes =
+          listOf(
+            "org/apache/iceberg/spark/parquet/**",
+            "org/apache/spark/sql/execution/datasources/parquet/**",
+          ),
+      )
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
+      )
+      .isFalse()
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+      )
+      .isFalse()
+    assertThat(
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+      )
+      .isFalse()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
   }
 
   @Test
   fun canRelocateExcludedSourceFileWithRegex() {
-    val relocator = SimpleRelocator(
-      "org.foo",
-      excludes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
-    )
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isFalse()
-    assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isFalse()
+    val relocator =
+      SimpleRelocator(
+        "org.foo",
+        excludes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
+      )
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
+      )
+      .isFalse()
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+      )
+      .isFalse()
+    assertThat(
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+      )
+      .isFalse()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
   }
 
   @Test
   fun canRelocateIncludedSourceFile() {
-    val relocator = SimpleRelocator(
-      includes = listOf("org/apache/iceberg/spark/parquet/**", "org/apache/spark/sql/execution/datasources/parquet/**"),
-    )
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isTrue()
+    val relocator =
+      SimpleRelocator(
+        includes =
+          listOf(
+            "org/apache/iceberg/spark/parquet/**",
+            "org/apache/spark/sql/execution/datasources/parquet/**",
+          )
+      )
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
+      )
+      .isTrue()
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+      )
+      .isTrue()
+    assertThat(
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+      )
+      .isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isFalse()
   }
 
   @Test
   fun canRelocateIncludedSourceFileWithRegex() {
-    val relocator = SimpleRelocator(
-      includes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
-    )
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")).isTrue()
-    assertThat(relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")).isTrue()
+    val relocator =
+      SimpleRelocator(
+        includes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]")
+      )
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
+      )
+      .isTrue()
+    assertThat(
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+      )
+      .isTrue()
+    assertThat(
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+      )
+      .isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isFalse()
   }
 
   @Test
   fun relocateSourceWithExcludesRaw() {
-    val relocator = SimpleRelocator(
-      "org.apache.maven",
-      "com.acme.maven",
-      listOf("foo.bar", "zot.baz"),
-      listOf("irrelevant.exclude", "org.apache.maven.exclude1", "org.apache.maven.sub.exclude2"),
-      true,
-    )
+    val relocator =
+      SimpleRelocator(
+        "org.apache.maven",
+        "com.acme.maven",
+        listOf("foo.bar", "zot.baz"),
+        listOf("irrelevant.exclude", "org.apache.maven.exclude1", "org.apache.maven.sub.exclude2"),
+        true,
+      )
     assertThat(relocator.applyToSourceContent(sourceFile)).isEqualTo(sourceFile)
   }
 
   @Test
   fun relocateSourceWithExcludes() {
     // Main relocator with in-/excludes
-    val relocator = SimpleRelocator(
-      "org.apache.maven",
-      "com.acme.maven",
-      listOf("foo.bar", "zot.baz"),
-      listOf("irrelevant.exclude", "org.apache.maven.exclude1", "org.apache.maven.sub.exclude2"),
-    )
+    val relocator =
+      SimpleRelocator(
+        "org.apache.maven",
+        "com.acme.maven",
+        listOf("foo.bar", "zot.baz"),
+        listOf("irrelevant.exclude", "org.apache.maven.exclude1", "org.apache.maven.sub.exclude2"),
+      )
     // Make sure not to replace variables 'io' and 'ioInput', package 'java.io'
     val ioRelocator = SimpleRelocator("io", "shaded.io")
     // Check corner case which was not working in PR #100
     val asmRelocator = SimpleRelocator("org.objectweb.asm", "aj.org.objectweb.asm")
     // Make sure not to replace 'foo' package by path-like 'shaded/foo'
-    val fooRelocator = SimpleRelocator(
-      "foo",
-      "shaded.foo",
-      excludes = listOf("foo.bar"),
-    )
+    val fooRelocator = SimpleRelocator("foo", "shaded.foo", excludes = listOf("foo.bar"))
     assertThat(
-      fooRelocator.applyToSourceContent(
-        asmRelocator.applyToSourceContent(
-          ioRelocator.applyToSourceContent(relocator.applyToSourceContent(sourceFile)),
-        ),
-      ),
-    ).isEqualTo(relocatedFile)
+        fooRelocator.applyToSourceContent(
+          asmRelocator.applyToSourceContent(
+            ioRelocator.applyToSourceContent(relocator.applyToSourceContent(sourceFile))
+          )
+        )
+      )
+      .isEqualTo(relocatedFile)
   }
 
   private companion object {
-    val sourceFile = """
+    val sourceFile =
+      """
       package org.apache.maven.hello;
       package org.objectweb.asm;
 
@@ -355,9 +419,11 @@ class SimpleRelocatorTest {
           String relocationPath = "org/apache/maven/In";
         }
       }
-    """.trimIndent()
+      """
+        .trimIndent()
 
-    val relocatedFile = """
+    val relocatedFile =
+      """
       package com.acme.maven.hello;
       package aj.org.objectweb.asm;
 
@@ -391,6 +457,7 @@ class SimpleRelocatorTest {
           String relocationPath = "com/acme/maven/In";
         }
       }
-    """.trimIndent()
+      """
+        .trimIndent()
   }
 }

@@ -8,26 +8,28 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternSet
 
 /**
- * Resources transformer that appends entries in `META-INF/services` resources into
- * a single resource. For example, if there are several `META-INF/services/org.apache.maven.project.ProjectBuilder`
- * resources spread across many JARs the individual entries will all be concatenated into a single
- * `META-INF/services/org.apache.maven.project.ProjectBuilder` resource packaged into the resultant JAR produced
- * by the shading process.
+ * Resources transformer that appends entries in `META-INF/services` resources into a single
+ * resource. For example, if there are several
+ * `META-INF/services/org.apache.maven.project.ProjectBuilder` resources spread across many JARs the
+ * individual entries will all be concatenated into a single
+ * `META-INF/services/org.apache.maven.project.ProjectBuilder` resource packaged into the resultant
+ * JAR produced by the shading process.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.ServicesResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ServicesResourceTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.ServicesResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ServicesResourceTransformer.java).
  *
  * @author jvanzyl
  * @author Charlie Knudsen
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ServiceFileTransformer @JvmOverloads constructor(
-  patternSet: PatternSet = PatternSet()
-    .include(SERVICES_PATTERN)
-    .exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
+public open class ServiceFileTransformer
+@JvmOverloads
+constructor(
+  patternSet: PatternSet =
+    PatternSet().include(SERVICES_PATTERN).exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
 ) : PatternFilterableResourceTransformer(patternSet = patternSet) {
-  @get:Internal
-  internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
+  @get:Internal internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 
   @get:Internal // No need to mark this as an input as `getIncludes` is already marked as `@Input`.
   public open var path: String = SERVICES_PATH
@@ -38,12 +40,13 @@ public open class ServiceFileTransformer @JvmOverloads constructor(
     }
 
   override fun transform(context: TransformerContext) {
-    val resource = path + "/" +
-      context.relocators.relocateClass(context.path.substringAfter("$path/"))
+    val resource =
+      path + "/" + context.relocators.relocateClass(context.path.substringAfter("$path/"))
     val out = serviceEntries.getOrPut(resource) { mutableSetOf() }
-    context.inputStream.bufferedReader().use { it.readLines() }.forEach { line ->
-      out.add(context.relocators.relocateClass(line))
-    }
+    context.inputStream
+      .bufferedReader()
+      .use { it.readLines() }
+      .forEach { line -> out.add(context.relocators.relocateClass(line)) }
   }
 
   override fun hasTransformedResource(): Boolean = serviceEntries.isNotEmpty()

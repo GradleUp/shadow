@@ -21,16 +21,15 @@ import org.gradle.api.tasks.Internal
 /**
  * Resources transformer that merges Properties files.
  *
- * The default merge strategy discards duplicate values coming from additional
- * resources. This behavior can be changed by setting a value for the [mergeStrategy] property,
- * such as [MergeStrategy.First] (default), [MergeStrategy.Latest] or [MergeStrategy.Append]. If the merge strategy is
- * [MergeStrategy.Latest] then the last value of a matching property entry will be used. If the
- * merge strategy is [MergeStrategy.Append] then the property values will be combined, using a
- * merge separator (default value is ','). The merge separator can be changed by
- * setting a value for the [mergeSeparator] property.
+ * The default merge strategy discards duplicate values coming from additional resources. This
+ * behavior can be changed by setting a value for the [mergeStrategy] property, such as
+ * [MergeStrategy.First] (default), [MergeStrategy.Latest] or [MergeStrategy.Append]. If the merge
+ * strategy is [MergeStrategy.Latest] then the last value of a matching property entry will be used.
+ * If the merge strategy is [MergeStrategy.Append] then the property values will be combined, using
+ * a merge separator (default value is ','). The merge separator can be changed by setting a value
+ * for the [mergeSeparator] property.
  *
- * Say there are two properties files A and B with the
- * following entries:
+ * Say there are two properties files A and B with the following entries:
  *
  * **A**
  * - key1 = value1
@@ -61,22 +60,20 @@ import org.gradle.api.tasks.Internal
  * - key2 = value2;balue2
  * - key3 = value3
  *
- * With `mergeStrategy = MergeStrategy.Fail` the transformation will fail if there are conflicting values.
+ * With `mergeStrategy = MergeStrategy.Fail` the transformation will fail if there are conflicting
+ * values.
  *
- * There are three additional properties that can be set: [paths], [mappings],
- * and [keyTransformer].
- * The first contains a list of strings or regexes that will be used to determine if
- * a path should be transformed or not. The merge strategy and merge separator are
- * taken from the global settings.
+ * There are three additional properties that can be set: [paths], [mappings], and [keyTransformer].
+ * The first contains a list of strings or regexes that will be used to determine if a path should
+ * be transformed or not. The merge strategy and merge separator are taken from the global settings.
  *
- * The [mappings] property allows you to define merge strategy and separator per
- * path. If either [paths] or [mappings] is defined then no other path
- * entries will be merged. [mappings] has precedence over [paths] if both
- * are defined.
+ * The [mappings] property allows you to define merge strategy and separator per path. If either
+ * [paths] or [mappings] is defined then no other path entries will be merged. [mappings] has
+ * precedence over [paths] if both are defined.
  *
- * If you need to transform keys in properties files, e.g. because they contain class
- * names about to be relocated, you can set the [keyTransformer] property to a
- * closure that receives the original key and returns the key name to be used.
+ * If you need to transform keys in properties files, e.g. because they contain class names about to
+ * be relocated, you can set the [keyTransformer] property to a closure that receives the original
+ * key and returns the key name to be used.
  *
  * Example:
  * ```groovy
@@ -93,43 +90,40 @@ import org.gradle.api.tasks.Internal
  * }
  * ```
  *
- * Related to [org.apache.maven.plugins.shade.resource.properties.PropertiesTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/properties/PropertiesTransformer.java).
+ * Related to
+ * [org.apache.maven.plugins.shade.resource.properties.PropertiesTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/properties/PropertiesTransformer.java).
  *
  * @author Andres Almiray
  * @author Marc Philipp
  */
 @CacheableTransformer
-public open class PropertiesFileTransformer @Inject constructor(
-  final override val objectFactory: ObjectFactory,
-) : ResourceTransformer {
-  private inline val charset get() = Charset.forName(charsetName.get())
+public open class PropertiesFileTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
+  private inline val charset
+    get() = Charset.forName(charsetName.get())
 
-  @get:Internal
-  internal val conflicts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
+  @get:Internal internal val conflicts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 
-  @get:Internal
-  internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
+  @get:Internal internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
 
-  @get:Input
-  public open val paths: SetProperty<String> = objectFactory.setProperty()
+  @get:Input public open val paths: SetProperty<String> = objectFactory.setProperty()
 
   @get:Input
   public open val mappings: MapProperty<String, Map<String, String>> = objectFactory.mapProperty()
 
   @get:Input
-  public open val mergeStrategy: Property<MergeStrategy> = objectFactory.property(MergeStrategy.First)
+  public open val mergeStrategy: Property<MergeStrategy> =
+    objectFactory.property(MergeStrategy.First)
 
-  @get:Input
-  public open val mergeSeparator: Property<String> = objectFactory.property(",")
+  @get:Input public open val mergeSeparator: Property<String> = objectFactory.property(",")
 
-  /**
-   * The character set to use when reading and writing property files.
-   * Defaults to `ISO-8859-1`.
-   */
+  /** The character set to use when reading and writing property files. Defaults to `ISO-8859-1`. */
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.ISO_8859_1.name())
 
-  @get:Internal // TODO: should be @Input, but it can't be serialized, see https://github.com/GradleUp/shadow/pull/1208.
+  @get:Internal // TODO: should be @Input, but it can't be serialized, see
+  // https://github.com/GradleUp/shadow/pull/1208.
   public open var keyTransformer: (String) -> String = IDENTITY
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
@@ -171,7 +165,10 @@ public open class PropertiesFileTransformer @Inject constructor(
     }
   }
 
-  private fun loadAndTransformKeys(inputStream: InputStream, action: (key: String, value: String) -> Unit) {
+  private fun loadAndTransformKeys(
+    inputStream: InputStream,
+    action: (key: String, value: String) -> Unit,
+  ) {
     val props = Properties().apply { load(inputStream.bufferedReader(charset)) }
     props.forEach { action(keyTransformer(it.key as String), it.value as String) }
   }
@@ -210,11 +207,18 @@ public open class PropertiesFileTransformer @Inject constructor(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     if (conflicts.isNotEmpty()) {
-      val message = "The following properties files have conflicting property values and cannot be merged:" +
-        conflicts.map { (path, props) ->
-          path + props.map { "Property ${it.key} is duplicated ${it.value} times with different values" }
-            .joinToString(separator = "\n   * ", prefix = "\n   * ")
-        }.joinToString(separator = "\n * ", prefix = "\n * ")
+      val message =
+        "The following properties files have conflicting property values and cannot be merged:" +
+          conflicts
+            .map { (path, props) ->
+              path +
+                props
+                  .map {
+                    "Property ${it.key} is duplicated ${it.value} times with different values"
+                  }
+                  .joinToString(separator = "\n   * ", prefix = "\n   * ")
+            }
+            .joinToString(separator = "\n * ", prefix = "\n * ")
       error(message)
     }
 
@@ -229,8 +233,7 @@ public open class PropertiesFileTransformer @Inject constructor(
     First,
     Latest,
     Append,
-    Fail,
-    ;
+    Fail;
 
     public companion object {
       @JvmStatic

@@ -8,8 +8,10 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.commons.Remapper
 
 /**
- * Modified from [org.apache.maven.plugins.shade.DefaultShader.RelocatorRemapper](https://github.com/apache/maven-shade-plugin/blob/83c123d1f9c5f6927af2aca12ee322b5168a7c63/src/main/java/org/apache/maven/plugins/shade/DefaultShader.java#L689-L772).
- * Modified from [org.apache.maven.plugins.shade.DefaultShader.DefaultPackageMapper](https://github.com/apache/maven-shade-plugin/blob/199ffaecd26a912527173ed4edae366e48a00998/src/main/java/org/apache/maven/plugins/shade/DefaultShader.java#L737-L774).
+ * Modified from
+ * [org.apache.maven.plugins.shade.DefaultShader.RelocatorRemapper](https://github.com/apache/maven-shade-plugin/blob/83c123d1f9c5f6927af2aca12ee322b5168a7c63/src/main/java/org/apache/maven/plugins/shade/DefaultShader.java#L689-L772).
+ * Modified from
+ * [org.apache.maven.plugins.shade.DefaultShader.DefaultPackageMapper](https://github.com/apache/maven-shade-plugin/blob/199ffaecd26a912527173ed4edae366e48a00998/src/main/java/org/apache/maven/plugins/shade/DefaultShader.java#L737-L774).
  *
  * @author John Engelman
  */
@@ -30,9 +32,7 @@ internal class RelocatorRemapper(
 
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
     // Maybe a list of types.
-    val newName = name.split(';').joinToString(";") {
-      mapNameImpl(it, mapLiterals)
-    }
+    val newName = name.split(';').joinToString(";") { mapNameImpl(it, mapLiterals) }
 
     if (newName != name) {
       onModified()
@@ -66,9 +66,7 @@ internal class RelocatorRemapper(
   }
 
   private companion object {
-    /**
-     * https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html
-     */
+    /** https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html */
     val classPattern: Pattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+);?")
   }
 }

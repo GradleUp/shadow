@@ -14,11 +14,11 @@ import org.gradle.work.DisableCachingByDefault
 
 /**
  * Helper task to temporarily add to your build script to find resources in the classpath that were
- * identified as duplicates by [com.github.jengelman.gradle.plugins.shadow.transformers.MergePropertiesResourceTransformer] or
+ * identified as duplicates by
+ * [com.github.jengelman.gradle.plugins.shadow.transformers.MergePropertiesResourceTransformer] or
  * [com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer].
  *
  * First, add the task to your build script:
- *
  * ```kotlin
  * val findResources by tasks.registering(FindResourceInClasspath::class) {
  *   // add configurations to search for resources in dependency jars
@@ -40,14 +40,11 @@ import org.gradle.work.DisableCachingByDefault
  */
 @DisableCachingByDefault(because = "Not worth caching")
 public abstract class FindResourceInClasspath(private val patternSet: PatternSet) :
-  DefaultTask(),
-  PatternFilterable by patternSet {
+  DefaultTask(), PatternFilterable by patternSet {
 
   @Inject public constructor() : this(PatternSet())
 
-  @get:InputFiles
-  @get:Classpath
-  public abstract val classpath: ConfigurableFileCollection
+  @get:InputFiles @get:Classpath public abstract val classpath: ConfigurableFileCollection
 
   @Input // Trigger task executions after includes changed.
   override fun getIncludes(): MutableSet<String> = patternSet.includes
@@ -55,8 +52,7 @@ public abstract class FindResourceInClasspath(private val patternSet: PatternSet
   @Input // Trigger task executions after excludes changed.
   override fun getExcludes(): MutableSet<String> = patternSet.excludes
 
-  @get:Inject
-  protected abstract val archiveOperations: ArchiveOperations
+  @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
   @TaskAction
   public fun findResources() {

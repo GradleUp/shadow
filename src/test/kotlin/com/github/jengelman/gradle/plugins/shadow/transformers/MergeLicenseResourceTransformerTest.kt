@@ -56,10 +56,12 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       artifactLicenseFile.writeText("artifact license file content")
       artifactLicense.set(artifactLicenseFile)
 
-      assertThat(elements).containsExactlyInAnyOrder("license one", "   license two", "license three")
+      assertThat(elements)
+        .containsExactlyInAnyOrder("license one", "   license two", "license three")
 
-      assertThat(buildLicense()).isEqualTo(
-        """
+      assertThat(buildLicense())
+        .isEqualTo(
+          """
           SPDX-License-Identifier: Apache-2.0
           artifact license file content
 
@@ -77,8 +79,9 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
           ------------------------------------------------------------------------------------------------------------------------
 
           license three
-        """.trimIndent(),
-      )
+          """
+            .trimIndent()
+        )
     }
   }
 
@@ -93,8 +96,9 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).containsExactlyInAnyOrder("license one")
 
-      assertThat(buildLicense()).isEqualTo(
-        """
+      assertThat(buildLicense())
+        .isEqualTo(
+          """
           SPDX-License-Identifier: Apache-2.0
           artifact license file content
 
@@ -104,8 +108,9 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
           ----------------------------------------------------------------
 
           license one
-        """.trimIndent(),
-      )
+          """
+            .trimIndent()
+        )
     }
   }
 
@@ -118,12 +123,14 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      assertThat(buildLicense()).isEqualTo(
-        """
+      assertThat(buildLicense())
+        .isEqualTo(
+          """
           SPDX-License-Identifier: Apache-2.0
           artifact license file content
-        """.trimIndent(),
-      )
+          """
+            .trimIndent()
+        )
     }
   }
 
@@ -138,9 +145,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
 
       assertThat(elements).isEmpty()
 
-      assertThat(buildLicense()).isEqualTo(
-        "artifact license file content",
-      )
+      assertThat(buildLicense()).isEqualTo("artifact license file content")
     }
   }
 }

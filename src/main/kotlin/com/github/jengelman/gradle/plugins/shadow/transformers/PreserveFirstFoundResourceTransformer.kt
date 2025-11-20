@@ -15,9 +15,10 @@ import org.gradle.api.tasks.util.PatternSet
 /**
  * A resource processor that preserves the first resource matched and excludes all others.
  *
- * This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the default behavior) and
- * want to ensure that only the first found resource is included in the final JAR. If there are multiple resources with
- * the same path in a project and its dependencies, the first one found should be the project's.
+ * This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` (the
+ * default behavior) and want to ensure that only the first found resource is included in the final
+ * JAR. If there are multiple resources with the same path in a project and its dependencies, the
+ * first one found should be the project's.
  *
  * @see [DuplicatesStrategy]
  * @see [ShadowJar.getDuplicatesStrategy]
@@ -27,20 +28,15 @@ public open class PreserveFirstFoundResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
-  private val includeResources by unsafeLazy {
-    @Suppress("DEPRECATION")
-    include(resources.get())
-  }
+  private val includeResources by unsafeLazy { @Suppress("DEPRECATION") include(resources.get()) }
 
-  @get:Internal
-  protected val found: MutableSet<String> = mutableSetOf()
+  @get:Internal protected val found: MutableSet<String> = mutableSetOf()
 
   @get:Deprecated("Use `include(..)` instead")
   @get:Input
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
-  @Inject
-  public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
+  @Inject public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     // Init once before patternSpec is accessed.

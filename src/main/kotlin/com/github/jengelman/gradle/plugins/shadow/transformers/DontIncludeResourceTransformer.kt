@@ -13,16 +13,17 @@ import org.gradle.api.tasks.Input
  *
  * You can also use [ShadowJar.exclude] instead.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/DontIncludeResourceTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/DontIncludeResourceTransformer.java).
  *
  * @author John Engelman
  */
 @CacheableTransformer
-public open class DontIncludeResourceTransformer @Inject constructor(
-  final override val objectFactory: ObjectFactory,
-) : ResourceTransformer by ResourceTransformer.Companion {
-  @get:Input
-  public open val resource: Property<String> = objectFactory.property("")
+public open class DontIncludeResourceTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) :
+  ResourceTransformer by ResourceTransformer.Companion {
+  @get:Input public open val resource: Property<String> = objectFactory.property("")
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.get().isNotEmpty() && element.path.endsWith(resource.get())

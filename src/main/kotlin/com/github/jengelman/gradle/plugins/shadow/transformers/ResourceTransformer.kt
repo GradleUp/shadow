@@ -9,7 +9,8 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 
 /**
- * Modified from [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.ResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ResourceTransformer.java).
  *
  * @author Jason van Zyl
  * @author Charlie Knudsen
@@ -18,37 +19,38 @@ import org.gradle.api.tasks.Internal
 public interface ResourceTransformer : Named {
   public fun canTransformResource(element: FileTreeElement): Boolean
 
-  @Throws(IOException::class)
-  public fun transform(context: TransformerContext)
+  @Throws(IOException::class) public fun transform(context: TransformerContext)
 
   public fun hasTransformedResource(): Boolean
 
   @Throws(IOException::class)
   public fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean)
 
-  @Suppress("unused") // Used by Gradle side, see https://github.com/GradleUp/shadow/pull/1289#issuecomment-2915738983.
+  @Suppress("unused") // Used by Gradle side, see
+  // https://github.com/GradleUp/shadow/pull/1289#issuecomment-2915738983.
   @Internal
   override fun getName(): String = this::class.java.simpleName
 
   /**
-   * This is used for creating Gradle's lazy properties in the subclass, Shadow's build-in transformers that depend on
-   * this have been injected via [ObjectFactory.newInstance]. Custom transformers should implement or inject
-   * this property if they need to access it.
+   * This is used for creating Gradle's lazy properties in the subclass, Shadow's build-in
+   * transformers that depend on this have been injected via [ObjectFactory.newInstance]. Custom
+   * transformers should implement or inject this property if they need to access it.
    */
   @get:Internal
   public val objectFactory: ObjectFactory
-    get() = throw NotImplementedError("You have to make sure this has been implemented or injected.")
+    get() =
+      throw NotImplementedError("You have to make sure this has been implemented or injected.")
 
   /**
-   * This also implements [ResourceTransformer] but no-op, which means it could be used by Kotlin delegations.
+   * This also implements [ResourceTransformer] but no-op, which means it could be used by Kotlin
+   * delegations.
    */
   public companion object : ResourceTransformer {
     @JvmStatic
     public fun <T : ResourceTransformer> Class<T>.create(objectFactory: ObjectFactory): T {
       // If the constructor takes a single ObjectFactory, inject it in.
-      val constructor = constructors.find {
-        it.parameterTypes.singleOrNull() == ObjectFactory::class.java
-      }
+      val constructor =
+        constructors.find { it.parameterTypes.singleOrNull() == ObjectFactory::class.java }
       return if (constructor != null) {
         objectFactory.newInstance(this@create)
       } else {
@@ -57,8 +59,14 @@ public interface ResourceTransformer : Named {
     }
 
     public override fun canTransformResource(element: FileTreeElement): Boolean = false
+
     public override fun transform(context: TransformerContext): Unit = Unit
-    public override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean): Unit = Unit
+
+    public override fun modifyOutputStream(
+      os: ZipOutputStream,
+      preserveFileTimestamps: Boolean,
+    ): Unit = Unit
+
     public override fun hasTransformedResource(): Boolean = false
   }
 }

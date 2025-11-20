@@ -13,28 +13,21 @@ object CodeSnippetExtractor {
   private val docRoot = Path(System.getProperty("DOCS_DIR"))
 
   @OptIn(ExperimentalPathApi::class)
-  private val markdownPaths = docRoot.walk()
-    .filter { it.name.endsWith(".md", ignoreCase = true) }
-    .toList()
+  private val markdownPaths =
+    docRoot.walk().filter { it.name.endsWith(".md", ignoreCase = true) }.toList()
 
   fun extract(lang: DslLang): List<SnippetExecutable> {
-    return markdownPaths.flatMap { path ->
-      createExecutables(lang, path)
-    }
+    return markdownPaths.flatMap { path -> createExecutables(lang, path) }
   }
 
-  private fun createExecutables(
-    lang: DslLang,
-    markdownPath: Path,
-  ): List<SnippetExecutable> {
+  private fun createExecutables(lang: DslLang, markdownPath: Path): List<SnippetExecutable> {
     val relativeDocPath = markdownPath.relativeTo(docRoot).toString()
     return createSnippets(markdownPath.readText(), lang).map { (lineNumber, snippet) ->
-      SnippetExecutable.create(
-        lang,
-        snippet,
-        "$relativeDocPath:$lineNumber",
-      ) {
-        RuntimeException("The error line in the doc is near ${markdownPath.toUri()}:$lineNumber", it)
+      SnippetExecutable.create(lang, snippet, "$relativeDocPath:$lineNumber") {
+        RuntimeException(
+          "The error line in the doc is near ${markdownPath.toUri()}:$lineNumber",
+          it,
+        )
       }
     }
   }

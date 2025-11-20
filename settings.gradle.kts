@@ -12,9 +12,7 @@ pluginManagement {
   }
 }
 
-plugins {
-  id("com.gradle.develocity") version "4.2.2"
-}
+plugins { id("com.gradle.develocity") version "4.2.2" }
 
 develocity {
   buildScan {

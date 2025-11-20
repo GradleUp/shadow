@@ -6,7 +6,8 @@ import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
 
 /**
- * Modified from [org.apache.maven.plugins.shade.resource.AppendingTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/AppendingTransformerTest.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.AppendingTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/AppendingTransformerTest.java).
  */
 class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
 

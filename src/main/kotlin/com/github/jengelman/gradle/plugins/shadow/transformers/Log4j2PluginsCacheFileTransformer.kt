@@ -17,21 +17,18 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 /**
- * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java).
+ * Modified from
+ * [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java).
  *
  * @author Paul Nelson Baker
  * @author John Engelman
  */
 @CacheableTransformer
 public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
-  /**
-   * Log4j config files to share across the transformation stages.
-   */
+  /** Log4j config files to share across the transformation stages. */
   private val tempFiles = mutableListOf<Path>()
 
-  /**
-   * [Relocator] instances to share across the transformation stages.
-   */
+  /** [Relocator] instances to share across the transformation stages. */
   private val tempRelocators = mutableListOf<Relocator>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
@@ -45,9 +42,7 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
     tempRelocators.addAll(context.relocators)
   }
 
-  /**
-   * @return `true` if any dat file collected.
-   */
+  /** @return `true` if any dat file collected. */
   override fun hasTransformedResource(): Boolean = tempFiles.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {

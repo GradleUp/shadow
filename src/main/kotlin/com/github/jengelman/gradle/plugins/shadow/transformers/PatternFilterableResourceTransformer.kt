@@ -14,9 +14,8 @@ import org.gradle.api.tasks.util.PatternSet
  * @param patternSet The [PatternSet] used for filtering resources.
  */
 public abstract class PatternFilterableResourceTransformer(
-  @Internal public val patternSet: PatternSet,
-) : ResourceTransformer by ResourceTransformer.Companion,
-  PatternFilterable by patternSet {
+  @Internal public val patternSet: PatternSet
+) : ResourceTransformer by ResourceTransformer.Companion, PatternFilterable by patternSet {
 
   @get:Internal
   protected val patternSpec: Spec<FileTreeElement> by unsafeLazy {

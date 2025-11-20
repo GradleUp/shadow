@@ -23,8 +23,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun serviceResourceTransformer(shortSyntax: Boolean) {
-    val config = if (shortSyntax) {
-      """
+    val config =
+      if (shortSyntax) {
+        """
         dependencies {
           ${implementationFiles(buildJarOne(), buildJarTwo())}
         }
@@ -33,15 +34,18 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
             exclude 'META-INF/services/com.acme.*'
           }
         }
-      """.trimIndent()
-    } else {
-      transform<ServiceFileTransformer>(
-        dependenciesBlock = implementationFiles(buildJarOne(), buildJarTwo()),
-        transformerBlock = """
-          exclude 'META-INF/services/com.acme.*'
-        """.trimIndent(),
-      )
-    }
+      """
+          .trimIndent()
+      } else {
+        transform<ServiceFileTransformer>(
+          dependenciesBlock = implementationFiles(buildJarOne(), buildJarTwo()),
+          transformerBlock =
+            """
+            exclude 'META-INF/services/com.acme.*'
+            """
+              .trimIndent(),
+        )
+      }
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
@@ -55,29 +59,29 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun serviceResourceTransformerAlternatePath(shortSyntax: Boolean) {
-    val one = buildJarOne {
-      insert(ENTRY_FOO_SHADE, CONTENT_ONE)
-    }
-    val two = buildJarTwo {
-      insert(ENTRY_FOO_SHADE, CONTENT_TWO)
-    }
-    val config = if (shortSyntax) {
-      """
+    val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
+    val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
+    val config =
+      if (shortSyntax) {
+        """
         dependencies {
           ${implementationFiles(one, two)}
         }
         $shadowJarTask {
           mergeServiceFiles("META-INF/foo")
         }
-      """.trimIndent()
-    } else {
-      transform<ServiceFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
-          path = 'META-INF/foo'
-        """.trimIndent(),
-      )
-    }
+      """
+          .trimIndent()
+      } else {
+        transform<ServiceFileTransformer>(
+          dependenciesBlock = implementationFiles(one, two),
+          transformerBlock =
+            """
+            path = 'META-INF/foo'
+            """
+              .trimIndent(),
+        )
+      }
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
@@ -92,9 +96,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       insert(
         "META-INF/services/java.sql.Driver",
         """
-          oracle.jdbc.OracleDriver
-          org.apache.hive.jdbc.HiveDriver
-        """.trimIndent(),
+        oracle.jdbc.OracleDriver
+        org.apache.hive.jdbc.HiveDriver
+        """
+          .trimIndent(),
       )
       insert(
         "META-INF/services/org.apache.axis.components.compiler.Compiler",
@@ -109,18 +114,16 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       insert(
         "META-INF/services/java.sql.Driver",
         """
-          org.apache.derby.jdbc.AutoloadedDriver
-          com.mysql.jdbc.Driver
-        """.trimIndent(),
+        org.apache.derby.jdbc.AutoloadedDriver
+        com.mysql.jdbc.Driver
+        """
+          .trimIndent(),
       )
       insert(
         "META-INF/services/org.apache.axis.components.compiler.Compiler",
         "org.apache.axis.components.compiler.Jikes",
       )
-      insert(
-        "META-INF/services/org.apache.commons.logging.LogFactory",
-        "org.mortbay.log.Factory",
-      )
+      insert("META-INF/services/org.apache.commons.logging.LogFactory", "org.mortbay.log.Factory")
     }
 
     projectScript.appendText(
@@ -135,32 +138,39 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
             exclude 'org.apache.commons.logging.LogFactory'
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/services/java.sql.Driver").isEqualTo(
-        """
+      getContent("META-INF/services/java.sql.Driver")
+        .isEqualTo(
+          """
           oracle.jdbc.OracleDriver
           myapache.hive.jdbc.HiveDriver
           myapache.derby.jdbc.AutoloadedDriver
           com.mysql.jdbc.Driver
-        """.trimIndent(),
-      )
-      getContent("META-INF/services/myapache.axis.components.compiler.Compiler").isEqualTo(
-        """
+          """
+            .trimIndent()
+        )
+      getContent("META-INF/services/myapache.axis.components.compiler.Compiler")
+        .isEqualTo(
+          """
           myapache.axis.components.compiler.Javac
           org.apache.axis.components.compiler.Jikes
-        """.trimIndent(),
-      )
-      getContent("META-INF/services/org.apache.commons.logging.LogFactory").isEqualTo(
-        """
+          """
+            .trimIndent()
+        )
+      getContent("META-INF/services/org.apache.commons.logging.LogFactory")
+        .isEqualTo(
+          """
           myapache.commons.logging.impl.LogFactoryImpl
           org.mortbay.log.Factory
-        """.trimIndent(),
-      )
+          """
+            .trimIndent()
+        )
     }
   }
 
@@ -171,12 +181,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   @Test
   fun transformProjectResources() {
     val servicesBarEntry = "META-INF/services/foo.Bar"
-    val one = buildJarOne {
-      insert(servicesBarEntry, CONTENT_ONE)
-    }
-    val two = buildJarTwo {
-      insert(servicesBarEntry, CONTENT_TWO)
-    }
+    val one = buildJarOne { insert(servicesBarEntry, CONTENT_ONE) }
+    val two = buildJarTwo { insert(servicesBarEntry, CONTENT_TWO) }
     projectScript.appendText(
       """
         dependencies {
@@ -185,7 +191,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         $shadowJarTask {
           mergeServiceFiles()
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
     path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
@@ -197,10 +204,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
   @ParameterizedTest
   @MethodSource("withThrowingProvider")
-  fun honorDuplicatesStrategyWithThrowing(
-    strategy: DuplicatesStrategy,
-    outputRegex: String,
-  ) {
+  fun honorDuplicatesStrategyWithThrowing(strategy: DuplicatesStrategy, outputRegex: String) {
     writeDuplicatesStrategy(strategy)
 
     val result = runWithFailure(shadowJarPath)
@@ -235,7 +239,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -256,7 +261,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -284,7 +290,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
             }
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -305,28 +312,38 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           duplicatesStrategy = DuplicatesStrategy.$strategy
           mergeServiceFiles()
         }
-      """.trimIndent() + lineSeparator,
+      """
+        .trimIndent() + lineSeparator
     )
   }
 
   private companion object {
     @JvmStatic
-    fun withThrowingProvider() = listOf(
-      Arguments.of(FAIL, "Cannot copy zip entry .* to .* because zip entry .* has already been copied there"),
-      Arguments.of(INHERIT, "Entry .* is a duplicate but no duplicate handling strategy has been set"),
-    )
+    fun withThrowingProvider() =
+      listOf(
+        Arguments.of(
+          FAIL,
+          "Cannot copy zip entry .* to .* because zip entry .* has already been copied there",
+        ),
+        Arguments.of(
+          INHERIT,
+          "Entry .* is a duplicate but no duplicate handling strategy has been set",
+        ),
+      )
 
     @JvmStatic
-    fun withoutThrowingProvider() = listOf(
-      Arguments.of(EXCLUDE, CONTENT_ONE, "one"),
-      Arguments.of(INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
-      Arguments.of(WARN, CONTENT_ONE_TWO, "one\ntwo"),
-    )
+    fun withoutThrowingProvider() =
+      listOf(
+        Arguments.of(EXCLUDE, CONTENT_ONE, "one"),
+        Arguments.of(INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
+        Arguments.of(WARN, CONTENT_ONE_TWO, "one\ntwo"),
+      )
 
     @JvmStatic
-    fun eachFileStrategyProvider() = listOf(
-      Arguments.of(EXCLUDE, INCLUDE, ENTRY_SERVICES_SHADE),
-      Arguments.of(INCLUDE, EXCLUDE, ENTRY_SERVICES_FOO),
-    )
+    fun eachFileStrategyProvider() =
+      listOf(
+        Arguments.of(EXCLUDE, INCLUDE, ENTRY_SERVICES_SHADE),
+        Arguments.of(INCLUDE, EXCLUDE, ENTRY_SERVICES_FOO),
+      )
   }
 }
