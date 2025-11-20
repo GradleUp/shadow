@@ -16,10 +16,10 @@ import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseTransformerTest<T : ResourceTransformer> {
-  protected lateinit var transformer: T
+  lateinit var transformer: T
     private set
 
-  protected val manifestTransformerContext: TransformerContext
+  val manifestTransformerContext: TransformerContext
     get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
 
   @BeforeEach
