@@ -80,7 +80,7 @@ class TransformersTest : BaseTransformerTest() {
       }
     } else {
       val buildResult = runWithFailure(shadowJarPath)
-      assertThat(buildResult.task(":shadowJar")!!.outcome).isSameInstanceAs(TaskOutcome.FAILED)
+      assertThat(buildResult).taskOutcomeEquals(":shadowJar", TaskOutcome.FAILED)
       assertThat(buildResult.output).contains(
         // Keep this list approach for Unix/Windows test compatibility.
         "Execution failed for task ':shadowJar'.",
