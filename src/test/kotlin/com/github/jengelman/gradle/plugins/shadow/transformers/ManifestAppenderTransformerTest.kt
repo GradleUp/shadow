@@ -47,7 +47,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       transform(manifestTransformerContext)
     }
 
-    val targetLines = doTransformAndGetTransformedPath(transformer, true)
+    val targetLines = transformer.transformToJar()
       .getContent(MANIFEST_NAME).lines()
     assertThat(targetLines).isNotEmpty()
     assertThat(targetLines.size).isGreaterThan(4)
@@ -68,7 +68,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
   fun noTransformation() {
     val sourceLines = requireResourceAsPath(MANIFEST_NAME).readLines()
     transformer.transform(manifestTransformerContext)
-    val targetLines = doTransformAndGetTransformedPath(transformer, true)
+    val targetLines = transformer.transformToJar()
       .getContent(MANIFEST_NAME).lines()
 
     assertThat(targetLines).isEqualTo(sourceLines)

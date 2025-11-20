@@ -34,7 +34,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun transformation() {
     transformer.transform(manifestTransformerContext)
 
-    val targetLines = doTransformAndGetTransformedPath(transformer, false)
+    val targetLines = transformer.transformToJar()
       .getContent(MANIFEST_NAME).lines()
 
     assertThat(targetLines).isNotEmpty()
@@ -45,10 +45,10 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun transformationPropertiesAreReproducible() {
     transformer.transform(manifestTransformerContext)
 
-    val firstRunTargetLines = doTransformAndGetTransformedPath(transformer, true)
+    val firstRunTargetLines = transformer.transformToJar()
       .getContent(MANIFEST_NAME).lines()
     Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
-    val secondRunTargetLines = doTransformAndGetTransformedPath(transformer, true)
+    val secondRunTargetLines = transformer.transformToJar()
       .getContent(MANIFEST_NAME).lines()
 
     assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)

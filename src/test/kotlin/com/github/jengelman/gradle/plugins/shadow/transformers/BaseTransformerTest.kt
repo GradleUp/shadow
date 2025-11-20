@@ -50,13 +50,12 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
       return TransformerContext(path = path, inputStream = text.byteInputStream(), relocators = relocators.toSet())
     }
 
-    fun doTransformAndGetTransformedPath(
-      transformer: ResourceTransformer,
-      preserveFileTimestamps: Boolean,
+    fun ResourceTransformer.transformToJar(
+      preserveFileTimestamps: Boolean = true,
     ): JarPath {
       val testableZipPath = createTempFile("testable-zip-file-", ".jar")
       ZipOutputStream(testableZipPath.outputStream()).use { zipOutputStream ->
-        transformer.modifyOutputStream(zipOutputStream, preserveFileTimestamps)
+        modifyOutputStream(zipOutputStream, preserveFileTimestamps)
       }
       return JarPath(testableZipPath)
     }
