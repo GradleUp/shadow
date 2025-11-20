@@ -42,11 +42,11 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
       return canTransformResource(element)
     }
 
-    fun resourceContext(path: String, vararg relocators: Relocator = emptyArray()): TransformerContext {
+    fun resourceContext(path: String, vararg relocators: Relocator): TransformerContext {
       return TransformerContext(path = path, inputStream = requireResourceAsStream(path), relocators = relocators.toSet())
     }
 
-    fun textContext(path: String, text: String = "", vararg relocators: Relocator = emptyArray()): TransformerContext {
+    fun textContext(path: String, text: String = "", vararg relocators: Relocator): TransformerContext {
       return TransformerContext(path = path, inputStream = text.byteInputStream(), relocators = relocators.toSet())
     }
 
