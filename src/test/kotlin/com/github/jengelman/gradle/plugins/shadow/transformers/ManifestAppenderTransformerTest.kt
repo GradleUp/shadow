@@ -3,10 +3,12 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isGreaterThan
-import assertk.assertions.isNotEmpty
+import assertk.assertions.isGreaterThanOrEqualTo
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import java.util.jar.JarFile.MANIFEST_NAME
 import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
@@ -44,27 +46,23 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       transform(manifestTransformerContext)
     }
 
-    val targetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
-    assertThat(targetLines).isNotEmpty()
-    assertThat(targetLines.size).isGreaterThan(4)
-
-    val trailer = targetLines.subList(targetLines.size - 5, targetLines.size)
-    assertThat(trailer).isEqualTo(
+    val targetLines = transformer.transformToJar().use { it.getContent(MANIFEST_NAME).trim().lines() }
+    assertThat(targetLines.size).isGreaterThanOrEqualTo(4)
+    assertThat(targetLines.takeLast(4)).isEqualTo(
       listOf(
         "Name: org/foo/bar/",
         "Sealed: true",
         "Name: com/example/",
         "Sealed: false",
-        "",
       ),
     )
   }
 
   @Test
   fun noTransformation() {
-    val sourceLines = requireResourceAsStream(MANIFEST_NAME).bufferedReader().readLines()
+    val sourceLines = requireResourceAsStream(MANIFEST_NAME).reader().readLines()
     transformer.transform(manifestTransformerContext)
-    val targetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
+    val targetLines = transformer.transformToJar().use { it.getStream(MANIFEST_NAME).reader().readLines() }
 
     assertThat(targetLines).isEqualTo(sourceLines)
   }

@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -50,8 +49,8 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   @MethodSource("serviceFileProvider")
   fun transformServiceFile(path: String, input1: String, input2: String, output: String) {
     if (transformer.canTransformResource(path)) {
-      transformer.transform(context(path, input1))
-      transformer.transform(context(path, input2))
+      transformer.transform(textContext(path, input1))
+      transformer.transform(textContext(path, input2))
     }
 
     assertThat(transformer.hasTransformedResource()).isTrue()
@@ -80,7 +79,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     val contentResourceShaded = "META-INF/services/borg.foo.something.another"
 
     val transformer = ServiceFileTransformer()
-    transformer.transform(context(contentResource, content, relocator))
+    transformer.transform(textContext(contentResource, content, relocator))
 
     tempJar.outputStream().zipOutputStream().use { zos ->
       transformer.modifyOutputStream(zos, false)
@@ -98,8 +97,8 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     val contentResourceShaded = "META-INF/services/borg.foo.something.another"
 
     val transformer = ServiceFileTransformer()
-    transformer.transform(context(contentResource, content, relocator))
-    transformer.transform(context(contentResourceShaded, content, relocator))
+    transformer.transform(textContext(contentResource, content, relocator))
+    transformer.transform(textContext(contentResourceShaded, content, relocator))
 
     tempJar.outputStream().zipOutputStream().use { zos ->
       transformer.modifyOutputStream(zos, false)
@@ -116,7 +115,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     val contentResource = "META-INF/services/org.osgi.framework.launch.FrameworkFactory"
 
     val transformer = ServiceFileTransformer()
-    transformer.transform(context(contentResource, content, relocator))
+    transformer.transform(textContext(contentResource, content, relocator))
 
     tempJar.outputStream().zipOutputStream().use { zos ->
       transformer.modifyOutputStream(zos, false)
@@ -133,12 +132,12 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
     var contentResource = "META-INF/services/org.something.another"
 
     val transformer = ServiceFileTransformer()
-    transformer.transform(context(contentResource, content, relocator))
+    transformer.transform(textContext(contentResource, content, relocator))
 
     content = "org.blah.Service\n"
     contentResource = "META-INF/services/org.something.another"
 
-    transformer.transform(context(contentResource, content, relocator))
+    transformer.transform(textContext(contentResource, content, relocator))
 
     tempJar.outputStream().zipOutputStream().use { zos ->
       transformer.modifyOutputStream(zos, false)
@@ -149,10 +148,6 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   }
 
   private companion object {
-    fun context(path: String, input: String, vararg relocators: Relocator): TransformerContext {
-      return TransformerContext(path, input.byteInputStream(), relocators = relocators.toSet())
-    }
-
     @JvmStatic
     fun resourceProvider() = listOf(
       // path, exclude, expected

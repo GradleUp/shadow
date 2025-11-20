@@ -43,7 +43,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
     val zos = ZipOutputStream(baos)
 
     transformer.projectName.set("test-project")
-    transformer.transform(context())
+    transformer.transform(textContext(NOTICE_RESOURCE))
     transformer.modifyOutputStream(zos, false)
     zos.close()
 
@@ -56,9 +56,5 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
 
   private companion object {
     const val NOTICE_RESOURCE = "META-INF/NOTICE"
-
-    fun context(text: String = ""): TransformerContext {
-      return TransformerContext(NOTICE_RESOURCE, text.byteInputStream())
-    }
   }
 }
