@@ -25,7 +25,7 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
   @BeforeEach
   open fun beforeEach() {
     @Suppress("UNCHECKED_CAST")
-    val clazz = (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.first() as Class<T>
+    val clazz = (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.single() as Class<T>
     transformer = clazz.create(testObjectFactory)
   }
 
