@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest # TODO: https://github.com/UmbrellaDocs/linkspector/issues/149
     if: github.event.repository.fork == false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: true
