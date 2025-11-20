@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import kotlin.io.path.readText
 import org.custommonkey.xmlunit.XMLUnit
 import org.junit.jupiter.api.Test
@@ -15,19 +14,13 @@ class ComponentsXmlResourceTransformerTest : BaseTransformerTest<ComponentsXmlRe
   @Test
   fun configurationMerging() {
     XMLUnit.setNormalizeWhitespace(true)
-    transformer.transform(context("components-1.xml"))
-    transformer.transform(context("components-2.xml"))
+    transformer.transform(resourceContext("components-1.xml"))
+    transformer.transform(resourceContext("components-2.xml"))
 
     val diff = XMLUnit.compareXML(
       requireResourceAsPath("components-expected.xml").readText(),
       transformer.transformedResource.decodeToString(),
     )
     assertThat(diff.identical()).isTrue()
-  }
-
-  private companion object {
-    fun context(path: String): TransformerContext {
-      return TransformerContext(path, requireResourceAsStream(path))
-    }
   }
 }

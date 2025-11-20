@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
@@ -37,6 +38,14 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
         override fun getRelativePath(): RelativePath = _relativePath
       }
       return canTransformResource(element)
+    }
+
+    fun resourceContext(path: String, vararg relocators: Relocator = emptyArray()): TransformerContext {
+      return TransformerContext(path = path, inputStream = requireResourceAsStream(path), relocators = relocators.toSet())
+    }
+
+    fun textContext(path: String, text: String = "", vararg relocators: Relocator = emptyArray()): TransformerContext {
+      return TransformerContext(path = path, inputStream = text.byteInputStream(), relocators = relocators.toSet())
     }
 
     fun doTransformAndGetTransformedPath(
