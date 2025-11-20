@@ -7,6 +7,7 @@ pluginPublish = "2.0.0"
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
+apache-commonsCodec = "commons-codec:commons-codec:1.20.0"
 apache-commonsIo = "commons-io:commons-io:2.21.0"
 apache-log4j = "org.apache.logging.log4j:log4j-core:2.25.2"
 apache-maven-modelBuilder = "org.apache.maven:maven-model:3.9.11"

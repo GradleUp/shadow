@@ -4,6 +4,7 @@ import java.io.File
 import java.security.MessageDigest
 import java.util.HexFormat
 import javax.inject.Inject
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
@@ -120,14 +121,7 @@ public open class DeduplicatingResourceTransformer(
     val d = digest!!
     try {
       d.reset()
-      file.inputStream().use {
-        val buffer = ByteArray(8192)
-        var readBytes: Int
-        while (it.read(buffer).also { r -> readBytes = r } != -1) {
-          d.update(buffer, 0, readBytes)
-        }
-      }
-      return HexFormat.of().formatHex(d.digest())
+      return HexFormat.of().formatHex(DigestUtils.digest(d, file))
     } catch (e: Exception) {
       throw RuntimeException("Failed to read data or calculate hash for $file", e)
     }

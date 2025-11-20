@@ -119,6 +119,7 @@ dependencies {
   compileOnly(libs.kotlin.gradlePlugin)
   compileOnly(libs.kotlin.reflect)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
+  implementation(libs.apache.commonsCodec)
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
   implementation(libs.asm)
