@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
@@ -39,10 +40,6 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
         override fun getRelativePath(): RelativePath = _relativePath
       }
       return canTransformResource(element)
-    }
-
-    fun JarPath.readContentLines(resourceName: String = MANIFEST_NAME): List<String> {
-      return use { it.getStream(resourceName).bufferedReader().readLines() }
     }
 
     fun doTransformAndGetTransformedPath(

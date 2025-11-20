@@ -7,6 +7,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import java.nio.charset.Charset
 import java.util.Properties
@@ -32,7 +33,8 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun transformation() {
     transformer.transform(manifestTransformerContext)
 
-    val targetLines = doTransformAndGetTransformedPath(transformer, false).readContentLines()
+    val targetLines = doTransformAndGetTransformedPath(transformer, false)
+      .getContent(MANIFEST_NAME).lines()
 
     assertThat(targetLines).isNotEmpty()
     assertThat(targetLines).contains("Manifest-Version=1.0")
@@ -42,9 +44,11 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun transformationPropertiesAreReproducible() {
     transformer.transform(manifestTransformerContext)
 
-    val firstRunTargetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
+    val firstRunTargetLines = doTransformAndGetTransformedPath(transformer, true)
+      .getContent(MANIFEST_NAME).lines()
     Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
-    val secondRunTargetLines = doTransformAndGetTransformedPath(transformer, true).readContentLines()
+    val secondRunTargetLines = doTransformAndGetTransformedPath(transformer, true)
+      .getContent(MANIFEST_NAME).lines()
 
     assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
   }
