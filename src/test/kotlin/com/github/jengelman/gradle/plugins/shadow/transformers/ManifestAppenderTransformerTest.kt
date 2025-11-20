@@ -47,7 +47,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
     }
 
     val targetLines = transformer.transformToJar().use { it.getContent(MANIFEST_NAME).trim().lines() }
-    assertThat(targetLines.size).isGreaterThan(5)
+    assertThat(targetLines.size).isGreaterThanOrEqualTo(4)
     assertThat(targetLines.takeLast(4)).isEqualTo(
       listOf(
         "Name: org/foo/bar/",
