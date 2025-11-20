@@ -18,10 +18,12 @@ import org.gradle.api.tasks.util.PatternSet
  * Multiple files with the same path but different content lead to an error.
  *
  * Some scenarios for duplicate resources in a shadow jar:
+ *
  * * Duplicate `.class` files
  *   Having duplicate `.class` files with different content is a situation indicating that the resulting jar is
  *   built with _incompatible_ classes, likely leading to issues during runtime.
  *   This situation can happen when one dependency is (also) included in an uber jar.
+ *
  * * Duplicate `META-INF/<group-id>/<artifact-id>/pom.properties`/`xml` files.
  *   Some dependencies contain shaded variants of other dependencies.
  *   Tools that inspect jar files to extract the included dependencies, for example, for license auditing
@@ -37,6 +39,7 @@ import org.gradle.api.tasks.util.PatternSet
  * To exclude a path or pattern from being deduplicated, for example, legit
  * `META-INF/<group-id>/<artifact-id>/pom.properties`/`xml`, configure the transformer with an exclusion
  * like the following:
+ *
  * ```kotlin
  * tasks.named<ShadowJar>("shadowJar").configure {
  *   // Keep pom.* files from different Guava versions in the jar.
@@ -60,23 +63,6 @@ public open class DeduplicatingResourceTransformer(
 
   @Inject
   public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
-
-  internal data class PathInfos(val failOnDuplicateContent: Boolean) {
-    val filesPerHash: MutableMap<String, MutableList<File>> = mutableMapOf()
-
-    fun uniqueContentCount() = filesPerHash.size
-
-    fun addFile(hash: String, file: File): Boolean {
-      var filesForHash: MutableList<File>? = filesPerHash[hash]
-      val new = filesForHash == null
-      if (new) {
-        filesForHash = mutableListOf()
-        filesPerHash[hash] = filesForHash
-      }
-      filesForHash.add(file)
-      return new
-    }
-  }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val file = element.file
@@ -124,6 +110,23 @@ public open class DeduplicatingResourceTransformer(
       return HexFormat.of().formatHex(DigestUtils.digest(d, file))
     } catch (e: Exception) {
       throw RuntimeException("Failed to read data or calculate hash for $file", e)
+    }
+  }
+
+  internal data class PathInfos(val failOnDuplicateContent: Boolean) {
+    val filesPerHash: MutableMap<String, MutableList<File>> = mutableMapOf()
+
+    fun uniqueContentCount() = filesPerHash.size
+
+    fun addFile(hash: String, file: File): Boolean {
+      var filesForHash: MutableList<File>? = filesPerHash[hash]
+      val new = filesForHash == null
+      if (new) {
+        filesForHash = mutableListOf()
+        filesPerHash[hash] = filesForHash
+      }
+      filesForHash.add(file)
+      return new
     }
   }
 }
