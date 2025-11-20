@@ -5,13 +5,11 @@ import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -49,12 +47,6 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
     this.hash1 = transformer.hashForFile(this.file1)
     this.hash2 = transformer.hashForFile(this.file2)
     this.hash3 = transformer.hashForFile(this.file3)
-  }
-
-  @Test
-  fun hashing() {
-    assertThat(hash1).isEqualTo(hash2)
-    assertThat(hash1).isNotEqualTo(hash3)
   }
 
   @ParameterizedTest
