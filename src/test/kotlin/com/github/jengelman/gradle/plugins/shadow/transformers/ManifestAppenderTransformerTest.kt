@@ -4,8 +4,8 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isGreaterThan
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import java.util.jar.JarFile.MANIFEST_NAME
@@ -46,18 +46,14 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       transform(manifestTransformerContext)
     }
 
-    val targetLines = transformer.transformToJar().getStream(MANIFEST_NAME).reader().readLines()
-    assertThat(targetLines).isNotEmpty()
-    assertThat(targetLines.size).isGreaterThan(4)
-
-    val trailer = targetLines.subList(targetLines.size - 5, targetLines.size)
-    assertThat(trailer).isEqualTo(
+    val targetLines = transformer.transformToJar().getContent(MANIFEST_NAME).trim().lines()
+    assertThat(targetLines.size).isGreaterThan(5)
+    assertThat(targetLines.takeLast(4)).isEqualTo(
       listOf(
         "Name: org/foo/bar/",
         "Sealed: true",
         "Name: com/example/",
         "Sealed: false",
-        "",
       ),
     )
   }
