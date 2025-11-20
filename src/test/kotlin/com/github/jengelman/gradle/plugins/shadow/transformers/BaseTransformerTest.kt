@@ -32,9 +32,9 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
   companion object {
     const val MANIFEST_NAME: String = "META-INF/MANIFEST.MF"
 
-    fun ResourceTransformer.canTransformResource(path: String, isFile: Boolean = true): Boolean {
+    fun ResourceTransformer.canTransformResource(path: String): Boolean {
       val element = object : FileTreeElement by noOpDelegate() {
-        private val _relativePath = RelativePath.parse(isFile, path)
+        private val _relativePath = RelativePath.parse(true, path)
         override fun getPath(): String = _relativePath.pathString
         override fun getRelativePath(): RelativePath = _relativePath
       }
