@@ -90,7 +90,17 @@ fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsO
  * Ensures the JAR contains exactly the specified entries, including duplicates, in any order.
  * Used alone, without [containsAtLeast] or [containsNone].
  */
-fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) = toEntries().containsExactlyInAnyOrder(*entries)
+fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) = transform { actual ->
+  JarInputStream(actual.path.inputStream()).use { jarInput ->
+    val allEntries = mutableListOf<String>()
+    while (true) {
+      val entry = jarInput.nextEntry ?: break
+      allEntries.add(entry.name)
+      jarInput.closeEntry()
+    }
+    allEntries
+  }
+}.containsExactlyInAnyOrder(*entries)
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }
