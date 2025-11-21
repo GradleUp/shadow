@@ -49,65 +49,63 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun duplicateContent(exclusionCheck: Boolean) {
-    with(transformer) {
-      if (!exclusionCheck) {
-        exclude("multiple-contents")
-      }
+  fun duplicateContent(exclusionCheck: Boolean) = with(transformer) {
+    if (!exclusionCheck) {
+      exclude("multiple-contents")
+    }
 
-      // new path, new file content --> retain resource
-      assertThat(canTransformResource("multiple-contents", file1)).isFalse()
-      // same path, same file content --> skip resource
-      assertThat(canTransformResource("multiple-contents", file2)).isTrue()
-      // same path, different file content --> retain resource (even if it's a duplicate)
-      assertThat(canTransformResource("multiple-contents", file3)).isFalse()
+    // new path, new file content --> retain resource
+    assertThat(canTransformResource("multiple-contents", file1)).isFalse()
+    // same path, same file content --> skip resource
+    assertThat(canTransformResource("multiple-contents", file2)).isTrue()
+    // same path, different file content --> retain resource (even if it's a duplicate)
+    assertThat(canTransformResource("multiple-contents", file3)).isFalse()
 
-      assertThat(canTransformResource("single-source", file1)).isFalse()
+    assertThat(canTransformResource("single-source", file1)).isFalse()
 
-      assertThat(canTransformResource("same-content-twice", file1)).isFalse()
-      assertThat(canTransformResource("same-content-twice", file2)).isTrue()
+    assertThat(canTransformResource("same-content-twice", file1)).isFalse()
+    assertThat(canTransformResource("same-content-twice", file2)).isTrue()
 
-      assertThat(canTransformResource("differing-content-2", file1)).isFalse()
-      assertThat(canTransformResource("differing-content-2", file3)).isFalse()
+    assertThat(canTransformResource("differing-content-2", file1)).isFalse()
+    assertThat(canTransformResource("differing-content-2", file3)).isFalse()
 
-      assertThat(sources.keys).containsExactlyInAnyOrder(
-        "multiple-contents",
-        "single-source",
-        "same-content-twice",
-        "differing-content-2",
+    assertThat(sources.keys).containsExactlyInAnyOrder(
+      "multiple-contents",
+      "single-source",
+      "same-content-twice",
+      "differing-content-2",
+    )
+
+    val pathInfosMultipleContents = sources.getValue("multiple-contents")
+    assertThat(pathInfosMultipleContents.failOnDuplicateContent).isEqualTo(exclusionCheck)
+    assertThat(pathInfosMultipleContents.uniqueContentCount()).isEqualTo(2)
+    assertThat(pathInfosMultipleContents.filesPerHash).containsOnly(
+      hash1 to listOf(file1, file2),
+      hash3 to listOf(file3),
+    )
+
+    val pathInfosSingleSource = sources.getValue("single-source")
+    assertThat(pathInfosSingleSource.failOnDuplicateContent).isTrue()
+    assertThat(pathInfosSingleSource.uniqueContentCount()).isEqualTo(1)
+    assertThat(pathInfosSingleSource.filesPerHash).containsOnly(hash1 to listOf(file1))
+
+    val pathInfosSameContentTwice = sources.getValue("same-content-twice")
+    assertThat(pathInfosSameContentTwice.failOnDuplicateContent).isTrue()
+    assertThat(pathInfosSameContentTwice.uniqueContentCount()).isEqualTo(1)
+    assertThat(pathInfosSameContentTwice.filesPerHash).containsOnly(hash1 to listOf(file1, file2))
+
+    val pathInfosDifferingContent2 = sources.getValue("differing-content-2")
+    assertThat(pathInfosDifferingContent2.failOnDuplicateContent).isTrue()
+    assertThat(pathInfosDifferingContent2.uniqueContentCount()).isEqualTo(2)
+    assertThat(pathInfosDifferingContent2.filesPerHash).containsOnly(hash1 to listOf(file1), hash3 to listOf(file3))
+
+    if (exclusionCheck) {
+      assertThat(duplicateContentViolations()).containsOnly(
+        "multiple-contents" to pathInfosMultipleContents,
+        "differing-content-2" to pathInfosDifferingContent2,
       )
-
-      val pathInfosMultipleContents = sources.getValue("multiple-contents")
-      assertThat(pathInfosMultipleContents.failOnDuplicateContent).isEqualTo(exclusionCheck)
-      assertThat(pathInfosMultipleContents.uniqueContentCount()).isEqualTo(2)
-      assertThat(pathInfosMultipleContents.filesPerHash).containsOnly(
-        hash1 to listOf(file1, file2),
-        hash3 to listOf(file3),
-      )
-
-      val pathInfosSingleSource = sources.getValue("single-source")
-      assertThat(pathInfosSingleSource.failOnDuplicateContent).isTrue()
-      assertThat(pathInfosSingleSource.uniqueContentCount()).isEqualTo(1)
-      assertThat(pathInfosSingleSource.filesPerHash).containsOnly(hash1 to listOf(file1))
-
-      val pathInfosSameContentTwice = sources.getValue("same-content-twice")
-      assertThat(pathInfosSameContentTwice.failOnDuplicateContent).isTrue()
-      assertThat(pathInfosSameContentTwice.uniqueContentCount()).isEqualTo(1)
-      assertThat(pathInfosSameContentTwice.filesPerHash).containsOnly(hash1 to listOf(file1, file2))
-
-      val pathInfosDifferingContent2 = sources.getValue("differing-content-2")
-      assertThat(pathInfosDifferingContent2.failOnDuplicateContent).isTrue()
-      assertThat(pathInfosDifferingContent2.uniqueContentCount()).isEqualTo(2)
-      assertThat(pathInfosDifferingContent2.filesPerHash).containsOnly(hash1 to listOf(file1), hash3 to listOf(file3))
-
-      if (exclusionCheck) {
-        assertThat(duplicateContentViolations()).containsOnly(
-          "multiple-contents" to pathInfosMultipleContents,
-          "differing-content-2" to pathInfosDifferingContent2,
-        )
-      } else {
-        assertThat(duplicateContentViolations()).containsOnly("differing-content-2" to pathInfosDifferingContent2)
-      }
+    } else {
+      assertThat(duplicateContentViolations()).containsOnly("differing-content-2" to pathInfosDifferingContent2)
     }
   }
 }
