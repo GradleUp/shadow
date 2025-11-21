@@ -8,7 +8,6 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,7 +23,6 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
   private lateinit var file3: File
 
   private var hash1 = ""
-  private var hash2 = ""
   private var hash3 = ""
 
   @BeforeEach
@@ -43,7 +41,6 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
     }
 
     hash1 = transformer.hashForFile(file1)
-    hash2 = transformer.hashForFile(file2)
     hash3 = transformer.hashForFile(file3)
   }
 
