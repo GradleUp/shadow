@@ -19,34 +19,32 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
   @TempDir
   lateinit var tempDir: Path
 
-  lateinit var file1: File
-  lateinit var file2: File
-  lateinit var file3: File
+  private lateinit var file1: File
+  private lateinit var file2: File
+  private lateinit var file3: File
 
-  var hash1: String = ""
-  var hash2: String = ""
-  var hash3: String = ""
+  private var hash1 = ""
+  private var hash2 = ""
+  private var hash3 = ""
 
   @BeforeEach
   fun setupFiles() {
-    val file1 = tempDir.resolve("file1")
-    val file2 = tempDir.resolve("file2")
-    val file3 = tempDir.resolve("file3")
-
     val content1 = "content1"
     val content2 = "content2"
 
-    file1.writeText(content1)
-    file2.writeText(content1)
-    file3.writeText(content2)
+    file1 = tempDir.resolve("file1").toFile().apply {
+      writeText(content1)
+    }
+    file2 = tempDir.resolve("file2").toFile().apply {
+      writeText(content1)
+    }
+    file3 = tempDir.resolve("file3").toFile().apply {
+      writeText(content2)
+    }
 
-    this.file1 = file1.toFile()
-    this.file2 = file2.toFile()
-    this.file3 = file3.toFile()
-
-    this.hash1 = transformer.hashForFile(this.file1)
-    this.hash2 = transformer.hashForFile(this.file2)
-    this.hash3 = transformer.hashForFile(this.file3)
+    hash1 = transformer.hashForFile(file1)
+    hash2 = transformer.hashForFile(file2)
+    hash3 = transformer.hashForFile(file3)
   }
 
   @ParameterizedTest
@@ -79,7 +77,7 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
         "differing-content-2",
       )
 
-      val pathInfosMultipleContents = sources["multiple-contents"]!!
+      val pathInfosMultipleContents = sources.getValue("multiple-contents")
       assertThat(pathInfosMultipleContents.failOnDuplicateContent).isEqualTo(exclusionCheck)
       assertThat(pathInfosMultipleContents.uniqueContentCount()).isEqualTo(2)
       assertThat(pathInfosMultipleContents.filesPerHash).containsOnly(
@@ -87,17 +85,17 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
         hash3 to listOf(file3),
       )
 
-      val pathInfosSingleSource = sources["single-source"]!!
+      val pathInfosSingleSource = sources.getValue("single-source")
       assertThat(pathInfosSingleSource.failOnDuplicateContent).isTrue()
       assertThat(pathInfosSingleSource.uniqueContentCount()).isEqualTo(1)
       assertThat(pathInfosSingleSource.filesPerHash).containsOnly(hash1 to listOf(file1))
 
-      val pathInfosSameContentTwice = sources["same-content-twice"]!!
+      val pathInfosSameContentTwice = sources.getValue("same-content-twice")
       assertThat(pathInfosSameContentTwice.failOnDuplicateContent).isTrue()
       assertThat(pathInfosSameContentTwice.uniqueContentCount()).isEqualTo(1)
       assertThat(pathInfosSameContentTwice.filesPerHash).containsOnly(hash1 to listOf(file1, file2))
 
-      val pathInfosDifferingContent2 = sources["differing-content-2"]!!
+      val pathInfosDifferingContent2 = sources.getValue("differing-content-2")
       assertThat(pathInfosDifferingContent2.failOnDuplicateContent).isTrue()
       assertThat(pathInfosDifferingContent2.uniqueContentCount()).isEqualTo(2)
       assertThat(pathInfosDifferingContent2.filesPerHash).containsOnly(hash1 to listOf(file1), hash3 to listOf(file3))
