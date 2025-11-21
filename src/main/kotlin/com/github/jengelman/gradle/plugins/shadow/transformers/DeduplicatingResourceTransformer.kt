@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import java.io.File
-import java.security.MessageDigest
-import java.util.HexFormat
 import javax.inject.Inject
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tools.zip.ZipOutputStream
@@ -19,12 +17,12 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * Some scenarios for duplicate resources in a shadow jar:
  *
- * * Duplicate `.class` files
+ * - Duplicate `.class` files
  *   Having duplicate `.class` files with different content is a situation indicating that the resulting jar is
  *   built with _incompatible_ classes, likely leading to issues during runtime.
  *   This situation can happen when one dependency is (also) included in an uber jar.
  *
- * * Duplicate `META-INF/<group-id>/<artifact-id>/pom.properties`/`xml` files.
+ * - Duplicate `META-INF/<group-id>/<artifact-id>/pom.properties`/`xml` files.
  *   Some dependencies contain shaded variants of other dependencies.
  *   Tools that inspect jar files to extract the included dependencies, for example, for license auditing
  *   use cases or tools that collect information of all included dependencies, may rely on these files.
@@ -41,7 +39,7 @@ import org.gradle.api.tasks.util.PatternSet
  * like the following:
  *
  * ```kotlin
- * tasks.named<ShadowJar>("shadowJar").configure {
+ * tasks.shadowJar {
  *   // Keep pom.* files from different Guava versions in the jar.
  *   exclude("META-INF/maven/com.google.guava/guava/pom.*")
  *   // Duplicates with different content for all other resource paths will raise an error.
@@ -76,8 +74,6 @@ public open class DeduplicatingResourceTransformer(
 
   override fun hasTransformedResource(): Boolean = true
 
-  internal fun duplicateContentViolations(): Map<String, PathInfos> = sources.filter { (_, pathInfos) -> pathInfos.failOnDuplicateContent && pathInfos.uniqueContentCount() > 1 }
-
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val duplicatePaths = duplicateContentViolations()
 
@@ -95,19 +91,13 @@ public open class DeduplicatingResourceTransformer(
     }
   }
 
-  // Gradle's configuration uses Java serialization, which cannot serialize `MessageDigest` instances.
-  // Using a rather dirty mechanism to memoize the MD instance for task/transformer execution.
-  @Transient
-  private var digest: MessageDigest? = null
+  internal fun duplicateContentViolations(): Map<String, PathInfos> = sources.filter { (_, pathInfos) ->
+    pathInfos.failOnDuplicateContent && pathInfos.uniqueContentCount() > 1
+  }
 
   internal fun hashForFile(file: File): String {
-    if (digest == null) {
-      digest = MessageDigest.getInstance("SHA-256")
-    }
-    val d = digest!!
     try {
-      d.reset()
-      return HexFormat.of().formatHex(DigestUtils.digest(d, file))
+      return DigestUtils.sha256Hex(file.inputStream())
     } catch (e: Exception) {
       throw RuntimeException("Failed to read data or calculate hash for $file", e)
     }
