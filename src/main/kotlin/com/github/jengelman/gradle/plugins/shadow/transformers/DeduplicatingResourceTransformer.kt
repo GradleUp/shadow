@@ -79,7 +79,7 @@ public open class DeduplicatingResourceTransformer(
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     val duplicatePaths = duplicateContentViolations()
 
-    if (!duplicatePaths.isEmpty()) {
+    if (duplicatePaths.isNotEmpty()) {
       val message =
         "Found ${duplicatePaths.size} path duplicate(s) with different content in the shadow JAR:" +
           duplicatePaths
@@ -113,13 +113,8 @@ public open class DeduplicatingResourceTransformer(
     fun uniqueContentCount() = filesPerHash.size
 
     fun addFile(hash: String, file: File): Boolean {
-      var filesForHash: MutableList<File>? = filesPerHash[hash]
-      val new = filesForHash == null
-      if (new) {
-        filesForHash = mutableListOf()
-        filesPerHash[hash] = filesForHash
-      }
-      filesForHash.add(file)
+      val new = hash !in filesPerHash
+      filesPerHash.getOrPut(hash) { mutableListOf() }.add(file)
       return new
     }
   }
