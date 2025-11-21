@@ -13,14 +13,12 @@ import org.junit.jupiter.api.Test
 
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   @Test
-  fun canTransformResource() {
-    with(transformer) {
-      append("Name", "org/foo/bar/")
-      append("Sealed", true)
-    }
+  fun canTransformResource() = with(transformer) {
+    append("Name", "org/foo/bar/")
+    append("Sealed", true)
 
-    assertThat(transformer.canTransformResource(MANIFEST_NAME)).isTrue()
-    assertThat(transformer.canTransformResource(MANIFEST_NAME.lowercase())).isTrue()
+    assertThat(canTransformResource(MANIFEST_NAME)).isTrue()
+    assertThat(canTransformResource(MANIFEST_NAME.lowercase())).isTrue()
   }
 
   @Test
@@ -36,17 +34,15 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
   }
 
   @Test
-  fun transformation() {
-    with(transformer) {
-      append("Name", "org/foo/bar/")
-      append("Sealed", true)
-      append("Name", "com/example/")
-      append("Sealed", false)
+  fun transformation() = with(transformer) {
+    append("Name", "org/foo/bar/")
+    append("Sealed", true)
+    append("Name", "com/example/")
+    append("Sealed", false)
 
-      transform(manifestTransformerContext)
-    }
+    transform(manifestTransformerContext)
 
-    val targetLines = transformer.transformToJar().use { it.getContent(MANIFEST_NAME).trim().lines() }
+    val targetLines = transformToJar().use { it.getContent(MANIFEST_NAME).trim().lines() }
     assertThat(targetLines.size).isGreaterThanOrEqualTo(4)
     assertThat(targetLines.takeLast(4)).isEqualTo(
       listOf(
