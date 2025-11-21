@@ -7,7 +7,6 @@ import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
-import assertk.assertions.isSameInstanceAs
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactlyInAnyOrder
@@ -25,7 +24,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
-import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -80,7 +79,7 @@ class TransformersTest : BaseTransformerTest() {
       }
     } else {
       val buildResult = runWithFailure(shadowJarPath)
-      assertThat(buildResult).taskOutcomeEquals(":shadowJar", TaskOutcome.FAILED)
+      assertThat(buildResult).taskOutcomeEquals(shadowJarPath, FAILED)
       assertThat(buildResult.output).contains(
         // Keep this list approach for Unix/Windows test compatibility.
         "Execution failed for task ':shadowJar'.",
