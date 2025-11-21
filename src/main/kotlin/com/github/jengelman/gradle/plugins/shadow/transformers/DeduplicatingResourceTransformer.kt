@@ -82,9 +82,9 @@ public open class DeduplicatingResourceTransformer(
         "Found ${duplicatePaths.size} path duplicate(s) with different content in the shadow JAR:" +
           duplicatePaths
             .map { (path, infos) ->
-              "  * $path${infos.filesPerHash.map { (hash, files) ->
-                files.joinToString { file -> "    * ${file.path} (SHA256: $hash)" }
-              }.joinToString("\n", "\n", "")}"
+              "  * $path\n${infos.filesPerHash.flatMap { (hash, files) ->
+                files.map { file -> "    * ${file.path} (SHA256: $hash)" }
+              }.joinToString("\n")}"
             }
             .joinToString("\n", "\n", "")
       throw GradleException(message)
