@@ -99,7 +99,9 @@ public open class DeduplicatingResourceTransformer(
 
   internal fun hashForFile(file: File): String {
     try {
-      return DigestUtils.sha256Hex(file.inputStream())
+      return file.inputStream().use {
+        DigestUtils.sha256Hex(it)
+      }
     } catch (e: Exception) {
       throw RuntimeException("Failed to read data or calculate hash for $file", e)
     }
