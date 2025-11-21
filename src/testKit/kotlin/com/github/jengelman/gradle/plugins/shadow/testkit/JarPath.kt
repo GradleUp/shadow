@@ -10,6 +10,7 @@ import java.nio.file.Path
 import java.util.jar.JarFile
 import java.util.jar.JarInputStream
 import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 import kotlin.io.path.inputStream
 
 /**
@@ -91,7 +92,7 @@ fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsO
  * Used alone, without [containsAtLeast] or [containsNone].
  */
 fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) = transform { actual ->
-  JarInputStream(actual.path.inputStream()).use { jarInput ->
+  ZipInputStream(actual.path.inputStream()).use { jarInput ->
     val allEntries = mutableListOf<String>()
     while (true) {
       val entry = jarInput.nextEntry ?: break
