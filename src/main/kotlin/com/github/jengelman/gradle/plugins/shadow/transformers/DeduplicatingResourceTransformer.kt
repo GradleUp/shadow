@@ -40,9 +40,11 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * ```kotlin
  * tasks.shadowJar {
- *   // Keep pom.* files from different Guava versions in the jar.
- *   exclude("META-INF/maven/com.google.guava/guava/pom.*")
- *   // Duplicates with different content for all other resource paths will raise an error.
+ *   transform(DeduplicatingResourceTransformer::class.java) {
+ *     // Keep pom.* files from different Guava versions in the jar.
+ *     exclude("META-INF/maven/com.google.guava/guava/pom.*")
+ *     // Duplicates with different content for all other resource paths will raise an error.
+ *   }
  * }
  * ```
  *
