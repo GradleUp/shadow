@@ -14,7 +14,7 @@
 - Add new merge strategy `Fail` to `PropertiesFileTransformer`. ([#1856](https://github.com/GradleUp/shadow/pull/1856))
 - Add `FindResourceInClasspath` task to help with debugging issues with merged duplicate resources. ([#1860](https://github.com/GradleUp/shadow/pull/1860))
 - Add `MergeLicenseResourceTransformer`. ([#1858](https://github.com/GradleUp/shadow/pull/1858))
-- Support disabling relocation of Kotlin module metadata. ([#1875](https://github.com/GradleUp/shadow/pull/1875))
+- Support disabling Kotlin module metadata remapping. ([#1875](https://github.com/GradleUp/shadow/pull/1875))
   ```kotlin
   tasks.shadowJar {
     // Disable remapping of Kotlin module metadata (`.kotlin_module`) files. This is enabled by default.
