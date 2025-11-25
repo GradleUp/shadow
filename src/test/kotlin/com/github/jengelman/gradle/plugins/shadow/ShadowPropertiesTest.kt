@@ -147,7 +147,7 @@ class ShadowPropertiesTest {
     with(shadowJarTask) {
       assertThat(addMultiReleaseAttribute.get()).isTrue()
       assertThat(enableAutoRelocation.get()).isFalse()
-      assertThat(enableKotlinModuleRelocation.get()).isTrue()
+      assertThat(enableKotlinModuleRemapping.get()).isTrue()
       assertThat(failOnDuplicateEntries.get()).isFalse()
       assertThat(minimizeJar.get()).isFalse()
       assertThat(mainClass.orNull).isNull()

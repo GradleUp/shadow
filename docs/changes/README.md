@@ -17,8 +17,8 @@
 - Support disabling relocation of Kotlin module metadata. ([#1875](https://github.com/GradleUp/shadow/pull/1875))
   ```kotlin
   tasks.shadowJar {
-    // Disable relocation of Kotlin module metadata (`.kotlin_module`) files. This is enabled by default.
-    enableKotlinModuleRelocation = false
+    // Disable remapping of Kotlin module metadata (`.kotlin_module`) files. This is enabled by default.
+    enableKotlinModuleRemapping = false
   }
   ```
 

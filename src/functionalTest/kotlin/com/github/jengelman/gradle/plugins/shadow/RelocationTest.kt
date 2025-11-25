@@ -606,7 +606,7 @@ class RelocationTest : BasePluginTest() {
   @OptIn(UnstableMetadataApi::class)
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
-  fun relocateKotlinModuleFiles(enableKotlinModuleRelocation: Boolean) {
+  fun relocateKotlinModuleFiles(enableKotlinModuleRemapping: Boolean) {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
     val originalModuleFileBytes = requireResourceAsPath(originalModuleFilePath).readBytes()
     val stdlibJar = buildJar("stdlib.jar") {
@@ -619,7 +619,7 @@ class RelocationTest : BasePluginTest() {
         }
         $shadowJarTask {
           relocate('kotlin', 'my.kotlin')
-          enableKotlinModuleRelocation = $enableKotlinModuleRelocation
+          enableKotlinModuleRemapping = $enableKotlinModuleRemapping
         }
       """.trimIndent(),
     )
@@ -628,7 +628,7 @@ class RelocationTest : BasePluginTest() {
 
     val relocatedModuleFilePath = "META-INF/kotlin-stdlib.shadow.kotlin_module"
 
-    if (enableKotlinModuleRelocation) {
+    if (enableKotlinModuleRemapping) {
       assertThat(outputShadowedJar).useAll {
         containsOnly(
           relocatedModuleFilePath,
