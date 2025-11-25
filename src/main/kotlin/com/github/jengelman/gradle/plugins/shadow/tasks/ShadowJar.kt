@@ -161,6 +161,15 @@ public abstract class ShadowJar : Jar() {
   public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
+   * Enables relocation of Kotlin module metadata (`.kotlin_module`) files.
+   *
+   * Defaults to `true`.
+   */
+  @get:Input
+  @get:Option(option = "enable-kotlin-module-relocation", description = "Enables relocation of Kotlin module metadata files.")
+  public open val enableKotlinModuleRelocation: Property<Boolean> = objectFactory.property(true)
+
+  /**
    * Prefix used for auto relocation of packages in the dependencies.
    *
    * Defaults to `shadow`.
@@ -431,6 +440,7 @@ public abstract class ShadowJar : Jar() {
       transformers = transformers.get(),
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
+      enableKotlinModuleRelocation = enableKotlinModuleRelocation.get(),
       preserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
       metadataCharset,

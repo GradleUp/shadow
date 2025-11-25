@@ -43,6 +43,7 @@ public open class ShadowCopyAction(
   private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
+  private val enableKotlinModuleRelocation: Boolean,
   private val preserveFileTimestamps: Boolean,
   private val failOnDuplicateEntries: Boolean,
   private val encoding: String?,
@@ -174,7 +175,7 @@ public open class ShadowCopyAction(
           }
         }
         path.endsWith(".kotlin_module") -> {
-          if (relocators.isEmpty()) {
+          if (relocators.isEmpty() || !enableKotlinModuleRelocation) {
             fileDetails.writeToZip(path)
           } else {
             fileDetails.remapKotlinModule()
