@@ -425,6 +425,7 @@ public abstract class ShadowJar : Jar() {
     } else {
       emptySet()
     }
+    @Suppress("DEPRECATION")
     return ShadowCopyAction(
       zipFile = archiveFile.get().asFile,
       zosProvider = zosProvider,

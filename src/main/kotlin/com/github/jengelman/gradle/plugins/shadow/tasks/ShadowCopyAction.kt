@@ -37,7 +37,9 @@ import org.objectweb.asm.commons.ClassRemapper
 /**
  * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
-public open class ShadowCopyAction(
+public open class ShadowCopyAction
+@Deprecated("This should not be used as a public API. Will be made internal in a future release.")
+constructor(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
   private val transformers: Set<ResourceTransformer>,

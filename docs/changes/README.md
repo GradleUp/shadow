@@ -22,6 +22,8 @@
 - Bump min Gradle requirement to 9.0.0. ([#1801](https://github.com/GradleUp/shadow/pull/1801))
 - Deprecate `PreserveFirstFoundResourceTransformer.resources`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
 - Make the output of `PropertiesFileTransformer` reproducible. ([#1861](https://github.com/GradleUp/shadow/pull/1861))
+- Deprecate `ShadowCopyAction`. ([#1876](https://github.com/GradleUp/shadow/pull/1876))  
+  It should not be used as a public API. Will be made internal in a future release.
 
 ### Fixed
 
