@@ -100,6 +100,8 @@ class JavaPluginsTest : BasePluginTest() {
       "--no-add-multi-release-attribute     Disables option --add-multi-release-attribute.",
       "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
       "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
+      "--enable-kotlin-module-relocation     Enables relocation of Kotlin module metadata files.",
+      "--no-enable-kotlin-module-relocation     Disables option --enable-kotlin-module-relocation.",
       "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
       "--no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries",
       "--main-class     Main class attribute to add to manifest.",
