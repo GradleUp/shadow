@@ -148,17 +148,19 @@ build script. Passing property values on the command line is particularly helpfu
 Here are the options that can be passed to the `shadowJar`:
 
 ```
---add-multi-release-attribute       Adds the multi-release attribute to the manifest if any dependencies contain it.
---no-add-multi-release-attribute    Disables option --add-multi-release-attribute.
---enable-auto-relocation            Enables auto relocation of packages in the dependencies.
---no-enable-auto-relocation         Disables option --enable-auto-relocation.
---fail-on-duplicate-entries         Fails build if the ZIP entries in the shadowed JAR are duplicate.
---no-fail-on-duplicate-entries      Disables option --fail-on-duplicate-entries.
---main-class                        Main class attribute to add to manifest.
---minimize-jar                      Minimizes the jar by removing unused classes.
---no-minimize-jar                   Disables option --minimize-jar.
---relocation-prefix                 Prefix used for auto relocation of packages in the dependencies.
---rerun                             Causes the task to be re-run even if up-to-date.
+--add-multi-release-attribute         Adds the multi-release attribute to the manifest if any dependencies contain it.
+--no-add-multi-release-attribute      Disables option --add-multi-release-attribute.
+--enable-auto-relocation              Enables auto relocation of packages in the dependencies.
+--no-enable-auto-relocation           Disables option --enable-auto-relocation.
+--enable-kotlin-module-remapping      Enables remapping of Kotlin module metadata files.
+--no-enable-kotlin-module-remapping   Disables option --enable-kotlin-module-remapping.
+--fail-on-duplicate-entries           Fails build if the ZIP entries in the shadowed JAR are duplicate.
+--no-fail-on-duplicate-entries        Disables option --fail-on-duplicate-entries.
+--main-class                          Main class attribute to add to manifest.
+--minimize-jar                        Minimizes the jar by removing unused classes.
+--no-minimize-jar                     Disables option --minimize-jar.
+--relocation-prefix                   Prefix used for auto relocation of packages in the dependencies.
+--rerun                               Causes the task to be re-run even if up-to-date.
 ```
 
 Also, you can view more information about the [`ShadowJar`][ShadowJar] task by running the following command:

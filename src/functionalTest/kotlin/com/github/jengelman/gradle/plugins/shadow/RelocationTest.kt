@@ -603,12 +603,14 @@ class RelocationTest : BasePluginTest() {
   @Issue(
     "https://github.com/GradleUp/shadow/issues/843",
   )
-  @Test
   @OptIn(UnstableMetadataApi::class)
-  fun relocateKotlinModuleFiles() {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun relocateKotlinModuleFiles(enableKotlinModuleRemapping: Boolean) {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
+    val originalModuleFileBytes = requireResourceAsPath(originalModuleFilePath).readBytes()
     val stdlibJar = buildJar("stdlib.jar") {
-      insert(originalModuleFilePath, requireResourceAsPath(originalModuleFilePath).readBytes())
+      insert(originalModuleFilePath, originalModuleFileBytes)
     }
     projectScript.appendText(
       """
@@ -617,6 +619,7 @@ class RelocationTest : BasePluginTest() {
         }
         $shadowJarTask {
           relocate('kotlin', 'my.kotlin')
+          enableKotlinModuleRemapping = $enableKotlinModuleRemapping
         }
       """.trimIndent(),
     )
@@ -624,11 +627,23 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     val relocatedModuleFilePath = "META-INF/kotlin-stdlib.shadow.kotlin_module"
-    assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        relocatedModuleFilePath,
-        *manifestEntries,
-      )
+
+    if (enableKotlinModuleRemapping) {
+      assertThat(outputShadowedJar).useAll {
+        containsOnly(
+          relocatedModuleFilePath,
+          *manifestEntries,
+        )
+      }
+    } else {
+      assertThat(outputShadowedJar).useAll {
+        containsOnly(
+          originalModuleFilePath,
+          *manifestEntries,
+        )
+      }
+      assertThat(outputShadowedJar.use { it.getBytes(originalModuleFilePath) }).isEqualTo(originalModuleFileBytes)
+      return
     }
 
     val originalModule = KotlinModuleMetadata.read(requireResourceAsStream(originalModuleFilePath).readBytes())

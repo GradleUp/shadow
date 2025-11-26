@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
@@ -159,6 +158,19 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(option = "enable-auto-relocation", description = "Enables auto relocation of packages in the dependencies.")
   public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
+
+  /**
+   * Enables remapping of Kotlin module metadata (`.kotlin_module`) files.
+   *
+   * If you enable this option, the Kotlin module metadata file paths and their contents will be relocated if they are
+   * matched by any of the configured [relocators]. Someone may want to disable this feature and write their own
+   * [ResourceTransformer]s to handle Kotlin module metadata files in a custom way.
+   *
+   * Defaults to `true`.
+   */
+  @get:Input
+  @get:Option(option = "enable-kotlin-module-remapping", description = "Enables remapping of Kotlin module metadata files.")
+  public open val enableKotlinModuleRemapping: Property<Boolean> = objectFactory.property(true)
 
   /**
    * Prefix used for auto relocation of packages in the dependencies.
@@ -432,6 +444,7 @@ public abstract class ShadowJar : Jar() {
       transformers = transformers.get(),
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
+      enableKotlinModuleRemapping = enableKotlinModuleRemapping.get(),
       preserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
       metadataCharset,

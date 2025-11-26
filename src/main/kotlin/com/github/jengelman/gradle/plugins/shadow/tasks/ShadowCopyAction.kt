@@ -45,6 +45,7 @@ constructor(
   private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
+  private val enableKotlinModuleRemapping: Boolean,
   private val preserveFileTimestamps: Boolean,
   private val failOnDuplicateEntries: Boolean,
   private val encoding: String?,
@@ -175,7 +176,7 @@ constructor(
             fileDetails.remapClass()
           }
         }
-        path.endsWith(".kotlin_module") -> {
+        enableKotlinModuleRemapping && path.endsWith(".kotlin_module") -> {
           if (relocators.isEmpty()) {
             fileDetails.writeToZip(path)
           } else {
