@@ -12,6 +12,7 @@ import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -45,9 +46,12 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
 
-@Suppress("GradleProjectIsolation") // TODO: https://github.com/gradle/gradle/issues/23572
-internal fun Project.findOptionalProperty(propertyName: String): String? = providers.gradleProperty(propertyName).orNull
-  ?: findProperty(propertyName)?.toString()
+// ExtraPropertiesExtension is IP safe and contains properties from both the root `gradle.properties` and the
+// subproject's `gradle.properties`. See https://github.com/gradle/gradle/issues/29600#issuecomment-3580868326.
+internal fun Project.findOptionalProperty(propertyName: String): String? {
+  val extras = checkNotNull(extensions.findByType(ExtraPropertiesExtension::class.java))
+  return if (extras.has(propertyName)) extras.get(propertyName)?.toString() else null
+}
 
 internal fun Project.addBuildScanCustomValues() {
   val develocity = extensions.findByType(DevelocityConfiguration::class.java) ?: return
