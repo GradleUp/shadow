@@ -224,7 +224,7 @@ gradlePlugin {
 kotlin.target.compilations {
   val main by getting
   getByName("functionalTest") {
-    // TODO: https://youtrack.jetbrains.com/issue/KTIJ-7662
+    // Share main's output with functionalTest.
     associateWith(main)
   }
 }
