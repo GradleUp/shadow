@@ -181,7 +181,7 @@ testing.suites {
   }
 
   withType<JvmTestSuite>().configureEach {
-    useJUnitJupiter(libs.junit.bom.map { requireNotNull(it.version) })
+    useJUnitJupiter(libs.junit.bom.map { checkNotNull(it.version) })
     dependencies {
       implementation(testKit.output)
       implementation(libs.assertk)

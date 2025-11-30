@@ -54,7 +54,7 @@ class JavaPluginsTest : BasePluginTest() {
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
     val kFunction = ShadowJar.Companion::class.declaredFunctions
       .single { it.name == "registerShadowJarCommon" }
-    val jvmName = requireNotNull(kFunction.javaMethod).name
+    val jvmName = checkNotNull(kFunction.javaMethod).name
 
     projectScript.writeText(
       """

@@ -38,7 +38,7 @@ fun ZipFile.getContent(entryName: String): String {
 }
 
 fun ZipFile.getStream(entryName: String): InputStream {
-  val entry = requireNotNull(getEntry(entryName)) { "Entry $entryName not found in all entries: ${entries().toList()}" }
+  val entry = checkNotNull(getEntry(entryName)) { "Entry $entryName not found in all entries: ${entries().toList()}" }
   return getInputStream(entry)
 }
 

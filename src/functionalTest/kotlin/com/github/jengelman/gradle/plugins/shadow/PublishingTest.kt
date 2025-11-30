@@ -715,7 +715,7 @@ class PublishingTest : BasePluginTest() {
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 
-    fun <T : Any> JsonAdapter<T>.fromJson(path: Path): T = requireNotNull(fromJson(path.readText()))
+    fun <T : Any> JsonAdapter<T>.fromJson(path: Path): T = checkNotNull(fromJson(path.readText()))
 
     val Path.entries: List<String> get() = listDirectoryEntries().map { it.name }
   }
