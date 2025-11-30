@@ -67,11 +67,11 @@ constructor(
         checkDuplicateEntries(zos)
       }
     } catch (e: Exception) {
-      if (e is Zip64RequiredException || e.cause is Zip64RequiredException) {
-        val message = if (e is Zip64RequiredException) e.message else e.cause?.message
+      val cause = e.cause
+      if (cause is Zip64RequiredException) {
         throw Zip64RequiredException(
           """
-            $message
+            ${cause.message}
 
             To build this archive, please enable the zip64 extension. e.g.
             ```kts
