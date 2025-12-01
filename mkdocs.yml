@@ -8,6 +8,7 @@ repo_url: https://github.com/GradleUp/shadow
 site_description: "Gradle plugin to create fat/uber JARs, apply file transforms, and relocate packages for applications and libraries"
 site_author: GradleUp developers
 remote_branch: gh-pages
+edit_uri: edit/main/docs
 
 theme:
   name: 'material'
@@ -32,6 +33,7 @@ theme:
   features:
     - content.code.copy
     - content.code.select
+    - content.action.edit
 
 markdown_extensions:
   - smarty
