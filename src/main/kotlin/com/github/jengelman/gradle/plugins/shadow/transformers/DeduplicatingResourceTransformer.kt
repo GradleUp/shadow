@@ -52,7 +52,8 @@ import org.gradle.api.tasks.util.PatternSet
  * *Tip*: the [FindResourceInClasspath] convenience task can be used to find resources in a Gradle
  * classpath/configuration.
  *
- * *Warning* Do **not** combine [PreserveFirstFoundResourceTransformer] with this transformer.
+ * *Warning* Do **not** combine [PreserveFirstFoundResourceTransformer] with this transformer,
+ * as they handle duplicates differently and combining them would lead to redundant or unexpected behavior.
  */
 @CacheableTransformer
 public open class DeduplicatingResourceTransformer(
