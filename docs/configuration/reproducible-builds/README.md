@@ -5,7 +5,7 @@ not be identical to each other. Sometimes it's desirable to configure a project 
 identical JAR on every build. Gradle supports this with the following configuration, and Shadow will correctly respect
 these settings too.
 
-Beside file timestamps and file order, this configuration also ensures that all files in the JAR are set to have the
+Besides file timestamps and file order, this configuration also ensures that all files in the JAR are set to have the
 same permissions, irrespective of the locally configured umask.
 
 More information about reproducible builds can be found at [reproducible-builds.org](https://reproducible-builds.org/).
