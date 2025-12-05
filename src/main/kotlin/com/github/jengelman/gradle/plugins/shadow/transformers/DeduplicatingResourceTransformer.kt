@@ -83,16 +83,17 @@ public open class DeduplicatingResourceTransformer(
     val duplicatePaths = duplicateContentViolations()
 
     if (duplicatePaths.isNotEmpty()) {
-      val message = "Found ${duplicatePaths.size} path duplicate(s) with different content in the shadowed JAR:" +
-        duplicatePaths
-          .map { (path, infos) ->
-            "  * $path\n${
-              infos.filesPerHash.flatMap { (hash, files) ->
-                files.map { file -> "    * ${file.path} (SHA256: $hash)" }
-              }.joinToString("\n")
-            }"
+      val message = buildString {
+        append("Found ${duplicatePaths.size} path duplicate(s) with different content in the shadowed JAR:\n")
+        duplicatePaths.forEach { (path, infos) ->
+          append("  * $path\n")
+          infos.filesPerHash.forEach { (hash, files) ->
+            files.forEach { file ->
+              append("    * ${file.path} (SHA256: $hash)\n")
+            }
           }
-          .joinToString("\n", "\n", "")
+        }
+      }
       throw GradleException(message)
     }
   }
