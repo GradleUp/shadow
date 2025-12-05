@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
 import java.io.File
 import javax.inject.Inject
 import org.apache.commons.codec.digest.DigestUtils
@@ -11,7 +12,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternSet
 
 /**
- * Transformer to include files with identical content only once in the shadow JAR.
+ * Transformer to include files with identical content only once in the shadowed JAR.
  *
  * Multiple files with the same path but different content lead to an error.
  *
@@ -28,7 +29,7 @@ import org.gradle.api.tasks.util.PatternSet
  *   use cases or tools that collect information of all included dependencies, may rely on these files.
  *   Hence, it is desirable to retain the duplicate resource `pom.properties`/`xml` resources.
  *
- * `DeduplicatingResourceTransformer` checks all entries in the resulting jar.
+ * [DeduplicatingResourceTransformer] checks all entries in the resulting jar.
  * It is generally not recommended to use any of the [include] configuration functions.
  *
  * There are reasons to retain duplicate resources with different contents in the resulting jar.
@@ -48,8 +49,8 @@ import org.gradle.api.tasks.util.PatternSet
  * }
  * ```
  *
- * *Tip*: the [com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath] convenience task
- * can be used to find resources in a Gradle classpath/configuration.
+ * *Tip*: the [FindResourceInClasspath] convenience task can be used to find resources in a Gradle
+ * classpath/configuration.
  *
  * *Warning* Do **not** combine [PreserveFirstFoundResourceTransformer] with this transformer.
  */
@@ -66,9 +67,11 @@ public open class DeduplicatingResourceTransformer(
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val file = element.file
-    val hash = hashForFile(file)
+    val hash = file.sha256Hex()
 
-    val pathInfos = sources.computeIfAbsent(element.path) { PathInfos(patternSpec.isSatisfiedBy(element)) }
+    val pathInfos = sources.computeIfAbsent(element.path) {
+      PathInfos(patternSpec.isSatisfiedBy(element))
+    }
     val retainInOutput = pathInfos.addFile(hash, file)
 
     return !retainInOutput
@@ -80,31 +83,22 @@ public open class DeduplicatingResourceTransformer(
     val duplicatePaths = duplicateContentViolations()
 
     if (duplicatePaths.isNotEmpty()) {
-      val message =
-        "Found ${duplicatePaths.size} path duplicate(s) with different content in the shadow JAR:" +
-          duplicatePaths
-            .map { (path, infos) ->
-              "  * $path\n${infos.filesPerHash.flatMap { (hash, files) ->
+      val message = "Found ${duplicatePaths.size} path duplicate(s) with different content in the shadowed JAR:" +
+        duplicatePaths
+          .map { (path, infos) ->
+            "  * $path\n${
+              infos.filesPerHash.flatMap { (hash, files) ->
                 files.map { file -> "    * ${file.path} (SHA256: $hash)" }
-              }.joinToString("\n")}"
-            }
-            .joinToString("\n", "\n", "")
+              }.joinToString("\n")
+            }"
+          }
+          .joinToString("\n", "\n", "")
       throw GradleException(message)
     }
   }
 
   internal fun duplicateContentViolations(): Map<String, PathInfos> = sources.filter { (_, pathInfos) ->
     pathInfos.failOnDuplicateContent && pathInfos.uniqueContentCount() > 1
-  }
-
-  internal fun hashForFile(file: File): String {
-    try {
-      return file.inputStream().use {
-        DigestUtils.sha256Hex(it)
-      }
-    } catch (e: Exception) {
-      throw RuntimeException("Failed to read data or calculate hash for $file", e)
-    }
   }
 
   internal data class PathInfos(val failOnDuplicateContent: Boolean) {
@@ -116,6 +110,18 @@ public open class DeduplicatingResourceTransformer(
       val new = hash !in filesPerHash
       filesPerHash.getOrPut(hash) { mutableListOf() }.add(file)
       return new
+    }
+  }
+
+  internal companion object {
+    fun File.sha256Hex(): String {
+      try {
+        return inputStream().use {
+          DigestUtils.sha256Hex(it)
+        }
+      } catch (e: Exception) {
+        throw RuntimeException("Failed to read data or calculate hash for $this", e)
+      }
     }
   }
 }

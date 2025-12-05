@@ -51,8 +51,8 @@ class TransformersTest : BaseTransformerTest() {
       transform<DeduplicatingResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = """
-          exclude("multiple-contents")
-          ${if (excludeAll) "exclude(\"differing-content-2\")" else ""}
+          exclude('multiple-contents')
+          ${if (excludeAll) "exclude('differing-content-2')" else ""}
         """.trimIndent(),
       ),
     )
@@ -83,7 +83,7 @@ class TransformersTest : BaseTransformerTest() {
       assertThat(buildResult.output).contains(
         // Keep this list approach for Unix/Windows test compatibility.
         "Execution failed for task ':shadowJar'.",
-        "> Found 1 path duplicate(s) with different content in the shadow JAR:",
+        "> Found 1 path duplicate(s) with different content in the shadowed JAR:",
         "    * differing-content-2",
         "differing-content-2 (SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73)",
         "differing-content-2 (SHA256: aa845861bbd4578700e10487d85b25ead8723ee98fbf143df7b7e0bf1cb3385d)",

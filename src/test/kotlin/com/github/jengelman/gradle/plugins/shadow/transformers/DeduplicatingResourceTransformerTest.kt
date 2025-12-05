@@ -6,6 +6,7 @@ import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer.Companion.sha256Hex
 import java.io.File
 import java.nio.file.Path
 import org.junit.jupiter.api.BeforeEach
@@ -40,8 +41,8 @@ class DeduplicatingResourceTransformerTest : BaseTransformerTest<DeduplicatingRe
       writeText(content2)
     }
 
-    hash1 = transformer.hashForFile(file1)
-    hash3 = transformer.hashForFile(file3)
+    hash1 = file1.sha256Hex()
+    hash3 = file3.sha256Hex()
   }
 
   @ParameterizedTest
