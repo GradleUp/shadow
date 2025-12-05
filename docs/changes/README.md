@@ -1,6 +1,9 @@
 # Change Log
 
 
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.3.0...HEAD) - 2025-xx-xx
+
+
 ## [9.3.0](https://github.com/GradleUp/shadow/releases/tag/9.3.0) - 2025-12-05
 
 ### Added
