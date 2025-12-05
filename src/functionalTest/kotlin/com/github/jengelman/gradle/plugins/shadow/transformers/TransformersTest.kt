@@ -2,13 +2,17 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactlyInAnyOrder
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContents
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
@@ -20,11 +24,73 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
+import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 
 class TransformersTest : BaseTransformerTest() {
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun deduplicatingResourceTransformer(excludeAll: Boolean) {
+    val one = buildJarOne {
+      insert("multiple-contents", "content")
+      insert("single-source", "content")
+      insert("same-content-twice", "content")
+      insert("differing-content-2", "content")
+    }
+    val two = buildJarTwo {
+      insert("multiple-contents", "content-is-different")
+      insert("same-content-twice", "content")
+      insert("differing-content-2", "content-is-different")
+    }
+
+    projectScript.appendText(
+      transform<DeduplicatingResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = """
+          exclude('multiple-contents')
+          ${if (excludeAll) "exclude('differing-content-2')" else ""}
+        """.trimIndent(),
+      ),
+    )
+
+    if (excludeAll) {
+      runWithSuccess(shadowJarPath)
+      assertThat(outputShadowedJar).useAll {
+        containsExactlyInAnyOrder(
+          // twice:
+          "multiple-contents",
+          "multiple-contents",
+          "single-source",
+          "same-content-twice",
+          // twice:
+          "differing-content-2",
+          "differing-content-2",
+          "META-INF/",
+          "META-INF/MANIFEST.MF",
+        )
+        getContents("multiple-contents").containsExactlyInAnyOrder("content", "content-is-different")
+        getContent("single-source").isEqualTo("content")
+        getContent("same-content-twice").isEqualTo("content")
+        getContents("differing-content-2").containsExactlyInAnyOrder("content", "content-is-different")
+      }
+    } else {
+      val buildResult = runWithFailure(shadowJarPath)
+      assertThat(buildResult).taskOutcomeEquals(shadowJarPath, FAILED)
+      assertThat(buildResult.output).contains(
+        // Keep this list approach for Unix/Windows test compatibility.
+        "Execution failed for task ':shadowJar'.",
+        "> Found 1 path duplicate(s) with different content in the shadowed JAR:",
+        "    * differing-content-2",
+        "differing-content-2 (SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73)",
+        "differing-content-2 (SHA256: aa845861bbd4578700e10487d85b25ead8723ee98fbf143df7b7e0bf1cb3385d)",
+      )
+    }
+  }
+
   @Test
   fun manifestRetained() {
     writeClass()
