@@ -14,6 +14,7 @@
 - Add new merge strategy `Fail` to `PropertiesFileTransformer`. ([#1856](https://github.com/GradleUp/shadow/pull/1856))
 - Add `FindResourceInClasspath` task to help with debugging issues with merged duplicate resources. ([#1860](https://github.com/GradleUp/shadow/pull/1860))
 - Add `MergeLicenseResourceTransformer`. ([#1858](https://github.com/GradleUp/shadow/pull/1858))
+- Add `DeduplicatingResourceTransformer` to deduplicate on path _and_ content. ([#1859](https://github.com/GradleUp/shadow/pull/1859))
 - Support disabling Kotlin module metadata remapping. ([#1875](https://github.com/GradleUp/shadow/pull/1875))
   ```kotlin
   tasks.shadowJar {
@@ -21,7 +22,6 @@
     enableKotlinModuleRemapping = false
   }
   ```
-- Add `DeduplicatingResourceTransformer` to deduplicate on path _and_ content. ([#1859](https://github.com/GradleUp/shadow/pull/1859))
 
 ### Changed
 
@@ -37,13 +37,13 @@
 
 - Fix Develocity integration when Isolated Projects enabled. ([#1836](https://github.com/GradleUp/shadow/pull/1836))
 
-## [9.2.2](https://github.com/GradleUp/shadow/compare/9.2.2) - 2025-09-26
+## [9.2.2](https://github.com/GradleUp/shadow/releases/tag/9.2.2) - 2025-09-26
 
 ### Fixed
 
 - Fix the regression of registering `ShadowJar` tasks without `ShadowPlugin` applied. ([#1787](https://github.com/GradleUp/shadow/pull/1787))
 
-## [9.2.1](https://github.com/GradleUp/shadow/compare/9.2.1) - 2025-09-24
+## [9.2.1](https://github.com/GradleUp/shadow/releases/tag/9.2.1) - 2025-09-24
 
 ### Added
 
@@ -103,7 +103,7 @@
 
 - Fix excluding dependencies whose versions contain `+`. ([#1597](https://github.com/GradleUp/shadow/pull/1597))
 
-## [9.1.0](https://github.com/GradleUp/shadow/compare/9.1.0) - 2025-08-29
+## [9.1.0](https://github.com/GradleUp/shadow/releases/tag/9.1.0) - 2025-08-29
 
 ### Added
 
