@@ -23,7 +23,8 @@ import org.gradle.api.tasks.util.PatternSet
  * See [DeduplicatingResourceTransformer] for a transformer that deduplicates based on the paths and contents of
  * the resources.
  *
- * *Warning* Do **not** combine [DeduplicatingResourceTransformer] with this transformer.
+ * *Warning* Do **not** combine [DeduplicatingResourceTransformer] with this transformer,
+ * as they handle duplicates differently and combining them would lead to redundant or unexpected behavior.
  *
  * @see [DuplicatesStrategy]
  * @see [ShadowJar.getDuplicatesStrategy]
