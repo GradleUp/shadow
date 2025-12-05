@@ -45,10 +45,10 @@ More information about reproducible builds can be found at [reproducible-builds.
           permissions {
               def isExec =
                       Files.getPosixFilePermissions(file.toPath()).contains(PosixFilePermission.OWNER_EXECUTE)
-              unix(isExec ? "755" : "644")
+              unix(isExec ? '755' : '644')
           }
       }
-      dirPermissions { unix("755") }
+      dirPermissions { unix('755') }
     }
     ```
 
