@@ -49,9 +49,9 @@ fun ZipFile.getStream(entryName: String): InputStream {
 fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
 
 /**
- * Scans the jar file for all entries that match the specified [entryName],
- * [getContent] or [getStream] return only one of the matching entries;
- * which one these functions return is undefined.
+ * Scans the jar file for all entries that match the specified [entryName].
+ * Unlike [getContent] or [getStream], which return only one of the matching entries
+ * (which one is undefined), this function returns all matching entries.
  */
 fun Assert<JarPath>.getContents(entryName: String) = transform { actual ->
   JarInputStream(actual.path.inputStream()).use { jarInput ->
