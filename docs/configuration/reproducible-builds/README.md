@@ -8,8 +8,6 @@ these settings too.
 Besides file timestamps and file order, this configuration also ensures that all files in the JAR are set to have the
 same permissions, irrespective of the locally configured umask.
 
-More information about reproducible builds can be found at [reproducible-builds.org](https://reproducible-builds.org/).
-
 === "Kotlin"
 
     ```kotlin
