@@ -305,7 +305,7 @@ public abstract class ShadowJar : Jar() {
   /**
    * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
    *
-   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate service
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate extension module
    * files are handled properly.
    *
    * @see [getDuplicatesStrategy]
