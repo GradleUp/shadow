@@ -156,7 +156,10 @@ public abstract class ShadowJar : Jar() {
    * @see relocationPrefix
    */
   @get:Input
-  @get:Option(option = "enable-auto-relocation", description = "Enables auto relocation of packages in the dependencies.")
+  @get:Option(
+    option = "enable-auto-relocation",
+    description = "Enables auto relocation of packages in the dependencies.",
+  )
   public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
@@ -169,7 +172,10 @@ public abstract class ShadowJar : Jar() {
    * Defaults to `true`.
    */
   @get:Input
-  @get:Option(option = "enable-kotlin-module-remapping", description = "Enables remapping of Kotlin module metadata files.")
+  @get:Option(
+    option = "enable-kotlin-module-remapping",
+    description = "Enables remapping of Kotlin module metadata files.",
+  )
   public open val enableKotlinModuleRemapping: Property<Boolean> = objectFactory.property(true)
 
   /**
@@ -180,7 +186,10 @@ public abstract class ShadowJar : Jar() {
    * @see enableAutoRelocation
    */
   @get:Input
-  @get:Option(option = "relocation-prefix", description = "Prefix used for auto relocation of packages in the dependencies.")
+  @get:Option(
+    option = "relocation-prefix",
+    description = "Prefix used for auto relocation of packages in the dependencies.",
+  )
   public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
@@ -208,7 +217,10 @@ public abstract class ShadowJar : Jar() {
    * Defaults to `false`.
    */
   @get:Input
-  @get:Option(option = "fail-on-duplicate-entries", description = "Fails build if the ZIP entries in the shadowed JAR are duplicate.")
+  @get:Option(
+    option = "fail-on-duplicate-entries",
+    description = "Fails build if the ZIP entries in the shadowed JAR are duplicate.",
+  )
   public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(false)
 
   /**
@@ -218,7 +230,10 @@ public abstract class ShadowJar : Jar() {
    * Defaults to `true`.
    */
   @get:Input
-  @get:Option(option = "add-multi-release-attribute", description = "Adds the multi-release attribute to the manifest if any dependencies contain it.")
+  @get:Option(
+    option = "add-multi-release-attribute",
+    description = "Adds the multi-release attribute to the manifest if any dependencies contain it.",
+  )
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
   @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
