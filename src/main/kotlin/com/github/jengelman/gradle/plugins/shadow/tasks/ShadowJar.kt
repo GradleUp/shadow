@@ -296,7 +296,8 @@ public abstract class ShadowJar : Jar() {
    * Merge Java services files with [rootPath].
    *
    * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate service
-   * files are handled properly.
+   * files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -308,7 +309,8 @@ public abstract class ShadowJar : Jar() {
    * Merge Java services files with [action].
    *
    * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate service
-   * files are handled properly.
+   * files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -321,7 +323,8 @@ public abstract class ShadowJar : Jar() {
    * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
    *
    * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate extension module
-   * files are handled properly.
+   * files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -387,7 +390,8 @@ public abstract class ShadowJar : Jar() {
    * Transform resources using a [ResourceTransformer].
    *
    * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
-   * duplicate resource files are handled properly.
+   * duplicate resource files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -400,7 +404,8 @@ public abstract class ShadowJar : Jar() {
    * Transform resources using a [ResourceTransformer].
    *
    * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
-   * duplicate resource files are handled properly.
+   * duplicate resource files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -413,7 +418,8 @@ public abstract class ShadowJar : Jar() {
    * Transform resources using a [ResourceTransformer].
    *
    * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
-   * duplicate resource files are handled properly.
+   * duplicate resource files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
    *
    * @see [getDuplicatesStrategy]
    */
