@@ -294,6 +294,12 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Merge Java services files with [rootPath].
+   *
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate service
+   * files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   *
+   * @see [getDuplicatesStrategy]
    */
   public open fun mergeServiceFiles(rootPath: String) {
     mergeServiceFiles { it.path = rootPath }
@@ -301,6 +307,12 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Merge Java services files with [action].
+   *
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate service
+   * files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   *
+   * @see [getDuplicatesStrategy]
    */
   @JvmOverloads
   public open fun mergeServiceFiles(action: Action<ServiceFileTransformer> = Action {}) {
@@ -309,6 +321,12 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
+   *
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate extension module
+   * files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   *
+   * @see [getDuplicatesStrategy]
    */
   public open fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, action = {})
@@ -370,6 +388,12 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Transform resources using a [ResourceTransformer].
+   *
+   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
+   * duplicate resource files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   *
+   * @see [getDuplicatesStrategy]
    */
   @JvmOverloads
   public open fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T> = Action {}) {
@@ -378,6 +402,12 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Transform resources using a [ResourceTransformer].
+   *
+   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
+   * duplicate resource files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   *
+   * @see [getDuplicatesStrategy]
    */
   @JvmOverloads
   public open fun <T : ResourceTransformer> transform(transformer: T, action: Action<T> = Action {}) {
@@ -386,6 +416,12 @@ public abstract class ShadowJar : Jar() {
 
   /**
    * Transform resources using a [ResourceTransformer].
+   *
+   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
+   * duplicate resource files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   *
+   * @see [getDuplicatesStrategy]
    */
   @JvmSynthetic
   public inline fun <reified T : ResourceTransformer> transform(action: Action<T> = Action {}) {
