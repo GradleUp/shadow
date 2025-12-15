@@ -31,9 +31,9 @@ theme:
     text: 'Lato'
     code: 'JetBrains Mono'
   features:
+    - content.action.edit
     - content.code.copy
     - content.code.select
-    - content.action.edit
     - content.tabs.link
     - toc.integrate
 
