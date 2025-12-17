@@ -175,7 +175,7 @@ testing.suites {
       }
     }
     dependencies {
-      implementation(libs.apache.maven.modelBuilder)
+      implementation(libs.apache.maven.model)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
     }
