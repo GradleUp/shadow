@@ -54,6 +54,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: true
+          dependency-graph: 'generate-submit-and-upload'
       - run: ./gradlew publishToMavenCentral
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
