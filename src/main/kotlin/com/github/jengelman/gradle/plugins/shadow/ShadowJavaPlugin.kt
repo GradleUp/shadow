@@ -25,6 +25,7 @@ import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.util.GradleVersion
 
 public abstract class ShadowJavaPlugin @Inject constructor(
   private val softwareComponentFactory: SoftwareComponentFactory,
@@ -119,6 +120,8 @@ public abstract class ShadowJavaPlugin @Inject constructor(
   }
 
   protected open fun Project.configureJavaGradlePlugin() {
+    if (GradleVersion.current() >= GradleVersion.version("9.4.0-milestone-4")) return
+
     // org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
     plugins.withId("org.gradle.java-gradle-plugin") {
       val gradleApi = dependencies.gradleApi()
