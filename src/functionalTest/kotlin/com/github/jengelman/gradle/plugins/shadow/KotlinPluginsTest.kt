@@ -21,7 +21,9 @@ class KotlinPluginsTest : BasePluginTest() {
   @BeforeEach
   override fun beforeEach() {
     super.beforeEach()
-    projectScript.writeText(getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform"))
+    projectScript.writeText(
+      getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")
+    )
   }
 
   @ParameterizedTest
@@ -36,20 +38,16 @@ class KotlinPluginsTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
           $stdlib
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
     val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Kotlin)
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      val entries = arrayOf(
-        "my/",
-        "META-INF/my.kotlin_module",
-        mainClassEntry,
-        *junitEntries,
-        *manifestEntries,
-      )
+      val entries =
+        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *junitEntries, *manifestEntries)
       if (excludeStdlib) {
         containsOnly(*entries)
       } else {
@@ -82,19 +80,15 @@ class KotlinPluginsTest : BasePluginTest() {
             }
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      val entries = arrayOf(
-        "my/",
-        "META-INF/my.kotlin_module",
-        mainClassEntry,
-        *entriesInAB,
-        *manifestEntries,
-      )
+      val entries =
+        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *entriesInAB, *manifestEntries)
       if (excludeStdlib) {
         containsOnly(*entries)
       } else {
@@ -103,9 +97,7 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/1377",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/1377")
   @Test
   fun compatKmpForOtherNamedJvmTarget() {
     val jvmTargetName = "newJvm"
@@ -130,41 +122,37 @@ class KotlinPluginsTest : BasePluginTest() {
             }
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      val entries = arrayOf(
-        "my/",
-        "META-INF/my.kotlin_module",
-        mainClassEntry,
-        *entriesInAB,
-        *manifestEntries,
-      )
+      val entries =
+        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *entriesInAB, *manifestEntries)
       containsAtLeast(*entries)
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/1377",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/1377")
   @Test
   fun doNotCreateJvmTargetEagerly() {
     projectScript.appendText(
       """
-        kotlin {
-          mingwX64()
-        }
-      """.trimIndent(),
+      kotlin {
+        mingwX64()
+      }
+      """
+        .trimIndent()
     )
 
     val result = runWithFailure(shadowJarPath)
 
-    assertThat(result.output).contains(
-      "Cannot locate tasks that match ':shadowJar' as task 'shadowJar' not found in root project",
-    )
+    assertThat(result.output)
+      .contains(
+        "Cannot locate tasks that match ':shadowJar' as task 'shadowJar' not found in root project"
+      )
   }
 
   @ParameterizedTest
@@ -172,7 +160,8 @@ class KotlinPluginsTest : BasePluginTest() {
   fun setMainClassAttributeFromMainRun(useShadowAttr: Boolean) {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
-    val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
+    val mainAttr =
+      if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
     projectScript.appendText(
       """
         kotlin {
@@ -185,13 +174,15 @@ class KotlinPluginsTest : BasePluginTest() {
             $mainAttr
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
+      getMainAttr(mainClassAttributeKey)
+        .isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
     }
   }
 
@@ -200,7 +191,8 @@ class KotlinPluginsTest : BasePluginTest() {
   fun setManifestAttrsFromJvmTargetJar(useShadowAttr: Boolean) {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
-    val mainAttr = if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
+    val mainAttr =
+      if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
     projectScript.appendText(
       """
         kotlin {
@@ -216,13 +208,15 @@ class KotlinPluginsTest : BasePluginTest() {
             $mainAttr
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getMainAttr(mainClassAttributeKey).isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
+      getMainAttr(mainClassAttributeKey)
+        .isEqualTo(if (useShadowAttr) main2ClassName else mainClassName)
     }
   }
 
@@ -252,15 +246,17 @@ class KotlinPluginsTest : BasePluginTest() {
             }
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     val result = runWithFailure(shadowJarPath, infoArgument)
 
-    assertThat(result.output).contains(
-      "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
-      "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
-    )
+    assertThat(result.output)
+      .contains(
+        "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
+        "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
+      )
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {

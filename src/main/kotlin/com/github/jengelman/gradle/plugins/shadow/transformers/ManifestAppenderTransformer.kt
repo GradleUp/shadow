@@ -14,17 +14,18 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 
 /**
- * A resource processor that can append arbitrary attributes to the first MANIFEST.MF
- * that is found in the set of JARs being processed. The attributes are appended in
- * the specified order, and duplicates are allowed.
+ * A resource processor that can append arbitrary attributes to the first MANIFEST.MF that is found
+ * in the set of JARs being processed. The attributes are appended in the specified order, and
+ * duplicates are allowed.
  *
  * Modified from [ManifestResourceTransformer].
+ *
  * @author Chris Rankin
  */
 @CacheableTransformer
-public open class ManifestAppenderTransformer @Inject constructor(
-  final override val objectFactory: ObjectFactory,
-) : ResourceTransformer {
+public open class ManifestAppenderTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var manifestContents = ByteArray(0)
 
   @get:Input

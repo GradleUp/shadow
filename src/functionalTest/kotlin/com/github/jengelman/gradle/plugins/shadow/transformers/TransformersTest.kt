@@ -50,11 +50,13 @@ class TransformersTest : BaseTransformerTest() {
     projectScript.appendText(
       transform<DeduplicatingResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           exclude('multiple-contents')
           ${if (excludeAll) "exclude('differing-content-2')" else ""}
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     if (excludeAll) {
@@ -72,22 +74,25 @@ class TransformersTest : BaseTransformerTest() {
           "META-INF/",
           "META-INF/MANIFEST.MF",
         )
-        getContents("multiple-contents").containsExactlyInAnyOrder("content", "content-is-different")
+        getContents("multiple-contents")
+          .containsExactlyInAnyOrder("content", "content-is-different")
         getContent("single-source").isEqualTo("content")
         getContent("same-content-twice").isEqualTo("content")
-        getContents("differing-content-2").containsExactlyInAnyOrder("content", "content-is-different")
+        getContents("differing-content-2")
+          .containsExactlyInAnyOrder("content", "content-is-different")
       }
     } else {
       val buildResult = runWithFailure(shadowJarPath)
       assertThat(buildResult).taskOutcomeEquals(shadowJarPath, FAILED)
-      assertThat(buildResult.output).contains(
-        // Keep this list approach for Unix/Windows test compatibility.
-        "Execution failed for task ':shadowJar'.",
-        "> Found 1 path duplicate(s) with different content in the shadowed JAR:",
-        "    * differing-content-2",
-        "differing-content-2 (SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73)",
-        "differing-content-2 (SHA256: aa845861bbd4578700e10487d85b25ead8723ee98fbf143df7b7e0bf1cb3385d)",
-      )
+      assertThat(buildResult.output)
+        .contains(
+          // Keep this list approach for Unix/Windows test compatibility.
+          "Execution failed for task ':shadowJar'.",
+          "> Found 1 path duplicate(s) with different content in the shadowed JAR:",
+          "    * differing-content-2",
+          "differing-content-2 (SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73)",
+          "differing-content-2 (SHA256: aa845861bbd4578700e10487d85b25ead8723ee98fbf143df7b7e0bf1cb3385d)",
+        )
     }
   }
 
@@ -102,7 +107,8 @@ class TransformersTest : BaseTransformerTest() {
             attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -124,29 +130,22 @@ class TransformersTest : BaseTransformerTest() {
     commonAssertions()
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/427",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/427")
   @Test
   fun mergeLog4j2PluginCacheFiles() {
     val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
-    val one = buildJarOne {
-      insert(PLUGIN_CACHE_FILE, content)
-    }
-    val two = buildJarOne {
-      insert(PLUGIN_CACHE_FILE, content)
-    }
+    val one = buildJarOne { insert(PLUGIN_CACHE_FILE, content) }
+    val two = buildJarOne { insert(PLUGIN_CACHE_FILE, content) }
     projectScript.appendText(
       transform<Log4j2PluginsCacheFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-      ),
+        dependenciesBlock = implementationFiles(one, two)
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
-    val actualFileBytes = outputShadowedJar.use { jar ->
-      jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
-    }
+    val actualFileBytes =
+      outputShadowedJar.use { jar -> jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() } }
     assertThat(actualFileBytes.contentHashCode()).all {
       // Hash of the original plugin cache file.
       isNotEqualTo(-2114104185)
@@ -159,20 +158,19 @@ class TransformersTest : BaseTransformerTest() {
     val foo = path("foo").apply { writeText("foo") }
     projectScript.appendText(
       transform<IncludeResourceTransformer>(
-        transformerBlock = """
+        transformerBlock =
+          """
           resource = 'bar'
           file = file('${foo.invariantSeparatorsPathString}')
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent()
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "bar",
-        *manifestEntries,
-      )
+      containsOnly("bar", *manifestEntries)
       getContent("bar").isEqualTo("foo")
     }
   }
@@ -187,16 +185,13 @@ class TransformersTest : BaseTransformerTest() {
       transform<DontIncludeResourceTransformer>(
         dependenciesBlock = implementationFiles(one),
         transformerBlock = "resource = 'foo'",
-      ),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "bar",
-        *manifestEntries,
-      )
+      containsOnly("bar", *manifestEntries)
       getContent("bar").isEqualTo("foo")
     }
   }
@@ -217,18 +212,13 @@ class TransformersTest : BaseTransformerTest() {
       transform<PreserveFirstFoundResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "resources = ['foo/bar']",
-      ),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "foo/",
-        "foo/bar",
-        "foo/baz",
-        *manifestEntries,
-      )
+      containsOnly("foo/", "foo/bar", "foo/baz", *manifestEntries)
       getContent("foo/bar").isEqualTo("bar1")
       getContent("foo/baz").isEqualTo("baz3")
     }
@@ -246,22 +236,16 @@ class TransformersTest : BaseTransformerTest() {
           // Use Transformer.Companion (no-op) to mock a custom transformer here.
           transform(${ResourceTransformer.Companion::class.java.name})
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        *entriesInAB,
-        *manifestEntries,
-      )
-    }
+    assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/1626",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/1626")
   @Test
   fun useApacheNoticeTransformerWithoutProjectName() {
     val noticeEntry = "META-INF/NOTICE"
@@ -274,7 +258,8 @@ class TransformersTest : BaseTransformerTest() {
 
         This product includes software developed at
         The Apache Software Foundation (https://www.apache.org/).
-        """.trimIndent(),
+        """
+          .trimIndent(),
       )
     }
     val two = buildJarTwo {
@@ -286,35 +271,35 @@ class TransformersTest : BaseTransformerTest() {
 
         This product includes software developed at
         The Apache Software Foundation (https://www.apache.org/).
-        """.trimIndent(),
+        """
+          .trimIndent(),
       )
     }
     projectScript.appendText(
       transform<ApacheNoticeResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "addHeader = false",
-      ),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        noticeEntry,
-        *manifestEntries,
-      )
-      getContent(noticeEntry).isEqualTo(
-        """
-        Apache Commons Pool
-        Copyright 2001-2025 The Apache Software Foundation
+      containsOnly(noticeEntry, *manifestEntries)
+      getContent(noticeEntry)
+        .isEqualTo(
+          """
+          Apache Commons Pool
+          Copyright 2001-2025 The Apache Software Foundation
 
-        This product includes software developed at
-        The Apache Software Foundation (https://www.apache.org/).
+          This product includes software developed at
+          The Apache Software Foundation (https://www.apache.org/).
 
-        Apache Commons DBCP
-        Copyright 2001-2024 The Apache Software Foundation
-        """.trimIndent(),
-      )
+          Apache Commons DBCP
+          Copyright 2001-2024 The Apache Software Foundation
+          """
+            .trimIndent()
+        )
     }
   }
 
@@ -322,28 +307,22 @@ class TransformersTest : BaseTransformerTest() {
   fun overrideOutputPathOfNoticeFile() {
     val noticeEntry = "META-INF/NOTICE"
     val customNoticeEntry = "META-INF/CUSTOM_NOTICE"
-    val one = buildJarOne {
-      insert(noticeEntry, "Notice from A")
-    }
-    val two = buildJarTwo {
-      insert(noticeEntry, "Notice from B")
-    }
+    val one = buildJarOne { insert(noticeEntry, "Notice from A") }
+    val two = buildJarTwo { insert(noticeEntry, "Notice from B") }
     projectScript.appendText(
       transform<ApacheNoticeResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "addHeader = false; outputPath = '$customNoticeEntry'",
-      ),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        customNoticeEntry,
-        *manifestEntries,
-      )
-      getContent(customNoticeEntry).isEqualTo(
-        """
+      containsOnly(customNoticeEntry, *manifestEntries)
+      getContent(customNoticeEntry)
+        .isEqualTo(
+          """
           Copyright 2006-2026 The Apache Software Foundation
 
           This product includes software developed at
@@ -352,8 +331,9 @@ class TransformersTest : BaseTransformerTest() {
           Notice from A
 
           Notice from B
-        """.trimIndent(),
-      )
+          """
+            .trimIndent()
+        )
     }
   }
 
@@ -370,14 +350,13 @@ class TransformersTest : BaseTransformerTest() {
         $shadowJarTask {
           transform(${transformer.java.name}) $configuration
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll {
-      containsAtLeast(*entriesInAB)
-    }
+    assertThat(outputShadowedJar).useAll { containsAtLeast(*entriesInAB) }
   }
 
   private fun commonAssertions(
@@ -385,7 +364,7 @@ class TransformersTest : BaseTransformerTest() {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
       assertThat(getValue(mainClassAttributeKey)).isEqualTo("my.Main")
       assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
-    },
+    }
   ) {
     val mf = outputShadowedJar.use { it.manifest }
     assertThat(mf).isNotNull()
@@ -396,7 +375,8 @@ class TransformersTest : BaseTransformerTest() {
     const val NEW_ENTRY_ATTR_KEY = "New-Entry"
     const val TEST_ENTRY_ATTR_KEY = "Test-Entry"
 
-    val MANIFEST_ATTRS = """
+    val MANIFEST_ATTRS =
+      """
         $jarTask {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
@@ -409,58 +389,57 @@ class TransformersTest : BaseTransformerTest() {
             attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
           }
         }
-    """.trimIndent()
+    """
+        .trimIndent()
 
     @JvmStatic
-    fun transformerConfigProvider() = listOf(
-      "" to ApacheLicenseResourceTransformer::class,
-      "" to ComponentsXmlResourceTransformer::class,
-      "" to ManifestAppenderTransformer::class,
-      "" to ManifestResourceTransformer::class,
-    )
+    fun transformerConfigProvider() =
+      listOf(
+        "" to ApacheLicenseResourceTransformer::class,
+        "" to ComponentsXmlResourceTransformer::class,
+        "" to ManifestAppenderTransformer::class,
+        "" to ManifestResourceTransformer::class,
+      )
   }
 
   @Test
   fun mergeLicenseResourceTransformer() {
-    val one = buildJarOne {
-      insert("META-INF/LICENSE", "license one")
-    }
-    val two = buildJarTwo {
-      insert("META-INF/LICENSE", "license two")
-    }
+    val one = buildJarOne { insert("META-INF/LICENSE", "license one") }
+    val two = buildJarTwo { insert("META-INF/LICENSE", "license two") }
     val artifactLicense = path("my-license")
     artifactLicense.writeText("artifact license text")
 
     projectScript.appendText(
       transform<MergeLicenseResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           outputPath = 'MY_LICENSE'
           artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
           firstSeparator = '####'
           separator = '----'
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "MY_LICENSE",
-        "META-INF/",
-        "META-INF/MANIFEST.MF",
-      )
-      getContent("MY_LICENSE").transform { it.invariantEolString }.isEqualTo(
-        """
+      containsOnly("MY_LICENSE", "META-INF/", "META-INF/MANIFEST.MF")
+      getContent("MY_LICENSE")
+        .transform { it.invariantEolString }
+        .isEqualTo(
+          """
           SPDX-License-Identifier: Apache-2.0
           artifact license text
           ####
           license one
           ----
           license two
-        """.trimIndent(),
-      )
+          """
+            .trimIndent()
+        )
     }
   }
 }

@@ -29,16 +29,18 @@ class FindResourceInClasspathTest : BasePluginTest() {
           classpath = configurations.runtimeClasspath
           exclude("a.properties")
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
-    assertThat(runWithSuccess(":find1").output).contains(
-      "> Task :find1",
-      "scanning ",
-      "/my/a/1.0/a-1.0.jar".variantSeparatorsPathString,
-      "/a.properties".variantSeparatorsPathString,
-      "/a2.properties".variantSeparatorsPathString,
-    )
+    assertThat(runWithSuccess(":find1").output)
+      .contains(
+        "> Task :find1",
+        "scanning ",
+        "/my/a/1.0/a-1.0.jar".variantSeparatorsPathString,
+        "/a.properties".variantSeparatorsPathString,
+        "/a2.properties".variantSeparatorsPathString,
+      )
 
     assertThat(runWithSuccess(":find2").output).all {
       contains(
@@ -47,9 +49,7 @@ class FindResourceInClasspathTest : BasePluginTest() {
         "/my/a/1.0/a-1.0.jar".variantSeparatorsPathString,
         "/a.properties".variantSeparatorsPathString,
       )
-      doesNotContain(
-        "/a2.properties".variantSeparatorsPathString,
-      )
+      doesNotContain("/a2.properties".variantSeparatorsPathString)
     }
 
     assertThat(runWithSuccess(":find3").output).all {
@@ -59,9 +59,7 @@ class FindResourceInClasspathTest : BasePluginTest() {
         "/my/a/1.0/a-1.0.jar".variantSeparatorsPathString,
         "/a2.properties".variantSeparatorsPathString,
       )
-      doesNotContain(
-        "/a.properties".variantSeparatorsPathString,
-      )
+      doesNotContain("/a.properties".variantSeparatorsPathString)
     }
   }
 }

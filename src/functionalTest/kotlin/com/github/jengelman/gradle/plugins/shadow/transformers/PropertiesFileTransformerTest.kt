@@ -19,61 +19,62 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
   @ParameterizedTest
   @EnumSource(MergeStrategy::class)
   fun mergePropertiesWithDifferentStrategies(strategy: MergeStrategy) {
-    val one = buildJarOne {
-      insert("META-INF/test.properties", "key1=one\nkey2=one")
-    }
-    val two = buildJarTwo {
-      insert("META-INF/test.properties", "key2=two\nkey3=two")
-    }
+    val one = buildJarOne { insert("META-INF/test.properties", "key1=one\nkey2=one") }
+    val two = buildJarTwo { insert("META-INF/test.properties", "key2=two\nkey3=two") }
     projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           mergeStrategy = $mergeStrategyClassName.$strategy
           mergeSeparator = ";"
           paths = ["META-INF/test.properties"]
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     if (strategy == MergeStrategy.Fail) {
       val result = runWithFailure(shadowJarPath)
 
       assertThat(result).taskOutcomeEquals(shadowJarPath, FAILED)
-      assertThat(result.output.invariantEolString).contains(
-        """
+      assertThat(result.output.invariantEolString)
+        .contains(
+          """
           Caused by: java.lang.IllegalStateException: The following properties files have conflicting property values and cannot be merged:
            * META-INF/test.properties
              * Property key2 is duplicated 2 times with different values
-        """.trimIndent(),
-      )
+          """
+            .trimIndent()
+        )
     } else {
       runWithSuccess(shadowJarPath)
 
-      val expected = when (strategy) {
-        MergeStrategy.First ->
-          """
-          |key1=one
-          |key2=one
-          |key3=two
-          |
-          """.trimMargin()
-        MergeStrategy.Latest ->
-          """
-          |key1=one
-          |key2=two
-          |key3=two
-          |
-          """.trimMargin()
-        MergeStrategy.Append ->
-          """
-          |key1=one
-          |key2=one;two
-          |key3=two
-          |
-          """.trimMargin()
-        else -> fail("Unexpected strategy: $strategy")
-      }
+      val expected =
+        when (strategy) {
+          MergeStrategy.First ->
+            """
+            |key1=one
+            |key2=one
+            |key3=two
+            |"""
+              .trimMargin()
+          MergeStrategy.Latest ->
+            """
+            |key1=one
+            |key2=two
+            |key3=two
+            |"""
+              .trimMargin()
+          MergeStrategy.Append ->
+            """
+            |key1=one
+            |key2=one;two
+            |key3=two
+            |"""
+              .trimMargin()
+          else -> fail("Unexpected strategy: $strategy")
+        }
       val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
       assertThat(content.invariantEolString).isEqualTo(expected)
     }
@@ -81,21 +82,19 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
   @Test
   fun mergePropertiesWithKeyTransformer() {
-    val one = buildJarOne {
-      insert("META-INF/test.properties", "foo=bar")
-    }
-    val two = buildJarTwo {
-      insert("META-INF/test.properties", "FOO=baz")
-    }
+    val one = buildJarOne { insert("META-INF/test.properties", "foo=bar") }
+    val two = buildJarTwo { insert("META-INF/test.properties", "FOO=baz") }
     projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           mergeStrategy = $mergeStrategyClassName.Append
           keyTransformer = { key -> key.toUpperCase() }
           paths = ["META-INF/test.properties"]
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     runWithSuccess(shadowJarPath)
@@ -106,21 +105,19 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
   @Test
   fun mergePropertiesWithSpecifiedCharset() {
-    val one = buildJarOne {
-      insert("META-INF/utf8.properties", "foo=第一")
-    }
-    val two = buildJarTwo {
-      insert("META-INF/utf8.properties", "foo=第二")
-    }
+    val one = buildJarOne { insert("META-INF/utf8.properties", "foo=第一") }
+    val two = buildJarTwo { insert("META-INF/utf8.properties", "foo=第二") }
     projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           mergeStrategy = $mergeStrategyClassName.Append
                 charsetName = "utf-8"
                 paths = ["META-INF/utf8.properties"]
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     runWithSuccess(shadowJarPath)
@@ -142,13 +139,15 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           mappings = [
             "META-INF/foo.properties": ["mergeStrategy": "append", "mergeSeparator": ";"],
             "META-INF/bar.properties": ["mergeStrategy": "latest"]
           ]
-        """.trimIndent(),
-      ),
+          """
+            .trimIndent(),
+      )
     )
 
     runWithSuccess(shadowJarPath)
@@ -159,48 +158,51 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/856",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/856")
   @Test
   fun mergedPropertiesWithoutComments() {
     val one = buildJarOne {
       insert(
         "META-INF/test.properties",
         """
-          # A comment from jar one.
-          foo=one
-        """.trimIndent(),
+        # A comment from jar one.
+        foo=one
+        """
+          .trimIndent(),
       )
     }
     val two = buildJarTwo {
       insert(
         "META-INF/test.properties",
         """
-          # A comment from jar two.
-          foo=two
-        """.trimIndent(),
+        # A comment from jar two.
+        foo=two
+        """
+          .trimIndent(),
       )
     }
     projectScript.appendText(
       transform<PropertiesFileTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           mergeStrategy = $mergeStrategyClassName.Append
           paths = ["META-INF/test.properties"]
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-    assertThat(content.invariantEolString).isEqualTo(
-      """
+    assertThat(content.invariantEolString)
+      .isEqualTo(
+        """
         |foo=one,two
-        |
-      """.trimMargin(),
-    )
+        |"""
+          .trimMargin()
+      )
   }
 
   private companion object {

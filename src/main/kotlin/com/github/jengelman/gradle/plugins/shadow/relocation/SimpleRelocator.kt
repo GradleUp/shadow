@@ -7,14 +7,17 @@ import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
 
 /**
- * Modified from [org.apache.maven.plugins.shade.relocation.SimpleRelocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/SimpleRelocator.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.relocation.SimpleRelocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/SimpleRelocator.java).
  *
  * @author Jason van Zyl
  * @author Mauro Talevi
  * @author John Engelman
  */
 @CacheableRelocator
-public open class SimpleRelocator @JvmOverloads constructor(
+public open class SimpleRelocator
+@JvmOverloads
+constructor(
   pattern: String? = null,
   shadedPattern: String? = null,
   includes: List<String>? = null,
@@ -29,11 +32,9 @@ public open class SimpleRelocator @JvmOverloads constructor(
   private val sourcePackageExcludes = mutableSetOf<String>()
   private val sourcePathExcludes = mutableSetOf<String>()
 
-  @get:Input
-  public val includes: MutableSet<String> = mutableSetOf()
+  @get:Input public val includes: MutableSet<String> = mutableSetOf()
 
-  @get:Input
-  public val excludes: MutableSet<String> = mutableSetOf()
+  @get:Input public val excludes: MutableSet<String> = mutableSetOf()
 
   init {
     if (rawString) {
@@ -74,13 +75,13 @@ public open class SimpleRelocator @JvmOverloads constructor(
         // Excludes should be subpackages of the global pattern.
         if (exclude.startsWith(this.pattern)) {
           sourcePackageExcludes.add(
-            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), ""),
+            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), "")
           )
         }
         // Excludes should be subpackages of the global pattern.
         if (exclude.startsWith(pathPattern)) {
           sourcePathExcludes.add(
-            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), ""),
+            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), "")
           )
         }
       }
@@ -105,7 +106,9 @@ public open class SimpleRelocator @JvmOverloads constructor(
     // Allow for annoying option of an extra / on the front of a path. See MSHADE-119;
     // comes from getClass().getResource("/a/b/c.properties").
     adjustedPath = adjustedPath.removePrefix("/")
-    return isIncluded(adjustedPath) && !isExcluded(adjustedPath) && adjustedPath.startsWith(pathPattern)
+    return isIncluded(adjustedPath) &&
+      !isExcluded(adjustedPath) &&
+      adjustedPath.startsWith(pathPattern)
   }
 
   override fun canRelocateClass(className: String): Boolean {
@@ -127,11 +130,13 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   /**
-   * We don't call this function now, so we don't have to expose [sourcePackageExcludes] and [sourcePathExcludes] as inputs.
+   * We don't call this function now, so we don't have to expose [sourcePackageExcludes] and
+   * [sourcePathExcludes] as inputs.
    */
   override fun applyToSourceContent(sourceContent: String): String {
     if (rawString) return sourceContent
-    val content = shadeSourceWithExcludes(sourceContent, pattern, shadedPattern, sourcePackageExcludes)
+    val content =
+      shadeSourceWithExcludes(sourceContent, pattern, shadedPattern, sourcePackageExcludes)
     return shadeSourceWithExcludes(content, pathPattern, shadedPathPattern, sourcePathExcludes)
   }
 
@@ -150,18 +155,19 @@ public open class SimpleRelocator @JvmOverloads constructor(
       excludes == other.excludes
   }
 
-  override fun hashCode(): Int = Objects.hash(
-    rawString,
-    skipStringConstants,
-    pattern,
-    pathPattern,
-    shadedPattern,
-    shadedPathPattern,
-    sourcePackageExcludes,
-    sourcePathExcludes,
-    includes,
-    excludes,
-  )
+  override fun hashCode(): Int =
+    Objects.hash(
+      rawString,
+      skipStringConstants,
+      pattern,
+      pathPattern,
+      shadedPattern,
+      shadedPathPattern,
+      sourcePackageExcludes,
+      sourcePathExcludes,
+      includes,
+      excludes,
+    )
 
   override fun toString(): String = buildString {
     append("SimpleRelocator(")
@@ -187,27 +193,26 @@ public open class SimpleRelocator @JvmOverloads constructor(
   }
 
   private companion object {
-    /**
-     * Match dot, slash or space at end of string
-     */
+    /** Match dot, slash or space at end of string */
     val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
 
     /**
      * Match
-     *  - certain Java keywords + space
-     *  - beginning of Javadoc link + optional line breaks and continuations with '*'
-     *  - (opening curly brace / opening parenthesis / comma / equals / semicolon) + space
-     *  - (closing curly brace / closing multi-line comment) + space
+     * - certain Java keywords + space
+     * - beginning of Javadoc link + optional line breaks and continuations with '*'
+     * - (opening curly brace / opening parenthesis / comma / equals / semicolon) + space
+     * - (closing curly brace / closing multi-line comment) + space
      *
      * at end of string
      */
-    val RX_ENDS_WITH_JAVA_KEYWORD: Pattern = Pattern.compile(
-      "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
-        "|" +
-        "\\{@link( \\*)* $" +
-        "|" +
-        "([{}(=;,]|\\*/) $",
-    )
+    val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
+      Pattern.compile(
+        "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
+          "|" +
+          "\\{@link( \\*)* $" +
+          "|" +
+          "([{}(=;,]|\\*/) $"
+      )
 
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
@@ -220,14 +225,17 @@ public open class SimpleRelocator @JvmOverloads constructor(
 
         val fileName = FilenameUtils.getName(pattern)
         val fileParent = FilenameUtils.getPathNoEndSeparator(pattern)
-        val filePattern = if (!fileParent.isNullOrEmpty() && fileName.isNotEmpty()) {
-          // It's a file pattern like `kotlin/kotlin.kotlin_builtins`, so we don't need to normalize it.
-          pattern
-        } else {
-          pattern.replace('.', '/')
-        }
+        val filePattern =
+          if (!fileParent.isNullOrEmpty() && fileName.isNotEmpty()) {
+            // It's a file pattern like `kotlin/kotlin.kotlin_builtins`, so we don't need to
+            // normalize it.
+            pattern
+          } else {
+            pattern.replace('.', '/')
+          }
         add(filePattern)
-        // Actually, class patterns should just use 'foo.bar.*' ending with a single asterisk, but some users
+        // Actually, class patterns should just use 'foo.bar.*' ending with a single asterisk, but
+        // some users
         // mistake them for path patterns like 'my/path/**', so let us be a bit more lenient here.
         if (filePattern.endsWith("/*") || filePattern.endsWith("/**")) {
           val packagePattern = filePattern.take(filePattern.lastIndexOf('/'))
@@ -242,11 +250,15 @@ public open class SimpleRelocator @JvmOverloads constructor(
       patternTo: String,
       excludedPatterns: Set<String>,
     ): String {
-      // Usually shading makes package names a bit longer, so make buffer 10% bigger than original source.
+      // Usually shading makes package names a bit longer, so make buffer 10% bigger than original
+      // source.
       val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
-      // Make sure that search pattern starts at word boundary and that we look for literal ".", not regex jokers.
-      val snippets = sourceContent.split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
-        .filter(CharSequence::isNotEmpty)
+      // Make sure that search pattern starts at word boundary and that we look for literal ".", not
+      // regex jokers.
+      val snippets =
+        sourceContent
+          .split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
+          .filter(CharSequence::isNotEmpty)
       snippets.forEachIndexed { i, snippet ->
         val isFirstSnippet = i == 0
         val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
@@ -261,12 +273,11 @@ public open class SimpleRelocator @JvmOverloads constructor(
           shadedSourceContent.append(snippet)
         } else {
           val previousSnippetOneLine = previousSnippet.replace("\\s+".toRegex(), " ")
-          val afterDotSlashSpace = RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
+          val afterDotSlashSpace =
+            RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
           val afterJavaKeyWord = RX_ENDS_WITH_JAVA_KEYWORD.matcher(previousSnippetOneLine).find()
           val shouldExclude = doExclude || afterDotSlashSpace && !afterJavaKeyWord
-          shadedSourceContent
-            .append(if (shouldExclude) patternFrom else patternTo)
-            .append(snippet)
+          shadedSourceContent.append(if (shouldExclude) patternFrom else patternTo).append(snippet)
         }
       }
       return shadedSourceContent.toString()

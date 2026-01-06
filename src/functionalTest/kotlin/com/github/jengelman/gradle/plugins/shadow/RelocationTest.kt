@@ -45,35 +45,32 @@ class RelocationTest : BasePluginTest() {
           enableAutoRelocation = true
           relocationPrefix = '$relocationPrefix'
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
-    val relocatedEntries = buildSet {
-      addAll(
-        junitEntries.map { "$entryPrefix/$it" }
-          .filterNot { it.startsWith("$entryPrefix/META-INF/") },
-      )
-      var parent = entryPrefix
-      while (parent.isNotEmpty()) {
-        add("$parent/")
-        parent = parent.substringBeforeLast('/', "")
-      }
-    }.toTypedArray()
+    val relocatedEntries =
+      buildSet {
+          addAll(
+            junitEntries
+              .map { "$entryPrefix/$it" }
+              .filterNot { it.startsWith("$entryPrefix/META-INF/") }
+          )
+          var parent = entryPrefix
+          while (parent.isNotEmpty()) {
+            add("$parent/")
+            parent = parent.substringBeforeLast('/', "")
+          }
+        }
+        .toTypedArray()
 
     val result = runWithSuccess(shadowJarPath, infoArgument)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "my/",
-        mainClassEntry,
-        *relocatedEntries,
-        *manifestEntries,
-      )
+      containsOnly("my/", mainClassEntry, *relocatedEntries, *manifestEntries)
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
-    assertThat(result.output).contains(
-      "Relocator count: 6.",
-    )
+    assertThat(result.output).contains("Relocator count: 6.")
   }
 
   @ParameterizedTest
@@ -82,45 +79,43 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """.trimIndent(),
+      dependencies {
+        implementation 'junit:junit:3.8.2'
+      }
+      """
+        .trimIndent()
     )
-    val relocatedEntries = junitEntries.map { "$relocationPrefix/$it" }
-      .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
-      .toTypedArray()
+    val relocatedEntries =
+      junitEntries
+        .map { "$relocationPrefix/$it" }
+        .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
+        .toTypedArray()
 
     if (enable) {
-      runWithSuccess(shadowJarPath, "--enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
+      runWithSuccess(
+        shadowJarPath,
+        "--enable-auto-relocation",
+        "--relocation-prefix=$relocationPrefix",
+      )
     } else {
-      runWithSuccess(shadowJarPath, "--no-enable-auto-relocation", "--relocation-prefix=$relocationPrefix")
+      runWithSuccess(
+        shadowJarPath,
+        "--no-enable-auto-relocation",
+        "--relocation-prefix=$relocationPrefix",
+      )
     }
 
-    val commonEntries = arrayOf(
-      "my/",
-      mainClassEntry,
-      *manifestEntries,
-    )
+    val commonEntries = arrayOf("my/", mainClassEntry, *manifestEntries)
     assertThat(outputShadowedJar).useAll {
       if (enable) {
-        containsOnly(
-          "$relocationPrefix/",
-          *relocatedEntries,
-          *commonEntries,
-        )
+        containsOnly("$relocationPrefix/", *relocatedEntries, *commonEntries)
       } else {
-        containsOnly(
-          *junitEntries,
-          *commonEntries,
-        )
+        containsOnly(*junitEntries, *commonEntries)
       }
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/58",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/58")
   @Test
   fun relocateDependencyFiles() {
     val mainClassEntry = writeClass()
@@ -133,17 +128,20 @@ class RelocationTest : BasePluginTest() {
           relocate 'junit.runner', 'a'
           relocate 'junit.framework', 'b'
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
     val runnerFilter = { it: String -> it.startsWith("junit/runner/") }
     val frameworkFilter = { it: String -> it.startsWith("junit/framework/") }
-    val runnerEntries = junitEntries
-      .filter(runnerFilter)
-      .map { it.replace("junit/runner/", "a/") }.toTypedArray()
-    val frameworkEntries = junitEntries
-      .filter(frameworkFilter)
-      .map { it.replace("junit/framework/", "b/") }.toTypedArray()
-    val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
+    val runnerEntries =
+      junitEntries.filter(runnerFilter).map { it.replace("junit/runner/", "a/") }.toTypedArray()
+    val frameworkEntries =
+      junitEntries
+        .filter(frameworkFilter)
+        .map { it.replace("junit/framework/", "b/") }
+        .toTypedArray()
+    val otherJunitEntries =
+      junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
     runWithSuccess(shadowJarPath)
 
@@ -175,17 +173,22 @@ class RelocationTest : BasePluginTest() {
             include 'junit.framework.Test*'
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
-    val runnerFilter = { it: String -> it.startsWith("junit/runner/") && it != "junit/runner/BaseTestRunner.class" }
+    val runnerFilter = { it: String ->
+      it.startsWith("junit/runner/") && it != "junit/runner/BaseTestRunner.class"
+    }
     val frameworkFilter = { it: String -> it.startsWith("junit/framework/Test") }
-    val runnerEntries = junitEntries
-      .filter(runnerFilter)
-      .map { it.replace("junit/runner/", "a/") }.toTypedArray()
-    val frameworkEntries = junitEntries
-      .filter(frameworkFilter)
-      .map { it.replace("junit/framework/", "b/") }.toTypedArray()
-    val otherJunitEntries = junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
+    val runnerEntries =
+      junitEntries.filter(runnerFilter).map { it.replace("junit/runner/", "a/") }.toTypedArray()
+    val frameworkEntries =
+      junitEntries
+        .filter(frameworkFilter)
+        .map { it.replace("junit/framework/", "b/") }
+        .toTypedArray()
+    val otherJunitEntries =
+      junitEntries.filterNot { runnerFilter(it) || frameworkFilter(it) }.toTypedArray()
 
     runWithSuccess(shadowJarPath)
 
@@ -217,13 +220,15 @@ class RelocationTest : BasePluginTest() {
         $shadowJarTask {
           relocate 'junit.framework', 'shadow.junit'
         }
-      """.trimIndent(),
-    )
-    val relocatedEntries = junitEntries
-      .map { it.replace("junit/framework/", "shadow/junit/") }.toTypedArray()
-
-    path("src/main/java/my/MyTest.java").writeText(
       """
+        .trimIndent()
+    )
+    val relocatedEntries =
+      junitEntries.map { it.replace("junit/framework/", "shadow/junit/") }.toTypedArray()
+
+    path("src/main/java/my/MyTest.java")
+      .writeText(
+        """
         package my;
         import junit.framework.Test;
         import junit.framework.TestResult;
@@ -231,29 +236,27 @@ class RelocationTest : BasePluginTest() {
           public int countTestCases() { return 0; }
           public void run(TestResult result) { }
         }
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "my/",
-        "shadow/",
-        "my/MyTest.class",
-        *relocatedEntries,
-        *manifestEntries,
-      )
+      containsOnly("my/", "shadow/", "my/MyTest.class", *relocatedEntries, *manifestEntries)
     }
 
     val url = outputShadowedJar.use { it.toUri().toURL() }
     URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
       assertFailure {
-        // check that the class can be loaded. If the file was not relocated properly, we should get a NoDefClassFound
-        // Isolated class loader with only the JVM system jars and the output jar from the test project
-        classLoader.loadClass("my.MyTest")
-        fail("Should not reach here.")
-      }.isInstanceOf(AssertionFailedError::class)
+          // check that the class can be loaded. If the file was not relocated properly, we should
+          // get a NoDefClassFound
+          // Isolated class loader with only the JVM system jars and the output jar from the test
+          // project
+          classLoader.loadClass("my.MyTest")
+          fail("Should not reach here.")
+        }
+        .isInstanceOf(AssertionFailedError::class)
     }
   }
 
@@ -263,9 +266,7 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun relocateResourceFiles() {
-    val depJar = buildJar("foo.jar") {
-      insert("foo/dep.properties", "c")
-    }
+    val depJar = buildJar("foo.jar") { insert("foo/dep.properties", "c") }
     writeClass(packageName = "foo", className = "Foo")
     path("src/main/resources/foo/foo.properties").writeText("name=foo")
 
@@ -277,7 +278,8 @@ class RelocationTest : BasePluginTest() {
         $shadowJarTask {
           relocate 'foo', 'bar'
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -295,7 +297,10 @@ class RelocationTest : BasePluginTest() {
 
   @ParameterizedTest
   @MethodSource("preserveLastModifiedProvider")
-  fun preserveLastModifiedCorrectly(enableAutoRelocation: Boolean, preserveFileTimestamps: Boolean) {
+  fun preserveLastModifiedCorrectly(
+    enableAutoRelocation: Boolean,
+    preserveFileTimestamps: Boolean,
+  ) {
     // Minus 3 sec to avoid the time difference between the file system and the JVM.
     val currentTimeMillis = System.currentTimeMillis() - 3.seconds.inWholeMilliseconds
     val junitEntryTimeRange = junitRawEntries.map { it.time }.let { it.min()..it.max() }
@@ -309,15 +314,17 @@ class RelocationTest : BasePluginTest() {
           enableAutoRelocation = $enableAutoRelocation
           preserveFileTimestamps = $preserveFileTimestamps
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     if (enableAutoRelocation) {
-      val (relocatedEntries, otherEntries) = outputShadowedJar.use {
-        it.entries().toList().partition { entry -> entry.name.startsWith("shadow/") }
-      }
+      val (relocatedEntries, otherEntries) =
+        outputShadowedJar.use {
+          it.entries().toList().partition { entry -> entry.name.startsWith("shadow/") }
+        }
       assertThat(relocatedEntries).isNotEmpty()
       assertThat(otherEntries).isNotEmpty()
       val (relocatedDirs, relocatedClasses) = relocatedEntries.partition { it.isDirectory }
@@ -332,9 +339,12 @@ class RelocationTest : BasePluginTest() {
           }
         }
         (relocatedDirs + otherEntries).forEach { entry ->
-          // Relocated directories and other entries are newly created, so they should be in now time.
+          // Relocated directories and other entries are newly created, so they should be in now
+          // time.
           if (entry.time < currentTimeMillis) {
-            fail("Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}")
+            fail(
+              "Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}"
+            )
           }
         }
       } else {
@@ -346,9 +356,10 @@ class RelocationTest : BasePluginTest() {
         }
       }
     } else {
-      val (shadowedEntries, otherEntries) = outputShadowedJar.use {
-        it.entries().toList().partition { entry -> entry.name.startsWith("junit/") }
-      }
+      val (shadowedEntries, otherEntries) =
+        outputShadowedJar.use {
+          it.entries().toList().partition { entry -> entry.name.startsWith("junit/") }
+        }
       assertThat(shadowedEntries).isNotEmpty()
       assertThat(otherEntries).isNotEmpty()
 
@@ -383,9 +394,10 @@ class RelocationTest : BasePluginTest() {
   )
   @Test
   fun excludeKotlinBuiltinsFromRelocation() {
-    val kotlinJar = buildJar("kotlin.jar") {
-      insert("kotlin/kotlin.kotlin_builtins", "This is a Kotlin builtins file.")
-    }
+    val kotlinJar =
+      buildJar("kotlin.jar") {
+        insert("kotlin/kotlin.kotlin_builtins", "This is a Kotlin builtins file.")
+      }
     projectScript.appendText(
       """
         dependencies {
@@ -396,31 +408,30 @@ class RelocationTest : BasePluginTest() {
             exclude('kotlin/kotlin.kotlin_builtins')
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "kotlin/",
-        "kotlin/kotlin.kotlin_builtins",
-        *manifestEntries,
-      )
+      containsOnly("kotlin/", "kotlin/kotlin.kotlin_builtins", *manifestEntries)
     }
   }
 
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun relocateAllPackagesButCertainOne(exclude: Boolean) {
-    val relocateConfig = if (exclude) {
-      """
+    val relocateConfig =
+      if (exclude) {
+        """
         exclude 'junit/**'
         exclude 'META-INF/**'
-      """.trimIndent()
-    } else {
-      ""
-    }
+        """
+          .trimIndent()
+      } else {
+        ""
+      }
     projectScript.appendText(
       """
         dependencies {
@@ -431,23 +442,17 @@ class RelocationTest : BasePluginTest() {
             $relocateConfig
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       if (exclude) {
-        containsOnly(
-          *junitEntries,
-          *manifestEntries,
-        )
+        containsOnly(*junitEntries, *manifestEntries)
       } else {
-        containsOnly(
-          "foo/",
-          "foo/$manifestEntry",
-          *junitEntries.map { "foo/$it" }.toTypedArray(),
-        )
+        containsOnly("foo/", "foo/$manifestEntry", *junitEntries.map { "foo/$it" }.toTypedArray())
       }
     }
   }
@@ -464,19 +469,14 @@ class RelocationTest : BasePluginTest() {
           configurations = []
           relocate('', 'foo/')
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "foo/",
-        "foo/my/",
-        "foo/META-INF/",
-        "foo/$mainClassEntry",
-        "foo/$manifestEntry",
-      )
+      containsOnly("foo/", "foo/my/", "foo/META-INF/", "foo/$mainClassEntry", "foo/$manifestEntry")
     }
   }
 
@@ -491,16 +491,14 @@ class RelocationTest : BasePluginTest() {
           }
           relocate('foo', 'shadow.foo')
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
-    assertThat(result).contains(
-      "shadow.foo.Foo",
-      "shadow.foo.Bar",
-    )
+    assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
   }
 
   @Issue(
@@ -521,41 +519,35 @@ class RelocationTest : BasePluginTest() {
             skipStringConstants = $skipStringConstants
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     if (skipStringConstants) {
-      assertThat(result).contains(
-        "foo.Foo",
-        "foo.Bar",
-      )
+      assertThat(result).contains("foo.Foo", "foo.Bar")
     } else {
-      assertThat(result).contains(
-        "shadow.foo.Foo",
-        "shadow.foo.Bar",
-      )
+      assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/1403",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/1403")
   @Test
   fun relocateMultiClassSignatureStringConstants() {
     writeClass {
       """
-        package my;
-        public class Main {
-          public static void main(String[] args) {
-            System.out.println("Lorg/package/ClassA;Lorg/package/ClassB;");
-            System.out.println("(Lorg/package/ClassC;Lorg/package/ClassD;)");
-            System.out.println("()Lorg/package/ClassE;Lorg/package/ClassF;");
-          }
+      package my;
+      public class Main {
+        public static void main(String[] args) {
+          System.out.println("Lorg/package/ClassA;Lorg/package/ClassB;");
+          System.out.println("(Lorg/package/ClassC;Lorg/package/ClassD;)");
+          System.out.println("()Lorg/package/ClassE;Lorg/package/ClassF;");
         }
-      """.trimIndent()
+      }
+      """
+        .trimIndent()
     }
     projectScript.appendText(
       """
@@ -565,18 +557,20 @@ class RelocationTest : BasePluginTest() {
           }
           relocate('org.package', 'shadow.org.package')
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     // Just check that the jar can be executed without NoClassDefFoundError.
-    assertThat(result).contains(
-      "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB",
-      "Lshadow/org/package/ClassC;Lshadow/org/package/ClassD",
-      "Lshadow/org/package/ClassE;Lshadow/org/package/ClassF",
-    )
+    assertThat(result)
+      .contains(
+        "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB",
+        "Lshadow/org/package/ClassC;Lshadow/org/package/ClassD",
+        "Lshadow/org/package/ClassE;Lshadow/org/package/ClassF",
+      )
   }
 
   @Test
@@ -590,7 +584,8 @@ class RelocationTest : BasePluginTest() {
         $shadowJarTask {
           enableAutoRelocation = true
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(":jar", shadowJarPath)
@@ -600,18 +595,15 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/843",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/843")
   @OptIn(UnstableMetadataApi::class)
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun relocateKotlinModuleFiles(enableKotlinModuleRemapping: Boolean) {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
     val originalModuleFileBytes = requireResourceAsPath(originalModuleFilePath).readBytes()
-    val stdlibJar = buildJar("stdlib.jar") {
-      insert(originalModuleFilePath, originalModuleFileBytes)
-    }
+    val stdlibJar =
+      buildJar("stdlib.jar") { insert(originalModuleFilePath, originalModuleFileBytes) }
     projectScript.appendText(
       """
         dependencies {
@@ -621,7 +613,8 @@ class RelocationTest : BasePluginTest() {
           relocate('kotlin', 'my.kotlin')
           enableKotlinModuleRemapping = $enableKotlinModuleRemapping
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -630,26 +623,21 @@ class RelocationTest : BasePluginTest() {
 
     if (enableKotlinModuleRemapping) {
       assertThat(outputShadowedJar).useAll {
-        containsOnly(
-          relocatedModuleFilePath,
-          *manifestEntries,
-        )
+        containsOnly(relocatedModuleFilePath, *manifestEntries)
       }
     } else {
       assertThat(outputShadowedJar).useAll {
-        containsOnly(
-          originalModuleFilePath,
-          *manifestEntries,
-        )
+        containsOnly(originalModuleFilePath, *manifestEntries)
       }
-      assertThat(outputShadowedJar.use { it.getBytes(originalModuleFilePath) }).isEqualTo(originalModuleFileBytes)
+      assertThat(outputShadowedJar.use { it.getBytes(originalModuleFilePath) })
+        .isEqualTo(originalModuleFileBytes)
       return
     }
 
-    val originalModule = KotlinModuleMetadata.read(requireResourceAsStream(originalModuleFilePath).readBytes())
-    val relocatedModule = outputShadowedJar.use {
-      KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath))
-    }
+    val originalModule =
+      KotlinModuleMetadata.read(requireResourceAsStream(originalModuleFilePath).readBytes())
+    val relocatedModule =
+      outputShadowedJar.use { KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath)) }
 
     assertThat(relocatedModule.version.toString()).isEqualTo("2.2.0")
     assertThat(originalModule.version.toString()).isEqualTo("2.2.0")
@@ -674,22 +662,23 @@ class RelocationTest : BasePluginTest() {
       } else {
         assertThat(relocatedParts.fileFacades).isNotEmpty()
         assertThat(relocatedParts.fileFacades).isNotEqualTo(originalParts.fileFacades)
-        assertThat(relocatedParts.fileFacades).isEqualTo(
-          originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") },
-        )
+        assertThat(relocatedParts.fileFacades)
+          .isEqualTo(originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") })
       }
 
       if (originalParts.multiFileClassParts.isEmpty()) {
         assertThat(relocatedParts.multiFileClassParts).isEmpty()
       } else {
         assertThat(relocatedParts.multiFileClassParts).isNotEmpty()
-        assertThat(relocatedParts.multiFileClassParts).isNotEqualTo(originalParts.multiFileClassParts)
-        assertThat(relocatedParts.multiFileClassParts).isEqualTo(
-          originalParts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
-            name.replace("kotlin/", "my/kotlin/") to
-              facade.replace("kotlin/", "my/kotlin/")
-          },
-        )
+        assertThat(relocatedParts.multiFileClassParts)
+          .isNotEqualTo(originalParts.multiFileClassParts)
+        assertThat(relocatedParts.multiFileClassParts)
+          .isEqualTo(
+            originalParts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
+              ->
+              name.replace("kotlin/", "my/kotlin/") to facade.replace("kotlin/", "my/kotlin/")
+            }
+          )
       }
     }
   }
@@ -697,36 +686,39 @@ class RelocationTest : BasePluginTest() {
   private fun writeClassWithStringRef() {
     writeClass {
       """
-        package my;
-        public class Main {
-          public static void main(String[] args) {
-            switch (1) {
-              default:
-                System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
-                break;
-            }
-            System.out.println("foo.Bar");
+      package my;
+      public class Main {
+        public static void main(String[] args) {
+          switch (1) {
+            default:
+              System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
+              break;
           }
+          System.out.println("foo.Bar");
         }
-      """.trimIndent()
+      }
+      """
+        .trimIndent()
     }
   }
 
   private companion object {
     @JvmStatic
-    fun preserveLastModifiedProvider() = listOf(
-      Arguments.of(false, false),
-      Arguments.of(true, false),
-      Arguments.of(false, true),
-      Arguments.of(true, true),
-    )
+    fun preserveLastModifiedProvider() =
+      listOf(
+        Arguments.of(false, false),
+        Arguments.of(true, false),
+        Arguments.of(false, true),
+        Arguments.of(true, true),
+      )
 
     @JvmStatic
-    fun relocationCliOptionProvider() = listOf(
-      Arguments.of(false, "foo"),
-      Arguments.of(false, "bar"),
-      Arguments.of(true, "foo"),
-      Arguments.of(true, "bar"),
-    )
+    fun relocationCliOptionProvider() =
+      listOf(
+        Arguments.of(false, "foo"),
+        Arguments.of(false, "bar"),
+        Arguments.of(true, "foo"),
+        Arguments.of(true, "bar"),
+      )
   }
 }

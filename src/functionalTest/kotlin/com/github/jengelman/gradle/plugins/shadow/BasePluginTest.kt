@@ -48,74 +48,75 @@ abstract class BasePluginTest {
   @TempDir
   lateinit var projectRoot: Path
     private set
+
   lateinit var localRepo: AppendableMavenRepository
     private set
 
   lateinit var artifactAJar: Path
     private set
+
   lateinit var artifactBJar: Path
     private set
 
-  val projectScript: Path get() = path("build.gradle")
-  val settingsScript: Path get() = path("settings.gradle")
-  val outputJar: JarPath get() = jarPath("build/libs/my-1.0.jar")
-  open val outputShadowedJar: JarPath get() = jarPath("build/libs/my-1.0-all.jar")
-  val outputServerShadowedJar: JarPath get() = jarPath("server/build/libs/server-1.0-all.jar")
+  val projectScript: Path
+    get() = path("build.gradle")
+
+  val settingsScript: Path
+    get() = path("settings.gradle")
+
+  val outputJar: JarPath
+    get() = jarPath("build/libs/my-1.0.jar")
+
+  open val outputShadowedJar: JarPath
+    get() = jarPath("build/libs/my-1.0-all.jar")
+
+  val outputServerShadowedJar: JarPath
+    get() = jarPath("server/build/libs/server-1.0-all.jar")
 
   @BeforeAll
   fun beforeAll() {
-    localRepo = AppendableMavenRepository(
-      root = createTempDirectory().resolve("local-maven-repo").createDirectories(),
-    ).apply {
-      jarModule("junit", "junit", "3.8.2") {
-        useJar(junitJar)
-      }
-      val a = jarModule("my", "a", "1.0") {
-        buildJar {
-          insert("a.properties", "a")
-          insert("a2.properties", "a2")
+    localRepo =
+      AppendableMavenRepository(
+          root = createTempDirectory().resolve("local-maven-repo").createDirectories()
+        )
+        .apply {
+          jarModule("junit", "junit", "3.8.2") { useJar(junitJar) }
+          val a =
+            jarModule("my", "a", "1.0") {
+              buildJar {
+                insert("a.properties", "a")
+                insert("a2.properties", "a2")
+              }
+            }
+          val b = jarModule("my", "b", "1.0") { buildJar { insert("b.properties", "b") } }
+          val c = jarModule("my", "c", "1.0") { buildJar { insert("c.properties", "c") } }
+          val d =
+            jarModule("my", "d", "1.0") {
+              buildJar { insert("d.properties", "d") }
+              // Depends on c but c does not depend on d.
+              addDependency(c)
+            }
+          val e =
+            jarModule("my", "e", "1.0") {
+              buildJar { insert("e.properties", "e") }
+              // Circular dependency with f.
+              addDependency("my:f:1.0")
+            }
+          val f =
+            jarModule("my", "f", "1.0") {
+              buildJar { insert("f.properties", "f") }
+              // Circular dependency with e.
+              addDependency(e)
+            }
+          bomModule("my", "bom", "1.0") {
+            addDependency(a)
+            addDependency(b)
+            addDependency(c)
+            addDependency(d)
+            addDependency(e)
+            addDependency(f)
+          }
         }
-      }
-      val b = jarModule("my", "b", "1.0") {
-        buildJar {
-          insert("b.properties", "b")
-        }
-      }
-      val c = jarModule("my", "c", "1.0") {
-        buildJar {
-          insert("c.properties", "c")
-        }
-      }
-      val d = jarModule("my", "d", "1.0") {
-        buildJar {
-          insert("d.properties", "d")
-        }
-        // Depends on c but c does not depend on d.
-        addDependency(c)
-      }
-      val e = jarModule("my", "e", "1.0") {
-        buildJar {
-          insert("e.properties", "e")
-        }
-        // Circular dependency with f.
-        addDependency("my:f:1.0")
-      }
-      val f = jarModule("my", "f", "1.0") {
-        buildJar {
-          insert("f.properties", "f")
-        }
-        // Circular dependency with e.
-        addDependency(e)
-      }
-      bomModule("my", "bom", "1.0") {
-        addDependency(a)
-        addDependency(b)
-        addDependency(c)
-        addDependency(d)
-        addDependency(e)
-        addDependency(f)
-      }
-    }
     localRepo.publish()
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
@@ -135,8 +136,7 @@ abstract class BasePluginTest {
 
   @AfterAll
   fun afterAll() {
-    @OptIn(ExperimentalPathApi::class)
-    localRepo.root.deleteRecursively()
+    @OptIn(ExperimentalPathApi::class) localRepo.root.deleteRecursively()
   }
 
   fun getDefaultProjectBuildScript(
@@ -154,13 +154,16 @@ abstract class BasePluginTest {
       }
       $groupInfo
       $versionInfo
-    """.trimIndent() + lineSeparator
+    """
+      .trimIndent() + lineSeparator
   }
 
   fun getDefaultSettingsBuildScript(
     startBlock: String = "",
-    // Use a test-specific build cache directory. This ensures that we'll only use cached outputs generated during
-    // this test, and we won't accidentally use cached outputs from a different test or a different build.
+    // Use a test-specific build cache directory. This ensures that we'll only use cached outputs
+    // generated during
+    // this test, and we won't accidentally use cached outputs from a different test or a different
+    // build.
     // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
     buildCacheBlock: String = "local { directory = file('build-cache') }",
     endBlock: String = "rootProject.name = 'my'",
@@ -178,7 +181,8 @@ abstract class BasePluginTest {
       }
       enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
       $endBlock
-    """.trimIndent() + lineSeparator
+    """
+      .trimIndent() + lineSeparator
   }
 
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
@@ -202,20 +206,16 @@ abstract class BasePluginTest {
     return JarBuilder(path("temp/$relative")).apply(builder).write()
   }
 
-  fun runWithSuccess(
-    vararg arguments: String,
-    block: GradleRunner.() -> Unit = {},
-  ): BuildResult {
+  fun runWithSuccess(vararg arguments: String, block: GradleRunner.() -> Unit = {}): BuildResult {
     return runner(arguments = arguments.toList(), block = block)
-      .build().assertNoDeprecationWarnings()
+      .build()
+      .assertNoDeprecationWarnings()
   }
 
-  fun runWithFailure(
-    vararg arguments: String,
-    block: GradleRunner.() -> Unit = {},
-  ): BuildResult {
+  fun runWithFailure(vararg arguments: String, block: GradleRunner.() -> Unit = {}): BuildResult {
     return runner(arguments = arguments.toList(), block = block)
-      .buildAndFail().assertNoDeprecationWarnings()
+      .buildAndFail()
+      .assertNoDeprecationWarnings()
   }
 
   fun writeClass(
@@ -240,7 +240,8 @@ abstract class BasePluginTest {
                 System.out.println($classRef);
               }
             }
-          """.trimIndent()
+          """
+            .trimIndent()
         }
         JvmLang.Kotlin -> {
           val imports = if (withImports) "import junit.framework.Test" else ""
@@ -255,7 +256,8 @@ abstract class BasePluginTest {
               println(content)
               println($classRef)
             }
-          """.trimIndent()
+          """
+            .trimIndent()
         }
       }
     },
@@ -265,41 +267,46 @@ abstract class BasePluginTest {
     return "$basePath.class"
   }
 
-  fun writeClientAndServerModules(
-    clientShadowed: Boolean = false,
-    serverShadowBlock: String = "",
-  ) {
+  fun writeClientAndServerModules(clientShadowed: Boolean = false, serverShadowBlock: String = "") {
     settingsScript.appendText(
       """
-        include 'client', 'server'
-      """.trimIndent(),
+      include 'client', 'server'
+      """
+        .trimIndent()
     )
     projectScript.writeText("")
 
-    path("client/src/main/java/client/Client.java").writeText(
-      """
+    path("client/src/main/java/client/Client.java")
+      .writeText(
+        """
         package client;
         public class Client {}
-      """.trimIndent(),
-    )
-    path("client/build.gradle").writeText(
-      """
+        """
+          .trimIndent()
+      )
+    path("client/build.gradle")
+      .writeText(
+        """
         ${getDefaultProjectBuildScript("java")}
         dependencies {
           implementation 'junit:junit:3.8.2'
         }
-      """.trimIndent() + lineSeparator,
-    )
-
-    path("server/src/main/java/server/Server.java").writeText(
       """
+          .trimIndent() + lineSeparator
+      )
+
+    path("server/src/main/java/server/Server.java")
+      .writeText(
+        """
         package server;
         import client.Client;
         public class Server {}
-      """.trimIndent(),
-    )
-    path("server/build.gradle").writeText(
-      """
+        """
+          .trimIndent()
+      )
+    path("server/build.gradle")
+      .writeText(
+        """
         ${getDefaultProjectBuildScript("java")}
         dependencies {
           implementation project(':client')
@@ -307,27 +314,34 @@ abstract class BasePluginTest {
         $shadowJarTask {
           $serverShadowBlock
         }
-      """.trimIndent() + lineSeparator,
-    )
+      """
+          .trimIndent() + lineSeparator
+      )
 
     if (!clientShadowed) return
-    path("client/build.gradle").appendText(
-      """
+    path("client/build.gradle")
+      .appendText(
+        """
         $shadowJarTask {
           relocate 'junit.framework', 'client.junit.framework'
         }
-      """.trimIndent() + lineSeparator,
-    )
-    path("server/src/main/java/server/Server.java").writeText(
       """
+          .trimIndent() + lineSeparator
+      )
+    path("server/src/main/java/server/Server.java")
+      .writeText(
+        """
         package server;
         import client.Client;
         import client.junit.framework.Test;
         public class Server {}
-      """.trimIndent(),
-    )
-    val replaced = path("server/build.gradle").readText()
-      .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
+        """
+          .trimIndent()
+      )
+    val replaced =
+      path("server/build.gradle")
+        .readText()
+        .replace("project(':client')", "project(path: ':client', configuration: 'shadow')")
     path("server/build.gradle").writeText(replaced)
   }
 
@@ -343,11 +357,13 @@ abstract class BasePluginTest {
             }
           }
         }
-      """.trimIndent() + lineSeparator,
+      """
+        .trimIndent() + lineSeparator
     )
 
-    path("src/main/java/my/plugin/MyPlugin.java").writeText(
-      """
+    path("src/main/java/my/plugin/MyPlugin.java")
+      .writeText(
+        """
         package my.plugin;
         import org.gradle.api.Plugin;
         import org.gradle.api.Project;
@@ -356,19 +372,18 @@ abstract class BasePluginTest {
             System.out.println("MyPlugin: Hello, World!");
           }
         }
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
   }
 
-  private fun runner(
-    arguments: Iterable<String>,
-    block: GradleRunner.() -> Unit,
-  ): GradleRunner {
-    val warningsAsErrors = try {
-      projectScript.readText().toWarningsAsErrors()
-    } catch (_: UninitializedPropertyAccessException) {
-      true // Default warning mode if projectScript is not initialized yet.
-    }
+  private fun runner(arguments: Iterable<String>, block: GradleRunner.() -> Unit): GradleRunner {
+    val warningsAsErrors =
+      try {
+        projectScript.readText().toWarningsAsErrors()
+      } catch (_: UninitializedPropertyAccessException) {
+        true // Default warning mode if projectScript is not initialized yet.
+      }
     return gradleRunner(
       projectDir = projectRoot,
       arguments = commonGradleArgs + arguments,
@@ -392,17 +407,19 @@ abstract class BasePluginTest {
     val entriesInB = arrayOf("b.properties")
     val entriesInAB = entriesInA + entriesInB
     val junitJar: Path = requireResourceAsPath("junit-3.8.2.jar")
-    val junitRawEntries: List<JarEntry> = JarPath(junitJar)
-      .use { it.entries().toList() }
-      .filterNot {
-        // This entry is not present in the jar file.
-        it.name == "junit3.8.2/"
-      }
+    val junitRawEntries: List<JarEntry> =
+      JarPath(junitJar)
+        .use { it.entries().toList() }
+        .filterNot {
+          // This entry is not present in the jar file.
+          it.name == "junit3.8.2/"
+        }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
     const val manifestEntry = "META-INF/MANIFEST.MF"
     val manifestEntries = arrayOf("META-INF/", manifestEntry)
 
-    val shadowJarTask: String = "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
+    val shadowJarTask: String =
+      "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
     const val runShadowTask = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
     const val jarTask = "tasks.named('jar', Jar)"
 
@@ -414,7 +431,9 @@ abstract class BasePluginTest {
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(lineSeparator) { "implementation files('${it.invariantSeparatorsPathString}')" }
+      return paths.joinToString(lineSeparator) {
+        "implementation files('${it.invariantSeparatorsPathString}')"
+      }
     }
 
     inline fun <reified T : ResourceTransformer> transform(
@@ -430,7 +449,8 @@ abstract class BasePluginTest {
             $transformerBlock
           }
         }
-      """.trimIndent()
+      """
+        .trimIndent()
     }
 
     fun <T : Closeable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {

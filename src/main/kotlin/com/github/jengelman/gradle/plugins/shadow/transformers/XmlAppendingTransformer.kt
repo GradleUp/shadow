@@ -22,37 +22,39 @@ import org.xml.sax.InputSource
 /**
  * Appends multiple occurrences of some XML file.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.XmlAppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/XmlAppendingTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.XmlAppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/XmlAppendingTransformer.java).
  *
  * @author John Engelman
  */
 @CacheableTransformer
-public open class XmlAppendingTransformer @Inject constructor(
-  final override val objectFactory: ObjectFactory,
-) : ResourceTransformer {
+public open class XmlAppendingTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var doc: Document? = null
 
-  @get:Input
-  public open val ignoreDtd: Property<Boolean> = objectFactory.property(true)
+  @get:Input public open val ignoreDtd: Property<Boolean> = objectFactory.property(true)
 
-  @get:Input
-  public open val resource: Property<String> = objectFactory.property("")
+  @get:Input public open val resource: Property<String> = objectFactory.property("")
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.get().equals(element.path, ignoreCase = true)
   }
 
   override fun transform(context: TransformerContext) {
-    val r = try {
-      SAXBuilder(XMLReaders.NONVALIDATING).apply {
-        expandEntities = false
-        if (ignoreDtd.get()) {
-          entityResolver = EntityResolver { _, _ -> InputSource(StringReader("")) }
-        }
-      }.build(context.inputStream)
-    } catch (e: JDOMException) {
-      throw IOException("Error processing resource ${resource.get()}: ${e.message}", e)
-    }
+    val r =
+      try {
+        SAXBuilder(XMLReaders.NONVALIDATING)
+          .apply {
+            expandEntities = false
+            if (ignoreDtd.get()) {
+              entityResolver = EntityResolver { _, _ -> InputSource(StringReader("")) }
+            }
+          }
+          .build(context.inputStream)
+      } catch (e: JDOMException) {
+        throw IOException("Error processing resource ${resource.get()}: ${e.message}", e)
+      }
 
     if (doc == null) {
       doc = r
@@ -65,9 +67,7 @@ public open class XmlAppendingTransformer @Inject constructor(
           mergedEl.setAttribute(a)
         }
       }
-      root.children.forEach { n ->
-        doc!!.rootElement.addContent(n.clone())
-      }
+      root.children.forEach { n -> doc!!.rootElement.addContent(n.clone()) }
     }
   }
 

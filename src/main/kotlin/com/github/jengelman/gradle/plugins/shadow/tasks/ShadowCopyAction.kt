@@ -1,4 +1,6 @@
-@file:Suppress("InternalGradleApiUsage") // We have to use internal Gradle APIs to implement a CopyAction.
+@file:Suppress(
+  "InternalGradleApiUsage"
+) // We have to use internal Gradle APIs to implement a CopyAction.
 
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
@@ -35,7 +37,8 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.commons.ClassRemapper
 
 /**
- * Modified from [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
+ * Modified from
+ * [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
 public open class ShadowCopyAction
 @Deprecated("This should not be used as a public API. Will be made internal in a future release.")
@@ -53,17 +56,21 @@ constructor(
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
-    val zipOutStream = try {
-      zosProvider(zipFile)
-    } catch (e: Exception) {
-      throw GradleException("Could not create ZIP '$zipFile'.", e)
-    }
+    val zipOutStream =
+      try {
+        zosProvider(zipFile)
+      } catch (e: Exception) {
+        throw GradleException("Could not create ZIP '$zipFile'.", e)
+      }
 
     try {
       zipOutStream.use { zos ->
         stream.process(StreamAction(zos))
         processTransformers(zos)
-        addDirs(zos) // This must be called after adding all file entries to avoid duplicate directories being added.
+        addDirs(
+          zos
+        ) // This must be called after adding all file entries to avoid duplicate directories being
+        // added.
         checkDuplicateEntries(zos)
       }
     } catch (e: Exception) {
@@ -80,7 +87,8 @@ constructor(
             }
             ```
             See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64 for more details.
-          """.trimIndent(),
+          """
+            .trimIndent()
         )
       }
       zipFile.delete()
@@ -98,8 +106,7 @@ constructor(
   }
 
   private fun addDirs(zos: ZipOutputStream) {
-    @Suppress("UNCHECKED_CAST")
-    val entries = zos.entries.map { it.name }
+    @Suppress("UNCHECKED_CAST") val entries = zos.entries.map { it.name }
     val added = entries.toMutableSet()
     val currentTimeMillis = System.currentTimeMillis()
 
@@ -108,32 +115,31 @@ constructor(
       val entryName = "$parent/"
       if (parent.isNotEmpty() && added.add(entryName)) {
         val details = visitedDirs[parent]
-        val (lastModified, flag) = if (details == null) {
-          currentTimeMillis to UnixStat.DEFAULT_DIR_PERM
-        } else {
-          details.lastModified to details.permissions.toUnixNumeric()
-        }
-        val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
-          unixMode = UnixStat.DIR_FLAG or flag
-        }
+        val (lastModified, flag) =
+          if (details == null) {
+            currentTimeMillis to UnixStat.DEFAULT_DIR_PERM
+          } else {
+            details.lastModified to details.permissions.toUnixNumeric()
+          }
+        val entry =
+          zipEntry(entryName, preserveFileTimestamps, lastModified) {
+            unixMode = UnixStat.DIR_FLAG or flag
+          }
         zos.putNextEntry(entry)
         zos.closeEntry()
         addParent(parent)
       }
     }
 
-    entries.forEach {
-      addParent(it)
-    }
+    entries.forEach { addParent(it) }
   }
 
   private fun checkDuplicateEntries(zos: ZipOutputStream) {
     val entries = zos.entries.map { it.name }
     val duplicates = entries.groupingBy { it }.eachCount().filter { it.value > 1 }
     if (duplicates.isNotEmpty()) {
-      val dupEntries = duplicates.entries.joinToString(separator = "\n") {
-        "${it.key} (${it.value} times)"
-      }
+      val dupEntries =
+        duplicates.entries.joinToString(separator = "\n") { "${it.key} (${it.value} times)" }
       val message = "Duplicate entries found in the shadowed JAR: \n$dupEntries"
       if (failOnDuplicateEntries) {
         throw GradleException(message)
@@ -143,9 +149,8 @@ constructor(
     }
   }
 
-  private inner class StreamAction(
-    private val zipOutStr: ZipOutputStream,
-  ) : CopyActionProcessingStreamAction {
+  private inner class StreamAction(private val zipOutStr: ZipOutputStream) :
+    CopyActionProcessingStreamAction {
     init {
       logger.info("Relocator count: ${relocators.size}.")
       if (encoding != null) {
@@ -201,110 +206,122 @@ constructor(
     }
 
     /**
-     * Applies remapping to the given class with the specified relocation path. The remapped class is then written
-     * to the zip file.
+     * Applies remapping to the given class with the specified relocation path. The remapped class
+     * is then written to the zip file.
      */
-    private fun FileCopyDetails.remapClass() = file.readBytes().let { bytes ->
-      var modified = false
-      val remapper = RelocatorRemapper(relocators) { modified = true }
+    private fun FileCopyDetails.remapClass() =
+      file.readBytes().let { bytes ->
+        var modified = false
+        val remapper = RelocatorRemapper(relocators) { modified = true }
 
-      // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
-      // Copying the original constant pool should be avoided because it would keep references
-      // to the original class names. This is not a problem at runtime (because these entries in the
-      // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
-      // that use the constant pool to determine the dependencies of a class.
-      val cw = ClassWriter(0)
-      val cr = ClassReader(bytes)
-      val cv = ClassRemapper(cw, remapper)
+        // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant
+        // pool.
+        // Copying the original constant pool should be avoided because it would keep references
+        // to the original class names. This is not a problem at runtime (because these entries in
+        // the
+        // constant pool are never used), but confuses some tools such as Felix's
+        // maven-bundle-plugin
+        // that use the constant pool to determine the dependencies of a class.
+        val cw = ClassWriter(0)
+        val cr = ClassReader(bytes)
+        val cv = ClassRemapper(cw, remapper)
 
-      try {
-        cr.accept(cv, ClassReader.EXPAND_FRAMES)
-      } catch (t: Throwable) {
-        throw GradleException("Error in ASM processing class $path", t)
-      }
-
-      val newBytes = if (modified) {
-        cw.toByteArray()
-      } else {
-        // If we didn't need to change anything, keep the original bytes as-is
-        bytes
-      }
-
-      // Temporarily remove the multi-release prefix.
-      val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
-      val newPath = path.replace(multiReleasePrefix, "")
-      val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
-      try {
-        val entry = zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
-          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+        try {
+          cr.accept(cv, ClassReader.EXPAND_FRAMES)
+        } catch (t: Throwable) {
+          throw GradleException("Error in ASM processing class $path", t)
         }
-        // Now we put it back on so the class file is written out with the right extension.
+
+        val newBytes =
+          if (modified) {
+            cw.toByteArray()
+          } else {
+            // If we didn't need to change anything, keep the original bytes as-is
+            bytes
+          }
+
+        // Temporarily remove the multi-release prefix.
+        val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
+        val newPath = path.replace(multiReleasePrefix, "")
+        val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
+        try {
+          val entry =
+            zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
+              unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+            }
+          // Now we put it back on so the class file is written out with the right extension.
+          zipOutStr.putNextEntry(entry)
+          zipOutStr.write(newBytes)
+          zipOutStr.closeEntry()
+        } catch (_: ZipException) {
+          logger.warn("We have a duplicate $relocatedPath in source project")
+        }
+      }
+
+    /**
+     * Applies remapping to the given kotlin module with the specified relocation path. The remapped
+     * module is then written to the zip file.
+     */
+    @OptIn(UnstableMetadataApi::class)
+    private fun FileCopyDetails.remapKotlinModule() =
+      file.readBytes().let { bytes ->
+        val kmMetadata = KotlinModuleMetadata.read(bytes)
+        val newKmModule =
+          KmModule().apply {
+            // We don't need to relocate the nested properties in `optionalAnnotationClasses`, there
+            // is a very special use case for Kotlin Multiplatform.
+            optionalAnnotationClasses += kmMetadata.kmModule.optionalAnnotationClasses
+            packageParts +=
+              kmMetadata.kmModule.packageParts.map { (pkg, parts) ->
+                val relocatedPkg = relocators.relocateClass(pkg)
+                val relocatedParts =
+                  KmPackageParts(
+                    parts.fileFacades.mapTo(mutableListOf()) { relocators.relocatePath(it) },
+                    parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
+                      ->
+                      relocators.relocatePath(name) to relocators.relocatePath(facade)
+                    },
+                  )
+                relocatedPkg to relocatedParts
+              }
+          }
+        val newKmMetadata = KotlinModuleMetadata(newKmModule, kmMetadata.version)
+
+        val newBytes = newKmMetadata.write()
+        val relocatedPath = relocators.relocatePath(path)
+        val entryName =
+          when {
+            relocatedPath != path -> relocatedPath
+            // Nothing changed, so keep the original path.
+            newBytes.contentEquals(bytes) -> path
+            // Content changed but path didn't, so rename to avoid name clash. The filename does not
+            // matter to the compiler.
+            else -> path.replace(".kotlin_module", ".shadow.kotlin_module")
+          }
+        val entry =
+          zipEntry(entryName, preserveFileTimestamps, lastModified) {
+            unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+          }
         zipOutStr.putNextEntry(entry)
         zipOutStr.write(newBytes)
         zipOutStr.closeEntry()
-      } catch (_: ZipException) {
-        logger.warn("We have a duplicate $relocatedPath in source project")
       }
-    }
-
-    /**
-     * Applies remapping to the given kotlin module with the specified relocation path.
-     * The remapped module is then written to the zip file.
-     */
-    @OptIn(UnstableMetadataApi::class)
-    private fun FileCopyDetails.remapKotlinModule() = file.readBytes().let { bytes ->
-      val kmMetadata = KotlinModuleMetadata.read(bytes)
-      val newKmModule = KmModule().apply {
-        // We don't need to relocate the nested properties in `optionalAnnotationClasses`, there is a very special use case for Kotlin Multiplatform.
-        optionalAnnotationClasses += kmMetadata.kmModule.optionalAnnotationClasses
-        packageParts += kmMetadata.kmModule.packageParts.map { (pkg, parts) ->
-          val relocatedPkg = relocators.relocateClass(pkg)
-          val relocatedParts = KmPackageParts(
-            parts.fileFacades.mapTo(mutableListOf()) { relocators.relocatePath(it) },
-            parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade) ->
-              relocators.relocatePath(name) to relocators.relocatePath(facade)
-            },
-          )
-          relocatedPkg to relocatedParts
-        }
-      }
-      val newKmMetadata = KotlinModuleMetadata(newKmModule, kmMetadata.version)
-
-      val newBytes = newKmMetadata.write()
-      val relocatedPath = relocators.relocatePath(path)
-      val entryName = when {
-        relocatedPath != path -> relocatedPath
-        // Nothing changed, so keep the original path.
-        newBytes.contentEquals(bytes) -> path
-        // Content changed but path didn't, so rename to avoid name clash. The filename does not matter to the compiler.
-        else -> path.replace(".kotlin_module", ".shadow.kotlin_module")
-      }
-      val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
-        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-      }
-      zipOutStr.putNextEntry(entry)
-      zipOutStr.write(newBytes)
-      zipOutStr.closeEntry()
-    }
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
       fileDetails.file.inputStream().use { inputStream ->
         transformer.transform(
-          TransformerContext(
-            path = path,
-            inputStream = inputStream,
-            relocators = relocators,
-          ),
+          TransformerContext(path = path, inputStream = inputStream, relocators = relocators)
         )
       }
       return true
     }
 
     private fun FileCopyDetails.writeToZip(entryName: String) {
-      val entry = zipEntry(entryName, preserveFileTimestamps, lastModified) {
-        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-      }
+      val entry =
+        zipEntry(entryName, preserveFileTimestamps, lastModified) {
+          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+        }
       zipOutStr.putNextEntry(entry)
       copyTo(zipOutStr)
       zipOutStr.closeEntry()
@@ -315,13 +332,16 @@ constructor(
     private val logger = Logging.getLogger(ShadowCopyAction::class.java)
 
     private val ZipOutputStream.entries: List<ZipEntry>
-      get() = this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
+      get() =
+        this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
 
     /**
-     * A copy of [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
+     * A copy of
+     * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
      *
      * 1980-02-01 00:00:00 (318182400000).
      */
-    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
+      GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }
 }

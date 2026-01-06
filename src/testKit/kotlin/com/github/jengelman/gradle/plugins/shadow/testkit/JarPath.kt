@@ -20,11 +20,10 @@ import kotlin.io.path.inputStream
  * be delegated to [JarPath] type.
  */
 @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
-class JarPath(val path: Path) :
-  JarFile(path.toFile()),
-  Path by path {
+class JarPath(val path: Path) : JarFile(path.toFile()), Path by path {
 
-  val mainAttrSize: Int get() = manifest.mainAttributes.size
+  val mainAttrSize: Int
+    get() = manifest.mainAttributes.size
 
   fun getMainAttr(name: String): String? {
     return manifest.mainAttributes.getValue(name)
@@ -42,16 +41,19 @@ fun ZipFile.getContent(entryName: String): String {
 }
 
 fun ZipFile.getStream(entryName: String): InputStream {
-  val entry = checkNotNull(getEntry(entryName)) { "Entry $entryName not found in all entries: ${entries().toList()}" }
+  val entry =
+    checkNotNull(getEntry(entryName)) {
+      "Entry $entryName not found in all entries: ${entries().toList()}"
+    }
   return getInputStream(entry)
 }
 
 fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
 
 /**
- * Scans the jar file for all entries that match the specified [entryName].
- * Unlike [getContent] or [getStream], which return only one of the matching entries
- * (which one is undefined), this function returns all matching entries.
+ * Scans the jar file for all entries that match the specified [entryName]. Unlike [getContent] or
+ * [getStream], which return only one of the matching entries (which one is undefined), this
+ * function returns all matching entries.
  */
 fun Assert<JarPath>.getContents(entryName: String) = transform { actual ->
   JarInputStream(actual.path.inputStream()).use { jarInput ->
@@ -70,38 +72,40 @@ fun Assert<JarPath>.getContents(entryName: String) = transform { actual ->
 fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
 
 /**
- * Ensures the JAR contains at least the specified entries.
- * Commonly used with [containsNone] to verify additional constraints.
+ * Ensures the JAR contains at least the specified entries. Commonly used with [containsNone] to
+ * verify additional constraints.
  */
 fun Assert<JarPath>.containsAtLeast(vararg entries: String) = toEntries().containsAtLeast(*entries)
 
 /**
- * Ensures the JAR does not contain any of the specified entries.
- * Commonly used with [containsAtLeast] for stricter checks.
+ * Ensures the JAR does not contain any of the specified entries. Commonly used with
+ * [containsAtLeast] for stricter checks.
  */
 fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsNone(*entries)
 
 /**
- * Ensures the JAR contains only the specified entries.
- * Used alone, without [containsAtLeast] or [containsNone].
+ * Ensures the JAR contains only the specified entries. Used alone, without [containsAtLeast] or
+ * [containsNone].
  */
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
 
 /**
- * Ensures the JAR contains exactly the specified entries, including duplicates, in any order.
- * Used alone, without [containsAtLeast] or [containsNone].
+ * Ensures the JAR contains exactly the specified entries, including duplicates, in any order. Used
+ * alone, without [containsAtLeast] or [containsNone].
  */
-fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) = transform { actual ->
-  ZipInputStream(actual.path.inputStream()).use { jarInput ->
-    val allEntries = mutableListOf<String>()
-    while (true) {
-      val entry = jarInput.nextEntry ?: break
-      allEntries.add(entry.name)
-      jarInput.closeEntry()
+fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) =
+  transform { actual ->
+      ZipInputStream(actual.path.inputStream()).use { jarInput ->
+        val allEntries = mutableListOf<String>()
+        while (true) {
+          val entry = jarInput.nextEntry ?: break
+          allEntries.add(entry.name)
+          jarInput.closeEntry()
+        }
+        allEntries
+      }
     }
-    allEntries
-  }
-}.containsExactlyInAnyOrder(*entries)
+    .containsExactlyInAnyOrder(*entries)
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }

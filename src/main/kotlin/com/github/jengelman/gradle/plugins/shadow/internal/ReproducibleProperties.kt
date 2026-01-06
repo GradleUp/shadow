@@ -6,9 +6,7 @@ import java.io.Writer
 import java.nio.charset.Charset
 import java.util.Properties
 
-/**
- * Provides functionality for reproducible serialization.
- */
+/** Provides functionality for reproducible serialization. */
 internal class ReproducibleProperties : Properties() {
   override fun store(writer: Writer, comments: String) {
     throw UnsupportedOperationException("use writeWithoutComments()")
@@ -19,19 +17,21 @@ internal class ReproducibleProperties : Properties() {
   }
 
   fun writeWithoutComments(charset: Charset, os: OutputStream) {
-    val bufferedReader = StringWriter().apply {
-      super.store(this, null)
-    }.toString().reader().buffered()
+    val bufferedReader =
+      StringWriter().apply { super.store(this, null) }.toString().reader().buffered()
 
-    os.bufferedWriter(charset).apply {
-      var line: String? = null
-      while (bufferedReader.readLine().also { line = it } != null && line != null) {
-        if (!line.startsWith("#")) {
-          write(line)
-          newLine()
+    os
+      .bufferedWriter(charset)
+      .apply {
+        var line: String? = null
+        while (bufferedReader.readLine().also { line = it } != null && line != null) {
+          if (!line.startsWith("#")) {
+            write(line)
+            newLine()
+          }
         }
       }
-    }.flush()
+      .flush()
   }
 
   override val entries: MutableSet<MutableMap.MutableEntry<Any, Any>>

@@ -14,12 +14,13 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class MinimizeTest : BasePluginTest() {
-  private val outputImplShadowedJar: JarPath get() = jarPath("impl/build/libs/impl-1.0-all.jar")
+  private val outputImplShadowedJar: JarPath
+    get() = jarPath("impl/build/libs/impl-1.0-all.jar")
 
   /**
-   * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent.
-   * The minimize step shall remove 'junit', but not 'api'.
-   * Unused classes of 'api' and theirs dependencies also shouldn't be removed.
+   * 'api' used as api for 'impl', and depended on 'lib'. 'junit' is independent. The minimize step
+   * shall remove 'junit', but not 'api'. Unused classes of 'api' and theirs dependencies also
+   * shouldn't be removed.
    */
   @Test
   fun useMinimizeWithDependenciesWithApiScope() {
@@ -42,22 +43,24 @@ class MinimizeTest : BasePluginTest() {
   }
 
   /**
-   * 'api' used as api for 'impl', and 'lib' used as api for 'api'.
-   * Unused classes of 'api' and 'lib' shouldn't be removed.
+   * 'api' used as api for 'impl', and 'lib' used as api for 'api'. Unused classes of 'api' and
+   * 'lib' shouldn't be removed.
    */
   @Test
   fun useMinimizeWithTransitiveDependenciesWithApiScope() {
     writeApiLibAndImplModules()
-    path("api/build.gradle").writeText(
-      """
+    path("api/build.gradle")
+      .writeText(
+        """
         plugins {
           id 'java-library'
         }
         dependencies {
           api project(':lib')
         }
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
 
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
 
@@ -76,84 +79,76 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  /**
-   * 'Server' depends on 'Client'. 'junit' is independent.
-   * The minimize shall remove 'junit'.
-   */
+  /** 'Server' depends on 'Client'. 'junit' is independent. The minimize shall remove 'junit'. */
   @Test
   fun minimizeByKeepingOnlyTransitiveDependencies() {
     writeClientAndServerModules(
-      serverShadowBlock = """
+      serverShadowBlock =
+        """
         minimize()
-      """.trimIndent(),
+        """
+          .trimIndent()
     )
-    path("server/src/main/java/server/Server.java").writeText(
-      """
+    path("server/src/main/java/server/Server.java")
+      .writeText(
+        """
         package server;
         import client.Client;
         public class Server {
           // This is to make sure that 'Client' is not removed.
           private final String client = Client.class.getName();
         }
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
 
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast(
-        "client/Client.class",
-        "server/Server.class",
-      )
-      containsNone(
-        "junit/framework/Test.class",
-      )
+      containsAtLeast("client/Client.class", "server/Server.class")
+      containsNone("junit/framework/Test.class")
     }
   }
 
   /**
-   * 'Client', 'Server' and 'junit' are independent.
-   * 'junit' is excluded from the minimize step.
-   * The minimize step shall remove 'Client' but not 'junit'.
+   * 'Client', 'Server' and 'junit' are independent. 'junit' is excluded from the minimize step. The
+   * minimize step shall remove 'Client' but not 'junit'.
    */
   @Test
   fun excludeDependencyFromMinimize() {
     writeClientAndServerModules(
-      serverShadowBlock = """
+      serverShadowBlock =
+        """
         minimize {
           exclude(dependency('junit:junit:.*'))
         }
-      """.trimIndent(),
+        """
+          .trimIndent()
     )
 
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast(
-        "server/Server.class",
-        *junitEntries,
-      )
-      containsNone(
-        "client/Client.class",
-      )
+      containsAtLeast("server/Server.class", *junitEntries)
+      containsNone("client/Client.class")
     }
   }
 
   /**
-   * 'Client', 'Server' and 'junit' are independent.
-   * Unused classes of 'client' and theirs dependencies shouldn't be removed.
+   * 'Client', 'Server' and 'junit' are independent. Unused classes of 'client' and theirs
+   * dependencies shouldn't be removed.
    */
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/744",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/744")
   @Test
   fun excludeProjectFromMinimize() {
     writeClientAndServerModules(
-      serverShadowBlock = """
+      serverShadowBlock =
+        """
         minimize {
           exclude(project(':client'))
         }
-      """.trimIndent(),
+        """
+          .trimIndent()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -171,58 +166,54 @@ class MinimizeTest : BasePluginTest() {
   }
 
   /**
-   * 'Client', 'Server' and 'junit' are independent.
-   * Unused classes of 'client' and theirs dependencies shouldn't be removed.
+   * 'Client', 'Server' and 'junit' are independent. Unused classes of 'client' and theirs
+   * dependencies shouldn't be removed.
    */
   @Test
   fun excludeProjectFromMinimizeShallNotExcludeTransitiveDependenciesThatAreUsedInSubproject() {
     writeClientAndServerModules(
-      serverShadowBlock = """
+      serverShadowBlock =
+        """
         minimize {
           exclude(project(':client'))
         }
-      """.trimIndent(),
+        """
+          .trimIndent()
     )
-    path("client/src/main/java/client/Client.java").writeText(
-      """
+    path("client/src/main/java/client/Client.java")
+      .writeText(
+        """
         package client;
         import junit.framework.TestCase;
         public class Client extends TestCase {
           public static void main(String[] args) {}
         }
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
 
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast(
-        "client/Client.class",
-        "server/Server.class",
-        *junitEntries,
-      )
+      containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
     }
 
-    path("client/src/main/java/client/Client.java").writeText(
-      """
+    path("client/src/main/java/client/Client.java")
+      .writeText(
+        """
         package client;
         public class Client {}
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast(
-        "client/Client.class",
-        "server/Server.class",
-        *junitEntries,
-      )
+      containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/1610",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/1610")
   @Test
   fun excludeCircularDependencies() {
     val dependency = "'my:e:1.0'"
@@ -236,17 +227,14 @@ class MinimizeTest : BasePluginTest() {
             exclude(dependency($dependency))
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "e.properties",
-        "f.properties",
-        *manifestEntries,
-      )
+      containsOnly("e.properties", "f.properties", *manifestEntries)
     }
   }
 
@@ -263,13 +251,8 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       if (enable) {
-        containsAtLeast(
-          "server/Server.class",
-          *manifestEntries,
-        )
-        containsNone(
-          "client/Client.class",
-        )
+        containsAtLeast("server/Server.class", *manifestEntries)
+        containsNone("client/Client.class")
       } else {
         containsOnly(
           "client/",
@@ -283,19 +266,19 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/1636",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/1636")
   @Test
   fun minimizeBomDependency() {
     writeApiLibAndImplModules()
-    path("impl/build.gradle").appendText(
-      """
+    path("impl/build.gradle")
+      .appendText(
+        """
         dependencies {
           api platform('my:bom:1.0')
         }
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
 
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
 
@@ -316,46 +299,58 @@ class MinimizeTest : BasePluginTest() {
   private fun writeApiLibAndImplModules() {
     settingsScript.appendText(
       """
-        include 'api', 'lib', 'impl'
-      """.trimIndent() + lineSeparator,
+      include 'api', 'lib', 'impl'
+      """
+        .trimIndent() + lineSeparator
     )
     projectScript.writeText("")
 
-    path("lib/src/main/java/lib/LibEntity.java").writeText(
-      """
+    path("lib/src/main/java/lib/LibEntity.java")
+      .writeText(
+        """
         package lib;
         public interface LibEntity {}
-      """.trimIndent(),
-    )
-    path("lib/src/main/java/lib/UnusedLibEntity.java").writeText(
-      """
+        """
+          .trimIndent()
+      )
+    path("lib/src/main/java/lib/UnusedLibEntity.java")
+      .writeText(
+        """
         package lib;
         public class UnusedLibEntity implements LibEntity {}
-      """.trimIndent(),
-    )
-    path("lib/build.gradle").writeText(
-      """
+        """
+          .trimIndent()
+      )
+    path("lib/build.gradle")
+      .writeText(
+        """
         plugins {
           id 'java'
         }
-      """.trimIndent() + lineSeparator,
-    )
+        """
+          .trimIndent() + lineSeparator
+      )
 
-    path("api/src/main/java/api/Entity.java").writeText(
-      """
+    path("api/src/main/java/api/Entity.java")
+      .writeText(
+        """
         package api;
         public interface Entity {}
-      """.trimIndent(),
-    )
-    path("api/src/main/java/api/UnusedEntity.java").writeText(
-      """
+        """
+          .trimIndent()
+      )
+    path("api/src/main/java/api/UnusedEntity.java")
+      .writeText(
+        """
         package api;
         import lib.LibEntity;
         public class UnusedEntity implements LibEntity {}
-      """.trimIndent(),
-    )
-    path("api/build.gradle").writeText(
-      """
+        """
+          .trimIndent()
+      )
+    path("api/build.gradle")
+      .writeText(
+        """
         plugins {
           id 'java'
         }
@@ -363,18 +358,22 @@ class MinimizeTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
           implementation project(':lib')
         }
-      """.trimIndent() + lineSeparator,
-    )
+        """
+          .trimIndent() + lineSeparator
+      )
 
-    path("impl/src/main/java/impl/SimpleEntity.java").writeText(
-      """
+    path("impl/src/main/java/impl/SimpleEntity.java")
+      .writeText(
+        """
         package impl;
         import api.Entity;
         public class SimpleEntity implements Entity {}
-      """.trimIndent(),
-    )
-    path("impl/build.gradle").writeText(
-      """
+        """
+          .trimIndent()
+      )
+    path("impl/build.gradle")
+      .writeText(
+        """
         ${getDefaultProjectBuildScript("java-library")}
         dependencies {
           api project(':api')
@@ -382,7 +381,8 @@ class MinimizeTest : BasePluginTest() {
         $shadowJarTask {
           minimize()
         }
-      """.trimIndent() + lineSeparator,
-    )
+      """
+          .trimIndent() + lineSeparator
+      )
   }
 }

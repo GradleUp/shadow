@@ -62,10 +62,12 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-  private val shadowDependencies = project.provider {
-    // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered without Shadow plugin applied.
-    project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
-  }
+  private val shadowDependencies =
+    project.provider {
+      // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
+      // without Shadow plugin applied.
+      project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
+    }
 
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
@@ -87,46 +89,48 @@ public abstract class ShadowJar : Jar() {
    * Defaults to `false`.
    */
   @get:Input
-  @get:Option(option = "minimize-jar", description = "Minimizes the jar by removing unused classes.")
+  @get:Option(
+    option = "minimize-jar",
+    description = "Minimizes the jar by removing unused classes.",
+  )
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @get:Classpath
-  public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
-      if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
+  public open val toMinimize: ConfigurableFileCollection =
+    objectFactory.fileCollection {
+      minimizeJar.map {
+        if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
+        else emptySet()
+      }
     }
-  }
 
   @get:Classpath
-  public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
-      if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet()
+  public open val apiJars: ConfigurableFileCollection =
+    objectFactory.fileCollection {
+      minimizeJar.map { if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet() }
     }
-  }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
-      if (it) {
-        project.sourceSets.map { sourceSet -> sourceSet.output.classesDirs.filter(File::isDirectory) }
-      } else {
-        emptySet()
+  public open val sourceSetsClassesDirs: ConfigurableFileCollection =
+    objectFactory.fileCollection {
+      minimizeJar.map {
+        if (it) {
+          project.sourceSets.map { sourceSet ->
+            sourceSet.output.classesDirs.filter(File::isDirectory)
+          }
+        } else {
+          emptySet()
+        }
       }
     }
-  }
 
-  /**
-   * [ResourceTransformer]s to be applied in the shadow steps.
-   */
+  /** [ResourceTransformer]s to be applied in the shadow steps. */
   @get:Nested
   public open val transformers: SetProperty<ResourceTransformer> = objectFactory.setProperty()
 
-  /**
-   * [Relocator]s to be applied in the shadow steps.
-   */
-  @get:Nested
-  public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
+  /** [Relocator]s to be applied in the shadow steps. */
+  @get:Nested public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
 
   /**
    * The configurations to include dependencies from.
@@ -140,13 +144,12 @@ public abstract class ShadowJar : Jar() {
   public open val dependencyFilter: Property<DependencyFilter> =
     objectFactory.property(DefaultDependencyFilter(project))
 
-  /**
-   * Final dependencies to be shadowed.
-   */
+  /** Final dependencies to be shadowed. */
   @get:Classpath
-  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
-    dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
-  }
+  public open val includedDependencies: ConfigurableFileCollection =
+    objectFactory.fileCollection {
+      dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
+    }
 
   /**
    * Enables auto relocation of packages in the dependencies.
@@ -165,9 +168,10 @@ public abstract class ShadowJar : Jar() {
   /**
    * Enables remapping of Kotlin module metadata (`.kotlin_module`) files.
    *
-   * If you enable this option, the Kotlin module metadata file paths and their contents will be relocated if they are
-   * matched by any of the configured [relocators]. Someone may want to disable this feature and write their own
-   * [ResourceTransformer]s to handle Kotlin module metadata files in a custom way.
+   * If you enable this option, the Kotlin module metadata file paths and their contents will be
+   * relocated if they are matched by any of the configured [relocators]. Someone may want to
+   * disable this feature and write their own [ResourceTransformer]s to handle Kotlin module
+   * metadata files in a custom way.
    *
    * Defaults to `true`.
    */
@@ -190,13 +194,14 @@ public abstract class ShadowJar : Jar() {
     option = "relocation-prefix",
     description = "Prefix used for auto relocation of packages in the dependencies.",
   )
-  public open val relocationPrefix: Property<String> = objectFactory.property(ShadowBasePlugin.SHADOW)
+  public open val relocationPrefix: Property<String> =
+    objectFactory.property(ShadowBasePlugin.SHADOW)
 
   /**
    * Main class attribute to add to manifest.
    *
-   * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for the [ShadowJar]
-   * task or the main [Jar] task.
+   * This property will be used as a fallback if there is no explicit `Main-Class` attribute set for
+   * the [ShadowJar] task or the main [Jar] task.
    *
    * Defaults to `null`.
    */
@@ -224,8 +229,8 @@ public abstract class ShadowJar : Jar() {
   public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(false)
 
   /**
-   * Adds the [java.util.jar.Attributes.Name.MULTI_RELEASE] attribute to the manifest of the shadow JAR if any
-   * dependencies contain the attribute.
+   * Adds the [java.util.jar.Attributes.Name.MULTI_RELEASE] attribute to the manifest of the shadow
+   * JAR if any dependencies contain the attribute.
    *
    * Defaults to `true`.
    */
@@ -251,19 +256,24 @@ public abstract class ShadowJar : Jar() {
    *
    * This global strategy can be overridden for individual files by using [filesMatching].
    *
-   * The default value is [EXCLUDE]. Different strategies will lead to different results for `foo/bar` files in the JARs to be merged:
-   *
+   * The default value is [EXCLUDE]. Different strategies will lead to different results for
+   * `foo/bar` files in the JARs to be merged:
    * - [EXCLUDE]: The **first** `foo/bar` file will be included in the final JAR.
-   * - [FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
+   * - [FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate
+   *   `foo/bar` files.
    * - [INCLUDE]: **Duplicate** `foo/bar` entries will be included in the final JAR.
-   * - [INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
-   * - [WARN]: **Warn** about duplicates in the build log, this behaves exactly as [INHERIT] otherwise.
+   * - [INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no
+   *   duplicate handling strategy has been set`.
+   * - [WARN]: **Warn** about duplicates in the build log, this behaves exactly as [INHERIT]
+   *   otherwise.
    *
-   * **NOTE:** The strategy takes precedence over transforming and relocating.
-   * Some [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the strategy to
-   * [EXCLUDE] (the default), as the duplicate resource files fed for them are excluded beforehand.
-   * Want [ResourceTransformer]s and the strategy to work together? See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   * **NOTE:** The strategy takes precedence over transforming and relocating. Some
+   * [ResourceTransformer]s like [ServiceFileTransformer] will not work as expected with setting the
+   * strategy to [EXCLUDE] (the default), as the duplicate resource files fed for them are excluded
+   * beforehand. Want [ResourceTransformer]s and the strategy to work together? See more details in
+   * the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @see [eachFile]
    * @see [filesMatching]
@@ -273,21 +283,16 @@ public abstract class ShadowJar : Jar() {
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
-  @get:Inject
-  protected abstract val archiveOperations: ArchiveOperations
+  @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /**
-   * Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize.
-   */
+  /** Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize. */
   @JvmOverloads
   public open fun minimize(action: Action<DependencyFilter> = Action {}) {
     minimizeJar.set(true)
     action.execute(dependencyFilterForMinimize)
   }
 
-  /**
-   * Extra dependency operations to be applied in the shadow steps.
-   */
+  /** Extra dependency operations to be applied in the shadow steps. */
   public open fun dependencies(action: Action<DependencyFilter>) {
     action.execute(dependencyFilter.get())
   }
@@ -295,9 +300,10 @@ public abstract class ShadowJar : Jar() {
   /**
    * Merge Java services files with [rootPath].
    *
-   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate service
-   * files are handled properly. See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to
+   * ensure duplicate service files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -308,9 +314,10 @@ public abstract class ShadowJar : Jar() {
   /**
    * Merge Java services files with [action].
    *
-   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate service
-   * files are handled properly. See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to
+   * ensure duplicate service files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -322,9 +329,10 @@ public abstract class ShadowJar : Jar() {
   /**
    * Merge Groovy extension modules (`META-INF/**/org.codehaus.groovy.runtime.ExtensionModule`).
    *
-   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to ensure duplicate extension module
-   * files are handled properly. See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to
+   * ensure duplicate extension module files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -335,22 +343,25 @@ public abstract class ShadowJar : Jar() {
   /**
    * Append contents to a resource in the jar.
    *
-   * e.g. `append("resources/application.yml", "\n---\n")` for merging `resources/application.yml` files.
+   * e.g. `append("resources/application.yml", "\n---\n")` for merging `resources/application.yml`
+   * files.
    *
    * @param resourcePath The path to the resource in the jar.
-   * @param separator The separator to use between the original content and the appended content, defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
+   * @param separator The separator to use between the original content and the appended content,
+   *   defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
    */
   @JvmOverloads
-  public open fun append(resourcePath: String, separator: String = AppendingTransformer.DEFAULT_SEPARATOR) {
+  public open fun append(
+    resourcePath: String,
+    separator: String = AppendingTransformer.DEFAULT_SEPARATOR,
+  ) {
     transform(AppendingTransformer::class.java) {
       it.resource.set(resourcePath)
       it.separator.set(separator)
     }
   }
 
-  /**
-   * Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator].
-   */
+  /** Relocate classes and resources matching [pattern] to [destination] using [SimpleRelocator]. */
   @JvmOverloads
   public open fun relocate(
     pattern: String,
@@ -361,26 +372,20 @@ public abstract class ShadowJar : Jar() {
     addRelocator(relocator, action)
   }
 
-  /**
-   * Relocate classes and resources using a [Relocator].
-   */
+  /** Relocate classes and resources using a [Relocator]. */
   @JvmOverloads
   public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
     addRelocator(relocator, action)
   }
 
-  /**
-   * Relocate classes and resources using a [Relocator].
-   */
+  /** Relocate classes and resources using a [Relocator]. */
   @JvmOverloads
   public open fun <R : Relocator> relocate(relocator: R, action: Action<R> = Action {}) {
     addRelocator(relocator, action)
   }
 
-  /**
-   * Relocate classes and resources using a [Relocator].
-   */
+  /** Relocate classes and resources using a [Relocator]. */
   @JvmSynthetic
   public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
     relocate(R::class.java, action)
@@ -389,37 +394,49 @@ public abstract class ShadowJar : Jar() {
   /**
    * Transform resources using a [ResourceTransformer].
    *
-   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
-   * duplicate resource files are handled properly. See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct
+   * [getDuplicatesStrategy] to ensure duplicate resource files are handled properly. See more
+   * details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @see [getDuplicatesStrategy]
    */
   @JvmOverloads
-  public open fun <T : ResourceTransformer> transform(clazz: Class<T>, action: Action<T> = Action {}) {
+  public open fun <T : ResourceTransformer> transform(
+    clazz: Class<T>,
+    action: Action<T> = Action {},
+  ) {
     addTransform(clazz.create(objectFactory), action)
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    *
-   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
-   * duplicate resource files are handled properly. See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct
+   * [getDuplicatesStrategy] to ensure duplicate resource files are handled properly. See more
+   * details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @see [getDuplicatesStrategy]
    */
   @JvmOverloads
-  public open fun <T : ResourceTransformer> transform(transformer: T, action: Action<T> = Action {}) {
+  public open fun <T : ResourceTransformer> transform(
+    transformer: T,
+    action: Action<T> = Action {},
+  ) {
     addTransform(transformer, action)
   }
 
   /**
    * Transform resources using a [ResourceTransformer].
    *
-   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct [getDuplicatesStrategy] to ensure
-   * duplicate resource files are handled properly. See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy) section.
+   * *Warning*: Most of the [ResourceTransformer]s should be used with the correct
+   * [getDuplicatesStrategy] to ensure duplicate resource files are handled properly. See more
+   * details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @see [getDuplicatesStrategy]
    */
@@ -436,11 +453,13 @@ public abstract class ShadowJar : Jar() {
           from(file)
         }
         file.extension.equals("aar", ignoreCase = true) -> {
-          val message = """
+          val message =
+            """
             Shadowing AAR file is not supported.
             Please exclude dependency artifact: $file
             or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
-          """.trimIndent()
+          """
+              .trimIndent()
           error(message)
         }
         else -> {
@@ -456,17 +475,20 @@ public abstract class ShadowJar : Jar() {
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
     val zosProvider = { destination: File ->
       try {
-        val entryCompressionMethod = when (entryCompression) {
-          ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
-          ZipEntryCompression.STORED -> ZipOutputStream.STORED
-        }
-        val stream = if (entryCompressionMethod == ZipOutputStream.STORED) {
-          ZipOutputStream(destination)
-        } else {
-          // Improve performance by avoiding lots of small writes to the file system.
-          // It is not possible to do this with STORED entries as the implementation requires a RandomAccessFile to update the CRC after write.
-          ZipOutputStream(destination.outputStream().buffered())
-        }
+        val entryCompressionMethod =
+          when (entryCompression) {
+            ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
+            ZipEntryCompression.STORED -> ZipOutputStream.STORED
+          }
+        val stream =
+          if (entryCompressionMethod == ZipOutputStream.STORED) {
+            ZipOutputStream(destination)
+          } else {
+            // Improve performance by avoiding lots of small writes to the file system.
+            // It is not possible to do this with STORED entries as the implementation requires a
+            // RandomAccessFile to update the CRC after write.
+            ZipOutputStream(destination.outputStream().buffered())
+          }
         stream.apply {
           setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
           setMethod(entryCompressionMethod)
@@ -475,19 +497,19 @@ public abstract class ShadowJar : Jar() {
         throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }
     }
-    val unusedClasses = if (minimizeJar.get()) {
-      val unusedTracker = UnusedTracker(
-        sourceSetsClassesDirs = sourceSetsClassesDirs.files,
-        classJars = apiJars,
-        toMinimize = toMinimize,
-      )
-      includedDependencies.files.forEach {
-        unusedTracker.addDependency(it)
+    val unusedClasses =
+      if (minimizeJar.get()) {
+        val unusedTracker =
+          UnusedTracker(
+            sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+            classJars = apiJars,
+            toMinimize = toMinimize,
+          )
+        includedDependencies.files.forEach { unusedTracker.addDependency(it) }
+        unusedTracker.findUnused()
+      } else {
+        emptySet()
       }
-      unusedTracker.findUnused()
-    } else {
-      emptySet()
-    }
     @Suppress("DEPRECATION")
     return ShadowCopyAction(
       zipFile = archiveFile.get().asFile,
@@ -515,7 +537,9 @@ public abstract class ShadowJar : Jar() {
   private val packageRelocators: List<SimpleRelocator>
     get() {
       if (enableAutoRelocation.get()) {
-        logger.info("Adding auto relocation packages in the dependencies with prefix '${relocationPrefix.get()}'.")
+        logger.info(
+          "Adding auto relocation packages in the dependencies with prefix '${relocationPrefix.get()}'."
+        )
       } else {
         logger.info("Skipping package relocators as auto relocation is disabled.")
         return emptyList()
@@ -523,7 +547,9 @@ public abstract class ShadowJar : Jar() {
       val prefix = relocationPrefix.get()
       return includedDependencies.files.flatMap { file ->
         JarFile(file).use { jarFile ->
-          jarFile.entries().toList()
+          jarFile
+            .entries()
+            .toList()
             .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
             .map { it.name.substringBeforeLast('/').replace('/', '.') }
             .toSet()
@@ -536,14 +562,20 @@ public abstract class ShadowJar : Jar() {
     val mainClassValue = mainClass.orNull
     when {
       manifest.attributes.contains(mainClassAttributeKey) -> {
-        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set.")
+        logger.info(
+          "Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set."
+        )
       }
       mainClassValue.isNullOrEmpty() -> {
-        logger.info("Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty.")
+        logger.info(
+          "Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty."
+        )
       }
       else -> {
         manifest.attributes[mainClassAttributeKey] = mainClassValue
-        logger.info("Adding $mainClassAttributeKey attribute to the manifest with value '$mainClassValue'.")
+        logger.info(
+          "Adding $mainClassAttributeKey attribute to the manifest with value '$mainClassValue'."
+        )
       }
     }
 
@@ -555,22 +587,28 @@ public abstract class ShadowJar : Jar() {
     }
 
     if (addMultiReleaseAttribute.get()) {
-      logger.info("Adding $multiReleaseAttributeKey attribute to the manifest if any dependencies contain it.")
+      logger.info(
+        "Adding $multiReleaseAttributeKey attribute to the manifest if any dependencies contain it."
+      )
     } else {
-      logger.info("Skipping adding $multiReleaseAttributeKey attribute to the manifest as it is disabled.")
+      logger.info(
+        "Skipping adding $multiReleaseAttributeKey attribute to the manifest as it is disabled."
+      )
       return
     }
-    val includeMultiReleaseAttr = includedDependencies.files.any {
-      try {
-        JarFile(it).use { jarFile ->
-          // Manifest might be null or the attribute name is invalid, or any other case.
-          runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }.getOrNull()
-        } == "true"
-      } catch (_: IOException) {
-        // If the jar file is not valid, ignore it.
-        false
+    val includeMultiReleaseAttr =
+      includedDependencies.files.any {
+        try {
+          JarFile(it).use { jarFile ->
+            // Manifest might be null or the attribute name is invalid, or any other case.
+            runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }
+              .getOrNull()
+          } == "true"
+        } catch (_: IOException) {
+          // If the jar file is not valid, ignore it.
+          false
+        }
       }
-    }
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
     }
@@ -587,32 +625,36 @@ public abstract class ShadowJar : Jar() {
       jarTask: TaskProvider<Jar>,
       action: Action<ShadowJar>,
     ): TaskProvider<ShadowJar> {
-      return tasks.register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
-        task.archiveClassifier.set("all")
-        task.exclude(
-          "META-INF/INDEX.LIST",
-          "META-INF/*.SF",
-          "META-INF/*.DSA",
-          "META-INF/*.RSA",
-          // module-info.class in Multi-Release folders.
-          "META-INF/versions/**/module-info.class",
-          "module-info.class",
-        )
+      return tasks
+        .register(SHADOW_JAR_TASK_NAME, ShadowJar::class.java) { task ->
+          task.archiveClassifier.set("all")
+          task.exclude(
+            "META-INF/INDEX.LIST",
+            "META-INF/*.SF",
+            "META-INF/*.DSA",
+            "META-INF/*.RSA",
+            // module-info.class in Multi-Release folders.
+            "META-INF/versions/**/module-info.class",
+            "module-info.class",
+          )
 
-        task.manifest = DefaultInheritManifest(
-          project,
-          @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
-          jarTask.get().manifest,
-        )
+          task.manifest =
+            DefaultInheritManifest(
+              project,
+              @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
+              jarTask.get().manifest,
+            )
 
-        action.execute(task)
-      }.also { task ->
-        // Can't use `named` directly as the task is optional or may not exist when the plugin is applied.
-        // Using Spec<String> applies the action to the task if it is added later.
-        tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach {
-          it.dependsOn(task)
+          action.execute(task)
         }
-      }
+        .also { task ->
+          // Can't use `named` directly as the task is optional or may not exist when the plugin is
+          // applied.
+          // Using Spec<String> applies the action to the task if it is added later.
+          tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach {
+            it.dependsOn(task)
+          }
+        }
     }
   }
 }
