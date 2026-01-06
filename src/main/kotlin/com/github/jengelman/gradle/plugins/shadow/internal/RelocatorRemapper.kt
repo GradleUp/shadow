@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.util.regex.Pattern
-import org.jetbrains.org.objectweb.asm.Opcodes
+import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
 
 /**
