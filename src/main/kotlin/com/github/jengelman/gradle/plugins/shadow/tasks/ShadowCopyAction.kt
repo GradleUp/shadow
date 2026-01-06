@@ -32,9 +32,9 @@ import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.commons.ClassRemapper
+import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
+import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
+import org.vafer.jdeb.shaded.objectweb.asm.commons.ClassRemapper
 
 /**
  * Modified from

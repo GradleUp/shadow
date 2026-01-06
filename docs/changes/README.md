@@ -3,6 +3,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.3.0...HEAD) - 2025-xx-xx
 
+### Fixed
+
+- Use ASM from jdependency embedded. ([#1898](https://github.com/GradleUp/shadow/pull/1898))  
+  This fixes potential classpath conflicts when using Shadow with other plugins that also use ASM.
 
 ## [9.3.0](https://github.com/GradleUp/shadow/releases/tag/9.3.0) - 2025-12-05
 
