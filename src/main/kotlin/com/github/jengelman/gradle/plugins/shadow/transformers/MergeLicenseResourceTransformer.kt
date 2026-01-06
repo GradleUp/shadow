@@ -19,11 +19,10 @@ import org.gradle.api.tasks.util.PatternSet
 /**
  * Generates a license file using the configured license text source.
  *
- * An optional `SPDX-License-Identifier` can be placed in front of the license text to avoid ambiguous
- * license detection by license-detection-tools.
+ * An optional `SPDX-License-Identifier` can be placed in front of the license text to avoid
+ * ambiguous license detection by license-detection-tools.
  *
  * License texts found in the file names:
- *
  * - `META-INF/LICENSE`
  * - `META-INF/LICENSE.txt`
  * - `META-INF/LICENSE.md`
@@ -35,16 +34,15 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * To exclude these defaults, add [exclude]s to the transformer configuration.
  *
- * Use the [org.gradle.api.tasks.util.PatternFilterable] functions to specify a different set of files to include,
- * the paths mentioned above are then not considered unless explicitly included.
+ * Use the [org.gradle.api.tasks.util.PatternFilterable] functions to specify a different set of
+ * files to include, the paths mentioned above are then not considered unless explicitly included.
  */
 @CacheableTransformer
 public open class MergeLicenseResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
-  @get:Internal
-  internal val elements: MutableSet<String> = LinkedHashSet()
+  @get:Internal internal val elements: MutableSet<String> = LinkedHashSet()
 
   /** Path to write the aggregated license file to. Defaults to `META-INF/LICENSE`. */
   @get:Input
@@ -68,36 +66,38 @@ public open class MergeLicenseResourceTransformer(
    * Separator between the project's license text and license texts from the included dependencies.
    */
   @get:Input
-  public open val firstSeparator: Property<String> = objectFactory.property(
-    """
+  public open val firstSeparator: Property<String> =
+    objectFactory.property(
+      """
       |
       |${"-".repeat(120)}
       |
       |This artifact includes dependencies with the following licenses:
       |----------------------------------------------------------------
-      |
-    """.trimMargin(),
-  )
+      |"""
+        .trimMargin()
+    )
 
-  /**
-   * Separator between included dependency license texts.
-   */
+  /** Separator between included dependency license texts. */
   @get:Input
   public open val separator: Property<String> = objectFactory.property("\n${"-".repeat(120)}\n")
 
   @Inject
-  public constructor(objectFactory: ObjectFactory) : this(
+  public constructor(
+    objectFactory: ObjectFactory
+  ) : this(
     objectFactory,
-    patternSet = PatternSet().apply {
-      include(
-        "META-INF/LICENSE",
-        "META-INF/LICENSE.txt",
-        "META-INF/LICENSE.md",
-        "LICENSE",
-        "LICENSE.txt",
-        "LICENSE.md",
-      )
-    },
+    patternSet =
+      PatternSet().apply {
+        include(
+          "META-INF/LICENSE",
+          "META-INF/LICENSE.txt",
+          "META-INF/LICENSE.md",
+          "LICENSE",
+          "LICENSE.txt",
+          "LICENSE.md",
+        )
+      },
   )
 
   override fun transform(context: TransformerContext) {

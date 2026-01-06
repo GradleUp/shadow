@@ -44,9 +44,11 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun transformationPropertiesAreReproducible() {
     transformer.transform(manifestTransformerContext)
 
-    val firstRunTargetLines = transformer.transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
+    val firstRunTargetLines =
+      transformer.transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
     Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
-    val secondRunTargetLines = transformer.transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
+    val secondRunTargetLines =
+      transformer.transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
 
     assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
   }
@@ -158,185 +160,190 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   }
 
   private companion object {
-    fun context(path: String, input: Map<String, String>, charset: Charset = Charsets.ISO_8859_1): TransformerContext {
+    fun context(
+      path: String,
+      input: Map<String, String>,
+      charset: Charset = Charsets.ISO_8859_1,
+    ): TransformerContext {
       val properties = Properties().apply { putAll(input) }
       return TransformerContext(path, properties.inputStream(charset))
     }
 
     @JvmStatic
-    fun pathProvider() = listOf(
-      Arguments.of("foo.properties", true),
-      Arguments.of("foo/bar.properties", true),
-      Arguments.of("foo.props", false),
-    )
+    fun pathProvider() =
+      listOf(
+        Arguments.of("foo.properties", true),
+        Arguments.of("foo/bar.properties", true),
+        Arguments.of("foo.props", false),
+      )
 
     @JvmStatic
-    fun charsetProvider() = listOf(
-      Arguments.of(
-        "utf8.properties",
-        "utf-8",
-        mapOf("foo" to "传傳磨宿说説"),
-        mapOf("foo" to "传傳磨宿说説"),
-      ),
-    )
+    fun charsetProvider() =
+      listOf(
+        Arguments.of("utf8.properties", "utf-8", mapOf("foo" to "传傳磨宿说説"), mapOf("foo" to "传傳磨宿说説"))
+      )
 
     @JvmStatic
-    fun transformConfigWithPathsProvider() = listOf(
-      Arguments.of(
-        "f.properties",
-        listOf("f.properties"),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo"),
-      ),
-      Arguments.of(
-        "foo.properties",
-        listOf(".*.properties"),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo"),
-      ),
-      Arguments.of(
-        "foo.properties",
-        listOf(".*bar"),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        emptyMap<String, String>(),
-      ),
-      Arguments.of(
-        "foo.properties",
-        emptyList<String>(),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo"),
-      ),
-    )
+    fun transformConfigWithPathsProvider() =
+      listOf(
+        Arguments.of(
+          "f.properties",
+          listOf("f.properties"),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo"),
+        ),
+        Arguments.of(
+          "foo.properties",
+          listOf(".*.properties"),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo"),
+        ),
+        Arguments.of(
+          "foo.properties",
+          listOf(".*bar"),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          emptyMap<String, String>(),
+        ),
+        Arguments.of(
+          "foo.properties",
+          emptyList<String>(),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo"),
+        ),
+      )
 
     @JvmStatic
-    fun transformConfigWithMappingsProvider() = listOf(
-      Arguments.of(
-        "f.properties",
-        mapOf("f.properties" to mapOf("mergeStrategy" to "first")),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo"),
-      ),
-      Arguments.of(
-        "f.properties",
-        mapOf("f.properties" to mapOf("mergeStrategy" to "latest")),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "bar"),
-      ),
-      Arguments.of(
-        "f.properties",
-        mapOf("f.properties" to mapOf("mergeStrategy" to "append")),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo,bar"),
-      ),
-      Arguments.of(
-        "f.properties",
-        mapOf("f.properties" to mapOf("mergeStrategy" to "append", "mergeSeparator" to ";")),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo;bar"),
-      ),
-      Arguments.of(
-        "foo.properties",
-        mapOf(".*.properties" to mapOf("mergeStrategy" to "first")),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo"),
-      ),
-      Arguments.of(
-        "foo.properties",
-        mapOf(".*bar" to mapOf("mergeStrategy" to "first")),
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        emptyMap<String, String>(),
-      ),
-    )
+    fun transformConfigWithMappingsProvider() =
+      listOf(
+        Arguments.of(
+          "f.properties",
+          mapOf("f.properties" to mapOf("mergeStrategy" to "first")),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo"),
+        ),
+        Arguments.of(
+          "f.properties",
+          mapOf("f.properties" to mapOf("mergeStrategy" to "latest")),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "bar"),
+        ),
+        Arguments.of(
+          "f.properties",
+          mapOf("f.properties" to mapOf("mergeStrategy" to "append")),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo,bar"),
+        ),
+        Arguments.of(
+          "f.properties",
+          mapOf("f.properties" to mapOf("mergeStrategy" to "append", "mergeSeparator" to ";")),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo;bar"),
+        ),
+        Arguments.of(
+          "foo.properties",
+          mapOf(".*.properties" to mapOf("mergeStrategy" to "first")),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo"),
+        ),
+        Arguments.of(
+          "foo.properties",
+          mapOf(".*bar" to mapOf("mergeStrategy" to "first")),
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          emptyMap<String, String>(),
+        ),
+      )
 
     @JvmStatic
-    fun transformConfigProvider() = listOf(
-      Arguments.of(
-        "f.properties",
-        "first",
-        "",
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo"),
-        mapOf<String, Map<String, Int>>(),
-      ),
-      Arguments.of(
-        "f.properties",
-        "latest",
-        "",
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "bar"),
-        mapOf<String, Map<String, Int>>(),
-      ),
-      Arguments.of(
-        "f.properties",
-        "append",
-        ",",
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo,bar"),
-        mapOf<String, Map<String, Int>>(),
-      ),
-      Arguments.of(
-        "f.properties",
-        "append",
-        ";",
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo;bar"),
-        mapOf<String, Map<String, Int>>(),
-      ),
-      Arguments.of(
-        "f.properties",
-        "fail",
-        ";",
-        mapOf("foo" to "foo"),
-        mapOf("foo" to "bar"),
-        mapOf("foo" to "foo"),
-        mapOf("f.properties" to mapOf("foo" to 2)),
-      ),
-    )
+    fun transformConfigProvider() =
+      listOf(
+        Arguments.of(
+          "f.properties",
+          "first",
+          "",
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo"),
+          mapOf<String, Map<String, Int>>(),
+        ),
+        Arguments.of(
+          "f.properties",
+          "latest",
+          "",
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "bar"),
+          mapOf<String, Map<String, Int>>(),
+        ),
+        Arguments.of(
+          "f.properties",
+          "append",
+          ",",
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo,bar"),
+          mapOf<String, Map<String, Int>>(),
+        ),
+        Arguments.of(
+          "f.properties",
+          "append",
+          ";",
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo;bar"),
+          mapOf<String, Map<String, Int>>(),
+        ),
+        Arguments.of(
+          "f.properties",
+          "fail",
+          ";",
+          mapOf("foo" to "foo"),
+          mapOf("foo" to "bar"),
+          mapOf("foo" to "foo"),
+          mapOf("f.properties" to mapOf("foo" to 2)),
+        ),
+      )
 
     @JvmStatic
-    fun keyTransformerProvider() = listOf(
-      Arguments.of(
-        "foo.properties",
-        { key: String -> key },
-        mapOf("foo" to "bar"),
-        mapOf("FOO" to "baz"),
-        mapOf("foo" to "bar", "FOO" to "baz"),
-      ),
-      Arguments.of(
-        "foo.properties",
-        { key: String -> key.uppercase() },
-        mapOf("foo" to "bar"),
-        mapOf("FOO" to "baz"),
-        mapOf("FOO" to "bar,baz"),
-      ),
-      Arguments.of(
-        "foo.properties",
-        { key: String -> "bar.${key.lowercase()}" },
-        mapOf("foo" to "bar"),
-        mapOf("FOO" to "baz"),
-        mapOf("bar.foo" to "bar,baz"),
-      ),
-      Arguments.of(
-        "foo.properties",
-        { key: String -> key.replaceFirst(Regex("^(foo)"), "bar.$1") },
-        mapOf("foo" to "bar"),
-        mapOf("FOO" to "baz"),
-        mapOf("bar.foo" to "bar", "FOO" to "baz"),
-      ),
-    )
+    fun keyTransformerProvider() =
+      listOf(
+        Arguments.of(
+          "foo.properties",
+          { key: String -> key },
+          mapOf("foo" to "bar"),
+          mapOf("FOO" to "baz"),
+          mapOf("foo" to "bar", "FOO" to "baz"),
+        ),
+        Arguments.of(
+          "foo.properties",
+          { key: String -> key.uppercase() },
+          mapOf("foo" to "bar"),
+          mapOf("FOO" to "baz"),
+          mapOf("FOO" to "bar,baz"),
+        ),
+        Arguments.of(
+          "foo.properties",
+          { key: String -> "bar.${key.lowercase()}" },
+          mapOf("foo" to "bar"),
+          mapOf("FOO" to "baz"),
+          mapOf("bar.foo" to "bar,baz"),
+        ),
+        Arguments.of(
+          "foo.properties",
+          { key: String -> key.replaceFirst(Regex("^(foo)"), "bar.$1") },
+          mapOf("foo" to "bar"),
+          mapOf("FOO" to "baz"),
+          mapOf("bar.foo" to "bar", "FOO" to "baz"),
+        ),
+      )
   }
 }

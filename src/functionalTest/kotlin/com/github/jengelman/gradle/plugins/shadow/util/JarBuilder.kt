@@ -5,18 +5,14 @@ import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 import kotlin.io.path.outputStream
 
-class JarBuilder(
-  private val outputPath: Path,
-) {
+class JarBuilder(private val outputPath: Path) {
   private val contents = mutableMapOf<String, ByteArray>()
   private val entries = mutableSetOf<String>()
   private val jos = JarOutputStream(outputPath.outputStream())
 
   fun insert(entry: String, content: String): JarBuilder = insert(entry, content.toByteArray())
 
-  fun insert(entry: String, content: ByteArray): JarBuilder = apply {
-    contents[entry] = content
-  }
+  fun insert(entry: String, content: ByteArray): JarBuilder = apply { contents[entry] = content }
 
   fun write(): Path {
     jos.use {

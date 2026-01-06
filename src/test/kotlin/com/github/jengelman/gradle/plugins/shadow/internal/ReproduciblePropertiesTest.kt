@@ -21,69 +21,73 @@ class ReproduciblePropertiesTest {
   @ParameterizedTest
   @MethodSource("generalCharsetsProvider")
   fun asciiProps(charset: Charset) {
-    val output = ReproducibleProperties().also { props ->
-      props["key"] = "value"
-      props["key2"] = "value2"
-      props["a"] = "b"
-      props["d"] = "e"
-      props["0"] = "1"
-      props["b"] = "c"
-      props["c"] = "d"
-      props["e"] = "f"
-    }.writeToString(charset)
+    val output =
+      ReproducibleProperties()
+        .also { props ->
+          props["key"] = "value"
+          props["key2"] = "value2"
+          props["a"] = "b"
+          props["d"] = "e"
+          props["0"] = "1"
+          props["b"] = "c"
+          props["c"] = "d"
+          props["e"] = "f"
+        }
+        .writeToString(charset)
 
-    assertThat(output).isEqualTo(
-      """
-      |0=1
-      |a=b
-      |b=c
-      |c=d
-      |d=e
-      |e=f
-      |key=value
-      |key2=value2
-      |
-      """.trimMargin(),
-    )
+    assertThat(output)
+      .isEqualTo(
+        """
+        |0=1
+        |a=b
+        |b=c
+        |c=d
+        |d=e
+        |e=f
+        |key=value
+        |key2=value2
+        |"""
+          .trimMargin()
+      )
   }
 
   @ParameterizedTest
   @MethodSource("utfCharsetsProvider")
   fun utfProps(charset: Charset) {
-    val output = ReproducibleProperties().also { props ->
-      props["äöüß"] = "aouss"
-      props["áèô"] = "aeo"
-      props["€²³"] = "x"
-      props["传傳磨宿说説"] = "b"
-    }.writeToString(charset)
+    val output =
+      ReproducibleProperties()
+        .also { props ->
+          props["äöüß"] = "aouss"
+          props["áèô"] = "aeo"
+          props["€²³"] = "x"
+          props["传傳磨宿说説"] = "b"
+        }
+        .writeToString(charset)
 
-    assertThat(output).isEqualTo(
-      """
-      |áèô=aeo
-      |äöüß=aouss
-      |€²³=x
-      |传傳磨宿说説=b
-      |
-      """.trimMargin(),
-    )
+    assertThat(output)
+      .isEqualTo(
+        """
+        |áèô=aeo
+        |äöüß=aouss
+        |€²³=x
+        |传傳磨宿说説=b
+        |"""
+          .trimMargin()
+      )
   }
 
   private companion object Companion {
     @JvmStatic
-    fun generalCharsetsProvider() = listOf(
-      StandardCharsets.ISO_8859_1,
-      StandardCharsets.US_ASCII,
-    ) + utfCharsetsProvider()
+    fun generalCharsetsProvider() =
+      listOf(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII) + utfCharsetsProvider()
 
-    @JvmStatic
-    fun utfCharsetsProvider() = listOf(
-      StandardCharsets.UTF_8,
-      StandardCharsets.UTF_16,
-    )
+    @JvmStatic fun utfCharsetsProvider() = listOf(StandardCharsets.UTF_8, StandardCharsets.UTF_16)
 
     fun ReproducibleProperties.writeToString(charset: Charset): String {
-      return ByteArrayOutputStream().also { writeWithoutComments(charset, it) }
-        .toString(charset.name()).invariantEolString
+      return ByteArrayOutputStream()
+        .also { writeWithoutComments(charset, it) }
+        .toString(charset.name())
+        .invariantEolString
     }
   }
 }

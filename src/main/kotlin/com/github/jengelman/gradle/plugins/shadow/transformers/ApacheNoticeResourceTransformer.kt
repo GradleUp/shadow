@@ -17,7 +17,8 @@ import org.gradle.api.tasks.util.PatternSet
 /**
  * Merges `META-INF/NOTICE.TXT` files.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformer.java).
  *
  * @author John Engelman
  */
@@ -28,51 +29,50 @@ public open class ApacheNoticeResourceTransformer(
 ) : PatternFilterableResourceTransformer(patternSet) {
   private val entries = mutableSetOf<String>()
   private val organizationEntries = mutableMapOf<String, MutableSet<String>>()
-  private inline val charset get() = Charset.forName(charsetName.get())
+  private inline val charset
+    get() = Charset.forName(charsetName.get())
 
-  /**
-   * Fallback [copyright] as the [Property] value can't be changed in execution phase.
-   */
+  /** Fallback [copyright] as the [Property] value can't be changed in execution phase. */
   private var fallbackCopyright: String? = null
 
-  @get:Input
-  public open val projectName: Property<String> = objectFactory.property("")
+  @get:Input public open val projectName: Property<String> = objectFactory.property("")
+
+  @get:Input public open val addHeader: Property<Boolean> = objectFactory.property(true)
 
   @get:Input
-  public open val addHeader: Property<Boolean> = objectFactory.property(true)
-
-  @get:Input
-  public open val preamble1: Property<String> = objectFactory.property(
-    """
+  public open val preamble1: Property<String> =
+    objectFactory.property(
+      """
       // ------------------------------------------------------------------
       // NOTICE file corresponding to the section 4d of The Apache License,
       // Version 2.0, in this case for
-    """.trimIndent() + " ", // The space is important for formatting.
-  )
+      """
+        .trimIndent() + " " // The space is important for formatting.
+    )
 
   @get:Input
-  public open val preamble2: Property<String> = objectFactory.property(
-    "\n// ------------------------------------------------------------------\n",
-  )
+  public open val preamble2: Property<String> =
+    objectFactory.property(
+      "\n// ------------------------------------------------------------------\n"
+    )
 
   @get:Input
-  public open val preamble3: Property<String> = objectFactory.property("This product includes software developed at\n")
+  public open val preamble3: Property<String> =
+    objectFactory.property("This product includes software developed at\n")
 
   @get:Input
-  public open val organizationName: Property<String> = objectFactory.property("The Apache Software Foundation")
+  public open val organizationName: Property<String> =
+    objectFactory.property("The Apache Software Foundation")
 
   @get:Input
-  public open val organizationURL: Property<String> = objectFactory.property("https://www.apache.org/")
+  public open val organizationURL: Property<String> =
+    objectFactory.property("https://www.apache.org/")
 
-  @get:Input
-  public open val inceptionYear: Property<String> = objectFactory.property("2006")
+  @get:Input public open val inceptionYear: Property<String> = objectFactory.property("2006")
 
-  @get:Input
-  public open val copyright: Property<String> = objectFactory.property("")
+  @get:Input public open val copyright: Property<String> = objectFactory.property("")
 
-  /**
-   * The file encoding of the `NOTICE` file.
-   */
+  /** The file encoding of the `NOTICE` file. */
   @get:Input
   public open val charsetName: Property<String> = objectFactory.property(Charsets.UTF_8.name())
 
@@ -81,19 +81,17 @@ public open class ApacheNoticeResourceTransformer(
    *
    * Defaults to `META-INF/NOTICE`.
    */
-  @get:Input
-  public open val outputPath: Property<String> = objectFactory.property(NOTICE_PATH)
+  @get:Input public open val outputPath: Property<String> = objectFactory.property(NOTICE_PATH)
 
   @Inject
-  public constructor(objectFactory: ObjectFactory) : this(
+  public constructor(
+    objectFactory: ObjectFactory
+  ) : this(
     objectFactory,
-    patternSet = PatternSet()
-      .apply { isCaseSensitive = false }
-      .include(
-        NOTICE_PATH,
-        NOTICE_TXT_PATH,
-        NOTICE_MD_PATH,
-      ),
+    patternSet =
+      PatternSet()
+        .apply { isCaseSensitive = false }
+        .include(NOTICE_PATH, NOTICE_TXT_PATH, NOTICE_MD_PATH),
   )
 
   override fun transform(context: TransformerContext) {
@@ -107,9 +105,10 @@ public open class ApacheNoticeResourceTransformer(
     val inceptionYear = inceptionYear.get()
 
     if (entries.isEmpty()) {
-      val year = SimpleDateFormat("yyyy", Locale.US).format(Date()).let {
-        if (inceptionYear != it) "$inceptionYear-$it" else it
-      }
+      val year =
+        SimpleDateFormat("yyyy", Locale.US).format(Date()).let {
+          if (inceptionYear != it) "$inceptionYear-$it" else it
+        }
       // Add headers.
       if (addHeader) {
         entries.add("$preamble1$projectName$preamble2")
@@ -132,7 +131,10 @@ public open class ApacheNoticeResourceTransformer(
         if (trimmedLine.isNotEmpty()) {
           if (trimmedLine.startsWith("- ")) {
             // resource-bundle 1.3 mode.
-            if (lineCount == 1 && sb.toString().contains("This product includes/uses software(s) developed by")) {
+            if (
+              lineCount == 1 &&
+                sb.toString().contains("This product includes/uses software(s) developed by")
+            ) {
               currentOrg = organizationEntries.getOrPut(sb.toString().trim()) { TreeSet() }
               sb.setLength(0)
             } else if (sb.isNotEmpty() && currentOrg != null) {

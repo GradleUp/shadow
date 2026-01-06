@@ -11,18 +11,20 @@ import org.gradle.api.file.FileTreeElement
  * Aggregate Apache Groovy extension modules descriptors.
  *
  * Resource transformer that merges Groovy extension module descriptor files into a single file.
- * Groovy extension module descriptor files have the name org.codehaus.groovy.runtime.ExtensionModule
- * and live in the META-INF/services (Groovy up to 2.4) or META-INF/groovy (Groovy 2.5+) directory.
- * See [GROOVY-8480](https://issues.apache.org/jira/browse/GROOVY-8480) for more details of the change.
+ * Groovy extension module descriptor files have the name
+ * org.codehaus.groovy.runtime.ExtensionModule and live in the META-INF/services (Groovy up to 2.4)
+ * or META-INF/groovy (Groovy 2.5+) directory. See
+ * [GROOVY-8480](https://issues.apache.org/jira/browse/GROOVY-8480) for more details of the change.
  *
- * If there are several descriptor files spread across many JARs the individual
- * entries will be merged into a single descriptor file which will be
- * packaged into the resultant JAR produced by the shadowing process.
- * It will live in the legacy directory (META-INF/services) if all the processed descriptor
- * files came from the legacy location, otherwise it will be written into the now standard location (META-INF/groovy).
- * Note that certain JDK9+ tooling will break when using the legacy location.
+ * If there are several descriptor files spread across many JARs the individual entries will be
+ * merged into a single descriptor file which will be packaged into the resultant JAR produced by
+ * the shadowing process. It will live in the legacy directory (META-INF/services) if all the
+ * processed descriptor files came from the legacy location, otherwise it will be written into the
+ * now standard location (META-INF/groovy). Note that certain JDK9+ tooling will break when using
+ * the legacy location.
  *
- * Related to [org.apache.maven.plugins.shade.resource.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
+ * Related to
+ * [org.apache.maven.plugins.shade.resource.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
  */
 @CacheableTransformer
 public open class GroovyExtensionModuleTransformer : ResourceTransformer {
@@ -30,7 +32,8 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.path
-    return path == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR || path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+    return path == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR ||
+      path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
   }
 
   override fun transform(context: TransformerContext) {
@@ -38,18 +41,16 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
     props.load(context.inputStream)
     props.forEach { (key, value) ->
       when (key as String) {
-        KEY_MODULE_NAME -> handle(key, value as String) {
-          module.setProperty(key, MERGED_MODULE_NAME)
-        }
-        KEY_MODULE_VERSION -> handle(key, value as String) {
-          module.setProperty(key, MERGED_MODULE_VERSION)
-        }
+        KEY_MODULE_NAME ->
+          handle(key, value as String) { module.setProperty(key, MERGED_MODULE_NAME) }
+        KEY_MODULE_VERSION ->
+          handle(key, value as String) { module.setProperty(key, MERGED_MODULE_VERSION) }
         KEY_EXTENSION_CLASSES,
-        KEY_STATIC_EXTENSION_CLASSES,
-        -> {
-          val relocatedClasses = (value as String).split(',').joinToString(",") { className ->
-            context.relocators.relocateClass(className)
-          }
+        KEY_STATIC_EXTENSION_CLASSES -> {
+          val relocatedClasses =
+            (value as String).split(',').joinToString(",") { className ->
+              context.relocators.relocateClass(className)
+            }
           handle(key, relocatedClasses) { existingValue ->
             module.setProperty(key, "$existingValue,$relocatedClasses")
           }
@@ -62,9 +63,7 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.putNextEntry(zipEntry(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, preserveFileTimestamps))
-    module.inputStream().use {
-      it.copyTo(os)
-    }
+    module.inputStream().use { it.copyTo(os) }
     os.closeEntry()
   }
 

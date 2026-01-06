@@ -18,29 +18,28 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * You can also use [ShadowJar.from] instead.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/IncludeResourceTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.IncludeResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/IncludeResourceTransformer.java).
  *
  * @author John Engelman
  */
 @CacheableTransformer
-public open class IncludeResourceTransformer @Inject constructor(
-  final override val objectFactory: ObjectFactory,
-) : ResourceTransformer by ResourceTransformer.Companion {
+public open class IncludeResourceTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) :
+  ResourceTransformer by ResourceTransformer.Companion {
   @get:InputFile
   @get:PathSensitive(PathSensitivity.NONE)
   public open val file: RegularFileProperty = objectFactory.fileProperty()
 
-  @get:Input
-  public open val resource: Property<String> = objectFactory.property()
+  @get:Input public open val resource: Property<String> = objectFactory.property()
 
   override fun hasTransformedResource(): Boolean = file.get().asFile.exists()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
 
-    file.get().asFile.inputStream().use { inputStream ->
-      inputStream.copyTo(os)
-    }
+    file.get().asFile.inputStream().use { inputStream -> inputStream.copyTo(os) }
 
     os.closeEntry()
   }

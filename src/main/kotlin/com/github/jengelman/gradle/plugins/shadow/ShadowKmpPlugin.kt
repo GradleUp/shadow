@@ -12,19 +12,24 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 public abstract class ShadowKmpPlugin : Plugin<Project> {
 
-  override fun apply(project: Project): Unit = with(project) {
-    extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target ->
-      if (target !is KotlinJvmTarget) return@configureEach
-      @Suppress("EagerGradleConfiguration")
-      if (tasks.findByName(SHADOW_JAR_TASK_NAME) != null) {
-        // Declaring multiple Kotlin Targets of the same type is not supported. See https://kotl.in/declaring-multiple-targets for more details.
-        logger.info("$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: ${target.name}")
-        return@configureEach
-      }
+  override fun apply(project: Project): Unit =
+    with(project) {
+      extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target
+        ->
+        if (target !is KotlinJvmTarget) return@configureEach
+        @Suppress("EagerGradleConfiguration")
+        if (tasks.findByName(SHADOW_JAR_TASK_NAME) != null) {
+          // Declaring multiple Kotlin Targets of the same type is not supported. See
+          // https://kotl.in/declaring-multiple-targets for more details.
+          logger.info(
+            "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: ${target.name}"
+          )
+          return@configureEach
+        }
 
-      configureShadowJar(target)
+        configureShadowJar(target)
+      }
     }
-  }
 
   private fun Project.configureShadowJar(target: KotlinJvmTarget) {
     val kotlinJvmMain = target.compilations.named("main")
@@ -33,15 +38,13 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       task.configurations.convention(
         provider {
           listOf(configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName))
-        },
+        }
       )
 
       if (!isAtLeastKgp("1.9.0")) return@registerShadowJarCommon
 
       @OptIn(ExperimentalKotlinGradlePluginApi::class)
-      target.mainRun {
-        task.mainClass.convention(mainClass)
-      }
+      target.mainRun { task.mainClass.convention(mainClass) }
     }
   }
 }

@@ -24,12 +24,11 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.util.GradleVersion
 
-/**
- * Return `runtimeClasspath` or `runtime` configuration.
- */
+/** Return `runtimeClasspath` or `runtime` configuration. */
 internal inline val Project.runtimeConfiguration: Configuration
-  get() = configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
-    ?: configurations.getByName("runtime")
+  get() =
+    configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
+      ?: configurations.getByName("runtime")
 
 internal inline val Project.sourceSets: SourceSetContainer
   get() = extensions.getByType(SourceSetContainer::class.java)
@@ -46,8 +45,10 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
 
-// ExtraPropertiesExtension is IP safe and contains properties from both the root `gradle.properties` and the
-// subproject's `gradle.properties`. See https://github.com/gradle/gradle/issues/29600#issuecomment-3580868326.
+// ExtraPropertiesExtension is IP safe and contains properties from both the root
+// `gradle.properties` and the
+// subproject's `gradle.properties`. See
+// https://github.com/gradle/gradle/issues/29600#issuecomment-3580868326.
 internal fun Project.findOptionalProperty(propertyName: String): String? {
   val extras = checkNotNull(extensions.findByType(ExtraPropertiesExtension::class.java))
   return if (extras.has(propertyName)) extras.get(propertyName)?.toString() else null
@@ -64,9 +65,7 @@ internal fun Project.addBuildScanCustomValues() {
   }
 }
 
-/**
- * TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above.
- */
+/** TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above. */
 @Suppress("UnstableApiUsage")
 internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
   outgoingConfiguration: NamedDomainObjectProvider<Configuration>,
@@ -81,44 +80,42 @@ internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
 }
 
 internal inline fun <reified V : Any> ObjectFactory.property(
-  defaultValue: Any? = null,
-): Property<V> = property(V::class.java).apply {
-  defaultValue ?: return@apply
-  if (defaultValue is Provider<*>) {
-    @Suppress("UNCHECKED_CAST")
-    convention(defaultValue as Provider<V>)
-  } else {
-    convention(defaultValue as V)
+  defaultValue: Any? = null
+): Property<V> =
+  property(V::class.java).apply {
+    defaultValue ?: return@apply
+    if (defaultValue is Provider<*>) {
+      @Suppress("UNCHECKED_CAST") convention(defaultValue as Provider<V>)
+    } else {
+      convention(defaultValue as V)
+    }
   }
-}
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified V : Any> ObjectFactory.setProperty(
-  defaultValue: Any? = null,
-): SetProperty<V> = setProperty(V::class.java).apply {
-  defaultValue ?: return@apply
-  if (defaultValue is Provider<*>) {
-    convention(defaultValue as Provider<Iterable<V>>)
-  } else {
-    convention(defaultValue as Iterable<V>)
+  defaultValue: Any? = null
+): SetProperty<V> =
+  setProperty(V::class.java).apply {
+    defaultValue ?: return@apply
+    if (defaultValue is Provider<*>) {
+      convention(defaultValue as Provider<Iterable<V>>)
+    } else {
+      convention(defaultValue as Iterable<V>)
+    }
   }
-}
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified V : Any> ObjectFactory.mapProperty(
-  defaultValue: Any? = null,
-): MapProperty<String, V> = mapProperty(String::class.java, V::class.java).apply {
-  defaultValue ?: return@apply
-  if (defaultValue is Provider<*>) {
-    convention(defaultValue as Provider<Map<String, V>>)
-  } else {
-    convention(defaultValue as Map<String, V>)
+  defaultValue: Any? = null
+): MapProperty<String, V> =
+  mapProperty(String::class.java, V::class.java).apply {
+    defaultValue ?: return@apply
+    if (defaultValue is Provider<*>) {
+      convention(defaultValue as Provider<Map<String, V>>)
+    } else {
+      convention(defaultValue as Map<String, V>)
+    }
   }
-}
 
-internal inline fun ObjectFactory.fileCollection(
-  path: () -> Any,
-): ConfigurableFileCollection = fileCollection().apply {
-  @Suppress("UnstableApiUsage")
-  convention(path())
-}
+internal inline fun ObjectFactory.fileCollection(path: () -> Any): ConfigurableFileCollection =
+  fileCollection().apply { @Suppress("UnstableApiUsage") convention(path()) }

@@ -13,34 +13,25 @@ import org.gradle.api.specs.Spec
 
 // DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
 public interface DependencyFilter : Serializable {
-  /**
-   * Resolve a [configuration] against the [include]/[exclude] rules in the filter.
-   */
+  /** Resolve a [configuration] against the [include]/[exclude] rules in the filter. */
   public fun resolve(configuration: Configuration): FileCollection
 
   /**
-   * Resolve all [configurations] against the [include]/[exclude] rules in the filter and combine the results.
+   * Resolve all [configurations] against the [include]/[exclude] rules in the filter and combine
+   * the results.
    */
   public fun resolve(configurations: Collection<Configuration>): FileCollection
 
-  /**
-   * Exclude dependencies that match the provided [spec].
-   */
+  /** Exclude dependencies that match the provided [spec]. */
   public fun exclude(spec: Spec<ResolvedDependency>)
 
-  /**
-   * Include dependencies that match the provided [spec].
-   */
+  /** Include dependencies that match the provided [spec]. */
   public fun include(spec: Spec<ResolvedDependency>)
 
-  /**
-   * Create a [Spec] that matches the provided project [notation].
-   */
+  /** Create a [Spec] that matches the provided project [notation]. */
   public fun project(notation: Any): Spec<ResolvedDependency>
 
-  /**
-   * Create a [Spec] that matches the provided [dependencyNotation].
-   */
+  /** Create a [Spec] that matches the provided [dependencyNotation]. */
   public fun dependency(dependencyNotation: Any): Spec<ResolvedDependency>
 
   public abstract class AbstractDependencyFilter(
@@ -68,9 +59,9 @@ public interface DependencyFilter : Serializable {
     }
 
     override fun resolve(configurations: Collection<Configuration>): FileCollection {
-      return configurations.map { resolve(it) }
-        .reduceOrNull { acc, fileCollection -> acc + fileCollection }
-        ?: project.files()
+      return configurations
+        .map { resolve(it) }
+        .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
     }
 
     override fun exclude(spec: Spec<ResolvedDependency>) {
@@ -83,21 +74,24 @@ public interface DependencyFilter : Serializable {
 
     override fun project(notation: Any): Spec<ResolvedDependency> {
       @Suppress("UNCHECKED_CAST")
-      val realNotation = when (notation) {
-        is ProjectDependency -> return notation.toSpec()
-        is Provider<*> -> mapOf("path" to notation.get())
-        is String -> mapOf("path" to notation)
-        is Map<*, *> -> notation as Map<String, Any>
-        else -> throw IllegalArgumentException("Unsupported notation type: ${notation::class.java}")
-      }
+      val realNotation =
+        when (notation) {
+          is ProjectDependency -> return notation.toSpec()
+          is Provider<*> -> mapOf("path" to notation.get())
+          is String -> mapOf("path" to notation)
+          is Map<*, *> -> notation as Map<String, Any>
+          else ->
+            throw IllegalArgumentException("Unsupported notation type: ${notation::class.java}")
+        }
       return project.dependencies.project(realNotation).toSpec()
     }
 
     override fun dependency(dependencyNotation: Any): Spec<ResolvedDependency> {
-      val realNotation = when (dependencyNotation) {
-        is Provider<*> -> dependencyNotation.get()
-        else -> dependencyNotation
-      }
+      val realNotation =
+        when (dependencyNotation) {
+          is Provider<*> -> dependencyNotation.get()
+          else -> dependencyNotation
+        }
       return project.dependencies.create(realNotation).toSpec()
     }
 
@@ -109,17 +103,24 @@ public interface DependencyFilter : Serializable {
 
     private fun Dependency.toSpec(): Spec<ResolvedDependency> {
       return Spec<ResolvedDependency> { resolvedDependency ->
-        val groupMatch = group?.let {
-          it == resolvedDependency.moduleGroup || resolvedDependency.moduleGroup.matches(it.toRegex())
-        } ?: true
-        val nameMatch = name.let {
-          it == resolvedDependency.moduleName || resolvedDependency.moduleName.matches(it.toRegex())
-        }
-        val versionMatch = version?.let {
-          // Version like `1.0.0+1` can't be converted to regex directly because `+` is a special character in regex.
-          // So we check for exact match first, then fallback to regex match.
-          it == resolvedDependency.moduleVersion || resolvedDependency.moduleVersion.matches(it.toRegex())
-        } ?: true
+        val groupMatch =
+          group?.let {
+            it == resolvedDependency.moduleGroup ||
+              resolvedDependency.moduleGroup.matches(it.toRegex())
+          } ?: true
+        val nameMatch =
+          name.let {
+            it == resolvedDependency.moduleName ||
+              resolvedDependency.moduleName.matches(it.toRegex())
+          }
+        val versionMatch =
+          version?.let {
+            // Version like `1.0.0+1` can't be converted to regex directly because `+` is a special
+            // character in regex.
+            // So we check for exact match first, then fallback to regex match.
+            it == resolvedDependency.moduleVersion ||
+              resolvedDependency.moduleVersion.matches(it.toRegex())
+          } ?: true
 
         groupMatch && nameMatch && versionMatch
       }

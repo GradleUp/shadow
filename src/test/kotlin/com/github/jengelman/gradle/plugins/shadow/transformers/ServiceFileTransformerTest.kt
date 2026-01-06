@@ -20,7 +20,8 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 /**
- * Modified from [org.apache.maven.plugins.shade.resource.ServiceResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ServiceResourceTransformerTest.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.ServiceResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ServiceResourceTransformerTest.java).
  */
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
   private lateinit var tempJar: Path
@@ -149,21 +150,23 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
   private companion object {
     @JvmStatic
-    fun resourceProvider() = listOf(
-      // path, exclude, expected
-      Arguments.of("META-INF/services/java.sql.Driver", false, true),
-      Arguments.of("META-INF/services/io.dropwizard.logging.AppenderFactory", false, true),
-      Arguments.of("META-INF/services/org.apache.maven.Shade", true, false),
-      Arguments.of("META-INF/services/foo/bar/moo.goo.Zoo", false, true),
-      Arguments.of("foo/bar.properties", false, false),
-      Arguments.of("foo.props", false, false),
-    )
+    fun resourceProvider() =
+      listOf(
+        // path, exclude, expected
+        Arguments.of("META-INF/services/java.sql.Driver", false, true),
+        Arguments.of("META-INF/services/io.dropwizard.logging.AppenderFactory", false, true),
+        Arguments.of("META-INF/services/org.apache.maven.Shade", true, false),
+        Arguments.of("META-INF/services/foo/bar/moo.goo.Zoo", false, true),
+        Arguments.of("foo/bar.properties", false, false),
+        Arguments.of("foo.props", false, false),
+      )
 
     @JvmStatic
-    fun serviceFileProvider() = listOf(
-      // path, input1, input2, output
-      Arguments.of("META-INF/services/com.acme.Foo", "foo", "bar", "foo\nbar"),
-      Arguments.of("META-INF/services/com.acme.Bar", "foo\nbar", "zoo", "foo\nbar\nzoo"),
-    )
+    fun serviceFileProvider() =
+      listOf(
+        // path, input1, input2, output
+        Arguments.of("META-INF/services/com.acme.Foo", "foo", "bar", "foo\nbar"),
+        Arguments.of("META-INF/services/com.acme.Bar", "foo\nbar", "zoo", "foo\nbar\nzoo"),
+      )
   }
 }

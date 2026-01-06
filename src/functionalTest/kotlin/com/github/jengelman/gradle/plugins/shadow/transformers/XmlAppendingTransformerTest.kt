@@ -11,81 +11,83 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
   @Test
   fun appendXmlFiles() {
     val xmlEntry = "properties.xml"
-    val xmlContent = """
+    val xmlContent =
+      """
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
       <properties version="1.0">
         <entry key="%s">%s</entry>
       </properties>
-    """.trimIndent()
-    val one = buildJarOne {
-      insert(xmlEntry, xmlContent.format("key1", "val1"))
-    }
-    val two = buildJarTwo {
-      insert(xmlEntry, xmlContent.format("key2", "val2"))
-    }
+      """
+        .trimIndent()
+    val one = buildJarOne { insert(xmlEntry, xmlContent.format("key1", "val1")) }
+    val two = buildJarTwo { insert(xmlEntry, xmlContent.format("key2", "val2")) }
 
     projectScript.appendText(
       transform<XmlAppendingTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           resource = '$xmlEntry'
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(xmlEntry) }.trimIndent()
-    assertThat(content).isEqualTo(
-      """
+    assertThat(content)
+      .isEqualTo(
+        """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
         <properties version="1.0">
           <entry key="key1">val1</entry>
           <entry key="key2">val2</entry>
         </properties>
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/168",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/168")
   @Test
   fun mergeNestedLevels() {
     val xmlEntry = "META-INF/nested.xml"
-    val xmlContent = """
+    val xmlContent =
+      """
       <?xml version="1.0" encoding="UTF-8"?>
       <a>%s</a>
-    """.trimIndent()
-    val one = buildJarOne {
-      insert(xmlEntry, xmlContent.format("<b />"))
-    }
-    val two = buildJarTwo {
-      insert(xmlEntry, xmlContent.format("<c />"))
-    }
+      """
+        .trimIndent()
+    val one = buildJarOne { insert(xmlEntry, xmlContent.format("<b />")) }
+    val two = buildJarTwo { insert(xmlEntry, xmlContent.format("<c />")) }
 
     projectScript.appendText(
       transform<XmlAppendingTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = """
+        transformerBlock =
+          """
           resource = '$xmlEntry'
-        """.trimIndent(),
-      ),
+        """
+            .trimIndent(),
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(xmlEntry) }.trimIndent()
-    assertThat(content).isEqualTo(
-      """
+    assertThat(content)
+      .isEqualTo(
+        """
         <?xml version="1.0" encoding="UTF-8"?>
         <a>
           <b />
           <c />
         </a>
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
   }
 }

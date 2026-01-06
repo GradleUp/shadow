@@ -14,20 +14,20 @@ import org.gradle.api.plugins.ExtensionContainer
 
 public abstract class ShadowBasePlugin : Plugin<Project> {
 
-  override fun apply(project: Project): Unit = with(project) {
-    with(extensions.create(EXTENSION_NAME, ShadowExtension::class.java)) {
-      addShadowVariantIntoJavaComponent.convention(true)
-      addTargetJvmVersionAttribute.convention(true)
-      bundlingAttribute.convention(Bundling.SHADOWED)
+  override fun apply(project: Project): Unit =
+    with(project) {
+      with(extensions.create(EXTENSION_NAME, ShadowExtension::class.java)) {
+        addShadowVariantIntoJavaComponent.convention(true)
+        addTargetJvmVersionAttribute.convention(true)
+        bundlingAttribute.convention(Bundling.SHADOWED)
+      }
+      @Suppress("EagerGradleConfiguration") // this should be created eagerly.
+      configurations.create(CONFIGURATION_NAME)
     }
-    @Suppress("EagerGradleConfiguration") // this should be created eagerly.
-    configurations.create(CONFIGURATION_NAME)
-  }
 
   public companion object {
     /**
      * Most of the components registered by Shadow plugin will use this name (`shadow`).
-     *
      * - [ExtensionContainer.create]
      * - [ConfigurationContainer.register]
      * - [SoftwareComponentContainer.register]

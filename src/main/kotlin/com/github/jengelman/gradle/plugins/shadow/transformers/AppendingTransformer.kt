@@ -13,23 +13,23 @@ import org.gradle.api.tasks.Input
 /**
  * A resource processor that appends content for a resource, separated by a newline.
  *
- * Modified from [org.apache.maven.plugins.shade.resource.AppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/AppendingTransformer.java).
+ * Modified from
+ * [org.apache.maven.plugins.shade.resource.AppendingTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/AppendingTransformer.java).
  *
  * @author John Engelman
  */
 @CacheableTransformer
-public open class AppendingTransformer @Inject constructor(
-  final override val objectFactory: ObjectFactory,
-) : ResourceTransformer {
-  @Suppress("ktlint:standard:backing-property-naming")
-  private var _data: ByteArrayOutputStream? = null // It's nullable to allow lazy initialization to support CC.
-  private inline val data get() = _data ?: ByteArrayOutputStream().also { _data = it }
+public open class AppendingTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
+  private var _data: ByteArrayOutputStream? =
+    null // It's nullable to allow lazy initialization to support CC.
+  private inline val data
+    get() = _data ?: ByteArrayOutputStream().also { _data = it }
 
-  @get:Input
-  public open val resource: Property<String> = objectFactory.property("")
+  @get:Input public open val resource: Property<String> = objectFactory.property("")
 
-  @get:Input
-  public open val separator: Property<String> = objectFactory.property(DEFAULT_SEPARATOR)
+  @get:Input public open val separator: Property<String> = objectFactory.property(DEFAULT_SEPARATOR)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return resource.get().equals(element.path, ignoreCase = true)
@@ -38,7 +38,8 @@ public open class AppendingTransformer @Inject constructor(
   override fun transform(context: TransformerContext) {
     data.let {
       if (it.size() > 0) {
-        // Append the separator before the new content to ensure the separator is not at the end of the file.
+        // Append the separator before the new content to ensure the separator is not at the end of
+        // the file.
         it.write(separator.get().toByteArray())
       }
       context.inputStream.copyTo(it)

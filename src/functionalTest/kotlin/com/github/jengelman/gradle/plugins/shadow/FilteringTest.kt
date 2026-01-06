@@ -16,11 +16,12 @@ class FilteringTest : BasePluginTest() {
     super.beforeEach()
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'my:a:1.0'
-          implementation 'my:b:1.0'
-        }
-      """.trimIndent() + lineSeparator,
+      dependencies {
+        implementation 'my:a:1.0'
+        implementation 'my:b:1.0'
+      }
+      """
+        .trimIndent() + lineSeparator
     )
   }
 
@@ -28,12 +29,7 @@ class FilteringTest : BasePluginTest() {
   fun includeAllDependencies() {
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        *entriesInAB,
-        *manifestEntries,
-      )
-    }
+    assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
   }
 
   @Test
@@ -43,17 +39,14 @@ class FilteringTest : BasePluginTest() {
         $shadowJarTask {
           exclude 'a2.properties'
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "a.properties",
-        "b.properties",
-        *manifestEntries,
-      )
+      containsOnly("a.properties", "b.properties", *manifestEntries)
     }
   }
 
@@ -62,12 +55,13 @@ class FilteringTest : BasePluginTest() {
   fun excludeDependency(useAccessor: Boolean) {
     settingsScript.appendText(
       """
-        dependencyResolutionManagement {
-          versionCatalogs.create('libs') {
-            library('my-d', 'my:d:1.0')
-          }
+      dependencyResolutionManagement {
+        versionCatalogs.create('libs') {
+          library('my-d', 'my:d:1.0')
         }
-      """.trimIndent(),
+      }
+      """
+        .trimIndent()
     )
     val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
     projectScript.appendText(
@@ -80,7 +74,8 @@ class FilteringTest : BasePluginTest() {
             exclude(dependency($dependency))
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -89,16 +84,7 @@ class FilteringTest : BasePluginTest() {
   }
 
   @ParameterizedTest
-  @ValueSource(
-    strings = [
-      "my:d",
-      "m.*:d",
-      "my:d:.*",
-      "m.*:d:.*",
-      "m.*:d.*:.*",
-      ".*:d:.*",
-    ],
-  )
+  @ValueSource(strings = ["my:d", "m.*:d", "my:d:.*", "m.*:d:.*", "m.*:d.*:.*", ".*:d:.*"])
   fun excludeDependencyUsingWildcardSyntax(wildcard: String) {
     projectScript.appendText(
       """
@@ -110,7 +96,8 @@ class FilteringTest : BasePluginTest() {
             exclude(dependency('$wildcard'))
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
@@ -130,24 +117,22 @@ class FilteringTest : BasePluginTest() {
             include(dependency('my:d:1.0'))
           }
         }
-      """.trimIndent(),
-    )
-    path("src/main/java/my/Passed.java").writeText(
       """
+        .trimIndent()
+    )
+    path("src/main/java/my/Passed.java")
+      .writeText(
+        """
         package my;
         public class Passed {}
-      """.trimIndent(),
-    )
+        """
+          .trimIndent()
+      )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "d.properties",
-        "my/",
-        "my/Passed.class",
-        *manifestEntries,
-      )
+      containsOnly("d.properties", "my/", "my/Passed.class", *manifestEntries)
     }
   }
 
@@ -156,59 +141,53 @@ class FilteringTest : BasePluginTest() {
   fun filterProjectDependencies(useAccessor: Boolean) {
     val clientProject = if (useAccessor) "project(projects.client)" else "project(':client')"
     writeClientAndServerModules(
-      serverShadowBlock = """
+      serverShadowBlock =
+        """
         dependencies {
           exclude($clientProject)
         }
-      """.trimIndent(),
+      """
+          .trimIndent()
     )
 
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
-        "server/",
-        "server/Server.class",
-        *junitEntries,
-        *manifestEntries,
-      )
+      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/671",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/671")
   @Test
   fun filterProjectThatVersionContainsPlus() {
     writeClientAndServerModules(
-      serverShadowBlock = """
+      serverShadowBlock =
+        """
         dependencies {
           exclude(project(':client'))
         }
-      """.trimIndent(),
+        """
+          .trimIndent()
     )
     path("client/build.gradle").appendText("version = '1.0.0+1'")
 
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
-        "server/",
-        "server/Server.class",
-        *junitEntries,
-        *manifestEntries,
-      )
+      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
     }
   }
 
   @Test
   fun excludeTransitiveProjectDependency() {
     writeClientAndServerModules(
-      serverShadowBlock = """
+      serverShadowBlock =
+        """
         dependencies {
           exclude { it.moduleGroup == 'junit' }
         }
-      """.trimIndent(),
+        """
+          .trimIndent()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -233,17 +212,14 @@ class FilteringTest : BasePluginTest() {
           include '*.properties'
           exclude 'a2.properties'
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "a.properties",
-        "b.properties",
-        *manifestEntries,
-      )
+      containsOnly("a.properties", "b.properties", *manifestEntries)
     }
   }
 
@@ -260,27 +236,20 @@ class FilteringTest : BasePluginTest() {
             exclude(dependency($dependency))
           }
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "f.properties",
-        *entriesInAB,
-        *manifestEntries,
-      )
+      containsOnly("f.properties", *entriesInAB, *manifestEntries)
     }
   }
 
   private fun commonAssertions() {
     assertThat(outputShadowedJar).useAll {
-      containsOnly(
-        "c.properties",
-        *entriesInAB,
-        *manifestEntries,
-      )
+      containsOnly("c.properties", *entriesInAB, *manifestEntries)
     }
   }
 }

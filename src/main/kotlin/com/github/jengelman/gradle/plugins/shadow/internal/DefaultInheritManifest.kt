@@ -16,17 +16,12 @@ internal class DefaultInheritManifest(
   manifest: Manifest? = null,
   // `AbstractTask.getServices` is protected, we need to get it via `DefaultProject`.
   // https://github.com/gradle/gradle/blob/master/subprojects/core/src/main/java/org/gradle/api/internal/AbstractTask.java#L194
-  private val fileResolver: FileResolver = (project as DefaultProject).services.get(FileResolver::class.java),
+  private val fileResolver: FileResolver =
+    (project as DefaultProject).services.get(FileResolver::class.java),
   private val internalManifest: Manifest = manifest ?: DefaultManifest(fileResolver),
-) : InheritManifest,
-  Manifest by internalManifest {
+) : InheritManifest, Manifest by internalManifest {
 
-  override fun inheritFrom(
-    vararg inheritPaths: Any,
-    action: Action<ManifestMergeSpec>,
-  ) {
-    inheritPaths.forEach {
-      from(it, action)
-    }
+  override fun inheritFrom(vararg inheritPaths: Any, action: Action<ManifestMergeSpec>) {
+    inheritPaths.forEach { from(it, action) }
   }
 }

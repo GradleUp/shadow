@@ -11,8 +11,9 @@ fun requireResourceAsStream(name: String): InputStream {
 }
 
 fun requireResourceAsPath(name: String): Path {
-  val resource = Utils::class.java.classLoader.getResource(name)
-    ?: throw NoSuchFileException("Resource $name not found.")
+  val resource =
+    Utils::class.java.classLoader.getResource(name)
+      ?: throw NoSuchFileException("Resource $name not found.")
   return resource.toURI().toPath()
 }
 

@@ -19,21 +19,16 @@ plugins {
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
+
 group = providers.gradleProperty("GROUP").get()
+
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
-dokka {
-  dokkaPublications.html {
-    outputDirectory = rootDir.resolve("docs/api")
-  }
-}
+dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") } }
 
 kotlin {
   explicitApi()
-  @OptIn(ExperimentalAbiValidation::class)
-  abiValidation {
-    enabled = true
-  }
+  @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
@@ -56,18 +51,15 @@ lint {
 }
 
 spotless {
-  kotlin {
-    ktlint(libs.ktlint.get().version)
-  }
-  kotlinGradle {
-    ktlint(libs.ktlint.get().version)
-  }
+  kotlin { ktfmt(libs.ktfmt.get().version).googleStyle() }
+  kotlinGradle { ktfmt(libs.ktfmt.get().version).googleStyle() }
 }
 
-val testPluginClasspath by configurations.registering {
-  isCanBeResolved = true
-  description = "Plugins used in integration tests could be resolved in classpath."
-}
+val testPluginClasspath by
+  configurations.registering {
+    isCanBeResolved = true
+    description = "Plugins used in integration tests could be resolved in classpath."
+  }
 
 val testKit by sourceSets.creating
 val testKitImplementation by configurations.getting
@@ -77,18 +69,18 @@ configurations.configureEach {
     API_ELEMENTS_CONFIGURATION_NAME,
     RUNTIME_ELEMENTS_CONFIGURATION_NAME,
     JAVADOC_ELEMENTS_CONFIGURATION_NAME,
-    SOURCES_ELEMENTS_CONFIGURATION_NAME,
-    -> outgoing {
-      // Main/current capability.
-      capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
+    SOURCES_ELEMENTS_CONFIGURATION_NAME ->
+      outgoing {
+        // Main/current capability.
+        capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
 
-      // Historical capabilities.
-      capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
-      capability("com.github.johnrengelman:shadow:$version")
-      capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
-      capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
-      capability("com.github.jengelman.gradle.plugins:shadow:$version")
-    }
+        // Historical capabilities.
+        capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
+        capability("com.github.johnrengelman:shadow:$version")
+        capability("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:$version")
+        capability("gradle.plugin.com.github.johnrengelman:shadow:$version")
+        capability("com.github.jengelman.gradle.plugins:shadow:$version")
+      }
   }
 }
 
@@ -108,11 +100,12 @@ configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
   )
 }
 
-val testGradleVersion: String = providers.gradleProperty("testGradleVersion").orNull.let {
-  val value = if (it == null || it == "current") GradleVersion.current().version else it
-  logger.lifecycle("Using Gradle $value in tests")
-  value
-}
+val testGradleVersion: String =
+  providers.gradleProperty("testGradleVersion").orNull.let {
+    val value = if (it == null || it == "current") GradleVersion.current().version else it
+    logger.lifecycle("Using Gradle $value in tests")
+    value
+  }
 
 dependencies {
   compileOnly(libs.develocity)
@@ -141,17 +134,15 @@ dependencies {
 }
 
 testing.suites {
-  getByName<JvmTestSuite>("test") {
-    dependencies {
-      implementation(libs.xmlunit)
-    }
-  }
+  getByName<JvmTestSuite>("test") { dependencies { implementation(libs.xmlunit) } }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
-        val docsDir = file("docs").also {
-          if (!it.exists() || !it.isDirectory) error("Docs dir $it does not exist or is not a directory.")
-        }
+        val docsDir =
+          file("docs").also {
+            if (!it.exists() || !it.isDirectory)
+              error("Docs dir $it does not exist or is not a directory.")
+          }
         // Add docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
         inputs.dir(docsDir)
         systemProperty("DOCS_DIR", docsDir.absolutePath)
@@ -215,10 +206,7 @@ gradlePlugin {
     }
   }
 
-  testSourceSets(
-    sourceSets["functionalTest"],
-    sourceSets["documentTest"],
-  )
+  testSourceSets(sourceSets["functionalTest"], sourceSets["documentTest"])
 }
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
@@ -234,11 +222,7 @@ tasks.withType<JavaCompile>().configureEach {
   options.release = libs.versions.jdkRelease.get().toInt()
 }
 
-tasks.pluginUnderTestMetadata {
-  pluginClasspath.from(
-    testPluginClasspath,
-  )
-}
+tasks.pluginUnderTestMetadata { pluginClasspath.from(testPluginClasspath) }
 
 tasks.validatePlugins {
   // TODO: https://github.com/gradle/gradle/issues/22600
@@ -254,11 +238,12 @@ tasks.check {
 }
 
 tasks.clean {
-  delete += listOf(
-    projectDir.resolve(".gradle"),
-    projectDir.resolve(".kotlin"),
-    dokka.dokkaPublications.html.map { it.outputDirectory },
-    // Generated by MkDocs.
-    rootDir.resolve("site"),
-  )
+  delete +=
+    listOf(
+      projectDir.resolve(".gradle"),
+      projectDir.resolve(".kotlin"),
+      dokka.dokkaPublications.html.map { it.outputDirectory },
+      // Generated by MkDocs.
+      rootDir.resolve("site"),
+    )
 }

@@ -28,9 +28,11 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 /**
- * Modified from [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformerTest.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/test/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformerTest.java).
+ * Modified from
+ * [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformerTest.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/test/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformerTest.java).
  */
-class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
+class Log4j2PluginsCacheFileTransformerTest :
+  BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
   @Test
   fun canTransformResource() {
     assertThat(transformer.canTransformResource("")).isFalse()
@@ -71,9 +73,7 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
     assertThat(transformer.hasTransformedResource()).isTrue()
 
     val jarBuff = ByteArrayOutputStream()
-    ZipOutputStream(jarBuff).use {
-      transformer.modifyOutputStream(it, false)
-    }
+    ZipOutputStream(jarBuff).use { transformer.modifyOutputStream(it, false) }
     JarInputStream(jarBuff.toByteArray().inputStream()).use { inputStream ->
       while (true) {
         val jarEntry = inputStream.nextJarEntry
@@ -94,9 +94,8 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
   @ParameterizedTest
   @MethodSource("relocationProvider")
   fun relocations(pattern: String, shadedPattern: String, expected: String) {
-    val aggregator = PluginCache().apply {
-      loadCacheFiles(Collections.enumeration(listOf(pluginCacheUrl)))
-    }
+    val aggregator =
+      PluginCache().apply { loadCacheFiles(Collections.enumeration(listOf(pluginCacheUrl))) }
     transformer.transform(context(SimpleRelocator(pattern, shadedPattern)))
     transformer.relocatePlugins(aggregator)
 
@@ -115,11 +114,16 @@ class Log4j2PluginsCacheFileTransformerTest : BaseTransformerTest<Log4j2PluginsC
     }
 
     @JvmStatic
-    fun relocationProvider() = listOf(
-      // test with matching relocator
-      Arguments.of("org.apache.logging", "new.location.org.apache.logging", "new.location.org.apache.logging"),
-      // test without matching relocator
-      Arguments.of("com.apache.logging", "new.location.com.apache.logging", "org.apache.logging"),
-    )
+    fun relocationProvider() =
+      listOf(
+        // test with matching relocator
+        Arguments.of(
+          "org.apache.logging",
+          "new.location.org.apache.logging",
+          "new.location.org.apache.logging",
+        ),
+        // test without matching relocator
+        Arguments.of("com.apache.logging", "new.location.com.apache.logging", "org.apache.logging"),
+      )
   }
 }

@@ -36,37 +36,45 @@ class ApplicationPluginTest : BasePluginTest() {
   @DisabledOnOs(
     OS.WINDOWS,
     architectures = ["aarch64"],
-    disabledReason = "Cannot use toolchain on Windows ARM64", // TODO: remove when min Gradle is bumped to 9.2+
+    disabledReason =
+      "Cannot use toolchain on Windows ARM64", // TODO: remove when min Gradle is bumped to 9.2+
   )
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
       mainClassWithImports = true,
       dependenciesBlock = "implementation 'junit:junit:3.8.2'",
-      projectBlock = """
+      projectBlock =
+        """
         java {
           toolchain.languageVersion = JavaLanguageVersion.of(17)
         }
-      """.trimIndent(),
-      settingsBlock = """
+        """
+          .trimIndent(),
+      settingsBlock =
+        """
         plugins {
           id 'org.gradle.toolchains.foojay-resolver-convention'
         }
-      """.trimIndent(),
-      runShadowBlock = $$"""
+        """
+          .trimIndent(),
+      runShadowBlock =
+        $$"""
         doFirst {
           logger.lifecycle("Running application with JDK ${it.javaLauncher.get().metadata.languageVersion.asInt()}")
         }
-      """.trimIndent(),
+        """
+          .trimIndent(),
     )
 
     val result = runWithSuccess(runShadowPath)
 
-    assertThat(result.output).contains(
-      "Running application with JDK 17",
-      "Hello, World! (foo) from Main",
-      "Refs: junit.framework.Test",
-    )
+    assertThat(result.output)
+      .contains(
+        "Running application with JDK 17",
+        "Hello, World! (foo) from Main",
+        "Refs: junit.framework.Test",
+      )
   }
 
   @Test
@@ -74,17 +82,19 @@ class ApplicationPluginTest : BasePluginTest() {
     prepare(
       mainClassWithImports = true,
       dependenciesBlock = "implementation 'junit:junit:3.8.2'",
-      applicationBlock = "applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']",
+      applicationBlock =
+        "applicationDefaultJvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']",
     )
 
     runWithSuccess(installShadowDistPath)
 
     val installPath = path("build/install/")
-    assertThat(installPath.walkEntries()).containsOnly(
-      "myapp-shadow/bin/myapp",
-      "myapp-shadow/bin/myapp.bat",
-      "myapp-shadow/lib/myapp-1.0-all.jar",
-    )
+    assertThat(installPath.walkEntries())
+      .containsOnly(
+        "myapp-shadow/bin/myapp",
+        "myapp-shadow/bin/myapp.bat",
+        "myapp-shadow/lib/myapp-1.0-all.jar",
+      )
 
     commonAssertions(
       jarPath("myapp-shadow/lib/myapp-1.0-all.jar", installPath),
@@ -94,25 +104,26 @@ class ApplicationPluginTest : BasePluginTest() {
     val unixScript = path("myapp-shadow/bin/myapp", installPath)
     val winScript = path("myapp-shadow/bin/myapp.bat", installPath)
 
-    assertThat(unixScript.readText()).contains(
-      $$"CLASSPATH=$APP_HOME/lib/myapp-1.0-all.jar",
-      $$"exec \"$JAVACMD\" \"$@\"",
-      "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
-    )
-    assertThat(winScript.readText()).contains(
-      "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
-      "set DEFAULT_JVM_OPTS=\"--add-opens=java.base/java.lang=ALL-UNNAMED\"",
-    )
+    assertThat(unixScript.readText())
+      .contains(
+        $$"CLASSPATH=$APP_HOME/lib/myapp-1.0-all.jar",
+        $$"exec \"$JAVACMD\" \"$@\"",
+        "DEFAULT_JVM_OPTS='\"--add-opens=java.base/java.lang=ALL-UNNAMED\"'",
+      )
+    assertThat(winScript.readText())
+      .contains(
+        "set CLASSPATH=%APP_HOME%\\lib\\myapp-1.0-all.jar",
+        "set DEFAULT_JVM_OPTS=\"--add-opens=java.base/java.lang=ALL-UNNAMED\"",
+      )
 
-    val runningOutput = if (isWindows) {
-      runProcess(winScript.toString(), "bar")
-    } else {
-      runProcess(unixScript.toString(), "bar")
-    }
-    assertThat(runningOutput).contains(
-      "Hello, World! (bar) from Main",
-      "Refs: junit.framework.Test",
-    )
+    val runningOutput =
+      if (isWindows) {
+        runProcess(winScript.toString(), "bar")
+      } else {
+        runProcess(unixScript.toString(), "bar")
+      }
+    assertThat(runningOutput)
+      .contains("Hello, World! (bar) from Main", "Refs: junit.framework.Test")
   }
 
   @Test
@@ -124,20 +135,20 @@ class ApplicationPluginTest : BasePluginTest() {
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/613",
-  )
+  @Issue("https://github.com/GradleUp/shadow/issues/613")
   @Test
   fun overrideMainClassAttrInManifestBlock() {
     val main2ClassEntry = writeClass(className = "Main2")
     prepare(
-      projectBlock = """
+      projectBlock =
+        """
         shadowJar {
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main2'
           }
         }
-      """.trimIndent(),
+      """
+          .trimIndent()
     )
 
     var result = runWithSuccess(runShadowPath)
@@ -158,10 +169,11 @@ class ApplicationPluginTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        run {
-          args 'bar'
-        }
-      """.trimIndent(),
+      run {
+        args 'bar'
+      }
+      """
+        .trimIndent()
     )
 
     result = runWithSuccess(":run")
@@ -177,7 +189,8 @@ class ApplicationPluginTest : BasePluginTest() {
         $shadowJarTask {
           mainClass = 'my.Main2' // Different from application.mainClass.
         }
-      """.trimIndent(),
+      """
+        .trimIndent()
     )
 
     runWithSuccess(runShadowPath) // Run without errors.
@@ -193,9 +206,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     val result = runWithFailure(runShadowPath)
 
-    assertThat(result.output).contains(
-      "no main manifest attribute, in",
-    )
+    assertThat(result.output).contains("no main manifest attribute, in")
   }
 
   @Test
@@ -203,18 +214,22 @@ class ApplicationPluginTest : BasePluginTest() {
     path("extra/echo.sh").writeText("echo 'Hello, World!'")
     path("some/dir/hello.txt").writeText("'Hello, World!'")
     prepare(
-      projectBlock = """
+      projectBlock =
+        """
         distributions.named('$DISTRIBUTION_NAME') {
           contents.from('extra/echo.sh') {
             into 'extra'
           }
         }
-      """.trimIndent(),
-      applicationBlock = """
+      """
+          .trimIndent(),
+      applicationBlock =
+        """
         applicationDistribution.from('some/dir') {
           include '*.txt'
         }
-      """.trimIndent(),
+        """
+          .trimIndent(),
     )
 
     runWithSuccess(shadowDistZipPath)
@@ -222,17 +237,16 @@ class ApplicationPluginTest : BasePluginTest() {
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
       val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
-      assertThat(entries).containsOnly(
-        "myapp-shadow-1.0/bin/myapp",
-        "myapp-shadow-1.0/bin/myapp.bat",
-        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
-        "myapp-shadow-1.0/extra/echo.sh",
-        "myapp-shadow-1.0/hello.txt",
-      )
-      assertThat(zip.getContent("myapp-shadow-1.0/extra/echo.sh"))
-        .isEqualTo("echo 'Hello, World!'")
-      assertThat(zip.getContent("myapp-shadow-1.0/hello.txt"))
-        .isEqualTo("'Hello, World!'")
+      assertThat(entries)
+        .containsOnly(
+          "myapp-shadow-1.0/bin/myapp",
+          "myapp-shadow-1.0/bin/myapp.bat",
+          "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+          "myapp-shadow-1.0/extra/echo.sh",
+          "myapp-shadow-1.0/hello.txt",
+        )
+      assertThat(zip.getContent("myapp-shadow-1.0/extra/echo.sh")).isEqualTo("echo 'Hello, World!'")
+      assertThat(zip.getContent("myapp-shadow-1.0/hello.txt")).isEqualTo("'Hello, World!'")
     }
   }
 
@@ -246,14 +260,14 @@ class ApplicationPluginTest : BasePluginTest() {
     val zipPath = path("build/distributions/myapp-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
       val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
-      assertThat(entries).containsOnly(
-        "myapp-shadow-1.0/bin/myapp",
-        "myapp-shadow-1.0/bin/myapp.bat",
-        "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
-        "myapp-shadow-1.0/echo.sh",
-      )
-      assertThat(zip.getContent("myapp-shadow-1.0/echo.sh"))
-        .isEqualTo("echo 'Hello, World!'")
+      assertThat(entries)
+        .containsOnly(
+          "myapp-shadow-1.0/bin/myapp",
+          "myapp-shadow-1.0/bin/myapp.bat",
+          "myapp-shadow-1.0/lib/myapp-1.0-all.jar",
+          "myapp-shadow-1.0/echo.sh",
+        )
+      assertThat(zip.getContent("myapp-shadow-1.0/echo.sh")).isEqualTo("echo 'Hello, World!'")
     }
   }
 
@@ -263,27 +277,31 @@ class ApplicationPluginTest : BasePluginTest() {
     val executableDirs = "sbin" to "sbin"
 
     prepare(
-      applicationBlock = """
+      applicationBlock =
+        """
         applicationName = '${applicationNames.first}'
         executableDir = '${executableDirs.first}'
-      """.trimIndent(),
+      """
+          .trimIndent()
     )
 
     runWithSuccess(installShadowDistPath, shadowDistZipPath)
 
-    assertThat(path("build/install/").walkEntries()).containsOnly(
-      "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}",
-      "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}.bat",
-      "${applicationNames.second}-shadow/lib/myapp-1.0-all.jar",
-    )
+    assertThat(path("build/install/").walkEntries())
+      .containsOnly(
+        "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}",
+        "${applicationNames.second}-shadow/${executableDirs.second}/${applicationNames.second}.bat",
+        "${applicationNames.second}-shadow/lib/myapp-1.0-all.jar",
+      )
     val zipPath = path("build/distributions/${applicationNames.second}-shadow-1.0.zip")
     ZipFile(zipPath.toFile()).use { zip ->
       val entries = zip.entries().toList().filter { !it.isDirectory }.map { it.name }
-      assertThat(entries).containsOnly(
-        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}",
-        "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}.bat",
-        "${applicationNames.second}-shadow-1.0/lib/myapp-1.0-all.jar",
-      )
+      assertThat(entries)
+        .containsOnly(
+          "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}",
+          "${applicationNames.second}-shadow-1.0/${executableDirs.second}/${applicationNames.second}.bat",
+          "${applicationNames.second}-shadow-1.0/lib/myapp-1.0-all.jar",
+        )
     }
   }
 
@@ -312,13 +330,14 @@ class ApplicationPluginTest : BasePluginTest() {
           args 'foo'
           $runShadowBlock
         }
-      """.trimIndent() + lineSeparator,
+      """
+        .trimIndent() + lineSeparator
     )
     settingsScript.writeText(
       getDefaultSettingsBuildScript(
         startBlock = settingsBlock,
         endBlock = "rootProject.name = 'myapp'",
-      ),
+      )
     )
   }
 
@@ -337,9 +356,10 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private companion object {
     @OptIn(ExperimentalPathApi::class)
-    fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> = walk()
-      .filter { includeDirs || it.isRegularFile() }
-      .map { it.relativeTo(this) }
-      .map { it.invariantSeparatorsPathString }
+    fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> =
+      walk()
+        .filter { includeDirs || it.isRegularFile() }
+        .map { it.relativeTo(this) }
+        .map { it.invariantSeparatorsPathString }
   }
 }

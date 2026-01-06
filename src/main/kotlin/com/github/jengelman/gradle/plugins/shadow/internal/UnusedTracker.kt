@@ -22,7 +22,9 @@ internal class UnusedTracker(
   private val cp = Clazzpath()
 
   init {
-    projectUnits = sourceSetsClassesDirs.map { cp.addClazzpathUnit(it) } + classJars.map { cp.addClazzpathUnit(it) }
+    projectUnits =
+      sourceSetsClassesDirs.map { cp.addClazzpathUnit(it) } +
+        classJars.map { cp.addClazzpathUnit(it) }
   }
 
   fun findUnused(): Set<String> {
@@ -42,8 +44,8 @@ internal class UnusedTracker(
 
   companion object {
     fun getApiJarsFromProject(project: Project): FileCollection {
-      val apiDependencies = project.configurations.findByName("api")?.dependencies
-        ?: return project.files()
+      val apiDependencies =
+        project.configurations.findByName("api")?.dependencies ?: return project.files()
       val runtimeConfiguration = project.runtimeConfiguration
       val apiJars = mutableListOf<File>()
       apiDependencies.forEach { dep ->
@@ -59,7 +61,8 @@ internal class UnusedTracker(
           is ExternalModuleDependency -> Unit
           else -> {
             addJar(runtimeConfiguration, dep, apiJars)
-            val jarFile = runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } ?: return@forEach
+            val jarFile =
+              runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } ?: return@forEach
             apiJars.add(jarFile)
           }
         }
