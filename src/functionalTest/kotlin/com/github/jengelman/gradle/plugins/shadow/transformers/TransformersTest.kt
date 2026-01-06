@@ -344,7 +344,7 @@ class TransformersTest : BaseTransformerTest() {
       )
       getContent(customNoticeEntry).isEqualTo(
         """
-          Copyright 2006-2025 The Apache Software Foundation
+          Copyright 2006-2026 The Apache Software Foundation
 
           This product includes software developed at
           The Apache Software Foundation (https://www.apache.org/).
