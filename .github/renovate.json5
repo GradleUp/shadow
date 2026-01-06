@@ -8,14 +8,6 @@
   ],
   packageRules: [
     {
-      // https://github.com/tcurdt/jdependency/issues/325
-      groupName: 'ASM and jdependency',
-      matchPackageNames: [
-        'org.vafer:jdependency',
-        'org.ow2.asm:asm-commons',
-      ],
-    },
-    {
       groupName: 'Develocity',
       matchPackageNames: [
         'com.gradle:develocity-gradle-plugin',

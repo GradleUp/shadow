@@ -115,7 +115,6 @@ dependencies {
   implementation(libs.apache.commonsCodec)
   implementation(libs.apache.commonsIo)
   implementation(libs.apache.log4j)
-  implementation(libs.asm)
   implementation(libs.jdependency)
   implementation(libs.jdom2)
   implementation(libs.kotlin.metadata)
