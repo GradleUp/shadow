@@ -13,7 +13,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWar
 import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.testkit.toWarningsAsErrors
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
@@ -378,16 +377,9 @@ abstract class BasePluginTest {
   }
 
   private fun runner(arguments: Iterable<String>, block: GradleRunner.() -> Unit): GradleRunner {
-    val warningsAsErrors =
-      try {
-        projectScript.readText().toWarningsAsErrors()
-      } catch (_: UninitializedPropertyAccessException) {
-        true // Default warning mode if projectScript is not initialized yet.
-      }
     return gradleRunner(
       projectDir = projectRoot,
       arguments = commonGradleArgs + arguments,
-      warningsAsErrors = warningsAsErrors,
       block = block,
     )
   }

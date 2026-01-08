@@ -60,6 +60,3 @@ fun BuildResult.assertNoDeprecationWarnings() = apply {
       "will fail with an error in Gradle",
     )
 }
-
-// TODO: https://youtrack.jetbrains.com/issue/KT-78620
-fun String.toWarningsAsErrors(): Boolean = !contains("org.jetbrains.kotlin.multiplatform")
