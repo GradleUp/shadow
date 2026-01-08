@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.snippet
 
 import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
-import com.github.jengelman.gradle.plugins.shadow.testkit.toWarningsAsErrors
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
@@ -92,11 +91,7 @@ sealed class SnippetExecutable : Executable {
     }
 
     try {
-      gradleRunner(
-          projectDir = projectRoot,
-          arguments = listOf("build", "--stacktrace"),
-          warningsAsErrors = mainScript.toWarningsAsErrors(),
-        )
+      gradleRunner(projectDir = projectRoot, arguments = listOf("build", "--stacktrace"))
         .build()
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
