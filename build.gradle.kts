@@ -26,8 +26,9 @@ description = providers.gradleProperty("POM_DESCRIPTION").get()
 
 dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") } }
 
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
+
 kotlin {
-  jvmToolchain(libs.versions.jdkRelease.get().toInt())
   explicitApi()
   @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
   compilerOptions {
@@ -37,6 +38,7 @@ kotlin {
     languageVersion = apiVersion
     jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+    freeCompilerArgs.add("-Xjdk-release=${libs.versions.jdkRelease.get()}")
   }
 }
 
