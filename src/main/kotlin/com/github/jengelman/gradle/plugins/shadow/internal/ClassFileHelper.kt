@@ -26,6 +26,7 @@ import java.lang.classfile.instruction.NewObjectInstruction
 import java.lang.classfile.instruction.NewReferenceArrayInstruction
 import java.lang.classfile.instruction.TypeCheckInstruction
 import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDesc
 import java.lang.constant.MethodTypeDesc
 import java.util.function.Function
 
@@ -181,7 +182,7 @@ internal object ClassFileHelper {
             builder.ldc(mapFunction.apply(ce.asSymbol()))
           } else if (element.constantEntry() is StringEntry) {
             val se = element.constantEntry() as StringEntry
-            builder.ldc(mapValueFunction.apply(se.stringValue()))
+            builder.ldc(mapValueFunction.apply(se.stringValue()) as ConstantDesc)
           } else {
             builder.with(element)
           }
