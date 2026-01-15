@@ -32,8 +32,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
-  private val javaExec = System.getProperty("java.home") + "/bin/java"
-
   @ParameterizedTest
   @ValueSource(strings = ["foo", "new.pkg", "new/path"])
   fun autoRelocation(relocationPrefix: String) {
@@ -498,7 +496,7 @@ class RelocationTest : BasePluginTest() {
     )
 
     runWithSuccess(shadowJarPath)
-    val result = runProcess(javaExec, "-jar", outputShadowedJar.use { it.toString() })
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
   }
@@ -526,7 +524,7 @@ class RelocationTest : BasePluginTest() {
     )
 
     runWithSuccess(shadowJarPath)
-    val result = runProcess(javaExec, "-jar", outputShadowedJar.use { it.toString() })
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     if (skipStringConstants) {
       assertThat(result).contains("foo.Foo", "foo.Bar")
@@ -564,7 +562,7 @@ class RelocationTest : BasePluginTest() {
     )
 
     runWithSuccess(shadowJarPath)
-    val result = runProcess(javaExec, "-jar", outputShadowedJar.use { it.toString() })
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     // Just check that the jar can be executed without NoClassDefFoundError.
     assertThat(result)
