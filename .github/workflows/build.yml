@@ -29,7 +29,7 @@ jobs:
   build-status:
     needs:
       - build
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-slim
     if: always()
     steps:
       - name: Check
