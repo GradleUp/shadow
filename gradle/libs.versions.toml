@@ -1,5 +1,5 @@
 [versions]
-jdkRelease = "17"
+jdkRelease = "24"
 minGradle = "9.0.0"
 kotlin = "2.3.20-Beta1"
 moshi = "1.15.2"

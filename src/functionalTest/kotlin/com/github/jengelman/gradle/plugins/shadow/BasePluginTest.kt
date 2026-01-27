@@ -380,7 +380,10 @@ abstract class BasePluginTest {
     return gradleRunner(
       projectDir = projectRoot,
       arguments = commonGradleArgs + arguments,
-      block = block,
+      block = {
+        forwardOutput()
+        block()
+      },
     )
   }
 
