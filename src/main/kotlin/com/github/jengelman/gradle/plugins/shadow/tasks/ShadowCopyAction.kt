@@ -4,6 +4,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.internal.ClassFileHelper
 import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
@@ -32,9 +33,6 @@ import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
-import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
-import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
-import org.vafer.jdeb.shaded.objectweb.asm.commons.ClassRemapper
 
 /**
  * Modified from
@@ -222,19 +220,16 @@ constructor(
         // constant pool are never used), but confuses some tools such as Felix's
         // maven-bundle-plugin
         // that use the constant pool to determine the dependencies of a class.
-        val cw = ClassWriter(0)
-        val cr = ClassReader(bytes)
-        val cv = ClassRemapper(cw, remapper)
-
-        try {
-          cr.accept(cv, ClassReader.EXPAND_FRAMES)
-        } catch (t: Throwable) {
-          throw GradleException("Error in ASM processing class $path", t)
-        }
-
         val newBytes =
+          try {
+            ClassFileHelper.remapClass(bytes, remapper::map, remapper::mapValue)
+          } catch (t: Throwable) {
+            throw GradleException("Error in Class-File API processing class $path", t)
+          }
+
+        val resultBytes =
           if (modified) {
-            cw.toByteArray()
+            newBytes
           } else {
             // If we didn't need to change anything, keep the original bytes as-is
             bytes
@@ -251,7 +246,7 @@ constructor(
             }
           // Now we put it back on so the class file is written out with the right extension.
           zipOutStr.putNextEntry(entry)
-          zipOutStr.write(newBytes)
+          zipOutStr.write(resultBytes)
           zipOutStr.closeEntry()
         } catch (_: ZipException) {
           logger.warn("We have a duplicate $relocatedPath in source project")

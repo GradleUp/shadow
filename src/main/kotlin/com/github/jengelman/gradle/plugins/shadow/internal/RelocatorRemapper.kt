@@ -3,9 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
+import java.lang.constant.ClassDesc
 import java.util.regex.Pattern
-import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
-import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
 
 /**
  * Modified from
@@ -18,17 +17,27 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
 internal class RelocatorRemapper(
   private val relocators: Set<Relocator>,
   private val onModified: () -> Unit = {},
-) : Remapper(Opcodes.ASM9) {
+) {
 
-  override fun mapValue(value: Any): Any {
-    return if (value is String) {
-      mapName(value, mapLiterals = true)
+  fun map(desc: ClassDesc): ClassDesc {
+    val descriptor = desc.descriptorString()
+    // We only map class types (L...;), not primitives.
+    if (descriptor.length < 3 || descriptor[0] != 'L') return desc
+
+    // Extract internal name: Lcom/example/Foo; -> com/example/Foo
+    val internalName = descriptor.substring(1, descriptor.length - 1)
+    val newInternalName = mapName(internalName, mapLiterals = false)
+
+    return if (newInternalName != internalName) {
+      ClassDesc.ofDescriptor("L$newInternalName;")
     } else {
-      super.mapValue(value)
+      desc
     }
   }
 
-  override fun map(internalName: String): String = mapName(internalName)
+  fun mapValue(value: String): String {
+    return mapName(value, true)
+  }
 
   private fun mapName(name: String, mapLiterals: Boolean = false): String {
     // Maybe a list of types.
