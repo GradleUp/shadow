@@ -31,6 +31,7 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -40,6 +41,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -254,9 +256,14 @@ class ShadowPropertiesTest {
       plugins.apply(JavaGradlePluginPlugin::class.java)
       val api = configurations.named(API_CONFIGURATION_NAME).get()
       val compileOnly = configurations.named(COMPILE_ONLY_CONFIGURATION_NAME).get()
+      val compileOnlyApi = configurations.named(COMPILE_ONLY_API_CONFIGURATION_NAME).get()
       val gradleApi = dependencies.gradleApi()
       assertThat(api.dependencies).containsNone(gradleApi)
-      assertThat(compileOnly.dependencies).containsOnly(gradleApi)
+      if (GradleVersion.current() < GradleVersion.version("9.4.0-rc-1")) {
+        assertThat(compileOnly.dependencies).containsOnly(gradleApi)
+      } else {
+        assertThat(compileOnlyApi.dependencies).containsOnly(gradleApi)
+      }
     }
 
   private companion object {

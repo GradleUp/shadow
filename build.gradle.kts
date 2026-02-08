@@ -196,8 +196,7 @@ gradlePlugin {
   vcsUrl = providers.gradleProperty("POM_URL")
 
   plugins {
-    create("shadowPlugin") {
-      id = "com.gradleup.shadow"
+    create("com.gradleup.shadow") {
       implementationClass = "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
       displayName = providers.gradleProperty("POM_NAME").get()
       description = providers.gradleProperty("POM_DESCRIPTION").get()
@@ -222,11 +221,6 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.pluginUnderTestMetadata { pluginClasspath.from(testPluginClasspath) }
-
-tasks.validatePlugins {
-  // TODO: https://github.com/gradle/gradle/issues/22600
-  enableStricterValidation = true
-}
 
 tasks.check { dependsOn(tasks.withType<Test>()) }
 

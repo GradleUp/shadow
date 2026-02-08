@@ -34,11 +34,13 @@ import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -515,11 +517,16 @@ class JavaPluginsTest : BasePluginTest() {
     projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
 
     val outputCompileOnly = dependencies(COMPILE_ONLY_CONFIGURATION_NAME)
+    val outputCompileOnlyApi = dependencies(COMPILE_ONLY_API_CONFIGURATION_NAME)
     val outputApi = dependencies(API_CONFIGURATION_NAME)
 
     // "unspecified" is the local Gradle API.
-    assertThat(outputCompileOnly).contains("unspecified")
-    assertThat(outputApi).doesNotContain("unspecified")
+    if (GradleVersion.current() < GradleVersion.version("9.4.0-rc-1")) {
+      assertThat(outputCompileOnly).contains("unspecified")
+      assertThat(outputApi).doesNotContain("unspecified")
+    } else {
+      assertThat(outputCompileOnlyApi).contains("unspecified")
+    }
   }
 
   @Issue("https://github.com/GradleUp/shadow/issues/1422")
