@@ -17,8 +17,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       extensions.getByType(KotlinMultiplatformExtension::class.java).targets.configureEach { target
         ->
         if (target !is KotlinJvmTarget) return@configureEach
-        @Suppress("EagerGradleConfiguration")
-        if (tasks.findByName(SHADOW_JAR_TASK_NAME) != null) {
+        if (tasks.names.contains(SHADOW_JAR_TASK_NAME)) {
           // Declaring multiple Kotlin Targets of the same type is not supported. See
           // https://kotl.in/declaring-multiple-targets for more details.
           logger.info(
