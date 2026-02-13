@@ -67,6 +67,6 @@ When adding new features or public APIs:
 3. Run all test suites: `./gradlew test documentTest functionalTest`
 4. Run `./gradlew checkKotlinAbi` to ensure API compatibility
 5. Run `./gradlew lint` to check for potential issues
-6. Or just run `./gradlew build` for depending on the tasks above
+6. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 7. Ensure your commit messages are clear and descriptive
 
