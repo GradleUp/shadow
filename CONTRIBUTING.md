@@ -25,7 +25,7 @@ Make sure all tests pass before submitting your changes.
 
 ### API Compatibility
 
-Shadow uses Kotlin's [binary compatibility validator](https://github.com/Kotlin/binary-compatibility-validator) to track public API changes.
+Shadow uses Kotlin's [binary compatibility validator](https://kotlinlang.org/docs/gradle-binary-compatibility-validation.html) to track public API changes.
 
 - **Check API dumps**: `./gradlew checkKotlinAbi`
 - **Update API dumps**: `./gradlew updateKotlinAbi`
