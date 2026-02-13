@@ -70,6 +70,3 @@ When adding new features or public APIs:
 6. Or just run `./gradlew build` for depending on the tasks above
 7. Ensure your commit messages are clear and descriptive
 
-## Questions?
-
-If you have questions or need help, feel free to open an issue or discussion on the [GitHub repository](https://github.com/GradleUp/shadow).
