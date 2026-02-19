@@ -351,6 +351,7 @@ abstract class BasePluginTest {
         gradlePlugin {
           plugins {
             create('my.plugin') {
+              id = 'my.plugin'
               implementationClass = 'my.plugin.MyPlugin'
             }
           }

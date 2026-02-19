@@ -204,7 +204,7 @@ gradlePlugin {
     }
   }
 
-  testSourceSets(sourceSets["functionalTest"], sourceSets["documentTest"])
+  testSourceSets(sourceSets["test"], sourceSets["functionalTest"], sourceSets["documentTest"])
 }
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.

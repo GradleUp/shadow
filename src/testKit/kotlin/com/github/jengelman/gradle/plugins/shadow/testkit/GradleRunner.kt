@@ -15,7 +15,7 @@ private val testKitDir by lazy {
   Path(gradleUserHome, "testkit")
 }
 
-private val testGradleVersion by lazy {
+val testGradleVersion: String by lazy {
   System.getProperty("TEST_GRADLE_VERSION")
     ?: error("TEST_GRADLE_VERSION system property is not set.")
 }

@@ -41,7 +41,6 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -259,11 +258,8 @@ class ShadowPropertiesTest {
       val compileOnlyApi = configurations.named(COMPILE_ONLY_API_CONFIGURATION_NAME).get()
       val gradleApi = dependencies.gradleApi()
       assertThat(api.dependencies).containsNone(gradleApi)
-      if (GradleVersion.current() < GradleVersion.version("9.4.0-rc-1")) {
-        assertThat(compileOnly.dependencies).containsOnly(gradleApi)
-      } else {
-        assertThat(compileOnlyApi.dependencies).containsOnly(gradleApi)
-      }
+      assertThat(compileOnly.dependencies).containsNone(gradleApi)
+      assertThat(compileOnlyApi.dependencies).containsOnly(gradleApi)
     }
 
   private companion object {

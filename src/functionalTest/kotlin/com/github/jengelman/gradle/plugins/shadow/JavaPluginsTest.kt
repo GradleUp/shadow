@@ -23,6 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.testGradleVersion
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
@@ -521,11 +522,11 @@ class JavaPluginsTest : BasePluginTest() {
     val outputApi = dependencies(API_CONFIGURATION_NAME)
 
     // "unspecified" is the local Gradle API.
-    if (GradleVersion.current() < GradleVersion.version("9.4.0-rc-1")) {
+    if (GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.4.0-rc-1")) {
+      assertThat(outputCompileOnlyApi).contains("unspecified")
+    } else {
       assertThat(outputCompileOnly).contains("unspecified")
       assertThat(outputApi).doesNotContain("unspecified")
-    } else {
-      assertThat(outputCompileOnlyApi).contains("unspecified")
     }
   }
 
