@@ -31,6 +31,7 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -254,9 +255,11 @@ class ShadowPropertiesTest {
       plugins.apply(JavaGradlePluginPlugin::class.java)
       val api = configurations.named(API_CONFIGURATION_NAME).get()
       val compileOnly = configurations.named(COMPILE_ONLY_CONFIGURATION_NAME).get()
+      val compileOnlyApi = configurations.named(COMPILE_ONLY_API_CONFIGURATION_NAME).get()
       val gradleApi = dependencies.gradleApi()
       assertThat(api.dependencies).containsNone(gradleApi)
-      assertThat(compileOnly.dependencies).containsOnly(gradleApi)
+      assertThat(compileOnly.dependencies).containsNone(gradleApi)
+      assertThat(compileOnlyApi.dependencies).containsOnly(gradleApi)
     }
 
   private companion object {

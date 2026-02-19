@@ -350,7 +350,7 @@ abstract class BasePluginTest {
         ${getDefaultProjectBuildScript("java-gradle-plugin")}
         gradlePlugin {
           plugins {
-            create('myPlugin') {
+            create('my.plugin') {
               id = 'my.plugin'
               implementationClass = 'my.plugin.MyPlugin'
             }

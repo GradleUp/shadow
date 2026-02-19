@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.addVariantsFromConfigurationCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.moveGradleApiIntoCompileOnly
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
@@ -21,9 +22,7 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
-import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
-import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin
@@ -141,23 +140,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   }
 
   protected open fun Project.configureJavaGradlePlugin() {
-    // org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
-    plugins.withId("org.gradle.java-gradle-plugin") {
-      val gradleApi = dependencies.gradleApi()
-      // Remove the gradleApi so it isn't merged into the jar file.
-      // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
-      // See
-      // https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161.
-      configurations.named(API_CONFIGURATION_NAME) { api ->
-        // Only proceed if the removal is successful.
-        if (!api.dependencies.remove(gradleApi)) return@named
-        // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
-        configurations
-          .getByName(COMPILE_ONLY_CONFIGURATION_NAME)
-          .dependencies
-          .add(dependencies.gradleApi())
-      }
-    }
+    moveGradleApiIntoCompileOnly()
   }
 
   public companion object {
