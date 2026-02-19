@@ -1,7 +1,7 @@
 [versions]
 jdkRelease = "17"
 minGradle = "9.0.0"
-kotlin = "2.3.20-Beta2"
+kotlin = "2.3.20-RC"
 moshi = "1.15.2"
 pluginPublish = "2.0.0"
 
