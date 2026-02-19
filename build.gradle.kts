@@ -26,6 +26,8 @@ description = providers.gradleProperty("POM_DESCRIPTION").get()
 
 dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") } }
 
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
+
 kotlin {
   explicitApi()
   @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
@@ -218,6 +220,7 @@ kotlin.target.compilations {
 
 tasks.withType<JavaCompile>().configureEach {
   options.release = libs.versions.jdkRelease.get().toInt()
+  options.compilerArgs.add("--enable-preview")
 }
 
 tasks.pluginUnderTestMetadata { pluginClasspath.from(testPluginClasspath) }
