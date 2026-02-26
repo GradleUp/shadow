@@ -386,6 +386,19 @@ If you used Shadow for merging service files, the following steps are recommende
 
 See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
+## [8.3.10](https://github.com/GradleUp/shadow/releases/tag/8.3.10) - 2026-02-26
+
+**Changed**
+
+- Stop using start script templates bundled in Shadow. ([#1750](https://github.com/GradleUp/shadow/pull/1750))
+- Update ASM and jdependency to support Java 26. ([#1810](https://github.com/GradleUp/shadow/pull/1810))
+
+**Fixed**
+
+- Fix resolving BOM dependencies when `minimize` is enabled. ([#1638](https://github.com/GradleUp/shadow/pull/1638))
+- Use ASM from jdependency embedded. ([#1898](https://github.com/GradleUp/shadow/pull/1898))  
+  This fixes potential classpath conflicts when using Shadow with other plugins that also use ASM.
+
 ## [8.3.9](https://github.com/GradleUp/shadow/releases/tag/8.3.9) - 2025-08-05
 
 **Changed**
