@@ -11,6 +11,8 @@
 **Fixed**
 
 - Fix resolving BOM dependencies when `minimize` is enabled. ([#1638](https://github.com/GradleUp/shadow/pull/1638))
+- Use ASM from jdependency embedded. ([#1898](https://github.com/GradleUp/shadow/pull/1898))  
+  This fixes potential classpath conflicts when using Shadow with other plugins that also use ASM.
 
 ## [v8.3.9] (2025-08-05)
 
