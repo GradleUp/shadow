@@ -74,7 +74,6 @@ publishing.publications.withType<MavenPublication>().configureEach {
 dependencies {
   api("org.apache.ant:ant:1.10.15") // Types from Ant are exposed in the public API.
   implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("org.ow2.asm:asm-commons:9.9")
   implementation("commons-io:commons-io:2.19.0")
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
   implementation("org.codehaus.plexus:plexus-xml:4.1.1")

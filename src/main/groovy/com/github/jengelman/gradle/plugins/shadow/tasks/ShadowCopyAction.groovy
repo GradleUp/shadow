@@ -34,10 +34,10 @@ import org.gradle.api.tasks.WorkResults
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.internal.UncheckedException
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.commons.ClassRemapper
+import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
+import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
+import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
+import org.vafer.jdeb.shaded.objectweb.asm.commons.ClassRemapper
 
 import java.util.zip.ZipException
 
