@@ -7,8 +7,8 @@ plugins {
   groovy
   `java-gradle-plugin`
   id("com.gradle.plugin-publish") version "2.0.0"
-  id("com.vanniktech.maven.publish") version "0.34.0"
-  id("com.diffplug.spotless") version "7.2.1"
+  id("com.vanniktech.maven.publish") version "0.36.0"
+  id("com.diffplug.spotless") version "8.2.1"
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -77,15 +77,15 @@ dependencies {
   implementation("org.ow2.asm:asm-commons:9.9")
   implementation("commons-io:commons-io:2.19.0")
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
-  implementation("org.codehaus.plexus:plexus-xml:4.1.0")
-  implementation("org.apache.logging.log4j:log4j-core:2.24.1")
+  implementation("org.codehaus.plexus:plexus-xml:4.1.1")
+  implementation("org.apache.logging.log4j:log4j-core:2.25.3")
   implementation("org.vafer:jdependency:2.15")
 
   testImplementation("org.spockframework:spock-core:2.4-groovy-4.0") {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
-  testImplementation("org.xmlunit:xmlunit-legacy:2.10.2")
+  testImplementation("org.xmlunit:xmlunit-legacy:2.11.0")
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
   testImplementation(platform("org.junit:junit-bom:5.13.1"))
