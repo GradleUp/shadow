@@ -6,11 +6,9 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.util.Properties
-import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * A resource transformer that handles Spring Boot configuration files to enable proper merging when
@@ -38,16 +36,20 @@ import org.gradle.api.tasks.Internal
  */
 @CacheableTransformer
 public open class SpringBootTransformer
-@Inject
-constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
+@JvmOverloads
+constructor(
+  patternSet: PatternSet =
+    PatternSet()
+      .include(PATH_SPRING_FACTORIES)
+      .include(PATH_SPRING_HANDLERS)
+      .include(PATH_SPRING_SCHEMAS)
+      .include(PATH_SPRING_TOOLING)
+      .include(PATH_SPRING_AUTOCONFIGURE_METADATA)
+      .include("$SPRING_IMPORTS_PREFIX*.imports"),
+) : PatternFilterableResourceTransformer(patternSet = patternSet) {
   @get:Internal internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
 
   @get:Internal internal val importsEntries = mutableMapOf<String, LinkedHashSet<String>>()
-
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return path in PROPERTIES_PATHS || isImportsFile(path)
-  }
 
   override fun transform(context: TransformerContext) {
     val path = context.path
@@ -107,15 +109,6 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     private const val SPRING_IMPORTS_PREFIX = "META-INF/spring/"
 
     private val PROPERTIES_CHARSET = Charsets.ISO_8859_1
-
-    internal val PROPERTIES_PATHS =
-      setOf(
-        PATH_SPRING_FACTORIES,
-        PATH_SPRING_HANDLERS,
-        PATH_SPRING_SCHEMAS,
-        PATH_SPRING_TOOLING,
-        PATH_SPRING_AUTOCONFIGURE_METADATA,
-      )
 
     internal fun isImportsFile(path: String): Boolean =
       path.startsWith(SPRING_IMPORTS_PREFIX) && path.endsWith(".imports")
