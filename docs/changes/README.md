@@ -7,6 +7,10 @@
 
 - Log warnings for duplicates in the final JAR. ([#1931](https://github.com/GradleUp/shadow/pull/1931))
 
+### Fixed
+
+- Fix relocation patterns not included in task fingerprint. ([#1933](https://github.com/GradleUp/shadow/pull/1933))
+
 ## [9.3.1](https://github.com/GradleUp/shadow/releases/tag/9.3.1) - 2026-01-06
 
 ### Fixed
