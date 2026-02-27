@@ -884,7 +884,7 @@ class JavaPluginsTest : BasePluginTest() {
       if (enable) {
         runWithFailure(shadowJarPath)
       } else {
-        runWithSuccess(shadowJarPath, infoArgument)
+        runWithSuccess(shadowJarPath)
       }
 
     assertThat(result.output)
@@ -911,7 +911,7 @@ class JavaPluginsTest : BasePluginTest() {
       if (enable) {
         runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
       } else {
-        runWithSuccess(shadowJarPath, infoArgument, "--no-fail-on-duplicate-entries")
+        runWithSuccess(shadowJarPath, "--no-fail-on-duplicate-entries")
       }
 
     assertThat(result.output)
