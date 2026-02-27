@@ -171,6 +171,100 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/1893")
+  @Test
+  fun shadowJarIsDefaultArtifactInMultiProjectBuild() {
+    settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
+    projectScript.writeText("")
+
+    path("foo/build.gradle").writeText(
+      """
+      ${getDefaultProjectBuildScript("java-library")}
+      dependencies {
+        implementation 'my:a:1.0'
+      }
+      configurations {
+        named('apiElements') {
+          outgoing.artifacts.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
+        }
+        named('runtimeElements') {
+          outgoing.artifacts.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
+        }
+      }
+      """.trimIndent() + lineSeparator,
+    )
+
+    path("consumer/build.gradle").writeText(
+      """
+      ${getDefaultProjectBuildScript("java")}
+      dependencies {
+        implementation project(':foo')
+      }
+      tasks.register('printClasspathFiles') {
+        doLast {
+          configurations.runtimeClasspath.files.each { println it.name }
+        }
+      }
+      """.trimIndent() + lineSeparator,
+    )
+
+    val result = runWithSuccess(":consumer:printClasspathFiles")
+    assertThat(result.output).all {
+      contains("foo-1.0-all.jar")
+      doesNotContain("foo-1.0.jar")
+    }
+  }
+
+  @Issue("https://github.com/GradleUp/shadow/issues/1893")
+  @Test
+  fun excludeRulesPreventBundledDepsOnConsumerClasspath() {
+    settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
+    projectScript.writeText("")
+
+    path("foo/build.gradle").writeText(
+      """
+      ${getDefaultProjectBuildScript("java-library")}
+      dependencies {
+        implementation 'my:a:1.0'
+      }
+      configurations {
+        named('apiElements') {
+          outgoing.artifacts.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
+          exclude(group: 'my', module: 'a')
+        }
+        named('runtimeElements') {
+          outgoing.artifacts.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
+          exclude(group: 'my', module: 'a')
+        }
+      }
+      """.trimIndent() + lineSeparator,
+    )
+
+    path("consumer/build.gradle").writeText(
+      """
+      ${getDefaultProjectBuildScript("java")}
+      dependencies {
+        implementation project(':foo')
+      }
+      tasks.register('printClasspathFiles') {
+        doLast {
+          configurations.runtimeClasspath.files.each { println it.name }
+        }
+      }
+      """.trimIndent() + lineSeparator,
+    )
+
+    val result = runWithSuccess(":consumer:printClasspathFiles")
+    assertThat(result.output).all {
+      contains("foo-1.0-all.jar")
+      doesNotContain("a-1.0.jar")
+    }
+  }
+
   @Issue("https://github.com/GradleUp/shadow/issues/1606")
   @Test
   fun shadowExposedCustomSourceSetOutput() {
