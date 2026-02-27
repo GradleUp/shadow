@@ -29,8 +29,8 @@ constructor(
   @get:Input internal val pathPattern: String
   @get:Input internal val shadedPattern: String
   @get:Input internal val shadedPathPattern: String
-  @get:Input internal val sourcePackageExcludes = mutableSetOf<String>()
-  @get:Input internal val sourcePathExcludes = mutableSetOf<String>()
+  internal val sourcePackageExcludes = mutableSetOf<String>()
+  internal val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input public val includes: MutableSet<String> = mutableSetOf()
   @get:Input public val excludes: MutableSet<String> = mutableSetOf()
