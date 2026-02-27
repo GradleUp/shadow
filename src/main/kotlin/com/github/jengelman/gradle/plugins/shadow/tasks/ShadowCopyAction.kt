@@ -144,7 +144,7 @@ constructor(
       if (failOnDuplicateEntries) {
         throw GradleException(message)
       } else {
-        logger.info(message)
+        logger.warn(message)
       }
     }
   }
