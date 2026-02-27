@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.3.1...HEAD) - 2026-xx-xx
 
+### Changed
+
+- Log warnings for duplicates in the final JAR. ([#1931](https://github.com/GradleUp/shadow/pull/1931))
 
 ## [9.3.1](https://github.com/GradleUp/shadow/releases/tag/9.3.1) - 2026-01-06
 
