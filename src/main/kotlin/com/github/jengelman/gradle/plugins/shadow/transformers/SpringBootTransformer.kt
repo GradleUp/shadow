@@ -45,7 +45,7 @@ constructor(
       .include(PATH_SPRING_SCHEMAS)
       .include(PATH_SPRING_TOOLING)
       .include(PATH_SPRING_AUTOCONFIGURE_METADATA)
-      .include("$SPRING_IMPORTS_PREFIX*.imports"),
+      .include("$SPRING_IMPORTS_PREFIX*.imports")
 ) : PatternFilterableResourceTransformer(patternSet = patternSet) {
   @get:Internal internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
 
