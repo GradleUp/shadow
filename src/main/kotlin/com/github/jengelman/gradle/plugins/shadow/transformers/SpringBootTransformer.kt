@@ -13,21 +13,21 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
 
 /**
- * A resource transformer that handles Spring Boot configuration files to enable proper merging
- * when creating a shadow JAR.
+ * A resource transformer that handles Spring Boot configuration files to enable proper merging when
+ * creating a shadow JAR.
  *
  * The following Spring Boot resource files are handled:
- * - `META-INF/spring.factories`: Properties file with comma-separated class name values,
- *   merged by appending values with a comma separator.
- * - `META-INF/spring.handlers`: Properties file with class name values, merged by appending
- *   with a comma separator.
+ * - `META-INF/spring.factories`: Properties file with comma-separated class name values, merged by
+ *   appending values with a comma separator.
+ * - `META-INF/spring.handlers`: Properties file with class name values, merged by appending with a
+ *   comma separator.
  * - `META-INF/spring.schemas`: Properties file with schema URL-to-path mappings, merged by
  *   appending with a comma separator.
- * - `META-INF/spring.tooling`: Properties file with tooling metadata, merged by appending
- *   with a comma separator.
+ * - `META-INF/spring.tooling`: Properties file with tooling metadata, merged by appending with a
+ *   comma separator.
  * - `META-INF/spring-autoconfigure-metadata.properties`: Properties file with autoconfiguration
  *   metadata, merged by appending with a comma separator.
- * - `META-INF/spring/*.imports`: Line-based files where each line is a fully qualified class
+ * - `META-INF/spring/`*`.imports`: Line-based files where each line is a fully qualified class
  *   name; lines are deduplicated and merged across JAR files.
  *
  * Class relocation is applied to both the keys and values of properties files (using path-based
@@ -40,11 +40,9 @@ import org.gradle.api.tasks.Internal
 public open class SpringBootTransformer
 @Inject
 constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
-  @get:Internal
-  internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
+  @get:Internal internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
 
-  @get:Internal
-  internal val importsEntries = mutableMapOf<String, LinkedHashSet<String>>()
+  @get:Internal internal val importsEntries = mutableMapOf<String, LinkedHashSet<String>>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val path = element.path
@@ -64,12 +62,14 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
         .forEach { entries.add(it) }
     } else {
       val props = propertiesEntries.getOrPut(path) { ReproducibleProperties() }
-      val incoming = Properties().apply { load(context.inputStream.bufferedReader(PROPERTIES_CHARSET)) }
+      val incoming =
+        Properties().apply { load(context.inputStream.bufferedReader(PROPERTIES_CHARSET)) }
       incoming.forEach { rawKey, rawValue ->
         val key = context.relocators.relocateClass(rawKey as String)
-        val value = (rawValue as String).splitToSequence(",").joinToString(",") { part ->
-          context.relocators.relocateValue(part.trim())
-        }
+        val value =
+          (rawValue as String).splitToSequence(",").joinToString(",") { part ->
+            context.relocators.relocateValue(part.trim())
+          }
         val existing = props.getProperty(key)
         if (existing != null) {
           props[key] = "$existing,$value"
@@ -121,10 +121,10 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
       path.startsWith(SPRING_IMPORTS_PREFIX) && path.endsWith(".imports")
 
     /**
-     * Relocates a value that may be either a dot-notation class name (e.g.,
-     * `com.example.MyClass`) or a slash-notation resource path (e.g.,
-     * `com/example/schema.xsd`). Path-notation values are relocated using
-     * [Iterable.relocatePath], and class-notation values using [Iterable.relocateClass].
+     * Relocates a value that may be either a dot-notation class name (e.g., `com.example.MyClass`)
+     * or a slash-notation resource path (e.g., `com/example/schema.xsd`). Path-notation values are
+     * relocated using [Iterable.relocatePath], and class-notation values using
+     * [Iterable.relocateClass].
      */
     private fun Iterable<Relocator>.relocateValue(value: String): String {
       return if (value.contains('/')) relocatePath(value) else relocateClass(value)

@@ -28,11 +28,13 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
-    assertThat(content).isEqualTo(
-      "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
-        "com.example.FooAutoConfiguration,com.example.BarAutoConfiguration\n",
-    )
+    val content =
+      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
+    assertThat(content)
+      .isEqualTo(
+        "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
+          "com.example.FooAutoConfiguration,com.example.BarAutoConfiguration\n"
+      )
   }
 
   @Test
@@ -57,13 +59,15 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
-    assertThat(content).isEqualTo(
-      "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
-        "com.example.FooAutoConfiguration,com.example.BarAutoConfiguration\n" +
-        "org.springframework.context.ApplicationListener=" +
-        "com.example.FooListener,com.example.BarListener\n",
-    )
+    val content =
+      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
+    assertThat(content)
+      .isEqualTo(
+        "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
+          "com.example.FooAutoConfiguration,com.example.BarAutoConfiguration\n" +
+          "org.springframework.context.ApplicationListener=" +
+          "com.example.FooListener,com.example.BarListener\n"
+      )
   }
 
   @Test
@@ -86,12 +90,14 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use {
-      it.getContent("META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
-    }
-    assertThat(content).isEqualTo(
-      "com.example.FooAutoConfiguration\ncom.example.BarAutoConfiguration",
-    )
+    val content =
+      outputShadowedJar.use {
+        it.getContent(
+          "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
+        )
+      }
+    assertThat(content)
+      .isEqualTo("com.example.FooAutoConfiguration\ncom.example.BarAutoConfiguration")
   }
 
   @Test
@@ -114,12 +120,16 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use {
-      it.getContent("META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
-    }
-    assertThat(content).isEqualTo(
-      "com.example.FooAutoConfiguration\ncom.example.BarAutoConfiguration\ncom.example.BazAutoConfiguration",
-    )
+    val content =
+      outputShadowedJar.use {
+        it.getContent(
+          "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
+        )
+      }
+    assertThat(content)
+      .isEqualTo(
+        "com.example.FooAutoConfiguration\ncom.example.BarAutoConfiguration\ncom.example.BazAutoConfiguration"
+      )
   }
 
   @Test
@@ -142,11 +152,13 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_HANDLERS) }
-    assertThat(content).isEqualTo(
-      "http\\://www.example.com/schema/bar=com.example.BarNamespaceHandler\n" +
-        "http\\://www.example.com/schema/foo=com.example.FooNamespaceHandler\n",
-    )
+    val content =
+      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_HANDLERS) }
+    assertThat(content)
+      .isEqualTo(
+        "http\\://www.example.com/schema/bar=com.example.BarNamespaceHandler\n" +
+          "http\\://www.example.com/schema/foo=com.example.FooNamespaceHandler\n"
+      )
   }
 
   @Test
@@ -172,10 +184,10 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
-    assertThat(content).isEqualTo(
-      "shadow.example.SomeInterface=shadow.example.SomeImplementation\n",
-    )
+    val content =
+      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
+    assertThat(content)
+      .isEqualTo("shadow.example.SomeInterface=shadow.example.SomeImplementation\n")
   }
 
   @Test
@@ -201,9 +213,12 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use {
-      it.getContent("META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
-    }
+    val content =
+      outputShadowedJar.use {
+        it.getContent(
+          "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
+        )
+      }
     assertThat(content).isEqualTo("shadow.example.FooAutoConfiguration")
   }
 }
