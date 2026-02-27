@@ -22,13 +22,15 @@ constructor(
   shadedPattern: String? = null,
   includes: List<String>? = null,
   excludes: List<String>? = null,
-  private val rawString: Boolean = false,
+  @get:Input val rawString: Boolean = false,
   @get:Input override var skipStringConstants: Boolean = false,
 ) : Relocator {
   private val pattern: String
-  private val pathPattern: String
+
+  @get:Input public val pathPattern: String
   private val shadedPattern: String
-  private val shadedPathPattern: String
+
+  @get:Input public val shadedPathPattern: String
   private val sourcePackageExcludes = mutableSetOf<String>()
   private val sourcePathExcludes = mutableSetOf<String>()
 
