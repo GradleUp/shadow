@@ -22,18 +22,17 @@ constructor(
   shadedPattern: String? = null,
   includes: List<String>? = null,
   excludes: List<String>? = null,
-  private val rawString: Boolean = false,
+  @get:Input internal val rawString: Boolean = false,
   @get:Input override var skipStringConstants: Boolean = false,
 ) : Relocator {
-  private val pattern: String
-  private val pathPattern: String
-  private val shadedPattern: String
-  private val shadedPathPattern: String
+  @get:Input internal val pattern: String
+  @get:Input internal val pathPattern: String
+  @get:Input internal val shadedPattern: String
+  @get:Input internal val shadedPathPattern: String
   private val sourcePackageExcludes = mutableSetOf<String>()
   private val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input public val includes: MutableSet<String> = mutableSetOf()
-
   @get:Input public val excludes: MutableSet<String> = mutableSetOf()
 
   init {

@@ -373,6 +373,38 @@ class CachingTest : BasePluginTest() {
     }
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/1932")
+  @Test
+  fun relocatorPatternChanged() {
+    projectScript.appendText(
+      """
+      dependencies {
+        implementation 'junit:junit:3.8.2'
+      }
+      $shadowJarTask {
+        relocate 'junit.framework', 'foo.junit.framework'
+      }
+      """
+        .trimIndent() + lineSeparator
+    )
+    val mainClassEntry = writeClass(withImports = true)
+    val fooEntries =
+      junitEntries.map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
+
+    assertCompositeExecutions {
+      containsOnly("my/", "foo/", "foo/junit/", mainClassEntry, *fooEntries, *manifestEntries)
+    }
+
+    val replaced = projectScript.readText().replace("foo.junit.framework", "bar.junit.framework")
+    projectScript.writeText(replaced)
+    val barEntries =
+      junitEntries.map { it.replace("junit/framework/", "bar/junit/framework/") }.toTypedArray()
+
+    assertCompositeExecutions {
+      containsOnly("my/", "bar/", "bar/junit/", mainClassEntry, *barEntries, *manifestEntries)
+    }
+  }
+
   @Test
   fun serviceFileTransformerPropsChanged() {
     val mainClassEntry = writeClass()
