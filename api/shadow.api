@@ -521,6 +521,24 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public class com/github/jengelman/gradle/plugins/shadow/transformers/SpringBootTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/SpringBootTransformer$Companion;
+	public static final field PATH_SPRING_AUTOCONFIGURE_METADATA Ljava/lang/String;
+	public static final field PATH_SPRING_FACTORIES Ljava/lang/String;
+	public static final field PATH_SPRING_HANDLERS Ljava/lang/String;
+	public static final field PATH_SPRING_SCHEMAS Ljava/lang/String;
+	public static final field PATH_SPRING_TOOLING Ljava/lang/String;
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/SpringBootTransformer$Companion {
+}
+
 public final class com/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/io/InputStream;)V
