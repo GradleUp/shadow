@@ -177,8 +177,9 @@ class JavaPluginsTest : BasePluginTest() {
     settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
     projectScript.writeText("")
 
-    path("foo/build.gradle").writeText(
-      """
+    path("foo/build.gradle")
+      .writeText(
+        """
       ${getDefaultProjectBuildScript("java-library")}
       dependencies {
         implementation 'my:a:1.0'
@@ -193,11 +194,13 @@ class JavaPluginsTest : BasePluginTest() {
           outgoing.artifact(tasks.named('shadowJar'))
         }
       }
-      """.trimIndent() + lineSeparator,
-    )
-
-    path("consumer/build.gradle").writeText(
       """
+          .trimIndent() + lineSeparator
+      )
+
+    path("consumer/build.gradle")
+      .writeText(
+        """
       ${getDefaultProjectBuildScript("java")}
       dependencies {
         implementation project(':foo')
@@ -207,8 +210,9 @@ class JavaPluginsTest : BasePluginTest() {
           configurations.runtimeClasspath.files.each { println it.name }
         }
       }
-      """.trimIndent() + lineSeparator,
-    )
+      """
+          .trimIndent() + lineSeparator
+      )
 
     val result = runWithSuccess(":consumer:printClasspathFiles")
     assertThat(result.output).all {
@@ -223,8 +227,9 @@ class JavaPluginsTest : BasePluginTest() {
     settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
     projectScript.writeText("")
 
-    path("foo/build.gradle").writeText(
-      """
+    path("foo/build.gradle")
+      .writeText(
+        """
       ${getDefaultProjectBuildScript("java-library")}
       dependencies {
         implementation 'my:a:1.0'
@@ -241,11 +246,13 @@ class JavaPluginsTest : BasePluginTest() {
           exclude(group: 'my', module: 'a')
         }
       }
-      """.trimIndent() + lineSeparator,
-    )
-
-    path("consumer/build.gradle").writeText(
       """
+          .trimIndent() + lineSeparator
+      )
+
+    path("consumer/build.gradle")
+      .writeText(
+        """
       ${getDefaultProjectBuildScript("java")}
       dependencies {
         implementation project(':foo')
@@ -255,8 +262,9 @@ class JavaPluginsTest : BasePluginTest() {
           configurations.runtimeClasspath.files.each { println it.name }
         }
       }
-      """.trimIndent() + lineSeparator,
-    )
+      """
+          .trimIndent() + lineSeparator
+      )
 
     val result = runWithSuccess(":consumer:printClasspathFiles")
     assertThat(result.output).all {
