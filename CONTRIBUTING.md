@@ -69,4 +69,5 @@ When adding new features or public APIs:
 5. Run `./gradlew lint` to check for potential issues
 6. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 7. Ensure your commit messages are clear and descriptive
+8. Update the `Unreleased` section in [CHANGELOG](docs/changes/README.md) if applicable
 
