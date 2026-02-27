@@ -3,6 +3,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.3.3...HEAD) - 2026-xx-xx
 
+### Added
+
+- Add `SpringBootTransformer` to handle Spring Boot configuration files merging. ([#1936](https://github.com/GradleUp/shadow/pull/1936))
+
 
 ## [9.3.2](https://github.com/GradleUp/shadow/releases/tag/9.3.2) - 2026-02-27
 

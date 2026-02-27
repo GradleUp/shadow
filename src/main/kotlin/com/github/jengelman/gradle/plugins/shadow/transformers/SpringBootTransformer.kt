@@ -2,7 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.util.Properties
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
@@ -28,8 +30,9 @@ import org.gradle.api.tasks.Internal
  * - `META-INF/spring/*.imports`: Line-based files where each line is a fully qualified class
  *   name; lines are deduplicated and merged across JAR files.
  *
- * Class relocation is applied to both the keys and values of properties files, as well as to
- * each line of `.imports` files.
+ * Class relocation is applied to both the keys and values of properties files (using path-based
+ * relocation for slash-notation values, and class-based relocation for dot-notation values), as
+ * well as to each line of `.imports` files.
  *
  * @see <a href="https://github.com/GradleUp/shadow/issues/1489">Issue #1489</a>
  */
@@ -61,11 +64,11 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
         .forEach { entries.add(it) }
     } else {
       val props = propertiesEntries.getOrPut(path) { ReproducibleProperties() }
-      val incoming = Properties().apply { load(context.inputStream.bufferedReader(Charsets.ISO_8859_1)) }
+      val incoming = Properties().apply { load(context.inputStream.bufferedReader(PROPERTIES_CHARSET)) }
       incoming.forEach { rawKey, rawValue ->
         val key = context.relocators.relocateClass(rawKey as String)
         val value = (rawValue as String).splitToSequence(",").joinToString(",") { part ->
-          context.relocators.relocateClass(part.trim())
+          context.relocators.relocateValue(part.trim())
         }
         val existing = props.getProperty(key)
         if (existing != null) {
@@ -83,7 +86,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     propertiesEntries.forEach { (path, props) ->
       os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      props.writeWithoutComments(Charsets.ISO_8859_1, os)
+      props.writeWithoutComments(PROPERTIES_CHARSET, os)
       os.closeEntry()
     }
     importsEntries.forEach { (path, entries) ->
@@ -103,6 +106,8 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
 
     private const val SPRING_IMPORTS_PREFIX = "META-INF/spring/"
 
+    private val PROPERTIES_CHARSET = Charsets.ISO_8859_1
+
     internal val PROPERTIES_PATHS =
       setOf(
         PATH_SPRING_FACTORIES,
@@ -114,5 +119,15 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
 
     internal fun isImportsFile(path: String): Boolean =
       path.startsWith(SPRING_IMPORTS_PREFIX) && path.endsWith(".imports")
+
+    /**
+     * Relocates a value that may be either a dot-notation class name (e.g.,
+     * `com.example.MyClass`) or a slash-notation resource path (e.g.,
+     * `com/example/schema.xsd`). Path-notation values are relocated using
+     * [Iterable.relocatePath], and class-notation values using [Iterable.relocateClass].
+     */
+    private fun Iterable<Relocator>.relocateValue(value: String): String {
+      return if (value.contains('/')) relocatePath(value) else relocateClass(value)
+    }
   }
 }
