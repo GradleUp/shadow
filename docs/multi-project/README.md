@@ -43,10 +43,12 @@ By tuning these _consumable_ configurations, you can enable a single declaration
       named("apiElements") {
         outgoing.artifacts.clear()
         outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
       }
       named("runtimeElements") {
         outgoing.artifacts.clear()
         outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
       }
     }
     ```
@@ -58,10 +60,12 @@ By tuning these _consumable_ configurations, you can enable a single declaration
       apiElements {
         outgoing.artifacts.clear()
         outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
       }
       runtimeElements {
         outgoing.artifacts.clear()
         outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
       }
     }
     ```
