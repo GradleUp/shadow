@@ -415,9 +415,6 @@ abstract class BasePluginTest {
     const val runShadowTask = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
     const val jarTask = "tasks.named('jar', Jar)"
 
-    // TODO: enable this flag for all tests once we have fixed all issues with isolated projects.
-    //  See https://github.com/GradleUp/shadow/pull/1139.
-    const val ipArgument = "-Dorg.gradle.unsafe.isolated-projects=true"
     const val infoArgument = "--info"
 
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }

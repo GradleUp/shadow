@@ -200,7 +200,7 @@ class JavaPluginsTest : BasePluginTest() {
       .appendText(
         """
         sourceSets {
-          custom
+          create('custom')
         }
         dependencies {
           implementation sourceSets.custom.output
@@ -871,7 +871,6 @@ class JavaPluginsTest : BasePluginTest() {
     val result =
       runWithSuccess(
         serverShadowJarPath,
-        ipArgument,
         infoArgument,
         "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
         "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a

@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFil
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
@@ -108,7 +109,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection =
     objectFactory.fileCollection {
-      minimizeJar.map { if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet() }
+      minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
     }
 
   @get:InputFiles

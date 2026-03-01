@@ -2,15 +2,50 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import java.io.File
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ExternalModuleDependency
-import org.gradle.api.artifacts.FileCollectionDependency
-import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
+import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFiles
 import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
+
+internal fun Project.getApiJars(): Provider<List<File>> {
+  val apiConfiguration =
+    configurations.findByName(API_CONFIGURATION_NAME) ?: return provider { emptyList() }
+
+  val configName = "shadowMinimizeApi"
+  val shadowApiConfig =
+    if (configurations.names.contains(configName)) {
+      configurations.named(configName)
+    } else {
+      configurations.register(configName) {
+        it.isCanBeResolved = true
+        it.isCanBeConsumed = false
+        it.attributes { attrs ->
+          attrs.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_API))
+          attrs.attribute(
+            Category.CATEGORY_ATTRIBUTE,
+            objects.named(Category::class.java, Category.LIBRARY),
+          )
+          attrs.attribute(
+            LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+            objects.named(LibraryElements::class.java, LibraryElements.JAR),
+          )
+        }
+        it.extendsFrom(apiConfiguration)
+      }
+    }
+
+  return shadowApiConfig.flatMap { shadowApi ->
+    shadowApi.incoming.artifacts.resolvedArtifacts.map { artifacts ->
+      artifacts.filter { it.id.componentIdentifier !is ModuleComponentIdentifier }.map { it.file }
+    }
+  }
+}
 
 /** Tracks unused classes in the project classpath. */
 internal class UnusedTracker(
@@ -39,46 +74,6 @@ internal class UnusedTracker(
   fun addDependency(jarOrDir: File) {
     if (toMinimize.contains(jarOrDir)) {
       cp.addClazzpathUnit(jarOrDir)
-    }
-  }
-
-  companion object {
-    fun getApiJarsFromProject(project: Project): FileCollection {
-      val apiDependencies =
-        project.configurations.findByName("api")?.dependencies ?: return project.files()
-      val runtimeConfiguration = project.runtimeConfiguration
-      val apiJars = mutableListOf<File>()
-      apiDependencies.forEach { dep ->
-        when (dep) {
-          is ProjectDependency -> {
-            apiJars.addAll(getApiJarsFromProject(project.project(dep.path)))
-            addJar(runtimeConfiguration, dep, apiJars)
-          }
-          is FileCollectionDependency -> {
-            apiJars.addAll(dep.files)
-          }
-          // Skip BOM dependencies and other non-JAR dependencies.
-          is ExternalModuleDependency -> Unit
-          else -> {
-            addJar(runtimeConfiguration, dep, apiJars)
-            val jarFile =
-              runtimeConfiguration.find { it.name.startsWith("${dep.name}-") } ?: return@forEach
-            apiJars.add(jarFile)
-          }
-        }
-      }
-      return project.files(apiJars)
-    }
-
-    private fun addJar(config: Configuration, dep: Dependency, result: MutableList<File>) {
-      config.find { isProjectDependencyFile(it, dep) }?.let { result.add(it) }
-    }
-
-    private fun isProjectDependencyFile(file: File, dep: Dependency): Boolean {
-      val fileName = file.name
-      val dependencyName = dep.name
-      return fileName == "$dependencyName.jar" ||
-        (fileName.startsWith("$dependencyName-") && fileName.endsWith(".jar"))
     }
   }
 }

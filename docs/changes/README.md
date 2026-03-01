@@ -3,6 +3,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.3.2...HEAD) - 2026-xx-xx
 
+### Added
+
+- Support Isolated Projects. ([#1139](https://github.com/GradleUp/shadow/pull/1139))
+
 ### Changed
 
 - Allow opting out of adding `shadowJar` into `assemble` lifecycle. ([#1939](https://github.com/GradleUp/shadow/pull/1939))
