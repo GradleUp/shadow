@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.transformers.SpringBootTransformer.Companion.PATH_SPRING_FACTORIES
 import com.github.jengelman.gradle.plugins.shadow.transformers.SpringBootTransformer.Companion.PATH_SPRING_HANDLERS
 import kotlin.io.path.appendText
@@ -31,7 +32,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(PATH_SPRING_FACTORIES) }
-    assertThat(content)
+    assertThat(content.invariantEolString)
       .isEqualTo(
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
           "com.example.FooAutoConfiguration,com.example.BarAutoConfiguration\n"
@@ -61,7 +62,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(PATH_SPRING_FACTORIES) }
-    assertThat(content)
+    assertThat(content.invariantEolString)
       .isEqualTo(
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
           "com.example.FooAutoConfiguration,com.example.BarAutoConfiguration\n" +
@@ -96,7 +97,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
           "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
         )
       }
-    assertThat(content)
+    assertThat(content.invariantEolString)
       .isEqualTo("com.example.FooAutoConfiguration\ncom.example.BarAutoConfiguration")
   }
 
@@ -126,7 +127,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
           "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
         )
       }
-    assertThat(content)
+    assertThat(content.invariantEolString)
       .isEqualTo(
         "com.example.FooAutoConfiguration\ncom.example.BarAutoConfiguration\ncom.example.BazAutoConfiguration"
       )
@@ -153,7 +154,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(PATH_SPRING_HANDLERS) }
-    assertThat(content)
+    assertThat(content.invariantEolString)
       .isEqualTo(
         "http\\://www.example.com/schema/bar=com.example.BarNamespaceHandler\n" +
           "http\\://www.example.com/schema/foo=com.example.FooNamespaceHandler\n"
@@ -181,7 +182,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(PATH_SPRING_FACTORIES) }
-    assertThat(content)
+    assertThat(content.invariantEolString)
       .isEqualTo("shadow.example.SomeInterface=shadow.example.SomeImplementation\n")
   }
 
@@ -214,6 +215,6 @@ class SpringBootTransformerTest : BaseTransformerTest() {
           "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
         )
       }
-    assertThat(content).isEqualTo("shadow.example.FooAutoConfiguration")
+    assertThat(content.invariantEolString).isEqualTo("shadow.example.FooAutoConfiguration")
   }
 }
