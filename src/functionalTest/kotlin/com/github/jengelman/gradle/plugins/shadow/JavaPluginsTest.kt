@@ -958,7 +958,6 @@ class JavaPluginsTest : BasePluginTest() {
     requireResourceAsPath("fixtures/gradle-artifact-transform")
       .copyToRecursively(target = projectRoot, followLinks = false, overwrite = true)
 
-    runWithSuccess(":lib:jar")
     runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
