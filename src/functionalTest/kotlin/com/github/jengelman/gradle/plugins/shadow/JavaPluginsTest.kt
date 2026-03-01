@@ -948,6 +948,81 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll { getMainAttr(mainClassAttributeKey).isEqualTo(expected) }
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/882")
+  @Test
+  fun compatGradleArtifactTransform() {
+    settingsScript.appendText(
+      """
+      include 'lib', 'app'
+      """
+        .trimIndent()
+    )
+    projectScript.writeText("")
+
+    path("lib/src/main/java/lib/Lib.java")
+      .writeText(
+        """
+        package lib;
+        public class Lib {}
+        """
+          .trimIndent()
+      )
+    path("lib/build.gradle").writeText(getDefaultProjectBuildScript("java") + lineSeparator)
+
+    path("app/src/main/java/app/App.java")
+      .writeText(
+        """
+        package app;
+        public class App {}
+        """
+          .trimIndent()
+      )
+    path("app/build.gradle")
+      .writeText(
+        """
+        ${getDefaultProjectBuildScript("java")}
+
+        abstract class NoOpTransform implements TransformAction<TransformParameters.None> {
+          @InputArtifact
+          abstract Provider<FileSystemLocation> getInputArtifact()
+
+          void transform(TransformOutputs outputs) {
+            def input = inputArtifact.get().asFile
+            def output = outputs.file(input.name)
+            output.bytes = input.bytes
+          }
+        }
+
+        def customAttr = Attribute.of('custom-transformed', Boolean)
+
+        dependencies {
+          implementation project(':lib')
+          attributesSchema {
+            attribute(customAttr)
+          }
+          artifactTypes.getByName('jar') {
+            attributes.attribute(customAttr, false)
+          }
+          registerTransform(NoOpTransform) {
+            from.attribute(customAttr, false)
+            to.attribute(customAttr, true)
+          }
+        }
+
+        configurations.runtimeClasspath {
+          attributes.attribute(customAttr, true)
+        }
+        """
+          .trimIndent() + lineSeparator
+      )
+
+    runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
+
+    assertThat(jarPath("app/build/libs/app-1.0-all.jar")).useAll {
+      containsAtLeast("app/", "app/App.class", "lib/", "lib/Lib.class", *manifestEntries)
+    }
+  }
+
   private fun dependencies(configuration: String, vararg flags: String): String {
     return runWithSuccess("dependencies", "--configuration", configuration, *flags).output
   }
