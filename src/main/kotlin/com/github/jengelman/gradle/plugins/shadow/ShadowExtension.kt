@@ -32,4 +32,12 @@ public interface ShadowExtension {
    * Defaults to [Bundling.SHADOWED].
    */
   public val bundlingAttribute: Property<String>
+
+  /**
+   * If `true`, adds the `shadowJar` task as a dependency of the `assemble` lifecycle task. Set this
+   * to `false` if you don't want the `shadowJar` task to run when `assemble` is invoked.
+   *
+   * Defaults to `true`.
+   */
+  public val addShadowJarToAssembleLifecycle: Property<Boolean>
 }

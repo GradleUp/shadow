@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
@@ -652,7 +653,9 @@ public abstract class ShadowJar : Jar() {
           // applied.
           // Using Spec<String> applies the action to the task if it is added later.
           tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach {
-            it.dependsOn(task)
+            if (shadow.addShadowJarToAssembleLifecycle.get()) {
+              it.dependsOn(task)
+            }
           }
         }
     }
