@@ -251,7 +251,7 @@ class JavaPluginsTest : BasePluginTest() {
     path("server/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java")}
+      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
       dependencies {
         // Look ma, no `configuration: "shadow"` needed!
         implementation project(':client')

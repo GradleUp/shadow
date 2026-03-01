@@ -148,3 +148,6 @@ If you want to exclude transitive dependencies that were bundled into the shadow
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[gradle-consumable-configs]: https://docs.gradle.org/current/userguide/dependency_management_terminology.html#sub:terminology_consumable_configuration
+[gradle-declarable-configs]: https://docs.gradle.org/current/userguide/dependency_management_terminology.html#sub:terminology_declarable_configuration
+[gradle-exclude-rules]: https://docs.gradle.org/current/userguide/dependency_downgrade_and_exclude.html#sec:excluding-transitive-deps
