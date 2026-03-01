@@ -194,51 +194,84 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Issue("https://github.com/GradleUp/shadow/issues/1893")
   @Test
-  fun shadowJarIsDefaultArtifactInMultiProjectBuild() {
-    settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
+  fun consumeShadowedProjectViaApiElementsAndRuntimeElements() {
+    settingsScript.appendText(
+      """
+      include 'client', 'server'
+      """
+        .trimIndent()
+    )
     projectScript.writeText("")
 
-    path("foo/build.gradle")
+    path("client/src/main/java/client/Client.java")
+      .writeText(
+        """
+        package client;
+        public class Client {}
+        """
+          .trimIndent()
+      )
+    path("client/build.gradle")
       .writeText(
         """
       ${getDefaultProjectBuildScript("java-library")}
       dependencies {
-        implementation 'my:a:1.0'
+        api 'junit:junit:3.8.2'
+      }
+      $shadowJarTask {
+        relocate 'junit.framework', 'client.junit.framework'
       }
       configurations {
-        named('apiElements') {
+        apiElements {
           outgoing.artifacts.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
+          outgoing.artifact(tasks.shadowJar)
+          // Ensure Gradle doesn't select the `classes` variant
+          outgoing.variants.clear()
         }
-        named('runtimeElements') {
+        runtimeElements {
           outgoing.artifacts.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
+          outgoing.artifact(tasks.shadowJar)
+          outgoing.variants.clear()
         }
       }
       """
           .trimIndent() + lineSeparator
       )
 
-    path("consumer/build.gradle")
+    path("server/src/main/java/server/Server.java")
+      .writeText(
+        """
+        package server;
+        import client.Client;
+        import client.junit.framework.Test;
+        public class Server {}
+        """
+          .trimIndent()
+      )
+    path("server/build.gradle")
       .writeText(
         """
       ${getDefaultProjectBuildScript("java")}
       dependencies {
-        implementation project(':foo')
+        // Look ma, no `configuration: "shadow"` needed!
+        implementation project(':client')
       }
-      tasks.register('printClasspathFiles') {
-        doLast {
-          configurations.runtimeClasspath.files.each { println it.name }
+      tasks.named("compileJava") {
+        doFirst {
+          println "CLASSPATH IS: " + classpath.files
         }
       }
       """
           .trimIndent() + lineSeparator
       )
 
-    val result = runWithSuccess(":consumer:printClasspathFiles")
-    assertThat(result.output).all {
-      contains("foo-1.0-all.jar")
-      doesNotContain("foo-1.0.jar")
+    // Running server:jar to ensure it compiles against the shadowed client
+    runWithSuccess(":server:jar")
+
+    // The fact that server compiled successfully against `client.junit.framework.Test`
+    // means it consumed the shadowed artifact during compilation.
+    assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
+      containsAtLeast("server/Server.class")
     }
   }
 
