@@ -3,6 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.transformers.SpringBootTransformer.Companion.PATH_SPRING_FACTORIES
+import com.github.jengelman.gradle.plugins.shadow.transformers.SpringBootTransformer.Companion.PATH_SPRING_HANDLERS
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 
@@ -12,13 +14,13 @@ class SpringBootTransformerTest : BaseTransformerTest() {
   fun mergeSpringFactories() {
     val one = buildJarOne {
       insert(
-        SpringBootTransformer.PATH_SPRING_FACTORIES,
+        PATH_SPRING_FACTORIES,
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.FooAutoConfiguration",
       )
     }
     val two = buildJarTwo {
       insert(
-        SpringBootTransformer.PATH_SPRING_FACTORIES,
+        PATH_SPRING_FACTORIES,
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.BarAutoConfiguration",
       )
     }
@@ -28,8 +30,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content =
-      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
+    val content = outputShadowedJar.use { it.getContent(PATH_SPRING_FACTORIES) }
     assertThat(content)
       .isEqualTo(
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
@@ -41,14 +42,14 @@ class SpringBootTransformerTest : BaseTransformerTest() {
   fun mergeSpringFactoriesWithMultipleKeys() {
     val one = buildJarOne {
       insert(
-        SpringBootTransformer.PATH_SPRING_FACTORIES,
+        PATH_SPRING_FACTORIES,
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.FooAutoConfiguration\n" +
           "org.springframework.context.ApplicationListener=com.example.FooListener",
       )
     }
     val two = buildJarTwo {
       insert(
-        SpringBootTransformer.PATH_SPRING_FACTORIES,
+        PATH_SPRING_FACTORIES,
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.BarAutoConfiguration\n" +
           "org.springframework.context.ApplicationListener=com.example.BarListener",
       )
@@ -59,8 +60,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content =
-      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
+    val content = outputShadowedJar.use { it.getContent(PATH_SPRING_FACTORIES) }
     assertThat(content)
       .isEqualTo(
         "org.springframework.boot.autoconfigure.EnableAutoConfiguration=" +
@@ -136,13 +136,13 @@ class SpringBootTransformerTest : BaseTransformerTest() {
   fun mergeSpringHandlers() {
     val one = buildJarOne {
       insert(
-        SpringBootTransformer.PATH_SPRING_HANDLERS,
+        PATH_SPRING_HANDLERS,
         "http\\://www.example.com/schema/foo=com.example.FooNamespaceHandler",
       )
     }
     val two = buildJarTwo {
       insert(
-        SpringBootTransformer.PATH_SPRING_HANDLERS,
+        PATH_SPRING_HANDLERS,
         "http\\://www.example.com/schema/bar=com.example.BarNamespaceHandler",
       )
     }
@@ -152,8 +152,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content =
-      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_HANDLERS) }
+    val content = outputShadowedJar.use { it.getContent(PATH_SPRING_HANDLERS) }
     assertThat(content)
       .isEqualTo(
         "http\\://www.example.com/schema/bar=com.example.BarNamespaceHandler\n" +
@@ -164,10 +163,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
   @Test
   fun relocateClassesInSpringFactories() {
     val one = buildJarOne {
-      insert(
-        SpringBootTransformer.PATH_SPRING_FACTORIES,
-        "com.example.SomeInterface=com.example.SomeImplementation",
-      )
+      insert(PATH_SPRING_FACTORIES, "com.example.SomeInterface=com.example.SomeImplementation")
     }
     projectScript.appendText(
       """
@@ -184,8 +180,7 @@ class SpringBootTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content =
-      outputShadowedJar.use { it.getContent(SpringBootTransformer.PATH_SPRING_FACTORIES) }
+    val content = outputShadowedJar.use { it.getContent(PATH_SPRING_FACTORIES) }
     assertThat(content)
       .isEqualTo("shadow.example.SomeInterface=shadow.example.SomeImplementation\n")
   }
