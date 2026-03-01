@@ -97,16 +97,19 @@ class JavaPluginsTest : BasePluginTest() {
   fun shadowJarNotAddedToAssembleWhenDisabled() {
     projectScript.appendText(
       """
-        shadow {
-          addShadowJarToAssembleLifecycle = false
-        }
+      shadow {
+        addShadowJarToAssembleLifecycle = false
+      }
       """
         .trimIndent()
     )
 
     val result = runWithSuccess(ASSEMBLE_TASK_NAME)
 
-    assertThat(result.task(":$ASSEMBLE_TASK_NAME")).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result.task(":$ASSEMBLE_TASK_NAME"))
+      .isNotNull()
+      .transform { it.outcome }
+      .isEqualTo(SUCCESS)
     assertThat(result.task(shadowJarPath)).isNull()
   }
 
