@@ -49,7 +49,7 @@ public interface DependencyFilter : Serializable {
     override fun resolve(configuration: Configuration): FileCollection {
       return configuration -
         project.files(
-          java.util.concurrent.Callable {
+          project.provider {
             val includes = mutableSetOf<ResolvedDependency>()
             val excludes = mutableSetOf<ResolvedDependency>()
             resolve(
