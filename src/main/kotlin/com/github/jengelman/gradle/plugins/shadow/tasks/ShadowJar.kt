@@ -108,18 +108,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection =
     objectFactory.fileCollection {
-      minimizeJar.map {
-        if (it) {
-          val apiConfig = project.configurations.findByName("api")
-          if (apiConfig != null) {
-            UnusedTracker.getApiJarsFromProject(project, apiConfig)
-          } else {
-            emptySet()
-          }
-        } else {
-          emptySet()
-        }
-      }
+      minimizeJar.map { if (it) UnusedTracker.getApiJarsFromProject(project) else emptySet() }
     }
 
   @get:InputFiles
