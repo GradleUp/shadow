@@ -28,7 +28,61 @@ configuration of the shadowed project.
     }
     ```
 
+However, this is not ideal as it allows one to mistakenly declare `implementation(project(":api"))` thus providing unshadowed packages or dependencies.
 
+As a reminder in Gradle, on a **java library**, configurations like `api`, `implementation`, `runtimeOnly` (and `compileOnly`) are where dependencies are declared (they are [_declarable_](https://docs.gradle.org/current/userguide/declaring_configurations.html#1_declarable_configurations)). But when consuming a project like `project(":api")`, Gradle looks for [_consumable_ configurations](https://docs.gradle.org/current/userguide/declaring_configurations.html#3_consumable_configurations), and there are [`apiElements` (for compilation) and `runtimeElements` (for runtime)](https://docs.gradle.org/current/userguide/declaring_configurations.html#3_consumable_configurations:~:text=A%20library%20typically%20provides%20consumable%20configurations%20like%20apiElements%20(for%20compilation)%20and%20runtimeElements%20(for%20runtime%20dependencies).) for a **java library** project.
+
+By tuning these _consumable_ configurations, you can enable a single declaration of the project without users needing to specify exposed configurations.
+
+**Shadowed project**
+
+=== "Kotlin"
+
+    ```kotlin
+    configurations {
+      named("apiElements") {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+      }
+      named("runtimeElements") {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    configurations {
+      apiElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+      }
+      runtimeElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+      }
+    }
+    ```
+
+**Consuming projects**
+
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation(project(":api"))
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    dependencies {
+      implementation project(':api')
+    }
+    ```
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
