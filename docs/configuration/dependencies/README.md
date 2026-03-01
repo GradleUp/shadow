@@ -444,6 +444,39 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     }
     ```
 
+## Excluded Dependencies in Manifest Class-Path
+
+When dependencies are excluded from the shadow JAR via the `dependencies` block (using `include` or
+`exclude`), Shadow automatically adds them to the `Class-Path` attribute of the JAR manifest. This
+ensures the JVM can still locate those dependencies at runtime.
+
+This behavior is enabled by default. To disable it, set `addExcludedDependenciesToClassPath` to
+`false`:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      // Opt out of automatically adding excluded deps to Class-Path.
+      addExcludedDependenciesToClassPath = false
+      dependencies {
+        include(dependency("com.example:my-lib:1.0"))
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Opt out of automatically adding excluded deps to Class-Path.
+      addExcludedDependenciesToClassPath = false
+      dependencies {
+        include(dependency('com.example:my-lib:1.0'))
+      }
+    }
+    ```
+
 
 
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)

@@ -22,6 +22,24 @@ public interface DependencyFilter : Serializable {
    */
   public fun resolve(configurations: Collection<Configuration>): FileCollection
 
+  /**
+   * Resolve the dependencies from [configuration] that are excluded by the [include]/[exclude]
+   * rules in the filter. Returns an empty [FileCollection] when no dependencies are excluded (i.e.,
+   * when no include/exclude rules are configured or all dependencies satisfy the include rules).
+   */
+  public fun resolveExcluded(configuration: Configuration): FileCollection {
+    return configuration - resolve(configuration)
+  }
+
+  /**
+   * Resolve all dependencies from [configurations] that are excluded by the [include]/[exclude]
+   * rules in the filter and combine the results.
+   */
+  public fun resolveExcluded(configurations: Collection<Configuration>): FileCollection {
+    return configurations.map { resolveExcluded(it) }.reduceOrNull { acc, fc -> acc + fc }
+      ?: resolve(emptyList())
+  }
+
   /** Exclude dependencies that match the provided [spec]. */
   public fun exclude(spec: Spec<ResolvedDependency>)
 

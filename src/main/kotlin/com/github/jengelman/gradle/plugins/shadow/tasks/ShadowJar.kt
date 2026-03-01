@@ -153,6 +153,13 @@ public abstract class ShadowJar : Jar() {
       dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
     }
 
+  /** Final dependencies excluded from shadowing. */
+  @get:Classpath
+  public open val excludedDependencies: ConfigurableFileCollection =
+    objectFactory.fileCollection {
+      dependencyFilter.zip(configurations) { df, cs -> df.resolveExcluded(cs) }
+    }
+
   /**
    * Enables auto relocation of packages in the dependencies.
    *
@@ -242,6 +249,24 @@ public abstract class ShadowJar : Jar() {
     description = "Adds the multi-release attribute to the manifest if any dependencies contain it.",
   )
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
+
+  /**
+   * Automatically adds excluded dependencies (those filtered out by the [dependencies] block) to
+   * the `Class-Path` attribute of the manifest. This ensures that dependencies not bundled in the
+   * shadow JAR are still resolvable by the JVM at runtime from the classpath.
+   *
+   * Defaults to `true`. Set to `false` to exclude filtered dependencies from the `Class-Path`
+   * attribute.
+   *
+   * @see dependencies
+   */
+  @get:Input
+  @get:Option(
+    option = "add-excluded-dependencies-to-class-path",
+    description = "Adds excluded dependencies to the Class-Path manifest attribute.",
+  )
+  public open val addExcludedDependenciesToClassPath: Property<Boolean> =
+    objectFactory.property(true)
 
   @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
   @Internal
@@ -582,9 +607,25 @@ public abstract class ShadowJar : Jar() {
     }
 
     val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
-    val shadowFiles = shadowDependencies.get()
-    if (!shadowFiles.isEmpty) {
-      val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
+    val shadowFileNames = shadowDependencies.get().map { it.name }
+    val excludedFileNames =
+      if (addExcludedDependenciesToClassPath.get()) {
+        val names = excludedDependencies.files.map { it.name }
+        if (names.isNotEmpty()) {
+          logger.info(
+            "Adding excluded dependencies to the $classPathAttributeKey manifest attribute."
+          )
+        }
+        names
+      } else {
+        logger.info(
+          "Skipping adding excluded dependencies to the $classPathAttributeKey manifest attribute as it is disabled."
+        )
+        emptyList()
+      }
+    val allExtraFileNames = (shadowFileNames + excludedFileNames).distinct()
+    if (allExtraFileNames.isNotEmpty()) {
+      val attrs = listOf(classPathAttr) + allExtraFileNames
       manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
     }
 

@@ -1,7 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.isNull
+import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -245,6 +249,59 @@ class FilteringTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll {
       containsOnly("f.properties", *entriesInAB, *manifestEntries)
     }
+  }
+
+  @Issue("https://github.com/GradleUp/shadow/issues/265")
+  @Test
+  fun excludedDependenciesAddedToClassPathInManifest() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'my:d:1.0'
+        }
+        $shadowJarTask {
+          dependencies {
+            include(dependency('my:d:1.0'))
+          }
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    // Only d is bundled in the shadow jar; a and b (first-level deps not matching the include spec)
+    // and c (transitive dep of d that also doesn't match the include spec) are all excluded.
+    assertThat(outputShadowedJar).useAll { containsOnly("d.properties", *manifestEntries) }
+    // Excluded deps a, b, c should appear in the Class-Path manifest attribute automatically.
+    val classPath = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
+    assertThat(checkNotNull(classPath)).contains("a-1.0.jar", "b-1.0.jar", "c-1.0.jar")
+  }
+
+  @Issue("https://github.com/GradleUp/shadow/issues/265")
+  @Test
+  fun excludedDependenciesNotAddedToClassPathWhenFlagDisabled() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'my:d:1.0'
+        }
+        $shadowJarTask {
+          addExcludedDependenciesToClassPath = false
+          dependencies {
+            include(dependency('my:d:1.0'))
+          }
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll { containsOnly("d.properties", *manifestEntries) }
+    // Class-Path should NOT contain excluded deps when the flag is disabled.
+    val classPath = outputShadowedJar.use { it.getMainAttr(classPathAttributeKey) }
+    assertThat(classPath).isNull()
   }
 
   private fun commonAssertions() {

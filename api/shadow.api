@@ -160,6 +160,8 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
 	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
+	public fun resolveExcluded (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
+	public fun resolveExcluded (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter$AbstractDependencyFilter : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
@@ -222,6 +224,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	protected fun copy ()V
 	protected fun createCopyAction ()Lorg/gradle/api/internal/file/copy/CopyAction;
 	public fun dependencies (Lorg/gradle/api/Action;)V
+	public fun getAddExcludedDependenciesToClassPath ()Lorg/gradle/api/provider/Property;
 	public fun getAddMultiReleaseAttribute ()Lorg/gradle/api/provider/Property;
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
@@ -230,6 +233,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getDuplicatesStrategy ()Lorg/gradle/api/file/DuplicatesStrategy;
 	public fun getEnableAutoRelocation ()Lorg/gradle/api/provider/Property;
 	public fun getEnableKotlinModuleRemapping ()Lorg/gradle/api/provider/Property;
+	public fun getExcludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getExcludes ()Ljava/util/Set;
 	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
