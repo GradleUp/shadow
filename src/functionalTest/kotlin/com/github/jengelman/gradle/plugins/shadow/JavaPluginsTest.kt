@@ -200,7 +200,7 @@ class JavaPluginsTest : BasePluginTest() {
       .appendText(
         """
         sourceSets {
-          custom
+          create('custom')
         }
         dependencies {
           implementation sourceSets.custom.output
