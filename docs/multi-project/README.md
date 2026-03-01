@@ -82,8 +82,9 @@ By tuning these consumable configurations, you can avoid users accidentally depe
     }
     ```
 
-> [!IMPORTANT]
-> Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during compilation.
+!!! important
+
+    Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during compilation.
 
 **Consuming projects can then depend on `:api` without specifying the `shadow` configuration:**
 
