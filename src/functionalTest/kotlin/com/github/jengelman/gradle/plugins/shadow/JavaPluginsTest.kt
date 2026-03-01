@@ -948,6 +948,111 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll { getMainAttr(mainClassAttributeKey).isEqualTo(expected) }
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/882")
+  @Test
+  fun compatGradleArtifactTransform() {
+    settingsScript.writeText("include('app', 'lib')\n")
+    path("lib/build.gradle")
+      .writeText(
+        """
+        plugins {
+          id 'java-library'
+        }
+        """
+          .trimIndent()
+      )
+    path("lib/src/main/java/com/company/Utils.java")
+      .writeText(
+        """
+        package com.company;
+
+        public class Utils {
+          public static void foo() {
+            System.out.println("bar");
+          }
+        }
+        """
+          .trimIndent()
+      )
+    path("app/build.gradle")
+      .writeText(
+        """
+        import org.gradle.api.artifacts.transform.TransformParameters
+        import org.gradle.api.artifacts.transform.TransformAction
+        import org.gradle.api.artifacts.transform.TransformOutputs
+        import org.gradle.api.artifacts.transform.InputArtifact
+        import org.gradle.api.file.FileSystemLocation
+        import org.gradle.api.provider.Provider
+
+        plugins {
+          id 'application'
+          id '$shadowPluginId'
+        }
+
+        application {
+          mainClass = 'com.company.Main'
+        }
+
+        dependencies {
+          implementation project(':lib')
+        }
+
+        def transformedAttribute = Attribute.of('custom-transformed', Boolean)
+
+        dependencies {
+          attributesSchema {
+            attribute(transformedAttribute)
+          }
+          artifactTypes.maybeCreate('jar').attributes.attribute(transformedAttribute, false)
+        }
+
+        dependencies {
+          registerTransform(CustomTransformAction) {
+            from.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, false)
+            to.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, true)
+          }
+        }
+
+        $shadowJarTask {
+          configurations = [project.configurations.runtimeClasspath]
+        }
+
+        configurations.runtimeClasspath {
+          attributes.attribute(transformedAttribute, true)
+        }
+
+        abstract class CustomTransformAction implements TransformAction<TransformParameters.None> {
+          @InputArtifact abstract Provider<FileSystemLocation> getInputArtifact()
+
+          @Override
+          void transform(TransformOutputs outputs) {
+            outputs.file(inputArtifact.get().asFile)
+          }
+        }
+      """
+          .trimIndent()
+      )
+    path("app/src/main/java/com/company/Main.java")
+      .writeText(
+        """
+        package com.company;
+
+        public class Main {
+          public static void main(String[] args) {
+            Utils.foo();
+          }
+        }
+        """
+          .trimIndent()
+      )
+
+    runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
+
+    assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
+      containsAtLeast("com/company/Main.class", "com/company/Utils.class", manifestEntry)
+    }
+  }
+
   private fun dependencies(configuration: String, vararg flags: String): String {
     return runWithSuccess("dependencies", "--configuration", configuration, *flags).output
   }
