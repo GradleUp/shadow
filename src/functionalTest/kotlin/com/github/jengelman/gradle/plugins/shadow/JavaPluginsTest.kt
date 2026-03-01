@@ -23,14 +23,11 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.testGradleVersion
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
-import kotlin.io.path.copyToRecursively
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
@@ -953,10 +950,101 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Issue("https://github.com/GradleUp/shadow/issues/882")
   @Test
-  @ExperimentalPathApi
   fun compatGradleArtifactTransform() {
-    requireResourceAsPath("fixtures/gradle-artifact-transform")
-      .copyToRecursively(target = projectRoot, followLinks = false, overwrite = true)
+    settingsScript.writeText("include('app', 'lib')\n")
+    path("lib/build.gradle")
+      .writeText(
+        """
+        plugins {
+          id 'java-library'
+        }
+        """
+          .trimIndent()
+      )
+    path("lib/src/main/java/com/company/Utils.java")
+      .writeText(
+        """
+        package com.company;
+
+        public class Utils {
+          public static void foo() {
+            System.out.println("bar");
+          }
+        }
+        """
+          .trimIndent()
+      )
+    path("app/build.gradle")
+      .writeText(
+        """
+        import org.gradle.api.artifacts.transform.TransformParameters
+        import org.gradle.api.artifacts.transform.TransformAction
+        import org.gradle.api.artifacts.transform.TransformOutputs
+        import org.gradle.api.artifacts.transform.InputArtifact
+        import org.gradle.api.file.FileSystemLocation
+        import org.gradle.api.provider.Provider
+
+        plugins {
+          id 'application'
+          id '$shadowPluginId'
+        }
+
+        application {
+          mainClass = 'com.company.Main'
+        }
+
+        dependencies {
+          implementation project(':lib')
+        }
+
+        def transformedAttribute = Attribute.of('custom-transformed', Boolean)
+
+        dependencies {
+          attributesSchema {
+            attribute(transformedAttribute)
+          }
+          artifactTypes.maybeCreate('jar').attributes.attribute(transformedAttribute, false)
+        }
+
+        dependencies {
+          registerTransform(CustomTransformAction) {
+            from.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, false)
+            to.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, true)
+          }
+        }
+
+        $shadowJarTask {
+          configurations = [project.configurations.runtimeClasspath]
+        }
+
+        configurations.runtimeClasspath {
+          attributes.attribute(transformedAttribute, true)
+        }
+
+        abstract class CustomTransformAction implements TransformAction<TransformParameters.None> {
+          @InputArtifact abstract Provider<FileSystemLocation> getInputArtifact()
+
+          @Override
+          void transform(TransformOutputs outputs) {
+            outputs.file(inputArtifact.get().asFile)
+          }
+        }
+      """
+          .trimIndent()
+      )
+    path("app/src/main/java/com/company/Main.java")
+      .writeText(
+        """
+        package com.company;
+
+        public class Main {
+          public static void main(String[] args) {
+            Utils.foo();
+          }
+        }
+        """
+          .trimIndent()
+      )
 
     runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
 
