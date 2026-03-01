@@ -292,11 +292,13 @@ class JavaPluginsTest : BasePluginTest() {
         named('apiElements') {
           outgoing.artifacts.clear()
           outgoing.artifact(tasks.named('shadowJar'))
+          outgoing.variants.clear()
           exclude(group: 'my', module: 'a')
         }
         named('runtimeElements') {
           outgoing.artifacts.clear()
           outgoing.artifact(tasks.named('shadowJar'))
+          outgoing.variants.clear()
           exclude(group: 'my', module: 'a')
         }
       }
@@ -312,8 +314,9 @@ class JavaPluginsTest : BasePluginTest() {
         implementation project(':foo')
       }
       tasks.register('printClasspathFiles') {
+        def cp = configurations.runtimeClasspath
         doLast {
-          configurations.runtimeClasspath.files.each { println it.name }
+          cp.files.each { println it.name }
         }
       }
       """
