@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.3.2...HEAD) - 2026-xx-xx
 
+### Fixed
+
+- Fix interaction with Gradle artifact transforms. ([#1345](https://github.com/GradleUp/shadow/pull/1345))
 
 ## [9.3.2](https://github.com/GradleUp/shadow/releases/tag/9.3.2) - 2026-02-27
 
