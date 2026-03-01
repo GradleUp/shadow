@@ -1,8 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import java.io.File
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.attributes.Category
@@ -19,25 +17,27 @@ internal fun Project.getApiJars(): Provider<List<File>> {
   val apiConfiguration =
     configurations.findByName(API_CONFIGURATION_NAME) ?: return provider { emptyList() }
 
+  val configName = "shadowMinimizeApi"
   val shadowApiConfig =
-    configurations.register(
-      @OptIn(ExperimentalUuidApi::class)
-      "shadowMinimizeApi_${Uuid.random().toString().substring(0, 8)}"
-    ) {
-      it.isCanBeResolved = true
-      it.isCanBeConsumed = false
-      it.attributes { attrs ->
-        attrs.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_API))
-        attrs.attribute(
-          Category.CATEGORY_ATTRIBUTE,
-          objects.named(Category::class.java, Category.LIBRARY),
-        )
-        attrs.attribute(
-          LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
-          objects.named(LibraryElements::class.java, LibraryElements.JAR),
-        )
+    if (configurations.names.contains(configName)) {
+      configurations.named(configName)
+    } else {
+      configurations.register(configName) {
+        it.isCanBeResolved = true
+        it.isCanBeConsumed = false
+        it.attributes { attrs ->
+          attrs.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_API))
+          attrs.attribute(
+            Category.CATEGORY_ATTRIBUTE,
+            objects.named(Category::class.java, Category.LIBRARY),
+          )
+          attrs.attribute(
+            LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+            objects.named(LibraryElements::class.java, LibraryElements.JAR),
+          )
+        }
+        it.extendsFrom(apiConfiguration)
       }
-      it.extendsFrom(apiConfiguration)
     }
 
   return shadowApiConfig.map { shadowApi ->
