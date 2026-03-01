@@ -256,11 +256,7 @@ class JavaPluginsTest : BasePluginTest() {
         // Look ma, no `configuration: "shadow"` needed!
         implementation project(':client')
       }
-      tasks.named("compileJava") {
-        doFirst {
-          println "CLASSPATH IS: " + classpath.files
-        }
-      }
+
       """
           .trimIndent() + lineSeparator
       )
@@ -309,7 +305,7 @@ class JavaPluginsTest : BasePluginTest() {
     path("consumer/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java")}
+      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
       dependencies {
         implementation project(':foo')
       }

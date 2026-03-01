@@ -34,7 +34,7 @@ When a project needs to expose the shadowed JAR as its default output — so tha
 
 As a reminder, configurations like `api` and `implementation` are where dependencies are declared ([_declarable_][gradle-declarable-configs]), while `apiElements` and `runtimeElements` are what Gradle consumes when projects depend on each other.
 
-By tuning these consumable configurations, you can avoid users accidentally depending on unshadowed packages or dependencies by mistakenly declaring `implementation(project(":api"))`.
+By tuning these consumable configurations, a simple declaration like `implementation(project(":api"))` will resolve to the shadowed JAR by default, preventing accidental consumption of the unshadowed artifact.
 
 **In the shadowed project (`:api`):**
 
