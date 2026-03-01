@@ -67,6 +67,7 @@ class ShadowPropertiesTest {
         assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
         assertThat(addTargetJvmVersionAttribute.get()).isTrue()
         assertThat(bundlingAttribute.get()).isEqualTo(Bundling.SHADOWED)
+        assertThat(addShadowJarToAssembleLifecycle.get()).isTrue()
       }
     }
 

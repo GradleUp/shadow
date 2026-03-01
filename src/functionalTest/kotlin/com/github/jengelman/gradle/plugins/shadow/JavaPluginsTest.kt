@@ -92,6 +92,24 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(result.output).contains("task dependencies: $SHADOW_JAR_TASK_NAME")
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/1908")
+  @Test
+  fun shadowJarNotAddedToAssembleWhenDisabled() {
+    projectScript.appendText(
+      """
+        shadow {
+          addShadowJarToAssembleLifecycle = false
+        }
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess(ASSEMBLE_TASK_NAME)
+
+    assertThat(result.task(":$ASSEMBLE_TASK_NAME")).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result.task(shadowJarPath)).isNull()
+  }
+
   @Test
   fun shadowJarCliOptions() {
     val result = runWithSuccess("help", "--task", shadowJarPath)
