@@ -40,10 +40,10 @@ internal fun Project.getApiJars(): Provider<List<File>> {
       }
     }
 
-  return shadowApiConfig.map { shadowApi ->
-    shadowApi.resolvedConfiguration.resolvedArtifacts
-      .filter { artifact -> artifact.id.componentIdentifier !is ModuleComponentIdentifier }
-      .map { it.file }
+  return shadowApiConfig.flatMap { shadowApi ->
+    shadowApi.incoming.artifacts.resolvedArtifacts.map { artifacts ->
+      artifacts.filter { it.id.componentIdentifier !is ModuleComponentIdentifier }.map { it.file }
+    }
   }
 }
 
