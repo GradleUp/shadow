@@ -224,14 +224,13 @@ class JavaPluginsTest : BasePluginTest() {
       configurations {
         apiElements {
           outgoing.artifacts.clear()
-          outgoing.artifact($shadowJarTask)
-          // Ensure Gradle doesn't select the `classes` variant
           outgoing.variants.clear()
+          outgoing.artifact($shadowJarTask)
         }
         runtimeElements {
           outgoing.artifacts.clear()
-          outgoing.artifact($shadowJarTask)
           outgoing.variants.clear()
+          outgoing.artifact($shadowJarTask)
         }
       }
       """
@@ -253,10 +252,9 @@ class JavaPluginsTest : BasePluginTest() {
         """
       ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
       dependencies {
-        // Look ma, no `configuration: "shadow"` needed!
+        // No `configuration: "shadow"` needed!
         implementation project(':client')
       }
-
       """
           .trimIndent() + lineSeparator
       )
@@ -287,14 +285,14 @@ class JavaPluginsTest : BasePluginTest() {
       configurations {
         named('apiElements') {
           outgoing.artifacts.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
           outgoing.variants.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
           exclude(group: 'my', module: 'a')
         }
         named('runtimeElements') {
           outgoing.artifacts.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
           outgoing.variants.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
           exclude(group: 'my', module: 'a')
         }
       }
@@ -312,7 +310,7 @@ class JavaPluginsTest : BasePluginTest() {
       tasks.register('printClasspathFiles') {
         def cp = configurations.runtimeClasspath
         doLast {
-          cp.files.each { println it.name }
+          cp.files.each { logger.lifecycle(it.name) }
         }
       }
       """

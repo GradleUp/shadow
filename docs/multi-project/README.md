@@ -54,13 +54,11 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
       named("apiElements") {
         outgoing.artifacts.clear()
         outgoing.variants.clear()
-        
         outgoing.artifact(tasks.shadowJar)
       }
       named("runtimeElements") {
         outgoing.artifacts.clear()
         outgoing.variants.clear()
-
         outgoing.artifact(tasks.shadowJar)
       }
     }
@@ -77,13 +75,13 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
     configurations {
       apiElements {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.named('shadowJar'))
         outgoing.variants.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
       }
       runtimeElements {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.named('shadowJar'))
         outgoing.variants.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
       }
     }
     ```
@@ -121,14 +119,14 @@ configurations as well:
     configurations {
       named("apiElements") {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.shadowJar)
         outgoing.variants.clear()
+        outgoing.artifact(tasks.shadowJar)
         exclude(group = "com.example", module = "bundled-library")
       }
       named("runtimeElements") {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.shadowJar)
         outgoing.variants.clear()
+        outgoing.artifact(tasks.shadowJar)
         exclude(group = "com.example", module = "bundled-library")
       }
     }
@@ -140,14 +138,14 @@ configurations as well:
     configurations {
       apiElements {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.named('shadowJar'))
         outgoing.variants.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
         exclude group: 'com.example', module: 'bundled-library'
       }
       runtimeElements {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.named('shadowJar'))
         outgoing.variants.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
         exclude group: 'com.example', module: 'bundled-library'
       }
     }
