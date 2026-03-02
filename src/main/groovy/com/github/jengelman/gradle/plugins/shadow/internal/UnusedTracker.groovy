@@ -1,13 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.FileCollectionDependency
-import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
-import org.gradle.util.GradleVersion
 import org.vafer.jdependency.Clazz
 import org.vafer.jdependency.Clazzpath
 import org.vafer.jdependency.ClazzpathUnit
@@ -48,52 +47,33 @@ class UnusedTracker {
         return toMinimize
     }
 
-    private static boolean isProjectDependencyFile(File file, Dependency dep) {
-        def fileName = file.name
-        def dependencyName = dep.name
-
-        return (fileName == "${dependencyName}.jar") ||
-            (fileName.startsWith("${dependencyName}-") && fileName.endsWith('.jar'))
-    }
-
-    private static void addJar(Configuration config, Dependency dep, List<File> result) {
-        def file = config.find { isProjectDependencyFile(it, dep) } as File
-        if (file != null) {
-            result.add(file)
-        }
-    }
-
     static FileCollection getApiJarsFromProject(Project project) {
-        def apiDependencies = project.configurations.asMap['api']?.dependencies ?: null
-        if (apiDependencies == null) return project.files()
+        def apiConfiguration = project.configurations.findByName("api")
+        if (apiConfiguration == null) return project.files()
 
-        def runtimeConfiguration = project.configurations.asMap['runtimeClasspath'] ?: project.configurations.runtime
-        def apiJars = new LinkedList<File>()
-        apiDependencies.each { dep ->
-            if (dep instanceof ProjectDependency) {
-                apiJars.addAll(getApiJarsFromProject(dependencyProjectCompat(dep, project)))
-                addJar(runtimeConfiguration, dep, apiJars)
-            } else if (dep instanceof FileCollectionDependency) {
-                apiJars.addAll(dep.files)
-            } else {
-                addJar(runtimeConfiguration, dep, apiJars)
-                def jarFile = runtimeConfiguration.find { it.name.startsWith("${dep.name}-") }
-                if (jarFile != null) {
-                    apiJars.add(jarFile)
+        def configName = "shadowMinimizeApi"
+        def shadowApiConfig
+        if (project.configurations.names.contains(configName)) {
+            shadowApiConfig = project.configurations.named(configName)
+        } else {
+            shadowApiConfig = project.configurations.register(configName) { config ->
+                config.canBeResolved = true
+                config.canBeConsumed = false
+                config.attributes { attrs ->
+                    attrs.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage, Usage.JAVA_API))
+                    attrs.attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category, Category.LIBRARY))
+                    attrs.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, LibraryElements.JAR))
                 }
+                config.extendsFrom(apiConfiguration)
             }
         }
 
-        return project.files(apiJars)
-    }
-
-    /**
-     * TODO: this could be removed after bumping the min Gradle requirement to 8.11 or above.
-     */
-    private static dependencyProjectCompat(ProjectDependency projectDependency, Project project) {
-        if (GradleVersion.current() >= GradleVersion.version("8.11")) {
-            return project.project(projectDependency.path)
-        }
-        return projectDependency.dependencyProject
+        return project.files(shadowApiConfig.flatMap { shadowApi ->
+            shadowApi.incoming.artifacts.resolvedArtifacts.map { artifacts ->
+                artifacts
+                    .findAll { it.id.componentIdentifier !instanceof ModuleComponentIdentifier }
+                    .collect { it.file }
+            }
+        })
     }
 }
