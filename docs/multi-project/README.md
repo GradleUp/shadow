@@ -28,7 +28,128 @@ configuration of the shadowed project.
     }
     ```
 
+## Making the Shadowed JAR the Default Artifact
 
+When a project needs to expose the shadowed JAR as its default output — so that consumers can depend on it without
+specifying the `shadow` configuration explicitly — you can reconfigure the consumable configurations `apiElements` and
+`runtimeElements` to publish the shadowed JAR instead of the regular JAR.
+
+As a reminder, configurations like `api` and `implementation` are where dependencies are declared (_declarable_), while
+`apiElements` and `runtimeElements` are what Gradle consumes when projects depend on each other.
+
+By tuning these consumable configurations, a simple declaration like `implementation(project(":api"))` will resolve to
+the shadowed JAR by default, preventing accidental consumption of the unshadowed artifact.
+
+**In the shadowed project (`:api`):**
+
+=== "Kotlin"
+
+    ```kotlin
+    plugins {
+      `java-library`
+      id("com.gradleup.shadow")
+    }
+
+    configurations {
+      named("apiElements") {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
+      }
+      named("runtimeElements") {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    plugins {
+      id 'java-library'
+      id 'com.gradleup.shadow'
+    }
+
+    configurations {
+      apiElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
+        outgoing.variants.clear()
+      }
+      runtimeElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
+        outgoing.variants.clear()
+      }
+    }
+    ```
+
+!!! important
+
+    Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during compilation.
+
+**Consuming projects can then depend on `:api` without specifying the `shadow` configuration:**
+
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      implementation(project(":api"))
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    dependencies {
+      implementation project(':api')
+    }
+    ```
+
+### Excluding Transitive Dependencies
+
+If you want to exclude transitive dependencies that were bundled into the shadow JAR, you can add `exclude` rules to the
+configurations as well:
+
+=== "Kotlin"
+
+    ```kotlin
+    configurations {
+      named("apiElements") {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
+        exclude(group = "com.example", module = "bundled-library")
+      }
+      named("runtimeElements") {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.shadowJar)
+        outgoing.variants.clear()
+        exclude(group = "com.example", module = "bundled-library")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    configurations {
+      apiElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
+        outgoing.variants.clear()
+        exclude group: 'com.example', module: 'bundled-library'
+      }
+      runtimeElements {
+        outgoing.artifacts.clear()
+        outgoing.artifact(tasks.named('shadowJar'))
+        outgoing.variants.clear()
+        exclude group: 'com.example', module: 'bundled-library'
+      }
+    }
+    ```
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

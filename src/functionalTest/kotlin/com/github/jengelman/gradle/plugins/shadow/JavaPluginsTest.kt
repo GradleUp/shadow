@@ -192,6 +192,140 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/1893")
+  @Test
+  fun consumeShadowedProjectViaApiElementsAndRuntimeElements() {
+    settingsScript.appendText(
+      """
+      include 'client', 'server'
+      """
+        .trimIndent()
+    )
+    projectScript.writeText("")
+
+    path("client/src/main/java/client/Client.java")
+      .writeText(
+        """
+        package client;
+        public class Client {}
+        """
+          .trimIndent()
+      )
+    path("client/build.gradle")
+      .writeText(
+        """
+      ${getDefaultProjectBuildScript("java-library")}
+      dependencies {
+        api 'junit:junit:3.8.2'
+      }
+      $shadowJarTask {
+        relocate 'junit.framework', 'client.junit.framework'
+      }
+      configurations {
+        apiElements {
+          outgoing.artifacts.clear()
+          outgoing.artifact($shadowJarTask)
+          // Ensure Gradle doesn't select the `classes` variant
+          outgoing.variants.clear()
+        }
+        runtimeElements {
+          outgoing.artifacts.clear()
+          outgoing.artifact($shadowJarTask)
+          outgoing.variants.clear()
+        }
+      }
+      """
+          .trimIndent() + lineSeparator
+      )
+
+    path("server/src/main/java/server/Server.java")
+      .writeText(
+        """
+        package server;
+        import client.Client;
+        import client.junit.framework.Test;
+        public class Server {}
+        """
+          .trimIndent()
+      )
+    path("server/build.gradle")
+      .writeText(
+        """
+      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
+      dependencies {
+        // Look ma, no `configuration: "shadow"` needed!
+        implementation project(':client')
+      }
+
+      """
+          .trimIndent() + lineSeparator
+      )
+
+    // Running server:jar to ensure it compiles against the shadowed client
+    runWithSuccess(":server:jar")
+
+    // The fact that server compiled successfully against `client.junit.framework.Test`
+    // means it consumed the shadowed artifact during compilation.
+    assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
+      containsAtLeast("server/Server.class")
+    }
+  }
+
+  @Issue("https://github.com/GradleUp/shadow/issues/1893")
+  @Test
+  fun excludeRulesPreventBundledDepsOnConsumerClasspath() {
+    settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
+    projectScript.writeText("")
+
+    path("foo/build.gradle")
+      .writeText(
+        """
+      ${getDefaultProjectBuildScript("java-library")}
+      dependencies {
+        implementation 'my:a:1.0'
+      }
+      configurations {
+        named('apiElements') {
+          outgoing.artifacts.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
+          outgoing.variants.clear()
+          exclude(group: 'my', module: 'a')
+        }
+        named('runtimeElements') {
+          outgoing.artifacts.clear()
+          outgoing.artifact(tasks.named('shadowJar'))
+          outgoing.variants.clear()
+          exclude(group: 'my', module: 'a')
+        }
+      }
+      """
+          .trimIndent() + lineSeparator
+      )
+
+    path("consumer/build.gradle")
+      .writeText(
+        """
+      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
+      dependencies {
+        implementation project(':foo')
+      }
+      tasks.register('printClasspathFiles') {
+        def cp = configurations.runtimeClasspath
+        doLast {
+          cp.files.each { println it.name }
+        }
+      }
+      """
+          .trimIndent() + lineSeparator
+      )
+
+    val result = runWithSuccess(":consumer:printClasspathFiles")
+    assertThat(result.output).all {
+      contains("foo-1.0-all.jar")
+      doesNotContain("a-1.0.jar")
+    }
+  }
+
   @Issue("https://github.com/GradleUp/shadow/issues/1606")
   @Test
   fun shadowExposedCustomSourceSetOutput() {
