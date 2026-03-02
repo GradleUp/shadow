@@ -53,13 +53,15 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
     configurations {
       named("apiElements") {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.shadowJar)
         outgoing.variants.clear()
+        
+        outgoing.artifact(tasks.shadowJar)
       }
       named("runtimeElements") {
         outgoing.artifacts.clear()
-        outgoing.artifact(tasks.shadowJar)
         outgoing.variants.clear()
+
+        outgoing.artifact(tasks.shadowJar)
       }
     }
     ```
