@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
@@ -589,9 +590,29 @@ public abstract class ShadowJar : Jar() {
     }
 
     val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
-    val shadowFileNames = shadowDependencies.get().map { it.name }.distinct()
-    if (shadowFileNames.isNotEmpty()) {
-      val attrs = listOf(classPathAttr) + shadowFileNames
+    val shadowFileNames = shadowDependencies.get().map { it.name }
+    val excludedFileNames =
+      if (
+        project.extensions.findByType(ShadowExtension::class.java)
+          ?.addExcludedDependenciesToClassPath
+          ?.get() != false
+      ) {
+        val names = excludedDependencies.files.map { it.name }
+        if (names.isNotEmpty()) {
+          logger.info(
+            "Adding excluded dependencies to the $classPathAttributeKey manifest attribute."
+          )
+        }
+        names
+      } else {
+        logger.info(
+          "Skipping adding excluded dependencies to the $classPathAttributeKey manifest attribute as it is disabled."
+        )
+        emptyList()
+      }
+    val allExtraFileNames = (shadowFileNames + excludedFileNames).distinct()
+    if (allExtraFileNames.isNotEmpty()) {
+      val attrs = listOf(classPathAttr) + allExtraFileNames
       manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
     }
 
@@ -664,22 +685,6 @@ public abstract class ShadowJar : Jar() {
             if (shadow.addShadowJarToAssembleLifecycle.get()) {
               it.dependsOn(task)
             }
-          }
-          // Wire excluded dependencies into the shadow configuration so all shadow usages benefit:
-          // manifest Class-Path, distribution lib/, and any other consumers of the configuration.
-          val shadowConfig = configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME)
-          if (shadowConfig != null) {
-            val conditionalExcludedDeps =
-              shadow.addExcludedDependenciesToShadowConfiguration.zip(
-                task.map { it.excludedDependencies }
-              ) { enabled, excluded ->
-                if (enabled) excluded else files()
-              }
-            shadowConfig.dependencies.add(dependencies.create(files(conditionalExcludedDeps)))
-          } else {
-            logger.debug(
-              "Shadow configuration not found; skipping wiring of excluded dependencies."
-            )
           }
         }
     }

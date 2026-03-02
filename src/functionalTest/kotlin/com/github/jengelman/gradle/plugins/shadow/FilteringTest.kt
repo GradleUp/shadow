@@ -284,7 +284,7 @@ class FilteringTest : BasePluginTest() {
     projectScript.appendText(
       """
         shadow {
-          addExcludedDependenciesToShadowConfiguration = false
+          addExcludedDependenciesToClassPath = false
         }
         dependencies {
           implementation 'my:d:1.0'

@@ -21,7 +21,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
         addTargetJvmVersionAttribute.convention(true)
         bundlingAttribute.convention(Bundling.SHADOWED)
         addShadowJarToAssembleLifecycle.convention(true)
-        addExcludedDependenciesToShadowConfiguration.convention(true)
+        addExcludedDependenciesToClassPath.convention(true)
       }
       @Suppress("EagerGradleConfiguration") // this should be created eagerly.
       configurations.create(CONFIGURATION_NAME)

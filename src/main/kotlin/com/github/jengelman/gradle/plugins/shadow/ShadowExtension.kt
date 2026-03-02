@@ -44,14 +44,13 @@ public interface ShadowExtension {
   /**
    * If `true`, automatically adds dependencies excluded from the shadow JAR (via the
    * [com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.dependencies] filter block) to the
-   * `shadow` configuration. This ensures those dependencies are available at runtime for all shadow
-   * usages, including the manifest `Class-Path` attribute, the distribution `lib/` folder, and
-   * consumers of the `shadow` configuration.
+   * `Class-Path` attribute of the JAR manifest. This ensures the JVM can resolve those dependencies
+   * at runtime even though they are not bundled in the shadow JAR.
    *
-   * Set to `false` to disable this behavior and keep only explicitly declared `shadow`
-   * dependencies.
+   * Set to `false` to disable this behavior and keep only explicitly declared `shadow` dependencies
+   * in `Class-Path`.
    *
    * Defaults to `true`.
    */
-  public val addExcludedDependenciesToShadowConfiguration: Property<Boolean>
+  public val addExcludedDependenciesToClassPath: Property<Boolean>
 }
