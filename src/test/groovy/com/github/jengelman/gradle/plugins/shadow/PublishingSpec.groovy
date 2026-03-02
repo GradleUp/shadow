@@ -142,40 +142,32 @@ class PublishingSpec extends PluginSpecification {
             include 'c'
         """.stripMargin()
 
-        buildFile.text = """
-            subprojects {
-                apply plugin: 'java'
-                apply plugin: 'maven-publish'
+        def publishingBlock = """
+            apply plugin: 'java'
+            apply plugin: 'maven-publish'
 
-                version = "1.0"
-                group = 'shadow'
+            version = "1.0"
+            group = 'shadow'
 
-                repositories { maven { url = "${repo.uri}" } }
-                publishing {
-                   repositories {
-                       maven {
-                           url = "${publishingRepo.uri}"
-                       }
+            repositories { maven { url = "${repo.uri}" } }
+            publishing {
+               repositories {
+                   maven {
+                       url = "${publishingRepo.uri}"
                    }
-                }
+               }
             }
         """.stripIndent()
 
         file('a/build.gradle') << """
-            plugins {
-                id 'java'
-                id 'maven-publish'
-            }
+            $publishingBlock
         """.stripMargin()
 
         file('a/src/main/resources/a.properties') << 'a'
         file('a/src/main/resources/a2.properties') << 'a2'
 
         file('b/build.gradle') << """
-            plugins {
-                id 'java'
-                id 'maven-publish'
-            }
+            $publishingBlock
         """.stripMargin()
 
         file('b/src/main/resources/b.properties') << 'b'
@@ -184,6 +176,7 @@ class PublishingSpec extends PluginSpecification {
             plugins {
                 id 'com.gradleup.shadow'
             }
+            $publishingBlock
 
             dependencies {
                 implementation project(':a')

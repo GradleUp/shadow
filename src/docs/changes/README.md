@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Fix compatibility with Isolated Projects. ([#1947](https://github.com/GradleUp/shadow/pull/1947))
 
 ## [v8.3.10] (2026-02-26)
 

@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.file.TestFile
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -67,7 +68,7 @@ abstract class PluginSpecification extends Specification {
             .withTestKitDir(TEST_KIT_DIR.toFile())
             .forwardOutput()
             .withPluginClasspath()
-            .withArguments(extraArgs + tasks)
+            .withArguments(extraArgs + ipFlag + tasks)
     }
 
     BuildResult runWithSuccess(String... tasks) {
@@ -195,4 +196,8 @@ abstract class PluginSpecification extends Specification {
         }
         return new File(gradleUserHome, "testkit")
     }
+
+    // https://docs.gradle.org/current/userguide/isolated_projects.html#how_do_i_use_it
+    private static def ipFlag = GradleVersion.version(TEST_GRADLE_VERSION) >= GradleVersion.version("9.0.0") ?
+        ["-Dorg.gradle.unsafe.isolated-projects=true"] : []
 }
