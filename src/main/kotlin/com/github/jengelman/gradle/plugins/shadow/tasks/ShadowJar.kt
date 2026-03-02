@@ -250,24 +250,6 @@ public abstract class ShadowJar : Jar() {
   )
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
-  /**
-   * Automatically adds excluded dependencies (those filtered out by the [dependencies] block) to
-   * the `Class-Path` attribute of the manifest. This ensures that dependencies not bundled in the
-   * shadow JAR are still resolvable by the JVM at runtime from the classpath.
-   *
-   * Defaults to `true`. Set to `false` to exclude filtered dependencies from the `Class-Path`
-   * attribute.
-   *
-   * @see dependencies
-   */
-  @get:Input
-  @get:Option(
-    option = "add-excluded-dependencies-to-class-path",
-    description = "Adds excluded dependencies to the Class-Path manifest attribute.",
-  )
-  public open val addExcludedDependenciesToClassPath: Property<Boolean> =
-    objectFactory.property(true)
-
   @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
@@ -607,25 +589,9 @@ public abstract class ShadowJar : Jar() {
     }
 
     val classPathAttr = manifest.attributes[classPathAttributeKey]?.toString().orEmpty()
-    val shadowFileNames = shadowDependencies.get().map { it.name }
-    val excludedFileNames =
-      if (addExcludedDependenciesToClassPath.get()) {
-        val names = excludedDependencies.files.map { it.name }
-        if (names.isNotEmpty()) {
-          logger.info(
-            "Adding excluded dependencies to the $classPathAttributeKey manifest attribute."
-          )
-        }
-        names
-      } else {
-        logger.info(
-          "Skipping adding excluded dependencies to the $classPathAttributeKey manifest attribute as it is disabled."
-        )
-        emptyList()
-      }
-    val allExtraFileNames = (shadowFileNames + excludedFileNames).distinct()
-    if (allExtraFileNames.isNotEmpty()) {
-      val attrs = listOf(classPathAttr) + allExtraFileNames
+    val shadowFileNames = shadowDependencies.get().map { it.name }.distinct()
+    if (shadowFileNames.isNotEmpty()) {
+      val attrs = listOf(classPathAttr) + shadowFileNames
       manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
     }
 
@@ -698,6 +664,22 @@ public abstract class ShadowJar : Jar() {
             if (shadow.addShadowJarToAssembleLifecycle.get()) {
               it.dependsOn(task)
             }
+          }
+          // Wire excluded dependencies into the shadow configuration so all shadow usages benefit:
+          // manifest Class-Path, distribution lib/, and any other consumers of the configuration.
+          val shadowConfig = configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME)
+          if (shadowConfig != null) {
+            val conditionalExcludedDeps =
+              shadow.addExcludedDependenciesToShadowConfiguration.zip(
+                task.map { it.excludedDependencies }
+              ) { enabled, excluded ->
+                if (enabled) excluded else files()
+              }
+            shadowConfig.dependencies.add(dependencies.create(files(conditionalExcludedDeps)))
+          } else {
+            logger.debug(
+              "Shadow configuration not found; skipping wiring of excluded dependencies."
+            )
           }
         }
     }

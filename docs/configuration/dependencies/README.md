@@ -444,21 +444,28 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     }
     ```
 
-## Excluded Dependencies in Manifest Class-Path
+## Excluded Dependencies in Shadow Configuration
 
 When dependencies are excluded from the shadow JAR via the `dependencies` block (using `include` or
-`exclude`), Shadow automatically adds them to the `Class-Path` attribute of the JAR manifest. This
-ensures the JVM can still locate those dependencies at runtime.
+`exclude`), Shadow automatically adds them to the `shadow` configuration. This ensures those
+dependencies are available at runtime for all shadow-related usages, including:
 
-This behavior is enabled by default. To disable it, set `addExcludedDependenciesToClassPath` to
-`false`:
+- The `Class-Path` manifest attribute of the shadow JAR.
+- The `lib/` folder of the shadow distribution (when using the `application` plugin).
+- Any consumers of the `shadow` configuration.
+
+This behavior is enabled by default. To disable it, set
+`addExcludedDependenciesToShadowConfiguration` to `false` in the `shadow` extension:
 
 === "Kotlin"
 
     ```kotlin
+    shadow {
+      // Opt out of automatically adding excluded deps to the shadow configuration.
+      addExcludedDependenciesToShadowConfiguration = false
+    }
+
     tasks.shadowJar {
-      // Opt out of automatically adding excluded deps to Class-Path.
-      addExcludedDependenciesToClassPath = false
       dependencies {
         include(dependency("com.example:my-lib:1.0"))
       }
@@ -468,9 +475,12 @@ This behavior is enabled by default. To disable it, set `addExcludedDependencies
 === "Groovy"
 
     ```groovy
+    shadow {
+      // Opt out of automatically adding excluded deps to the shadow configuration.
+      addExcludedDependenciesToShadowConfiguration = false
+    }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Opt out of automatically adding excluded deps to Class-Path.
-      addExcludedDependenciesToClassPath = false
       dependencies {
         include(dependency('com.example:my-lib:1.0'))
       }

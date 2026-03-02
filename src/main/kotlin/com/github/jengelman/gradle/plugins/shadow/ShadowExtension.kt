@@ -40,4 +40,18 @@ public interface ShadowExtension {
    * Defaults to `true`.
    */
   public val addShadowJarToAssembleLifecycle: Property<Boolean>
+
+  /**
+   * If `true`, automatically adds dependencies excluded from the shadow JAR (via the
+   * [com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.dependencies] filter block) to the
+   * `shadow` configuration. This ensures those dependencies are available at runtime for all shadow
+   * usages, including the manifest `Class-Path` attribute, the distribution `lib/` folder, and
+   * consumers of the `shadow` configuration.
+   *
+   * Set to `false` to disable this behavior and keep only explicitly declared `shadow`
+   * dependencies.
+   *
+   * Defaults to `true`.
+   */
+  public val addExcludedDependenciesToShadowConfiguration: Property<Boolean>
 }

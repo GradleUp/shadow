@@ -283,11 +283,13 @@ class FilteringTest : BasePluginTest() {
   fun excludedDependenciesNotAddedToClassPathWhenFlagDisabled() {
     projectScript.appendText(
       """
+        shadow {
+          addExcludedDependenciesToShadowConfiguration = false
+        }
         dependencies {
           implementation 'my:d:1.0'
         }
         $shadowJarTask {
-          addExcludedDependenciesToClassPath = false
           dependencies {
             include(dependency('my:d:1.0'))
           }

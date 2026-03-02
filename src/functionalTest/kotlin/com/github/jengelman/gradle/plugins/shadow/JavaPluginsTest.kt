@@ -119,8 +119,6 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(result.output)
       .contains(
-        "--add-excluded-dependencies-to-class-path     Adds excluded dependencies to the Class-Path manifest attribute.",
-        "--no-add-excluded-dependencies-to-class-path     Disables option --add-excluded-dependencies-to-class-path.",
         "--add-multi-release-attribute     Adds the multi-release attribute to the manifest if any dependencies contain it.",
         "--no-add-multi-release-attribute     Disables option --add-multi-release-attribute.",
         "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",

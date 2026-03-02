@@ -6,10 +6,11 @@
 ### Added
 
 - Support Isolated Projects. ([#1139](https://github.com/GradleUp/shadow/pull/1139))
-- Auto-add excluded dependencies to the `Class-Path` manifest attribute. ([#1944](https://github.com/GradleUp/shadow/pull/1944))
+- Auto-add excluded dependencies to the `shadow` configuration. ([#1944](https://github.com/GradleUp/shadow/pull/1944))
   Dependencies filtered out of the shadow JAR via the `dependencies` block are now automatically
-  listed in `Class-Path` so the JVM can resolve them at runtime. Set
-  `addExcludedDependenciesToClassPath = false` to opt out.
+  added to the `shadow` configuration, ensuring they appear in the manifest `Class-Path`, the
+  distribution `lib/` folder, and other shadow usages. Set
+  `shadow { addExcludedDependenciesToShadowConfiguration = false }` to opt out.
 
 ### Changed
 
