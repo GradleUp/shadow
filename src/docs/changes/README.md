@@ -6,6 +6,7 @@
 **Fixed**
 
 - Fix compatibility with Isolated Projects. ([#1947](https://github.com/GradleUp/shadow/pull/1947))
+- Fix interaction with Gradle artifact transforms. ([#1949](https://github.com/GradleUp/shadow/pull/1949))
 
 ## [v8.3.10] (2026-02-26)
 

@@ -26,12 +26,14 @@ abstract class AbstractDependencyFilter implements DependencyFilter {
 
     @Override
     FileCollection resolve(FileCollection configuration) {
-        Set<ResolvedDependency> includedDeps = []
-        Set<ResolvedDependency> excludedDeps = []
-        resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, includedDeps, excludedDeps)
-        return project.files(configuration.files) - project.files(excludedDeps.collect {
-            it.moduleArtifacts*.file
-        }.flatten())
+        return configuration - project.files(project.provider {
+            Set<ResolvedDependency> includedDeps = []
+            Set<ResolvedDependency> excludedDeps = []
+            resolve(configuration.resolvedConfiguration.firstLevelModuleDependencies, includedDeps, excludedDeps)
+            excludedDeps.collectMany {
+                it.moduleArtifacts.collect { it.file }
+            }
+        })
     }
 
     @Override

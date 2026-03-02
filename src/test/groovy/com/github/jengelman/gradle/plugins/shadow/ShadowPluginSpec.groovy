@@ -1054,4 +1054,104 @@ class ShadowPluginSpec extends PluginSpecification {
         JarFile jar = new JarFile(output)
         assert jar.entries().collect().findAll { it.name.endsWith('.class') }.size() == 1
     }
+
+    @Issue("https://github.com/GradleUp/shadow/issues/882")
+    def 'compat gradle artifact transform'() {
+        given:
+        file('settings.gradle') << "include('app', 'lib')\n"
+        file("lib/build.gradle") << """
+            plugins {
+              id 'java-library'
+            }
+        """.stripIndent()
+
+        file("lib/src/main/java/com/company/Utils.java") << """
+            package com.company;
+
+            public class Utils {
+              public static void foo() {
+                System.out.println("bar");
+              }
+            }
+        """.stripIndent()
+
+        file("app/build.gradle") << """
+            import org.gradle.api.artifacts.transform.TransformParameters
+            import org.gradle.api.artifacts.transform.TransformAction
+            import org.gradle.api.artifacts.transform.TransformOutputs
+            import org.gradle.api.artifacts.transform.InputArtifact
+            import org.gradle.api.file.FileSystemLocation
+            import org.gradle.api.provider.Provider
+
+            plugins {
+              id 'application'
+              id 'com.gradleup.shadow'
+            }
+
+            application {
+              mainClass = 'com.company.Main'
+            }
+
+            dependencies {
+              implementation project(':lib')
+            }
+
+            def transformedAttribute = Attribute.of('custom-transformed', Boolean)
+
+            dependencies {
+              attributesSchema {
+                attribute(transformedAttribute)
+              }
+              artifactTypes.maybeCreate('jar').attributes.attribute(transformedAttribute, false)
+            }
+
+            dependencies {
+              registerTransform(CustomTransformAction) {
+                from.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, false)
+                to.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, true)
+              }
+            }
+
+            tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+              configurations = [project.configurations.runtimeClasspath]
+            }
+
+            configurations.runtimeClasspath {
+              attributes.attribute(transformedAttribute, true)
+            }
+
+            abstract class CustomTransformAction implements TransformAction<TransformParameters.None> {
+              @InputArtifact abstract Provider<FileSystemLocation> getInputArtifact()
+
+              @Override
+              void transform(TransformOutputs outputs) {
+                File input = inputArtifact.get().asFile
+                File output = outputs.file(input.name)
+                output.bytes = input.bytes
+              }
+            }
+        """.stripIndent()
+
+        file("app/src/main/java/com/company/Main.java") << """
+            package com.company;
+
+            public class Main {
+              public static void main(String[] args) {
+                Utils.foo();
+              }
+            }
+        """.stripIndent()
+
+        when:
+        runWithSuccess(":app:shadowJar")
+
+        then:
+        File outputJar = getFile("app/build/libs/app-all.jar")
+        outputJar.exists()
+        contains(outputJar, [
+            "com/company/Main.class",
+            "com/company/Utils.class",
+            "META-INF/MANIFEST.MF"
+        ])
+    }
 }
