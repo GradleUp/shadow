@@ -5,18 +5,17 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.tools.zip.ZipOutputStream
-import spock.lang.Specification
+import spock.lang.Unroll
+
+import java.util.jar.JarInputStream
 
 import static java.util.Collections.singletonList
 import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 
 /**
- * @author Paul Nelson Baker
- * @since 2018-08
- * @see <a href="https://github.com/paul-nelson-baker/">GitHub</a>
- * @see <a href="https://www.linkedin.com/in/paul-n-baker/">LinkedIn</a>
+ * Modified from <a href="https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/test/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformerTest.java">Log4j2PluginCacheFileTransformerTest.java</a>.
  */
-class Log4j2PluginsCacheFileTransformerSpec extends Specification {
+class Log4j2PluginsCacheFileTransformerSpec extends TransformerSpecSupport {
 
     Log4j2PluginsCacheFileTransformer transformer
 
@@ -24,24 +23,49 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
         transformer = new Log4j2PluginsCacheFileTransformer()
     }
 
-    void "should not transformer"() {
+    void "canTransformResource"() {
+        expect:
+        !transformer.canTransformResource(getFileElement(""))
+        !transformer.canTransformResource(getFileElement("."))
+        !transformer.canTransformResource(getFileElement("tmp.dat"))
+        !transformer.canTransformResource(getFileElement("${PLUGIN_CACHE_FILE}.tmp"))
+        !transformer.canTransformResource(getFileElement("tmp/${PLUGIN_CACHE_FILE}"))
+        transformer.canTransformResource(getFileElement(PLUGIN_CACHE_FILE))
+    }
+
+    void "transformAndModifyOutputStream"() {
+        expect:
+        !transformer.hasTransformedResource()
+
         when:
+        transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), null))
         transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), null))
 
         then:
-        !transformer.hasTransformedResource()
-    }
-
-    void "should transform"() {
-        given:
-        List<Relocator> relocators = new ArrayList<>()
-        relocators.add(new SimpleRelocator(null, null, null, null))
+        transformer.hasTransformedResource()
 
         when:
-        transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), relocators))
+        def jarBuff = new ByteArrayOutputStream()
+        new ZipOutputStream(jarBuff).withCloseable { zos ->
+            transformer.modifyOutputStream(zos, false)
+        }
+        def foundEntry = findEntry(jarBuff)
 
         then:
-        transformer.hasTransformedResource()
+        foundEntry != null
+    }
+
+    private static String findEntry(ByteArrayOutputStream jarBuff) {
+        new JarInputStream(new ByteArrayInputStream(jarBuff.toByteArray())).withCloseable { jarIn ->
+            def entry = jarIn.nextJarEntry
+            while (entry != null) {
+                if (entry.name == PLUGIN_CACHE_FILE) {
+                    return entry.name
+                }
+                entry = jarIn.nextJarEntry
+            }
+            return null
+        }
     }
 
     void "relocate classes inside DAT file"() {
@@ -77,10 +101,34 @@ class Log4j2PluginsCacheFileTransformerSpec extends Specification {
         cache.loadCacheFiles(Collections.enumeration([new URL(urlString)]))
 
         cache.getCategory("lookup")["date"].className == "new.location.org.apache.logging.log4j.core.lookup.DateLookup"
+    }
 
+    @Unroll
+    void "relocations [#pattern -> #shadedPattern expects #target]"() {
+        given:
+        PluginCache aggregator = new PluginCache()
+        aggregator.loadCacheFiles(Collections.enumeration([getResourceUrl(PLUGIN_CACHE_FILE)]))
+        transformer.transform(new TransformerContext(PLUGIN_CACHE_FILE, getResourceStream(PLUGIN_CACHE_FILE), [new SimpleRelocator(pattern, shadedPattern, null, null)], new ShadowStats()))
+        transformer.relocatePlugins(aggregator)
+
+        expect:
+        for (def pluginEntryMap : aggregator.allCategories.values()) {
+            for (def entry : pluginEntryMap.values()) {
+                assert entry.className.startsWith(target)
+            }
+        }
+
+        where:
+        pattern               | shadedPattern                         | target
+        "org.apache.logging"  | "new.location.org.apache.logging"     | "new.location.org.apache.logging"
+        "com.apache.logging"  | "new.location.com.apache.logging"     | "org.apache.logging"
     }
 
     InputStream getResourceStream(String resource) {
         return this.class.getClassLoader().getResourceAsStream(resource)
+    }
+
+    URL getResourceUrl(String resource) {
+        return this.class.getClassLoader().getResource(resource)
     }
 }

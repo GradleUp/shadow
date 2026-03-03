@@ -33,18 +33,23 @@ import org.gradle.api.file.FileTreeElement
 import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 
 /**
- * Modified from the maven equivalent to work with gradle
+ * Modified from <a href="https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java">Log4j2PluginCacheFileTransformer.java</a>.
  *
  * @author Paul Nelson Baker
  * @see <a href="https://www.linkedin.com/in/paul-n-baker/">LinkedIn</a>
  * @see <a href="https://github.com/paul-nelson-baker/">GitHub</a>
- * @see <a href="https://github.com/edwgiz/maven-shaded-log4j-transformer">edwgiz/maven-shaded-log4j-transformer</a>
- * @see <a href="https://github.com/edwgiz/maven-shaded-log4j-transformer/blob/master/src/main/java/com/github/edwgiz/mavenShadePlugin/log4j2CacheTransformer/PluginsCacheFileTransformer.java">PluginsCacheFileTransformer.java</a>
  */
 @CacheableTransformer
 class Log4j2PluginsCacheFileTransformer implements Transformer {
 
+    /**
+     * Log4j config files to share across the transformation stages.
+     */
     private final List<File> temporaryFiles
+
+    /**
+     * {@link Relocator} instances to share across the transformation stages.
+     */
     private final List<Relocator> relocators
 
     private ShadowStats stats
@@ -56,7 +61,7 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
-        return PLUGIN_CACHE_FILE == element.name
+        return PLUGIN_CACHE_FILE == element.relativePath.pathString
     }
 
     @Override
@@ -80,27 +85,28 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
         }
     }
 
+    /**
+     * @return {@code true} if any dat file collected.
+     */
     @Override
     boolean hasTransformedResource() {
-        // This functionality matches the original plugin, however, I'm not clear what
-        // the exact logic is. From what I can tell temporaryFiles should be never be empty
-        // if anything has been performed.
-        def hasTransformedMultipleFiles = temporaryFiles.size() > 1
-        def hasAtLeastOneFileAndRelocator = !temporaryFiles.isEmpty() && !relocators.isEmpty()
-        def hasTransformedResources = hasTransformedMultipleFiles || hasAtLeastOneFileAndRelocator
-        return hasTransformedResources
+        return !temporaryFiles.isEmpty()
     }
 
     @Override
     void modifyOutputStream(ZipOutputStream zipOutputStream, boolean preserveFileTimestamps) {
-        PluginCache pluginCache = new PluginCache()
-        pluginCache.loadCacheFiles(getUrlEnumeration())
-        relocatePlugins(pluginCache)
-        ZipEntry entry = new ZipEntry(PLUGIN_CACHE_FILE)
-        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-        zipOutputStream.putNextEntry(entry)
-        pluginCache.writeCache(CloseShieldOutputStream.wrap(zipOutputStream))
-        temporaryFiles.clear()
+        try {
+            PluginCache aggregator = new PluginCache()
+            aggregator.loadCacheFiles(getUrlEnumeration())
+            relocatePlugins(aggregator)
+            ZipEntry entry = new ZipEntry(PLUGIN_CACHE_FILE)
+            entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
+            zipOutputStream.putNextEntry(entry)
+            // prevent the aggregator to close the jar output.
+            aggregator.writeCache(CloseShieldOutputStream.wrap(zipOutputStream))
+        } finally {
+            deleteTempFiles()
+        }
     }
 
     private Enumeration<URL> getUrlEnumeration() {
@@ -108,7 +114,17 @@ class Log4j2PluginsCacheFileTransformer implements Transformer {
         return Collections.enumeration(urls)
     }
 
-    private void relocatePlugins(PluginCache pluginCache) {
+    private void deleteTempFiles() {
+        def iterator = temporaryFiles.listIterator()
+        while (iterator.hasNext()) {
+            def file = iterator.next()
+            file.delete()
+            iterator.remove()
+        }
+    }
+
+    // Package-private for testing.
+    void relocatePlugins(PluginCache pluginCache) {
         for (Map<String, PluginEntry> currentMap : pluginCache.getAllCategories().values()) {
             pluginEntryLoop:
             for (PluginEntry currentPluginEntry : currentMap.values()) {
