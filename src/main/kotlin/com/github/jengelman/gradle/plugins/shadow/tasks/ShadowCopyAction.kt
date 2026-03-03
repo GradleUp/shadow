@@ -13,6 +13,8 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
+import java.lang.classfile.ClassFile
+import java.lang.constant.ClassDesc
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
 import kotlin.metadata.jvm.KmModule
@@ -32,9 +34,6 @@ import org.gradle.api.internal.file.copy.FileCopyDetailsInternal
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.WorkResult
 import org.gradle.api.tasks.WorkResults
-import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
-import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
-import org.vafer.jdeb.shaded.objectweb.asm.commons.ClassRemapper
 
 /**
  * Modified from
@@ -212,36 +211,29 @@ constructor(
     private fun FileCopyDetails.remapClass() =
       file.readBytes().let { bytes ->
         var modified = false
+        val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
+        val internalClassName = path.replace(multiReleasePrefix, "").removeSuffix(".class")
         val remapper = RelocatorRemapper(relocators) { modified = true }
 
-        // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant
-        // pool.
-        // Copying the original constant pool should be avoided because it would keep references
-        // to the original class names. This is not a problem at runtime (because these entries in
-        // the
-        // constant pool are never used), but confuses some tools such as Felix's
-        // maven-bundle-plugin
-        // that use the constant pool to determine the dependencies of a class.
-        val cw = ClassWriter(0)
-        val cr = ClassReader(bytes)
-        val cv = ClassRemapper(cw, remapper)
-
-        try {
-          cr.accept(cv, ClassReader.EXPAND_FRAMES)
-        } catch (t: Throwable) {
-          throw GradleException("Error in ASM processing class $path", t)
-        }
-
         val newBytes =
+          try {
+            val classFile = ClassFile.of()
+            val classModel = classFile.parse(bytes)
+            val newClassDesc = remapper.mapClassDesc(ClassDesc.ofInternalName(internalClassName))!!
+            classFile.transformClass(classModel, newClassDesc, remapper.asClassTransform())
+          } catch (t: Throwable) {
+            throw GradleException("Error in Class-File API processing class $path", t)
+          }
+
+        val finalBytes =
           if (modified) {
-            cw.toByteArray()
+            newBytes
           } else {
             // If we didn't need to change anything, keep the original bytes as-is
             bytes
           }
 
-        // Temporarily remove the multi-release prefix.
-        val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
+        // Multi-release prefix was calculated earlier.
         val newPath = path.replace(multiReleasePrefix, "")
         val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
         try {
@@ -251,7 +243,7 @@ constructor(
             }
           // Now we put it back on so the class file is written out with the right extension.
           zipOutStr.putNextEntry(entry)
-          zipOutStr.write(newBytes)
+          zipOutStr.write(finalBytes)
           zipOutStr.closeEntry()
         } catch (_: ZipException) {
           logger.warn("We have a duplicate $relocatedPath in source project")
