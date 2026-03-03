@@ -19,11 +19,14 @@ import java.lang.classfile.Signature
 import java.lang.classfile.Superclass
 import java.lang.classfile.TypeAnnotation
 import java.lang.classfile.attribute.AnnotationDefaultAttribute
+import java.lang.classfile.attribute.ConstantValueAttribute
 import java.lang.classfile.attribute.EnclosingMethodAttribute
 import java.lang.classfile.attribute.ExceptionsAttribute
 import java.lang.classfile.attribute.InnerClassInfo
 import java.lang.classfile.attribute.InnerClassesAttribute
 import java.lang.classfile.attribute.ModuleAttribute
+import java.lang.classfile.attribute.ModuleExportInfo
+import java.lang.classfile.attribute.ModuleOpenInfo
 import java.lang.classfile.attribute.ModuleProvideInfo
 import java.lang.classfile.attribute.NestHostAttribute
 import java.lang.classfile.attribute.NestMembersAttribute
@@ -37,6 +40,7 @@ import java.lang.classfile.attribute.RuntimeVisibleAnnotationsAttribute
 import java.lang.classfile.attribute.RuntimeVisibleParameterAnnotationsAttribute
 import java.lang.classfile.attribute.RuntimeVisibleTypeAnnotationsAttribute
 import java.lang.classfile.attribute.SignatureAttribute
+import java.lang.classfile.constantpool.StringEntry
 import java.lang.classfile.instruction.ConstantInstruction
 import java.lang.classfile.instruction.ExceptionCatch
 import java.lang.classfile.instruction.FieldInstruction
@@ -55,6 +59,7 @@ import java.lang.constant.DynamicCallSiteDesc
 import java.lang.constant.DynamicConstantDesc
 import java.lang.constant.MethodHandleDesc
 import java.lang.constant.MethodTypeDesc
+import java.lang.constant.PackageDesc
 import java.util.regex.Pattern
 
 /**
@@ -75,7 +80,7 @@ internal class RelocatorRemapper(
           cle.fieldName().stringValue(),
           mapClassDesc(ClassDesc.ofDescriptor(cle.fieldType().stringValue())),
         ) { fb ->
-          fb.transform(cle, asFieldTransform())
+          fb.withFlags(cle.flags().flagsMask()).transform(cle, asFieldTransform())
         }
       is MethodModel ->
         clb.withMethod(
@@ -123,8 +128,28 @@ internal class RelocatorRemapper(
             cle.moduleFlagsMask(),
             cle.moduleVersion().orElse(null),
             cle.requires(),
-            cle.exports(),
-            cle.opens(),
+            cle.exports().map { mei ->
+              ModuleExportInfo.of(
+                clb
+                  .constantPool()
+                  .packageEntry(
+                    PackageDesc.ofInternalName(map(mei.exportedPackage().asSymbol().internalName()))
+                  ),
+                mei.exportsFlagsMask(),
+                mei.exportsTo(),
+              )
+            },
+            cle.opens().map { moi ->
+              ModuleOpenInfo.of(
+                clb
+                  .constantPool()
+                  .packageEntry(
+                    PackageDesc.ofInternalName(map(moi.openedPackage().asSymbol().internalName()))
+                  ),
+                moi.opensFlagsMask(),
+                moi.opensTo(),
+              )
+            },
             cle.uses().map { clb.constantPool().classEntry(mapClassDesc(it.asSymbol())!!) },
             cle.provides().map { mp ->
               ModuleProvideInfo.of(
@@ -160,6 +185,15 @@ internal class RelocatorRemapper(
 
   private fun asFieldTransform(): FieldTransform = FieldTransform { fb, fe ->
     when (fe) {
+      is ConstantValueAttribute -> {
+        val constant = fe.constant()
+        if (constant is StringEntry) {
+          val remapped = map(constant.stringValue(), true)
+          fb.with(ConstantValueAttribute.of(fb.constantPool().stringEntry(remapped)))
+        } else {
+          fb.with(fe)
+        }
+      }
       is SignatureAttribute -> fb.with(SignatureAttribute.of(mapSignature(fe.asTypeSignature())))
       is RuntimeVisibleAnnotationsAttribute ->
         fb.with(RuntimeVisibleAnnotationsAttribute.of(mapAnnotations(fe.annotations())))
@@ -436,7 +470,16 @@ internal class RelocatorRemapper(
         AnnotationValue.ofAnnotation(mapAnnotation(valObj.annotation()))
       is AnnotationValue.OfArray ->
         AnnotationValue.ofArray(valObj.values().map(this::mapAnnotationValue))
-      is AnnotationValue.OfConstant -> valObj
+      is AnnotationValue.OfConstant -> {
+        if (valObj is AnnotationValue.OfString) {
+          val str = valObj.stringValue()
+          // mapLiterals=true enables the skipStringConstants check in each relocator.
+          val mapped = map(str, mapLiterals = true)
+          if (mapped != str) AnnotationValue.ofString(mapped) else valObj
+        } else {
+          valObj
+        }
+      }
       is AnnotationValue.OfClass -> AnnotationValue.ofClass(mapClassDesc(valObj.classSymbol())!!)
       is AnnotationValue.OfEnum ->
         AnnotationValue.ofEnum(
@@ -486,7 +529,7 @@ internal class RelocatorRemapper(
 
     for (relocator in relocators) {
       if (mapLiterals && relocator.skipStringConstants) {
-        return name
+        continue
       } else if (relocator.canRelocateClass(newName)) {
         return prefix + relocator.relocateClass(newName) + suffix
       } else if (relocator.canRelocatePath(newName)) {

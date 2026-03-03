@@ -533,6 +533,45 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun relocateAnnotationStringConstants() {
+    writeClass {
+      """
+      package my;
+      import java.lang.annotation.Retention;
+      import java.lang.annotation.RetentionPolicy;
+      @Retention(RetentionPolicy.RUNTIME)
+      @interface MyAnnotation {
+        String value();
+      }
+      @MyAnnotation("foo.Bar")
+      public class Main {
+        public static void main(String[] args) {
+          MyAnnotation ann = Main.class.getAnnotation(MyAnnotation.class);
+          System.out.println(ann.value());
+        }
+      }
+      """
+        .trimIndent()
+    }
+    projectScript.appendText(
+      """
+        $shadowJarTask {
+          manifest {
+            attributes '$mainClassAttributeKey': 'my.Main'
+          }
+          relocate('foo', 'shadow.foo')
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
+
+    assertThat(result).contains("shadow.foo.Bar")
+  }
+
   @Issue("https://github.com/GradleUp/shadow/issues/1403")
   @Test
   fun relocateMultiClassSignatureStringConstants() {
