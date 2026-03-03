@@ -24,6 +24,8 @@ import java.lang.classfile.attribute.ExceptionsAttribute
 import java.lang.classfile.attribute.InnerClassInfo
 import java.lang.classfile.attribute.InnerClassesAttribute
 import java.lang.classfile.attribute.ModuleAttribute
+import java.lang.classfile.attribute.ModuleExportInfo
+import java.lang.classfile.attribute.ModuleOpenInfo
 import java.lang.classfile.attribute.ModuleProvideInfo
 import java.lang.classfile.attribute.NestHostAttribute
 import java.lang.classfile.attribute.NestMembersAttribute
@@ -55,6 +57,7 @@ import java.lang.constant.DynamicCallSiteDesc
 import java.lang.constant.DynamicConstantDesc
 import java.lang.constant.MethodHandleDesc
 import java.lang.constant.MethodTypeDesc
+import java.lang.constant.PackageDesc
 import java.util.regex.Pattern
 
 /**
@@ -74,6 +77,7 @@ internal class RelocatorRemapper(
         clb.withField(
           cle.fieldName().stringValue(),
           mapClassDesc(ClassDesc.ofDescriptor(cle.fieldType().stringValue())),
+          cle.flags().flagsMask(),
         ) { fb ->
           fb.transform(cle, asFieldTransform())
         }
@@ -123,8 +127,20 @@ internal class RelocatorRemapper(
             cle.moduleFlagsMask(),
             cle.moduleVersion().orElse(null),
             cle.requires(),
-            cle.exports(),
-            cle.opens(),
+            cle.exports().map { mei ->
+              ModuleExportInfo.of(
+                clb.constantPool().packageEntry(PackageDesc.ofInternalName(map(mei.exportedPackage().asSymbol().internalName()))),
+                mei.exportsFlagsMask(),
+                mei.exportsTo(),
+              )
+            },
+            cle.opens().map { moi ->
+              ModuleOpenInfo.of(
+                clb.constantPool().packageEntry(PackageDesc.ofInternalName(map(moi.openedPackage().asSymbol().internalName()))),
+                moi.opensFlagsMask(),
+                moi.opensTo(),
+              )
+            },
             cle.uses().map { clb.constantPool().classEntry(mapClassDesc(it.asSymbol())!!) },
             cle.provides().map { mp ->
               ModuleProvideInfo.of(
