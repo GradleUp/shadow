@@ -45,7 +45,7 @@ class ApplicationSpec extends PluginSpecification {
         settingsFile << "rootProject.name = 'myapp'"
 
         when:
-        BuildResult result = runWithSuccess('runShadow')
+        BuildResult result = runWithSuccess('installShadowDist', 'runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('TestApp: Hello World! (foo)')
@@ -123,7 +123,7 @@ class ApplicationSpec extends PluginSpecification {
         """.stripIndent()
 
         when:
-        BuildResult result = runWithSuccess('runShadow')
+        BuildResult result = runWithSuccess('installShadowDist', 'runShadow')
 
         then: 'tests that runShadow executed and exited'
         assert result.output.contains('Running application with JDK 17')

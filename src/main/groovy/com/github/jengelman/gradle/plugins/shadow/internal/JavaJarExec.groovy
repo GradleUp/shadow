@@ -4,6 +4,10 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * @deprecated This is unused for now, it will be removed in the next major release.
+ */
+@Deprecated
 abstract class JavaJarExec extends JavaExec {
 
     @InputFile

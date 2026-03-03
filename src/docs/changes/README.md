@@ -5,6 +5,7 @@
 
 **Deprecated**
 
+- Deprecate `JavaJarExec`, it will be removed in the next major release. ([#1956](https://github.com/GradleUp/shadow/pull/1956))
 - Deprecate `KnowsTask`, it will be removed in the next major release. ([#1957](https://github.com/GradleUp/shadow/pull/1957))
 
 **Fixed**
@@ -12,6 +13,7 @@
 - Fix compatibility with Isolated Projects. ([#1947](https://github.com/GradleUp/shadow/pull/1947))
 - Fix interaction with Gradle artifact transforms. ([#1949](https://github.com/GradleUp/shadow/pull/1949))
 - Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1955](https://github.com/GradleUp/shadow/pull/1955))
+- Fix various issues about `runShadow` and polish `ShadowApplicationPlugin`. ([#1956](https://github.com/GradleUp/shadow/pull/1956))
 
 ## [v8.3.10] (2026-02-26)
 
