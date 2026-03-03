@@ -77,9 +77,8 @@ internal class RelocatorRemapper(
         clb.withField(
           cle.fieldName().stringValue(),
           mapClassDesc(ClassDesc.ofDescriptor(cle.fieldType().stringValue())),
-          cle.flags().flagsMask(),
         ) { fb ->
-          fb.transform(cle, asFieldTransform())
+          fb.withFlags(cle.flags().flagsMask()).transform(cle, asFieldTransform())
         }
       is MethodModel ->
         clb.withMethod(
@@ -129,14 +128,22 @@ internal class RelocatorRemapper(
             cle.requires(),
             cle.exports().map { mei ->
               ModuleExportInfo.of(
-                clb.constantPool().packageEntry(PackageDesc.ofInternalName(map(mei.exportedPackage().asSymbol().internalName()))),
+                clb
+                  .constantPool()
+                  .packageEntry(
+                    PackageDesc.ofInternalName(map(mei.exportedPackage().asSymbol().internalName()))
+                  ),
                 mei.exportsFlagsMask(),
                 mei.exportsTo(),
               )
             },
             cle.opens().map { moi ->
               ModuleOpenInfo.of(
-                clb.constantPool().packageEntry(PackageDesc.ofInternalName(map(moi.openedPackage().asSymbol().internalName()))),
+                clb
+                  .constantPool()
+                  .packageEntry(
+                    PackageDesc.ofInternalName(map(moi.openedPackage().asSymbol().internalName()))
+                  ),
                 moi.opensFlagsMask(),
                 moi.opensTo(),
               )
