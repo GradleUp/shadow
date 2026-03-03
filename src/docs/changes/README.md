@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Deprecated**
+
+- Deprecate `KnowsTask`, it will be removed in the next major release. ([#1957](https://github.com/GradleUp/shadow/pull/1957))
+
 **Fixed**
 
 - Fix compatibility with Isolated Projects. ([#1947](https://github.com/GradleUp/shadow/pull/1947))
