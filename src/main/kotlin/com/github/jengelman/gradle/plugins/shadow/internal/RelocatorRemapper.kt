@@ -436,7 +436,16 @@ internal class RelocatorRemapper(
         AnnotationValue.ofAnnotation(mapAnnotation(valObj.annotation()))
       is AnnotationValue.OfArray ->
         AnnotationValue.ofArray(valObj.values().map(this::mapAnnotationValue))
-      is AnnotationValue.OfConstant -> valObj
+      is AnnotationValue.OfConstant -> {
+        if (valObj is AnnotationValue.OfString) {
+          val str = valObj.stringValue()
+          // mapLiterals=true enables the skipStringConstants check in each relocator.
+          val mapped = map(str, mapLiterals = true)
+          if (mapped != str) AnnotationValue.ofString(mapped) else valObj
+        } else {
+          valObj
+        }
+      }
       is AnnotationValue.OfClass -> AnnotationValue.ofClass(mapClassDesc(valObj.classSymbol())!!)
       is AnnotationValue.OfEnum ->
         AnnotationValue.ofEnum(

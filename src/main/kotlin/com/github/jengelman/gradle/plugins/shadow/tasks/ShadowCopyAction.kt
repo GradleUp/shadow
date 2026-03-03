@@ -14,7 +14,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
 import java.lang.classfile.ClassFile
-import java.lang.constant.ClassDesc
 import java.util.GregorianCalendar
 import java.util.zip.ZipException
 import kotlin.metadata.jvm.KmModule
@@ -212,14 +211,14 @@ constructor(
       file.readBytes().let { bytes ->
         var modified = false
         val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
-        val internalClassName = path.replace(multiReleasePrefix, "").removeSuffix(".class")
         val remapper = RelocatorRemapper(relocators) { modified = true }
 
         val newBytes =
           try {
             val classFile = ClassFile.of()
             val classModel = classFile.parse(bytes)
-            val newClassDesc = remapper.mapClassDesc(ClassDesc.ofInternalName(internalClassName))!!
+            val originalClassDesc = classModel.thisClass().asSymbol()
+            val newClassDesc = remapper.mapClassDesc(originalClassDesc)!!
             classFile.transformClass(classModel, newClassDesc, remapper.asClassTransform())
           } catch (t: Throwable) {
             throw GradleException("Error in Class-File API processing class $path", t)
