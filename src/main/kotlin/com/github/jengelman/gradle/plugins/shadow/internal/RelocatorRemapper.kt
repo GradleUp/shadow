@@ -19,6 +19,7 @@ import java.lang.classfile.Signature
 import java.lang.classfile.Superclass
 import java.lang.classfile.TypeAnnotation
 import java.lang.classfile.attribute.AnnotationDefaultAttribute
+import java.lang.classfile.attribute.ConstantValueAttribute
 import java.lang.classfile.attribute.EnclosingMethodAttribute
 import java.lang.classfile.attribute.ExceptionsAttribute
 import java.lang.classfile.attribute.InnerClassInfo
@@ -39,6 +40,7 @@ import java.lang.classfile.attribute.RuntimeVisibleAnnotationsAttribute
 import java.lang.classfile.attribute.RuntimeVisibleParameterAnnotationsAttribute
 import java.lang.classfile.attribute.RuntimeVisibleTypeAnnotationsAttribute
 import java.lang.classfile.attribute.SignatureAttribute
+import java.lang.classfile.constantpool.StringEntry
 import java.lang.classfile.instruction.ConstantInstruction
 import java.lang.classfile.instruction.ExceptionCatch
 import java.lang.classfile.instruction.FieldInstruction
@@ -183,6 +185,15 @@ internal class RelocatorRemapper(
 
   private fun asFieldTransform(): FieldTransform = FieldTransform { fb, fe ->
     when (fe) {
+      is ConstantValueAttribute -> {
+        val constant = fe.constant()
+        if (constant is StringEntry) {
+          val remapped = map(constant.stringValue(), true)
+          fb.with(ConstantValueAttribute.of(fb.constantPool().stringEntry(remapped)))
+        } else {
+          fb.with(fe)
+        }
+      }
       is SignatureAttribute -> fb.with(SignatureAttribute.of(mapSignature(fe.asTypeSignature())))
       is RuntimeVisibleAnnotationsAttribute ->
         fb.with(RuntimeVisibleAnnotationsAttribute.of(mapAnnotations(fe.annotations())))
@@ -518,7 +529,7 @@ internal class RelocatorRemapper(
 
     for (relocator in relocators) {
       if (mapLiterals && relocator.skipStringConstants) {
-        return name
+        continue
       } else if (relocator.canRelocateClass(newName)) {
         return prefix + relocator.relocateClass(newName) + suffix
       } else if (relocator.canRelocatePath(newName)) {
