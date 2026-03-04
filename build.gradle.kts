@@ -6,7 +6,7 @@ import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
 plugins {
   groovy
   `java-gradle-plugin`
-  id("com.gradle.plugin-publish") version "2.0.0"
+  id("com.gradle.plugin-publish") version "2.1.0"
   id("com.vanniktech.maven.publish") version "0.36.0"
   id("com.diffplug.spotless") version "8.2.1"
 }
@@ -31,6 +31,7 @@ gradlePlugin {
       displayName = providers.gradleProperty("POM_NAME").get()
       description = providers.gradleProperty("POM_DESCRIPTION").get()
       tags = listOf("onejar", "shade", "fatjar", "uberjar")
+      compatibility { features { configurationCache = true } }
     }
   }
 }
