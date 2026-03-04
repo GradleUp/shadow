@@ -4,6 +4,7 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
@@ -201,6 +202,7 @@ gradlePlugin {
       displayName = providers.gradleProperty("POM_NAME").get()
       description = providers.gradleProperty("POM_DESCRIPTION").get()
       tags = listOf("onejar", "shade", "fatjar", "uberjar")
+      compatibility { features { configurationCache = true } }
     }
   }
 
