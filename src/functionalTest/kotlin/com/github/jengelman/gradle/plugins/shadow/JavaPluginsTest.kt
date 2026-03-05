@@ -675,7 +675,7 @@ class JavaPluginsTest : BasePluginTest() {
     val outputApi = dependencies(API_CONFIGURATION_NAME)
 
     // "unspecified" is the local Gradle API.
-    if (GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.4.0-rc-1")) {
+    if (GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.4.0")) {
       assertThat(outputCompileOnlyApi).contains("unspecified")
     } else {
       assertThat(outputCompileOnly).contains("unspecified")

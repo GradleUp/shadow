@@ -83,8 +83,8 @@ internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
 
 /** TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above. */
 internal fun Project.moveGradleApiIntoCompileOnly() {
-  // gradleApi has been added into compileOnlyApi since Gradle 9.4-rc-1.
-  if (GradleVersion.current() >= GradleVersion.version("9.4.0-rc-1")) return
+  // gradleApi has been added into compileOnlyApi since Gradle 9.4.0.
+  if (GradleVersion.current() >= GradleVersion.version("9.4.0")) return
 
   // org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
   plugins.withId("org.gradle.java-gradle-plugin") {
