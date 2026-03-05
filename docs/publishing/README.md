@@ -384,6 +384,62 @@ for details. The only thing you need to do from the Shadow side is to empty the 
     }
     ```
 
+### Customizing the Gradle Plugin Publication
+
+The `com.gradle.plugin-publish` plugin creates a `pluginMaven` publication automatically. If you need to customize it
+(e.g. add extra artifacts or modify the POM), do **not** create a separate `shadow` publication — that would produce
+a second artifact with the same coordinates and cause a warning like:
+
+```
+Multiple publications with coordinates 'com.example:my-plugin:1.0' are published to repository 'mavenLocal'.
+The publications 'pluginMaven' and 'shadow' will overwrite each other!
+```
+
+Instead, look up the existing `pluginMaven` publication inside `afterEvaluate` (because
+`com.gradle.plugin-publish` creates it during project evaluation):
+
+=== "Kotlin"
+
+    ```kotlin
+    afterEvaluate {
+      publishing {
+        publications {
+          getByName<MavenPublication>("pluginMaven") {
+            // Optionally, you can add extra dependencies to the POM file like the following:
+            pom.withXml {
+              val dependenciesNode = asNode().get("dependencies") ?: asNode().appendNode("dependencies")
+              val node = (dependenciesNode as groovy.util.Node).appendNode("dependency")
+              node.appendNode("groupId", "com.example")
+              node.appendNode("artifactId", "some-dependency")
+              node.appendNode("version", "1.0")
+              node.appendNode("scope", "runtime")
+            }
+          }
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    afterEvaluate {
+      publishing {
+        publications.named('pluginMaven', MavenPublication) {
+          // Optionally, you can add extra dependencies to the POM file like the following:
+          pom.withXml { xml ->
+            def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
+            def node = dependenciesNode.appendNode('dependency')
+            node.appendNode('groupId', 'com.example')
+            node.appendNode('artifactId', 'some-dependency')
+            node.appendNode('version', '1.0')
+            node.appendNode('scope', 'runtime')
+          }
+        }
+      }
+    }
+    ```
+
 ## Publishing Custom ShadowJar Task Outputs
 
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
