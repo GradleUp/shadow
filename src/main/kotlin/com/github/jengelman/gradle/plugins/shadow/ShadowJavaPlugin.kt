@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHADOW
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.addVariantsFromConfigurationCompat
+import com.github.jengelman.gradle.plugins.shadow.internal.extendsFromCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.moveGradleApiIntoCompileOnly
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
@@ -47,13 +48,13 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   }
 
   protected open fun Project.configureConfigurations() {
-    val shadowConfiguration = configurations.shadow.get()
+    val shadowConfiguration = configurations.shadow
     configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
-      compileClasspath.extendsFrom(shadowConfiguration)
+      compileClasspath.extendsFromCompat(shadowConfiguration)
     }
     val shadowRuntimeElements =
       configurations.register(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
-        it.extendsFrom(shadowConfiguration)
+        it.extendsFromCompat(shadowConfiguration)
         it.isCanBeConsumed = true
         it.isCanBeResolved = false
         it.attributes { attrs ->
