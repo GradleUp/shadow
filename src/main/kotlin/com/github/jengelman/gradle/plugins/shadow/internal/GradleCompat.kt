@@ -68,13 +68,12 @@ internal fun Project.addBuildScanCustomValues() {
 }
 
 /** TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above. */
-@Suppress("UnstableApiUsage")
 internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
   outgoingConfiguration: NamedDomainObjectProvider<Configuration>,
   action: Action<in ConfigurationVariantDetails>,
 ) {
   if (GradleVersion.current() >= GradleVersion.version("9.2")) {
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UnstableApiUsage", "UNCHECKED_CAST")
     addVariantsFromConfiguration(outgoingConfiguration as Provider<ConsumableConfiguration>, action)
   } else {
     addVariantsFromConfiguration(outgoingConfiguration.get(), action)
