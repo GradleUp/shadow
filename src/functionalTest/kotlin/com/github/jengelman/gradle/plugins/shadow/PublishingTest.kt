@@ -5,6 +5,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsOnly
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.single
@@ -373,6 +374,54 @@ class PublishingTest : BasePluginTest() {
     assertShadowVariantCommon(
       gmmAdapter.fromJson(repoPath("$artifactRoot/my-gradle-plugin-1.0.module"))
     )
+  }
+
+  @Issue("https://github.com/GradleUp/shadow/issues/1748")
+  @Test
+  fun customizePluginMavenPublicationViaAfterEvaluate() {
+    writeGradlePluginModule()
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock =
+          """
+          apply plugin: 'com.gradle.plugin-publish'
+          group = 'my.plugin'
+          version = '1.0'
+          """
+            .trimIndent(),
+        shadowBlock =
+          """
+          archiveClassifier = ''
+          """
+            .trimIndent(),
+        // Don't create a separate 'shadow' publication that would conflict with 'pluginMaven'.
+        publicationsBlock = "",
+      ) +
+        """
+        afterEvaluate {
+          publishing {
+            publications.named('pluginMaven', MavenPublication) {
+              pom {
+                description = 'A customized Gradle plugin'
+              }
+            }
+          }
+        }
+        """
+          .trimIndent() +
+        lineSeparator
+    )
+
+    val result = publish()
+
+    // The correct approach does not trigger the "Multiple publications ... will overwrite each
+    // other!" warning. That warning would occur if a separate 'shadow' publication were created.
+    assertThat(result.output).doesNotContain("will overwrite each other!")
+
+    val artifactRoot = "my/plugin/maven/1.0"
+    assertShadowJarCommon(repoJarPath("$artifactRoot/maven-1.0.jar"))
+    assertThat(pomReader.read(repoPath("$artifactRoot/maven-1.0.pom")).description)
+      .isEqualTo("A customized Gradle plugin")
   }
 
   @Issue(
