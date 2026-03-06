@@ -221,14 +221,14 @@ public abstract class ShadowJar : Jar() {
    * - Usually used with setting [getDuplicatesStrategy] to [INCLUDE] or [WARN].
    * - It provides a stricter check before the JAR is created.
    *
-   * Defaults to `false`.
+   * Defaults to `true`.
    */
   @get:Input
   @get:Option(
     option = "fail-on-duplicate-entries",
     description = "Fails build if the ZIP entries in the shadowed JAR are duplicate.",
   )
-  public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(false)
+  public open val failOnDuplicateEntries: Property<Boolean> = objectFactory.property(true)
 
   /**
    * Adds the [java.util.jar.Attributes.Name.MULTI_RELEASE] attribute to the manifest of the shadow
