@@ -29,14 +29,11 @@ internal fun FileCopyDetails.remapClass(
     var modified = false
     val remapper = RelocatorRemapper(relocators) { modified = true }
 
-    // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant
-    // pool.
-    // Copying the original constant pool should be avoided because it would keep references
-    // to the original class names. This is not a problem at runtime (because these entries in
-    // the
-    // constant pool are never used), but confuses some tools such as Felix's
-    // maven-bundle-plugin
-    // that use the constant pool to determine the dependencies of a class.
+    // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
+    // Copying the original constant pool should be avoided because it would keep references to the
+    // original class names. This is not a problem at runtime (because these entries in the constant
+    // pool are never used), but confuses some tools such as Felix's maven-bundle-plugin that use
+    // the constant pool to determine the dependencies of a class.
     val cw = ClassWriter(0)
     val cr = ClassReader(bytes)
     val cv = ClassRemapper(cw, remapper)
@@ -47,13 +44,8 @@ internal fun FileCopyDetails.remapClass(
       throw GradleException("Error in ASM processing class $path", t)
     }
 
-    val newBytes =
-      if (modified) {
-        cw.toByteArray()
-      } else {
-        // If we didn't need to change anything, keep the original bytes as-is
-        bytes
-      }
+    // If we didn't need to change anything, keep the original bytes as-is.
+    val newBytes = if (modified) cw.toByteArray() else bytes
 
     // Temporarily remove the multi-release prefix.
     val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
