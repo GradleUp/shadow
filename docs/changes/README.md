@@ -16,7 +16,7 @@
     addShadowJarToAssembleLifecycle = false
   }
   ```
-- Stop catching ZipException when writing entires. ([#1970](https://github.com/GradleUp/shadow/pull/1970))
+- Stop catching ZipException when writing entries. ([#1970](https://github.com/GradleUp/shadow/pull/1970))
 
 ### Fixed
 
