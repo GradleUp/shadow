@@ -2,12 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
-import java.util.zip.ZipException
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.logging.Logger
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
@@ -23,7 +21,6 @@ internal fun FileCopyDetails.remapClass(
   zipOutStr: ZipOutputStream,
   preserveFileTimestamps: Boolean,
   lastModified: Long,
-  logger: Logger,
 ) =
   file.readBytes().let { bytes ->
     var modified = false
@@ -51,18 +48,14 @@ internal fun FileCopyDetails.remapClass(
     val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
     val newPath = path.replace(multiReleasePrefix, "")
     val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
-    try {
-      val entry =
-        zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
-          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-        }
-      // Now we put it back on so the class file is written out with the right extension.
-      zipOutStr.putNextEntry(entry)
-      zipOutStr.write(newBytes)
-      zipOutStr.closeEntry()
-    } catch (_: ZipException) {
-      logger.warn("We have a duplicate $relocatedPath in source project")
-    }
+    val entry =
+      zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
+        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+      }
+    // Now we put it back on so the class file is written out with the right extension.
+    zipOutStr.putNextEntry(entry)
+    zipOutStr.write(newBytes)
+    zipOutStr.closeEntry()
   }
 
 /**
