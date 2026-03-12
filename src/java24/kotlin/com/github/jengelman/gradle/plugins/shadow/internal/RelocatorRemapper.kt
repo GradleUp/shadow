@@ -1,10 +1,6 @@
-@file:Suppress("DuplicatedCode")
-
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.lang.classfile.Annotation
 import java.lang.classfile.AnnotationElement
 import java.lang.classfile.AnnotationValue
@@ -64,25 +60,34 @@ import java.lang.constant.DynamicConstantDesc
 import java.lang.constant.MethodHandleDesc
 import java.lang.constant.MethodTypeDesc
 import java.lang.constant.PackageDesc
-import java.util.regex.Pattern
-import java.util.zip.ZipException
 import kotlin.jvm.optionals.getOrNull
-import org.apache.tools.zip.UnixStat
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.logging.Logger
 
-/**
- * Ported from ASM's Remapper and JDK's ClassRemapperImpl to use Java 24 Class-File API.
- *
- * @author John Engelman
- */
-internal class RelocatorRemapper(
+@Suppress("unused") // Used by Multi-Release JARs for Java 24+.
+internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
+  file.readBytes().let { bytes ->
+    var modified = false
+    val remapper = RelocatorRemapper(relocators) { modified = true }
+
+    val newBytes =
+      try {
+        val classFile = ClassFile.of()
+        val classModel = classFile.parse(bytes)
+        val newClassDesc = remapper.mapClassDesc(classModel.thisClass().asSymbol())
+        classFile.transformClass(classModel, newClassDesc, remapper.asClassTransform())
+      } catch (t: Throwable) {
+        throw GradleException("Error in Class-File API processing class $path", t)
+      }
+
+    // If we didn't need to change anything, keep the original bytes as-is.
+    if (modified) newBytes else bytes
+  }
+
+private class RelocatorRemapper(
   private val relocators: Set<Relocator>,
-  private val onModified: () -> Unit = {},
+  private val onModified: () -> Unit,
 ) {
-
   fun asClassTransform(): ClassTransform = ClassTransform { clb, cle ->
     when (cle) {
       is FieldModel ->
@@ -204,42 +209,7 @@ internal class RelocatorRemapper(
     else ClassDesc.ofDescriptor("L$mappedInternalName;")
   }
 
-  private fun map(name: String, mapLiterals: Boolean = false): String {
-    // Maybe a list of types.
-    val newName = name.split(';').joinToString(";") { mapNameImpl(it, mapLiterals) }
-
-    if (newName != name) {
-      onModified()
-    }
-    return newName
-  }
-
-  private fun mapNameImpl(name: String, mapLiterals: Boolean): String {
-    var newName = name
-    var prefix = ""
-    var suffix = ""
-
-    val matcher = classPattern.matcher(newName)
-    if (matcher.matches()) {
-      prefix = matcher.group(1) + "L"
-      suffix = ""
-      newName = matcher.group(2)
-    }
-
-    for (relocator in relocators) {
-      if (mapLiterals && relocator.skipStringConstants) {
-        continue
-      } else if (relocator.canRelocateClass(newName)) {
-        return prefix + relocator.relocateClass(newName) + suffix
-      } else if (relocator.canRelocatePath(newName)) {
-        return prefix + relocator.relocatePath(newName) + suffix
-      }
-    }
-
-    return name
-  }
-
-  private fun asFieldTransform(): FieldTransform = FieldTransform { fb, fe ->
+  private fun asFieldTransform() = FieldTransform { fb, fe ->
     when (fe) {
       is ConstantValueAttribute -> {
         val constant = fe.constant()
@@ -263,7 +233,7 @@ internal class RelocatorRemapper(
     }
   }
 
-  private fun asMethodTransform(): MethodTransform = MethodTransform { mb, me ->
+  private fun asMethodTransform() = MethodTransform { mb, me ->
     when (me) {
       is AnnotationDefaultAttribute ->
         mb.with(AnnotationDefaultAttribute.of(mapAnnotationValue(me.defaultValue())))
@@ -296,7 +266,7 @@ internal class RelocatorRemapper(
     }
   }
 
-  private fun asCodeTransform(): CodeTransform = CodeTransform { cob, coe ->
+  private fun asCodeTransform() = CodeTransform { cob, coe ->
     when (coe) {
       is FieldInstruction ->
         cob.fieldAccess(
@@ -545,58 +515,6 @@ internal class RelocatorRemapper(
       )
     }
 
-  private companion object {
-    /** https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html */
-    val classPattern: Pattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+);?")
-  }
-}
-
-@Suppress("unused", "DuplicatedCode") // Used by Multi-Release JARs for Java 24+.
-internal fun FileCopyDetails.remapClass(
-  relocators: Set<Relocator>,
-  zipOutStr: ZipOutputStream,
-  preserveFileTimestamps: Boolean,
-  lastModified: Long,
-  logger: Logger,
-) {
-  file.readBytes().let { bytes ->
-    var modified = false
-    val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
-    val remapper = RelocatorRemapper(relocators) { modified = true }
-
-    val newBytes =
-      try {
-        val classFile = ClassFile.of()
-        val classModel = classFile.parse(bytes)
-        val originalClassDesc = classModel.thisClass().asSymbol()
-        val newClassDesc = remapper.mapClassDesc(originalClassDesc)
-        classFile.transformClass(classModel, newClassDesc, remapper.asClassTransform())
-      } catch (t: Throwable) {
-        throw GradleException("Error in Class-File API processing class $path", t)
-      }
-
-    val finalBytes =
-      if (modified) {
-        newBytes
-      } else {
-        // If we didn't need to change anything, keep the original bytes as-is
-        bytes
-      }
-
-    // Multi-release prefix was calculated earlier.
-    val newPath = path.replace(multiReleasePrefix, "")
-    val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
-    try {
-      val entry =
-        zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
-          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-        }
-      // Now we put it back on so the class file is written out with the right extension.
-      zipOutStr.putNextEntry(entry)
-      zipOutStr.write(finalBytes)
-      zipOutStr.closeEntry()
-    } catch (_: ZipException) {
-      logger.warn("We have a duplicate $relocatedPath in source project")
-    }
-  }
+  private fun map(name: String, mapLiterals: Boolean = false): String =
+    relocators.mapName(name = name, mapLiterals = mapLiterals, onModified = onModified)
 }
