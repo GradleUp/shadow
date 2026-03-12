@@ -176,8 +176,7 @@ constructor(
           } else {
             with(fileDetails) {
               // Temporarily remove the multi-release prefix.
-              val multiReleasePrefix =
-                "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
+              val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
               val newPath = path.replace(multiReleasePrefix, "")
               val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
               writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
@@ -278,6 +277,7 @@ constructor(
 
   public companion object {
     private val logger = Logging.getLogger(ShadowCopyAction::class.java)
+    private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
     private val ZipOutputStream.entries: List<ZipEntry>
       get() =
