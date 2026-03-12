@@ -179,7 +179,6 @@ constructor(
               zipOutStr = zipOutStr,
               preserveFileTimestamps = preserveFileTimestamps,
               lastModified = fileDetails.lastModified,
-              logger = logger,
             )
           }
         }
