@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
+import com.github.jengelman.gradle.plugins.shadow.internal.mapName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -11,9 +11,8 @@ class RelocatorRemapperTest {
   @ParameterizedTest
   @MethodSource("signaturePatternsProvider")
   fun relocateSignaturePatterns(input: String, expected: String) {
-    val relocator =
-      RelocatorRemapper(relocators = setOf(SimpleRelocator("org.package", "shadow.org.package")))
-    assertThat(relocator.map(input)).isEqualTo(expected)
+    val relocators = setOf(SimpleRelocator("org.package", "shadow.org.package"))
+    assertThat(relocators.mapName(input)).isEqualTo(expected)
   }
 
   private companion object {
