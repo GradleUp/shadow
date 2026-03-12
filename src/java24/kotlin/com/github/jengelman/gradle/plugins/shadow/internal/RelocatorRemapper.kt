@@ -100,7 +100,7 @@ private class RelocatorRemapper(
       is MethodModel ->
         clb.withMethod(
           cle.methodName().stringValue(),
-          mapMethodDesc(cle.methodTypeSymbol()),
+          cle.methodTypeSymbol().remap(),
           cle.flags().flagsMask(),
         ) { mb ->
           mb.transform(cle, asMethodTransform())
@@ -108,8 +108,7 @@ private class RelocatorRemapper(
       is Superclass -> clb.withSuperclass(mapClassDesc(cle.superclassEntry().asSymbol()))
       is Interfaces ->
         clb.withInterfaceSymbols(cle.interfaces().map { mapClassDesc(it.asSymbol()) })
-      is SignatureAttribute ->
-        clb.with(SignatureAttribute.of(mapClassSignature(cle.asClassSignature())))
+      is SignatureAttribute -> clb.with(SignatureAttribute.of(cle.asClassSignature().remap()))
       is InnerClassesAttribute ->
         clb.with(
           InnerClassesAttribute.of(
@@ -131,11 +130,10 @@ private class RelocatorRemapper(
             cle
               .enclosingMethodType()
               .map { MethodTypeDesc.ofDescriptor(it.stringValue()) }
-              .map(this::mapMethodDesc),
+              .map { it.remap() },
           )
         )
-      is RecordAttribute ->
-        clb.with(RecordAttribute.of(cle.components().map(this::mapRecordComponent)))
+      is RecordAttribute -> clb.with(RecordAttribute.of(cle.components().map { it.remap() }))
       is ModuleAttribute ->
         clb.with(
           ModuleAttribute.of(
@@ -187,13 +185,13 @@ private class RelocatorRemapper(
           )
         )
       is RuntimeVisibleAnnotationsAttribute ->
-        clb.with(RuntimeVisibleAnnotationsAttribute.of(mapAnnotations(cle.annotations())))
+        clb.with(RuntimeVisibleAnnotationsAttribute.of(cle.annotations().map { it.remap() }))
       is RuntimeInvisibleAnnotationsAttribute ->
-        clb.with(RuntimeInvisibleAnnotationsAttribute.of(mapAnnotations(cle.annotations())))
+        clb.with(RuntimeInvisibleAnnotationsAttribute.of(cle.annotations().map { it.remap() }))
       is RuntimeVisibleTypeAnnotationsAttribute ->
-        clb.with(RuntimeVisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(cle.annotations())))
+        clb.with(RuntimeVisibleTypeAnnotationsAttribute.of(cle.annotations().map { it.remap() }))
       is RuntimeInvisibleTypeAnnotationsAttribute ->
-        clb.with(RuntimeInvisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(cle.annotations())))
+        clb.with(RuntimeInvisibleTypeAnnotationsAttribute.of(cle.annotations().map { it.remap() }))
       else -> clb.with(cle)
     }
   }
@@ -220,15 +218,15 @@ private class RelocatorRemapper(
           fb.with(fe)
         }
       }
-      is SignatureAttribute -> fb.with(SignatureAttribute.of(mapSignature(fe.asTypeSignature())))
+      is SignatureAttribute -> fb.with(SignatureAttribute.of(fe.asTypeSignature().remap()))
       is RuntimeVisibleAnnotationsAttribute ->
-        fb.with(RuntimeVisibleAnnotationsAttribute.of(mapAnnotations(fe.annotations())))
+        fb.with(RuntimeVisibleAnnotationsAttribute.of(fe.annotations().map { it.remap() }))
       is RuntimeInvisibleAnnotationsAttribute ->
-        fb.with(RuntimeInvisibleAnnotationsAttribute.of(mapAnnotations(fe.annotations())))
+        fb.with(RuntimeInvisibleAnnotationsAttribute.of(fe.annotations().map { it.remap() }))
       is RuntimeVisibleTypeAnnotationsAttribute ->
-        fb.with(RuntimeVisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(fe.annotations())))
+        fb.with(RuntimeVisibleTypeAnnotationsAttribute.of(fe.annotations().map { it.remap() }))
       is RuntimeInvisibleTypeAnnotationsAttribute ->
-        fb.with(RuntimeInvisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(fe.annotations())))
+        fb.with(RuntimeInvisibleTypeAnnotationsAttribute.of(fe.annotations().map { it.remap() }))
       else -> fb.with(fe)
     }
   }
@@ -236,32 +234,31 @@ private class RelocatorRemapper(
   private fun asMethodTransform() = MethodTransform { mb, me ->
     when (me) {
       is AnnotationDefaultAttribute ->
-        mb.with(AnnotationDefaultAttribute.of(mapAnnotationValue(me.defaultValue())))
+        mb.with(AnnotationDefaultAttribute.of(me.defaultValue().remap()))
       is CodeModel -> mb.transformCode(me, asCodeTransform())
       is ExceptionsAttribute ->
         mb.with(ExceptionsAttribute.ofSymbols(me.exceptions().map { mapClassDesc(it.asSymbol()) }))
-      is SignatureAttribute ->
-        mb.with(SignatureAttribute.of(mapMethodSignature(me.asMethodSignature())))
+      is SignatureAttribute -> mb.with(SignatureAttribute.of(me.asMethodSignature().remap()))
       is RuntimeVisibleAnnotationsAttribute ->
-        mb.with(RuntimeVisibleAnnotationsAttribute.of(mapAnnotations(me.annotations())))
+        mb.with(RuntimeVisibleAnnotationsAttribute.of(me.annotations().map { it.remap() }))
       is RuntimeInvisibleAnnotationsAttribute ->
-        mb.with(RuntimeInvisibleAnnotationsAttribute.of(mapAnnotations(me.annotations())))
+        mb.with(RuntimeInvisibleAnnotationsAttribute.of(me.annotations().map { it.remap() }))
       is RuntimeVisibleParameterAnnotationsAttribute ->
         mb.with(
           RuntimeVisibleParameterAnnotationsAttribute.of(
-            me.parameterAnnotations().map(this::mapAnnotations)
+            me.parameterAnnotations().map { pas -> pas.map { it.remap() } }
           )
         )
       is RuntimeInvisibleParameterAnnotationsAttribute ->
         mb.with(
           RuntimeInvisibleParameterAnnotationsAttribute.of(
-            me.parameterAnnotations().map(this::mapAnnotations)
+            me.parameterAnnotations().map { pas -> pas.map { it.remap() } }
           )
         )
       is RuntimeVisibleTypeAnnotationsAttribute ->
-        mb.with(RuntimeVisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(me.annotations())))
+        mb.with(RuntimeVisibleTypeAnnotationsAttribute.of(me.annotations().map { it.remap() }))
       is RuntimeInvisibleTypeAnnotationsAttribute ->
-        mb.with(RuntimeInvisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(me.annotations())))
+        mb.with(RuntimeInvisibleTypeAnnotationsAttribute.of(me.annotations().map { it.remap() }))
       else -> mb.with(me)
     }
   }
@@ -280,16 +277,16 @@ private class RelocatorRemapper(
           coe.opcode(),
           mapClassDesc(coe.owner().asSymbol()),
           coe.name().stringValue(),
-          mapMethodDesc(coe.typeSymbol()),
+          coe.typeSymbol().remap(),
           coe.isInterface,
         )
       is InvokeDynamicInstruction ->
         cob.invokedynamic(
           DynamicCallSiteDesc.of(
-            mapDirectMethodHandle(coe.bootstrapMethod()),
+            coe.bootstrapMethod().remap(),
             coe.name().stringValue(),
-            mapMethodDesc(coe.typeSymbol()),
-            *coe.bootstrapArgs().map(this::mapConstantValue).toTypedArray(),
+            coe.typeSymbol().remap(),
+            *coe.bootstrapArgs().map { it.remap() }.toTypedArray(),
           )
         )
       is NewObjectInstruction -> cob.new_(mapClassDesc(coe.className().asSymbol()))
@@ -317,7 +314,7 @@ private class RelocatorRemapper(
         cob.localVariableType(
           coe.slot(),
           coe.name().stringValue(),
-          mapSignature(coe.signatureSymbol()),
+          coe.signatureSymbol().remap(),
           coe.startScope(),
           coe.endScope(),
         )
@@ -334,186 +331,173 @@ private class RelocatorRemapper(
           "java.lang.Float" -> cob.ldc(cob.constantPool().floatEntry(value as Float))
           "java.lang.Long" -> cob.ldc(cob.constantPool().longEntry(value as Long))
           "java.lang.Double" -> cob.ldc(cob.constantPool().doubleEntry(value as Double))
-          else -> cob.ldc(mapConstantValue(value as ConstantDesc))
+          else -> cob.ldc((value as ConstantDesc).remap())
         }
       }
       is RuntimeVisibleTypeAnnotationsAttribute ->
-        cob.with(RuntimeVisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(coe.annotations())))
+        cob.with(RuntimeVisibleTypeAnnotationsAttribute.of(coe.annotations().map { it.remap() }))
       is RuntimeInvisibleTypeAnnotationsAttribute ->
-        cob.with(RuntimeInvisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(coe.annotations())))
+        cob.with(RuntimeInvisibleTypeAnnotationsAttribute.of(coe.annotations().map { it.remap() }))
       else -> cob.with(coe)
     }
   }
 
-  private fun mapMethodDesc(desc: MethodTypeDesc): MethodTypeDesc {
+  private fun MethodTypeDesc.remap(): MethodTypeDesc {
     return MethodTypeDesc.of(
-      mapClassDesc(desc.returnType()),
-      *desc.parameterList().map { mapClassDesc(it) }.toTypedArray(),
+      mapClassDesc(returnType()),
+      *parameterList().map { mapClassDesc(it) }.toTypedArray(),
     )
   }
 
-  private fun mapClassSignature(signature: ClassSignature): ClassSignature {
-    val superclassSignature = signature.superclassSignature()?.let { mapSignature(it) }
+  private fun ClassSignature.remap(): ClassSignature {
+    val superclassSignature = superclassSignature()?.remap()
     return ClassSignature.of(
-      mapTypeParams(signature.typeParameters()),
+      typeParameters().map { it.remap() },
       superclassSignature,
-      *signature.superinterfaceSignatures().map { mapSignature(it) }.toTypedArray(),
+      *superinterfaceSignatures().map { it.remap() }.toTypedArray(),
     )
   }
 
-  private fun mapMethodSignature(signature: MethodSignature): MethodSignature {
+  private fun MethodSignature.remap(): MethodSignature {
     return MethodSignature.of(
-      mapTypeParams(signature.typeParameters()),
-      signature.throwableSignatures().map { mapSignature(it) },
-      mapSignature(signature.result()),
-      *signature.arguments().map { mapSignature(it) }.toTypedArray(),
+      typeParameters().map { it.remap() },
+      throwableSignatures().map { it.remap() },
+      result().remap(),
+      *arguments().map { it.remap() }.toTypedArray(),
     )
   }
 
-  private fun mapRecordComponent(component: RecordComponentInfo): RecordComponentInfo {
+  private fun RecordComponentInfo.remap(): RecordComponentInfo {
     return RecordComponentInfo.of(
-      component.name().stringValue(),
-      mapClassDesc(component.descriptorSymbol()),
-      component.attributes().map { atr ->
+      name().stringValue(),
+      mapClassDesc(descriptorSymbol()),
+      attributes().map { atr ->
         when (atr) {
-          is SignatureAttribute -> SignatureAttribute.of(mapSignature(atr.asTypeSignature()))
+          is SignatureAttribute -> SignatureAttribute.of(atr.asTypeSignature().remap())
           is RuntimeVisibleAnnotationsAttribute ->
-            RuntimeVisibleAnnotationsAttribute.of(mapAnnotations(atr.annotations()))
+            RuntimeVisibleAnnotationsAttribute.of(atr.annotations().map { it.remap() })
           is RuntimeInvisibleAnnotationsAttribute ->
-            RuntimeInvisibleAnnotationsAttribute.of(mapAnnotations(atr.annotations()))
+            RuntimeInvisibleAnnotationsAttribute.of(atr.annotations().map { it.remap() })
           is RuntimeVisibleTypeAnnotationsAttribute ->
-            RuntimeVisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(atr.annotations()))
+            RuntimeVisibleTypeAnnotationsAttribute.of(atr.annotations().map { it.remap() })
           is RuntimeInvisibleTypeAnnotationsAttribute ->
-            RuntimeInvisibleTypeAnnotationsAttribute.of(mapTypeAnnotations(atr.annotations()))
+            RuntimeInvisibleTypeAnnotationsAttribute.of(atr.annotations().map { it.remap() })
           else -> atr
         }
       },
     )
   }
 
-  private fun mapDirectMethodHandle(dmhd: DirectMethodHandleDesc): DirectMethodHandleDesc {
-    return when (dmhd.kind()) {
+  private fun DirectMethodHandleDesc.remap(): DirectMethodHandleDesc {
+    return when (kind()) {
       DirectMethodHandleDesc.Kind.GETTER,
       DirectMethodHandleDesc.Kind.SETTER,
       DirectMethodHandleDesc.Kind.STATIC_GETTER,
       DirectMethodHandleDesc.Kind.STATIC_SETTER ->
         MethodHandleDesc.ofField(
-          dmhd.kind(),
-          mapClassDesc(dmhd.owner()),
-          dmhd.methodName(),
-          mapClassDesc(ClassDesc.ofDescriptor(dmhd.lookupDescriptor())),
+          kind(),
+          mapClassDesc(owner()),
+          methodName(),
+          mapClassDesc(ClassDesc.ofDescriptor(lookupDescriptor())),
         )
       else ->
         MethodHandleDesc.ofMethod(
-          dmhd.kind(),
-          mapClassDesc(dmhd.owner()),
-          dmhd.methodName(),
-          mapMethodDesc(MethodTypeDesc.ofDescriptor(dmhd.lookupDescriptor())),
+          kind(),
+          mapClassDesc(owner()),
+          methodName(),
+          MethodTypeDesc.ofDescriptor(lookupDescriptor()).remap(),
         )
     }
   }
 
-  private fun mapConstantValue(value: ConstantDesc): ConstantDesc {
-    return when (value) {
-      is ClassDesc -> mapClassDesc(value)
-      is DynamicConstantDesc<*> -> mapDynamicConstant(value)
-      is DirectMethodHandleDesc -> mapDirectMethodHandle(value)
-      is MethodTypeDesc -> mapMethodDesc(value)
+  private fun ConstantDesc.remap(): ConstantDesc {
+    return when (this) {
+      is ClassDesc -> mapClassDesc(this)
+      is DynamicConstantDesc<*> -> remap()
+      is DirectMethodHandleDesc -> remap()
+      is MethodTypeDesc -> remap()
       else -> {
         @Suppress("CAST_NEVER_SUCCEEDS")
-        if (value.javaClass.name == "java.lang.String") {
-          map(value.toString(), mapLiterals = true) as ConstantDesc
+        if (javaClass.name == "java.lang.String") {
+          map(toString(), mapLiterals = true) as ConstantDesc
         } else {
-          value
+          this
         }
       }
     }
   }
 
-  private fun mapDynamicConstant(dcd: DynamicConstantDesc<*>): DynamicConstantDesc<*> {
+  private fun DynamicConstantDesc<*>.remap(): DynamicConstantDesc<*> {
     return DynamicConstantDesc.ofNamed<Any>(
-      mapDirectMethodHandle(dcd.bootstrapMethod()),
-      dcd.constantName(),
-      mapClassDesc(dcd.constantType()),
-      *dcd.bootstrapArgsList().map(this::mapConstantValue).toTypedArray(),
+      bootstrapMethod().remap(),
+      constantName(),
+      mapClassDesc(constantType()),
+      *bootstrapArgsList().map { it.remap() }.toTypedArray(),
     )
   }
 
   @Suppress("UNCHECKED_CAST")
-  private fun <S : Signature> mapSignature(signature: S): S {
-    return when (signature) {
-      is Signature.ArrayTypeSig ->
-        Signature.ArrayTypeSig.of(mapSignature(signature.componentSignature())) as S
+  private fun <S : Signature> S.remap(): S {
+    return when (this) {
+      is Signature.ArrayTypeSig -> Signature.ArrayTypeSig.of(componentSignature().remap()) as S
       is Signature.ClassTypeSig -> {
-        val mappedOuter = signature.outerType().getOrNull()?.let { mapSignature(it) }
-        val mappedClass = mapClassDesc(signature.classDesc())
+        val mappedOuter = outerType().getOrNull()?.remap()
+        val mappedClass = mapClassDesc(classDesc())
         // Extract internal name simply bypassing util
         val internalName = mappedClass.descriptorString().let { it.substring(1, it.length - 1) }
         Signature.ClassTypeSig.of(
           mappedOuter,
           internalName,
-          *signature
-            .typeArgs()
+          *typeArgs()
             .map { ta ->
               when (ta) {
                 is Signature.TypeArg.Unbounded -> ta
                 is Signature.TypeArg.Bounded ->
-                  Signature.TypeArg.bounded(ta.wildcardIndicator(), mapSignature(ta.boundType()))
+                  Signature.TypeArg.bounded(ta.wildcardIndicator(), ta.boundType().remap())
               }
             }
             .toTypedArray(),
         ) as S
       }
-      else -> signature
+      else -> this
     }
   }
 
-  private fun mapAnnotations(annotations: List<Annotation>) = annotations.map(this::mapAnnotation)
-
-  private fun mapAnnotation(a: Annotation) =
+  private fun Annotation.remap() =
     Annotation.of(
-      mapClassDesc(a.classSymbol()),
-      a.elements().map { el -> AnnotationElement.of(el.name(), mapAnnotationValue(el.value())) },
+      mapClassDesc(classSymbol()),
+      elements().map { el -> AnnotationElement.of(el.name(), el.value().remap()) },
     )
 
-  private fun mapAnnotationValue(valObj: AnnotationValue): AnnotationValue {
-    return when (valObj) {
-      is AnnotationValue.OfAnnotation ->
-        AnnotationValue.ofAnnotation(mapAnnotation(valObj.annotation()))
-      is AnnotationValue.OfArray ->
-        AnnotationValue.ofArray(valObj.values().map(this::mapAnnotationValue))
+  private fun AnnotationValue.remap(): AnnotationValue {
+    return when (this) {
+      is AnnotationValue.OfAnnotation -> AnnotationValue.ofAnnotation(annotation().remap())
+      is AnnotationValue.OfArray -> AnnotationValue.ofArray(values().map { it.remap() })
       is AnnotationValue.OfConstant -> {
-        if (valObj is AnnotationValue.OfString) {
-          val str = valObj.stringValue()
+        if (this is AnnotationValue.OfString) {
+          val str = stringValue()
           // mapLiterals=true enables the skipStringConstants check in each relocator.
           val mapped = map(str, mapLiterals = true)
-          if (mapped != str) AnnotationValue.ofString(mapped) else valObj
+          if (mapped != str) AnnotationValue.ofString(mapped) else this
         } else {
-          valObj
+          this
         }
       }
-      is AnnotationValue.OfClass -> AnnotationValue.ofClass(mapClassDesc(valObj.classSymbol()))
+      is AnnotationValue.OfClass -> AnnotationValue.ofClass(mapClassDesc(classSymbol()))
       is AnnotationValue.OfEnum ->
-        AnnotationValue.ofEnum(
-          mapClassDesc(valObj.classSymbol()),
-          valObj.constantName().stringValue(),
-        )
+        AnnotationValue.ofEnum(mapClassDesc(classSymbol()), constantName().stringValue())
     }
   }
 
-  private fun mapTypeAnnotations(typeAnnotations: List<TypeAnnotation>) =
-    typeAnnotations.map { a ->
-      TypeAnnotation.of(a.targetInfo(), a.targetPath(), mapAnnotation(a.annotation()))
-    }
+  private fun TypeAnnotation.remap() =
+    TypeAnnotation.of(targetInfo(), targetPath(), annotation().remap())
 
-  private fun mapTypeParams(typeParams: List<Signature.TypeParam>) =
-    typeParams.map { tp ->
-      Signature.TypeParam.of(
-        tp.identifier(),
-        tp.classBound().getOrNull()?.let { mapSignature(it) },
-        *tp.interfaceBounds().map { mapSignature(it) }.toTypedArray(),
-      )
-    }
+  private fun Signature.TypeParam.remap() =
+    Signature.TypeParam.of(
+      identifier(),
+      classBound().getOrNull()?.remap(),
+      *interfaceBounds().map { it.remap() }.toTypedArray(),
+    )
 
   private fun map(name: String, mapLiterals: Boolean = false): String =
     relocators.mapName(name = name, mapLiterals = mapLiterals, onModified = onModified)
