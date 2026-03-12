@@ -11,7 +11,7 @@ private val classPattern: Pattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+)
 internal fun Set<Relocator>.mapName(
   name: String,
   mapLiterals: Boolean = false,
-  onModified: () -> Unit,
+  onModified: () -> Unit = {},
 ): String {
   // Maybe a list of types.
   val newName = name.split(';').joinToString(";") { realMap(it, mapLiterals) }
@@ -35,7 +35,7 @@ private fun Set<Relocator>.realMap(name: String, mapLiterals: Boolean): String {
 
   for (relocator in this) {
     if (mapLiterals && relocator.skipStringConstants) {
-      return name
+      continue
     } else if (relocator.canRelocateClass(newName)) {
       return prefix + relocator.relocateClass(newName) + suffix
     } else if (relocator.canRelocatePath(newName)) {
