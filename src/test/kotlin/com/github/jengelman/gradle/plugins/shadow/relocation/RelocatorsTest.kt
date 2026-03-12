@@ -11,8 +11,10 @@ class RelocatorsTest {
   @ParameterizedTest
   @MethodSource("signaturePatternsProvider")
   fun relocateSignaturePatterns(input: String, expected: String) {
-    val relocators = setOf(SimpleRelocator("org.package", "shadow.org.package"))
-    assertThat(relocators.mapName(input)).isEqualTo(expected)
+    val actual =
+      setOf(SimpleRelocator("org.package", "shadow.org.package"))
+        .mapName(name = input, onModified = {})
+    assertThat(actual).isEqualTo(expected)
   }
 
   private companion object {

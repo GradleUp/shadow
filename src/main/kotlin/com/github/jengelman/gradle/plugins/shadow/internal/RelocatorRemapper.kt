@@ -75,7 +75,7 @@ internal fun FileCopyDetails.remapClass(
  */
 private class RelocatorRemapper(
   private val relocators: Set<Relocator>,
-  private val onModified: () -> Unit = {},
+  private val onModified: () -> Unit,
 ) : Remapper(Opcodes.ASM9) {
 
   override fun mapValue(value: Any): Any {
