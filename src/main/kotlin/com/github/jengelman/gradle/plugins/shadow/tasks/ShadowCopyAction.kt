@@ -4,8 +4,8 @@
 
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.internal.RelocatorRemapper
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
+import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
@@ -13,9 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import java.lang.classfile.ClassFile
 import java.util.GregorianCalendar
-import java.util.zip.ZipException
 import kotlin.metadata.jvm.KmModule
 import kotlin.metadata.jvm.KmPackageParts
 import kotlin.metadata.jvm.KotlinModuleMetadata
@@ -176,7 +174,13 @@ constructor(
           if (relocators.isEmpty()) {
             fileDetails.writeToZip(path)
           } else {
-            fileDetails.remapClass()
+            fileDetails.remapClass(
+              relocators,
+              zipOutStr,
+              preserveFileTimestamps,
+              fileDetails.lastModified,
+              logger,
+            )
           }
         }
         enableKotlinModuleRemapping && path.endsWith(".kotlin_module") -> {
@@ -202,52 +206,6 @@ constructor(
         }
       }
     }
-
-    /**
-     * Applies remapping to the given class with the specified relocation path. The remapped class
-     * is then written to the zip file.
-     */
-    private fun FileCopyDetails.remapClass() =
-      file.readBytes().let { bytes ->
-        var modified = false
-        val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
-        val remapper = RelocatorRemapper(relocators) { modified = true }
-
-        val newBytes =
-          try {
-            val classFile = ClassFile.of()
-            val classModel = classFile.parse(bytes)
-            val originalClassDesc = classModel.thisClass().asSymbol()
-            val newClassDesc = remapper.mapClassDesc(originalClassDesc)!!
-            classFile.transformClass(classModel, newClassDesc, remapper.asClassTransform())
-          } catch (t: Throwable) {
-            throw GradleException("Error in Class-File API processing class $path", t)
-          }
-
-        val finalBytes =
-          if (modified) {
-            newBytes
-          } else {
-            // If we didn't need to change anything, keep the original bytes as-is
-            bytes
-          }
-
-        // Multi-release prefix was calculated earlier.
-        val newPath = path.replace(multiReleasePrefix, "")
-        val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
-        try {
-          val entry =
-            zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
-              unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-            }
-          // Now we put it back on so the class file is written out with the right extension.
-          zipOutStr.putNextEntry(entry)
-          zipOutStr.write(finalBytes)
-          zipOutStr.closeEntry()
-        } catch (_: ZipException) {
-          logger.warn("We have a duplicate $relocatedPath in source project")
-        }
-      }
 
     /**
      * Applies remapping to the given kotlin module with the specified relocation path. The remapped
