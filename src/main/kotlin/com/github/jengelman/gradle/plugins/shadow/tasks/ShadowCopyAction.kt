@@ -174,12 +174,22 @@ constructor(
           if (relocators.isEmpty()) {
             fileDetails.writeToZip(path)
           } else {
-            fileDetails.remapClass(
-              relocators = relocators,
-              zipOutStr = zipOutStr,
-              preserveFileTimestamps = preserveFileTimestamps,
-              lastModified = fileDetails.lastModified,
-            )
+            with(fileDetails) {
+              // Temporarily remove the multi-release prefix.
+              val multiReleasePrefix =
+                "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
+              val newPath = path.replace(multiReleasePrefix, "")
+              val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
+
+              val entry =
+                zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
+                  unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+                }
+              // Now we put it back on so the class file is written out with the right extension.
+              zipOutStr.putNextEntry(entry)
+              zipOutStr.write(file.remapClass(relocators = relocators))
+              zipOutStr.closeEntry()
+            }
           }
         }
         enableKotlinModuleRemapping && path.endsWith(".kotlin_module") -> {
