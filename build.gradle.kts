@@ -217,7 +217,7 @@ gradlePlugin {
 kotlin.target.compilations {
   val main by getting
   getByName("functionalTest") {
-    // Share main's output with functionalTest.
+    // Import main and its classpath as dependencies and establish internal visibility.
     associateWith(main)
   }
 }
