@@ -25,6 +25,7 @@
 
 ### Changed
 
+- Stop moving `gradleApi` dependency from `api` to `compileOnly` for Gradle 9.4+. ([#1919](https://github.com/GradleUp/shadow/pull/1919))
 - Log warnings for duplicates in the final JAR. ([#1931](https://github.com/GradleUp/shadow/pull/1931))
 
 ### Fixed
