@@ -10,8 +10,8 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.ClassRemapper
 import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
 
 /**
- * Applies remapping to the given class with the specified relocation path. The remapped class is
- * then written to the zip file.
+ * Applies remapping to the given class file using the provided relocators and returns the
+ * (possibly) remapped class bytes. If no remapping is required, the original bytes are returned.
  */
 internal fun File.remapClass(relocators: Set<Relocator>): ByteArray =
   readBytes().let { bytes ->
