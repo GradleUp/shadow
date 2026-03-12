@@ -1,9 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
-import org.apache.tools.zip.UnixStat
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
@@ -13,15 +10,10 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.ClassRemapper
 import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
 
 /**
- * Applies remapping to the given class with the specified relocation path. The remapped class is
- * then written to the zip file.
+ * Applies remapping to the given class file using the provided relocators and returns the
+ * (possibly) remapped class bytes. If no remapping is required, the original bytes are returned.
  */
-internal fun FileCopyDetails.remapClass(
-  relocators: Set<Relocator>,
-  zipOutStr: ZipOutputStream,
-  preserveFileTimestamps: Boolean,
-  lastModified: Long,
-) =
+internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
   file.readBytes().let { bytes ->
     var modified = false
     val remapper = RelocatorRemapper(relocators) { modified = true }
@@ -42,20 +34,7 @@ internal fun FileCopyDetails.remapClass(
     }
 
     // If we didn't need to change anything, keep the original bytes as-is.
-    val newBytes = if (modified) cw.toByteArray() else bytes
-
-    // Temporarily remove the multi-release prefix.
-    val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
-    val newPath = path.replace(multiReleasePrefix, "")
-    val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
-    val entry =
-      zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
-        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-      }
-    // Now we put it back on so the class file is written out with the right extension.
-    zipOutStr.putNextEntry(entry)
-    zipOutStr.write(newBytes)
-    zipOutStr.closeEntry()
+    if (modified) cw.toByteArray() else bytes
   }
 
 /**
