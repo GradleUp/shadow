@@ -177,8 +177,8 @@ constructor(
             with(fileDetails) {
               // Temporarily remove the multi-release prefix.
               val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
-              val newPath = path.replace(multiReleasePrefix, "")
-              val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
+              val pathSuffix = path.removePrefix(multiReleasePrefix)
+              val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
               writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
             }
           }
