@@ -180,15 +180,10 @@ constructor(
                 "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
               val newPath = path.replace(multiReleasePrefix, "")
               val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
-
-              val entry =
-                zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
-                  unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-                }
-              // Now we put it back on so the class file is written out with the right extension.
-              zipOutStr.putNextEntry(entry)
-              zipOutStr.write(file.remapClass(relocators = relocators))
-              zipOutStr.closeEntry()
+              writeToZip(
+                entryName = relocatedPath,
+                bytes = file.remapClass(relocators = relocators),
+              )
             }
           }
         }
@@ -256,13 +251,7 @@ constructor(
             // matter to the compiler.
             else -> path.replace(".kotlin_module", ".shadow.kotlin_module")
           }
-        val entry =
-          zipEntry(entryName, preserveFileTimestamps, lastModified) {
-            unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-          }
-        zipOutStr.putNextEntry(entry)
-        zipOutStr.write(newBytes)
-        zipOutStr.closeEntry()
+        writeToZip(entryName = entryName, bytes = newBytes)
       }
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
@@ -275,13 +264,17 @@ constructor(
       return true
     }
 
-    private fun FileCopyDetails.writeToZip(entryName: String) {
+    private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
       val entry =
         zipEntry(entryName, preserveFileTimestamps, lastModified) {
           unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
         }
       zipOutStr.putNextEntry(entry)
-      copyTo(zipOutStr)
+      if (bytes == null) {
+        copyTo(zipOutStr)
+      } else {
+        zipOutStr.write(bytes)
+      }
       zipOutStr.closeEntry()
     }
   }
