@@ -14,6 +14,9 @@ internal fun Set<Relocator>.mapName(
   onModified: () -> Unit,
 ): String {
   // Maybe a list of types.
+  // Unlike Java's String.split(), Kotlin's split() with the default limit = 0 preserves trailing
+  // empty segments,
+  // so descriptor strings ending with ';' (e.g. "Lorg/package/ClassA;") round-trip correctly.
   val newName = name.split(';').joinToString(";") { realMap(it, mapLiterals) }
   if (newName != name) {
     onModified()
