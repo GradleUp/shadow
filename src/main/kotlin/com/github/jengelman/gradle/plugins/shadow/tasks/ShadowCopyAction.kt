@@ -174,13 +174,13 @@ constructor(
           if (relocators.isEmpty()) {
             fileDetails.writeToZip(path)
           } else {
-            fileDetails.remapClass(
-              relocators,
-              zipOutStr,
-              preserveFileTimestamps,
-              fileDetails.lastModified,
-              logger,
-            )
+            with(fileDetails) {
+              // Temporarily remove the multi-release prefix.
+              val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
+              val pathSuffix = path.removePrefix(multiReleasePrefix)
+              val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
+              writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
+            }
           }
         }
         enableKotlinModuleRemapping && path.endsWith(".kotlin_module") -> {
@@ -247,13 +247,7 @@ constructor(
             // matter to the compiler.
             else -> path.replace(".kotlin_module", ".shadow.kotlin_module")
           }
-        val entry =
-          zipEntry(entryName, preserveFileTimestamps, lastModified) {
-            unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
-          }
-        zipOutStr.putNextEntry(entry)
-        zipOutStr.write(newBytes)
-        zipOutStr.closeEntry()
+        writeToZip(entryName = entryName, bytes = newBytes)
       }
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
@@ -266,19 +260,24 @@ constructor(
       return true
     }
 
-    private fun FileCopyDetails.writeToZip(entryName: String) {
+    private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
       val entry =
         zipEntry(entryName, preserveFileTimestamps, lastModified) {
           unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
         }
       zipOutStr.putNextEntry(entry)
-      copyTo(zipOutStr)
+      if (bytes == null) {
+        copyTo(zipOutStr)
+      } else {
+        zipOutStr.write(bytes)
+      }
       zipOutStr.closeEntry()
     }
   }
 
   public companion object {
     private val logger = Logging.getLogger(ShadowCopyAction::class.java)
+    private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
     private val ZipOutputStream.entries: List<ZipEntry>
       get() =
