@@ -1,11 +1,69 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
-import java.util.regex.Pattern
+import java.util.zip.ZipException
+import org.apache.tools.zip.UnixStat
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.GradleException
+import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.logging.Logger
+import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
+import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
+import org.vafer.jdeb.shaded.objectweb.asm.commons.ClassRemapper
 import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
+
+/**
+ * Applies remapping to the given class with the specified relocation path. The remapped class is
+ * then written to the zip file.
+ */
+internal fun FileCopyDetails.remapClass(
+  relocators: Set<Relocator>,
+  zipOutStr: ZipOutputStream,
+  preserveFileTimestamps: Boolean,
+  lastModified: Long,
+  logger: Logger,
+) =
+  file.readBytes().let { bytes ->
+    var modified = false
+    val remapper = RelocatorRemapper(relocators) { modified = true }
+
+    // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
+    // Copying the original constant pool should be avoided because it would keep references to the
+    // original class names. This is not a problem at runtime (because these entries in the constant
+    // pool are never used), but confuses some tools such as Felix's maven-bundle-plugin that use
+    // the constant pool to determine the dependencies of a class.
+    val cw = ClassWriter(0)
+    val cr = ClassReader(bytes)
+    val cv = ClassRemapper(cw, remapper)
+
+    try {
+      cr.accept(cv, ClassReader.EXPAND_FRAMES)
+    } catch (t: Throwable) {
+      throw GradleException("Error in ASM processing class $path", t)
+    }
+
+    // If we didn't need to change anything, keep the original bytes as-is.
+    val newBytes = if (modified) cw.toByteArray() else bytes
+
+    // Temporarily remove the multi-release prefix.
+    val multiReleasePrefix = "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
+    val newPath = path.replace(multiReleasePrefix, "")
+    val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
+    try {
+      val entry =
+        zipEntry(relocatedPath, preserveFileTimestamps, lastModified) {
+          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+        }
+      // Now we put it back on so the class file is written out with the right extension.
+      zipOutStr.putNextEntry(entry)
+      zipOutStr.write(newBytes)
+      zipOutStr.closeEntry()
+    } catch (_: ZipException) {
+      logger.warn("We have a duplicate $relocatedPath in source project")
+    }
+  }
 
 /**
  * Modified from
@@ -15,58 +73,19 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
  *
  * @author John Engelman
  */
-internal class RelocatorRemapper(
+private class RelocatorRemapper(
   private val relocators: Set<Relocator>,
-  private val onModified: () -> Unit = {},
+  private val onModified: () -> Unit,
 ) : Remapper(Opcodes.ASM9) {
 
   override fun mapValue(value: Any): Any {
     return if (value is String) {
-      mapName(value, mapLiterals = true)
+      relocators.mapName(name = value, mapLiterals = true, onModified = onModified)
     } else {
       super.mapValue(value)
     }
   }
 
-  override fun map(internalName: String): String = mapName(internalName)
-
-  private fun mapName(name: String, mapLiterals: Boolean = false): String {
-    // Maybe a list of types.
-    val newName = name.split(';').joinToString(";") { mapNameImpl(it, mapLiterals) }
-
-    if (newName != name) {
-      onModified()
-    }
-    return newName
-  }
-
-  private fun mapNameImpl(name: String, mapLiterals: Boolean): String {
-    var newName = name
-    var prefix = ""
-    var suffix = ""
-
-    val matcher = classPattern.matcher(newName)
-    if (matcher.matches()) {
-      prefix = matcher.group(1) + "L"
-      suffix = ""
-      newName = matcher.group(2)
-    }
-
-    for (relocator in relocators) {
-      if (mapLiterals && relocator.skipStringConstants) {
-        return name
-      } else if (relocator.canRelocateClass(newName)) {
-        return prefix + relocator.relocateClass(newName) + suffix
-      } else if (relocator.canRelocatePath(newName)) {
-        return prefix + relocator.relocatePath(newName) + suffix
-      }
-    }
-
-    return name
-  }
-
-  private companion object {
-    /** https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html */
-    val classPattern: Pattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+);?")
-  }
+  override fun map(internalName: String): String =
+    relocators.mapName(name = internalName, onModified = onModified)
 }
