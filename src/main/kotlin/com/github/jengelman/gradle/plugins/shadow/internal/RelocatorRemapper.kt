@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import java.io.File
 import org.gradle.api.GradleException
+import org.gradle.api.file.FileCopyDetails
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
@@ -13,8 +13,8 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
  * Applies remapping to the given class file using the provided relocators and returns the
  * (possibly) remapped class bytes. If no remapping is required, the original bytes are returned.
  */
-internal fun File.remapClass(relocators: Set<Relocator>): ByteArray =
-  readBytes().let { bytes ->
+internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
+  file.readBytes().let { bytes ->
     var modified = false
     val remapper = RelocatorRemapper(relocators) { modified = true }
 

@@ -180,10 +180,7 @@ constructor(
                 "^META-INF/versions/\\d+/".toRegex().find(path)?.value.orEmpty()
               val newPath = path.replace(multiReleasePrefix, "")
               val relocatedPath = multiReleasePrefix + relocators.relocatePath(newPath)
-              writeToZip(
-                entryName = relocatedPath,
-                bytes = file.remapClass(relocators = relocators),
-              )
+              writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
             }
           }
         }
