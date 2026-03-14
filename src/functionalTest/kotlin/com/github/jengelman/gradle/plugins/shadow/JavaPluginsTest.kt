@@ -813,6 +813,25 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/1975")
+  @Test
+  fun skipNonExistentDependencyDirectory() {
+    val nonExistentDir = projectRoot.resolve("non-existent-dir")
+
+    projectScript.appendText(
+      """
+        dependencies {
+          ${implementationFiles(nonExistentDir)}
+        }
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess(shadowJarPath)
+
+    assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+  }
+
   @Issue("https://github.com/GradleUp/shadow/issues/915")
   @Test
   fun failBuildIfProcessingBadJar() {

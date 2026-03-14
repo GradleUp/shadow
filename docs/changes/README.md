@@ -22,6 +22,7 @@
 
 - Fix interaction with Gradle artifact transforms. ([#1345](https://github.com/GradleUp/shadow/pull/1345))
 - Fix `skipStringConstants` per-relocator behavior in `mapName`. ([#1968](https://github.com/GradleUp/shadow/pull/1968))
+- Fix failing for non-existent class directories. ([#1976](https://github.com/GradleUp/shadow/pull/1976))
 
 ## [9.3.2](https://github.com/GradleUp/shadow/releases/tag/9.3.2) - 2026-02-27
 

@@ -451,6 +451,9 @@ public abstract class ShadowJar : Jar() {
   override fun copy() {
     includedDependencies.files.forEach { file ->
       when {
+        !file.exists() -> {
+          logger.info("Skipping non-existent dependency: {}", file)
+        }
         file.isDirectory -> {
           from(file)
         }
