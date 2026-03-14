@@ -21,7 +21,9 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
           // Declaring multiple Kotlin Targets of the same type is not supported. See
           // https://kotl.in/declaring-multiple-targets for more details.
           logger.info(
-            "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: ${target.name}"
+            "{} task already exists, skipping configuration for target: {}",
+            SHADOW_JAR_TASK_NAME,
+            target.name,
           )
           return@configureEach
         }

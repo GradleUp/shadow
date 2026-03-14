@@ -148,7 +148,7 @@ constructor(
   private inner class StreamAction(private val zipOutStr: ZipOutputStream) :
     CopyActionProcessingStreamAction {
     init {
-      logger.info("Relocator count: ${relocators.size}.")
+      logger.info("Relocator count: {}.", relocators.size)
       if (encoding != null) {
         zipOutStr.setEncoding(encoding)
       }
@@ -202,7 +202,7 @@ constructor(
       val className = classPath.substringBeforeLast(".").replace('/', '.')
       return unusedClasses.contains(className).also {
         if (it) {
-          logger.info("Dropping unused class: $className")
+          logger.info("Dropping unused class: {}", className)
         }
       }
     }
