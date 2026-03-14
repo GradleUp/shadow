@@ -82,11 +82,15 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     afterEvaluate {
       if (shadow.addTargetJvmVersionAttribute.get()) {
         logger.info(
-          "Setting ${TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name} attribute for ${shadowRuntimeElements.name} configuration."
+          "Setting {} attribute for {} configuration.",
+          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name,
+          shadowRuntimeElements.name,
         )
       } else {
         logger.info(
-          "Skipping setting ${TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name} attribute for ${shadowRuntimeElements.name} configuration."
+          "Skipping setting {} attribute for {} configuration.",
+          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name,
+          shadowRuntimeElements.name,
         )
         return@afterEvaluate
       }
@@ -105,7 +109,9 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         )
       } else {
         logger.info(
-          "Setting target JVM version to $targetJvmVersion for ${shadowRuntimeElements.name} configuration."
+          "Setting target JVM version to {} for {} configuration.",
+          targetJvmVersion,
+          shadowRuntimeElements.name,
         )
         shadowRuntimeElements.configure {
           it.attributes { attrs ->
@@ -127,9 +133,9 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     // addShadowVariantIntoJavaComponent.
     afterEvaluate {
       if (shadow.addShadowVariantIntoJavaComponent.get()) {
-        logger.info("Adding ${shadowRuntimeElements.name} variant to Java component.")
+        logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
       } else {
-        logger.info("Skipping adding ${shadowRuntimeElements.name} variant to Java component.")
+        logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
         return@afterEvaluate
       }
       components.named("java", AdhocComponentWithVariants::class.java) {

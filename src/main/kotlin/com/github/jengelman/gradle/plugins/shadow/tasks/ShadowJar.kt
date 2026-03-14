@@ -543,7 +543,8 @@ public abstract class ShadowJar : Jar() {
     get() {
       if (enableAutoRelocation.get()) {
         logger.info(
-          "Adding auto relocation packages in the dependencies with prefix '${relocationPrefix.get()}'."
+          "Adding auto relocation packages in the dependencies with prefix '{}'.",
+          relocationPrefix.get(),
         )
       } else {
         logger.info("Skipping package relocators as auto relocation is disabled.")
@@ -568,18 +569,22 @@ public abstract class ShadowJar : Jar() {
     when {
       manifest.attributes.contains(mainClassAttributeKey) -> {
         logger.info(
-          "Skipping adding $mainClassAttributeKey attribute to the manifest as it is already set."
+          "Skipping adding {} attribute to the manifest as it is already set.",
+          mainClassAttributeKey,
         )
       }
       mainClassValue.isNullOrEmpty() -> {
         logger.info(
-          "Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty."
+          "Skipping adding {} attribute to the manifest as it is empty.",
+          mainClassAttributeKey,
         )
       }
       else -> {
         manifest.attributes[mainClassAttributeKey] = mainClassValue
         logger.info(
-          "Adding $mainClassAttributeKey attribute to the manifest with value '$mainClassValue'."
+          "Adding {} attribute to the manifest with value '{}'.",
+          mainClassAttributeKey,
+          mainClassValue,
         )
       }
     }
@@ -593,11 +598,13 @@ public abstract class ShadowJar : Jar() {
 
     if (addMultiReleaseAttribute.get()) {
       logger.info(
-        "Adding $multiReleaseAttributeKey attribute to the manifest if any dependencies contain it."
+        "Adding {} attribute to the manifest if any dependencies contain it.",
+        multiReleaseAttributeKey,
       )
     } else {
       logger.info(
-        "Skipping adding $multiReleaseAttributeKey attribute to the manifest as it is disabled."
+        "Skipping adding {} attribute to the manifest as it is disabled.",
+        multiReleaseAttributeKey,
       )
       return
     }
