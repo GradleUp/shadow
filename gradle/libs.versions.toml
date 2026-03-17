@@ -3,7 +3,6 @@ minGradle = "9.0.0"
 kotlin = "2.3.20"
 moshi = "1.15.2"
 pluginPublish = "2.1.0"
-jdkRelease = "17"
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
@@ -20,6 +19,7 @@ plexus-xml = "org.codehaus.plexus:plexus-xml:4.1.1"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.11.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
+asm-commons = "org.ow2.asm:asm-commons:9.9.1"
 
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:1.0.0"
 develocity = "com.gradle:develocity-gradle-plugin:4.3.2"
