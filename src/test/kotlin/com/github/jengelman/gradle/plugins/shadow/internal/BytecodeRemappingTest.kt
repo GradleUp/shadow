@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -19,6 +20,8 @@ import kotlin.reflect.KClass
 import org.gradle.api.file.FileCopyDetails
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 /**
  * The cases reflect the cases in
@@ -143,13 +146,15 @@ class BytecodeRemappingTest {
       .contains("(L$relocatedFixtureBase;L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
-  @Test
-  fun methodPrimitivePlusClassIsRelocated() {
+  @ParameterizedTest
+  @ValueSource(chars = ['B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z'])
+  fun primitivePlusClassMethodIsRelocated(primitiveDescriptor: Char) {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     val classModel = ClassFile.of().parse(result)
     val methodDescriptors = classModel.methods().map { it.methodType().stringValue() }
-    assertThat(methodDescriptors).contains("(BL$relocatedFixtureBase;)L$relocatedFixtureBase;")
+    assertThat(methodDescriptors)
+      .contains("(${primitiveDescriptor}L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
   @Test
@@ -162,7 +167,46 @@ class BytecodeRemappingTest {
       classModel.constantPool().mapNotNull { entry ->
         if (entry is java.lang.classfile.constantpool.StringEntry) entry.stringValue() else null
       }
-    assertThat(stringConstants).contains("com.example.relocated.BytecodeRemappingTest\$FixtureBase")
+    assertThat(stringConstants)
+      .contains($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
+  }
+
+  @Test
+  fun stringConstantNotRelocatedWhenSkipEnabled() {
+    val skipRelocators =
+      setOf(
+        SimpleRelocator(
+          "com.github.jengelman.gradle.plugins.shadow.internal",
+          "com.example.relocated",
+          skipStringConstants = true,
+        )
+      )
+    val result = fixtureSubjectDetails.remapClass(skipRelocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val stringConstants =
+      classModel.constantPool().mapNotNull { entry ->
+        if (entry is java.lang.classfile.constantpool.StringEntry) entry.stringValue() else null
+      }
+    assertThat(stringConstants)
+      .doesNotContain($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
+  }
+
+  @Test
+  fun multiClassDescriptorStringConstantIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val stringConstants =
+      classModel.constantPool().mapNotNull { entry ->
+        if (entry is java.lang.classfile.constantpool.StringEntry) entry.stringValue() else null
+      }
+    // Verify that two adjacent class references in a single string constant are both relocated
+    // (regression test for the issue-1403 pattern).
+    assertThat(stringConstants)
+      .contains(
+        $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;"
+      )
   }
 
   @Test
@@ -258,12 +302,28 @@ class BytecodeRemappingTest {
     val array2dField: Array<Array<FixtureBase>> = emptyArray()
     val stringConstant: String =
       $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase"
+    val multiClassDescriptor: String =
+      $$"()Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;"
 
     fun method(arg: FixtureBase): FixtureBase = arg
 
     fun methodMultiArgs(a: FixtureBase, b: FixtureBase): FixtureBase = a
 
     fun methodWithPrimitivePlusClass(b: Byte, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithCharPlusClass(c: Char, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithDoublePlusClass(d: Double, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithFloatPlusClass(f: Float, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithIntPlusClass(i: Int, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithLongPlusClass(l: Long, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithShortPlusClass(s: Short, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithBooleanPlusClass(z: Boolean, arg: FixtureBase): FixtureBase = arg
 
     fun methodWithCheckCast(arg: Any): FixtureBase {
       (arg as FixtureBase).toString()
