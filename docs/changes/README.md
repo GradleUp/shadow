@@ -1,7 +1,10 @@
 # Change Log
 
 
-## [Unreleased](https://github.com/GradleUp/shadow/compare/9.3.2...HEAD) - 2026-xx-xx
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.4.0...HEAD) - 2026-xx-xx
+
+
+## [9.4.0](https://github.com/GradleUp/shadow/releases/tag/9.4.0) - 2026-03-15
 
 ### Added
 
@@ -22,6 +25,7 @@
 
 - Fix interaction with Gradle artifact transforms. ([#1345](https://github.com/GradleUp/shadow/pull/1345))
 - Fix `skipStringConstants` per-relocator behavior in `mapName`. ([#1968](https://github.com/GradleUp/shadow/pull/1968))
+- Fix failing for non-existent class directories. ([#1976](https://github.com/GradleUp/shadow/pull/1976))
 
 ## [9.3.2](https://github.com/GradleUp/shadow/releases/tag/9.3.2) - 2026-02-27
 
