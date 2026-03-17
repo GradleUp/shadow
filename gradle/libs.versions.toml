@@ -19,7 +19,6 @@ plexus-xml = "org.codehaus.plexus:plexus-xml:4.1.1"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.11.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
-asm-commons = "org.ow2.asm:asm-commons:9.9.1"
 
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:1.0.0"
 develocity = "com.gradle:develocity-gradle-plugin:4.3.2"

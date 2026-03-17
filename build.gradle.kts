@@ -138,12 +138,7 @@ dependencies {
 }
 
 testing.suites {
-  getByName<JvmTestSuite>("test") {
-    dependencies {
-      implementation(libs.xmlunit)
-      implementation(libs.asm.commons)
-    }
-  }
+  getByName<JvmTestSuite>("test") { dependencies { implementation(libs.xmlunit) } }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
