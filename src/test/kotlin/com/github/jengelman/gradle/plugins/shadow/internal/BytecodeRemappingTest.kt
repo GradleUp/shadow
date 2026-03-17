@@ -224,34 +224,86 @@ class BytecodeRemappingTest {
       override fun getFile(): File = _file
     }
 
-  private data class ClassBytecodeInfo(
-    val annotationDescriptors: List<String>,
-    val fieldDescriptors: List<String>,
-    val methodData: List<MethodBytecodeInfo>,
-  ) {
-    val methodDescriptors
-      get() = methodData.map { it.descriptor }
+  // ---------------------------------------------------------------------------
+  // Fixture classes – declared as nested classes so their bytecode is compiled
+  // into the test output directory and can be fetched via requireResourceAsPath.
+  // ---------------------------------------------------------------------------
 
-    val stringConstants
-      get() = methodData.flatMap { it.stringConstants }
+  @Retention(AnnotationRetention.RUNTIME)
+  @Target(AnnotationTarget.CLASS)
+  annotation class FixtureAnnotation
+
+  interface FixtureInterface
+
+  open class FixtureBase
+
+  @Suppress("unused") // Used by parsing bytecode.
+  @FixtureAnnotation
+  class FixtureSubject : FixtureBase(), FixtureInterface {
+    val field: FixtureBase = FixtureBase()
+    val arrayField: Array<FixtureBase> = emptyArray()
+    val array2dField: Array<Array<FixtureBase>> = emptyArray()
+    val stringConstant: String =
+      $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase"
+    val multiClassDescriptor: String =
+      $$"()Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;"
+
+    fun method(arg: FixtureBase): FixtureBase = arg
+
+    fun methodMultiArgs(a: FixtureBase, b: FixtureBase): FixtureBase = a
+
+    fun methodWithPrimitivePlusClass(b: Byte, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithCharPlusClass(c: Char, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithDoublePlusClass(d: Double, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithFloatPlusClass(f: Float, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithIntPlusClass(i: Int, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithLongPlusClass(l: Long, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithShortPlusClass(s: Short, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithBooleanPlusClass(z: Boolean, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithCheckCast(arg: Any): FixtureBase {
+      (arg as FixtureBase).toString()
+      return arg
+    }
+
+    fun methodWithGeneric(list: List<FixtureBase>): FixtureBase = list[0]
   }
+}
 
-  private data class MethodBytecodeInfo(
+private data class ClassBytecodeInfo(
+  val annotationDescriptors: List<String>,
+  val fieldDescriptors: List<String>,
+  val methodData: List<MethodBytecodeInfo>,
+) {
+  val methodDescriptors = methodData.map { it.descriptor }
+  val stringConstants = methodData.flatMap { it.stringConstants }
+
+  data class MethodBytecodeInfo(
     val name: String,
     val descriptor: String,
     val signature: String?,
     val localVarDescriptors: List<String>,
-    val checkcastTargets: List<String>,
+    @Suppress("SpellCheckingInspection") val checkcastTargets: List<String>,
     val invokeOwners: List<String>,
     val stringConstants: List<String>,
   )
+}
 
-  private fun ByteArray.classInfo(): ClassBytecodeInfo {
-    val annotationDescs = mutableListOf<String>()
-    val fieldDescs = mutableListOf<String>()
-    val methods = mutableListOf<MethodBytecodeInfo>()
+@Suppress("SpellCheckingInspection")
+private fun ByteArray.classInfo(): ClassBytecodeInfo {
+  val annotationDescs = mutableListOf<String>()
+  val fieldDescs = mutableListOf<String>()
+  val methods = mutableListOf<ClassBytecodeInfo.MethodBytecodeInfo>()
 
-    ClassReader(this).accept(
+  ClassReader(this)
+    .accept(
       object : ClassVisitor(Opcodes.ASM9) {
         override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? {
           annotationDescs.add(descriptor)
@@ -313,7 +365,7 @@ class BytecodeRemappingTest {
 
             override fun visitEnd() {
               methods.add(
-                MethodBytecodeInfo(
+                ClassBytecodeInfo.MethodBytecodeInfo(
                   name,
                   descriptor,
                   signature,
@@ -330,58 +382,5 @@ class BytecodeRemappingTest {
       0,
     )
 
-    return ClassBytecodeInfo(annotationDescs, fieldDescs, methods)
-  }
-
-  // ---------------------------------------------------------------------------
-  // Fixture classes – declared as nested classes so their bytecode is compiled
-  // into the test output directory and can be fetched via requireResourceAsPath.
-  // ---------------------------------------------------------------------------
-
-  @Retention(AnnotationRetention.RUNTIME)
-  @Target(AnnotationTarget.CLASS)
-  annotation class FixtureAnnotation
-
-  interface FixtureInterface
-
-  open class FixtureBase
-
-  @Suppress("unused") // Used by parsing bytecode.
-  @FixtureAnnotation
-  class FixtureSubject : FixtureBase(), FixtureInterface {
-    val field: FixtureBase = FixtureBase()
-    val arrayField: Array<FixtureBase> = emptyArray()
-    val array2dField: Array<Array<FixtureBase>> = emptyArray()
-    val stringConstant: String =
-      $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase"
-    val multiClassDescriptor: String =
-      $$"()Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;"
-
-    fun method(arg: FixtureBase): FixtureBase = arg
-
-    fun methodMultiArgs(a: FixtureBase, b: FixtureBase): FixtureBase = a
-
-    fun methodWithPrimitivePlusClass(b: Byte, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithCharPlusClass(c: Char, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithDoublePlusClass(d: Double, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithFloatPlusClass(f: Float, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithIntPlusClass(i: Int, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithLongPlusClass(l: Long, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithShortPlusClass(s: Short, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithBooleanPlusClass(z: Boolean, arg: FixtureBase): FixtureBase = arg
-
-    fun methodWithCheckCast(arg: Any): FixtureBase {
-      (arg as FixtureBase).toString()
-      return arg
-    }
-
-    fun methodWithGeneric(list: List<FixtureBase>): FixtureBase = list[0]
-  }
+  return ClassBytecodeInfo(annotationDescs, fieldDescs, methods)
 }
