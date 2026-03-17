@@ -30,12 +30,18 @@ dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") }
 kotlin {
   explicitApi()
   @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
+  val jdkRelease = "17"
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
     apiVersion = KotlinVersion.KOTLIN_2_2
     languageVersion = apiVersion
+    jvmTarget = JvmTarget.fromTarget(jdkRelease)
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+    freeCompilerArgs.add("-Xjdk-release=$jdkRelease")
+  }
+  target.compilations.configureEach {
+    compileJavaTaskProvider { options.release = jdkRelease.toInt() }
   }
 }
 
@@ -215,15 +221,6 @@ kotlin.target.compilations {
     associateWith(main)
   }
 }
-
-tasks.compileKotlin {
-  compilerOptions {
-    jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
-    freeCompilerArgs.add("-Xjdk-release=${libs.versions.jdkRelease.get()}")
-  }
-}
-
-tasks.compileJava { options.release = libs.versions.jdkRelease.get().toInt() }
 
 tasks.pluginUnderTestMetadata { pluginClasspath.from(testPluginClasspath) }
 
