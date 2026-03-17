@@ -1,9 +1,7 @@
 [versions]
-minGradle = "9.0.0"
 kotlin = "2.3.20"
 moshi = "1.15.2"
 pluginPublish = "2.1.0"
-jdkRelease = "17"
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.15"
@@ -40,3 +38,4 @@ jetbrains-dokka = "org.jetbrains.dokka:2.1.0"
 mavenPublish = "com.vanniktech.maven.publish:0.36.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 spotless = "com.diffplug.spotless:8.3.0"
+tapmoc = "com.gradleup.tapmoc:0.4.0"

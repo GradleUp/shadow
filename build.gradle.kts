@@ -6,8 +6,6 @@ import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
@@ -17,6 +15,7 @@ plugins {
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.pluginPublish)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.tapmoc)
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -32,9 +31,6 @@ kotlin {
   @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
   compilerOptions {
     allWarningsAsErrors = true
-    // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    apiVersion = KotlinVersion.KOTLIN_2_2
-    languageVersion = apiVersion
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
   }
 }
@@ -52,6 +48,13 @@ lint {
 spotless {
   kotlin { ktfmt(libs.ktfmt.get().version).googleStyle() }
   kotlinGradle { ktfmt(libs.ktfmt.get().version).googleStyle() }
+}
+
+tapmoc {
+  gradle("9.0.0")
+  java(17)
+  // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+  kotlin("2.2.0")
 }
 
 val testPluginClasspath by
@@ -89,14 +92,6 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(RUNTIME_ELEMENTS_CONFIGURATION_NAME)
   suppressPomMetadataWarningsFor(JAVADOC_ELEMENTS_CONFIGURATION_NAME)
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
-}
-
-configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
-  attributes.attribute(
-    // TODO: https://github.com/gradle/gradle/issues/24608
-    GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-    objects.named(libs.versions.minGradle.get()),
-  )
 }
 
 val testGradleVersion: String =
@@ -215,15 +210,6 @@ kotlin.target.compilations {
     associateWith(main)
   }
 }
-
-tasks.compileKotlin {
-  compilerOptions {
-    jvmTarget = JvmTarget.fromTarget(libs.versions.jdkRelease.get())
-    freeCompilerArgs.add("-Xjdk-release=${libs.versions.jdkRelease.get()}")
-  }
-}
-
-tasks.compileJava { options.release = libs.versions.jdkRelease.get().toInt() }
 
 tasks.pluginUnderTestMetadata { pluginClasspath.from(testPluginClasspath) }
 
