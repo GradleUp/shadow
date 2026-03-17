@@ -24,7 +24,7 @@ import org.junit.jupiter.api.io.TempDir
  * bytecode level to verify that the remapper correctly transforms class names in all relevant
  * bytecode structures.
  */
-class RelocatorRemapperTest {
+class BytecodeRemappingTest {
   @TempDir lateinit var tempDir: Path
 
   // Relocator used across all relocation tests: moves the test package to a distinct target.
@@ -37,11 +37,14 @@ class RelocatorRemapperTest {
     )
 
   // Internal name of the relocated FixtureBase for use in assertions.
-  private val relocatedFixtureBase = $$"com/example/relocated/RelocatorRemapperTest$FixtureBase"
+  private val relocatedFixtureBase = $$"com/example/relocated/BytecodeRemappingTest$FixtureBase"
+
+  private val fixtureSubjectDetails
+    get() = FixtureSubject::class.toFileCopyDetails()
 
   @Test
-  fun remapClassNotModified() {
-    val details = FixtureSubject::class.toFileCopyDetails()
+  fun classNotModified() {
+    val details = fixtureSubjectDetails
     // Relocator pattern does not match – original bytes must be returned as-is.
     val noMatchRelocators = setOf(SimpleRelocator("org.unrelated", "org.other"))
 
@@ -51,53 +54,17 @@ class RelocatorRemapperTest {
   }
 
   @Test
-  fun remapClassNameIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
+  fun classNameIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
 
     val classModel = ClassFile.of().parse(result)
     assertThat(classModel.thisClass().asInternalName())
-      .isEqualTo($$"com/example/relocated/RelocatorRemapperTest$FixtureSubject")
+      .isEqualTo($$"com/example/relocated/BytecodeRemappingTest$FixtureSubject")
   }
 
   @Test
-  fun remapSuperclassIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
-
-    val classModel = ClassFile.of().parse(result)
-    assertThat(classModel.superclass().get().asInternalName()).isEqualTo(relocatedFixtureBase)
-  }
-
-  @Test
-  fun remapFieldDescriptorIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
-
-    val classModel = ClassFile.of().parse(result)
-    val fieldDescriptors = classModel.fields().map { it.fieldType().stringValue() }
-    assertThat(fieldDescriptors).contains("L$relocatedFixtureBase;")
-  }
-
-  @Test
-  fun remapMethodDescriptorIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
-
-    val classModel = ClassFile.of().parse(result)
-    val methodDescriptors = classModel.methods().map { it.methodType().stringValue() }
-    assertThat(methodDescriptors).contains("(L$relocatedFixtureBase;)L$relocatedFixtureBase;")
-  }
-
-  @Test
-  fun remapAnnotationIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
+  fun annotationIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
 
     val classModel = ClassFile.of().parse(result)
     val annotationsAttr = classModel.findAttribute(Attributes.runtimeVisibleAnnotations())
@@ -105,56 +72,11 @@ class RelocatorRemapperTest {
     val annotationDescriptors =
       annotationsAttr.get().annotations().map { it.className().stringValue() }
     assertThat(annotationDescriptors)
-      .contains($$"Lcom/example/relocated/RelocatorRemapperTest$FixtureAnnotation;")
+      .contains($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;")
   }
 
   @Test
-  fun remapArrayFieldDescriptorIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
-
-    val classModel = ClassFile.of().parse(result)
-    val fieldDescriptors = classModel.fields().map { it.fieldType().stringValue() }
-    assertThat(fieldDescriptors).contains("[L$relocatedFixtureBase;")
-  }
-
-  @Test
-  fun remapArray2dFieldDescriptorIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
-
-    val classModel = ClassFile.of().parse(result)
-    val fieldDescriptors = classModel.fields().map { it.fieldType().stringValue() }
-    assertThat(fieldDescriptors).contains("[[L$relocatedFixtureBase;")
-  }
-
-  @Test
-  fun remapMethodMultipleArgsIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
-
-    val classModel = ClassFile.of().parse(result)
-    val methodDescriptors = classModel.methods().map { it.methodType().stringValue() }
-    assertThat(methodDescriptors)
-      .contains("(L$relocatedFixtureBase;L$relocatedFixtureBase;)L$relocatedFixtureBase;")
-  }
-
-  @Test
-  fun remapMethodPrimitivePlusClassIsRelocated() {
-    val details = FixtureSubject::class.toFileCopyDetails()
-
-    val result = details.remapClass(relocators)
-
-    val classModel = ClassFile.of().parse(result)
-    val methodDescriptors = classModel.methods().map { it.methodType().stringValue() }
-    assertThat(methodDescriptors).contains("(BL$relocatedFixtureBase;)L$relocatedFixtureBase;")
-  }
-
-  @Test
-  fun remapBaseClassNameIsRelocated() {
+  fun baseClassNameIsRelocated() {
     // Verify relocation also works on a simple class (FixtureBase has no fields/methods
     // referencing the target package beyond its own class name).
     val details = FixtureBase::class.toFileCopyDetails()
@@ -163,6 +85,69 @@ class RelocatorRemapperTest {
 
     val classModel = ClassFile.of().parse(result)
     assertThat(classModel.thisClass().asInternalName()).isEqualTo(relocatedFixtureBase)
+  }
+
+  @Test
+  fun superclassIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    assertThat(classModel.superclass().get().asInternalName()).isEqualTo(relocatedFixtureBase)
+  }
+
+  @Test
+  fun fieldDescriptorIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val fieldDescriptors = classModel.fields().map { it.fieldType().stringValue() }
+    assertThat(fieldDescriptors).contains("L$relocatedFixtureBase;")
+  }
+
+  @Test
+  fun arrayFieldDescriptorIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val fieldDescriptors = classModel.fields().map { it.fieldType().stringValue() }
+    assertThat(fieldDescriptors).contains("[L$relocatedFixtureBase;")
+  }
+
+  @Test
+  fun array2dFieldDescriptorIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val fieldDescriptors = classModel.fields().map { it.fieldType().stringValue() }
+    assertThat(fieldDescriptors).contains("[[L$relocatedFixtureBase;")
+  }
+
+  @Test
+  fun methodDescriptorIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val methodDescriptors = classModel.methods().map { it.methodType().stringValue() }
+    assertThat(methodDescriptors).contains("(L$relocatedFixtureBase;)L$relocatedFixtureBase;")
+  }
+
+  @Test
+  fun methodMultipleArgsIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val methodDescriptors = classModel.methods().map { it.methodType().stringValue() }
+    assertThat(methodDescriptors)
+      .contains("(L$relocatedFixtureBase;L$relocatedFixtureBase;)L$relocatedFixtureBase;")
+  }
+
+  @Test
+  fun methodPrimitivePlusClassIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val methodDescriptors = classModel.methods().map { it.methodType().stringValue() }
+    assertThat(methodDescriptors).contains("(BL$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
   private fun KClass<*>.toFileCopyDetails() =
@@ -187,13 +172,13 @@ class RelocatorRemapperTest {
 
   @Retention(AnnotationRetention.RUNTIME)
   @Target(AnnotationTarget.CLASS)
-  annotation class FixtureAnnotation
+  private annotation class FixtureAnnotation
 
-  open class FixtureBase
+  private open class FixtureBase
 
   @Suppress("unused") // Used by parsing bytecode.
   @FixtureAnnotation
-  class FixtureSubject : FixtureBase() {
+  private class FixtureSubject : FixtureBase() {
     val field: FixtureBase = FixtureBase()
     val arrayField: Array<FixtureBase> = emptyArray()
     val array2dField: Array<Array<FixtureBase>> = emptyArray()
