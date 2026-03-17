@@ -10,6 +10,8 @@ import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import java.io.File
 import java.lang.classfile.Attributes
 import java.lang.classfile.ClassFile
+import java.lang.classfile.instruction.InvokeInstruction
+import java.lang.classfile.instruction.TypeCheckInstruction
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
@@ -150,6 +152,76 @@ class BytecodeRemappingTest {
     assertThat(methodDescriptors).contains("(BL$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
+  @Test
+  fun stringConstantIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    // Find the constant string in the bytecode.
+    val stringConstants =
+      classModel.constantPool().mapNotNull { entry ->
+        if (entry is java.lang.classfile.constantpool.StringEntry) entry.stringValue() else null
+      }
+    assertThat(stringConstants).contains("com.example.relocated.BytecodeRemappingTest\$FixtureBase")
+  }
+
+  @Test
+  fun interfaceIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val interfaces = classModel.interfaces().map { it.asInternalName() }
+    assertThat(interfaces)
+      .contains($$"com/example/relocated/BytecodeRemappingTest$FixtureInterface")
+  }
+
+  @Test
+  fun signatureIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val method = classModel.methods().first { it.methodName().stringValue() == "methodWithGeneric" }
+    val signatureAttr = method.findAttribute(Attributes.signature())
+    assertThat(signatureAttr.isPresent).isTrue()
+    val sig = signatureAttr.get().signature().stringValue()
+    assertThat(sig).contains("L$relocatedFixtureBase;")
+  }
+
+  @Test
+  fun localVariableIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val method = classModel.methods().first { it.methodName().stringValue() == "method" }
+    val code = method.code().get()
+    val lvt = code.findAttribute(Attributes.localVariableTable())
+    assertThat(lvt.isPresent).isTrue()
+    val descriptors = lvt.get().localVariables().map { it.type().stringValue() }
+    assertThat(descriptors).contains("L$relocatedFixtureBase;")
+  }
+
+  @Test
+  fun instructionIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val classModel = ClassFile.of().parse(result)
+    val method =
+      classModel.methods().first { it.methodName().stringValue() == "methodWithCheckCast" }
+    val code = method.code().get()
+
+    val hasRelocatedCheckCast =
+      code.elementStream().anyMatch { element ->
+        element is TypeCheckInstruction && element.type().asInternalName() == relocatedFixtureBase
+      }
+    assertThat(hasRelocatedCheckCast).isTrue()
+
+    val hasRelocatedInvoke =
+      code.elementStream().anyMatch { element ->
+        element is InvokeInstruction && element.owner().asInternalName() == relocatedFixtureBase
+      }
+    assertThat(hasRelocatedInvoke).isTrue()
+  }
+
   private fun KClass<*>.toFileCopyDetails() =
     object : FileCopyDetails by noOpDelegate() {
       private val _path = java.name.replace('.', '/') + ".class"
@@ -172,21 +244,32 @@ class BytecodeRemappingTest {
 
   @Retention(AnnotationRetention.RUNTIME)
   @Target(AnnotationTarget.CLASS)
-  private annotation class FixtureAnnotation
+  annotation class FixtureAnnotation
 
-  private open class FixtureBase
+  interface FixtureInterface
+
+  open class FixtureBase
 
   @Suppress("unused") // Used by parsing bytecode.
   @FixtureAnnotation
-  private class FixtureSubject : FixtureBase() {
+  class FixtureSubject : FixtureBase(), FixtureInterface {
     val field: FixtureBase = FixtureBase()
     val arrayField: Array<FixtureBase> = emptyArray()
     val array2dField: Array<Array<FixtureBase>> = emptyArray()
+    val stringConstant: String =
+      $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase"
 
     fun method(arg: FixtureBase): FixtureBase = arg
 
     fun methodMultiArgs(a: FixtureBase, b: FixtureBase): FixtureBase = a
 
     fun methodWithPrimitivePlusClass(b: Byte, arg: FixtureBase): FixtureBase = arg
+
+    fun methodWithCheckCast(arg: Any): FixtureBase {
+      (arg as FixtureBase).toString()
+      return arg
+    }
+
+    fun methodWithGeneric(list: List<FixtureBase>): FixtureBase = list[0]
   }
 }
