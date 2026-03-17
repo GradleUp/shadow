@@ -4,6 +4,7 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.language.base.plugins.LifecycleBasePlugin.VERIFICATION_GROUP
 import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -256,6 +257,19 @@ fun addMultiReleaseSourceSet(version: Int) {
 
     tasks.jar { from(output.allOutputs) { into("META-INF/versions/$version") } }
 
-    tasks.withType<Test>().configureEach { inputs.files(output.allOutputs) }
+    val versionedTest =
+      tasks.register("testJava${version}", Test::class) {
+        useJUnitPlatform()
+        group = VERIFICATION_GROUP
+        description = "Runs test suite using Java $version toolchain."
+        val testSourceSet = sourceSets.test.get()
+        testClassesDirs = testSourceSet.output.classesDirs
+        val testCpWithoutMainOutput = testSourceSet.runtimeClasspath - sourceSets.main.get().output
+        // Prefer MR classes on the classpath, so remove main output.
+        classpath = files(tasks.jar.flatMap { it.archiveFile }) + testCpWithoutMainOutput
+        javaLauncher =
+          javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(version) }
+      }
+    tasks.check { dependsOn(versionedTest) }
   }
 }
