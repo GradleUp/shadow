@@ -43,11 +43,10 @@ class RelocatorsTest {
   private companion object {
     val primitiveTypes = setOf('B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z')
 
-    val primitiveTypePatterns =
-      primitiveTypes.map {
-        // Methods like `void method(boolean arg1, org.package.ClassA arg2)`
-        Arguments.of("(${it}Lorg/package/ClassA;)V", "(${it}Lshadow/org/package/ClassA;)V")
-      }
+    val primitiveTypePatterns = primitiveTypes.map {
+      // Methods like `void method(boolean arg1, org.package.ClassA arg2)`
+      Arguments.of("(${it}Lorg/package/ClassA;)V", "(${it}Lshadow/org/package/ClassA;)V")
+    }
 
     @JvmStatic
     fun signaturePatternsProvider() =

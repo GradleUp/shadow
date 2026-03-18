@@ -49,8 +49,9 @@ public interface ResourceTransformer : Named {
     @JvmStatic
     public fun <T : ResourceTransformer> Class<T>.create(objectFactory: ObjectFactory): T {
       // If the constructor takes a single ObjectFactory, inject it in.
-      val constructor =
-        constructors.find { it.parameterTypes.singleOrNull() == ObjectFactory::class.java }
+      val constructor = constructors.find {
+        it.parameterTypes.singleOrNull() == ObjectFactory::class.java
+      }
       return if (constructor != null) {
         objectFactory.newInstance(this@create)
       } else {
