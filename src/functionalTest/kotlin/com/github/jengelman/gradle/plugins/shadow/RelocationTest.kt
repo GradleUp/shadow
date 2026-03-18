@@ -636,8 +636,9 @@ class RelocationTest : BasePluginTest() {
 
     val originalModule =
       KotlinModuleMetadata.read(requireResourceAsStream(originalModuleFilePath).readBytes())
-    val relocatedModule =
-      outputShadowedJar.use { KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath)) }
+    val relocatedModule = outputShadowedJar.use {
+      KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath))
+    }
 
     assertThat(relocatedModule.version.toString()).isEqualTo("2.2.0")
     assertThat(originalModule.version.toString()).isEqualTo("2.2.0")

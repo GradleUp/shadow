@@ -144,8 +144,9 @@ class TransformersTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val actualFileBytes =
-      outputShadowedJar.use { jar -> jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() } }
+    val actualFileBytes = outputShadowedJar.use { jar ->
+      jar.getStream(PLUGIN_CACHE_FILE).use { it.readAllBytes() }
+    }
     assertThat(actualFileBytes.contentHashCode()).all {
       // Hash of the original plugin cache file.
       isNotEqualTo(-2114104185)

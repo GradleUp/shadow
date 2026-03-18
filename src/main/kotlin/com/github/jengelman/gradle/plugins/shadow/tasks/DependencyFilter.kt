@@ -112,11 +112,9 @@ public interface DependencyFilter : Serializable {
             it == resolvedDependency.moduleGroup ||
               resolvedDependency.moduleGroup.matches(it.toRegex())
           } ?: true
-        val nameMatch =
-          name.let {
-            it == resolvedDependency.moduleName ||
-              resolvedDependency.moduleName.matches(it.toRegex())
-          }
+        val nameMatch = name.let {
+          it == resolvedDependency.moduleName || resolvedDependency.moduleName.matches(it.toRegex())
+        }
         val versionMatch =
           version?.let {
             // Version like `1.0.0+1` can't be converted to regex directly because `+` is a special

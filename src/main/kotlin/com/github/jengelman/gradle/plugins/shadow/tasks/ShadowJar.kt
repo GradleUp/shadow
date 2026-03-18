@@ -64,12 +64,11 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-  private val shadowDependencies =
-    project.provider {
-      // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
-      // without Shadow plugin applied.
-      project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
-    }
+  private val shadowDependencies = project.provider {
+    // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
+    // without Shadow plugin applied.
+    project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
+  }
 
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
@@ -98,34 +97,30 @@ public abstract class ShadowJar : Jar() {
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   @get:Classpath
-  public open val toMinimize: ConfigurableFileCollection =
-    objectFactory.fileCollection {
-      minimizeJar.map {
-        if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars)
-        else emptySet()
-      }
+  public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map {
+      if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
     }
+  }
 
   @get:Classpath
-  public open val apiJars: ConfigurableFileCollection =
-    objectFactory.fileCollection {
-      minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
-    }
+  public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
+  }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public open val sourceSetsClassesDirs: ConfigurableFileCollection =
-    objectFactory.fileCollection {
-      minimizeJar.map {
-        if (it) {
-          project.sourceSets.map { sourceSet ->
-            sourceSet.output.classesDirs.filter(File::isDirectory)
-          }
-        } else {
-          emptySet()
+  public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.map {
+      if (it) {
+        project.sourceSets.map { sourceSet ->
+          sourceSet.output.classesDirs.filter(File::isDirectory)
         }
+      } else {
+        emptySet()
       }
     }
+  }
 
   /** [ResourceTransformer]s to be applied in the shadow steps. */
   @get:Nested
@@ -148,10 +143,9 @@ public abstract class ShadowJar : Jar() {
 
   /** Final dependencies to be shadowed. */
   @get:Classpath
-  public open val includedDependencies: ConfigurableFileCollection =
-    objectFactory.fileCollection {
-      dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
-    }
+  public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
+    dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
+  }
 
   /**
    * Enables auto relocation of packages in the dependencies.
