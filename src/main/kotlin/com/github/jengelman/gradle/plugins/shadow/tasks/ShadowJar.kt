@@ -453,7 +453,7 @@ public abstract class ShadowJar : Jar() {
         file.isDirectory -> {
           from(file)
         }
-        file.isAar() -> {
+        file.extension.equals("aar", ignoreCase = true) && file.isAar() -> {
           val message =
             """
             Shadowing AAR file is not supported.
