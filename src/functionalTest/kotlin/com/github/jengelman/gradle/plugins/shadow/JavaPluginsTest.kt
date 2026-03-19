@@ -853,7 +853,30 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun failBuildIfProcessingAar() {
-    val fooAarPath = path("foo.aar")
+    val fooAarPath = buildJar("foo.aar") {
+      insert("AndroidManifest.xml", "<manifest/>")
+    }
+
+    projectScript.appendText(
+      """
+        dependencies {
+          ${implementationFiles(fooAarPath)}
+        }
+      """
+        .trimIndent()
+    )
+
+    val result = runWithFailure(shadowJarPath)
+
+    assertThat(result.output)
+      .contains("Shadowing AAR file is not supported.", "Please exclude dependency artifact:")
+  }
+
+  @Test
+  fun failBuildIfProcessingAarWithJarExtension() {
+    val fooAarPath = buildJar("foo.jar") {
+      insert("AndroidManifest.xml", "<manifest/>")
+    }
 
     projectScript.appendText(
       """
