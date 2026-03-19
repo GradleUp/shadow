@@ -669,13 +669,10 @@ public abstract class ShadowJar : Jar() {
   }
 }
 
-/**
- * Returns true if the file is an AAR (Android Archive) by inspecting its contents.
- * An AAR is a ZIP file that contains an `AndroidManifest.xml` entry at the root.
- */
-private fun File.isAar(): Boolean = try {
-  ZipFile(this).use { zip -> zip.getEntry("AndroidManifest.xml") != null }
-} catch (_: ZipException) {
-  // File is not a valid ZIP, so it cannot be an AAR.
-  false
-}
+private fun File.isAar(): Boolean =
+  try {
+    ZipFile(this).use { zip -> zip.getEntry("AndroidManifest.xml") != null }
+  } catch (_: ZipException) {
+    // File is not a valid ZIP, so it cannot be an AAR.
+    false
+  }

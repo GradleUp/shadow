@@ -853,9 +853,7 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun failBuildIfProcessingAar() {
-    val fooAarPath = buildJar("foo.aar") {
-      insert("AndroidManifest.xml", "<manifest/>")
-    }
+    val fooAarPath = buildJar("foo.aar") { insert("AndroidManifest.xml", "<manifest/>") }
 
     projectScript.appendText(
       """
