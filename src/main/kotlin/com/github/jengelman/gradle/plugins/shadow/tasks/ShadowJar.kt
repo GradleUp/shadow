@@ -26,6 +26,8 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 import java.io.File
 import java.io.IOException
 import java.util.jar.JarFile
+import java.util.zip.ZipException
+import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
@@ -451,7 +453,7 @@ public abstract class ShadowJar : Jar() {
         file.isDirectory -> {
           from(file)
         }
-        file.extension.equals("aar", ignoreCase = true) -> {
+        file.extension.equals("aar", ignoreCase = true) && file.isAar() -> {
           val message =
             """
             Shadowing AAR file is not supported.
@@ -666,3 +668,11 @@ public abstract class ShadowJar : Jar() {
     }
   }
 }
+
+private fun File.isAar(): Boolean =
+  try {
+    ZipFile(this).use { zip -> zip.getEntry("AndroidManifest.xml") != null }
+  } catch (_: ZipException) {
+    // File is not a valid ZIP, so it cannot be an AAR.
+    false
+  }
