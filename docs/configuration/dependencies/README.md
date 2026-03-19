@@ -166,6 +166,37 @@ configuration.
     }
     ```
 
+### Excluding Non-JAR Transitive Dependencies
+
+If the non-JAR file is a transitive dependency (e.g., a POM-only metapackage) that you don't actually need
+in your shadowed JAR, you can exclude it using the `dependencies` block instead of embedding it.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      dependencies {
+        exclude(
+          // Exclude the transitive dependency on js-community, which can't be unzipped by the task.
+          dependency("org.graalvm.js:js-community:.*"),
+        )
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      dependencies {
+        exclude(
+          // Exclude the transitive dependency on js-community, which can't be unzipped by the task.
+          dependency('org.graalvm.js:js-community:.*'),
+        )
+      }
+    }
+    ```
+
 ## Filtering Dependencies
 
 Individual dependencies can be filtered from the final JAR by using the `dependencies` block of a
