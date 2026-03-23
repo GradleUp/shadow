@@ -22,7 +22,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}" --stacktrace
 
   # Status check that is required in branch protection rules.
@@ -51,7 +51,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: true
           dependency-graph: 'generate-submit-and-upload'
