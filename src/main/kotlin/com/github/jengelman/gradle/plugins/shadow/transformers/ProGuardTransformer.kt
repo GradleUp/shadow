@@ -19,14 +19,6 @@ constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
   PatternFilterableResourceTransformer(patternSet = patternSet) {
   @get:Internal internal val proGuardEntries = mutableMapOf<String, MutableList<String>>()
 
-  @get:Internal // No need to mark this as an input as `getIncludes` is already marked as `@Input`.
-  public open var path: String = PROGUARD_PATH
-    set(value) {
-      field = value
-      // Reset the includes to match the new path.
-      setIncludes(listOf("$value/**"))
-    }
-
   override fun transform(context: TransformerContext) {
     val lines = proGuardEntries.getOrPut(context.path) { mutableListOf() }
     context.inputStream.bufferedReader().use { it.readLines() }.forEach { line -> lines.add(line) }
@@ -37,13 +29,12 @@ constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     proGuardEntries.forEach { (path, lines) ->
       os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      os.write(lines.joinToString("\n").toByteArray())
+      os.write(lines.joinToString(System.lineSeparator()).toByteArray())
       os.closeEntry()
     }
   }
 
   private companion object {
-    private const val PROGUARD_PATH = "META-INF/proguard"
-    private const val PROGUARD_PATTERN = "$PROGUARD_PATH/**"
+    private const val PROGUARD_PATTERN = "META-INF/proguard/**"
   }
 }

@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -71,9 +70,9 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
 
   @Test
   fun canTransformAlternatePath() {
-    transformer.path = "META-INF/custom"
+    transformer.include("META-INF/custom")
+    assertThat(transformer.canTransformResource("META-INF/proguard/rules.pro")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/custom/rules.pro")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/proguard/rules.pro")).isFalse()
   }
 
   private companion object {
