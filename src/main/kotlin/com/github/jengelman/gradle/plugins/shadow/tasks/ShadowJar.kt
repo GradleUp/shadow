@@ -20,7 +20,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ProGuardTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
@@ -337,21 +336,6 @@ public abstract class ShadowJar : Jar() {
    */
   public open fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, action = {})
-  }
-
-  /**
-   * Merge ProGuard rules files (`META-INF/proguard/**`) with [action].
-   *
-   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to
-   * ensure duplicate ProGuard files are handled properly. See more details in the
-   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
-   * section.
-   *
-   * @see [getDuplicatesStrategy]
-   */
-  @JvmOverloads
-  public open fun mergeProGuardFiles(action: Action<ProGuardTransformer> = Action {}) {
-    transform(ProGuardTransformer::class.java, action)
   }
 
   /**
