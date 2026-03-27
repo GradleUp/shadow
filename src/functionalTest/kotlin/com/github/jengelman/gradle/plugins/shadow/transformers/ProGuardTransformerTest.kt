@@ -28,9 +28,7 @@ class ProGuardTransformerTest : BaseTransformerTest() {
       """
           .trimIndent()
       } else {
-        transform<ProGuardTransformer>(
-          dependenciesBlock = implementationFiles(one, two),
-        )
+        transform<ProGuardTransformer>(dependenciesBlock = implementationFiles(one, two))
       }
     projectScript.appendText(config)
 

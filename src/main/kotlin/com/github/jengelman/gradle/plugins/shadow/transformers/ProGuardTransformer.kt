@@ -15,9 +15,8 @@ import org.gradle.api.tasks.util.PatternSet
 @CacheableTransformer
 public open class ProGuardTransformer
 @JvmOverloads
-constructor(
-  patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN),
-) : PatternFilterableResourceTransformer(patternSet = patternSet) {
+constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
+  PatternFilterableResourceTransformer(patternSet = patternSet) {
   @get:Internal internal val proGuardEntries = mutableMapOf<String, MutableList<String>>()
 
   @get:Internal // No need to mark this as an input as `getIncludes` is already marked as `@Input`.
@@ -30,10 +29,7 @@ constructor(
 
   override fun transform(context: TransformerContext) {
     val lines = proGuardEntries.getOrPut(context.path) { mutableListOf() }
-    context.inputStream
-      .bufferedReader()
-      .use { it.readLines() }
-      .forEach { line -> lines.add(line) }
+    context.inputStream.bufferedReader().use { it.readLines() }.forEach { line -> lines.add(line) }
   }
 
   override fun hasTransformedResource(): Boolean = proGuardEntries.isNotEmpty()

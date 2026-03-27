@@ -65,7 +65,8 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
     }
 
     val transformedContent = JarPath(tempJar).use { it.getContent(path) }
-    assertThat(transformedContent).isEqualTo("-keep class com.foo.Bar { *; }\n-keep class com.foo.Baz { *; }")
+    assertThat(transformedContent)
+      .isEqualTo("-keep class com.foo.Bar { *; }\n-keep class com.foo.Baz { *; }")
   }
 
   @Test

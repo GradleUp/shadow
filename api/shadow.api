@@ -460,6 +460,17 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PreserveFir
 	public fun getResources ()Lorg/gradle/api/provider/SetProperty;
 }
 
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ProGuardTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
+	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getPath ()Ljava/lang/String;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun setPath (Ljava/lang/String;)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
