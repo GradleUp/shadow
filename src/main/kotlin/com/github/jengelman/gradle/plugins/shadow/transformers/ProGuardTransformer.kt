@@ -21,7 +21,16 @@ constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
 
   override fun transform(context: TransformerContext) {
     val lines = proGuardEntries.getOrPut(context.path) { mutableListOf() }
-    context.inputStream.bufferedReader().use { it.readLines() }.forEach { line -> lines.add(line) }
+    context.inputStream
+      .bufferedReader()
+      .use { it.readLines() }
+      .forEach { line ->
+        var relocatedLine = line
+        context.relocators.forEach { relocator ->
+          relocatedLine = relocator.applyToSourceContent(relocatedLine)
+        }
+        lines.add(relocatedLine)
+      }
   }
 
   override fun hasTransformedResource(): Boolean = proGuardEntries.isNotEmpty()

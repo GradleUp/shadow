@@ -68,31 +68,40 @@ constructor(
       this.excludes.addAll(excludes)
     }
 
-    if (!rawString) {
-      // Create exclude pattern sets for sources.
-      for (exclude in this.excludes) {
-        // Excludes should be subpackages of the global pattern.
-        if (exclude.startsWith(this.pattern)) {
-          sourcePackageExcludes.add(
-            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), "")
-          )
-        }
-        // Excludes should be subpackages of the global pattern.
-        if (exclude.startsWith(pathPattern)) {
-          sourcePathExcludes.add(
-            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), "")
-          )
-        }
+    updateSourceExcludes()
+  }
+
+  private fun updateSourceExcludes() {
+    if (rawString) return
+    sourcePackageExcludes.clear()
+    sourcePathExcludes.clear()
+    // Create exclude pattern sets for sources.
+    for (exclude in this.excludes) {
+      // Excludes should be subpackages of the global pattern.
+      if (exclude.startsWith(this.pattern)) {
+        sourcePackageExcludes.add(
+          exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), "")
+        )
+      }
+      // Excludes should be subpackages of the global pattern.
+      if (exclude.startsWith(pathPattern)) {
+        sourcePathExcludes.add(
+          exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), "")
+        )
       }
     }
   }
 
   public open fun include(pattern: String) {
     includes.addAll(normalizePatterns(listOf(pattern)))
+    includes.add(pattern)
+    updateSourceExcludes()
   }
 
   public open fun exclude(pattern: String) {
     excludes.addAll(normalizePatterns(listOf(pattern)))
+    excludes.add(pattern)
+    updateSourceExcludes()
   }
 
   override fun canRelocatePath(path: String): Boolean {
@@ -206,7 +215,7 @@ constructor(
      */
     val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
       Pattern.compile(
-        "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
+        "\\b(import|package|class|interface|enum|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws|-keep) $" +
           "|" +
           "\\{@link( \\*)* $" +
           "|" +
@@ -255,9 +264,7 @@ constructor(
       // Make sure that search pattern starts at word boundary and that we look for literal ".", not
       // regex jokers.
       val snippets =
-        sourceContent
-          .split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
-          .filter(CharSequence::isNotEmpty)
+        sourceContent.split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
       snippets.forEachIndexed { i, snippet ->
         val isFirstSnippet = i == 0
         val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]

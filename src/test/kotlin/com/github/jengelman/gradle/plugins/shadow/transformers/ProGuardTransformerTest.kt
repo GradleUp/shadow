@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
@@ -73,6 +74,42 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
     transformer.include("META-INF/custom/**")
     assertThat(transformer.canTransformResource("META-INF/proguard/rules.pro")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/custom/rules.pro")).isTrue()
+  }
+
+  @Test
+  fun relocatedClasses() {
+    val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
+    val content = "-keep class org.foo.Service { *; }\n-keep class org.foo.exclude.OtherService"
+    val path = "META-INF/proguard/app.pro"
+
+    transformer.transform(textContext(path, content, relocator))
+
+    tempJar.outputStream().zipOutputStream().use { zos ->
+      transformer.modifyOutputStream(zos, false)
+    }
+
+    val transformedContent = JarPath(tempJar).use { it.getContent(path) }
+    assertThat(transformedContent)
+      .isEqualTo("-keep class borg.foo.Service { *; }\n-keep class org.foo.exclude.OtherService")
+  }
+
+  @Test
+  fun mergeRelocatedFiles() {
+    val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
+    val content1 = "-keep class org.foo.Service { *; }"
+    val content2 = "-keep class org.foo.exclude.OtherService"
+    val path = "META-INF/proguard/app.pro"
+
+    transformer.transform(textContext(path, content1, relocator))
+    transformer.transform(textContext(path, content2, relocator))
+
+    tempJar.outputStream().zipOutputStream().use { zos ->
+      transformer.modifyOutputStream(zos, false)
+    }
+
+    val transformedContent = JarPath(tempJar).use { it.getContent(path) }
+    assertThat(transformedContent)
+      .isEqualTo("-keep class borg.foo.Service { *; }\n-keep class org.foo.exclude.OtherService")
   }
 
   private companion object {

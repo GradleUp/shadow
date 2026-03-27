@@ -345,6 +345,12 @@ class SimpleRelocatorTest {
   }
 
   @Test
+  fun relocateSourceAtStart() {
+    val relocator = SimpleRelocator("org.foo", "borg.foo")
+    assertThat(relocator.applyToSourceContent("org.foo.Bar")).isEqualTo("borg.foo.Bar")
+  }
+
+  @Test
   fun relocateSourceWithExcludesRaw() {
     val relocator =
       SimpleRelocator(
