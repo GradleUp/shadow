@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.4.0...HEAD) - 2026-xx-xx
 
+### Changed
+
+- Update Kotlin to 2.3.20. ([#1978](https://github.com/GradleUp/shadow/pull/1978))
 
 ## [9.4.0](https://github.com/GradleUp/shadow/releases/tag/9.4.0) - 2026-03-15
 
