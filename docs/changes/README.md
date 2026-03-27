@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.4.1...HEAD) - 2026-xx-xx
 
+### Added
+
+- Add `ProGuardTransformer` to merge `META-INF/proguard/*.pro` files. ([#1997](https://github.com/GradleUp/shadow/pull/1997))
 
 ## [9.4.1](https://github.com/GradleUp/shadow/releases/tag/9.4.1) - 2026-03-27
 
