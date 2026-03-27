@@ -338,6 +338,22 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
+  @Test
+  fun mergeProGuardFiles() {
+    val proGuardEntry = "META-INF/proguard/app.pro"
+    val content1 = "-keep class com.foo.Bar { *; }"
+    val content2 = "-keep class com.foo.Baz { *; }"
+    val one = buildJarOne { insert(proGuardEntry, content1) }
+    val two = buildJarTwo { insert(proGuardEntry, content2) }
+    val config = transform<ProGuardTransformer>(dependenciesBlock = implementationFiles(one, two))
+    projectScript.appendText(config)
+
+    runWithSuccess(shadowJarPath)
+
+    val content = outputShadowedJar.use { it.getContent(proGuardEntry) }
+    assertThat(content).isEqualTo("$content1\n$content2")
+  }
+
   @ParameterizedTest
   @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {

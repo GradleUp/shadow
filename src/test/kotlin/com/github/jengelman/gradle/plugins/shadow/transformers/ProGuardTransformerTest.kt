@@ -70,7 +70,7 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
 
   @Test
   fun canTransformAlternatePath() {
-    transformer.include("META-INF/custom")
+    transformer.include("META-INF/custom/**")
     assertThat(transformer.canTransformResource("META-INF/proguard/rules.pro")).isTrue()
     assertThat(transformer.canTransformResource("META-INF/custom/rules.pro")).isTrue()
   }
