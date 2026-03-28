@@ -123,7 +123,7 @@ configuration.
 === "Kotlin"
 
     ```kotlin
-    val nonJar by configurations.creating
+    val nonJar = configurations.create("nonJar")
 
     // This is necessary to make the dependencies in `nonJar` available at compile time.
     // If you don't need that, you can skip this step.

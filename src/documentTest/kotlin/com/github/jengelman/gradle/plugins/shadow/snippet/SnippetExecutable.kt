@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.snippet
 
 import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
+import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
@@ -48,6 +49,8 @@ sealed class SnippetExecutable : Executable {
         }
         include ':api', ':main'
         rootProject.name = 'snippet'
+        $enableNoImplicitLookupInParentProjects
+        enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
         enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
           .trimIndent()
@@ -61,25 +64,24 @@ sealed class SnippetExecutable : Executable {
     projectRoot.addSubProject("api", apiScript)
 
     val (imports, withoutImports) = importsExtractor(snippet)
-    val mainScript =
-      buildString {
-          append(imports)
-          append(lineSeparator)
-          // All buildscript {} blocks must appear before any plugins {} blocks in the script.
-          if (withoutImports.contains("buildscript {")) {
-            append(withoutImports)
-          } else {
-            if (!withoutImports.contains("plugins {")) {
-              append(pluginsBlock)
-              append(lineSeparator)
-            }
-            append(withoutImports)
-          }
-          append(lineSeparator)
-          append(assembleDependsOn)
+    val mainScript = buildString {
+      append(imports)
+      append(lineSeparator)
+      // All buildscript {} blocks must appear before any plugins {} blocks in the script.
+      if (withoutImports.contains("buildscript {")) {
+        append(withoutImports)
+      } else {
+        if (!withoutImports.contains("plugins {")) {
+          append(pluginsBlock)
           append(lineSeparator)
         }
-        .trimIndent()
+        append(withoutImports)
+      }
+      append(lineSeparator)
+      append(assembleDependsOn)
+      append(lineSeparator)
+    }
+      .trimIndent()
     projectRoot.addSubProject("main", mainScript)
     projectRoot.resolve("main/foo.jar").createFile().also {
       // Dummy JAR file to ensure the project can be built.

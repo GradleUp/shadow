@@ -12,7 +12,7 @@ pluginManagement {
   }
 }
 
-plugins { id("com.gradle.develocity") version "4.4.0" }
+plugins { id("com.gradle.develocity") version "4.4.3" }
 
 develocity {
   buildScan {
@@ -38,5 +38,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "shadow"
+
+enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")

@@ -29,7 +29,7 @@ dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") }
 
 kotlin {
   explicitApi()
-  @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
+  @OptIn(ExperimentalAbiValidation::class) abiValidation()
   val jdkRelease = "17"
   compilerOptions {
     allWarningsAsErrors = true
@@ -60,13 +60,15 @@ spotless {
   kotlinGradle { ktfmt(libs.ktfmt.get().version).googleStyle() }
 }
 
-val testPluginClasspath by configurations.registering {
-  isCanBeResolved = true
-  description = "Plugins used in integration tests could be resolved in classpath."
-}
+val testPluginClasspath =
+  configurations.register("testPluginClasspath") {
+    isCanBeResolved = true
+    description = "Plugins used in integration tests could be resolved in classpath."
+    extendsFrom(configurations.compileOnly)
+  }
 
-val testKit by sourceSets.creating
-val testKitImplementation by configurations.getting
+val testKit = sourceSets.register("testKit")
+val testKitImplementation = configurations.named("testKitImplementation")
 
 configurations.configureEach {
   when (name) {
@@ -178,7 +180,7 @@ testing.suites {
   withType<JvmTestSuite>().configureEach {
     useJUnitJupiter(libs.junit.bom.map { checkNotNull(it.version) })
     dependencies {
-      implementation(testKit.output)
+      implementation(testKit.get().output)
       implementation(libs.assertk)
     }
     targets.configureEach {
@@ -214,7 +216,7 @@ gradlePlugin {
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
 kotlin.target.compilations {
-  val main by getting
+  val main = getByName("main")
   getByName("functionalTest") {
     // Import main and its classpath as dependencies and establish internal visibility.
     associateWith(main)

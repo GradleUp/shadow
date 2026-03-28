@@ -235,7 +235,8 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(
     option = "add-multi-release-attribute",
-    description = "Adds the multi-release attribute to the manifest if any dependencies contain it.",
+    description =
+      "Adds the multi-release attribute to the manifest if any dependencies contain it.",
   )
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
