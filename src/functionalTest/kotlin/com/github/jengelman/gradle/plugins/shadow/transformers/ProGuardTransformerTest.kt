@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 
@@ -19,7 +20,7 @@ class ProGuardTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val content = outputShadowedJar.use { it.getContent(proGuardEntry) }
+    val content = outputShadowedJar.use { it.getContent(proGuardEntry) }.invariantEolString
     assertThat(content).isEqualTo("$content1\n$content2")
   }
 
@@ -45,7 +46,8 @@ class ProGuardTransformerTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    val transformedContent = outputShadowedJar.use { it.getContent(proGuardEntry) }
+    val transformedContent =
+      outputShadowedJar.use { it.getContent(proGuardEntry) }.invariantEolString
     assertThat(transformedContent)
       .isEqualTo("-keep class borg.foo.Service { *; }\n-keep class org.foo.exclude.OtherService")
   }

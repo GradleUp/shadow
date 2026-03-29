@@ -6,6 +6,7 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.file.Path
 import kotlin.io.path.createTempFile
@@ -38,6 +39,13 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
     assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
+  @Test
+  fun canTransformAlternatePath() {
+    transformer.include("META-INF/custom/**")
+    assertThat(transformer.canTransformResource("META-INF/proguard/rules.pro")).isTrue()
+    assertThat(transformer.canTransformResource("META-INF/custom/rules.pro")).isTrue()
+  }
+
   @ParameterizedTest
   @MethodSource("proGuardFileProvider")
   fun transformProGuardFile(path: String, input1: String, input2: String, output: String) {
@@ -64,16 +72,9 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = JarPath(tempJar).use { it.getContent(path) }
+    val transformedContent = JarPath(tempJar).use { it.getContent(path) }.invariantEolString
     assertThat(transformedContent)
       .isEqualTo("-keep class com.foo.Bar { *; }\n-keep class com.foo.Baz { *; }")
-  }
-
-  @Test
-  fun canTransformAlternatePath() {
-    transformer.include("META-INF/custom/**")
-    assertThat(transformer.canTransformResource("META-INF/proguard/rules.pro")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/custom/rules.pro")).isTrue()
   }
 
   @Test
@@ -88,7 +89,7 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = JarPath(tempJar).use { it.getContent(path) }
+    val transformedContent = JarPath(tempJar).use { it.getContent(path) }.invariantEolString
     assertThat(transformedContent)
       .isEqualTo("-keep class borg.foo.Service { *; }\n-keep class org.foo.exclude.OtherService")
   }
@@ -107,7 +108,7 @@ class ProGuardTransformerTest : BaseTransformerTest<ProGuardTransformer>() {
       transformer.modifyOutputStream(zos, false)
     }
 
-    val transformedContent = JarPath(tempJar).use { it.getContent(path) }
+    val transformedContent = JarPath(tempJar).use { it.getContent(path) }.invariantEolString
     assertThat(transformedContent)
       .isEqualTo("-keep class borg.foo.Service { *; }\n-keep class org.foo.exclude.OtherService")
   }
