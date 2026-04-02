@@ -713,7 +713,7 @@ type.
   ```
 
 - [Cédric Champeau](https://github.com/melix) - Support Gradle 7 [#624](https://github.com/GradleUp/shadow/pull/624)
-- [Daniel Oakey](https://github.com/danieloakey) - Close `FileInputStream` when remapping close to avoid classloader
+- [Daniel Oakey](https://github.com/ghost) - Close `FileInputStream` when remapping close to avoid classloader
   locks [#642](https://github.com/GradleUp/shadow/pull/642)
 - [Maximilian Müller](https://github.com/maxm123) - Groovy error in `ServiceFileTransformer` in Gradle
   3 [#655](https://github.com/GradleUp/shadow/pull/655)
