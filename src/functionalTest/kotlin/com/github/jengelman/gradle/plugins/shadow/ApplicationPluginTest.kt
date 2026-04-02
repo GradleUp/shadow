@@ -18,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.Path
 import java.util.zip.ZipFile
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
@@ -27,18 +26,10 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 class ApplicationPluginTest : BasePluginTest() {
   private lateinit var mainClass: String
 
-  @DisabledOnOs(
-    OS.WINDOWS,
-    architectures = ["aarch64"],
-    disabledReason =
-      "Cannot use toolchain on Windows ARM64", // TODO: remove when min Gradle is bumped to 9.2+
-  )
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
@@ -355,7 +346,6 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private companion object {
-    @OptIn(ExperimentalPathApi::class)
     fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> =
       walk()
         .filter { includeDirs || it.isRegularFile() }

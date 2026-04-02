@@ -80,18 +80,17 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     val ktorVersion = "3.1.0"
 
     kotlin {
-      @Suppress("OPT_IN_USAGE")
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`.
         mainClass = "myapp.MainKt"
       }
       sourceSets {
-        val commonMain = getByName("commonMain") {
+        commonMain {
           dependencies {
             implementation("io.ktor:ktor-client-core:$ktorVersion")
           }
         }
-        val jvmMain = getByName("jvmMain") {
+        jvmMain {
           dependencies {
             implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
           }

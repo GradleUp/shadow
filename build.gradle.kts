@@ -131,8 +131,6 @@ dependencies {
   testKitImplementation(libs.assertk)
 
   testPluginClasspath(libs.foojayResolver)
-  testPluginClasspath(libs.develocity)
-  testPluginClasspath(libs.kotlin.gradlePlugin)
   testPluginClasspath(libs.pluginPublish)
 
   lintChecks(libs.androidx.gradlePluginLints)

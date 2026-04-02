@@ -12,7 +12,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
@@ -474,7 +473,6 @@ class CachingTest : BasePluginTest() {
 
   private fun cleanOutputs() {
     runWithSuccess("clean")
-    @OptIn(ExperimentalPathApi::class)
     val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
     // Make sure build folders are deleted by clean task.
     assertThat(buildDirs).isEmpty()
