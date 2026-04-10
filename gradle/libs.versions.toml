@@ -5,7 +5,7 @@ moshi = "1.15.2"
 pluginPublish = "2.1.1"
 
 [libraries]
-apache-ant = "org.apache.ant:ant:1.10.16"
+apache-ant = "org.apache.ant:ant:1.10.17"
 apache-commonsCodec = "commons-codec:commons-codec:1.21.0"
 apache-commonsIo = "commons-io:commons-io:2.21.0"
 apache-log4j = "org.apache.logging.log4j:log4j-core:2.25.4"
