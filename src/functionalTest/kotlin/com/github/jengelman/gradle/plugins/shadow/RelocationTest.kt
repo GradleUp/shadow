@@ -466,7 +466,7 @@ class RelocationTest : BasePluginTest() {
           implementation 'junit:junit:3.8.2'
         }
         $shadowJarTask {
-          configurations = []
+          clearConfigurations()
           relocate('', 'foo/')
         }
       """

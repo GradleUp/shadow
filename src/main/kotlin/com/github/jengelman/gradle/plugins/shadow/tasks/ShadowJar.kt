@@ -72,6 +72,9 @@ public abstract class ShadowJar : Jar() {
     project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
   }
 
+  @Transient
+  private val _sourceConfigurations = mutableListOf<Configuration>()
+
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
     description = "Create a combined JAR of project and runtime dependencies"
@@ -101,7 +104,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.map {
-      if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
+      if (it) (dependencyFilterForMinimize.resolve(_sourceConfigurations) - apiJars) else emptySet()
     }
   }
 
@@ -132,12 +135,34 @@ public abstract class ShadowJar : Jar() {
   @get:Nested public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
 
   /**
-   * The configurations to include dependencies from.
+   * The resolved files from configurations to include dependencies from.
+   *
+   * Do not add to this file collection directly. Use [addConfiguration], [setConfigurations],
+   * or [clearConfigurations] instead, so that dependency filtering works correctly.
    *
    * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
    */
   @get:Classpath
-  public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
+  public open val configurations: ConfigurableFileCollection = objectFactory.fileCollection()
+
+  /** Add a [Configuration] whose dependencies should be shadowed. */
+  public open fun addConfiguration(config: Configuration) {
+    _sourceConfigurations.add(config)
+    configurations.from(config)
+  }
+
+  /** Replace all configurations with the given set. */
+  public open fun setConfigurations(configs: Iterable<Configuration>) {
+    _sourceConfigurations.clear()
+    configurations.setFrom()
+    configs.forEach { addConfiguration(it) }
+  }
+
+  /** Remove all configurations. */
+  public open fun clearConfigurations() {
+    _sourceConfigurations.clear()
+    configurations.setFrom()
+  }
 
   @get:Input
   public open val dependencyFilter: Property<DependencyFilter> =
@@ -146,7 +171,7 @@ public abstract class ShadowJar : Jar() {
   /** Final dependencies to be shadowed. */
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
-    dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
+    dependencyFilter.map { df -> df.resolve(_sourceConfigurations) }
   }
 
   /**
