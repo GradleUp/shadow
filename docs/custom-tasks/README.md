@@ -13,7 +13,7 @@ the output.
 
       archiveClassifier = "test"
       from(sourceSets.test.map { it.output })
-      configurations = project.configurations.testRuntimeClasspath.map { listOf(it) }
+      configurations.setFrom(project.configurations.testRuntimeClasspath)
 
       manifest {
         // Optionally, set the main class for the JAR.
@@ -36,7 +36,7 @@ the output.
 
       archiveClassifier = 'test'
       from sourceSets.named('test').map { it.output }
-      configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+      configurations.setFrom project.configurations.named('testRuntimeClasspath')
 
       manifest {
         // Optionally, set the main class for the JAR.
@@ -67,7 +67,7 @@ source code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] 
     tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
       description = "Create a shadow JAR of all dependencies"
       archiveClassifier = "dep"
-      configurations = project.configurations.runtimeClasspath.map { listOf(it) }
+      configurations.setFrom(project.configurations.runtimeClasspath)
     }
     ```
 
@@ -77,7 +77,7 @@ source code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] 
     tasks.register('dependencyShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       description = 'Create a shadow JAR of all dependencies'
       archiveClassifier = 'dep'
-      configurations = project.configurations.named('runtimeClasspath').map { [it] }
+      configurations.setFrom project.configurations.named('runtimeClasspath')
     }
     ```
 

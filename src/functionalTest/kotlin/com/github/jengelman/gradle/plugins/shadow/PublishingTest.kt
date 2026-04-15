@@ -305,7 +305,7 @@ class PublishingTest : BasePluginTest() {
             description = 'Create a combined JAR of project and test dependencies'
             archiveClassifier = 'tests'
             from sourceSets.named('test').map { it.output }
-            setConfigurations([project.configurations.testRuntimeClasspath])
+            configurations.setFrom project.configurations.named('testRuntimeClasspath')
           }
         """
             .trimIndent(),

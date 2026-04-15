@@ -36,8 +36,10 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
     val kotlinJvmMain = target.compilations.named("main")
     registerShadowJarCommon(tasks.named(target.artifactsTaskName, Jar::class.java)) { task ->
       task.from(kotlinJvmMain.map { it.output.allOutputs })
-      task.addConfiguration(
-        configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName)
+      task.configurations.convention(
+        provider {
+          configurations.getByName(kotlinJvmMain.get().runtimeDependencyConfigurationName)
+        }
       )
 
       if (!isAtLeastKgp("1.9.0")) return@registerShadowJarCommon

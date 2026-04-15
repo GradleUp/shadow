@@ -714,7 +714,7 @@ class JavaPluginsTest : BasePluginTest() {
           description = 'Create a combined JAR of project and test dependencies'
           archiveClassifier = 'test'
           from sourceSets.named('test').map { it.output }
-          setConfigurations([project.configurations.testRuntimeClasspath])
+          configurations.setFrom project.configurations.named('testRuntimeClasspath')
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
@@ -751,7 +751,7 @@ class JavaPluginsTest : BasePluginTest() {
           description = 'Create a combined JAR of project and test dependencies'
           archiveClassifier = 'test'
           from sourceSets.named('test').map { it.output }
-          setConfigurations([project.configurations.testRuntimeClasspath])
+          configurations.setFrom project.configurations.named('testRuntimeClasspath')
           manifest {
             attributes '$mainClassAttributeKey': 'my.Main'
           }
@@ -795,7 +795,7 @@ class JavaPluginsTest : BasePluginTest() {
         def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
           description = 'Create a shadow JAR of all dependencies'
           archiveClassifier = 'dep'
-          setConfigurations([project.configurations.runtimeClasspath])
+          configurations.setFrom project.configurations.named('runtimeClasspath')
         }
       """
         .trimIndent()
@@ -1185,7 +1185,7 @@ class JavaPluginsTest : BasePluginTest() {
         }
 
         $shadowJarTask {
-          setConfigurations([project.configurations.runtimeClasspath])
+          configurations.setFrom project.configurations.runtimeClasspath
         }
 
         configurations.runtimeClasspath {

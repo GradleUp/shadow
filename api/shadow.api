@@ -160,6 +160,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
 	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
+	public abstract fun resolve (Lorg/gradle/api/file/ConfigurableFileCollection;)Lorg/gradle/api/file/FileCollection;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter$AbstractDependencyFilter : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
@@ -175,6 +176,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/Dependenc
 	public fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
 	protected abstract fun resolve (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
 	public fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
+	public fun resolve (Lorg/gradle/api/file/ConfigurableFileCollection;)Lorg/gradle/api/file/FileCollection;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/FindResourceInClasspath : org/gradle/api/DefaultTask, org/gradle/api/tasks/util/PatternFilterable {
@@ -225,7 +227,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getAddMultiReleaseAttribute ()Lorg/gradle/api/provider/Property;
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
-	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
+	public fun getConfigurations ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getDuplicatesStrategy ()Lorg/gradle/api/file/DuplicatesStrategy;
 	public fun getEnableAutoRelocation ()Lorg/gradle/api/provider/Property;
