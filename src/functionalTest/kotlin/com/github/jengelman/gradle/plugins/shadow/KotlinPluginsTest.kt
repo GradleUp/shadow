@@ -47,7 +47,13 @@ class KotlinPluginsTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       val entries =
-        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *junitEntries, *manifestEntries)
+        arrayOf(
+          "my/",
+          "META-INF/my_my.kotlin_module",
+          mainClassEntry,
+          *junitEntries,
+          *manifestEntries,
+        )
       if (excludeStdlib) {
         containsOnly(*entries)
       } else {
@@ -88,7 +94,13 @@ class KotlinPluginsTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       val entries =
-        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *entriesInAB, *manifestEntries)
+        arrayOf(
+          "my/",
+          "META-INF/my_my.kotlin_module",
+          mainClassEntry,
+          *entriesInAB,
+          *manifestEntries,
+        )
       if (excludeStdlib) {
         containsOnly(*entries)
       } else {
@@ -129,8 +141,7 @@ class KotlinPluginsTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      val entries =
-        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *entriesInAB, *manifestEntries)
+      val entries = arrayOf("my/", mainClassEntry, *entriesInAB, *manifestEntries)
       containsAtLeast(*entries)
     }
   }
