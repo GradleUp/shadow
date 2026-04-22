@@ -25,7 +25,7 @@ develocity = "com.gradle:develocity-gradle-plugin:4.4.1"
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "pluginPublish" }
 
-androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha06"
+androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-beta01"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
 ktfmt = "com.facebook:ktfmt:0.62"
 
