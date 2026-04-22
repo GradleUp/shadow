@@ -29,7 +29,7 @@ dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") }
 
 kotlin {
   explicitApi()
-  @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
+  @OptIn(ExperimentalAbiValidation::class) abiValidation()
   val jdkRelease = "17"
   compilerOptions {
     allWarningsAsErrors = true
