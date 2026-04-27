@@ -34,7 +34,6 @@ import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.CopySpec
@@ -101,7 +100,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.map {
-      if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
+      if (it) (dependencyFilterForMinimize.resolve(configurations) - apiJars) else emptySet()
     }
   }
 
@@ -137,7 +136,7 @@ public abstract class ShadowJar : Jar() {
    * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
    */
   @get:Classpath
-  public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
+  public open val configurations: ConfigurableFileCollection = objectFactory.fileCollection()
 
   @get:Input
   public open val dependencyFilter: Property<DependencyFilter> =
@@ -146,7 +145,7 @@ public abstract class ShadowJar : Jar() {
   /** Final dependencies to be shadowed. */
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
-    dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
+    dependencyFilter.map { df -> df.resolve(configurations) }
   }
 
   /**
