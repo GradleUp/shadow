@@ -63,6 +63,7 @@ spotless {
 val testPluginClasspath by configurations.registering {
   isCanBeResolved = true
   description = "Plugins used in integration tests could be resolved in classpath."
+  extendsFrom(configurations.compileOnly)
 }
 
 val testKit by sourceSets.creating
@@ -129,8 +130,6 @@ dependencies {
   testKitImplementation(libs.assertk)
 
   testPluginClasspath(libs.foojayResolver)
-  testPluginClasspath(libs.develocity)
-  testPluginClasspath(libs.kotlin.gradlePlugin)
   testPluginClasspath(libs.pluginPublish)
 
   lintChecks(libs.androidx.gradlePluginLints)
