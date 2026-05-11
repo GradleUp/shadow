@@ -87,7 +87,7 @@ class TransformersTest : BaseTransformerTest() {
       assertThat(buildResult.output)
         .contains(
           // Keep this list approach for Unix/Windows test compatibility.
-          "Execution failed for task ':shadowJar'.",
+          "Execution failed for task ':shadowJar'",
           "> Found 1 path duplicate(s) with different content in the shadowed JAR:",
           "    * differing-content-2",
           "differing-content-2 (SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73)",

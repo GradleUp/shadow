@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.4.1...HEAD) - 2026-xx-xx
 
+### Changed
+
+- Bump min Gradle requirement to 9.1.0. ([#2016](https://github.com/GradleUp/shadow/pull/2016))
 
 ## [9.4.1](https://github.com/GradleUp/shadow/releases/tag/9.4.1) - 2026-03-27
 
