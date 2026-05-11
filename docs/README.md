@@ -27,6 +27,7 @@ dependent libraries into the output jar without incurring the I/O overhead of ex
 | 9.0.0+         | 8.11               | 11               | [`com.gradleup.shadow`][gradleup's]                  |
 | 9.2.0+         | 8.11               | 17               | [`com.gradleup.shadow`][gradleup's]                  |
 | 9.3.0+         | 9.0                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
+| 9.5.0+         | 9.1                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
 
 ## Benefits of Shadow
 
