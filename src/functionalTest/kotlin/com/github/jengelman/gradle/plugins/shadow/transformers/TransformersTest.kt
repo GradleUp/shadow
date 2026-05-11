@@ -4,7 +4,6 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactlyInAnyOrder
-import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
@@ -86,15 +85,13 @@ class TransformersTest : BaseTransformerTest() {
       val buildResult = runWithFailure(shadowJarPath)
       assertThat(buildResult).taskOutcomeEquals(shadowJarPath, FAILED)
       assertThat(buildResult.output)
-        .containsMatch(
-          """
-          Caused by: org\.gradle\.api\.GradleException: Found 1 path duplicate\(s\) with different content in the shadowed JAR:
-          \s*\* differing-content-2
-          \s*\* (.*?)/differing-content-2 \(SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73\)
-          \s*\* (.*?)/differing-content-2 \(SHA256: aa845861bbd4578700e10487d85b25ead8723ee98fbf143df7b7e0bf1cb3385d\)
-          """
-            .trimIndent()
-            .toRegex()
+        .contains(
+          // Keep this list approach for Unix/Windows test compatibility.
+          "Execution failed for task ':shadowJar'",
+          "> Found 1 path duplicate(s) with different content in the shadowed JAR:",
+          "    * differing-content-2",
+          "differing-content-2 (SHA256: ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73)",
+          "differing-content-2 (SHA256: aa845861bbd4578700e10487d85b25ead8723ee98fbf143df7b7e0bf1cb3385d)",
         )
     }
   }
