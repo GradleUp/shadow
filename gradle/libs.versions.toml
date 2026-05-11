@@ -8,7 +8,7 @@ pluginPublish = "2.1.1"
 apache-ant = "org.apache.ant:ant:1.10.17"
 apache-commonsCodec = "commons-codec:commons-codec:1.22.0"
 apache-commonsIo = "commons-io:commons-io:2.22.0"
-apache-log4j = "org.apache.logging.log4j:log4j-core:2.25.4"
+apache-log4j = "org.apache.logging.log4j:log4j-core:2.26.0"
 apache-maven-model = "org.apache.maven:maven-model:3.9.15"
 jdependency = "org.vafer:jdependency:2.15"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
@@ -34,7 +34,7 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-android-lint = "com.android.lint:9.2.0"
+android-lint = "com.android.lint:9.2.1"
 jetbrains-dokka = "org.jetbrains.dokka:2.2.0"
 mavenPublish = "com.vanniktech.maven.publish:0.36.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
