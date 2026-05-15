@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -48,6 +49,8 @@ public open class PreserveFirstFoundResourceTransformer(
   override fun canTransformResource(element: FileTreeElement): Boolean {
     // Init once before patternSpec is accessed.
     includeResources
-    return patternSpec.isSatisfiedBy(element) && !found.add(element.path)
+    val flag = patternSpec.isSatisfiedBy(element)
+    checkDupStrategy(flag, element)
+    return flag && !found.add(element.path)
   }
 }

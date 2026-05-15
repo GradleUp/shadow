@@ -5,6 +5,8 @@
 
 ### Added
 
+- Check `DuplicatesStrategy` for merging transformers. ([#2026](https://github.com/GradleUp/shadow/pull/2026))  
+  This will log warnings if the wrong `DuplicatesStrategy`s are applied in the Gradle configurations for built-in `ResourceTransformer`s.
 - Expose `patternSet` of `ComponentsXmlResourceTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
 - Expose `patternSet` of `GroovyExtensionModuleTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
 - Expose `patternSet` of `Log4j2PluginsCacheFileTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))

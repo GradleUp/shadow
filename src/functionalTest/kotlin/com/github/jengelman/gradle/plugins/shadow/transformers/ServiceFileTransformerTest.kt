@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -221,7 +222,15 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    runWithSuccess(shadowJarPath)
+    val result = runWithSuccess(shadowJarPath)
+
+    if (strategy == EXCLUDE) {
+      assertThat(result.output)
+        .contains(
+          "META-INF/services/com.acme.Foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer (a merging transformer) but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before merging.",
+          "META-INF/services/org.apache.maven.Shade' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer (a merging transformer) but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before merging.",
+        )
+    }
 
     assertThat(outputShadowedJar).useAll {
       getContent(ENTRY_SERVICES_SHADE).isEqualTo(firstValue)
