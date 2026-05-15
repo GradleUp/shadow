@@ -76,9 +76,10 @@ Different strategies will lead to different results for `foo/bar` files in the J
     }
     ```
 
-The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
-as expected as the duplicate resource files fed for them are excluded beforehand. However, this behavior might be what
-you expected for duplicate `foo/bar` files, preventing them from being included.
+With `duplicatesStrategy = EXCLUDE` (the default), duplicate resource files are removed before
+[`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] process them, so
+those transformers cannot merge the excluded files. This default behavior is still useful when you want to prevent
+duplicate `foo/bar` files from being included.
 
 Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several common
 steps to take:

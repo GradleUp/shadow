@@ -6,6 +6,7 @@
 ### Changed
 
 - Bump min Gradle requirement to 9.1.0. ([#2016](https://github.com/GradleUp/shadow/pull/2016))
+- Clarify docs for `ResourceTransformer` behavior with `duplicatesStrategy` in merge configuration. ([#2022](https://github.com/GradleUp/shadow/issues/2022))
 
 ## [9.4.1](https://github.com/GradleUp/shadow/releases/tag/9.4.1) - 2026-03-27
 
