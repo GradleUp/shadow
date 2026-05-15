@@ -129,17 +129,15 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
     val paths = paths.get()
-
     val path = element.path
-    if (path in mappings) return true
-    for (key in mappings.keys) {
-      if (key.toRegex().containsMatchIn(path)) return true
+
+    return when {
+      path in mappings -> true
+      mappings.keys.any { it.toRegex().containsMatchIn(path) } -> true
+      path in paths -> true
+      paths.any { it.toRegex().containsMatchIn(path) } -> true
+      else -> mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
     }
-    if (path in paths) return true
-    for (p in paths) {
-      if (p.toRegex().containsMatchIn(path)) return true
-    }
-    return mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
   }
 
   override fun transform(context: TransformerContext) {
