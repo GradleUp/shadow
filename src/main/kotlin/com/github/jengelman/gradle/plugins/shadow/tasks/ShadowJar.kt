@@ -344,6 +344,11 @@ public abstract class ShadowJar : Jar() {
    * e.g. `append("resources/application.yml", "\n---\n")` for merging `resources/application.yml`
    * files.
    *
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to
+   * ensure duplicate extension module files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
+   *
    * @param resourcePath The path to the resource in the jar.
    * @param separator The separator to use between the original content and the appended content,
    *   defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
