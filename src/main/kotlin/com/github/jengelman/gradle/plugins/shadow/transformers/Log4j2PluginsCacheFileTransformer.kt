@@ -14,7 +14,7 @@ import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Modified from
@@ -24,16 +24,15 @@ import org.gradle.api.file.FileTreeElement
  * @author John Engelman
  */
 @CacheableTransformer
-public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
+public open class Log4j2PluginsCacheFileTransformer
+@JvmOverloads
+constructor(patternSet: PatternSet = PatternSet().include(PLUGIN_CACHE_FILE)) :
+  PatternFilterableResourceTransformer(patternSet) {
   /** Log4j config files to share across the transformation stages. */
   private val tempFiles = mutableListOf<Path>()
 
   /** [Relocator] instances to share across the transformation stages. */
   private val tempRelocators = mutableListOf<Relocator>()
-
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return PLUGIN_CACHE_FILE == element.path
-  }
 
   override fun transform(context: TransformerContext) {
     val temporaryFile = createTempFile("Log4j2Plugins", ".dat")

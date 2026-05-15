@@ -3,6 +3,14 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.4.1...HEAD) - 2026-xx-xx
 
+### Added
+
+- Expose `patternSet` of `ComponentsXmlResourceTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
+- Expose `patternSet` of `GroovyExtensionModuleTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
+- Expose `patternSet` of `Log4j2PluginsCacheFileTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
+- Expose `patternSet` of `ManifestAppenderTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
+- Expose `patternSet` of `ManifestResourceTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
+
 ### Changed
 
 - Bump min Gradle requirement to 9.1.0. ([#2016](https://github.com/GradleUp/shadow/pull/2016))
