@@ -11,8 +11,8 @@ import org.codehaus.plexus.util.xml.XmlStreamWriter
 import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * A resource processor that aggregates plexus `components.xml` files.
@@ -23,7 +23,10 @@ import org.gradle.api.tasks.Internal
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ComponentsXmlResourceTransformer : ResourceTransformer {
+public open class ComponentsXmlResourceTransformer
+@JvmOverloads
+constructor(patternSet: PatternSet = PatternSet().include(COMPONENTS_XML_PATH)) :
+  PatternFilterableResourceTransformer(patternSet) {
   private val components = mutableMapOf<String, Xpp3Dom>()
 
   @get:Internal
@@ -41,10 +44,6 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
       }
       return os.toByteArray()
     }
-
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return COMPONENTS_XML_PATH == element.path
-  }
 
   override fun transform(context: TransformerContext) {
     val newDom =

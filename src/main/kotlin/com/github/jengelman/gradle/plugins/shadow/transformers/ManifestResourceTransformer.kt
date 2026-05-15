@@ -10,12 +10,12 @@ import java.util.jar.JarFile
 import java.util.jar.Manifest
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * A resource processor that allows the arbitrary addition of attributes to the first MANIFEST.MF
@@ -29,9 +29,10 @@ import org.gradle.api.tasks.Input
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ManifestResourceTransformer
-@Inject
-constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
+public open class ManifestResourceTransformer(
+  final override val objectFactory: ObjectFactory,
+  patternSet: PatternSet,
+) : PatternFilterableResourceTransformer(patternSet) {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
@@ -40,9 +41,13 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   @get:Input
   public open val manifestEntries: MapProperty<String, JarAttribute> = objectFactory.mapProperty()
 
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    return JarFile.MANIFEST_NAME.equals(element.path, ignoreCase = true)
-  }
+  @Inject
+  public constructor(
+    objectFactory: ObjectFactory
+  ) : this(
+    objectFactory,
+    patternSet = PatternSet().apply { isCaseSensitive = false }.include(JarFile.MANIFEST_NAME),
+  )
 
   override fun transform(context: TransformerContext) {
     // We just want to take the first manifest we come across as that's our project's manifest. This

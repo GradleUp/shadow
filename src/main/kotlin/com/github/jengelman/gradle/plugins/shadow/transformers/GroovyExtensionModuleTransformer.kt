@@ -5,7 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.util.Properties
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.file.FileTreeElement
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Aggregate Apache Groovy extension modules descriptors.
@@ -27,14 +27,17 @@ import org.gradle.api.file.FileTreeElement
  * [org.apache.maven.plugins.shade.resource.GroovyResourceTransformer.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/resource/GroovyResourceTransformer.java).
  */
 @CacheableTransformer
-public open class GroovyExtensionModuleTransformer : ResourceTransformer {
+public open class GroovyExtensionModuleTransformer
+@JvmOverloads
+constructor(
+  patternSet: PatternSet =
+    PatternSet()
+      .include(
+        PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+        PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
+      )
+) : PatternFilterableResourceTransformer(patternSet) {
   private val module = Properties()
-
-  override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return path == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR ||
-      path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-  }
 
   override fun transform(context: TransformerContext) {
     val props = Properties()
