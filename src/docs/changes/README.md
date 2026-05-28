@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- Update jdependency to support Java 27. ([#2033](https://github.com/GradleUp/shadow/pull/2033))
+
 **Deprecated**
 
 - Deprecate `KnowsTask`, it will be removed in the next major release. ([#1957](https://github.com/GradleUp/shadow/pull/1957))
