@@ -9,7 +9,7 @@ Thank you for considering contributing to the Shadow Gradle plugin! This documen
 Shadow uses [Spotless](https://github.com/diffplug/spotless) to maintain consistent code formatting.
 
 - **Check code style**: `./gradlew spotlessCheck`
-- **Format code**: `./gradlew spotlessFormat`
+- **Format code**: `./gradlew spotlessApply`
 
 Please ensure your code is properly formatted before submitting a pull request.
 
@@ -62,7 +62,7 @@ When adding new features or public APIs:
 
 ### Before Submitting a Pull Request
 
-1. Run `./gradlew spotlessFormat` to format your code
+1. Run `./gradlew spotlessApply` to format your code
 2. Run `./gradlew spotlessCheck` to verify formatting
 3. Run all test suites: `./gradlew test documentTest functionalTest`
 4. Run `./gradlew checkKotlinAbi` to ensure API compatibility
@@ -70,4 +70,3 @@ When adding new features or public APIs:
 6. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 7. Ensure your commit messages are clear and descriptive
 8. Update the `Unreleased` section in [CHANGELOG](docs/changes/README.md) if applicable
-
