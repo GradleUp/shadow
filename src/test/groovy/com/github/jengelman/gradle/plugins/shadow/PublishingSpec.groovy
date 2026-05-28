@@ -168,6 +168,14 @@ class PublishingSpec extends PluginSpecification {
 
         file('b/build.gradle') << """
             $publishingBlock
+
+            publishing {
+               publications {
+                   maven(MavenPublication) {
+                       from components.java
+                   }
+               }
+            }
         """.stripMargin()
 
         file('b/src/main/resources/b.properties') << 'b'
