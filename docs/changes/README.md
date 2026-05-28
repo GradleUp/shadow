@@ -445,8 +445,10 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ## [8.3.11](https://github.com/GradleUp/shadow/releases/tag/8.3.11) - 2026-05-28
 
-> [!WARNING]
-> Only Gradle 9 support is being backported to this version. No additional features or crucial bug fixes will be included in the 8.x line. Please migrate to Shadow 9 as soon as possible.
+!!! warning
+
+    Only Gradle 9 support is being backported to this version. No additional features or crucial bug fixes will be
+    included in the 8.x line. Please migrate to Shadow 9 as soon as possible.
 
 **Changed**
 
