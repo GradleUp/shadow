@@ -2,6 +2,7 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.plugin.compatibility.compatibility
 
 plugins {
   groovy
@@ -25,8 +26,7 @@ gradlePlugin {
   vcsUrl = providers.gradleProperty("POM_URL")
 
   plugins {
-    create("shadowPlugin") {
-      id = "com.gradleup.shadow"
+    create("com.gradleup.shadow") {
       implementationClass = "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
       displayName = providers.gradleProperty("POM_NAME").get()
       description = providers.gradleProperty("POM_DESCRIPTION").get()
