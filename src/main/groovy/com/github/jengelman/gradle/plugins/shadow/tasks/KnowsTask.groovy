@@ -3,11 +3,13 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 import org.codehaus.groovy.reflection.ReflectionUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * @deprecated This task will be removed in the next major release.
  */
 @Deprecated
+@DisableCachingByDefault(because = "Deprecated compatibility task")
 class KnowsTask extends DefaultTask {
 
     public static final String NAME = "knows"
