@@ -5,7 +5,7 @@
 
 **Changed**
 
-- Update jdependency to support Java 27. ([#2033](https://github.com/GradleUp/shadow/pull/2033))
+- Update jdependency to support Java 27. ([#2040](https://github.com/GradleUp/shadow/pull/2040))
 
 **Deprecated**
 
