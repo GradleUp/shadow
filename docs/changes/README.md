@@ -1,6 +1,12 @@
 # Change Log
 
 
+## [9.4.2](https://github.com/GradleUp/shadow/releases/tag/9.4.2) - 2026-05-28
+
+### Changed
+
+- Update jdependency to support Java 27. ([#2033](https://github.com/GradleUp/shadow/pull/2033))
+
 ## [9.4.1](https://github.com/GradleUp/shadow/releases/tag/9.4.1) - 2026-03-27
 
 ### Changed
