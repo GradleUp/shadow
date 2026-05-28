@@ -9,7 +9,7 @@ import org.gradle.work.DisableCachingByDefault
  * @deprecated This task will be removed in the next major release.
  */
 @Deprecated
-@DisableCachingByDefault(because = "Deprecated compatibility task")
+@DisableCachingByDefault(because = "Not worth caching")
 class KnowsTask extends DefaultTask {
 
     public static final String NAME = "knows"
