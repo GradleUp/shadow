@@ -78,7 +78,7 @@ dependencies {
   implementation("org.codehaus.plexus:plexus-utils:4.0.2")
   implementation("org.codehaus.plexus:plexus-xml:4.1.1")
   implementation("org.apache.logging.log4j:log4j-core:2.25.3")
-  implementation("org.vafer:jdependency:2.15")
+  implementation("org.vafer:jdependency:2.16")
 
   testImplementation("org.spockframework:spock-core:2.4-groovy-4.0") {
     exclude(group = "org.codehaus.groovy")
