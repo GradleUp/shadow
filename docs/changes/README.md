@@ -443,6 +443,25 @@ If you used Shadow for merging service files, the following steps are recommende
 
 See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
+## [8.3.11](https://github.com/GradleUp/shadow/releases/tag/8.3.11) - 2026-05-28
+
+> [!WARNING]
+> Only Gradle 9 support is being backported to this version. No additional features or crucial bug fixes will be included in the 8.x line. Please migrate to Shadow 9 as soon as possible.
+
+**Changed**
+
+- Update jdependency to support Java 27. ([#2040](https://github.com/GradleUp/shadow/pull/2040))
+
+**Deprecated**
+
+- Deprecate `KnowsTask`, it will be removed in the next major release. ([#1957](https://github.com/GradleUp/shadow/pull/1957))
+
+**Fixed**
+
+- Fix compatibility with Isolated Projects. ([#1947](https://github.com/GradleUp/shadow/pull/1947))
+- Fix interaction with Gradle artifact transforms. ([#1949](https://github.com/GradleUp/shadow/pull/1949))
+- Fix `Log4j2PluginsCacheFileTransformer` not working for merging `Log4j2Plugins.dat` files. ([#1955](https://github.com/GradleUp/shadow/pull/1955))
+
 ## [8.3.10](https://github.com/GradleUp/shadow/releases/tag/8.3.10) - 2026-02-26
 
 **Changed**
