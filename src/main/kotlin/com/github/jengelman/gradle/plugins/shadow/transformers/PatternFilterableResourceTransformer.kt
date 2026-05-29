@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.specs.Spec
@@ -24,7 +25,7 @@ public abstract class PatternFilterableResourceTransformer(
   }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return patternSpec.isSatisfiedBy(element)
+    return patternSpec.isSatisfiedBy(element).also { flag -> checkDupStrategy(flag, element) }
   }
 
   @Input // Trigger task executions after includes changed.
