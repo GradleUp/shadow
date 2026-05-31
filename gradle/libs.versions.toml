@@ -16,7 +16,7 @@ kotlin-metadata = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.3"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.1.1"
-xmlunit = "org.xmlunit:xmlunit-legacy:2.11.0"
+xmlunit = "org.xmlunit:xmlunit-legacy:2.12.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
