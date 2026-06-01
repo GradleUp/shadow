@@ -9,7 +9,7 @@ merging can be configured using the [`configurations`][ShadowJar.configurations]
 
     ```kotlin
     tasks.shadowJar {
-      configurations = project.configurations.compileClasspath.map { listOf(it) }
+      configurations.setFrom(project.configurations.compileClasspath)
     }
     ```
 
@@ -17,7 +17,7 @@ merging can be configured using the [`configurations`][ShadowJar.configurations]
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      configurations = project.configurations.named('compileClasspath').map { [it] }
+      configurations.setFrom project.configurations.named('compileClasspath')
     }
     ```
 
@@ -27,7 +27,7 @@ This means any dependency declared in the `runtimeOnly` configuration would be *
 
 > Note the literal use of [`project.configurations`][Project.configurations] when setting the
 > [`configurations`][ShadowJar.configurations] attribute of a [`ShadowJar`][ShadowJar] task.
-> This is **required**. It may be tempting to specify `configurations = [configurations.compileClasspath]` but this will
+> This is **required**. It may be tempting to specify `configurations.setFrom(configurations.compileClasspath)` but this will
 > not have the intended effect, as `configurations.compile` will try to delegate to the
 > [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`
 
