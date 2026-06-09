@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.snippet
 
 import java.nio.file.Path
 import java.util.regex.Pattern
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.name
 import kotlin.io.path.readText
@@ -12,7 +11,6 @@ import kotlin.io.path.walk
 object CodeSnippetExtractor {
   private val docRoot = Path(System.getProperty("DOCS_DIR"))
 
-  @OptIn(ExperimentalPathApi::class)
   private val markdownPaths =
     docRoot.walk().filter { it.name.endsWith(".md", ignoreCase = true) }.toList()
 

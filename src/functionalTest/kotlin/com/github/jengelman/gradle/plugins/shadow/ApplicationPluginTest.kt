@@ -18,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.Path
 import java.util.zip.ZipFile
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
@@ -355,7 +354,6 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private companion object {
-    @OptIn(ExperimentalPathApi::class)
     fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> =
       walk()
         .filter { includeDirs || it.isRegularFile() }
