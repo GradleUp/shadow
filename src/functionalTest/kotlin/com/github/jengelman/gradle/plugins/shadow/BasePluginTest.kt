@@ -178,6 +178,7 @@ abstract class BasePluginTest {
       buildCache {
         $buildCacheBlock
       }
+      enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
       enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
       $endBlock
     """
