@@ -48,6 +48,7 @@ sealed class SnippetExecutable : Executable {
         }
         include ':api', ':main'
         rootProject.name = 'snippet'
+        enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
         enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
           .trimIndent()
