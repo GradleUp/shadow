@@ -22,7 +22,7 @@ val testGradleVersion: String by lazy {
 }
 
 // TODO: this could be inlined after bumping the min Gradle requirement to 9.6 or above.
-val enableNoExplicitLookupInParentProjects: String
+val enableNoImplicitLookupInParentProjects: String
   get() =
     when {
       GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.6.0") ->

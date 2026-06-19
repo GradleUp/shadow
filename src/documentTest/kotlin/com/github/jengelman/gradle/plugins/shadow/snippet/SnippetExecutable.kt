@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.snippet
 
 import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
-import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoExplicitLookupInParentProjects
+import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
@@ -49,7 +49,7 @@ sealed class SnippetExecutable : Executable {
         }
         include ':api', ':main'
         rootProject.name = 'snippet'
-        $enableNoExplicitLookupInParentProjects
+        $enableNoImplicitLookupInParentProjects
         enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
           .trimIndent()

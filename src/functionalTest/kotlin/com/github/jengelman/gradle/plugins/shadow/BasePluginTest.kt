@@ -11,7 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
 import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
-import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoExplicitLookupInParentProjects
+import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -179,7 +179,7 @@ abstract class BasePluginTest {
       buildCache {
         $buildCacheBlock
       }
-      $enableNoExplicitLookupInParentProjects
+      $enableNoImplicitLookupInParentProjects
       enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
       $endBlock
     """
