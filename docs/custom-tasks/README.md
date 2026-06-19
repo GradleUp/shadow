@@ -8,7 +8,7 @@ the output.
 === "Kotlin"
 
     ```kotlin
-    val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+    val testShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("testShadowJar") {
       description = "Create a combined JAR of project and test dependencies"
 
       archiveClassifier = "test"
@@ -64,7 +64,7 @@ source code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] 
 === "Kotlin"
 
     ```kotlin
-    tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+    val dependencyShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("dependencyShadowJar") {
       description = "Create a shadow JAR of all dependencies"
       archiveClassifier = "dep"
       configurations = project.configurations.runtimeClasspath.map { listOf(it) }

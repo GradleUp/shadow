@@ -126,7 +126,7 @@ configure the upstream.
 === "Kotlin"
 
     ```kotlin
-    val testJar by tasks.registering(Jar::class) {
+    val testJar = tasks.register<Jar>("testJar") {
       manifest {
         attributes["Description"] = "This is an application JAR"
       }

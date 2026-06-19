@@ -398,7 +398,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
       id("com.gradleup.shadow")
     }
 
-    val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+    val testShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("testShadowJar") {
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
