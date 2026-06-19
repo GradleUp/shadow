@@ -67,7 +67,7 @@ internal fun Project.addBuildScanCustomValues() {
   }
 }
 
-/** TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above. */
+// TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above.
 internal fun Configuration.extendsFromCompat(vararg superConfigs: Provider<out Configuration>) {
   if (GradleVersion.current() >= GradleVersion.version("9.4.0")) {
     @Suppress("UnstableApiUsage") extendsFrom(*superConfigs)
@@ -76,7 +76,7 @@ internal fun Configuration.extendsFromCompat(vararg superConfigs: Provider<out C
   }
 }
 
-/** TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above. */
+// TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above.
 internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
   outgoingConfiguration: NamedDomainObjectProvider<Configuration>,
   action: Action<in ConfigurationVariantDetails>,
@@ -89,7 +89,7 @@ internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
   }
 }
 
-/** TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above. */
+// TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above.
 internal fun Project.moveGradleApiIntoCompileOnly() {
   // gradleApi has been added into compileOnlyApi since Gradle 9.4.0.
   if (GradleVersion.current() >= GradleVersion.version("9.4.0")) return
