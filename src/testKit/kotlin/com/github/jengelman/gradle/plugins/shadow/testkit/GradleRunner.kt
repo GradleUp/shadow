@@ -7,6 +7,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 
 private val testKitDir by lazy {
   val gradleUserHome =
@@ -19,6 +20,15 @@ val testGradleVersion: String by lazy {
   System.getProperty("TEST_GRADLE_VERSION")
     ?: error("TEST_GRADLE_VERSION system property is not set.")
 }
+
+// TODO: this could be inlined after bumping the min Gradle requirement to 9.6 or above.
+val enableNoImplicitLookupInParentProjects: String
+  get() =
+    when {
+      GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.6.0") ->
+        "enableFeaturePreview 'NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS'"
+      else -> ""
+    }
 
 val commonGradleArgs =
   setOf(

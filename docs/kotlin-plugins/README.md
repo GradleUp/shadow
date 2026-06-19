@@ -86,12 +86,12 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
         mainClass = "myapp.MainKt"
       }
       sourceSets {
-        val commonMain by getting {
+        val commonMain = getByName("commonMain") {
           dependencies {
             implementation("io.ktor:ktor-client-core:$ktorVersion")
           }
         }
-        val jvmMain by getting {
+        val jvmMain = getByName("jvmMain") {
           dependencies {
             implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
           }
