@@ -15,12 +15,12 @@ import org.gradle.work.DisableCachingByDefault
 /**
  * Helper task to temporarily add to your build script to find resources in the classpath that were
  * identified as duplicates by
- * [com.github.jengelman.gradle.plugins.shadow.transformers.MergePropertiesResourceTransformer] or
+ * [com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer] or
  * [com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer].
  *
  * First, add the task to your build script:
  * ```kotlin
- * val findResources by tasks.registering(FindResourceInClasspath::class) {
+ * val findResources = tasks.register<FindResourceInClasspath>("findResources") {
  *   // add configurations to search for resources in dependency jars
  *   classpath.from(configurations.runtimeClasspath)
  *   // the patterns to search for (it is a Gradle PatternFilterable)
