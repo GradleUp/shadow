@@ -16,6 +16,10 @@
 - Bump min Gradle requirement to 9.2.0. ([#2057](https://github.com/GradleUp/shadow/pull/2057))
 - Remove `afterEvaluate` when adding variants. ([#2056](https://github.com/GradleUp/shadow/pull/2056))
 
+### Fixed
+
+- Fix the conflicts when using `afterEvaluate` with other plugins. ([#2055](https://github.com/GradleUp/shadow/pull/2055))
+
 ## [9.4.2](https://github.com/GradleUp/shadow/releases/tag/9.4.2) - 2026-05-28
 
 ### Changed
