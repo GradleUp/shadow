@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHADOW
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
-import com.github.jengelman.gradle.plugins.shadow.internal.addVariantsFromConfigurationCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.extendsFromCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.moveGradleApiIntoCompileOnly
@@ -16,6 +15,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.ConsumableConfiguration
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
@@ -24,6 +24,7 @@ import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin
@@ -110,21 +111,23 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    shadowComponent.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
+    @Suppress("UNCHECKED_CAST")
+    shadowComponent.addVariantsFromConfiguration(
+      shadowRuntimeElements as Provider<ConsumableConfiguration>
+    ) { variant ->
       variant.mapToMavenScope("runtime")
     }
-    // Must use afterEvaluate here as we need to track the changes of
-    // addShadowVariantIntoJavaComponent.
-    afterEvaluate {
-      if (shadow.addShadowVariantIntoJavaComponent.get()) {
-        logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
-      } else {
-        logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
-        return@afterEvaluate
-      }
-      components.named("java", AdhocComponentWithVariants::class.java) {
-        it.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
-          variant.mapToOptional()
+    components.named("java", AdhocComponentWithVariants::class.java) { component ->
+      @Suppress("UNCHECKED_CAST")
+      component.addVariantsFromConfiguration(
+        shadowRuntimeElements as Provider<ConsumableConfiguration>
+      ) { variant ->
+        variant.mapToOptional()
+        if (shadow.addShadowVariantIntoJavaComponent.get()) {
+          logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
+        } else {
+          logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
+          variant.skip()
         }
       }
     }
