@@ -129,18 +129,14 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     shadowComponent.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
-    // Must use afterEvaluate here as we need to track the changes of
-    // addShadowVariantIntoJavaComponent.
-    afterEvaluate {
-      if (shadow.addShadowVariantIntoJavaComponent.get()) {
-        logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
-      } else {
-        logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
-        return@afterEvaluate
-      }
-      components.named("java", AdhocComponentWithVariants::class.java) {
-        it.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
-          variant.mapToOptional()
+    components.named("java", AdhocComponentWithVariants::class.java) { component ->
+      component.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
+        variant.mapToOptional()
+        if (shadow.addShadowVariantIntoJavaComponent.get()) {
+          logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
+        } else {
+          logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
+          variant.skip()
         }
       }
     }
