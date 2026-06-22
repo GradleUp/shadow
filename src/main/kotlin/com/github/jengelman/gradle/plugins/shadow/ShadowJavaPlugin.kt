@@ -20,7 +20,7 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.attributes.java.TargetJvmVersion
+import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
@@ -49,62 +49,59 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   }
 
   protected open fun Project.configureConfigurations() {
-    val shadowConfiguration = configurations.shadow
-    configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
-      compileClasspath.extendsFromCompat(shadowConfiguration)
-    }
-    val shadowRuntimeElements =
-      configurations.register(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
-        it.extendsFromCompat(shadowConfiguration)
-        it.isCanBeConsumed = true
-        it.isCanBeResolved = false
-        it.attributes { attrs ->
-          attrs.attribute(
-            Usage.USAGE_ATTRIBUTE,
-            objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
-          )
-          attrs.attribute(
-            Category.CATEGORY_ATTRIBUTE,
-            objects.named(Category::class.java, Category.LIBRARY),
-          )
-          attrs.attribute(
-            LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
-            objects.named(LibraryElements::class.java, LibraryElements.JAR),
-          )
-          attrs.attributeProvider(
-            Bundling.BUNDLING_ATTRIBUTE,
-            shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
-          )
-          if (shadow.addTargetJvmVersionAttribute.get()) {
-            val compileClasspath = configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME).get()
-            val compileJvmVersion =
-              compileClasspath.attributes.getAttribute(
-                TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
-              )
-            val targetJvmVersion =
-              compileJvmVersion ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
-            if (targetJvmVersion != Int.MAX_VALUE) {
-              logger.info(
-                "Setting target JVM version to {} for {} configuration.",
-                targetJvmVersion,
-                SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-              )
-              attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
-            } else {
-              logger.info(
-                "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
-              )
-            }
+    val shadowConfig = configurations.shadow
+    val compileClasspathConfig =
+      configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
+        compileClasspath.extendsFromCompat(shadowConfig)
+      }
+    configurations.register(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) { shadowRuntimeElements ->
+      shadowRuntimeElements.extendsFromCompat(shadowConfig)
+      shadowRuntimeElements.isCanBeConsumed = true
+      shadowRuntimeElements.isCanBeResolved = false
+      shadowRuntimeElements.attributes { attrs ->
+        attrs.attribute(
+          Usage.USAGE_ATTRIBUTE,
+          objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
+        )
+        attrs.attribute(
+          Category.CATEGORY_ATTRIBUTE,
+          objects.named(Category::class.java, Category.LIBRARY),
+        )
+        attrs.attribute(
+          LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+          objects.named(LibraryElements::class.java, LibraryElements.JAR),
+        )
+        attrs.attributeProvider(
+          Bundling.BUNDLING_ATTRIBUTE,
+          shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
+        )
+        if (shadow.addTargetJvmVersionAttribute.get()) {
+          val compileJvmVersion =
+            compileClasspathConfig.get().attributes.getAttribute(TARGET_JVM_VERSION_ATTRIBUTE)
+          val targetJvmVersion =
+            compileJvmVersion ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
+          if (targetJvmVersion != Int.MAX_VALUE) {
+            logger.info(
+              "Setting target JVM version to {} for {} configuration.",
+              targetJvmVersion,
+              shadowRuntimeElements.name,
+            )
+            attrs.attribute(TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
           } else {
             logger.info(
-              "Skipping setting {} attribute for {} configuration.",
-              TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name,
-              SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+              "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
             )
           }
+        } else {
+          logger.info(
+            "Skipping setting {} attribute for {} configuration.",
+            TARGET_JVM_VERSION_ATTRIBUTE,
+            shadowRuntimeElements.name,
+          )
         }
-        it.outgoing.artifact(tasks.shadowJar)
       }
+      shadowRuntimeElements.outgoing.artifact(tasks.shadowJar)
+    }
   }
 
   protected open fun Project.configureComponents() {
