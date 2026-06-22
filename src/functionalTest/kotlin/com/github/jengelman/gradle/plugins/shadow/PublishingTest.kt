@@ -44,8 +44,6 @@ import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -59,12 +57,6 @@ class PublishingTest : BasePluginTest() {
     settingsScript.appendText("rootProject.name = 'maven'$lineSeparator")
   }
 
-  @DisabledOnOs(
-    OS.WINDOWS,
-    architectures = ["aarch64"],
-    disabledReason =
-      "Cannot use toolchain on Windows ARM64", // TODO: remove when min Gradle is bumped to 9.2+
-  )
   @Test
   fun publishShadowJarWithCorrectTargetJvm() {
     projectScript.appendText(
