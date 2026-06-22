@@ -2,13 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
-import org.gradle.api.Action
-import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ConsumableConfiguration
-import org.gradle.api.component.AdhocComponentWithVariants
-import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -73,19 +68,6 @@ internal fun Configuration.extendsFromCompat(vararg superConfigs: Provider<out C
     @Suppress("UnstableApiUsage") extendsFrom(*superConfigs)
   } else {
     extendsFrom(*superConfigs.map { it.get() }.toTypedArray())
-  }
-}
-
-// TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above.
-internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
-  outgoingConfiguration: NamedDomainObjectProvider<Configuration>,
-  action: Action<in ConfigurationVariantDetails>,
-) {
-  if (GradleVersion.current() >= GradleVersion.version("9.2")) {
-    @Suppress("UnstableApiUsage", "UNCHECKED_CAST")
-    addVariantsFromConfiguration(outgoingConfiguration as Provider<ConsumableConfiguration>, action)
-  } else {
-    addVariantsFromConfiguration(outgoingConfiguration.get(), action)
   }
 }
 
