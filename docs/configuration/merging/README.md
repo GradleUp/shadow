@@ -582,6 +582,38 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
     }
     ```
 
+## Finding Resources in the Classpath
+
+When dealing with resource merge conflicts, it can be helpful to find which dependencies contain the conflicting resources.
+Shadow provides a [`FindResourceInClasspath`][FindResourceInClasspath] helper task for this purpose.
+
+To scan for resources, register a [`FindResourceInClasspath`][FindResourceInClasspath] task in your build script and configure its `classpath` and the resource patterns to look for:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath>("findResources") {
+      classpath.from(configurations.runtimeClasspath)
+      include("META-INF/services/org.codehaus.groovy.runtime.ExtensionModule")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.register('findResources', com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath) {
+      classpath.from(configurations.runtimeClasspath)
+      include 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule'
+    }
+    ```
+
+You can then run the task to scan each entry on the classpath and print any matched resources to the console:
+
+```shell
+./gradlew findResources
+```
+
+
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
 [Jar.eachFile]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:eachFile(org.gradle.api.Action)
@@ -589,6 +621,7 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 [Jar.filesNotMatching]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:filesNotMatching(java.lang.Iterable,%20org.gradle.api.Action)
 [AppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/index.html
 [DuplicatesStrategy]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html
+[FindResourceInClasspath]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-find-resource-in-classpath/index.html
 [GroovyExtensionModuleTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-groovy-extension-module-transformer/index.html
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [Log4j2PluginsCacheFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-log4j2-plugins-cache-file-transformer/index.html
