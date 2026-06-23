@@ -19,10 +19,10 @@ minimizing the resulting shadowed JAR.
     }
     ```
 
-A dependency can be excluded from the minimization process, thereby forcing its inclusion the shadow JAR.
-This is useful when the dependency analyzer cannot find the usage of a class programmatically, for example if the class
-is loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of
-a `dependency` is interpreted as a regular expression.
+A dependency can be excluded from the minimization process, thereby forcing its inclusion the shadow JAR. This is useful
+when the dependency analyzer cannot find the usage of a class programmatically, for example if the class is loaded
+dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
+`dependency` is interpreted as a regular expression.
 
 === "Kotlin"
 
@@ -69,9 +69,8 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
     }
     ```
 
-> When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from 
+> When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from
 > minimization as well.
-
 
 
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html

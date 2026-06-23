@@ -9,7 +9,8 @@ should process a particular entry and apply any modifications before writing the
 **Important**: [`ResourceTransformer`][ResourceTransformer] follows a guaranteed processing order:
 
 1. **Project files first**: All files in projects are processed before any dependency files.
-2. **Dependency files second**: Files from configurations (runtime dependencies) or added via [`ShadowJar.from`][ShadowJar.from] are processed after project files.
+2. **Dependency files second**: Files from configurations (runtime dependencies) or added via [
+   `ShadowJar.from`][ShadowJar.from] are processed after project files.
 
 This ordering is crucial when merging configuration files where you want to preserve project-specific values while
 merging in additional data from dependencies.
@@ -86,24 +87,25 @@ steps to take:
 1. Set the default strategy to `INCLUDE` or `WARN`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Remove duplicate entries by
-    - overriding the default strategy for specific files to `EXCLUDE` or `FAIL` using
-    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
-    - or applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] for specific files
-    - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
-    - or mechanism similar.
+  - overriding the default strategy for specific files to `EXCLUDE` or `FAIL` using
+    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
+    functions
+  - or applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] for specific files
+  - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
+  - or mechanism similar.
 
 Alternatively, you can follow these steps:
 
 1. Set the default strategy to `EXCLUDE` or `FAIL`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Bypass the duplicate entries which should be handled by the [`ResourceTransformer`][ResourceTransformer]s using
-    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
-    to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
+   [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
+   functions to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 
 Optional steps:
 
-- Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
-  This can also ensure the regressions are caught in the future.
+- Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final
+  JAR. This can also ensure the regressions are caught in the future.
 - Use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
 
 Here are some examples:
@@ -298,16 +300,16 @@ can also be provided.
 
 ## Merging Service Descriptor Files
 
-Java libraries often contain service descriptors files in the `META-INF/services` directory of the JAR.
-A service descriptor typically contains a line delimited list of classes that are supported for a particular _service_.
-At runtime, this file is read and used to configure library or application behavior.
+Java libraries often contain service descriptors files in the `META-INF/services` directory of the JAR. A service
+descriptor typically contains a line delimited list of classes that are supported for a particular _service_. At
+runtime, this file is read and used to configure library or application behavior.
 
-Multiple dependencies may use the same service descriptor file name.
-In this case, it is generally desired to merge the content of each instance of the file into a single output file.
-The [`ServiceFileTransformer`][ServiceFileTransformer] class is used to perform this merging.
-By default, it will merge each copy of a file under `META-INF/services` into a single file in the output JAR.
-You can use either the short syntax method [`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax
-method [`transform`][ShadowJar.transform] to add the [`ServiceFileTransformer`][ServiceFileTransformer]:
+Multiple dependencies may use the same service descriptor file name. In this case, it is generally desired to merge the
+content of each instance of the file into a single output file. The [`ServiceFileTransformer`][ServiceFileTransformer]
+class is used to perform this merging. By default, it will merge each copy of a file under `META-INF/services` into a
+single file in the output JAR. You can use either the short syntax method [
+`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to add
+the [`ServiceFileTransformer`][ServiceFileTransformer]:
 
 === "Kotlin"
 
@@ -415,10 +417,10 @@ from merging.
 
 ## Merging Groovy Extension Modules
 
-Shadow provides a specific transformer for dealing with Groovy extension module files.
-This is due to their special syntax and how they need to be merged together.
-The [`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files.
-The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
+Shadow provides a specific transformer for dealing with Groovy extension module files. This is due to their special
+syntax and how they need to be merged together. The [
+`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files. The [
+`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
 
 === "Kotlin"
 
@@ -448,8 +450,8 @@ The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add thi
 
 [`Log4j2PluginsCacheFileTransformer`][Log4j2PluginsCacheFileTransformer] is a
 [`ResourceTransformer`][ResourceTransformer] that merges
-`META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat` plugin caches from all the jars
-containing Log4j 2.x Core components. It's a Gradle equivalent of
+`META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat` plugin caches from all the jars containing
+Log4j 2.x Core components. It's a Gradle equivalent of
 [Log4j Plugin Descriptor Transformer](https://logging.apache.org/log4j/transform/log4j-transform-maven-shade-plugin-extensions.html#log4j-plugin-cache-transformer).
 
 === "Kotlin"
@@ -470,10 +472,9 @@ containing Log4j 2.x Core components. It's a Gradle equivalent of
 
 ## Appending Text Files
 
-Generic text files can be appended together using the [`AppendingTransformer`][AppendingTransformer].
-Each file is appended using separators (defaults to `\n`) to separate content.
-The [`ShadowJar`][ShadowJar] task provides a short syntax method of [`append(String)`][ShadowJar.append] to configure
-this transformer.
+Generic text files can be appended together using the [`AppendingTransformer`][AppendingTransformer]. Each file is
+appended using separators (defaults to `\n`) to separate content. The [`ShadowJar`][ShadowJar] task provides a short
+syntax method of [`append(String)`][ShadowJar.append] to configure this transformer.
 
 === "Kotlin"
 
@@ -522,9 +523,9 @@ this transformer.
 ## Appending XML Files
 
 XML files require a special transformer for merging. The [`XmlAppendingTransformer`][XmlAppendingTransformer]
-reads each XML document and merges each root element into a single document.
-There is no short syntax method for the [`XmlAppendingTransformer`][XmlAppendingTransformer].
-It must be added using the [`transform`][ShadowJar.transform] methods.
+reads each XML document and merges each root element into a single document. There is no short syntax method for the [
+`XmlAppendingTransformer`][XmlAppendingTransformer]. It must be added using the [`transform`][ShadowJar.transform]
+methods.
 
 === "Kotlin"
 
@@ -584,10 +585,11 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 
 ## Finding Resources in the Classpath
 
-When dealing with resource merge conflicts, it can be helpful to find which dependencies contain the conflicting resources.
-Shadow provides a [`FindResourceInClasspath`][FindResourceInClasspath] helper task for this purpose.
+When dealing with resource merge conflicts, it can be helpful to find which dependencies contain the conflicting
+resources. Shadow provides a [`FindResourceInClasspath`][FindResourceInClasspath] helper task for this purpose.
 
-To scan for resources, register a [`FindResourceInClasspath`][FindResourceInClasspath] task in your build script and configure its `classpath` and the resource patterns to look for:
+To scan for resources, register a [`FindResourceInClasspath`][FindResourceInClasspath] task in your build script and
+configure its `classpath` and the resource patterns to look for:
 
 === "Kotlin"
 
@@ -612,8 +614,6 @@ You can then run the task to scan each entry on the classpath and print any matc
 ```shell
 ./gradlew findResources
 ```
-
-
 
 [AbstractCopyTask]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html
 [Jar.eachFile]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:eachFile(org.gradle.api.Action)

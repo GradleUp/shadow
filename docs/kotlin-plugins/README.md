@@ -1,8 +1,8 @@
 # Integrating with Kotlin Plugins
 
 Kotlin standard libraries (stdlib) are added by Kotlin plugins by default via `implementation` (`runtimeClasspath`),
-they will be bundled into the shadowed JARs automatically.
-If you don't need a standard library at all, you can add the following Gradle property to your gradle.properties file:
+they will be bundled into the shadowed JARs automatically. If you don't need a standard library at all, you can add the
+following Gradle property to your gradle.properties file:
 
 ```properties
 kotlin.stdlib.default.dependency=false
@@ -60,8 +60,8 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     }
     ```
 
-You can mix the Kotlin JVM plugin with `java-gradle-plugin`, `application`, and other Java plugins,
-easily organize your build logic for [Publishing Libraries](../publishing/README.md),
+You can mix the Kotlin JVM plugin with `java-gradle-plugin`, `application`, and other Java plugins, easily organize your
+build logic for [Publishing Libraries](../publishing/README.md),
 [Running Applications](../application-plugin/README.md), and so on.
 
 ## For Kotlin Multiplatform Plugin
@@ -143,7 +143,5 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       }
     }
     ```
-
-
 
 [org.jetbrains.kotlin.multiplatform]: https://kotlinlang.org/docs/multiplatform-intro.html

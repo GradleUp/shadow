@@ -3,9 +3,8 @@
 ## Publishing with Maven-Publish Plugin
 
 The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle's
-[`maven-publish`][maven-publish] plugin.
-The plugin provides the `shadow` component to configure the publication with the necessary
-artifact and dependencies in the POM file.
+[`maven-publish`][maven-publish] plugin. The plugin provides the `shadow` component to configure the publication with
+the necessary artifact and dependencies in the POM file.
 
 === "Kotlin"
 
@@ -127,9 +126,9 @@ you can disable this by setting the `addTargetJvmVersionAttribute` property in t
     }
     ```
 
-The BUNDLING attribute (`org.gradle.dependency.bundling`) of the shadowed variant is set to `shadowed` by default,
-it is useful for consumers to distinguish between normal and shadowed dependencies. You can override this attribute by
-setting the `bundlingAttribute` property in the `shadow` extension:
+The BUNDLING attribute (`org.gradle.dependency.bundling`) of the shadowed variant is set to `shadowed` by default, it is
+useful for consumers to distinguish between normal and shadowed dependencies. You can override this attribute by setting
+the `bundlingAttribute` property in the `shadow` extension:
 
 === "Kotlin"
 
@@ -151,22 +150,18 @@ setting the `bundlingAttribute` property in the `shadow` extension:
 
 ## Shadow Configuration and Publishing
 
-The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify
-runtime dependencies that are **not** merged into the final JAR file.
-When configuring publishing with the Shadow plugin, the dependencies in the `shadow`
-configuration, are translated to become `RUNTIME` scoped dependencies of the
-published artifact.
+The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify runtime dependencies that are
+**not** merged into the final JAR file. When configuring publishing with the Shadow plugin, the dependencies in the
+`shadow`
+configuration, are translated to become `RUNTIME` scoped dependencies of the published artifact.
 
-No other dependencies are automatically configured for inclusion in the POM file.
-For example, excluded dependencies are **not** automatically added to the POM file or
-if the configuration for merging are modified by specifying
-`shadowJar.configurations = [configurations.myConfiguration]`, there is no automatic
-configuration of the POM file.
+No other dependencies are automatically configured for inclusion in the POM file. For example, excluded dependencies are
+**not** automatically added to the POM file or if the configuration for merging are modified by specifying
+`shadowJar.configurations = [configurations.myConfiguration]`, there is no automatic configuration of the POM file.
 
-This automatic configuration occurs _only_ when using the above methods for
-configuring publishing. If this behavior is not desirable, then publishing **must**
+This automatic configuration occurs _only_ when using the above methods for configuring publishing. If this behavior is
+not desirable, then publishing **must**
 be manually configured.
-
 
 === "Kotlin"
 
@@ -254,8 +249,8 @@ be manually configured.
 
 ## Publishing the Shadowed JAR instead of the Original JAR
 
-You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
-the `archiveClassifier` of the shadowed JAR like the following:
+You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming the
+`archiveClassifier` of the shadowed JAR like the following:
 
 === "Kotlin"
 
@@ -304,8 +299,8 @@ the `archiveClassifier` of the shadowed JAR like the following:
     ```
 
 Because the default `archiveClassifier` of [`Jar`][Jar] is `""` (empty), setting the `archiveClassifier` of
-[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases.
-If you don't need the standard JAR, you can disable the `jar` task like:
+[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases. If
+you don't need the standard JAR, you can disable the `jar` task like:
 
 === "Kotlin"
 
@@ -343,10 +338,9 @@ Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
 
 ## Publishing the Shadowed Gradle Plugins
 
-The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
-Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be
-automatically configured to publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the
-plugin. See the
+The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0. Starting with this
+version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be automatically configured to
+publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the plugin. See the
 [Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies)
 for details. The only thing you need to do from the Shadow side is to empty the `archiveClassifier` like:
 
@@ -524,7 +518,6 @@ customizable properties listed in [Configuring Output Name](../configuration/REA
 
 We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will
 be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
-
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html

@@ -1,7 +1,7 @@
 # Configuring Shadow
 
-The [`ShadowJar`][ShadowJar] task type extends from Gradle's [`Jar`][Jar] type.
-This means that all attributes and methods available on [`Jar`][Jar] are also available on [`ShadowJar`][ShadowJar].
+The [`ShadowJar`][ShadowJar] task type extends from Gradle's [`Jar`][Jar] type. This means that all attributes and
+methods available on [`Jar`][Jar] are also available on [`ShadowJar`][ShadowJar].
 
 ## Configuring Output Name
 
@@ -47,22 +47,19 @@ This will result in the output file being named `myApp-all.jar` instead of `myAp
 
 ## Configuring the Runtime Classpath
 
-Each Java JAR file contains a manifest file that provides metadata about the contents of the JAR file itself.
-When using a shadowed JAR file as an executable JAR, it is assumed that all necessary runtime classes are contained
-within the JAR itself.
-There may be situations where the desire is to **not** bundle select dependencies into the shadowed JAR file, but
-they are still required for runtime execution.
+Each Java JAR file contains a manifest file that provides metadata about the contents of the JAR file itself. When using
+a shadowed JAR file as an executable JAR, it is assumed that all necessary runtime classes are contained within the JAR
+itself. There may be situations where the desire is to **not** bundle select dependencies into the shadowed JAR file,
+but they are still required for runtime execution.
 
-In these scenarios, Shadow creates a `shadow` configuration to declare these dependencies.
-Dependencies added to the `shadow` configuration are **not** bundled into the output JAR.
-Think of `configurations.shadow` as unmerged, runtime dependencies.
-The integration with the [`maven-publish`][maven-publish] plugin will automatically configure dependencies added
-to `configurations.shadow` as `RUNTIME` scope dependencies in the resulting POM file.
+In these scenarios, Shadow creates a `shadow` configuration to declare these dependencies. Dependencies added to the
+`shadow` configuration are **not** bundled into the output JAR. Think of `configurations.shadow` as unmerged, runtime
+dependencies. The integration with the [`maven-publish`][maven-publish] plugin will automatically configure dependencies
+added to `configurations.shadow` as `RUNTIME` scope dependencies in the resulting POM file.
 
 Additionally, Shadow automatically configures the manifest of the [`ShadowJar`][ShadowJar] task to contain a
-`Class-Path` entry in the JAR manifest.
-The value of the `Class-Path` entry is the name of all dependencies resolved in the `shadow` configuration for the
-project.
+`Class-Path` entry in the JAR manifest. The value of the `Class-Path` entry is the name of all dependencies resolved in
+the `shadow` configuration for the project.
 
 === "Kotlin"
 
@@ -91,8 +88,8 @@ When deploying a shadowed JAR as an execution JAR, it is important to note that 
 
 ## Configuring the JAR Manifest
 
-The [`ShadowJar`][ShadowJar] manifest is configured in a number of ways. First, the manifest for the `shadowJar` task
-is configured to __inherit__ from the manifest of the standard `jar` task.
+The [`ShadowJar`][ShadowJar] manifest is configured in a number of ways. First, the manifest for the `shadowJar` task is
+configured to __inherit__ from the manifest of the standard `jar` task.
 
 === "Kotlin"
 
@@ -153,8 +150,8 @@ configure the upstream.
 
 ## Adding Multi-Release Manifest Attribute
 
-The [`ShadowJar`][ShadowJar] task can automatically add the `Multi-Release` attribute to the JAR manifest if any of
-the included dependencies contain this attribute. This is controlled by the `addMultiReleaseAttribute` property.
+The [`ShadowJar`][ShadowJar] task can automatically add the `Multi-Release` attribute to the JAR manifest if any of the
+included dependencies contain this attribute. This is controlled by the `addMultiReleaseAttribute` property.
 
 By default, `addMultiReleaseAttribute` is set to `true`. When enabled, Shadow will scan all dependencies being merged
 into the shadow JAR. If any dependency JAR has the `Multi-Release` manifest attribute set to `true`, Shadow will add
@@ -178,8 +175,8 @@ You can disable this behavior by setting `addMultiReleaseAttribute` to `false`:
     }
     ```
 
-This is useful if you want to control the presence of the `Multi-Release` attribute manually or avoid inheriting it
-from dependencies.
+This is useful if you want to control the presence of the `Multi-Release` attribute manually or avoid inheriting it from
+dependencies.
 
 ## Adding Extra Files
 
@@ -208,7 +205,8 @@ method can be used to add extra files.
     }
     ```
 
-See also [Embedding Local Jar Files Into Your Shadowed Jar](dependencies/README.md#embedding-local-jar-files-into-your-shadowed-jar).
+See
+also [Embedding Local Jar Files Into Your Shadowed Jar](dependencies/README.md#embedding-local-jar-files-into-your-shadowed-jar).
 
 
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)

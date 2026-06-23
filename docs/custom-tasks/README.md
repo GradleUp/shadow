@@ -1,9 +1,9 @@
 # Creating a Custom ShadowJar Task
 
-The built in [`ShadowJar`][ShadowJar] task only provides an output for the `main` source set of the project.
-It is possible to add arbitrary [`ShadowJar`][ShadowJar] tasks to a project. When doing so, ensure that the
-[`configurations`][ShadowJar.configurations] property is specified to inform Shadow which dependencies to merge into
-the output.
+The built in [`ShadowJar`][ShadowJar] task only provides an output for the `main` source set of the project. It is
+possible to add arbitrary [`ShadowJar`][ShadowJar] tasks to a project. When doing so, ensure that the
+[`configurations`][ShadowJar.configurations] property is specified to inform Shadow which dependencies to merge into the
+output.
 
 === "Kotlin"
 
@@ -57,8 +57,8 @@ The code snippet above will generate a shadowed JAR containing both the `main` a
 
 ## Creating a Dependencies-Only Shadow JAR
 
-It is also possible to create a shadow JAR that contains *only* the dependencies and none of the project's own
-source code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task and configuring the
+It is also possible to create a shadow JAR that contains *only* the dependencies and none of the project's own source
+code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task and configuring the
 [`configurations`][ShadowJar.configurations] property, but **not** adding any project sources with `from(...)`.
 
 === "Kotlin"
