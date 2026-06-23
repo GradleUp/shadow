@@ -17,7 +17,7 @@ internal fun ResourceTransformer.checkDupStrategy(
       val logger = Logging.getLogger(this::class.java)
       logger.warn(
         """
-          ${element.path}' is matched by ${this::class.qualifiedName} (a merging transformer) but its DuplicatesStrategy is ${element.duplicatesStrategy} — duplicates may be silently dropped before merging.
+          '${element.path}' is matched by ${this::class.qualifiedName} but its DuplicatesStrategy is ${element.duplicatesStrategy} — duplicates may be silently dropped before the transformer processes them.
           Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
           See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
         """

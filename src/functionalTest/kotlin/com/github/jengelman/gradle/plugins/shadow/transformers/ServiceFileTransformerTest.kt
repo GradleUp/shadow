@@ -227,8 +227,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     if (strategy == EXCLUDE) {
       assertThat(result.output)
         .contains(
-          "META-INF/services/com.acme.Foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer (a merging transformer) but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before merging.",
-          "META-INF/services/org.apache.maven.Shade' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer (a merging transformer) but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before merging.",
+          "'META-INF/services/com.acme.Foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.",
+          "'META-INF/services/org.apache.maven.Shade' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.",
         )
     }
 
