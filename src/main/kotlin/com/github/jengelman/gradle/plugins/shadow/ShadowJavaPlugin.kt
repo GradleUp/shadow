@@ -108,14 +108,14 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "UnstableApiUsage")
     shadowComponent.addVariantsFromConfiguration(
       shadowRuntimeElements as Provider<ConsumableConfiguration>
     ) { variant ->
       variant.mapToMavenScope("runtime")
     }
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
-      @Suppress("UNCHECKED_CAST")
+      @Suppress("UNCHECKED_CAST", "UnstableApiUsage")
       component.addVariantsFromConfiguration(
         shadowRuntimeElements as Provider<ConsumableConfiguration>
       ) { variant ->
