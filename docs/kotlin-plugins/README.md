@@ -43,7 +43,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     }
 
     dependencies {
-      implementation("io.ktor:ktor-client-okhttp:latest")
+      implementation("io.ktor:ktor-client-okhttp:3.1.0")
     }
     ```
 
@@ -56,7 +56,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     }
 
     dependencies {
-      implementation 'io.ktor:ktor-client-okhttp:latest'
+      implementation 'io.ktor:ktor-client-okhttp:3.1.0'
     }
     ```
 
@@ -77,6 +77,8 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       id("com.gradleup.shadow")
     }
 
+    val ktorVersion = "3.1.0"
+
     kotlin {
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`.
@@ -85,12 +87,12 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       sourceSets {
         commonMain {
           dependencies {
-            implementation("io.ktor:ktor-client-core:latest")
+            implementation("io.ktor:ktor-client-core:$ktorVersion")
           }
         }
         jvmMain {
           dependencies {
-            implementation("io.ktor:ktor-client-okhttp:latest")
+            implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
           }
         }
       }
@@ -113,6 +115,8 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       id 'com.gradleup.shadow'
     }
 
+    def ktorVersion = "3.1.0"
+
     kotlin {
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`.
@@ -121,12 +125,12 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       sourceSets {
         commonMain {
           dependencies {
-            implementation "io.ktor:ktor-client-core:latest"
+            implementation "io.ktor:ktor-client-core:$ktorVersion"
           }
         }
         jvmMain {
           dependencies {
-            implementation "io.ktor:ktor-client-okhttp:latest"
+            implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
           }
         }
       }

@@ -177,14 +177,15 @@ be manually configured.
       id("com.gradleup.shadow")
     }
 
+    val retrofitVersion = "2.12.0"
     dependencies {
       // This will be bundled in the shadowed JAR and not declared in the POM.
-      implementation("com.squareup.retrofit2:retrofit:latest")
+      implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
       // file's `Class-Path` entry, and also in the POM file.
-      shadow("com.squareup.retrofit2:converter-java8:latest")
+      shadow("com.squareup.retrofit2:converter-java8:$retrofitVersion")
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
-      compileOnly("com.squareup.retrofit2:converter-scalars:latest")
+      compileOnly("com.squareup.retrofit2:converter-scalars:$retrofitVersion")
     }
 
     publishing {
@@ -218,14 +219,15 @@ be manually configured.
       id 'com.gradleup.shadow'
     }
 
+    def retrofitVersion = '2.12.0'
     dependencies {
       // This will be bundled in the shadowed JAR and not declared in the POM.
-      implementation "com.squareup.retrofit2:retrofit:latest"
+      implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
       // file's `Class-Path` entry, and also in the POM file.
-      shadow "com.squareup.retrofit2:converter-java8:latest"
+      shadow "com.squareup.retrofit2:converter-java8:$retrofitVersion"
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
-      compileOnly "com.squareup.retrofit2:converter-scalars:latest"
+      compileOnly "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     }
 
     publishing {
