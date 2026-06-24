@@ -27,7 +27,7 @@ pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.r
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
-ktfmt = "com.facebook:ktfmt:0.63"
+ktfmt = "com.facebook:ktfmt:0.64"
 
 junit-bom = "org.junit:junit-bom:6.1.0"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
