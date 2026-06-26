@@ -1,7 +1,7 @@
 # Change Log
 
 
-## [9.4.3](https://github.com/GradleUp/shadow/releases/tag/9.4.3) - 2026-05-28
+## [9.4.3](https://github.com/GradleUp/shadow/releases/tag/9.4.3) - 2026-06-26
 
 ### Changed
 
