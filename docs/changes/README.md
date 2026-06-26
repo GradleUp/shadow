@@ -1,6 +1,12 @@
 # Change Log
 
 
+## [9.4.3](https://github.com/GradleUp/shadow/releases/tag/9.4.3) - 2026-05-28
+
+### Changed
+
+- Update dependencies for resolving CVEs. ([#2069](https://github.com/GradleUp/shadow/pull/2069))
+
 ## [9.4.2](https://github.com/GradleUp/shadow/releases/tag/9.4.2) - 2026-05-28
 
 ### Changed
