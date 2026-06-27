@@ -22,6 +22,12 @@
 
 - Fix the conflicts when using `afterEvaluate` with other plugins. ([#2055](https://github.com/GradleUp/shadow/pull/2055))
 
+## [9.4.3](https://github.com/GradleUp/shadow/releases/tag/9.4.3) - 2026-06-26
+
+### Changed
+
+- Update dependencies for resolving CVEs. ([#2069](https://github.com/GradleUp/shadow/pull/2069))
+
 ## [9.4.2](https://github.com/GradleUp/shadow/releases/tag/9.4.2) - 2026-05-28
 
 ### Changed

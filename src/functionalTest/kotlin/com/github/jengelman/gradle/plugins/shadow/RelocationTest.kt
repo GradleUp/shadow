@@ -49,20 +49,19 @@ class RelocationTest : BasePluginTest() {
         .trimIndent()
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
-    val relocatedEntries =
-      buildSet {
-          addAll(
-            junitEntries
-              .map { "$entryPrefix/$it" }
-              .filterNot { it.startsWith("$entryPrefix/META-INF/") }
-          )
-          var parent = entryPrefix
-          while (parent.isNotEmpty()) {
-            add("$parent/")
-            parent = parent.substringBeforeLast('/', "")
-          }
-        }
-        .toTypedArray()
+    val relocatedEntries = buildSet {
+      addAll(
+        junitEntries
+          .map { "$entryPrefix/$it" }
+          .filterNot { it.startsWith("$entryPrefix/META-INF/") }
+      )
+      var parent = entryPrefix
+      while (parent.isNotEmpty()) {
+        add("$parent/")
+        parent = parent.substringBeforeLast('/', "")
+      }
+    }
+      .toTypedArray()
 
     val result = runWithSuccess(shadowJarPath, infoArgument)
 
