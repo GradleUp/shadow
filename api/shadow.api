@@ -156,6 +156,7 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)V
+	public abstract fun getAddExcludedIntoShadowConfiguration ()Lorg/gradle/api/provider/Property;
 	public abstract fun include (Lorg/gradle/api/specs/Spec;)V
 	public abstract fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
@@ -167,6 +168,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/Dependenc
 	public synthetic fun <init> (Lorg/gradle/api/Project;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public fun exclude (Lorg/gradle/api/specs/Spec;)V
+	public fun getAddExcludedIntoShadowConfiguration ()Lorg/gradle/api/provider/Property;
 	protected final fun getExcludeSpecs ()Ljava/util/List;
 	protected final fun getIncludeSpecs ()Ljava/util/List;
 	public fun include (Lorg/gradle/api/specs/Spec;)V

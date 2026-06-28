@@ -602,6 +602,33 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/265")
+  @Test
+  fun addExcludedDependencyIntoShadowConfiguration() {
+    projectScript.appendText(
+      """
+        dependencies {
+          shadow 'my:a:1.0'
+          implementation 'my:b:1.0'
+        }
+        $shadowJarTask {
+          dependencies {
+            addExcludedIntoShadowConfiguration = true
+            exclude(dependency('my:b:1.0'))
+          }
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*manifestEntries)
+      getMainAttr(classPathAttributeKey).isEqualTo("b-1.0.jar a-1.0.jar")
+    }
+  }
+
   @Issue("https://github.com/GradleUp/shadow/issues/203")
   @ParameterizedTest
   @EnumSource(ZipEntryCompression::class)

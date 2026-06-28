@@ -1,5 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.internal.property
 import java.io.Serializable
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -8,11 +10,22 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.Input
 
 // DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
 public interface DependencyFilter : Serializable {
+  /**
+   * When `true`, excluded dependencies will be added to the `shadow` configuration. This is useful
+   * when you want to exclude a dependency from the shadowed JAR, but still want it to be available
+   * at the `Class-Path` manifest attribute.
+   *
+   * Default is `false`.
+   */
+  @get:Input public val addExcludedIntoShadowConfiguration: Property<Boolean>
+
   /** Resolve a [configuration] against the [include]/[exclude] rules in the filter. */
   public fun resolve(configuration: Configuration): FileCollection
 
@@ -39,6 +52,9 @@ public interface DependencyFilter : Serializable {
     @Transient protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
     @Transient protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
   ) : DependencyFilter {
+    @Transient
+    override val addExcludedIntoShadowConfiguration: Property<Boolean> =
+      project.objects.property(false)
 
     protected abstract fun resolve(
       dependencies: Set<ResolvedDependency>,
@@ -57,7 +73,13 @@ public interface DependencyFilter : Serializable {
               includedDependencies = includes,
               excludedDependencies = excludes,
             )
-            excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }
+            val excluded = excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }
+            if (addExcludedIntoShadowConfiguration.get()) {
+              project.configurations.shadow.configure { shadowConfig ->
+                shadowConfig.plus(project.files(excluded))
+              }
+            }
+            excluded
           }
         )
     }
