@@ -47,18 +47,14 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       }
     artifacts.add(configurations.shadow.name, taskProvider)
 
-    val excludedFiles =
-      files(
-        provider {
-          val task = taskProvider.get()
-          val filter = task.dependencyFilter.get()
-          if (filter.addExcludedIntoShadowConfiguration.getOrElse(false)) {
-            filter.resolveExcluded(task.configurations.get())
-          } else {
-            files()
-          }
-        }
-      )
+    val excludedFiles = taskProvider.map { task ->
+      val filter = task.dependencyFilter.get()
+      if (filter.addExcludedIntoShadowConfiguration.get()) {
+        filter.resolveExcluded(task.configurations.get())
+      } else {
+        files()
+      }
+    }
     dependencies.add(configurations.shadow.name, excludedFiles)
   }
 
