@@ -46,6 +46,20 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         task.configurations.convention(provider { listOf(runtimeConfiguration) })
       }
     artifacts.add(configurations.shadow.name, taskProvider)
+
+    val excludedFiles =
+      files(
+        provider {
+          val task = taskProvider.get()
+          val filter = task.dependencyFilter.get()
+          if (filter.addExcludedIntoShadowConfiguration.getOrElse(false)) {
+            filter.resolveExcluded(task.configurations.get())
+          } else {
+            files()
+          }
+        }
+      )
+    dependencies.add(configurations.shadow.name, excludedFiles)
   }
 
   protected open fun Project.configureConfigurations() {

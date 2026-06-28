@@ -161,6 +161,8 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun project (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
 	public abstract fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
+	public abstract fun resolveExcluded (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
+	public abstract fun resolveExcluded (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter$AbstractDependencyFilter : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
@@ -177,6 +179,8 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/Dependenc
 	public fun resolve (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
 	protected abstract fun resolve (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
 	public fun resolve (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
+	public fun resolveExcluded (Ljava/util/Collection;)Lorg/gradle/api/file/FileCollection;
+	public fun resolveExcluded (Lorg/gradle/api/artifacts/Configuration;)Lorg/gradle/api/file/FileCollection;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/FindResourceInClasspath : org/gradle/api/DefaultTask, org/gradle/api/tasks/util/PatternFilterable {

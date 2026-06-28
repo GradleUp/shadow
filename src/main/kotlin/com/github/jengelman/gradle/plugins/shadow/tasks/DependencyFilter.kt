@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import java.io.Serializable
 import org.gradle.api.Project
@@ -35,6 +34,18 @@ public interface DependencyFilter : Serializable {
    */
   public fun resolve(configurations: Collection<Configuration>): FileCollection
 
+  /**
+   * Resolve the excluded files of a [configuration] against the [include]/[exclude] rules in the
+   * filter.
+   */
+  public fun resolveExcluded(configuration: Configuration): FileCollection
+
+  /**
+   * Resolve the excluded files of all [configurations] against the [include]/[exclude] rules in the
+   * filter and combine the results.
+   */
+  public fun resolveExcluded(configurations: Collection<Configuration>): FileCollection
+
   /** Exclude dependencies that match the provided [spec]. */
   public fun exclude(spec: Spec<ResolvedDependency>)
 
@@ -63,30 +74,33 @@ public interface DependencyFilter : Serializable {
     )
 
     override fun resolve(configuration: Configuration): FileCollection {
-      return configuration -
-        project.files(
-          project.provider {
-            val includes = mutableSetOf<ResolvedDependency>()
-            val excludes = mutableSetOf<ResolvedDependency>()
-            resolve(
-              dependencies = configuration.resolvedConfiguration.firstLevelModuleDependencies,
-              includedDependencies = includes,
-              excludedDependencies = excludes,
-            )
-            val excluded = excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }
-            if (addExcludedIntoShadowConfiguration.get()) {
-              project.configurations.shadow.configure { shadowConfig ->
-                shadowConfig.plus(project.files(excluded))
-              }
-            }
-            excluded
-          }
-        )
+      return configuration - resolveExcluded(configuration)
     }
 
     override fun resolve(configurations: Collection<Configuration>): FileCollection {
       return configurations
         .map { resolve(it) }
+        .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
+    }
+
+    override fun resolveExcluded(configuration: Configuration): FileCollection {
+      return project.files(
+        project.provider {
+          val includes = mutableSetOf<ResolvedDependency>()
+          val excludes = mutableSetOf<ResolvedDependency>()
+          resolve(
+            dependencies = configuration.resolvedConfiguration.firstLevelModuleDependencies,
+            includedDependencies = includes,
+            excludedDependencies = excludes,
+          )
+          excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }
+        }
+      )
+    }
+
+    override fun resolveExcluded(configurations: Collection<Configuration>): FileCollection {
+      return configurations
+        .map { resolveExcluded(it) }
         .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
     }
 
