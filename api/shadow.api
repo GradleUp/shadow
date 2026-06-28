@@ -276,11 +276,13 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicen
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAddHeader ()Lorg/gradle/api/provider/Property;
 	public fun getCharsetName ()Lorg/gradle/api/provider/Property;
 	public fun getCopyright ()Lorg/gradle/api/provider/Property;
@@ -323,6 +325,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsX
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -364,6 +367,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExten
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -388,6 +392,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2Plugi
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
@@ -397,6 +402,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
 	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAttributes ()Lorg/gradle/api/provider/SetProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun hasTransformedResource ()Z
@@ -408,6 +414,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
 	public fun attributes (Ljava/util/Map;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
@@ -419,6 +426,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 public class com/github/jengelman/gradle/plugins/shadow/transformers/MergeLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getArtifactLicense ()Lorg/gradle/api/file/RegularFileProperty;
 	public fun getArtifactLicenseSpdxId ()Lorg/gradle/api/provider/Property;
 	public fun getFirstSeparator ()Lorg/gradle/api/provider/Property;
@@ -518,6 +526,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getPath ()Ljava/lang/String;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V

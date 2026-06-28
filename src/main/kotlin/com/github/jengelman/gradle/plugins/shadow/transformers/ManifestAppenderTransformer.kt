@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.ByteArrayOutputStream
@@ -7,6 +8,7 @@ import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
@@ -39,6 +41,10 @@ public open class ManifestAppenderTransformer(
     objectFactory,
     patternSet = PatternSet().apply { isCaseSensitive = false }.include(MANIFEST_NAME),
   )
+
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+  }
 
   override fun transform(context: TransformerContext) {
     if (manifestContents.isEmpty()) {

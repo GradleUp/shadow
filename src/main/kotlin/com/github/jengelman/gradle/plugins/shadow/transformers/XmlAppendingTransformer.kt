@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.IOException
@@ -38,7 +39,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   @get:Input public open val resource: Property<String> = objectFactory.property("")
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.get().equals(element.path, ignoreCase = true)
+    return resource.get().equals(element.path, ignoreCase = true).also { flag ->
+      checkDupStrategy(flag, element)
+    }
   }
 
   override fun transform(context: TransformerContext) {

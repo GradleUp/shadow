@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -137,7 +138,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
       path in paths -> true
       paths.any { it.toRegex().containsMatchIn(path) } -> true
       else -> mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
-    }
+    }.also { checkDupStrategy(it, element) }
   }
 
   override fun transform(context: TransformerContext) {

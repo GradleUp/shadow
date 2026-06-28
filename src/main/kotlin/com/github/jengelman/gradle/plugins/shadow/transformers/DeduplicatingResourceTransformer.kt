@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
 import java.io.File
 import javax.inject.Inject
@@ -66,8 +67,10 @@ public open class DeduplicatingResourceTransformer(
     val file = element.file
     val hash = file.sha256Hex()
 
-    val pathInfos =
-      sources.computeIfAbsent(element.path) { PathInfos(patternSpec.isSatisfiedBy(element)) }
+    val flag = patternSpec.isSatisfiedBy(element)
+    checkDupStrategy(flag, element)
+
+    val pathInfos = sources.computeIfAbsent(element.path) { PathInfos(flag) }
     val retainInOutput = pathInfos.addFile(hash, file)
 
     return !retainInOutput
