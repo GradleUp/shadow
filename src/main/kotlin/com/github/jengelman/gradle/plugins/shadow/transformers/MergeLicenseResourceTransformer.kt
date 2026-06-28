@@ -1,11 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.LinkedHashSet
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -99,6 +101,10 @@ public open class MergeLicenseResourceTransformer(
         )
       },
   )
+
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+  }
 
   override fun transform(context: TransformerContext) {
     transformInternal(context.inputStream.readAllBytes())

@@ -1,5 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.util.PatternSet
 
 /**
@@ -19,6 +21,10 @@ constructor(
       .apply { isCaseSensitive = false }
       .include(LICENSE_PATH, LICENSE_TXT_PATH, LICENSE_MD_PATH)
 ) : PatternFilterableResourceTransformer(patternSet = patternSet) {
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+  }
+
   private companion object {
     private const val LICENSE_PATH = "META-INF/LICENSE"
     private const val LICENSE_TXT_PATH = "META-INF/LICENSE.txt"

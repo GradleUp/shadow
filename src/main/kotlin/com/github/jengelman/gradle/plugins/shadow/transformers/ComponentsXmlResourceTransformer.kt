@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.BufferedInputStream
@@ -11,6 +12,7 @@ import org.codehaus.plexus.util.xml.XmlStreamWriter
 import org.codehaus.plexus.util.xml.Xpp3Dom
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.util.PatternSet
 
@@ -44,6 +46,10 @@ constructor(patternSet: PatternSet = PatternSet().include(COMPONENTS_XML_PATH)) 
       }
       return os.toByteArray()
     }
+
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+  }
 
   override fun transform(context: TransformerContext) {
     val newDom =

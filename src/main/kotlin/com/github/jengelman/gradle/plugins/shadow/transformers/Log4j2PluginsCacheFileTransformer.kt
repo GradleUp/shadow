@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
@@ -14,6 +15,7 @@ import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.util.PatternSet
 
 /**
@@ -33,6 +35,10 @@ constructor(patternSet: PatternSet = PatternSet().include(PLUGIN_CACHE_FILE)) :
 
   /** [Relocator] instances to share across the transformation stages. */
   private val tempRelocators = mutableListOf<Relocator>()
+
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+  }
 
   override fun transform(context: TransformerContext) {
     val temporaryFile = createTempFile("Log4j2Plugins", ".dat")
