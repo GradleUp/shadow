@@ -7,11 +7,11 @@ import org.gradle.api.file.FileTreeElement
 import org.gradle.api.logging.Logging
 
 internal fun ResourceTransformer.checkDupStrategy(
-  canTransformResource: Boolean,
+  matched: Boolean,
   element: FileTreeElement,
 ) {
   when {
-    !canTransformResource -> return
+    !matched -> return
     element !is FileCopyDetails -> return
     element.duplicatesStrategy == DuplicatesStrategy.EXCLUDE -> {
       val logger = Logging.getLogger(this::class.java)
