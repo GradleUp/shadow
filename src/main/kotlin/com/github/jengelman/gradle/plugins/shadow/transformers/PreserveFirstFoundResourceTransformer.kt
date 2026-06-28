@@ -39,7 +39,7 @@ public open class PreserveFirstFoundResourceTransformer(
 
   @get:Internal protected val found: MutableSet<String> = mutableSetOf()
 
-  @get:Deprecated("Use `include(..)` instead")
+  @get:Deprecated("Use `include(..)` instead") // TODO: remove this in Shadow 10.
   @get:Input
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
