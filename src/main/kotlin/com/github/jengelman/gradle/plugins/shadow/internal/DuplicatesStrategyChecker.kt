@@ -5,11 +5,15 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.logging.Logging
+import org.jetbrains.annotations.VisibleForTesting
+
+@VisibleForTesting internal var onCheckDupStrategyInvoked: (() -> Unit)? = null
 
 internal fun ResourceTransformer.checkDupStrategy(
   matched: Boolean,
   element: FileTreeElement,
 ) {
+  onCheckDupStrategyInvoked?.invoke()
   when {
     !matched -> return
     element !is FileCopyDetails -> return
