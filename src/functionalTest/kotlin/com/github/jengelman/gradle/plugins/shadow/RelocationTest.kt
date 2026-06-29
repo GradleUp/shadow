@@ -683,6 +683,86 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Issue("https://github.com/GradleUp/shadow/issues/843")
+  @OptIn(UnstableMetadataApi::class)
+  @Test
+  fun relocateKotlinModuleFilesExplicitly() {
+    val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
+    val originalModuleFileBytes = requireResourceAsPath(originalModuleFilePath).readBytes()
+    val stdlibJar =
+      buildJar("stdlib.jar") { insert(originalModuleFilePath, originalModuleFileBytes) }
+    projectScript.appendText(
+      """
+        dependencies {
+          ${implementationFiles(stdlibJar)}
+        }
+        $shadowJarTask {
+          relocate('kotlin', 'my.kotlin')
+          enableKotlinModuleRemapping = false
+          transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer)
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    val relocatedModuleFilePath = "META-INF/kotlin-stdlib.shadow.kotlin_module"
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(relocatedModuleFilePath, *manifestEntries)
+    }
+
+    val originalModule =
+      KotlinModuleMetadata.read(requireResourceAsStream(originalModuleFilePath).readBytes())
+    val relocatedModule = outputShadowedJar.use {
+      KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath))
+    }
+
+    assertThat(relocatedModule.version.toString()).isEqualTo("2.2.0")
+    assertThat(originalModule.version.toString()).isEqualTo("2.2.0")
+
+    // No implementation for writing the optionalAnnotationClasses property yet.
+    // https://github.com/JetBrains/kotlin/blob/81502985ae0a2f5b21e121ffc180c3f4dd467e17/libraries/kotlinx-metadata/jvm/src/kotlin/metadata/jvm/KotlinModuleMetadata.kt#L71
+    assertThat(relocatedModule.kmModule.optionalAnnotationClasses).isEmpty()
+
+    val originalPkgParts = originalModule.kmModule.packageParts.entries
+    val relocatedPkgParts = relocatedModule.kmModule.packageParts.entries
+    // They are not empty and different.
+    assertThat(originalPkgParts).isNotEqualTo(relocatedPkgParts)
+    assertThat(originalPkgParts.size).isEqualTo(relocatedPkgParts.size)
+
+    relocatedPkgParts.forEachIndexed { index, (relocatedPkg, relocatedParts) ->
+      val (originalPkg, originalParts) = originalPkgParts.elementAt(index)
+      assertThat(relocatedPkg).isNotEqualTo(originalPkg)
+      assertThat(relocatedPkg).isEqualTo(originalPkg.replace("kotlin", "my.kotlin"))
+
+      if (originalParts.fileFacades.isEmpty()) {
+        assertThat(relocatedParts.fileFacades).isEmpty()
+      } else {
+        assertThat(relocatedParts.fileFacades).isNotEmpty()
+        assertThat(relocatedParts.fileFacades).isNotEqualTo(originalParts.fileFacades)
+        assertThat(relocatedParts.fileFacades)
+          .isEqualTo(originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") })
+      }
+
+      if (originalParts.multiFileClassParts.isEmpty()) {
+        assertThat(relocatedParts.multiFileClassParts).isEmpty()
+      } else {
+        assertThat(relocatedParts.multiFileClassParts).isNotEmpty()
+        assertThat(relocatedParts.multiFileClassParts)
+          .isNotEqualTo(originalParts.multiFileClassParts)
+        assertThat(relocatedParts.multiFileClassParts)
+          .isEqualTo(
+            originalParts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
+              ->
+              name.replace("kotlin/", "my/kotlin/") to facade.replace("kotlin/", "my/kotlin/")
+            }
+          )
+      }
+    }
+  }
+
   private fun writeClassWithStringRef() {
     writeClass {
       """
