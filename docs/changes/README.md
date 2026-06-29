@@ -463,15 +463,12 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
     Only Gradle 9 support is being backported to this version. No additional features or crucial bug fixes will be
     included in the 8.x line. Please migrate to Shadow 9 as soon as possible.
 
-**Changed**
+### Changed
 
 - Update jdependency to support Java 27. ([#2040](https://github.com/GradleUp/shadow/pull/2040))
-
-**Deprecated**
-
 - Deprecate `KnowsTask`, it will be removed in the next major release. ([#1957](https://github.com/GradleUp/shadow/pull/1957))
 
-**Fixed**
+### Fixed
 
 - Fix compatibility with Isolated Projects. ([#1947](https://github.com/GradleUp/shadow/pull/1947))
 - Fix interaction with Gradle artifact transforms. ([#1949](https://github.com/GradleUp/shadow/pull/1949))
@@ -479,12 +476,12 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ## [8.3.10](https://github.com/GradleUp/shadow/releases/tag/8.3.10) - 2026-02-26
 
-**Changed**
+### Changed
 
 - Stop using start script templates bundled in Shadow. ([#1750](https://github.com/GradleUp/shadow/pull/1750))
 - Update ASM and jdependency to support Java 26. ([#1810](https://github.com/GradleUp/shadow/pull/1810))
 
-**Fixed**
+### Fixed
 
 - Fix resolving BOM dependencies when `minimize` is enabled. ([#1638](https://github.com/GradleUp/shadow/pull/1638))
 - Use ASM from jdependency embedded. ([#1898](https://github.com/GradleUp/shadow/pull/1898))  
@@ -492,7 +489,7 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ## [8.3.9](https://github.com/GradleUp/shadow/releases/tag/8.3.9) - 2025-08-05
 
-**Changed**
+### Changed
 
 - Use `BufferedOutputStream` when writing the Zip file to improve performance. ([#1579](https://github.com/GradleUp/shadow/pull/1579))
 
