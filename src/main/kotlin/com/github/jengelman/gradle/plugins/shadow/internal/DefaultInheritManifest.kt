@@ -21,6 +21,7 @@ internal class DefaultInheritManifest(
   private val internalManifest: Manifest = manifest ?: DefaultManifest(fileResolver),
 ) : InheritManifest, Manifest by internalManifest {
 
+  @Suppress("OVERRIDE_DEPRECATION")
   override fun inheritFrom(vararg inheritPaths: Any, action: Action<ManifestMergeSpec>) {
     inheritPaths.forEach { from(it, action) }
   }
