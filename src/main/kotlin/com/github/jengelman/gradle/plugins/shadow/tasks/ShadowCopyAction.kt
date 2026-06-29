@@ -37,7 +37,9 @@ import org.gradle.api.tasks.WorkResults
  * [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
 public open class ShadowCopyAction
-@Deprecated("This should not be used as a public API. Will be made internal in a future release.")
+@Deprecated(
+  "This constructor should not be used as a public API. Will be made internal in Shadow 10."
+)
 constructor(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
