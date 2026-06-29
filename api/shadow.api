@@ -414,6 +414,16 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeReso
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public class com/github/jengelman/gradle/plugins/shadow/transformers/KotlinModuleMetadataTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
