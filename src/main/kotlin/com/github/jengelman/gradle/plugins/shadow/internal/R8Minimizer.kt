@@ -1,0 +1,331 @@
+package com.github.jengelman.gradle.plugins.shadow.internal
+
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
+import com.github.jengelman.gradle.plugins.shadow.tasks.R8Spec
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import java.util.jar.JarFile
+import org.apache.tools.zip.UnixStat
+import org.apache.tools.zip.Zip64Mode
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.GradleException
+import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.Logger
+import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.gradle.process.ExecOperations
+
+/**
+ * Runs R8 as a final-archive shrinker.
+ *
+ * Shadow first writes the complete jar with relocations, resource transformers, merged service
+ * files, and duplicate handling applied. R8 then processes that exact artifact. The result is
+ * normalized back through Shadow's archive settings because R8 does not know about this task's
+ * reproducibility options.
+ *
+ * Generated rules intentionally use final jar contents: source-set classes are kept as roots,
+ * dependencies excluded from minimization are kept, and entries under `META-INF/services` keep both
+ * service interfaces and providers for downstream `ServiceLoader` use. User rule files and inline
+ * rules are appended last. The default [R8Spec.args] are shrink-only: `--no-minification` also
+ * causes Shadow to generate `-dontoptimize`; callers that replace the default args own the rest of
+ * R8's behavior.
+ */
+internal class R8Minimizer(
+  private val execOperations: ExecOperations,
+  private val logger: Logger,
+  private val r8Classpath: FileCollection,
+  private val r8Spec: R8Spec,
+  private val sourceSetsClassesDirs: Iterable<File>,
+  private val keptDependencyFiles: Iterable<File>,
+  private val relocators: Iterable<Relocator>,
+  private val preserveFileTimestamps: Boolean,
+  private val reproducibleFileOrder: Boolean,
+  private val zip64: Boolean,
+  private val entryCompression: ZipEntryCompression,
+  private val metadataCharset: String?,
+) {
+  fun minimize(inputJar: File, temporaryDir: File) {
+    if (r8Classpath.isEmpty) {
+      throw GradleException(
+        "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
+      )
+    }
+
+    val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
+    val rulesFile = r8Dir.resolve("rules.pro")
+    val r8Output = r8Dir.resolve("output.jar")
+    val normalizedOutput = r8Dir.resolve("normalized-output.jar")
+    val javaHome = System.getProperty("java.home")
+    if (javaHome.isNullOrBlank()) {
+      throw GradleException("R8 minimization requires the java.home system property.")
+    }
+
+    val r8Args = r8Spec.args.get()
+    rulesFile.writeText(createRules(inputJar, r8Args).joinToString(System.lineSeparator()))
+
+    val arguments = buildList {
+      add("--classfile")
+      add("--output")
+      add(r8Output.absolutePath)
+      add("--pg-conf")
+      add(rulesFile.absolutePath)
+      add("--lib")
+      add(javaHome)
+      addAll(r8Args)
+      add(inputJar.absolutePath)
+    }
+
+    logger.info("Running R8 to minimize {}.", inputJar)
+    execOperations.javaexec {
+      it.classpath = r8Classpath
+      it.mainClass.set(R8_MAIN_CLASS)
+      it.args(arguments)
+    }
+
+    normalizeJar(r8Output, normalizedOutput)
+    Files.move(normalizedOutput.toPath(), inputJar.toPath(), REPLACE_EXISTING)
+  }
+
+  private fun createRules(inputJar: File, r8Args: List<String>): List<String> {
+    val rules = linkedSetOf<String>()
+    if (DefaultR8Spec.NO_MINIFICATION_ARG in r8Args) {
+      rules += "-dontoptimize"
+    }
+    rules += sourceKeepRules(inputJar)
+    rules += keptDependencyRules(inputJar)
+    rules += serviceKeepRules(inputJar)
+    r8Spec.keepRuleFiles.files
+      .sortedBy { it.absolutePath }
+      .forEach { file ->
+        if (file.isFile) {
+          rules += file.readText().lineSequence().toList()
+        }
+      }
+    rules += r8Spec.keepRules.get()
+    return rules.toList()
+  }
+
+  // Project classes are the public surface of the shadowed jar, even when nothing in the input jar
+  // refers to every class directly.
+  private fun sourceKeepRules(inputJar: File): List<String> {
+    val jarClasses = jarClassEntries(inputJar)
+    return sourceSetsClassesDirs
+      .asSequence()
+      .filter(File::isDirectory)
+      .flatMap { dir ->
+        dir
+          .walkTopDown()
+          .filter { it.isFile && it.name.endsWith(".class") }
+          .mapNotNull { file ->
+            file.toClassName(relativeTo = dir)
+          }
+      }
+      .map { relocators.relocateClass(it) }
+      .filter { it.isJavaTypeName() }
+      .filter { className -> "${className.replace('.', '/')}.class" in jarClasses }
+      .distinct()
+      .sorted()
+      .map { "-keep,includedescriptorclasses class $it { *; }" }
+      .toList()
+  }
+
+  // Keep dependencies users explicitly excluded from minimization, matching the existing
+  // minimize { exclude(...) } contract for the default analyzer.
+  private fun keptDependencyRules(inputJar: File): List<String> {
+    val jarClasses = jarClassEntries(inputJar)
+    return keptDependencyFiles
+      .asSequence()
+      .flatMap { it.classNames() }
+      .map { relocators.relocateClass(it) }
+      .filter { it.isJavaTypeName() }
+      .filter { className -> "${className.replace('.', '/')}.class" in jarClasses }
+      .distinct()
+      .sorted()
+      .map { "-keep class $it { *; }" }
+      .toList()
+  }
+
+  // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
+  // interface and every listed provider even if R8 sees no direct references.
+  private fun serviceKeepRules(inputJar: File): List<String> {
+    val rules = linkedSetOf<String>()
+    JarFile(inputJar).use { jarFile ->
+      jarFile
+        .entries()
+        .asSequence()
+        .filter { !it.isDirectory && it.name.startsWith(SERVICES_PATH) }
+        .sortedBy { it.name }
+        .forEach { entry ->
+          val serviceClass = entry.name.removePrefix(SERVICES_PATH).replace('/', '.')
+          if (serviceClass.isJavaTypeName()) {
+            rules += "-keep class $serviceClass { *; }"
+          }
+          jarFile.getInputStream(entry).bufferedReader().useLines { lines ->
+            lines
+              .map { it.substringBefore('#').trim() }
+              .filter { it.isNotEmpty() && it.isJavaTypeName() }
+              .forEach { provider -> rules += "-keep class $provider { *; }" }
+          }
+        }
+    }
+    return rules.toList()
+  }
+
+  private fun jarClassEntries(inputJar: File): Set<String> {
+    return JarFile(inputJar).use { jarFile ->
+      jarFile
+        .entries()
+        .asSequence()
+        .filter { !it.isDirectory && it.name.endsWith(".class") }
+        .map { it.name }
+        .toSet()
+    }
+  }
+
+  private fun File.toClassName(relativeTo: File): String? {
+    if (name == "module-info.class" || name == "package-info.class") return null
+    return relativeTo
+      .toPath()
+      .relativize(toPath())
+      .toString()
+      .replace(File.separatorChar, '/')
+      .removeSuffix(".class")
+      .replace('/', '.')
+  }
+
+  private fun File.classNames(): Sequence<String> {
+    return when {
+      isDirectory ->
+        walkTopDown()
+          .filter { it.isFile && it.name.endsWith(".class") }
+          .mapNotNull {
+            it.toClassName(relativeTo = this)
+          }
+      isFile ->
+        JarFile(this)
+          .use { jarFile ->
+            jarFile
+              .entries()
+              .asSequence()
+              .filter { !it.isDirectory && it.name.endsWith(".class") }
+              .mapNotNull { it.name.toClassName() }
+              .toList()
+          }
+          .asSequence()
+      else -> emptySequence()
+    }
+  }
+
+  private fun String.toClassName(): String? {
+    val name = substringAfterLast('/')
+    if (name == "module-info.class" || name == "package-info.class") return null
+    return removeSuffix(".class").replace('/', '.')
+  }
+
+  // R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve
+  // reproducible ordering, timestamps, compression, zip64, and metadata charset behavior.
+  private fun normalizeJar(inputJar: File, outputJar: File) {
+    val entries =
+      JarFile(inputJar).use { jarFile ->
+        jarFile
+          .entries()
+          .asSequence()
+          .filter { !it.isDirectory }
+          .map { entry ->
+            R8JarEntry(
+              name = entry.name,
+              time = entry.time,
+              bytes = jarFile.getInputStream(entry).use { it.readBytes() },
+            )
+          }
+          .toList()
+      }
+    val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
+    val entryCompressionMethod =
+      when (entryCompression) {
+        ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
+        ZipEntryCompression.STORED -> ZipOutputStream.STORED
+      }
+    val zipOutputStream =
+      if (entryCompressionMethod == ZipOutputStream.STORED) {
+        ZipOutputStream(outputJar)
+      } else {
+        ZipOutputStream(outputJar.outputStream().buffered())
+      }
+    zipOutputStream.use { zos ->
+      if (metadataCharset != null) {
+        zos.setEncoding(metadataCharset)
+      }
+      zos.setUseZip64(if (zip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
+      zos.setMethod(entryCompressionMethod)
+      val added = mutableSetOf<String>()
+
+      fun addParentDirs(name: String) {
+        val parent = name.substringBeforeLast('/', "")
+        if (parent.isEmpty()) return
+        addParentDirs(parent)
+        val entryName = "$parent/"
+        if (added.add(entryName)) {
+          zos.putNextEntry(
+            zipEntry(entryName, preserveFileTimestamps) {
+              unixMode = UnixStat.DIR_FLAG or DEFAULT_DIR_MODE
+            }
+          )
+          zos.closeEntry()
+        }
+      }
+
+      orderedEntries.forEach { entry ->
+        addParentDirs(entry.name)
+        if (added.add(entry.name)) {
+          zos.putNextEntry(
+            zipEntry(entry.name, preserveFileTimestamps, entry.time) {
+              unixMode = UnixStat.FILE_FLAG or DEFAULT_FILE_MODE
+            }
+          )
+          zos.write(entry.bytes)
+          zos.closeEntry()
+        }
+      }
+    }
+  }
+
+  private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
+
+  private class R8JarEntry(val name: String, val time: Long, val bytes: ByteArray) {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+
+      other as R8JarEntry
+
+      if (time != other.time) return false
+      if (name != other.name) return false
+      if (!bytes.contentEquals(other.bytes)) return false
+
+      return true
+    }
+
+    override fun hashCode(): Int {
+      var result = time.hashCode()
+      result = 31 * result + name.hashCode()
+      result = 31 * result + bytes.contentHashCode()
+      return result
+    }
+
+    override fun toString(): String {
+      return "R8JarEntry(name='$name', time=$time, bytes=${bytes.toHexString()})"
+    }
+  }
+
+  private companion object {
+    private const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
+    private const val SERVICES_PATH = "META-INF/services/"
+    private const val DEFAULT_DIR_MODE = 493 // 0755
+    private const val DEFAULT_FILE_MODE = 420 // 0644
+    // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
+    // service lines, comments, malformed providers, and JVM-only names R8 would reject.
+    private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
+  }
+}
