@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -19,4 +20,7 @@ public interface MinimizeSpec : DependencyFilter {
 
   /** Use R8 to minimize the shadowed JAR and configure its options. */
   public fun r8(action: Action<in R8Spec>)
+
+  /** Use R8 to minimize the shadowed JAR and configure its options. */
+  public fun r8(action: Closure<*>)
 }
