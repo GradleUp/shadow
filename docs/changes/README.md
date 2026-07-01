@@ -12,6 +12,7 @@
 - Expose `patternSet` of `Log4j2PluginsCacheFileTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
 - Expose `patternSet` of `ManifestAppenderTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
 - Expose `patternSet` of `ManifestResourceTransformer` as `public`. ([#2028](https://github.com/GradleUp/shadow/pull/2028))
+- Add R8 as an opt-in `minimize { r8 { ... } }` tool for shrinking the final shadowed JAR.
 
 ### Changed
 
