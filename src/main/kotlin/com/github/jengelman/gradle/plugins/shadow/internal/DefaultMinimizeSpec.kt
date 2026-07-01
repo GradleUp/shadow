@@ -16,14 +16,14 @@ internal class DefaultMinimizeSpec(project: Project, objectFactory: ObjectFactor
   override val tool: Property<MinimizeTool> =
     objectFactory.property(MinimizeTool.DEPENDENCY_ANALYZER)
 
-  private val r8Spec: R8Spec by lazy { DefaultR8Spec(objectFactory) }
+  private val r8Spec: DefaultR8Spec by lazy { DefaultR8Spec(objectFactory) }
 
   @get:Nested
   @get:Optional
   val r8SpecForInputs: R8Spec?
     get() = if (tool.orNull == MinimizeTool.R8) r8Spec else null
 
-  internal fun r8Spec(): R8Spec = r8Spec
+  internal fun r8Spec(): DefaultR8Spec = r8Spec
 
   override fun r8(action: Action<in R8Spec>) {
     tool.set(MinimizeTool.R8)

@@ -376,6 +376,52 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
+  fun minimizeWithR8CanEnableObfuscation() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        minimize {
+          r8 {
+            enableObfuscation()
+          }
+        }
+        """
+          .trimIndent()
+    )
+
+    runWithSuccess(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsAtLeast("server/Server.class", *manifestEntries)
+      containsNone("client/Used.class", "client/Unused.class")
+    }
+  }
+
+  @Test
+  fun minimizeWithR8CanEnableOptimization() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        minimize {
+          r8 {
+            enableOptimization()
+          }
+        }
+        """
+          .trimIndent()
+    )
+
+    runWithSuccess(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsAtLeast("server/Server.class", *manifestEntries)
+      containsNone("client/Used.class", "client/Unused.class")
+    }
+  }
+
+  @Test
   fun minimizeWithR8HonorsDependencyExcludes() {
     writeR8Repository()
     writeR8ClientAndServerModules(

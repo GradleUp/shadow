@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
-import com.github.jengelman.gradle.plugins.shadow.tasks.R8Spec
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -19,23 +18,24 @@ import org.gradle.process.ExecOperations
 /**
  * Runs R8 as a final-archive shrinker.
  *
- * Shadow first writes the complete jar with relocations, resource transformers, merged service
- * files, and duplicate handling applied. R8 then processes that exact artifact. The result is
- * normalized back through Shadow's archive settings because R8 does not know about this task's
- * reproducibility options.
+ * Shadow first writes the complete jar, including relocations, resource transformers, merged
+ * service files, and duplicate handling. R8 then processes that exact artifact.
  *
- * Generated rules intentionally use final jar contents: source-set classes are kept as roots,
- * dependencies excluded from minimization are kept, and entries under `META-INF/services` keep both
- * service interfaces and providers for downstream `ServiceLoader` use. User rule files and inline
- * rules are appended last. The default [R8Spec.args] are shrink-only: `--no-minification` also
- * causes Shadow to generate `-dontoptimize`; callers that replace the default args own the rest of
- * R8's behavior.
+ * R8 does not know about Shadow's reproducible archive settings, so its output is normalized before
+ * replacing the original jar.
+ *
+ * Generated rules are based on the final jar contents. Source-set classes are kept as roots,
+ * dependencies excluded from minimization are kept, and service descriptors keep providers for
+ * downstream `ServiceLoader` users. User rule files and inline rules are appended last.
+ *
+ * The default R8 configuration is shrink-only. Shadow passes `--no-minification` to disable name
+ * obfuscation and generates `-dontoptimize` unless optimization is enabled explicitly.
  */
 internal class R8Minimizer(
   private val execOperations: ExecOperations,
   private val logger: Logger,
   private val r8Classpath: FileCollection,
-  private val r8Spec: R8Spec,
+  private val r8Spec: DefaultR8Spec,
   private val sourceSetsClassesDirs: Iterable<File>,
   private val keptDependencyFiles: Iterable<File>,
   private val relocators: Iterable<Relocator>,
@@ -89,8 +89,8 @@ internal class R8Minimizer(
 
   private fun createRules(inputJar: File, r8Args: List<String>): List<String> {
     val rules = linkedSetOf<String>()
-    if (DefaultR8Spec.NO_MINIFICATION_ARG in r8Args) {
-      rules += "-dontoptimize"
+    if (shouldDisableOptimization(r8Args)) {
+      rules += DefaultR8Spec.DONT_OPTIMIZE_RULE
     }
     rules += sourceKeepRules(inputJar)
     rules += keptDependencyRules(inputJar)
@@ -104,6 +104,11 @@ internal class R8Minimizer(
       }
     rules += r8Spec.keepRules.get()
     return rules.toList()
+  }
+
+  private fun shouldDisableOptimization(r8Args: List<String>): Boolean {
+    if (r8Spec.optimizationEnabled.get()) return false
+    return r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args
   }
 
   // Project classes are the public surface of the shadowed jar, even when nothing in the input jar
@@ -293,6 +298,7 @@ internal class R8Minimizer(
 
   private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 
+  // Not a data class because of the bytearray
   private class R8JarEntry(val name: String, val time: Long, val bytes: ByteArray) {
     override fun equals(other: Any?): Boolean {
       if (this === other) return true

@@ -23,4 +23,20 @@ public interface R8Spec {
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public val keepRuleFiles: ConfigurableFileCollection
+
+  /**
+   * Enable R8 name obfuscation while keeping Shadow's default no-optimization behavior.
+   *
+   * This removes Shadow's default `--no-minification` argument. Optimization remains disabled
+   * unless [enableOptimization] is also called.
+   */
+  public fun enableObfuscation()
+
+  /**
+   * Enable R8 optimization while keeping Shadow's default no-obfuscation behavior.
+   *
+   * This removes Shadow's generated `-dontoptimize` rule. Name obfuscation remains disabled unless
+   * [enableObfuscation] is also called.
+   */
+  public fun enableOptimization()
 }

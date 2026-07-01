@@ -217,6 +217,8 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/R8Spec {
+	public abstract fun enableObfuscation ()V
+	public abstract fun enableOptimization ()V
 	public abstract fun getArgs ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getKeepRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getKeepRules ()Lorg/gradle/api/provider/ListProperty;

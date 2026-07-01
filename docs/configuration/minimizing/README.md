@@ -136,23 +136,19 @@ published by Google Maven rather than Maven Central. Add `google()` to your repo
     ```
 
 Advanced R8 command line arguments can be added with `args`. Replacing the default `args` value removes Shadow's
-shrink-only defaults, including the generated `-dontoptimize` rule.
+default command line arguments, so prefer the helper functions for common obfuscation and optimization toggles. These
+helpers are independent and can be used together.
+
+For example, to downgrade R8 warnings to info:
 
 === "Kotlin"
 
     ```kotlin
     repositories {
-      google()
-    }
-
     tasks.shadowJar {
       minimize {
         r8 {
-          // Appends to Shadow's defaults.
           args.addAll(listOf("--map-diagnostics", "warning", "info"))
-
-          // Replaces Shadow's defaults.
-          // args.set(emptyList())
         }
       }
     }
@@ -162,22 +158,81 @@ shrink-only defaults, including the generated `-dontoptimize` rule.
 
     ```groovy
     repositories {
-      google()
-    }
-
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       minimize {
         r8 {
-          // Appends to Shadow's defaults.
           args.addAll(['--map-diagnostics', 'warning', 'info'])
-
-          // Replaces Shadow's defaults.
-          // args.set([])
         }
       }
     }
     ```
 
+To enable name obfuscation:
 
+=== "Kotlin"
+
+    ```kotlin
+    minimize {
+      r8 {
+        enableObfuscation()
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    minimize {
+      r8 {
+        enableObfuscation()
+      }
+    }
+    ```
+
+To enable optimization:
+
+=== "Kotlin"
+
+    ```kotlin
+    minimize {
+      r8 {
+        enableOptimization()
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    minimize {
+      r8 {
+        enableOptimization()
+      }
+    }
+    ```
+
+To enable both:
+
+=== "Kotlin"
+
+    ```kotlin
+    minimize {
+      r8 {
+        enableObfuscation()
+        enableOptimization()
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    minimize {
+      r8 {
+        enableObfuscation()
+        enableOptimization()
+      }
+    }
+    ```
 
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html

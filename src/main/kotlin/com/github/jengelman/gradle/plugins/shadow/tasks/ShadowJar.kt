@@ -71,8 +71,7 @@ public abstract class ShadowJar : Jar() {
   private val defaultMinimizeSpec = DefaultMinimizeSpec(project, objectFactory)
 
   /** Options for [minimize]. */
-  @get:Nested
-  public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
+  @get:Nested public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
 
   private val shadowDependencies = project.provider {
     // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
