@@ -8,13 +8,22 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 
 internal class DefaultMinimizeSpec(project: Project, objectFactory: ObjectFactory) :
   MinimizeDependencyFilter(project), MinimizeSpec {
   override val tool: Property<MinimizeTool> =
     objectFactory.property(MinimizeTool.DEPENDENCY_ANALYZER)
 
-  override val r8Spec: R8Spec = DefaultR8Spec(objectFactory)
+  private val r8Spec: R8Spec by lazy { DefaultR8Spec(objectFactory) }
+
+  @get:Nested
+  @get:Optional
+  val r8SpecForInputs: R8Spec?
+    get() = if (tool.orNull == MinimizeTool.R8) r8Spec else null
+
+  internal fun r8Spec(): R8Spec = r8Spec
 
   override fun r8(action: Action<in R8Spec>) {
     tool.set(MinimizeTool.R8)
