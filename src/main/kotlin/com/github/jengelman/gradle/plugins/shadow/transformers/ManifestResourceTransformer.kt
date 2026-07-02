@@ -7,7 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
 import java.io.IOException
 import java.util.jar.Attributes as JarAttribute
-import java.util.jar.JarFile
+import java.util.jar.JarFile.MANIFEST_NAME
 import java.util.jar.Manifest
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
@@ -17,7 +17,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.util.PatternSet
 
 /**
  * A resource processor that allows the arbitrary addition of attributes to the first MANIFEST.MF
@@ -31,10 +30,9 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ManifestResourceTransformer(
-  final override val objectFactory: ObjectFactory,
-  patternSet: PatternSet,
-) : PatternFilterableResourceTransformer(patternSet) {
+public open class ManifestResourceTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var manifestDiscovered = false
   private var manifest: Manifest? = null
 
@@ -43,16 +41,10 @@ public open class ManifestResourceTransformer(
   @get:Input
   public open val manifestEntries: MapProperty<String, JarAttribute> = objectFactory.mapProperty()
 
-  @Inject
-  public constructor(
-    objectFactory: ObjectFactory
-  ) : this(
-    objectFactory,
-    patternSet = PatternSet().apply { isCaseSensitive = false }.include(JarFile.MANIFEST_NAME),
-  )
-
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+    return MANIFEST_NAME.equals(element.path, ignoreCase = true).also { flag ->
+      checkDupStrategy(flag, element)
+    }
   }
 
   override fun transform(context: TransformerContext) {
@@ -83,7 +75,7 @@ public open class ManifestResourceTransformer(
     mainClass.get().takeIf(CharSequence::isNotEmpty)?.let { attributes[mainClassAttributeKey] = it }
     manifestEntries.get().forEach { (key, value) -> attributes[JarAttribute.Name(key)] = value }
 
-    os.putNextEntry(zipEntry(JarFile.MANIFEST_NAME, preserveFileTimestamps))
+    os.putNextEntry(zipEntry(MANIFEST_NAME, preserveFileTimestamps))
     manifest!!.write(os)
     os.closeEntry()
   }
