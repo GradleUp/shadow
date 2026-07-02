@@ -202,6 +202,28 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
 }
 
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
+	public abstract fun getTool ()Lorg/gradle/api/provider/Property;
+	public abstract fun r8 (Lgroovy/lang/Closure;)V
+	public abstract fun r8 (Lorg/gradle/api/Action;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool : java/lang/Enum {
+	public static final field DEPENDENCY_ANALYZER Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+	public static final field R8 Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+	public static fun values ()[Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/R8Spec {
+	public abstract fun enableObfuscation ()V
+	public abstract fun enableOptimization ()V
+	public abstract fun getArgs ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getKeepRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getKeepRules ()Lorg/gradle/api/provider/ListProperty;
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field CONSTANT_TIME_FOR_ZIP_ENTRIES J
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
@@ -232,6 +254,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getEnableAutoRelocation ()Lorg/gradle/api/provider/Property;
 	public fun getEnableKotlinModuleRemapping ()Lorg/gradle/api/provider/Property;
 	public fun getExcludes ()Ljava/util/Set;
+	protected abstract fun getExecOperations ()Lorg/gradle/process/ExecOperations;
 	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludes ()Ljava/util/Set;
@@ -239,6 +262,8 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
+	public fun getMinimizeSpec ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec;
+	public fun getR8Classpath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
 	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;

@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolvedDependency
 
-internal class MinimizeDependencyFilter(project: Project) :
+internal open class MinimizeDependencyFilter(project: Project) :
   DependencyFilter.AbstractDependencyFilter(project) {
   override fun resolve(
     dependencies: Set<ResolvedDependency>,

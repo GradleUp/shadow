@@ -7,6 +7,8 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -341,6 +343,40 @@ class CachingTest : BasePluginTest() {
   }
 
   @Test
+  fun r8KeepRuleFileChanged() {
+    val previousTaskPath = taskPath
+    taskPath = serverShadowJarPath
+    try {
+      writeR8Repository()
+      writeR8ClientAndServerModules()
+      val keepRules = path("server/r8-rules.pro")
+      keepRules.writeText("")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsAtLeast("server/Server.class", "client/Used.class", *manifestEntries)
+        containsNone("client/Reflective.class")
+      }
+
+      keepRules.writeText("-keep class client.Reflective { *; }")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsAtLeast(
+          "server/Server.class",
+          "client/Used.class",
+          "client/Reflective.class",
+          *manifestEntries,
+        )
+        containsNone("client/Unused.class")
+      }
+      assertExecutionsFromCacheAndUpToDate()
+    } finally {
+      taskPath = previousTaskPath
+    }
+  }
+
+  @Test
   fun relocatorChanged() {
     projectScript.appendText(
       """
@@ -512,5 +548,88 @@ class CachingTest : BasePluginTest() {
   private fun assertRunWithResult(expectedOutcome: TaskOutcome) {
     val result = runWithSuccess(taskPath)
     assertThat(result).taskOutcomeEquals(taskPath, expectedOutcome)
+  }
+
+  private fun writeR8Repository() {
+    settingsScript.writeText(
+      settingsScript.readText().replace("mavenCentral()", "mavenCentral()\n          google()")
+    )
+  }
+
+  private fun writeR8ClientAndServerModules() {
+    settingsScript.appendText(
+      """
+      include 'client', 'server'
+      """
+        .trimIndent()
+    )
+    projectScript.writeText("")
+
+    path("client/src/main/java/client/Used.java")
+      .writeText(
+        """
+        package client;
+        public class Used {
+          public static String name() {
+            return "used";
+          }
+        }
+        """
+          .trimIndent()
+      )
+    path("client/src/main/java/client/Unused.java")
+      .writeText(
+        """
+        package client;
+        public class Unused {}
+        """
+          .trimIndent()
+      )
+    path("client/src/main/java/client/Reflective.java")
+      .writeText(
+        """
+        package client;
+        public class Reflective {}
+        """
+          .trimIndent()
+      )
+    path("client/build.gradle")
+      .writeText(
+        """
+        ${getDefaultProjectBuildScript("java")}
+        """
+          .trimIndent() + lineSeparator
+      )
+
+    path("server/src/main/java/server/Server.java")
+      .writeText(
+        """
+        package server;
+        import client.Used;
+        public class Server {
+          public String name() {
+            return Used.name();
+          }
+        }
+        """
+          .trimIndent()
+      )
+    path("server/build.gradle")
+      .writeText(
+        """
+        ${getDefaultProjectBuildScript("java")}
+        dependencies {
+          implementation project(':client')
+        }
+        $shadowJarTask {
+          minimize {
+            r8 {
+              keepRuleFiles.from(file("r8-rules.pro"))
+            }
+          }
+        }
+        """
+          .trimIndent() + lineSeparator
+      )
   }
 }
