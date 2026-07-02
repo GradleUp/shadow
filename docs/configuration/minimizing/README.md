@@ -145,6 +145,9 @@ For example, to downgrade R8 warnings to info:
 
     ```kotlin
     repositories {
+      google()
+    }
+
     tasks.shadowJar {
       minimize {
         r8 {
@@ -158,6 +161,9 @@ For example, to downgrade R8 warnings to info:
 
     ```groovy
     repositories {
+      google()
+    }
+
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       minimize {
         r8 {
@@ -172,9 +178,15 @@ To enable name obfuscation:
 === "Kotlin"
 
     ```kotlin
-    minimize {
-      r8 {
-        enableObfuscation()
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableObfuscation()
+        }
       }
     }
     ```
@@ -182,9 +194,15 @@ To enable name obfuscation:
 === "Groovy"
 
     ```groovy
-    minimize {
-      r8 {
-        enableObfuscation()
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableObfuscation()
+        }
       }
     }
     ```
@@ -194,9 +212,15 @@ To enable optimization:
 === "Kotlin"
 
     ```kotlin
-    minimize {
-      r8 {
-        enableOptimization()
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableOptimization()
+        }
       }
     }
     ```
@@ -204,9 +228,15 @@ To enable optimization:
 === "Groovy"
 
     ```groovy
-    minimize {
-      r8 {
-        enableOptimization()
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableOptimization()
+        }
       }
     }
     ```
@@ -216,10 +246,16 @@ To enable both:
 === "Kotlin"
 
     ```kotlin
-    minimize {
-      r8 {
-        enableObfuscation()
-        enableOptimization()
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableObfuscation()
+          enableOptimization()
+        }
       }
     }
     ```
@@ -227,10 +263,16 @@ To enable both:
 === "Groovy"
 
     ```groovy
-    minimize {
-      r8 {
-        enableObfuscation()
-        enableOptimization()
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableObfuscation()
+          enableOptimization()
+        }
       }
     }
     ```
