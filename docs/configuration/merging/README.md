@@ -102,8 +102,8 @@ Alternatively, you can follow these steps:
 
 Optional steps:
 
-- Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
-  This can also ensure the regressions are caught in the future.
+- [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled by default to check duplicate entries in the final JAR.
+  This can also ensure the regressions are caught in the future. Disable it if you want to allow duplicate entries.
 - Use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
 
 Here are some examples:
@@ -144,8 +144,8 @@ Here are some examples:
     }
 
     tasks.shadowJar {
-      // Optional step.
-      failOnDuplicateEntries = true
+      // Optional step: disable it if you want to allow duplicate entries.
+      failOnDuplicateEntries = false
     }
     ```
 
@@ -185,8 +185,8 @@ Here are some examples:
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Optional step.
-      failOnDuplicateEntries = true
+      // Optional step: disable it if you want to allow duplicate entries.
+      failOnDuplicateEntries = false
     }
     ```
 
