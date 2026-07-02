@@ -144,6 +144,30 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     }
     ```
 
+## Kotlin Module Metadata Remapping
 
+Kotlin module metadata (`.kotlin_module`) files contain information about package parts and facades. When relocating
+classes, Shadow automatically relocates the packages and facades inside the Kotlin module metadata files. This feature
+is enabled by default via the deprecated `enableKotlinModuleRemapping` property.
+
+To explicitly apply this remapping (recommended for future compatibility), add
+[`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer] to your task configuration:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer::class.java)
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.shadowJar {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer)
+    }
+    ```
 
 [org.jetbrains.kotlin.multiplatform]: https://kotlinlang.org/docs/multiplatform-intro.html
+[KotlinModuleMetadataTransformer]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-kotlin-module-metadata-transformer/index.html
