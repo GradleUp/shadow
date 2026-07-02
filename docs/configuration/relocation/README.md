@@ -227,7 +227,8 @@ relocating), you can try out the trick like:
     ```kotlin
     tasks.shadowJar {
       // Empty configurations list will exclude all dependencies.
-      configurations = emptyList()
+      configurations.unset()
+      configurations.unsetConvention()
       relocate("com.example", "shadow.com.example")
     }
     ```
@@ -237,7 +238,8 @@ relocating), you can try out the trick like:
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       // Empty configurations list will exclude all dependencies.
-      configurations = []
+      configurations.unset()
+      configurations.unsetConvention()
       relocate 'com.example', 'shadow.com.example'
     }
     ```
