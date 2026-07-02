@@ -320,12 +320,10 @@ public final class com/github/jengelman/gradle/plugins/shadow/transformers/Appen
 public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/transformers/CacheableTransformer : java/lang/annotation/Annotation {
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public static final field COMPONENTS_XML_PATH Ljava/lang/String;
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ComponentsXmlResourceTransformer$Companion;
 	public fun <init> ()V
-	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
-	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
@@ -355,7 +353,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/DontInclude
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/GroovyExtensionModuleTransformer$Companion;
 	public static final field KEY_EXTENSION_CLASSES Ljava/lang/String;
 	public static final field KEY_MODULE_NAME Ljava/lang/String;
@@ -366,8 +364,6 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/GroovyExten
 	public static final field PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR Ljava/lang/String;
 	public static final field PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR Ljava/lang/String;
 	public fun <init> ()V
-	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
-	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
@@ -389,19 +385,16 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeReso
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> ()V
-	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
-	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestAppenderTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
 	public fun append (Ljava/lang/String;Ljava/lang/Comparable;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAttributes ()Lorg/gradle/api/provider/SetProperty;
@@ -411,9 +404,8 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
-public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
-	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
 	public fun attributes (Ljava/util/Map;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
