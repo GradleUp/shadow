@@ -13,7 +13,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.util.PatternSet
 
 /**
  * A resource processor that can append arbitrary attributes to the first MANIFEST.MF that is found
@@ -25,25 +24,18 @@ import org.gradle.api.tasks.util.PatternSet
  * @author Chris Rankin
  */
 @CacheableTransformer
-public open class ManifestAppenderTransformer(
-  final override val objectFactory: ObjectFactory,
-  patternSet: PatternSet,
-) : PatternFilterableResourceTransformer(patternSet) {
+public open class ManifestAppenderTransformer
+@Inject
+constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var manifestContents = ByteArray(0)
 
   @get:Input
   public open val attributes: SetProperty<Pair<String, Comparable<*>>> = objectFactory.setProperty()
 
-  @Inject
-  public constructor(
-    objectFactory: ObjectFactory
-  ) : this(
-    objectFactory,
-    patternSet = PatternSet().apply { isCaseSensitive = false }.include(MANIFEST_NAME),
-  )
-
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+    return MANIFEST_NAME.equals(element.path, ignoreCase = true).also { flag ->
+      checkDupStrategy(flag, element)
+    }
   }
 
   override fun transform(context: TransformerContext) {

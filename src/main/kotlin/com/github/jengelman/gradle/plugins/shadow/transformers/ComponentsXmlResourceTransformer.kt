@@ -14,7 +14,6 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder
 import org.codehaus.plexus.util.xml.Xpp3DomWriter
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.util.PatternSet
 
 /**
  * A resource processor that aggregates plexus `components.xml` files.
@@ -25,10 +24,7 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ComponentsXmlResourceTransformer
-@JvmOverloads
-constructor(patternSet: PatternSet = PatternSet().include(COMPONENTS_XML_PATH)) :
-  PatternFilterableResourceTransformer(patternSet) {
+public open class ComponentsXmlResourceTransformer : ResourceTransformer {
   private val components = mutableMapOf<String, Xpp3Dom>()
 
   @get:Internal
@@ -48,7 +44,7 @@ constructor(patternSet: PatternSet = PatternSet().include(COMPONENTS_XML_PATH)) 
     }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+    return (COMPONENTS_XML_PATH == element.path).also { flag -> checkDupStrategy(flag, element) }
   }
 
   override fun transform(context: TransformerContext) {
