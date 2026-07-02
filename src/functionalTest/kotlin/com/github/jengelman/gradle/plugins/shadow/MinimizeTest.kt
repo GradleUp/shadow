@@ -318,8 +318,13 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("server/Server.class", "client/Used.class", *manifestEntries)
-      containsNone("client/Unused.class")
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        "client/",
+        "client/Used.class",
+        *manifestEntries,
+      )
     }
   }
 
@@ -331,10 +336,13 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "server/",
         "server/Server.class",
+        "service/",
         "service/Greeter.class",
         "service/DefaultGreeter.class",
+        "META-INF/services/",
         "META-INF/services/service.Greeter",
         *manifestEntries,
       )
@@ -365,13 +373,14 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "server/",
         "server/Server.class",
+        "client/",
         "client/Used.class",
         "client/Reflective.class",
         *manifestEntries,
       )
-      containsNone("client/Unused.class")
     }
   }
 
@@ -393,8 +402,13 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("server/Server.class", *manifestEntries)
-      containsNone("client/Used.class", "client/Unused.class")
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        "a/",
+        "a/a.class",
+        *manifestEntries,
+      )
     }
   }
 
@@ -416,8 +430,11 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("server/Server.class", *manifestEntries)
-      containsNone("client/Used.class", "client/Unused.class")
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        *manifestEntries,
+      )
     }
   }
 
@@ -438,8 +455,10 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "server/",
         "server/Server.class",
+        "client/",
         "client/Used.class",
         "client/Unused.class",
         "client/Reflective.class",
