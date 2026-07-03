@@ -152,6 +152,14 @@ class ShadowPropertiesTest {
         assertThat(failOnDuplicateEntries.get()).isFalse()
         assertThat(minimizeJar.get()).isFalse()
         assertThat(mainClass.orNull).isNull()
+        assertThat(javaLauncher.get().metadata.jvmVersion)
+          .isEqualTo(
+            javaToolchainService
+              .launcherFor(javaPluginExtension.toolchain)
+              .get()
+              .metadata
+              .jvmVersion
+          )
 
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
         assertThat(configurations.get()).containsOnly(runtimeConfiguration)

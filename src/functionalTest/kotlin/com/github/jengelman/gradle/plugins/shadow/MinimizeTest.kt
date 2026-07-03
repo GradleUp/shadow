@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
@@ -15,6 +16,7 @@ import java.util.ServiceLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import org.gradle.api.JavaVersion
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -467,6 +469,34 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun minimizeWithR8UsesJavaToolchain() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverProjectBlock =
+        """
+        java {
+          toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
+        }
+        """
+          .trimIndent(),
+      serverShadowBlock =
+        """
+        doFirst {
+          logger.lifecycle("R8 launcher JDK " + javaLauncher.get().metadata.languageVersion.asInt())
+        }
+        minimize {
+          r8 {}
+        }
+        """
+          .trimIndent(),
+    )
+
+    val result = runWithSuccess(serverShadowJarPath)
+
+    assertThat(result.output).contains("R8 launcher JDK ${JavaVersion.current().majorVersion}")
+  }
+
   private fun writeApiLibAndImplModules() {
     settingsScript.appendText(
       """
@@ -563,7 +593,10 @@ class MinimizeTest : BasePluginTest() {
     )
   }
 
-  private fun writeR8ClientAndServerModules(serverShadowBlock: String) {
+  private fun writeR8ClientAndServerModules(
+    serverShadowBlock: String,
+    serverProjectBlock: String = "",
+  ) {
     settingsScript.appendText(
       """
       include 'client', 'server'
@@ -625,6 +658,7 @@ class MinimizeTest : BasePluginTest() {
       .writeText(
         """
         ${getDefaultProjectBuildScript("java")}
+        $serverProjectBlock
         dependencies {
           implementation project(':client')
         }

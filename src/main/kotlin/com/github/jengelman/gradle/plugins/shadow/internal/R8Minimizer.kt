@@ -12,7 +12,9 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.process.ExecOperations
 
 /**
@@ -36,6 +38,7 @@ internal class R8Minimizer(
   private val logger: Logger,
   private val r8Classpath: FileCollection,
   private val r8Spec: DefaultR8Spec,
+  private val javaLauncher: Provider<JavaLauncher>,
   private val sourceSetsClassesDirs: Iterable<File>,
   private val keptDependencyFiles: Iterable<File>,
   private val relocators: Iterable<Relocator>,
@@ -56,7 +59,9 @@ internal class R8Minimizer(
     val rulesFile = r8Dir.resolve("rules.pro")
     val r8Output = r8Dir.resolve("output.jar")
     val normalizedOutput = r8Dir.resolve("normalized-output.jar")
-    val javaHome = System.getProperty("java.home")
+    val launcher = javaLauncher.orNull
+    val javaHome =
+      launcher?.metadata?.installationPath?.asFile?.absolutePath ?: System.getProperty("java.home")
     if (javaHome.isNullOrBlank()) {
       throw GradleException("R8 minimization requires the java.home system property.")
     }
@@ -80,6 +85,9 @@ internal class R8Minimizer(
     execOperations.javaexec {
       it.classpath = r8Classpath
       it.mainClass.set(R8_MAIN_CLASS)
+      if (launcher != null) {
+        it.executable = launcher.executablePath.asFile.absolutePath
+      }
       it.args(arguments)
     }
 

@@ -11,6 +11,8 @@ import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
+import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
@@ -63,6 +65,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
+import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
 
@@ -72,6 +75,11 @@ public abstract class ShadowJar : Jar() {
 
   /** Options for [minimize]. */
   @get:Nested public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
+
+  /** Java launcher used when running R8. */
+  @get:Nested
+  @get:Optional
+  public open val javaLauncher: Property<JavaLauncher> = objectFactory.property()
 
   private val shadowDependencies = project.provider {
     // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
@@ -90,6 +98,12 @@ public abstract class ShadowJar : Jar() {
     outputs.doNotCacheIf("Has one or more transforms or relocators that are not cacheable") {
       transformers.get().any { !it::class.hasAnnotation<CacheableTransformer>() } ||
         relocators.get().any { !it::class.hasAnnotation<CacheableRelocator>() }
+    }
+
+    project.plugins.withId("java") {
+      javaLauncher.convention(
+        project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
+      )
     }
   }
 
@@ -519,6 +533,7 @@ public abstract class ShadowJar : Jar() {
           logger = logger,
           r8Classpath = r8Classpath,
           r8Spec = defaultMinimizeSpec.r8Spec,
+          javaLauncher = javaLauncher,
           sourceSetsClassesDirs = sourceSetsClassesDirs.files,
           keptDependencyFiles = keptDependencyFilesForR8,
           relocators = relocators.get() + packageRelocators,
