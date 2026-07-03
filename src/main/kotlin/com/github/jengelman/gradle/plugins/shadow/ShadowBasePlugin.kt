@@ -53,7 +53,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     public const val SHADOW: String = "shadow"
     public const val EXTENSION_NAME: String = SHADOW
     public const val CONFIGURATION_NAME: String = SHADOW
-    internal const val R8_CONFIGURATION_NAME: String = "shadowR8"
+    public const val R8_CONFIGURATION_NAME: String = "shadowR8"
     internal const val DEFAULT_R8_DEPENDENCY: String = "com.android.tools:r8:9.1.31"
 
     @get:JvmSynthetic

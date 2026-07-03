@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
-import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
@@ -351,7 +351,7 @@ class MinimizeTest : BasePluginTest() {
     val shadowJarUrl = outputServerShadowedJar.use { it.path.toUri().toURL() }
     URLClassLoader(arrayOf(shadowJarUrl), null).use { loader ->
       val serviceClass = loader.loadClass("service.Greeter")
-      assertThat(ServiceLoader.load(serviceClass, loader).iterator().hasNext()).isTrue()
+      assertThat(ServiceLoader.load(serviceClass, loader).toList()).hasSize(1)
     }
   }
 

@@ -29,6 +29,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugi
 	public static final field CONFIGURATION_NAME Ljava/lang/String;
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion;
 	public static final field EXTENSION_NAME Ljava/lang/String;
+	public static final field R8_CONFIGURATION_NAME Ljava/lang/String;
 	public static final field SHADOW Ljava/lang/String;
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -204,7 +205,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
 	public abstract fun getTool ()Lorg/gradle/api/provider/Property;
-	public abstract fun r8 (Lgroovy/lang/Closure;)V
 	public abstract fun r8 (Lorg/gradle/api/Action;)V
 }
 

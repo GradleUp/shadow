@@ -68,7 +68,7 @@ import org.gradle.process.ExecOperations
 
 @CacheableTask
 public abstract class ShadowJar : Jar() {
-  private val defaultMinimizeSpec = DefaultMinimizeSpec(project, objectFactory)
+  private val defaultMinimizeSpec = objectFactory.newInstance(DefaultMinimizeSpec::class.java)
 
   /** Options for [minimize]. */
   @get:Nested public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
@@ -108,9 +108,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
-      if (!enabled) {
-        return@zip emptySet()
-      }
+      if (!enabled) return@zip emptySet()
       when (tool) {
         MinimizeTool.DEPENDENCY_ANALYZER,
         MinimizeTool.R8 -> minimizeSpec.resolve(configurations.get()) - apiJars
@@ -121,9 +119,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
-      if (!enabled) {
-        return@zip project.provider { emptyList<File>() }
-      }
+      if (!enabled) return@zip project.provider { emptyList() }
       when (tool) {
         MinimizeTool.DEPENDENCY_ANALYZER,
         MinimizeTool.R8 -> project.getApiJars()
@@ -522,7 +518,7 @@ public abstract class ShadowJar : Jar() {
           execOperations = execOperations,
           logger = logger,
           r8Classpath = r8Classpath,
-          r8Spec = defaultMinimizeSpec.r8Spec(),
+          r8Spec = defaultMinimizeSpec.r8Spec,
           sourceSetsClassesDirs = sourceSetsClassesDirs.files,
           keptDependencyFiles = keptDependencyFilesForR8,
           relocators = relocators.get() + packageRelocators,

@@ -37,7 +37,6 @@ public interface DependencyFilter : Serializable {
 
   public abstract class AbstractDependencyFilter(
     @Transient private val project: Project,
-    // @Internal because MinimizeSpec is a @Nested task input now
     @get:Internal
     @Transient
     protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),

@@ -107,8 +107,8 @@ internal class R8Minimizer(
   }
 
   private fun shouldDisableOptimization(r8Args: List<String>): Boolean {
-    if (r8Spec.optimizationEnabled.get()) return false
-    return r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args
+    return !r8Spec.optimizationEnabled.get() &&
+      (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
   }
 
   // Project classes are the public surface of the shadowed jar, even when nothing in the input jar
@@ -326,12 +326,12 @@ internal class R8Minimizer(
   }
 
   private companion object {
-    private const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
-    private const val SERVICES_PATH = "META-INF/services/"
-    private const val DEFAULT_DIR_MODE = 493 // 0755
-    private const val DEFAULT_FILE_MODE = 420 // 0644
+    const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
+    const val SERVICES_PATH = "META-INF/services/"
+    const val DEFAULT_DIR_MODE = 493 // 0755
+    const val DEFAULT_FILE_MODE = 420 // 0644
     // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
     // service lines, comments, malformed providers, and JVM-only names R8 would reject.
-    private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
+    val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
   }
 }
