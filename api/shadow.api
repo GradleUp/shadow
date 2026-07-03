@@ -235,6 +235,9 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 	public final fun getCONSTANT_TIME_FOR_ZIP_ENTRIES ()J
 }
 
+public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowDslMarker : java/lang/annotation/Annotation {
+}
+
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar$Companion;
 	public static final field SHADOW_JAR_TASK_NAME Ljava/lang/String;
@@ -258,6 +261,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludes ()Ljava/util/Set;
+	public fun getJavaLauncher ()Lorg/gradle/api/provider/Property;
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;

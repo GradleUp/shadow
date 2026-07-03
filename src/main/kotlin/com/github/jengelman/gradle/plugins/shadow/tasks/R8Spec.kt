@@ -8,6 +8,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
 /** Minimal R8 configuration for [ShadowJar.minimize]. */
+@ShadowDslMarker
 public interface R8Spec {
   /**
    * Additional R8 command line arguments.

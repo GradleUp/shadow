@@ -5,6 +5,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 
 /** Configures how [ShadowJar.minimize] removes unused code from the shadowed JAR. */
+@ShadowDslMarker
 public interface MinimizeSpec : DependencyFilter {
   /**
    * The tool used to minimize the shadowed JAR.
