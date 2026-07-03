@@ -160,7 +160,7 @@ published artifact.
 No other dependencies are automatically configured for inclusion in the POM file.
 For example, excluded dependencies are **not** automatically added to the POM file or
 if the configuration for merging are modified by specifying
-`shadowJar.configurations = [configurations.myConfiguration]`, there is no automatic
+`shadowJar.configurations.setFrom(configurations.myConfiguration)`, there is no automatic
 configuration of the POM file.
 
 This automatic configuration occurs _only_ when using the above methods for
@@ -402,7 +402,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
-      configurations = project.configurations.testRuntimeClasspath.map { listOf(it) }
+      configurations.setFrom(project.configurations.testRuntimeClasspath)
     }
 
     dependencies {
@@ -434,7 +434,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
       description = 'Create a combined JAR of project and test dependencies'
       archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
-      configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+      configurations.setFrom project.configurations.named('testRuntimeClasspath')
     }
 
     dependencies {
