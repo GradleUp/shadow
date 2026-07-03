@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowDslMarker
 import org.gradle.api.Action
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input

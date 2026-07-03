@@ -41,6 +41,9 @@ public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$C
 	public final synthetic fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
+public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/ShadowDslMarker : java/lang/annotation/Annotation {
+}
+
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
 	public abstract fun getAddShadowJarToAssembleLifecycle ()Lorg/gradle/api/provider/Property;
 	public abstract fun getAddShadowVariantIntoJavaComponent ()Lorg/gradle/api/provider/Property;
@@ -233,9 +236,6 @@ public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction :
 
 public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion {
 	public final fun getCONSTANT_TIME_FOR_ZIP_ENTRIES ()J
-}
-
-public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowDslMarker : java/lang/annotation/Annotation {
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar {
