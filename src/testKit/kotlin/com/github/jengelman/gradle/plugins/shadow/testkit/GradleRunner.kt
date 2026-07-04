@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.assertThat
 import assertk.assertions.doesNotContain
+import com.github.jengelman.gradle.plugins.shadow.TestKitBuildConfig.TEST_GRADLE_VERSION
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
@@ -16,10 +17,7 @@ private val testKitDir by lazy {
   Path(gradleUserHome, "testkit")
 }
 
-val testGradleVersion: String by lazy {
-  System.getProperty("TEST_GRADLE_VERSION")
-    ?: error("TEST_GRADLE_VERSION system property is not set.")
-}
+const val testGradleVersion: String = TEST_GRADLE_VERSION
 
 // TODO: this could be inlined after bumping the min Gradle requirement to 9.6 or above.
 val enableNoImplicitLookupInParentProjects: String
