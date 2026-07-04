@@ -489,13 +489,6 @@ public abstract class ShadowJar : Jar() {
 
   @TaskAction
   override fun copy() {
-    val useR8 = minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
-    val keptDependencyFilesForR8 =
-      if (useR8) {
-        includedDependencies.files - toMinimize.files
-      } else {
-        emptySet()
-      }
     includedDependencies.files.forEach { file ->
       when {
         !file.exists() -> {
@@ -521,24 +514,7 @@ public abstract class ShadowJar : Jar() {
     }
     injectManifestAttributes()
     super.copy()
-    if (useR8) {
-      R8Minimizer(
-          execOperations = execOperations,
-          logger = logger,
-          r8Classpath = r8Classpath,
-          r8Spec = defaultMinimizeSpec.r8Spec,
-          javaLauncher = javaLauncher,
-          sourceSetsClassesDirs = sourceSetsClassesDirs.files,
-          keptDependencyFiles = keptDependencyFilesForR8,
-          relocators = relocators.get() + packageRelocators,
-          preserveFileTimestamps = isPreserveFileTimestamps,
-          reproducibleFileOrder = isReproducibleFileOrder,
-          zip64 = isZip64,
-          entryCompression = entryCompression,
-          metadataCharset = metadataCharset,
-        )
-        .minimize(archiveFile.get().asFile, temporaryDir)
-    }
+    minimizeWithR8()
   }
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
@@ -689,6 +665,28 @@ public abstract class ShadowJar : Jar() {
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
     }
+  }
+
+  private fun minimizeWithR8() {
+    val useR8 = minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
+    if (!useR8) return
+    val keptDependencyFiles = includedDependencies.files - toMinimize.files
+    R8Minimizer(
+        execOperations = execOperations,
+        logger = logger,
+        r8Classpath = r8Classpath,
+        r8Spec = defaultMinimizeSpec.r8Spec,
+        javaLauncher = javaLauncher,
+        sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+        keptDependencyFiles = keptDependencyFiles,
+        relocators = relocators.get() + packageRelocators,
+        preserveFileTimestamps = isPreserveFileTimestamps,
+        reproducibleFileOrder = isReproducibleFileOrder,
+        zip64 = isZip64,
+        entryCompression = entryCompression,
+        metadataCharset = metadataCharset,
+      )
+      .minimize(archiveFile.get().asFile, temporaryDir)
   }
 
   public companion object {
