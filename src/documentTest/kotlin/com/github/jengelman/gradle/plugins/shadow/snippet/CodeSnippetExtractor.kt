@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.snippet
 
+import com.github.jengelman.gradle.plugins.shadow.DocumentTestBuildConfig
 import java.nio.file.Path
 import java.util.regex.Pattern
 import kotlin.io.path.Path
@@ -9,7 +10,7 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
 object CodeSnippetExtractor {
-  private val docRoot = Path(System.getProperty("DOCS_DIR"))
+  private val docRoot = Path(DocumentTestBuildConfig.DOCS_DIR)
 
   private val markdownPaths =
     docRoot.walk().filter { it.name.endsWith(".md", ignoreCase = true) }.toList()

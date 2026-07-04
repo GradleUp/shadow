@@ -26,15 +26,6 @@ group = providers.gradleProperty("GROUP").get()
 
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
-buildConfig {
-  packageName = "com.github.jengelman.gradle.plugins.shadow"
-  generateAtSync = true
-
-  sourceSets.named("main") {
-    buildConfigField("DEFAULT_R8_DEPENDENCY", libs.r8.map(Dependency::toString))
-  }
-}
-
 dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") } }
 
 kotlin {
@@ -158,7 +149,6 @@ testing.suites {
           }
         // Add docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
         inputs.dir(docsDir)
-        systemProperty("DOCS_DIR", docsDir.absolutePath)
       }
     }
   }
@@ -193,7 +183,6 @@ testing.suites {
     }
     targets.configureEach {
       testTask {
-        systemProperty("TEST_GRADLE_VERSION", testGradleVersion)
         develocity {
           testRetry {
             maxRetries = 2
@@ -228,6 +217,26 @@ kotlin.target.compilations {
   getByName("functionalTest") {
     // Import main and its classpath as dependencies and establish internal visibility.
     associateWith(main)
+  }
+}
+
+buildConfig {
+  packageName = "com.github.jengelman.gradle.plugins.shadow"
+  generateAtSync = true
+
+  sourceSets.named("main") {
+    buildConfigField("DEFAULT_R8_DEPENDENCY", libs.r8.map(Dependency::toString))
+  }
+  sourceSets.named("testKit") {
+    buildConfigField("TEST_GRADLE_VERSION", testGradleVersion)
+  }
+  sourceSets.named("documentTest") {
+    val docsDir =
+      file("docs").also {
+        if (!it.exists() || !it.isDirectory)
+          error("Docs dir $it does not exist or is not a directory.")
+      }
+    buildConfigField("DOCS_DIR", docsDir.absolutePath)
   }
 }
 
