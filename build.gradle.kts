@@ -17,6 +17,7 @@ plugins {
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.pluginPublish)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.buildConfig)
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -24,6 +25,15 @@ version = providers.gradleProperty("VERSION_NAME").get()
 group = providers.gradleProperty("GROUP").get()
 
 description = providers.gradleProperty("POM_DESCRIPTION").get()
+
+buildConfig {
+  packageName = "com.github.jengelman.gradle.plugins.shadow"
+  generateAtSync = true
+
+  sourceSets.named("main") {
+    buildConfigField("DEFAULT_R8_DEPENDENCY", libs.r8.map(Dependency::toString))
+  }
+}
 
 dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") } }
 
