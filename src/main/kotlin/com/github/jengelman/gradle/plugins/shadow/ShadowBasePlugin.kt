@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.CONFIGURATION_NAME
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.EXTENSION_NAME
+import com.github.jengelman.gradle.plugins.shadow.BuildConfig.DEFAULT_R8_DEPENDENCY
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -54,7 +53,6 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     public const val EXTENSION_NAME: String = SHADOW
     public const val CONFIGURATION_NAME: String = SHADOW
     public const val R8_CONFIGURATION_NAME: String = "shadowR8"
-    internal const val DEFAULT_R8_DEPENDENCY: String = "com.android.tools:r8:9.1.31"
 
     @get:JvmSynthetic
     public inline val ConfigurationContainer.shadow: NamedDomainObjectProvider<Configuration>
