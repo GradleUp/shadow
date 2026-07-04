@@ -99,12 +99,6 @@ public abstract class ShadowJar : Jar() {
       transformers.get().any { !it::class.hasAnnotation<CacheableTransformer>() } ||
         relocators.get().any { !it::class.hasAnnotation<CacheableRelocator>() }
     }
-
-    project.plugins.withId("java") {
-      javaLauncher.convention(
-        project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
-      )
-    }
   }
 
   /**
@@ -727,6 +721,10 @@ public abstract class ShadowJar : Jar() {
               @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
               jarTask.get().manifest,
             )
+
+          task.javaLauncher.convention(
+            project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
+          )
 
           action.execute(task)
         }
