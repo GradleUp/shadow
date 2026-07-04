@@ -318,9 +318,9 @@ public abstract class ShadowJar : Jar() {
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
-  @get:Inject protected abstract val archiveOperations: ArchiveOperations
-
   @get:Inject protected abstract val execOperations: ExecOperations
+
+  @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
   /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
