@@ -13,6 +13,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -104,6 +105,19 @@ internal inline fun <reified V : Any> ObjectFactory.property(
       @Suppress("UNCHECKED_CAST") convention(defaultValue as Provider<V>)
     } else {
       convention(defaultValue as V)
+    }
+  }
+
+@Suppress("UNCHECKED_CAST")
+internal inline fun <reified V : Any> ObjectFactory.listProperty(
+  defaultValue: Any? = null
+): ListProperty<V> =
+  listProperty(V::class.java).apply {
+    defaultValue ?: return@apply
+    if (defaultValue is Provider<*>) {
+      convention(defaultValue as Provider<Iterable<V>>)
+    } else {
+      convention(defaultValue as Iterable<V>)
     }
   }
 

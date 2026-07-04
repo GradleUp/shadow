@@ -10,6 +10,7 @@ import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.Internal
 
 // DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
 public interface DependencyFilter : Serializable {
@@ -36,8 +37,12 @@ public interface DependencyFilter : Serializable {
 
   public abstract class AbstractDependencyFilter(
     @Transient private val project: Project,
-    @Transient protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
-    @Transient protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
+    @get:Internal
+    @Transient
+    protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
+    @get:Internal
+    @Transient
+    protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
   ) : DependencyFilter {
 
     protected abstract fun resolve(

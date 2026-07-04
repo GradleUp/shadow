@@ -72,6 +72,209 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 > When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from 
 > minimization as well.
 
+## Minimizing with R8
 
+Shadow can also run [R8](https://r8.googlesource.com/r8) over the final shadowed JAR. This is useful when you want
+whole-program shrinking instead of the default dependency analyzer. R8 runs after Shadow has merged, transformed, and
+relocated the JAR, so service descriptors in `META-INF/services` are used to keep service providers.
+
+The default R8 configuration only shrinks unused code. It disables name minification and optimization.
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          // Optional extra configuration
+          keepRules.add("-keep class com.example.ReflectiveApi { *; }")
+          keepRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          // Optional extra configuration
+          keepRules.add('-keep class com.example.ReflectiveApi { *; }')
+          keepRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
+        }
+      }
+    }
+    ```
+
+Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
+published by Google Maven rather than Maven Central. Add `google()` to your repositories or override the dependency:
+
+=== "Kotlin"
+
+    ```kotlin
+    dependencies {
+      shadowR8("com.android.tools:r8:9.1.31")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    dependencies {
+      shadowR8 'com.android.tools:r8:9.1.31'
+    }
+    ```
+
+Advanced R8 command line arguments can be added with `args`. Replacing the default `args` value removes Shadow's
+default command line arguments, so prefer the helper functions for common obfuscation and optimization toggles. These
+helpers are independent and can be used together.
+
+For example, to downgrade R8 warnings to info:
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          args.addAll(listOf("--map-diagnostics", "warning", "info"))
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          args.addAll(['--map-diagnostics', 'warning', 'info'])
+        }
+      }
+    }
+    ```
+
+To enable name obfuscation:
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableObfuscation()
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableObfuscation()
+        }
+      }
+    }
+    ```
+
+To enable optimization:
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableOptimization()
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableOptimization()
+        }
+      }
+    }
+    ```
+
+To enable both:
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableObfuscation()
+          enableOptimization()
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableObfuscation()
+          enableOptimization()
+        }
+      }
+    }
+    ```
 
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html

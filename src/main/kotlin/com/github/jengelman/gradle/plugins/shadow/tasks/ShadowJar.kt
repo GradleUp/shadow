@@ -1,14 +1,18 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.R8_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
-import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
+import com.github.jengelman.gradle.plugins.shadow.internal.R8Minimizer
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
+import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
@@ -61,11 +65,14 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
+import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.process.ExecOperations
 
 @CacheableTask
 public abstract class ShadowJar : Jar() {
-  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  private val defaultMinimizeSpec = objectFactory.newInstance(DefaultMinimizeSpec::class.java)
+
   private val shadowDependencies = project.provider {
     // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
     // without Shadow plugin applied.
@@ -98,16 +105,29 @@ public abstract class ShadowJar : Jar() {
   )
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
+  /** Options for [minimize]. */
+  @get:Nested public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
+
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
-      if (it) (dependencyFilterForMinimize.resolve(configurations.get()) - apiJars) else emptySet()
+    minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
+      if (!enabled) return@zip emptySet()
+      when (tool) {
+        MinimizeTool.DEPENDENCY_ANALYZER,
+        MinimizeTool.R8 -> minimizeSpec.resolve(configurations.get()) - apiJars
+      }
     }
   }
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
+    minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
+      if (!enabled) return@zip project.provider { emptyList() }
+      when (tool) {
+        MinimizeTool.DEPENDENCY_ANALYZER,
+        MinimizeTool.R8 -> project.getApiJars()
+      }
+    }
   }
 
   @get:InputFiles
@@ -123,6 +143,22 @@ public abstract class ShadowJar : Jar() {
       }
     }
   }
+
+  @get:Classpath
+  public open val r8Classpath: ConfigurableFileCollection = objectFactory.fileCollection {
+    minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
+      if (enabled && tool == MinimizeTool.R8) {
+        project.configurations.findByName(R8_CONFIGURATION_NAME) ?: project.files()
+      } else {
+        emptySet()
+      }
+    }
+  }
+
+  /** Java launcher used when running R8. */
+  @get:Nested
+  @get:Optional
+  public open val javaLauncher: Property<JavaLauncher> = objectFactory.property()
 
   /** [ResourceTransformer]s to be applied in the shadow steps. */
   @get:Nested
@@ -282,13 +318,15 @@ public abstract class ShadowJar : Jar() {
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
+  @get:Inject protected abstract val execOperations: ExecOperations
+
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize. */
+  /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
-  public open fun minimize(action: Action<DependencyFilter> = Action {}) {
+  public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
     minimizeJar.set(true)
-    action.execute(dependencyFilterForMinimize)
+    action.execute(minimizeSpec)
   }
 
   /** Extra dependency operations to be applied in the shadow steps. */
@@ -476,6 +514,7 @@ public abstract class ShadowJar : Jar() {
     }
     injectManifestAttributes()
     super.copy()
+    minimizeWithR8()
   }
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
@@ -505,7 +544,7 @@ public abstract class ShadowJar : Jar() {
       }
     }
     val unusedClasses =
-      if (minimizeJar.get()) {
+      if (minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
         val unusedTracker =
           UnusedTracker(
             sourceSetsClassesDirs = sourceSetsClassesDirs.files,
@@ -628,6 +667,28 @@ public abstract class ShadowJar : Jar() {
     }
   }
 
+  private fun minimizeWithR8() {
+    val useR8 = minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
+    if (!useR8) return
+    val keptDependencyFiles = includedDependencies.files - toMinimize.files
+    R8Minimizer(
+        execOperations = execOperations,
+        logger = logger,
+        r8Classpath = r8Classpath,
+        r8Spec = defaultMinimizeSpec.r8Spec,
+        javaLauncher = javaLauncher,
+        sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+        keptDependencyFiles = keptDependencyFiles,
+        relocators = relocators.get() + packageRelocators,
+        preserveFileTimestamps = isPreserveFileTimestamps,
+        reproducibleFileOrder = isReproducibleFileOrder,
+        zip64 = isZip64,
+        entryCompression = entryCompression,
+        metadataCharset = metadataCharset,
+      )
+      .minimize(archiveFile.get().asFile, temporaryDir)
+  }
+
   public companion object {
     public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
 
@@ -658,6 +719,12 @@ public abstract class ShadowJar : Jar() {
               @Suppress("EagerGradleConfiguration") // The ctor doesn't support Provider.
               jarTask.get().manifest,
             )
+
+          project.plugins.withId("org.gradle.java") {
+            task.javaLauncher.convention(
+              project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
+            )
+          }
 
           action.execute(task)
         }

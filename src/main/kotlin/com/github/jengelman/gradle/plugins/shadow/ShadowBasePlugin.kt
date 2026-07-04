@@ -24,6 +24,15 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
       }
       @Suppress("EagerGradleConfiguration") // this should be created eagerly.
       configurations.create(CONFIGURATION_NAME)
+      @Suppress("EagerGradleConfiguration") // this should be created eagerly.
+      configurations.create(R8_CONFIGURATION_NAME) {
+        it.description = "R8 executable used by ShadowJar R8 minimization."
+        it.isCanBeConsumed = false
+        it.isCanBeResolved = true
+        it.defaultDependencies { dependencies ->
+          dependencies.add(project.dependencies.create(DEFAULT_R8_DEPENDENCY))
+        }
+      }
     }
 
   public companion object {
@@ -44,6 +53,8 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
     public const val SHADOW: String = "shadow"
     public const val EXTENSION_NAME: String = SHADOW
     public const val CONFIGURATION_NAME: String = SHADOW
+    public const val R8_CONFIGURATION_NAME: String = "shadowR8"
+    internal const val DEFAULT_R8_DEPENDENCY: String = "com.android.tools:r8:9.1.31"
 
     @get:JvmSynthetic
     public inline val ConfigurationContainer.shadow: NamedDomainObjectProvider<Configuration>
