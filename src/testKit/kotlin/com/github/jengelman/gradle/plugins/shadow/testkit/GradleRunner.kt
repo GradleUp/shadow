@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.assertThat
 import assertk.assertions.doesNotContain
-import com.github.jengelman.gradle.plugins.shadow.TestKitBuildConfig
+import com.github.jengelman.gradle.plugins.shadow.TestKitBuildConfig.TEST_GRADLE_VERSION
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
@@ -17,7 +17,7 @@ private val testKitDir by lazy {
   Path(gradleUserHome, "testkit")
 }
 
-const val testGradleVersion: String = TestKitBuildConfig.TEST_GRADLE_VERSION
+const val testGradleVersion: String = TEST_GRADLE_VERSION
 
 // TODO: this could be inlined after bumping the min Gradle requirement to 9.6 or above.
 val enableNoImplicitLookupInParentProjects: String
