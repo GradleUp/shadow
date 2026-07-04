@@ -73,14 +73,6 @@ import org.gradle.process.ExecOperations
 public abstract class ShadowJar : Jar() {
   private val defaultMinimizeSpec = objectFactory.newInstance(DefaultMinimizeSpec::class.java)
 
-  /** Options for [minimize]. */
-  @get:Nested public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
-
-  /** Java launcher used when running R8. */
-  @get:Nested
-  @get:Optional
-  public open val javaLauncher: Property<JavaLauncher> = objectFactory.property()
-
   private val shadowDependencies = project.provider {
     // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
     // without Shadow plugin applied.
@@ -112,6 +104,9 @@ public abstract class ShadowJar : Jar() {
     description = "Minimizes the jar by removing unused classes.",
   )
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
+
+  /** Options for [minimize]. */
+  @get:Nested public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
 
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
@@ -159,6 +154,11 @@ public abstract class ShadowJar : Jar() {
       }
     }
   }
+
+  /** Java launcher used when running R8. */
+  @get:Nested
+  @get:Optional
+  public open val javaLauncher: Property<JavaLauncher> = objectFactory.property()
 
   /** [ResourceTransformer]s to be applied in the shadow steps. */
   @get:Nested
