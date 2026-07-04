@@ -50,7 +50,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
-  @Issue("https://github.com/GradleUp/shadow/pull/1766")
+  @Issue("https://github.com/GradleUp/shadow/issues/1766")
   @Test
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
     val kFunction =
