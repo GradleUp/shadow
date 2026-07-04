@@ -722,9 +722,11 @@ public abstract class ShadowJar : Jar() {
               jarTask.get().manifest,
             )
 
-          task.javaLauncher.convention(
-            project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
-          )
+          project.plugins.withId("org.gradle.java") {
+            task.javaLauncher.convention(
+              project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
+            )
+          }
 
           action.execute(task)
         }
