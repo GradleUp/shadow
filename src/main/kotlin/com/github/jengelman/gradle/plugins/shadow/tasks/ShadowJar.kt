@@ -201,12 +201,13 @@ public abstract class ShadowJar : Jar() {
   public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
-   * Enables remapping of Kotlin module metadata (`.kotlin_module`) files.
+   * Enables remapping of Kotlin module metadata (`.kotlin_module`) files' contents.
    *
-   * If you enable this option, the Kotlin module metadata file paths and their contents will be
-   * relocated if they are matched by any of the configured [relocators]. Someone may want to
-   * disable this feature and write their own [ResourceTransformer]s to handle Kotlin module
-   * metadata files in a custom way.
+   * If you enable this option, the Kotlin module metadata file contents will be relocated if they
+   * are matched by any of the configured [relocators]. Note that the file paths of these metadata
+   * files are relocated unconditionally regardless of this option. Someone may want to disable this
+   * feature and write their own [ResourceTransformer]s to handle Kotlin module metadata files in a
+   * custom way.
    *
    * Defaults to `true`.
    */
