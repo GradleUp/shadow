@@ -73,7 +73,7 @@ public open class KotlinModuleMetadataTransformer(
         newBytes.contentEquals(bytes) -> context.path
         // Content changed but path didn't, so rename to avoid name clash. The filename does not
         // matter to the compiler.
-        else -> context.path.replace(".kotlin_module", ".shadow.kotlin_module")
+        else -> context.path.removeSuffix(".kotlin_module") + ".shadow.kotlin_module"
       }
 
     moduleEntries[entryName] = newBytes
