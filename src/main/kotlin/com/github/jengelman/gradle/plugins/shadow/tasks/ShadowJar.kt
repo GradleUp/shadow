@@ -24,6 +24,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
@@ -200,15 +201,24 @@ public abstract class ShadowJar : Jar() {
   public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
-   * Enables remapping of Kotlin module metadata (`.kotlin_module`) files.
+   * Enables remapping of Kotlin module metadata (`.kotlin_module`) files' contents.
    *
-   * If you enable this option, the Kotlin module metadata file paths and their contents will be
-   * relocated if they are matched by any of the configured [relocators]. Someone may want to
-   * disable this feature and write their own [ResourceTransformer]s to handle Kotlin module
-   * metadata files in a custom way.
+   * If you enable this option, the Kotlin module metadata file contents will be relocated if they
+   * are matched by any of the configured [relocators]. Note that the file paths of these metadata
+   * files are relocated unconditionally regardless of this option. Someone may want to disable this
+   * feature and write their own [ResourceTransformer]s to handle Kotlin module metadata files in a
+   * custom way.
    *
    * Defaults to `true`.
    */
+  @Deprecated(
+    "Use `KotlinModuleMetadataTransformer` explicitly instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform(KotlinModuleMetadataTransformer::class.java)",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer",
+      ),
+  )
   @get:Input
   @get:Option(
     option = "enable-kotlin-module-remapping",
@@ -556,14 +566,25 @@ public abstract class ShadowJar : Jar() {
       } else {
         emptySet()
       }
+    val actualTransformers =
+      transformers.get().let { set ->
+        @Suppress("DEPRECATION")
+        if (
+          enableKotlinModuleRemapping.get() && set.none { it is KotlinModuleMetadataTransformer }
+        ) {
+          set + KotlinModuleMetadataTransformer::class.java.create(objectFactory)
+        } else {
+          set
+        }
+      }
     @Suppress("DEPRECATION")
     return ShadowCopyAction(
       zipFile = archiveFile.get().asFile,
       zosProvider = zosProvider,
-      transformers = transformers.get(),
+      transformers = actualTransformers,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
-      enableKotlinModuleRemapping = enableKotlinModuleRemapping.get(),
+      enableKotlinModuleRemapping = false, // Unused param.
       preserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
       metadataCharset,

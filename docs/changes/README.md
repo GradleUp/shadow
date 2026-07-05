@@ -7,12 +7,15 @@
 
 - Check `DuplicatesStrategy` for merging transformers. ([#2026](https://github.com/GradleUp/shadow/pull/2026))  
   This will log warnings when an incompatible `DuplicatesStrategy` (e.g., `EXCLUDE`) is applied in Gradle configuration for built-in `ResourceTransformer`s.
+- Add `KotlinModuleMetadataTransformer`. ([#2073](https://github.com/GradleUp/shadow/pull/2073))
 - Add R8 as an opt-in `minimize { r8 { ... } }` tool for shrinking the final shadowed JAR. ([#2077](https://github.com/GradleUp/shadow/pull/2077))
 
 ### Changed
 
 - Bump min Gradle requirement to 9.2.0. ([#2057](https://github.com/GradleUp/shadow/pull/2057))
 - Remove `afterEvaluate` when adding variants. ([#2056](https://github.com/GradleUp/shadow/pull/2056))
+- Deprecate `enableKotlinModuleRemapping` for `ShadowJar`. ([#2073](https://github.com/GradleUp/shadow/pull/2073))  
+  Apply `KotlinModuleMetadataTransformer` explicitly to support relocating inside Kotlin module metadata files.
 
 ### Fixed
 
