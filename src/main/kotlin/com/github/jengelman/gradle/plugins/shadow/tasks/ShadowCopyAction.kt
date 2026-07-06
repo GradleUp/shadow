@@ -228,7 +228,7 @@ public open class ShadowCopyAction(
 
     @Deprecated(
       message =
-        "Use `ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES` const instead. This will be removed in Shadow 10.",
+        "Use `ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES` constant instead. This will be removed in Shadow 10.",
       replaceWith = ReplaceWith("ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES"),
     )
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES
