@@ -13,7 +13,6 @@ import kotlin.io.path.createTempFile
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.pathString
 import kotlin.io.path.toPath
 import kotlin.io.path.walk
 import kotlin.reflect.full.isSubclassOf
@@ -48,7 +47,7 @@ class DuplicatesStrategyCheckerTest {
 private fun getTransformerClasses(): List<Class<out ResourceTransformer>> {
   val packageName = "com.github.jengelman.gradle.plugins.shadow.transformers"
   val parentClass = ResourceTransformer::class
-  val packagePath = packageName.replace('.', File.separatorChar)
+  val packagePath = packageName.replace('.', '/')
   val classLoader =
     Thread.currentThread().contextClassLoader ?: ResourceTransformer::class.java.classLoader
   val resources = classLoader.getResources(packagePath)
@@ -72,8 +71,8 @@ private fun getTransformerClasses(): List<Class<out ResourceTransformer>> {
             .walk()
             .filter { it.isRegularFile() && it.extension == "class" }
             .forEach { file ->
-              val relativePath = file.pathString.substringAfter(packagePath).removeSuffix(".class")
-              val className = packageName + relativePath.replace(File.separatorChar, '.')
+              val relativePath = directory.relativize(file).toString().removeSuffix(".class")
+              val className = packageName + "." + relativePath.replace(File.separatorChar, '.')
               block(className)
             }
         }
