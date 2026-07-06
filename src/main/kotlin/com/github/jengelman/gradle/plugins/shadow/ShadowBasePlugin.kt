@@ -22,7 +22,9 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
         addShadowJarToAssembleLifecycle.convention(true)
       }
       @Suppress("EagerGradleConfiguration") // this should be created eagerly.
-      configurations.create(CONFIGURATION_NAME)
+      configurations.create(CONFIGURATION_NAME) {
+        it.description = "Specify runtime dependencies that are not merged into the final JAR."
+      }
       @Suppress("EagerGradleConfiguration") // this should be created eagerly.
       configurations.create(R8_CONFIGURATION_NAME) {
         it.description = "R8 executable used by ShadowJar R8 minimization."
