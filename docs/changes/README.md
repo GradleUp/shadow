@@ -6,7 +6,7 @@
 ### Fixed
 
 - Fix eager calls for `targetCompatibility` for `toolchainSpec`.  
-  This fixes the regression when using `toolchain` without `targetCompatibility` in `java` blocks.
+  This fixes the regression when using `toolchain` without `targetCompatibility` in Kotlin DSL.
 
 ## [9.5.0](https://github.com/GradleUp/shadow/releases/tag/9.5.0) - 2026-07-06
 
