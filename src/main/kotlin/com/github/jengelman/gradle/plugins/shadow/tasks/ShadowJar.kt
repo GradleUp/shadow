@@ -30,6 +30,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import java.io.File
 import java.io.IOException
+import java.util.GregorianCalendar
 import java.util.jar.JarFile
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
@@ -712,6 +713,16 @@ public abstract class ShadowJar : Jar() {
 
   public companion object {
     public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
+
+    /**
+     * A copy of
+     * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
+     *
+     * 1980-02-01 00:00:00 (318182400000).
+     */
+    @JvmField
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
+      GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
 
     @get:JvmSynthetic
     public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>

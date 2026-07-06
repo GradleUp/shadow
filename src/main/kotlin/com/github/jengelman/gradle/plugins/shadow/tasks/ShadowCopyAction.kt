@@ -12,7 +12,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import java.util.GregorianCalendar
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
@@ -233,7 +232,11 @@ public open class ShadowCopyAction(
      *
      * 1980-02-01 00:00:00 (318182400000).
      */
-    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
-      GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+    @Deprecated(
+      message =
+        "Use `ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES` const instead. This will be removed in Shadow 10.",
+      replaceWith = ReplaceWith("ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES"),
+    )
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES
   }
 }
