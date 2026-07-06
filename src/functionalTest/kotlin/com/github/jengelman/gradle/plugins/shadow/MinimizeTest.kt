@@ -387,6 +387,29 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
+  fun minimizeWithR8UsesClasspathRules() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        minimize {
+          r8 {}
+        }
+        """
+          .trimIndent()
+    )
+    path("client/src/main/resources/META-INF/proguard/client.pro")
+      .writeText("-keep class client.Reflective { *; }")
+
+    runWithSuccess(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsAtLeast("server/Server.class", "client/Used.class", "client/Reflective.class")
+      containsNone("client/Unused.class")
+    }
+  }
+
+  @Test
   fun minimizeWithR8CanEnableObfuscation() {
     writeR8Repository()
     writeR8ClientAndServerModules(

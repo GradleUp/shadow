@@ -27,8 +27,9 @@ import org.gradle.process.ExecOperations
  * replacing the original jar.
  *
  * Generated rules are based on the final jar contents. Source-set classes are kept as roots,
- * dependencies excluded from minimization are kept, and service descriptors keep providers for
- * downstream `ServiceLoader` users. User rule files and inline rules are appended last.
+ * dependencies excluded from minimization are kept, service descriptors keep providers for
+ * downstream `ServiceLoader` users, and R8 consumer rules are extracted from the jar. User rule
+ * files and inline rules are appended last.
  *
  * The default R8 configuration is shrink-only. Shadow passes `--no-minification` to disable name
  * obfuscation and generates `-dontoptimize` unless optimization is enabled explicitly.
@@ -56,6 +57,7 @@ internal class R8Minimizer(
     }
 
     val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
+    val extractedRulesFile = r8Dir.resolve("classpath-rules.pro")
     val rulesFile = r8Dir.resolve("rules.pro")
     val r8Output = r8Dir.resolve("output.jar")
     val normalizedOutput = r8Dir.resolve("normalized-output.jar")
@@ -66,8 +68,12 @@ internal class R8Minimizer(
       throw GradleException("R8 minimization requires the java.home system property.")
     }
 
+    extractClasspathRules(inputJar, extractedRulesFile, launcher)
+
     val r8Args = r8Spec.args.get()
-    rulesFile.writeText(createRules(inputJar, r8Args).joinToString(System.lineSeparator()))
+    rulesFile.writeText(
+      createRules(inputJar, r8Args, extractedRulesFile).joinToString(System.lineSeparator())
+    )
 
     val arguments = buildList {
       add("--classfile")
@@ -95,7 +101,37 @@ internal class R8Minimizer(
     Files.move(normalizedOutput.toPath(), inputJar.toPath(), REPLACE_EXISTING)
   }
 
-  private fun createRules(inputJar: File, r8Args: List<String>): List<String> {
+  // R8's command line does not automatically apply consumer rules carried inside program jars.
+  // Extract them from the exact jar R8 will shrink, matching the classpath-rule handling used by
+  // Android builds.
+  private fun extractClasspathRules(
+    inputJar: File,
+    outputFile: File,
+    launcher: JavaLauncher?,
+  ) {
+    val arguments = buildList {
+      add("--rules-output")
+      add(outputFile.absolutePath)
+      add("--include-origin-comments")
+      add(inputJar.absolutePath)
+    }
+
+    logger.info("Extracting R8 rules from {}.", inputJar)
+    execOperations.javaexec {
+      it.classpath = r8Classpath
+      it.mainClass.set(R8_RULES_MAIN_CLASS)
+      if (launcher != null) {
+        it.executable = launcher.executablePath.asFile.absolutePath
+      }
+      it.args(arguments)
+    }
+  }
+
+  private fun createRules(
+    inputJar: File,
+    r8Args: List<String>,
+    extractedRulesFile: File,
+  ): List<String> {
     val rules = linkedSetOf<String>()
     if (shouldDisableOptimization(r8Args)) {
       rules += DefaultR8Spec.DONT_OPTIMIZE_RULE
@@ -103,11 +139,12 @@ internal class R8Minimizer(
     rules += sourceKeepRules(inputJar)
     rules += keptDependencyRules(inputJar)
     rules += serviceKeepRules(inputJar)
+    rules += extractedRulesFile.readLines()
     r8Spec.keepRuleFiles.files
       .sortedBy { it.absolutePath }
       .forEach { file ->
         if (file.isFile) {
-          rules += file.readText().lineSequence().toList()
+          rules += file.readLines()
         }
       }
     rules += r8Spec.keepRules.get()
@@ -335,6 +372,7 @@ internal class R8Minimizer(
 
   private companion object {
     const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
+    const val R8_RULES_MAIN_CLASS = "com.android.tools.r8.ExtractR8Rules"
     const val SERVICES_PATH = "META-INF/services/"
     const val DEFAULT_DIR_MODE = 493 // 0755
     const val DEFAULT_FILE_MODE = 420 // 0644

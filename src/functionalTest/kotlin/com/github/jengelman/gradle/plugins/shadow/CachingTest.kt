@@ -377,6 +377,40 @@ class CachingTest : BasePluginTest() {
   }
 
   @Test
+  fun r8ClasspathRuleChanged() {
+    val previousTaskPath = taskPath
+    taskPath = serverShadowJarPath
+    try {
+      writeR8Repository()
+      writeR8ClientAndServerModules()
+      path("server/r8-rules.pro").writeText("")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsAtLeast("server/Server.class", "client/Used.class", *manifestEntries)
+        containsNone("client/Reflective.class")
+      }
+
+      path("client/src/main/resources/META-INF/proguard/client.pro")
+        .writeText("-keep class client.Reflective { *; }")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsAtLeast(
+          "server/Server.class",
+          "client/Used.class",
+          "client/Reflective.class",
+          *manifestEntries,
+        )
+        containsNone("client/Unused.class")
+      }
+      assertExecutionsFromCacheAndUpToDate()
+    } finally {
+      taskPath = previousTaskPath
+    }
+  }
+
+  @Test
   fun relocatorChanged() {
     projectScript.appendText(
       """
