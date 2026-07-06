@@ -226,12 +226,6 @@ public open class ShadowCopyAction(
       get() =
         this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
 
-    /**
-     * A copy of
-     * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
-     *
-     * 1980-02-01 00:00:00 (318182400000).
-     */
     @Deprecated(
       message =
         "Use `ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES` const instead. This will be removed in Shadow 10.",
