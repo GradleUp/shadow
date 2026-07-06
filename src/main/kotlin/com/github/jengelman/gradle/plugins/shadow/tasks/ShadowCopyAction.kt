@@ -227,21 +227,12 @@ public open class ShadowCopyAction(
       get() =
         this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
 
-    @Deprecated(
-      message =
-        "Use `CONSTANT_TIME_FOR_ZIP_ENTRIES` const instead. This will be removed in Shadow 10.",
-      replaceWith = ReplaceWith("CONSTANT_TIME_FOR_ZIP_ENTRIES"),
-    )
-    @Suppress("FunctionName") // For ABI compatibility.
-    public fun getCONSTANT_TIME_FOR_ZIP_ENTRIES(): Long = CONSTANT_TIME_FOR_ZIP_ENTRIES
-
     /**
      * A copy of
      * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
      *
      * 1980-02-01 00:00:00 (318182400000).
      */
-    @JvmField
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
       GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
   }

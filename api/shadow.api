@@ -228,7 +228,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
-	public static final field CONSTANT_TIME_FOR_ZIP_ENTRIES J
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
 	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ZZZLjava/lang/String;)V
 	public fun execute (Lorg/gradle/api/internal/file/copy/CopyActionProcessingStream;)Lorg/gradle/api/tasks/WorkResult;
