@@ -12,7 +12,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import java.util.GregorianCalendar
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
@@ -31,11 +30,8 @@ import org.gradle.api.tasks.WorkResults
  * Modified from
  * [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
-public open class ShadowCopyAction
-@Deprecated(
-  "This constructor should not be used as a public API. Will be made internal in Shadow 10."
-)
-constructor(
+@Deprecated("This should not be used as a public API. Will be made internal in Shadow 10.")
+public open class ShadowCopyAction(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
   private val transformers: Set<ResourceTransformer>,
@@ -223,20 +219,18 @@ constructor(
   }
 
   public companion object {
-    private val logger = Logging.getLogger(ShadowCopyAction::class.java)
+    @Suppress("DEPRECATION") private val logger = Logging.getLogger(ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
     private val ZipOutputStream.entries: List<ZipEntry>
       get() =
         this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
 
-    /**
-     * A copy of
-     * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
-     *
-     * 1980-02-01 00:00:00 (318182400000).
-     */
-    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
-      GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+    @Deprecated(
+      message =
+        "Use `ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES` constant instead. This will be removed in Shadow 10.",
+      replaceWith = ReplaceWith("ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES"),
+    )
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES
   }
 }

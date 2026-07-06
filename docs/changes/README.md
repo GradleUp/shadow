@@ -16,6 +16,7 @@
 - Remove `afterEvaluate` when adding variants. ([#2056](https://github.com/GradleUp/shadow/pull/2056))
 - Deprecate `enableKotlinModuleRemapping` for `ShadowJar`. ([#2073](https://github.com/GradleUp/shadow/pull/2073))  
   Apply `KotlinModuleMetadataTransformer` explicitly to support relocating inside Kotlin module metadata files.
+- Deprecate everything under `ShadowCopyAction`. ([#2083](https://github.com/GradleUp/shadow/pull/2083))
 
 ### Fixed
 

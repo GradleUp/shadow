@@ -238,6 +238,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar {
+	public static final field CONSTANT_TIME_FOR_ZIP_ENTRIES J
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar$Companion;
 	public static final field SHADOW_JAR_TASK_NAME Ljava/lang/String;
 	public fun <init> ()V

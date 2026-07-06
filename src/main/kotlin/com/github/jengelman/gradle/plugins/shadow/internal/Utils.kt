@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
@@ -39,7 +39,7 @@ internal inline fun zipEntry(
         time = lastModified
       }
     } else {
-      time = ShadowCopyAction.CONSTANT_TIME_FOR_ZIP_ENTRIES
+      time = CONSTANT_TIME_FOR_ZIP_ENTRIES
     }
     block()
   }
