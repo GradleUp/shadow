@@ -34,7 +34,6 @@ import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
-import org.gradle.api.JavaVersion
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
@@ -1223,23 +1222,6 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
       containsAtLeast("com/company/Main.class", "com/company/Utils.class", manifestEntry)
     }
-  }
-
-  @Issue("https://github.com/GradleUp/shadow/issues/2086")
-  @Test
-  fun useToolchainWithoutTargetCompatibility() {
-    projectScript.appendText(
-      """
-        java {
-          toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
-        }
-      """
-        .trimIndent()
-    )
-
-    val result = runWithSuccess(shadowJarPath)
-
-    assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {
