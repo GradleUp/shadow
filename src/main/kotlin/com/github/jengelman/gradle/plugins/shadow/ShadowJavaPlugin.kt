@@ -75,29 +75,34 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
           Bundling.BUNDLING_ATTRIBUTE,
           shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
         )
-        if (shadow.addTargetJvmVersionAttribute.get()) {
-          val compileJvmVersion =
-            compileClasspathConfig.get().attributes.getAttribute(TARGET_JVM_VERSION_ATTRIBUTE)
-          val targetJvmVersion =
-            compileJvmVersion ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
-          if (targetJvmVersion != Int.MAX_VALUE) {
-            logger.info(
-              "Setting target JVM version to {} for {} configuration.",
-              targetJvmVersion,
-              shadowRuntimeElements.name,
-            )
-            attrs.attribute(TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+
+        // `targetCompatibility` eagerly calls toolchainSpec, we need to defer it by afterEvaluate.
+        // https://github.com/gradle/gradle/blob/9e1a582adeb5ba12e6ad3807e62964806ea51bbb/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/internal/DefaultJavaPluginExtension.java#L119
+        afterEvaluate {
+          if (shadow.addTargetJvmVersionAttribute.get()) {
+            val compileJvmVersion =
+              compileClasspathConfig.get().attributes.getAttribute(TARGET_JVM_VERSION_ATTRIBUTE)
+            val targetJvmVersion =
+              compileJvmVersion ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
+            if (targetJvmVersion != Int.MAX_VALUE) {
+              logger.info(
+                "Setting target JVM version to {} for {} configuration.",
+                targetJvmVersion,
+                shadowRuntimeElements.name,
+              )
+              attrs.attribute(TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+            } else {
+              logger.info(
+                "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
+              )
+            }
           } else {
             logger.info(
-              "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
+              "Skipping setting {} attribute for {} configuration.",
+              TARGET_JVM_VERSION_ATTRIBUTE,
+              shadowRuntimeElements.name,
             )
           }
-        } else {
-          logger.info(
-            "Skipping setting {} attribute for {} configuration.",
-            TARGET_JVM_VERSION_ATTRIBUTE,
-            shadowRuntimeElements.name,
-          )
         }
       }
       shadowRuntimeElements.outgoing.artifact(tasks.shadowJar)
