@@ -3,6 +3,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.5.0...HEAD) - 2026-xx-xx
 
+### Fixed
+
+- Fix eager calls for `toolchainSpec` in Kotlin DSL.  
+  This fixes the regression when using `toolchain` without `targetCompatibility` in Kotlin DSL.
 
 ## [9.5.0](https://github.com/GradleUp/shadow/releases/tag/9.5.0) - 2026-07-06
 
