@@ -5,7 +5,7 @@ help you get started.
 
 ## Prerequisites
 
-- **Java Development Kit (JDK)**: JDK 17 or higher is required to build the project. JDK 25 is recommended.
+- **Java Development Kit (JDK)**: JDK 25 or higher is required to build the project.
 - **Gradle**: The project uses the Gradle Wrapper, so you do not need to install Gradle globally. Run command-line tasks
   using `./gradlew` (or `gradlew.bat` on Windows).
 

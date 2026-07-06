@@ -2,8 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
@@ -77,7 +79,9 @@ class BytecodeRemappingTest {
 
     val failure = assertThrows<GradleException> { details.remapClass(relocators) }
 
-    assertThat(failure.message).isEqualTo("Error in ASM processing class $path")
+    assertThat(failure.message)
+      .isNotNull()
+      .containsMatch("Error in (ASM|Class-File API) processing class $path".toRegex())
   }
 
   @Test

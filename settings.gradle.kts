@@ -12,7 +12,10 @@ pluginManagement {
   }
 }
 
-plugins { id("com.gradle.develocity") version "4.5.0" }
+plugins {
+  id("com.gradle.develocity") version "4.5.0"
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 
 develocity {
   buildScan {
@@ -42,3 +45,7 @@ rootProject.name = "shadow"
 enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+
+check(JavaVersion.current() >= JavaVersion.VERSION_25) {
+  "Needs Java 25 or above to run, the current is ${JavaVersion.current()}"
+}
