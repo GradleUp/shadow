@@ -31,11 +31,8 @@ import org.gradle.api.tasks.WorkResults
  * Modified from
  * [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
-public open class ShadowCopyAction
-@Deprecated(
-  "This constructor should not be used as a public API. Will be made internal in Shadow 10."
-)
-constructor(
+@Deprecated("This should not be used as a public API. Will be made internal in Shadow 10.")
+public open class ShadowCopyAction(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
   private val transformers: Set<ResourceTransformer>,
@@ -223,7 +220,7 @@ constructor(
   }
 
   public companion object {
-    private val logger = Logging.getLogger(ShadowCopyAction::class.java)
+    @Suppress("DEPRECATION") private val logger = Logging.getLogger(ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
     private val ZipOutputStream.entries: List<ZipEntry>
