@@ -5,7 +5,7 @@
 
 ### Added
 
-- Extract R8 rules from dependency JARs when using `minimize { r8 { ... } }`.
+- Extract R8 rules from dependency JARs when using `minimize { r8 { ... } }`. ([#2089](https://github.com/GradleUp/shadow/pull/2089))
 
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06
 
