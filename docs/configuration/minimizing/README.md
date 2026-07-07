@@ -79,6 +79,7 @@ whole-program shrinking instead of the default dependency analyzer. R8 runs afte
 relocated the JAR, so service descriptors in `META-INF/services` are used to keep service providers.
 
 The default R8 configuration only shrinks unused code. It disables name minification and optimization.
+Shadow also extracts R8 rules published in dependency JARs, for example under `META-INF/proguard`.
 
 === "Kotlin"
 

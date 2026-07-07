@@ -7,8 +7,6 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -354,21 +352,69 @@ class CachingTest : BasePluginTest() {
 
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
-        containsAtLeast("server/Server.class", "client/Used.class", *manifestEntries)
-        containsNone("client/Reflective.class")
+        containsOnly(
+          "client/",
+          "client/Used.class",
+          "server/",
+          "server/Server.class",
+          *manifestEntries,
+        )
       }
 
       keepRules.writeText("-keep class client.Reflective { *; }")
 
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
-        containsAtLeast(
-          "server/Server.class",
+        containsOnly(
+          "client/",
           "client/Used.class",
           "client/Reflective.class",
+          "server/",
+          "server/Server.class",
           *manifestEntries,
         )
-        containsNone("client/Unused.class")
+      }
+      assertExecutionsFromCacheAndUpToDate()
+    } finally {
+      taskPath = previousTaskPath
+    }
+  }
+
+  @Test
+  fun r8ClasspathRuleChanged() {
+    val previousTaskPath = taskPath
+    taskPath = serverShadowJarPath
+    try {
+      writeR8Repository()
+      writeR8ClientAndServerModules()
+      path("server/r8-rules.pro").writeText("")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsOnly(
+          "client/",
+          "client/Used.class",
+          "server/",
+          "server/Server.class",
+          *manifestEntries,
+        )
+      }
+
+      path("client/src/main/resources/META-INF/proguard/client.pro")
+        .writeText("-keep class client.Reflective { *; }")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsOnly(
+          "client/",
+          "client/Used.class",
+          "client/Reflective.class",
+          "server/",
+          "server/Server.class",
+          "META-INF/proguard/",
+          "META-INF/proguard/client.pro",
+          *manifestEntries,
+        )
       }
       assertExecutionsFromCacheAndUpToDate()
     } finally {
