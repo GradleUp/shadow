@@ -7,6 +7,10 @@
 
 - Extract R8 rules from dependency JARs when using `minimize { r8 { ... } }`. ([#2089](https://github.com/GradleUp/shadow/pull/2089))
 
+### Changed
+
+- Rename `ShadowDslMarker` to `ShadowDsl`. ([#2091](https://github.com/GradleUp/shadow/pull/2091))
+
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06
 
 ### Fixed
