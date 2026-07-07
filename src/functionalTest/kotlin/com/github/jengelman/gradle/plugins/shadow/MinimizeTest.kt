@@ -404,8 +404,16 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("server/Server.class", "client/Used.class", "client/Reflective.class")
-      containsNone("client/Unused.class")
+      containsOnly(
+        "client/",
+        "client/Used.class",
+        "client/Reflective.class",
+        "server/",
+        "server/Server.class",
+        "META-INF/proguard/",
+        "META-INF/proguard/client.pro",
+        *manifestEntries,
+      )
     }
   }
 
