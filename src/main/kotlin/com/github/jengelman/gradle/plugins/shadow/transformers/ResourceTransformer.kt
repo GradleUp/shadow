@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowDslMarker
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import java.io.IOException
 import org.apache.tools.zip.ZipOutputStream
@@ -17,7 +17,7 @@ import org.gradle.api.tasks.Internal
  * @author Charlie Knudsen
  * @author John Engelman
  */
-@ShadowDslMarker
+@ShadowDsl
 public interface ResourceTransformer : Named {
   public fun canTransformResource(element: FileTreeElement): Boolean
 

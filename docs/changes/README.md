@@ -10,7 +10,7 @@
 ### Changed
 
 - Rename `ShadowDslMarker` to `ShadowDsl`. ([#2091](https://github.com/GradleUp/shadow/pull/2091))
-- Apply `@ShadowDslMarker` to `ShadowJar`, `ResourceTransformer`, `DependencyFilter`, and `Relocator`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
+- Apply `@ShadowDsl` to `ShadowJar`, `ResourceTransformer`, `DependencyFilter`, and `Relocator`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
   This restricts nested DSL configuration blocks from implicitly calling outer receiver APIs in Kotlin script files.
 
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06

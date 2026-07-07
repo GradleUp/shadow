@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowDslMarker
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import org.gradle.api.tasks.Input
 
@@ -11,7 +11,7 @@ import org.gradle.api.tasks.Input
  * @author Jason van Zyl
  * @author John Engelman
  */
-@ShadowDslMarker
+@ShadowDsl
 public interface Relocator {
   public fun canRelocatePath(path: String): Boolean
 
