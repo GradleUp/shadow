@@ -80,10 +80,11 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         shadowRuntimeElements.outgoing.artifact(tasks.shadowJar)
       }
 
-    // `targetCompatibility` eagerly calls toolchainSpec, we need to defer it by afterEvaluate.
-    // https://github.com/gradle/gradle/blob/9e1a582adeb5ba12e6ad3807e62964806ea51bbb/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/internal/DefaultJavaPluginExtension.java#L119
+    // See more details in #2086.
     afterEvaluate {
       if (shadow.addTargetJvmVersionAttribute.get()) {
+        // This eager call will lock `toolchain.languageVersion`, so we must defer it by
+        // `afterEvaluate`.
         val compileJvmVersion =
           compileClasspathConfig.get().attributes.getAttribute(TARGET_JVM_VERSION_ATTRIBUTE)
         val targetJvmVersion =
