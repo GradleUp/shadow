@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import java.io.Serializable
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -13,6 +14,7 @@ import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Internal
 
 // DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
+@ShadowDsl
 public interface DependencyFilter : Serializable {
   /** Resolve a [configuration] against the [include]/[exclude] rules in the filter. */
   public fun resolve(configuration: Configuration): FileCollection

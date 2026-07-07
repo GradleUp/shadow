@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.R8_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
@@ -71,6 +72,7 @@ import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
 
+@ShadowDsl
 @CacheableTask
 public abstract class ShadowJar : Jar() {
   private val defaultMinimizeSpec = objectFactory.newInstance(DefaultMinimizeSpec::class.java)
