@@ -7,6 +7,11 @@
 
 - Extract R8 rules from dependency JARs when using `minimize { r8 { ... } }`. ([#2089](https://github.com/GradleUp/shadow/pull/2089))
 
+### Changed
+
+- Mark `ShadowDslMarker` for `PatternFilterableResourceTransformer` and `ShadowJar`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
+  You shouldn't call `ShadowJar` members in `PatternFilterableResourceTransformer` blocks.
+
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06
 
 ### Fixed

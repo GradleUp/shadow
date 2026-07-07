@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.ShadowDslMarker
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.specs.Spec
@@ -13,6 +14,7 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * @param patternSet The [PatternSet] used for filtering resources.
  */
+@ShadowDslMarker
 public abstract class PatternFilterableResourceTransformer(
   @Internal public val patternSet: PatternSet
 ) : ResourceTransformer by ResourceTransformer.Companion, PatternFilterable by patternSet {
