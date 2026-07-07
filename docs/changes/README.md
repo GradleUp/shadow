@@ -9,8 +9,8 @@
 
 ### Changed
 
-- Mark `ShadowDslMarker` for `PatternFilterableResourceTransformer` and `ShadowJar`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
-  You shouldn't call `ShadowJar` members in `PatternFilterableResourceTransformer` blocks.
+- Apply `@ShadowDslMarker` to `PatternFilterableResourceTransformer` and `ShadowJar`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
+  This prevents Kotlin DSL from accidentally calling `ShadowJar` APIs inside `PatternFilterableResourceTransformer` configuration blocks.
 
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06
 
