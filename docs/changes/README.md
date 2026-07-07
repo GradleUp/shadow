@@ -9,8 +9,8 @@
 
 ### Changed
 
-- Apply `@ShadowDslMarker` to `PatternFilterableResourceTransformer` and `ShadowJar`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
-  This prevents Kotlin DSL from accidentally calling `ShadowJar` APIs inside `PatternFilterableResourceTransformer` configuration blocks.
+- Apply `@ShadowDslMarker` to `ShadowJar`, `ResourceTransformer`, `DependencyFilter`, and `Relocator`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
+  This restricts nested DSL configuration blocks from implicitly calling outer receiver APIs in Kotlin script files.
 
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06
 
