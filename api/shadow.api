@@ -41,6 +41,9 @@ public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$C
 	public final synthetic fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
+public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/ShadowDsl : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/ShadowDslMarker : java/lang/annotation/Annotation {
 }
 
