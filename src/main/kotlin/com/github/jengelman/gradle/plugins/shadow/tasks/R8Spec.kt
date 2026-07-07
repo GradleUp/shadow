@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowDslMarker
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
@@ -9,7 +9,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
 /** Minimal R8 configuration for [ShadowJar.minimize]. */
-@ShadowDslMarker
+@ShadowDsl
 public interface R8Spec {
   /**
    * Additional R8 command line arguments.
