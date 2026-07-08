@@ -57,8 +57,14 @@ lint {
 }
 
 spotless {
-  kotlin { ktfmt(libs.ktfmt.get().version).googleStyle() }
-  kotlinGradle { ktfmt(libs.ktfmt.get().version).googleStyle() }
+  kotlin {
+    ktfmt(libs.ktfmt.get().version).googleStyle()
+    target("src/**/*.kt")
+  }
+  kotlinGradle {
+    ktfmt(libs.ktfmt.get().version).googleStyle()
+    target("*.kts")
+  }
 }
 
 val testPluginClasspath =
