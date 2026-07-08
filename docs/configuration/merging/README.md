@@ -642,3 +642,4 @@ You can then run the task to scan each entry on the classpath and print any matc
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
 [mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
+[CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
