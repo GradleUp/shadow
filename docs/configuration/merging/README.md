@@ -444,6 +444,38 @@ The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add thi
     }
     ```
 
+## Merging Spring Boot Configuration Files
+
+Shadow provides a specific transformer for dealing with Spring Boot configuration and imports files.
+This handles merging and class relocation for common Spring Boot files including:
+
+- `META-INF/spring.factories` (properties merging)
+- `META-INF/spring-autoconfigure-metadata.properties` (properties merging)
+- `META-INF/spring.handlers` (properties merging)
+- `META-INF/spring.schemas` (properties merging)
+- `META-INF/spring.tooling` (properties merging)
+- `META-INF/spring/aot.factories` (properties merging)
+- `META-INF/spring/*.imports` (line-based imports concatenation and deduplication)
+
+The [`SpringBootTransformer`][SpringBootTransformer] will handle these files.
+The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.SpringBootTransformer>()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.SpringBootTransformer)
+    }
+    ```
+
 ## Merging Log4j2 Plugin Cache Files (`Log4j2Plugins.dat`)
 
 [`Log4j2PluginsCacheFileTransformer`][Log4j2PluginsCacheFileTransformer] is a
@@ -640,3 +672,5 @@ You can then run the task to scan each entry on the classpath and print any matc
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
 [mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
+[SpringBootTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-spring-boot-transformer/index.html
+
