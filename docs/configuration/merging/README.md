@@ -100,6 +100,8 @@ Alternatively, you can follow these steps:
     [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
     to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 
+Note, however that functions inherited from [`CopySpec`][CopySpec], such as [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching],  [`eachFile`][Jar.eachFile], or others, disable the output caching.
+
 Optional steps:
 
 - Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
