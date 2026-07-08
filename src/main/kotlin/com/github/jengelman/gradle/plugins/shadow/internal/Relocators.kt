@@ -21,6 +21,10 @@ internal fun Set<Relocator>.mapName(
   return newName
 }
 
+/**
+ * Modified from
+ * [org.apache.maven.plugins.shade.DefaultShader.DefaultPackageMapper](https://github.com/apache/maven-shade-plugin/blob/ba62a7b7c553e42c586bc6cc86b721f66b838ce1/src/main/java/org/apache/maven/plugins/shade/DefaultShader.java#L757-L794).
+ */
 private fun Set<Relocator>.realMap(name: String, mapLiterals: Boolean): String {
   var newName = name
   var prefix = ""

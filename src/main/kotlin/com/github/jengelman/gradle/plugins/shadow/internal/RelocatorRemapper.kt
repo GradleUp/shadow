@@ -37,14 +37,6 @@ internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
     if (modified) cw.toByteArray() else bytes
   }
 
-/**
- * Modified from
- * [org.apache.maven.plugins.shade.DefaultShader.RelocatorRemapper](https://github.com/apache/maven-shade-plugin/blob/83c123d1f9c5f6927af2aca12ee322b5168a7c63/src/main/java/org/apache/maven/plugins/shade/DefaultShader.java#L689-L772).
- * Modified from
- * [org.apache.maven.plugins.shade.DefaultShader.DefaultPackageMapper](https://github.com/apache/maven-shade-plugin/blob/199ffaecd26a912527173ed4edae366e48a00998/src/main/java/org/apache/maven/plugins/shade/DefaultShader.java#L737-L774).
- *
- * @author John Engelman
- */
 private class RelocatorRemapper(
   private val relocators: Set<Relocator>,
   private val onModified: () -> Unit,
