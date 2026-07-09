@@ -100,6 +100,8 @@ Alternatively, you can follow these steps:
     [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
     to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 
+Note, however that functions inherited from [`CopySpec`][CopySpec], such as [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching],  [`eachFile`][Jar.eachFile], or others, disable the output caching.
+
 Optional steps:
 
 - Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
@@ -640,3 +642,4 @@ You can then run the task to scan each entry on the classpath and print any matc
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
 [mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
+[CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
