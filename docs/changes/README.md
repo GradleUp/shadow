@@ -13,6 +13,10 @@
 - **POTENTIALLY BREAKING:** Apply `@ShadowDsl` to `ShadowJar`, `ResourceTransformer`, `DependencyFilter`, and `Relocator`. ([#2090](https://github.com/GradleUp/shadow/pull/2090))  
   This restricts nested DSL configuration blocks from implicitly calling outer receiver APIs in Kotlin script files.
 
+### Fixed
+
+- Validate ZIP entry names to prevent Zip Slip path traversal.
+
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06
 
 ### Fixed

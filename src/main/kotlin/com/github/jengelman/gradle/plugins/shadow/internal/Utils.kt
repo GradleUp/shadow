@@ -7,6 +7,7 @@ import java.nio.charset.Charset
 import java.util.Properties
 import java.util.jar.Attributes.Name as JarAttributeName
 import org.apache.tools.zip.ZipEntry
+import org.gradle.api.GradleException
 
 /** Known as `Main-Class` in the manifest file. */
 internal val mainClassAttributeKey = JarAttributeName.MAIN_CLASS.toString()
@@ -32,8 +33,12 @@ internal inline fun zipEntry(
   preserveLastModified: Boolean = true,
   lastModified: Long = -1,
   block: ZipEntry.() -> Unit = {},
-): ZipEntry =
-  ZipEntry(name).apply {
+): ZipEntry {
+  if (name.split('/', '\\').any { it == ".." }) {
+    throw GradleException("Malicious ZIP entry containing path traversal sequence: $name")
+  }
+
+  return ZipEntry(name).apply {
     if (preserveLastModified) {
       if (lastModified >= 0) {
         time = lastModified
@@ -43,6 +48,7 @@ internal inline fun zipEntry(
     }
     block()
   }
+}
 
 internal fun Properties.inputStream(
   charset: Charset = Charsets.ISO_8859_1,
