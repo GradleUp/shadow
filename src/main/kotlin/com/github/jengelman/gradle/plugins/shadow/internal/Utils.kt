@@ -39,13 +39,12 @@ internal inline fun zipEntry(
   }
 
   return ZipEntry(name).apply {
-    if (preserveLastModified) {
-      if (lastModified >= 0) {
-        time = lastModified
+    time =
+      if (preserveLastModified && lastModified >= 0) {
+        lastModified
+      } else {
+        CONSTANT_TIME_FOR_ZIP_ENTRIES
       }
-    } else {
-      time = CONSTANT_TIME_FOR_ZIP_ENTRIES
-    }
     block()
   }
 }
