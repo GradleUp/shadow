@@ -30,7 +30,7 @@ androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0"
 ktfmt = "com.facebook:ktfmt:0.64"
 r8 = "com.android.tools:r8:9.1.31"
 
-junit-bom = "org.junit:junit-bom:6.1.1"
+junit-bom = "org.junit:junit-bom:6.1.2"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 
 [plugins]
