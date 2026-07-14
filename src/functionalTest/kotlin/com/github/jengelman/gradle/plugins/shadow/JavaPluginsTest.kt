@@ -825,7 +825,7 @@ class JavaPluginsTest : BasePluginTest() {
           minimize {
             r8 {}
           }
-          doLast {
+          doFirst {
             assert $customShadowJar.get().r8Classpath.files.empty
           }
         }
