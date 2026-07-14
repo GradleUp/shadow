@@ -26,12 +26,12 @@ class ZipEntryValidationTest {
   fun propertiesInputStreamUsesRequestedCharsetAndComments() {
     val properties = Properties().apply { setProperty("greeting", "你好") }
 
-    val content = properties.inputStream(StandardCharsets.UTF_8, "header").reader().readText()
+    val charset = StandardCharsets.UTF_16
+    val bytes = properties.inputStream(charset, "header").readBytes()
+    val content = String(bytes, charset)
 
     assertThat(content.startsWith("#header")).isTrue()
-    assertThat(content)
-      .isEqualTo(content.toByteArray(StandardCharsets.UTF_8).toString(StandardCharsets.UTF_8))
-    val loaded = Properties().apply { load(content.reader()) }
+    val loaded = Properties().apply { load(bytes.inputStream().reader(charset)) }
     assertThat(loaded.getProperty("greeting")).isEqualTo("你好")
   }
 

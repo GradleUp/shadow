@@ -54,7 +54,7 @@ class DuplicatesStrategyCheckerTest {
     try {
       ResourceTransformer.checkDupStrategy(false, noOpDelegate<FileTreeElement>())
       ResourceTransformer.checkDupStrategy(true, noOpDelegate<FileTreeElement>())
-      DuplicatesStrategy.entries.forEach { strategy ->
+      DuplicatesStrategy.values().forEach { strategy ->
         val details =
           object : FileCopyDetails by noOpDelegate() {
             override fun getPath(): String = "duplicate.txt"
@@ -63,7 +63,7 @@ class DuplicatesStrategyCheckerTest {
           }
         ResourceTransformer.checkDupStrategy(true, details)
       }
-      assertThat(invocationCount).isEqualTo(2 + DuplicatesStrategy.entries.size)
+      assertThat(invocationCount).isEqualTo(2 + DuplicatesStrategy.values().size)
     } finally {
       onCheckDupStrategyInvoked = null
     }
