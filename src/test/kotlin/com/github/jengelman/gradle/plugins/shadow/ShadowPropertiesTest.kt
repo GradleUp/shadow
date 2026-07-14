@@ -64,6 +64,7 @@ class ShadowPropertiesTest {
       assertThat(tasks.findByName(SHADOW_JAR_TASK_NAME)).isNull()
 
       with(extensions.getByType(ShadowExtension::class.java)) {
+        assertThat(addExcludedDependenciesToShadowConfiguration.get()).isFalse()
         assertThat(addShadowVariantIntoJavaComponent.get()).isTrue()
         assertThat(addTargetJvmVersionAttribute.get()).isTrue()
         assertThat(bundlingAttribute.get()).isEqualTo(Bundling.SHADOWED)

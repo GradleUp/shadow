@@ -6,6 +6,13 @@
 ### Added
 
 - Extract R8 rules from dependency JARs when using `minimize { r8 { ... } }`. ([#2089](https://github.com/GradleUp/shadow/pull/2089))
+- Add an opt-in option to add excluded dependencies into `shadow` configuration. ([#2106](https://github.com/GradleUp/shadow/pull/2106))  
+  ```kotlin
+  shadow {
+    // This is disabled by default.
+    addExcludedDependenciesToShadowConfiguration = true
+  }
+  ```
 
 ### Changed
 

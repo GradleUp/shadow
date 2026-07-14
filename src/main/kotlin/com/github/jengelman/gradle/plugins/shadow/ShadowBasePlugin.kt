@@ -16,6 +16,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
       with(extensions.create(EXTENSION_NAME, ShadowExtension::class.java)) {
+        addExcludedDependenciesToShadowConfiguration.convention(false)
         addShadowVariantIntoJavaComponent.convention(true)
         addTargetJvmVersionAttribute.convention(true)
         bundlingAttribute.convention(Bundling.SHADOWED)

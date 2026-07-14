@@ -157,11 +157,30 @@ When configuring publishing with the Shadow plugin, the dependencies in the `sha
 configuration, are translated to become `RUNTIME` scoped dependencies of the
 published artifact.
 
-No other dependencies are automatically configured for inclusion in the POM file.
-For example, excluded dependencies are **not** automatically added to the POM file or
-if the configuration for merging are modified by specifying
-`shadowJar.configurations = [configurations.myConfiguration]`, there is no automatic
-configuration of the POM file.
+By default, no other dependencies are automatically configured for inclusion in the POM file.
+You can opt in to adding dependencies excluded by `shadowJar.dependencies` to the `shadow`
+configuration. They are added as non-transitive dependencies so that their own dependencies,
+which may already be merged into the shadowed JAR, are not exposed to consumers again.
+
+=== "Kotlin"
+
+    ```kotlin
+    shadow {
+      addExcludedDependenciesToShadowConfiguration = true
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    shadow {
+      addExcludedDependenciesToShadowConfiguration = true
+    }
+    ```
+
+If the configuration for merging is modified by specifying
+`shadowJar.configurations = [configurations.myConfiguration]`, the excluded dependencies from
+that configuration are also added when this option is enabled.
 
 This automatic configuration occurs _only_ when using the above methods for
 configuring publishing. If this behavior is not desirable, then publishing **must**

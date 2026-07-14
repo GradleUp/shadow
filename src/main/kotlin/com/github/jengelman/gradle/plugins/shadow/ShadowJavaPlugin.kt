@@ -50,6 +50,26 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
 
   protected open fun Project.configureConfigurations() {
     val shadowConfig = configurations.shadow
+
+    shadowConfig.configure { configuration ->
+      configuration.dependencies.addAllLater(
+        shadow.addExcludedDependenciesToShadowConfiguration.flatMap { enabled ->
+          if (!enabled) return@flatMap provider { emptyList() }
+
+          tasks.shadowJar.map { shadowJar ->
+            val includedFiles = shadowJar.includedDependencies.files
+            shadowJar.configurations
+              .get()
+              .flatMap { it.resolvedConfiguration.resolvedArtifacts }
+              .filterNot { it.file in includedFiles }
+              .map { it.moduleVersion.id.toString() }
+              .distinct()
+              .map(dependencies::create)
+          }
+        }
+      )
+    }
+
     val compileClasspathConfig =
       configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
         compileClasspath.extendsFromCompat(shadowConfig)

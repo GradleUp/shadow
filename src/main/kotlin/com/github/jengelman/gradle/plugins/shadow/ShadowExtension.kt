@@ -6,6 +6,16 @@ import org.gradle.api.provider.Property
 
 public interface ShadowExtension {
   /**
+   * If `true`, dependencies excluded from the shadowed JAR by its dependency filter are added to
+   * the `shadow` configuration as non-transitive dependencies. This makes them available to
+   * consumers of the published shadowed component without also pulling in dependencies that were
+   * merged into the JAR.
+   *
+   * Defaults to `false`.
+   */
+  public val addExcludedDependenciesToShadowConfiguration: Property<Boolean>
+
+  /**
    * If `true`, publishes the [ShadowJavaPlugin.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME] as an
    * optional variant of the `java` component. This affects how consumers resolve the published
    * artifact.
