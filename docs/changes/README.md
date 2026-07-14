@@ -16,6 +16,7 @@
 ### Fixed
 
 - Validate ZIP entry names to prevent Zip Slip path traversal.
+- Avoid resolving unused R8 dependency. ([#2101](https://github.com/GradleUp/shadow/pull/2101))
 
 ## [9.5.1](https://github.com/GradleUp/shadow/releases/tag/9.5.1) - 2026-07-06
 
