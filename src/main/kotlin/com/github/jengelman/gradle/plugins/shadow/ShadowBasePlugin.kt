@@ -25,8 +25,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
       configurations.create(CONFIGURATION_NAME) {
         it.description = "Specify runtime dependencies that are not merged into the final JAR."
       }
-      @Suppress("EagerGradleConfiguration") // this should be created eagerly.
-      configurations.create(R8_CONFIGURATION_NAME) {
+      configurations.register(R8_CONFIGURATION_NAME) {
         it.description = "R8 executable used by ShadowJar R8 minimization."
         it.isCanBeConsumed = false
         it.isCanBeResolved = true
