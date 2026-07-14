@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import com.github.jengelman.gradle.plugins.shadow.BuildConfig.DEFAULT_R8_DEPENDENCY
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -29,6 +30,9 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
         it.description = "R8 executable used by ShadowJar R8 minimization."
         it.isCanBeConsumed = false
         it.isCanBeResolved = true
+        it.defaultDependencies { dependencies ->
+          dependencies.add(project.dependencies.create(DEFAULT_R8_DEPENDENCY))
+        }
       }
     }
 
