@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.BuildConfig.DEFAULT_R8_DEPENDENCY
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.R8_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
@@ -152,7 +153,9 @@ public abstract class ShadowJar : Jar() {
   public open val r8Classpath: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
       if (enabled && tool == MinimizeTool.R8) {
-        project.configurations.findByName(R8_CONFIGURATION_NAME) ?: project.files()
+        project.configurations.getByName(R8_CONFIGURATION_NAME).defaultDependencies { deps ->
+          deps.add(project.dependencies.create(DEFAULT_R8_DEPENDENCY))
+        }
       } else {
         emptySet()
       }
