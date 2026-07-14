@@ -101,8 +101,11 @@ class UnusedTrackerTest {
       if (classpath != null) addAll(listOf("-classpath", classpath.absolutePath))
       addAll(sourceFiles.map(File::getAbsolutePath))
     }
-    val result =
-      ToolProvider.getSystemJavaCompiler().run(null, null, null, *arguments.toTypedArray())
+    val compiler =
+      requireNotNull(ToolProvider.getSystemJavaCompiler()) {
+        "No system Java compiler available. Run tests on a JDK (not a JRE)."
+      }
+    val result = compiler.run(null, null, null, *arguments.toTypedArray())
     assertThat(result).isEqualTo(0)
   }
 }
