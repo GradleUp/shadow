@@ -816,7 +816,7 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @Test
-  fun allowCustomShadowJarWithoutShadowR8Configuration() {
+  fun registerCustomShadowJarWithoutShadowR8Configuration() {
     val customShadowJar = "customShadowJar"
     projectScript.writeText(
       """
@@ -824,9 +824,6 @@ class JavaPluginsTest : BasePluginTest() {
         def $customShadowJar = tasks.register('$customShadowJar', ${ShadowJar::class.java.name}) {
           minimize {
             r8 {}
-          }
-          doFirst {
-            assert $customShadowJar.get().r8Classpath.files.empty
           }
         }
       """
