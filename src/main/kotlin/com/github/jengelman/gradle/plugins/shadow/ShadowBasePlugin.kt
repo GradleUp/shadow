@@ -28,6 +28,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
       configurations.register(R8_CONFIGURATION_NAME) {
         it.description = "R8 executable used by ShadowJar R8 minimization."
         it.isCanBeConsumed = false
+        // Defer the dependency resolving.
         it.isCanBeResolved = false
         it.defaultDependencies { dependencies ->
           dependencies.add(project.dependencies.create(DEFAULT_R8_DEPENDENCY))
