@@ -104,8 +104,9 @@ class UnusedTrackerTest {
     val compiler = ToolProvider.getSystemJavaCompiler()
     org.junit.jupiter.api.Assumptions.assumeTrue(
       compiler != null,
-      "JDK (javax.tools.JavaCompiler) is required to compile test sources"
+      "JDK (javax.tools.JavaCompiler) is required to compile test sources",
     )
     val result = compiler!!.run(null, null, null, *arguments.toTypedArray())
     assertThat(result).isEqualTo(0)
+  }
 }
