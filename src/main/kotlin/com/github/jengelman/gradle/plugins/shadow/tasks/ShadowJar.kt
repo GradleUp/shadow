@@ -152,7 +152,7 @@ public abstract class ShadowJar : Jar() {
   public open val r8Classpath: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
       if (enabled && tool == MinimizeTool.R8) {
-        project.configurations.findByName(R8_CONFIGURATION_NAME) ?: project.files()
+        project.configurations.getByName(R8_CONFIGURATION_NAME).also { it.isCanBeResolved = true }
       } else {
         emptySet()
       }
@@ -340,9 +340,6 @@ public abstract class ShadowJar : Jar() {
   public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
     minimizeJar.set(true)
     action.execute(minimizeSpec)
-    if (minimizeSpec.tool.get() == MinimizeTool.R8) {
-      project.configurations.named(R8_CONFIGURATION_NAME) { it.isCanBeResolved = true }
-    }
   }
 
   /** Extra dependency operations to be applied in the shadow steps. */

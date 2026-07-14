@@ -52,39 +52,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
-  @Test
-  fun doNotResolveR8WhenLockingAllConfigurations() {
-    projectScript.appendText(
-      """
-        dependencyLocking {
-          lockAllConfigurations()
-        }
-
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-
-        tasks.register('resolveAndLockAll') {
-          notCompatibleWithConfigurationCache('Filters configurations at execution time')
-          doFirst {
-            assert gradle.startParameter.writeDependencyLocks
-          }
-          doLast {
-            configurations.toList().findAll { it.canBeResolved }.each { it.resolve() }
-          }
-        }
-      """
-        .trimIndent()
-    )
-
-    runWithSuccess("resolveAndLockAll", "--write-locks")
-
-    assertThat(path("gradle.lockfile").toFile().readText()).all {
-      contains("junit:junit:3.8.2")
-      doesNotContain("com.android.tools:r8")
-    }
-  }
-
   @Issue("https://github.com/GradleUp/shadow/issues/1766")
   @Test
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
@@ -1280,6 +1247,40 @@ class JavaPluginsTest : BasePluginTest() {
     val result = runWithSuccess(shadowJarPath)
 
     assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+  }
+
+  @Issue("https://github.com/GradleUp/shadow/issues/2099")
+  @Test
+  fun doNotResolveR8WhenLockingAllConfigurations() {
+    projectScript.appendText(
+      """
+      dependencyLocking {
+        lockAllConfigurations()
+      }
+
+      dependencies {
+        implementation 'junit:junit:3.8.2'
+      }
+
+      tasks.register('resolveAndLockAll') {
+        notCompatibleWithConfigurationCache('Filters configurations at execution time')
+        doFirst {
+          assert gradle.startParameter.writeDependencyLocks
+        }
+        doLast {
+          configurations.toList().findAll { it.canBeResolved }.each { it.resolve() }
+        }
+      }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess("resolveAndLockAll", "--write-locks")
+
+    assertThat(path("gradle.lockfile").toFile().readText()).all {
+      contains("junit:junit:3.8.2")
+      doesNotContain("com.android.tools:r8")
+    }
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {
